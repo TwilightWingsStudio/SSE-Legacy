@@ -1,7 +1,15 @@
-# Serious Engine
+# Serious Sam Evolution
 ========================
 
-This is the source code for Serious Engine v.1.10, including the following projects:
+This is the non-official fork of Serious-Engine.
+This fork will be always synchronized with the official repository - https://github.com/Croteam-official/Serious-Engine.
+
+This fork created for extra features which are focused on improving gameplay stability and adding more opportunities for mapping and modding.
+For some reasons these features non added into Official repository.
+Information about features you can find on our wiki - https://github.com/zcaliptium/Serious-Engine/wiki.
+
+========================
+Here is Serious Engine v.1.10 source code, including the following projects:
 
 * `DedicatedServer`
 * `Ecc` The *Entity Class Compiler*, a custom build tool used to compile *.es files
