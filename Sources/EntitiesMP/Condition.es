@@ -99,7 +99,7 @@ functions:
     ETrigger eTrigger = ((ETrigger &) ee);
 
     if (m_bCaused1 && eTrigger.penCaused) {
-      m_penIfCondition1=eTrigger.penCaused;
+      m_penIfCondition1 = eTrigger.penCaused;
     }
 
     if (m_bCaused2 && eTrigger.penCaused) {
@@ -142,15 +142,15 @@ functions:
       if (m_eCT1 == ECT_ENTITY) {
         if (m_penIfCondition1->PropertyForName(m_strProperty1) != NULL) {
           SLONG offset1 = m_penIfCondition1->PropertyForName(m_strProperty1)->ep_slOffset; 
-          if (m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType==CEntityProperty::EPT_FLOAT||m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType==CEntityProperty::EPT_INDEX||m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType==CEntityProperty::EPT_RANGE||m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType==CEntityProperty::EPT_BOOL||m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType==CEntityProperty::EPT_ANGLE) {
-            fValue = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penIfCondition1)+offset1)); 
+          if (m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_FLOAT||m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_INDEX||m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_RANGE||m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_BOOL||m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_ANGLE) {
+            fValue = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1)); 
             bf1 = TRUE;
-          } else if (m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType==CEntityProperty::EPT_ENTITYPTR) {
-            penPointer = *((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penIfCondition1)+offset1)); 
-            bp1=TRUE;
-          } else if (m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType==CEntityProperty::EPT_STRING||m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType==CEntityProperty::EPT_FILENAME) {
-            strValue = *((CTString *)(((UBYTE *)(CEntity*)&*m_penIfCondition1)+offset1)); 
-            bs1=TRUE;
+          } else if (m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_ENTITYPTR) {
+            penPointer = *((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1)); 
+            bp1 = TRUE;
+          } else if (m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_STRING || m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_FILENAME) {
+            strValue = *((CTString *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1)); 
+            bs1 = TRUE;
           }
         }
       } else if (m_eCT1 == ECT_POSX) {
@@ -171,7 +171,7 @@ functions:
       } else if (m_eCT1 == ECT_ROTB) {
         fValue = m_penIfCondition1->GetPlacement().pl_OrientationAngle(3);
         bf1 = TRUE;
-      } else if (m_penIfCondition1->GetFlags()&ENF_ALIVE&&m_eCT1 == ECT_HEALTH) {
+      } else if (m_penIfCondition1->GetFlags()&ENF_ALIVE && m_eCT1 == ECT_HEALTH) {
         fValue = ((CLiveEntity&)*m_penIfCondition1).en_fHealth;
         bf1 = TRUE;
       } else if (IsDerivedFromClass(m_penIfCondition1,"MovableEntity")) {
@@ -210,20 +210,20 @@ functions:
       } else {
         be = TRUE;
         if (m_bDebug) {
-          CPrintF(TRANS("%s 1: Don't use speeds on not moving entities or health on entities without health\n"),m_strName);
+          CPrintF(TRANS("%s 1 : Don't use speeds on not moving entities or health on entities without health\n"),m_strName);
         }
       }
       if (m_penIfCondition2) {
         if (m_eCT2 == ECT_ENTITY) {
           if (m_penIfCondition2->PropertyForName(m_strProperty2) != NULL) {
             SLONG offset2=m_penIfCondition2->PropertyForName(m_strProperty2)->ep_slOffset; 
-            if (m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType==CEntityProperty::EPT_FLOAT||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType==CEntityProperty::EPT_INDEX||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType==CEntityProperty::EPT_RANGE||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType==CEntityProperty::EPT_BOOL||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType==CEntityProperty::EPT_ANGLE) {
+            if (m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_FLOAT||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_INDEX||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_RANGE||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_BOOL||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_ANGLE) {
               fValue2 = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2)); 
               bf2 = TRUE;
-            } else if (m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType==CEntityProperty::EPT_ENTITYPTR) {
+            } else if (m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_ENTITYPTR) {
               penPointer2 = *((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2)); 
               bp2=TRUE;
-            } else if (m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType==CEntityProperty::EPT_STRING||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType==CEntityProperty::EPT_FILENAME) {
+            } else if (m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_STRING||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_FILENAME) {
               strValue2 = *((CTString *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2)); 
               bs2=TRUE;
             }
@@ -284,14 +284,14 @@ functions:
         } else {
           be = true;
           if (m_bDebug) {
-            CPrintF(TRANS("%s 2: Don't use speeds on not moving entities or health on entities without health\n"),m_strName);
+            CPrintF(TRANS("%s 2 : Don't use speeds on not moving entities or health on entities without health\n"),m_strName);
           }
         }
       } else {
         CPrintF(TRANS("%sSet the second condition target goddammit\n"),GetName());
       }
       
-      //FLOAT
+      // FLOAT
       if (bf1 && bf2) {
         FLOAT rAbs1 = fValue;
         FLOAT rAbs2 = fValue2;
@@ -304,76 +304,77 @@ functions:
         }
         if (m_eCondition == EC_DIFFERENT) {
           if (rAbs1 != rAbs2) {
-            bResult=TRUE;
+            bResult = TRUE;
           }
         }
         if (m_eCondition == EC_LARGER) {
           if (rAbs1 > rAbs2) {
-            bResult=TRUE;
+            bResult = TRUE;
           }
         }
         if (m_eCondition == EC_LARGER_SAME) {
           if (rAbs1 >= rAbs2) {
-            bResult=TRUE;
+            bResult = TRUE;
           }
         }
         if (m_eCondition == EC_SMALLER) {
           if (rAbs1 < rAbs2) {
-            bResult=TRUE;
+            bResult = TRUE;
           }
         }
         if (m_eCondition == EC_SMALLER_SAME) {
           if (rAbs1 <= rAbs2) {
-            bResult=TRUE;
+            bResult = TRUE;
           }
         }
       } else if (bf1) {
         if (fValue > 0) {
-          bResult=TRUE;
+          bResult = TRUE;
         }
-      } else if (bp1&&bp2) {
+      // POINTER
+      } else if (bp1 && bp2) {
         if (penPointer) {
           if (penPointer2) {
             if (m_eCondition == EC_SAME) {
-              if (penPointer==penPointer2) {
-                bResult=TRUE;
+              if (penPointer == penPointer2) {
+                bResult = TRUE;
               }
             }
             if (m_eCondition == EC_DIFFERENT) {
-              if (penPointer!=penPointer2) {
-                bResult=TRUE;
+              if (penPointer != penPointer2) {
+                bResult = TRUE;
               }
             }
           } else {
             if (m_bDebug) {
-              CPrintF(TRANS("%s:Second Condition Pointer not set, checking if %s.%s exists instead\n"),m_strName,((CEntity&)*m_penIfCondition1).GetName(),m_strProperty1);
+              CPrintF(TRANS("%s : Second Condition Pointer not set, checking if %s.%s exists instead\n"),m_strName,((CEntity&)*m_penIfCondition1).GetName(),m_strProperty1);
             }
             if (penPointer!=NULL) {
-              bResult=TRUE;
+              bResult = TRUE;
             }
           }
         }
     
-      //String
+      // String
       } else if (bs1) {
         if (bs2) {
           if (m_eCondition == EC_SAME) {
             if (strValue==strValue2) {
-              bResult=TRUE;
+              bResult = TRUE;
             }
           }
           if (m_eCondition == EC_DIFFERENT) {
             if (strValue != strValue2) {
-              bResult=TRUE;
+              bResult = TRUE;
             }
           }
         } else {
           if (strValue != "") {
-            bResult=TRUE;
+            bResult = TRUE;
           }
         }
         
-      //other
+      // Other
       } else {
         be = TRUE;
         if (m_bDebug) {
@@ -390,35 +391,35 @@ functions:
     if (bResult) {
       if (m_penIfTarget) {
         if (m_bDebug) {
-          CPrintF(TRANS("%s: Triggering if Target:%s\n"),m_strName,m_penIfTarget->GetName());
+          CPrintF(TRANS("%s : Triggering if Target: %s\n"),m_strName,m_penIfTarget->GetName());
         }
         m_penIfTarget->SendEvent(ETrigger());
       } else if (m_bDebug) {
-        CPrintF(TRANS("%s: Result=TRUE, but no if Target to trigger\n"),m_strName);
+        CPrintF(TRANS("%s : Result=TRUE, but no if Target to trigger\n"),m_strName);
       }
     } else {
       if (m_penElseTarget) {
         if (m_bDebug) {
-          CPrintF(TRANS("%s: Triggering else Target:%s\n"),m_strName,m_penElseTarget->GetName());
+          CPrintF(TRANS("%s : Triggering else Target:%s\n"),m_strName,m_penElseTarget->GetName());
         }
         m_penElseTarget->SendEvent(ETrigger());
       } else if (m_bDebug) {
-        CPrintF(TRANS("%s: Result=FALSE, but no else Target to trigger\n"),m_strName);
+        CPrintF(TRANS("%s : Result=FALSE, but no else Target to trigger\n"),m_strName);
       }
     }
   }
    
   BOOL HandleEvent(const CEntityEvent &ee)
   { 
-    if (ee.ee_slEvent==EVENTCODE_ETrigger) {
+    if (ee.ee_slEvent == EVENTCODE_ETrigger) {
       HandleETrigger(ee);
     }
 
-    if (ee.ee_slEvent==EVENTCODE_EActivate) {
+    if (ee.ee_slEvent== EVENTCODE_EActivate) {
       m_bActive = TRUE;
     }
 
-    if (ee.ee_slEvent==EVENTCODE_EDeactivate) {
+    if (ee.ee_slEvent == EVENTCODE_EDeactivate) {
       m_bActive = FALSE;
     }
 

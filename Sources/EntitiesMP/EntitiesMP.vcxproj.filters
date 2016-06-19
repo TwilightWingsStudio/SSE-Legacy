@@ -550,6 +550,9 @@
     <ClCompile Include="Condition.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BulletShooter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1506,6 +1509,12 @@
     <ClInclude Include="Condition_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BulletShooter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BulletShooter_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2384,6 +2393,9 @@
       <Filter>Class Files\Tools</Filter>
     </None>
     <None Include="Condition.es">
+      <Filter>Class Files\Tools</Filter>
+    </None>
+    <None Include="BulletShooter.es">
       <Filter>Class Files\Tools</Filter>
     </None>
   </ItemGroup>

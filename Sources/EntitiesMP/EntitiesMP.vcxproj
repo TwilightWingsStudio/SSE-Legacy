@@ -176,6 +176,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BulletShooter.cpp" />
     <ClCompile Include="Common\Common.cpp" />
     <ClCompile Include="Common\EmanatingParticles.cpp" />
     <ClCompile Include="Common\HUD.cpp" />
@@ -394,6 +395,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="WorldSettingsController.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BulletShooter.h" />
+    <ClInclude Include="BulletShooter_tables.h" />
     <ClInclude Include="Common\Common.h" />
     <ClInclude Include="Common\Flags.h" />
     <ClInclude Include="Common\GameInterface.h" />
@@ -2684,6 +2687,19 @@ ecc EntitiesMP/%(Filename).es </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
 ecc EntitiesMP/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="BulletShooter.es">
+      <FileType>Document</FileType>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
 ecc EntitiesMP/%(Filename).es </Command>
     </CustomBuild>
