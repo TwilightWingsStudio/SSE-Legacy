@@ -559,6 +559,9 @@
     <ClCompile Include="RayCaster.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1533,6 +1536,12 @@
     <ClInclude Include="RayCaster_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerInfo_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2421,6 +2430,9 @@
     </None>
     <None Include="RayCaster.es">
       <Filter>Class Files\Tools</Filter>
+    </None>
+    <None Include="PlayerInfo.es">
+      <Filter>Class Files\Players</Filter>
     </None>
   </ItemGroup>
 </Project>

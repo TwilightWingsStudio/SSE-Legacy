@@ -140,15 +140,19 @@ functions:
       BOOL bf1, bf2, bp1, bp2, bs1, bs2;
       
       if (m_eCT1 == ECT_ENTITY) {
-        if (m_penIfCondition1->PropertyForName(m_strProperty1) != NULL) {
-          SLONG offset1 = m_penIfCondition1->PropertyForName(m_strProperty1)->ep_slOffset; 
-          if (m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_FLOAT||m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_INDEX||m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_RANGE||m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_BOOL||m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_ANGLE) {
+        CEntityProperty* pProperty = m_penIfCondition1->PropertyForName(m_strProperty1);
+
+        if (pProperty != NULL) {
+          SLONG offset1 = pProperty->ep_slOffset;
+          CEntityProperty::PropertyType eptType = pProperty->ep_eptType;
+
+          if (eptType == CEntityProperty::EPT_FLOAT || eptType == CEntityProperty::EPT_INDEX || eptType == CEntityProperty::EPT_RANGE || eptType == CEntityProperty::EPT_BOOL || eptType == CEntityProperty::EPT_ANGLE) {
             fValue = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1)); 
             bf1 = TRUE;
-          } else if (m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_ENTITYPTR) {
+          } else if (eptType== CEntityProperty::EPT_ENTITYPTR) {
             penPointer = *((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1)); 
             bp1 = TRUE;
-          } else if (m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_STRING || m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType == CEntityProperty::EPT_FILENAME) {
+          } else if (eptType == CEntityProperty::EPT_STRING || eptType == CEntityProperty::EPT_FILENAME) {
             strValue = *((CTString *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1)); 
             bs1 = TRUE;
           }
@@ -213,19 +217,24 @@ functions:
           CPrintF(TRANS("%s 1 : Don't use speeds on not moving entities or health on entities without health\n"),m_strName);
         }
       }
+
       if (m_penIfCondition2) {
         if (m_eCT2 == ECT_ENTITY) {
-          if (m_penIfCondition2->PropertyForName(m_strProperty2) != NULL) {
-            SLONG offset2=m_penIfCondition2->PropertyForName(m_strProperty2)->ep_slOffset; 
-            if (m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_FLOAT||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_INDEX||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_RANGE||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_BOOL||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_ANGLE) {
+          CEntityProperty* pProperty2 = m_penIfCondition2->PropertyForName(m_strProperty2);
+
+          if (pProperty2 != NULL) {
+            SLONG offset2 = pProperty2->ep_slOffset;
+            CEntityProperty::PropertyType eptType = pProperty2->ep_eptType;
+
+            if (eptType == CEntityProperty::EPT_FLOAT || eptType == CEntityProperty::EPT_INDEX || eptType == CEntityProperty::EPT_RANGE || eptType == CEntityProperty::EPT_BOOL || eptType == CEntityProperty::EPT_ANGLE) {
               fValue2 = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2)); 
               bf2 = TRUE;
-            } else if (m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_ENTITYPTR) {
+            } else if (eptType == CEntityProperty::EPT_ENTITYPTR) {
               penPointer2 = *((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2)); 
-              bp2=TRUE;
-            } else if (m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_STRING||m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType == CEntityProperty::EPT_FILENAME) {
+              bp2 = TRUE;
+            } else if (eptType == CEntityProperty::EPT_STRING || eptType == CEntityProperty::EPT_FILENAME) {
               strValue2 = *((CTString *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2)); 
-              bs2=TRUE;
+              bs2 = TRUE;
             }
           }
         } else if (m_eCT2 == ECT_POSX) {
@@ -288,7 +297,7 @@ functions:
           }
         }
       } else {
-        CPrintF(TRANS("%sSet the second condition target goddammit\n"),GetName());
+        CPrintF(TRANS("%s : Set the second condition target goddammit\n"), GetName());
       }
       
       // FLOAT

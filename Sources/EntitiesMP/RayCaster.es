@@ -24,7 +24,6 @@ thumbnail "Thumbnails\\RayCaster.tbn";
 features  "HasName", "HasTarget", "IsTargetable";
 
 properties:
-
    1 CTString m_strName          "Name" 'N' = "Ray Caster",
    3 CTString m_strDescription = "",
    2 CEntityPointer m_penTarget  "Target" 'T' COLOR(C_BROWN|0xFF),
@@ -89,7 +88,7 @@ procedures:
             // perform first cast
             GetWorld()->CastRay(crRay);  
           }
-          if (crRay.cr_penHit&&crRay.cr_fHitDistance<1.0f&&!(crRay.cr_penHit->GetRenderType()!= RT_BRUSH)){
+          if (crRay.cr_penHit && crRay.cr_fHitDistance < 1.0f && !(crRay.cr_penHit->GetRenderType() != RT_BRUSH)){
             // next casts
             GetWorld()->ContinueCast(crRay);
           } else {
