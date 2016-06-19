@@ -65,18 +65,18 @@ procedures:
         }
         
         on (EStart eStart) : {
-            if(!m_bPlayer) {
+          if (!m_bPlayer) {
             //remove all parented stuff from player
             {FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten) {
               CEntity *pen = iten;
-              if(pen){
-                if(pen->GetParent() == eStart.penCaused){
+              if (pen) {
+                if (pen->GetParent() == eStart.penCaused) {
                   pen->SetParent(NULL);
                 }
               }
             }}
           } else {
-            if(eStart.penCaused != NULL){
+            if (eStart.penCaused != NULL) {
               eStart.penCaused->SetParent(NULL);
             }
           }
@@ -84,6 +84,7 @@ procedures:
         }
         on (ETrigger eTrigger) : {
           if (!m_penTarget) { resume;}
+
           CEntityPointer pen = m_penTarget;
           CEntityPointer penCaused = eTrigger.penCaused;
           CPlacement3D plWanted = pen->GetPlacement();
@@ -120,8 +121,7 @@ procedures:
           
           if (m_bCopy) {
             pen = GetWorld()->CopyEntityInWorld(*pen,
-              CPlacement3D(FLOAT3D(-32000.0F+FRnd()*200.0F, -32000.0F+FRnd()*200.0F, 0), ANGLE3D(0, 0, 0))
-            );
+              CPlacement3D(FLOAT3D(-32000.0F+FRnd()*200.0F, -32000.0F+FRnd()*200.0F, 0), ANGLE3D(0, 0, 0)));
           }
           
           pen->Teleport(plWanted, FALSE);

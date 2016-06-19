@@ -565,6 +565,9 @@
     <ClCompile Include="PlayerParenter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Explosion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1551,6 +1554,12 @@
     <ClInclude Include="PlayerParenter_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Explosion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Explosion_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2445,6 +2454,9 @@
     </None>
     <None Include="PlayerParenter.es">
       <Filter>Class Files\Players</Filter>
+    </None>
+    <None Include="Explosion.es">
+      <Filter>Class Files\Effects</Filter>
     </None>
   </ItemGroup>
 </Project>
