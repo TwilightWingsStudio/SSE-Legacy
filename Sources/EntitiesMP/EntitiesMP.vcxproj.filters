@@ -553,6 +553,9 @@
     <ClCompile Include="BulletShooter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PropertyChanger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1515,6 +1518,12 @@
     <ClInclude Include="BulletShooter_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PropertyChanger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertyChanger_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2396,6 +2405,9 @@
       <Filter>Class Files\Tools</Filter>
     </None>
     <None Include="BulletShooter.es">
+      <Filter>Class Files\Tools</Filter>
+    </None>
+    <None Include="PropertyChanger.es">
       <Filter>Class Files\Tools</Filter>
     </None>
   </ItemGroup>
