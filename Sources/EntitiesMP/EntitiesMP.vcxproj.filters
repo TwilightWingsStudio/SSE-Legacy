@@ -562,6 +562,9 @@
     <ClCompile Include="PlayerInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerParenter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1542,6 +1545,12 @@
     <ClInclude Include="PlayerInfo_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerParenter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerParenter_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2432,6 +2441,9 @@
       <Filter>Class Files\Tools</Filter>
     </None>
     <None Include="PlayerInfo.es">
+      <Filter>Class Files\Players</Filter>
+    </None>
+    <None Include="PlayerParenter.es">
       <Filter>Class Files\Players</Filter>
     </None>
   </ItemGroup>
