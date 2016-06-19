@@ -556,6 +556,9 @@
     <ClCompile Include="PropertyChanger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RayCaster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1524,6 +1527,12 @@
     <ClInclude Include="PropertyChanger_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RayCaster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RayCaster_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2408,6 +2417,9 @@
       <Filter>Class Files\Tools</Filter>
     </None>
     <None Include="PropertyChanger.es">
+      <Filter>Class Files\Tools</Filter>
+    </None>
+    <None Include="RayCaster.es">
       <Filter>Class Files\Tools</Filter>
     </None>
   </ItemGroup>
