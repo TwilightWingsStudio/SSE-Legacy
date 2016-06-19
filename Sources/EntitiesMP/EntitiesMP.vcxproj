@@ -374,6 +374,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="TouchField.cpp" />
     <ClCompile Include="Trigger.cpp" />
     <ClCompile Include="Twister.cpp" />
+    <ClCompile Include="VariableHolder.cpp" />
     <ClCompile Include="VoiceHolder.cpp" />
     <ClCompile Include="Walker.cpp" />
     <ClCompile Include="Watcher.cpp" />
@@ -688,6 +689,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="Trigger_tables.h" />
     <ClInclude Include="Twister.h" />
     <ClInclude Include="Twister_tables.h" />
+    <ClInclude Include="VariableHolder.h" />
+    <ClInclude Include="VariableHolder_tables.h" />
     <ClInclude Include="VoiceHolder.h" />
     <ClInclude Include="VoiceHolder_tables.h" />
     <ClInclude Include="Walker.h" />
@@ -2655,6 +2658,19 @@ ecc EntitiesMP/%(Filename).es </Command>
     <CustomBuild Include="..\..\Flesh\Data\Messages\Enemies\WalkerBig.txt" />
     <CustomBuild Include="..\..\Flesh\Data\Messages\Enemies\WalkerSmall.txt" />
     <CustomBuild Include="..\..\Flesh\Data\Messages\Enemies\Woman.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="VariableHolder.es">
+      <FileType>Document</FileType>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
