@@ -5,7 +5,7 @@ This is the non-official fork of Serious-Engine.
 This fork will be always synchronized with the official repository - https://github.com/Croteam-official/Serious-Engine.
 
 This fork created for extra features which are focused on improving gameplay stability and adding more opportunities for mapping and modding.
-For some reasons these features non added into Official repository.
+For some reasons these features not added into Official repository.
 Information about features you can find on our wiki - https://github.com/zcaliptium/Serious-Engine/wiki.
 
 ========================
