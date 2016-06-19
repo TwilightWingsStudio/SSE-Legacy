@@ -27,16 +27,16 @@ properties:
    1 CTString m_strName          "Name" 'N' = "Variable Holder",
      
    2 INDEX m_i1  "Index 01" = 0,
-   3 INDEX m_i2	 "Index 02" = 0,
+   3 INDEX m_i2  "Index 02" = 0,
    4 INDEX m_i3  "Index 03" = 0,
    5 INDEX m_i4  "Index 04" = 0,
-   6 INDEX m_i5	 "Index 05" = 0,
+   6 INDEX m_i5  "Index 05" = 0,
      
-  30 FLOAT m_f1  "Float 01" = 0.0f,
-  31 FLOAT m_f2  "Float 02" = 0.0f,
-  32 FLOAT m_f3  "Float 03" = 0.0f,
-  33 FLOAT m_f4  "Float 04" = 0.0f,
-  34 FLOAT m_f5  "Float 05" = 0.0f,
+  30 FLOAT m_f1  "Float 01" = 0.0F,
+  31 FLOAT m_f2  "Float 02" = 0.0F,
+  32 FLOAT m_f3  "Float 03" = 0.0F,
+  33 FLOAT m_f4  "Float 04" = 0.0F,
+  34 FLOAT m_f5  "Float 05" = 0.0F,
      
   60 CTString m_str1  "String 01" = "",
   61 CTString m_str2  "String 02" = "",

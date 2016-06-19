@@ -547,6 +547,9 @@
     <ClCompile Include="VariableHolder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Condition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1497,6 +1500,12 @@
     <ClInclude Include="VariableHolder_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Condition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Condition_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2372,6 +2381,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="VariableHolder.es">
+      <Filter>Class Files\Tools</Filter>
+    </None>
+    <None Include="Condition.es">
       <Filter>Class Files\Tools</Filter>
     </None>
   </ItemGroup>
