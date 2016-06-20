@@ -574,6 +574,9 @@
     <ClCompile Include="MovableBrush.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MBTeleporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1578,6 +1581,12 @@
     <ClInclude Include="MovableBrush_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MBTeleporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MBTeleporter_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2480,6 +2489,9 @@
       <Filter>Class Files\Tools</Filter>
     </None>
     <None Include="MovableBrush.es">
+      <Filter>Class Files\Brushes</Filter>
+    </None>
+    <None Include="MBTeleporter.es">
       <Filter>Class Files\Brushes</Filter>
     </None>
   </ItemGroup>
