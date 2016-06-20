@@ -79,13 +79,13 @@ procedures:
     } else if (IsOfClass(m_penMB, "Movable Brush")) {
       CMovableBrush mb = (CMovableBrush&)*m_penMB;
       
-      mb.m_fTransX = brush.m_fbTransX;
-      mb.m_fTransY = brush.m_fbTransY;
-      mb.m_fTransZ = brush.m_fbTransZ;
+      mb.m_fTransX = mb.m_fbTransX;
+      mb.m_fTransY = mb.m_fbTransY;
+      mb.m_fTransZ = mb.m_fbTransZ;
 
-      mb.m_fRotH = brush.m_fbRotH;
-      mb.m_fRotP = brush.m_fbRotP;
-      mb.m_fRotB = brush.m_fbRotB;
+      mb.m_fRotH = mb.m_fbRotH;
+      mb.m_fRotP = mb.m_fbRotP;
+      mb.m_fRotB = mb.m_fbRotB;
 
     } else if (IsOfClass(m_penMB, "Movable Model")) {
       CMovableModel mm = (CMovableModel&)*m_penMB;
