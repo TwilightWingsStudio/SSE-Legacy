@@ -571,6 +571,9 @@
     <ClCompile Include="MovableModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MovableBrush.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1569,6 +1572,12 @@
     <ClInclude Include="MovableModel_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MovableBrush.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MovableBrush_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2469,6 +2478,9 @@
     </None>
     <None Include="MovableModel.es">
       <Filter>Class Files\Tools</Filter>
+    </None>
+    <None Include="MovableBrush.es">
+      <Filter>Class Files\Brushes</Filter>
     </None>
   </ItemGroup>
 </Project>
