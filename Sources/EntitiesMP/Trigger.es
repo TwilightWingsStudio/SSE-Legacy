@@ -86,7 +86,7 @@ properties:
   
  106 BOOL m_bMessageForAll "Message for all Players" = FALSE,
  
- 110 TIME m_tmLastTriggered = 0.0f,
+ 110 FLOAT m_tmLastTriggered = 0.0f,
  111 FLOAT m_fMinTime           "Min Time between Trigs" = 0.0f,
  112 FLOAT m_fRandDelayFactor   "Random delay factor"    = 0.5F,
  113 FLOAT m_fWaitInternal = 1.0f,
@@ -170,11 +170,11 @@ functions:
       }
     }
 
-    if(m_strConsole!=""){
+    if (m_strConsoleMsg ! ="") {
       CPrintF(TRANS("%s\n"), m_strConsoleMsg);
     } 
 	
-    if(m_strCommand != "") {
+    if (m_strConsoleCmd != "") {
       _pShell->Execute(m_strConsoleCmd);
     }
 
