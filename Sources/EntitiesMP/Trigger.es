@@ -82,7 +82,7 @@ properties:
   95 BOOL m_bDebug        "Debug Messages" = FALSE,
   
  100 CTString m_strCausedOnlyByClass "Triggerable only by class" = "",
- 101 CTString m_strRangeClass  "Send Range Class" ="",
+ 101 CTString m_strRangeClass  "Send Range Class" = "",
   
  106 BOOL m_bMessageForAll "Message for all Players" = FALSE,
  
@@ -120,7 +120,7 @@ functions:
     slUsedMemory += m_strRangeClass.Length();
     slUsedMemory += m_strConsoleCmd.Length();
     slUsedMemory += m_strConsoleCmd.Length();
-    return slUsedMemory;
+	return slUsedMemory;
   }
 
   BOOL AdjustShadingParameters(FLOAT3D &vLightDirection, COLOR &colLight, COLOR &colAmbient){
@@ -262,6 +262,161 @@ procedures:
     return;
   };
 
+  Active() {
+    ASSERT(m_bActive);
+    // store count start value
+    m_iCountTmp = m_iCount;
+
+    //main loop
+    wait() {
+      on (EBegin) : { 
+        // if auto start send event on init
+        if (m_bAutoStart) {
+          if (m_eTType == TT_NORMAL) {
+            call SendEventToTargets();
+          } else if (m_eTType == TT_DELAYED) {
+            call Delayed();
+          } else if (m_eTType == TT_PROCEDURAL) {
+            call Procedural();
+          } else if (m_eTType == TT_RANDOM) {
+            call Random();
+          } else if (m_eTType == TT_DELRAND) {
+            call DelayedRandomly();
+          }
+        }
+        resume;
+      }
+
+      // re-roots start events as triggers
+      on (EStart eStart) : {
+        SendToTarget(this, EET_TRIGGER, eStart.penCaused);
+        resume;
+      }
+
+      // cascade trigger
+      on (ETrigger eTrigger) : {
+	    CPrintF("ETrigger!\n");
+        if(m_fMinTime > 0 && m_tmLastTriggered != 0 && (_pTimer->CurrentTick() - m_fMinTime) < m_tmLastTriggered){
+          if(m_bDebug){
+            CPrintF(TRANS("%s: received Trigger event, but min Time was not reached\n"), m_strName);
+          }
+          stop;
+        }
+
+        if(!(m_strCausedOnlyByClass == "" || IsOfClass(eTrigger.penCaused, m_strCausedOnlyByClass))){
+          if(m_bDebug){
+            CPrintF(TRANS("%s: received Trigger event, but from wrong class\n"),m_strName);
+          }
+          resume;
+        }
+
+        m_tmLastTriggered = _pTimer->CurrentTick();
+    
+        if(m_bDebug){
+          if(eTrigger.penCaused != NULL){
+            CPrintF(TRANS("%s triggered through %s\n"), m_strName,eTrigger.penCaused->GetName());
+          }else{
+            CPrintF(TRANS("%s triggered through unknown entity\n"), m_strName);
+          }
+        }
+		
+        if (m_ctMaxTrigs > 0 || m_ctMaxTrigs == -1) {
+          m_penCaused = eTrigger.penCaused;
+          // if using count
+          if (m_bUseCount) {
+            // count reach lowest value
+            if (m_iCountTmp > 0) {
+              // decrease count
+              m_iCountTmp--;
+              // send event if count is less than one (is zero)
+              if (m_iCountTmp < 1) {
+                if (m_bReuseCount) {
+                  m_iCountTmp = m_iCount;
+                } else {
+                  m_iCountTmp = 0;
+                }
+                if (m_eTType == TT_NORMAL) {
+                  call SendEventToTargets();
+                } else if (m_eTType == TT_DELAYED) {
+                  call Delayed();
+                } else if (m_eTType == TT_PROCEDURAL) {
+                  call Procedural();
+                } else if (m_eTType == TT_RANDOM) {
+                  call Random();
+                } else if (m_eTType == TT_DELRAND) {
+                  call DelayedRandomly();
+                }
+              } else if (m_bTellCount) {
+                CTString strRemaining;
+                strRemaining.PrintF(TRANS("%d more to go..."), m_iCountTmp);
+                PrintCenterMessage(this, m_penCaused, strRemaining, 3.0f, MSS_INFO);
+              }
+            }
+          // else send event
+          } else {
+            call SendEventToTargets();
+          }
+		}
+        resume;
+      }
+      // if deactivated
+      on (EDeactivate) : {
+        // go to inactive state
+        m_bActive = FALSE;
+        jump Inactive();
+      }
+    }
+  };
+  
+  Inactive() {
+    ASSERT(!m_bActive);
+    while (TRUE) {
+      // wait 
+      wait() {
+        // if activated
+        on (EActivate) : {
+          // go to active state
+          m_bActive = TRUE;
+          jump Active();
+        }
+        otherwise() : {
+          resume;
+        };
+      };
+      
+      // wait a bit to recover
+      autowait(0.1f);
+    }
+  }
+  
+  Main() {
+    InitAsEditorModel();
+    SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
+    SetCollisionFlags(ECF_IMMATERIAL);
+
+    // set appearance
+    SetModel(MODEL_MARKER);
+    SetModelMainTexture(TEXTURE_MARKER);
+
+    m_fSendRange = ClampDn(m_fSendRange, 0.01F);
+    m_fRandDelayFactor = Clamp(m_fRandDelayFactor, 0.0F, 1.0F);
+
+    // spawn in world editor
+    autowait(0.1F);
+	
+    // go into active or inactive state
+    if (m_bActive) {
+      jump Active();
+    } else {
+      jump Inactive();
+    }
+
+    // cease to exist
+    Destroy();
+
+    return;
+  };
+
   Delayed() {
     Stuff();
     
@@ -369,7 +524,7 @@ procedures:
     return;
   };
   
-  DelayedRandomly(){ 
+  DelayedRandomly() { 
     Stuff();
   
     // if needed wait some time before event is send
@@ -505,7 +660,7 @@ procedures:
     return;
   };
   
-  Procedural(){
+  Procedural() {
     UpdateCurrentPos();
   
     if (m_fWaitTime > 0.0f) {
@@ -537,148 +692,4 @@ procedures:
     Stuff();
     return;
   }
-  
-  Active() {
-    ASSERT(m_bActive);
-    // store count start value
-    m_iCountTmp = m_iCount;
-
-    //main loop
-    wait() {
-      on (EBegin) : { 
-        // if auto start send event on init
-        if (m_bAutoStart) {
-          if (m_eTType==TT_NORMAL) {
-            call SendEventToTargets();
-          } else if (m_eTType == TT_DELAYED) {
-            call Delayed();
-          } else if (m_eTType == TT_PROCEDURAL) {
-            call Procedural();
-          } else if (m_eTType == TT_RANDOM) {
-            call Random();
-          } else if (m_eTType == TT_DELRAND) {
-            call DelayedRandomly();
-          }
-        }
-        resume;
-      }
-
-      // re-roots start events as triggers
-      on (EStart eStart) : {
-        SendToTarget(this, EET_TRIGGER, eStart.penCaused);
-        resume;
-      }
-
-      // cascade trigger
-      on (ETrigger eTrigger) : {
-        if(m_fMinTime > 0 && m_tmLastTriggered !=0 && (_pTimer->CurrentTick() - m_fMinTime) < m_tmLastTriggered){
-          if(m_bDebug){
-            CPrintF(TRANS("%s: received Trigger event, but min Time was not reached\n"), m_strName);
-          }
-          stop;
-        }
-
-        if(!(m_strCausedOnlyByClass == "" || IsOfClass(eTrigger.penCaused, m_strCausedOnlyByClass))){
-          if(m_bDebug){
-            CPrintF(TRANS("%s: received Trigger event, but from wrong class\n"),m_strName);
-          }
-          resume;
-        }
-
-        m_tmLastTriggered = _pTimer->CurrentTick();
-    
-        m_penCaused = eTrigger.penCaused;
-        // if using count
-        if (m_bUseCount) {
-          // count reach lowest value
-          if (m_iCountTmp > 0) {
-            // decrease count
-            m_iCountTmp--;
-            // send event if count is less than one (is zero)
-            if (m_iCountTmp < 1) {
-              if (m_bReuseCount) {
-                m_iCountTmp = m_iCount;
-              } else {
-                m_iCountTmp = 0;
-              }
-              if (m_eTType==TT_NORMAL) {
-                call SendEventToTargets();
-              } else if (m_eTType == TT_DELAYED) {
-                call Delayed();
-              } else if (m_eTType == TT_PROCEDURAL) {
-                call Procedural();
-              } else if (m_eTType == TT_RANDOM) {
-                call Random();
-              } else if (m_eTType == TT_DELRAND) {
-                call DelayedRandomly();
-              }
-            } else if (m_bTellCount) {
-              CTString strRemaining;
-              strRemaining.PrintF(TRANS("%d more to go..."), m_iCountTmp);
-              PrintCenterMessage(this, m_penCaused, strRemaining, 3.0f, MSS_INFO);
-            }
-          }
-        // else send event
-        } else {
-          call SendEventToTargets();
-        }
-        resume;
-      }
-      // if deactivated
-      on (EDeactivate) : {
-        // go to inactive state
-        m_bActive = FALSE;
-        jump Inactive();
-      }
-    }
-  };
-  
-  Inactive() {
-    ASSERT(!m_bActive);
-    while (TRUE) {
-      // wait 
-      wait() {
-        // if activated
-        on (EActivate) : {
-          // go to active state
-          m_bActive = TRUE;
-          jump Active();
-        }
-        otherwise() : {
-          resume;
-        };
-      };
-      
-      // wait a bit to recover
-      autowait(0.1f);
-    }
-  }
-
-  Main() {
-    InitAsEditorModel();
-    SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
-    SetCollisionFlags(ECF_IMMATERIAL);
-
-    // set appearance
-    SetModel(MODEL_MARKER);
-    SetModelMainTexture(TEXTURE_MARKER);
-
-    m_fSendRange = ClampDn(m_fSendRange, 0.01f);
-    m_fRandDelayFactor = Clamp(m_fRandDelayFactor,0.0f,1.0f);
-
-    // spawn in world editor
-    autowait(0.1f);
-
-    // go into active or inactive state
-    if (m_bActive) {
-      jump Active();
-    } else {
-      jump Inactive();
-    }
-
-    // cease to exist
-    Destroy();
-
-    return;
-  };
 };
