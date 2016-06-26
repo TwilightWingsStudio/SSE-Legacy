@@ -13,6 +13,15 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
 
+/*
+  NOTE: New procedures must be after the Main().
+  If you change this order you lose compatibility with the old maps.
+  
+  If you need to use only this entity from SSE addon don't forget
+  about piece of code related to m_bCountAsSecret in the MusicHolder
+  entity.
+*/
+
 205
 %{
   #include "StdH.h"
@@ -82,7 +91,7 @@ properties:
   95 BOOL m_bDebug        "Debug Messages" = FALSE,
   
  100 CTString m_strCausedOnlyByClass "Triggerable only by class" = "",
- 101 CTString m_strRangeClass  "Send Range Class" = "",
+ 101 CTString m_strRangeClass        "Send Range Class" = "",
   
  106 BOOL m_bMessageForAll "Message for all Players" = FALSE,
  
@@ -97,6 +106,9 @@ properties:
  122 BOOL m_bDestroyOnMaxTriggs "Destroy on Max Triggs" = TRUE,
  
  125 CTString m_strTellCountMsg "Count tell message" = "%d more to go...",
+ 
+ 130 BOOL m_bCountAsSecret "Count as secret" = TRUE,
+ 131 BOOL m_bGiveScoreOnce "Give score once" = TRUE,
 
 components:
   1 model   MODEL_MARKER     "Models\\Editor\\Trigger.mdl",
@@ -139,8 +151,8 @@ functions:
       SendInRange(this, m_eetRange, FLOATaabbox3D(GetPlacement().pl_PositionVector, m_fSendRange));
     }
 
-    // if trigger gives score
-    if (m_fScore > 0) {
+    // if trigger gives/steals score
+    if (m_fScore != 0) {
       CEntity *penCaused = FixupCausedToPlayer(this, m_penCaused);
 
       // if we have causer
@@ -149,11 +161,17 @@ functions:
         EReceiveScore eScore;
         eScore.iPoints = m_fScore;
         penCaused->SendEvent(eScore);
-        penCaused->SendEvent(ESecretFound());
+
+		if (m_bCountAsSecret) {
+		  penCaused->SendEvent(ESecretFound());
+		}
       }
 
       // kill score to never be reported again
-      m_fScore = 0;
+      // m_bCountAsSecret because multiple calls can break the statistics calcultion.
+	  if (m_bGiveScoreOnce || m_bCountAsSecret) {
+        m_fScore = 0;
+	  }
     }
   
     if (m_bMessageForAll) {

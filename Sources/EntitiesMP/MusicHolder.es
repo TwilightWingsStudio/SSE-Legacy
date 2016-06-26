@@ -164,7 +164,7 @@ functions:
       } else if (IsDerivedFromClass(pen, "Trigger")) {
         CTrigger *penTrigger = (CTrigger *)pen;
         // if has score
-        if (penTrigger->m_fScore>0) {
+        if (penTrigger->m_fScore != 0 && penTrigger->m_bCountAsSecret) {
           // it counts as a secret
           m_ctSecretsInWorld++;
         }
