@@ -92,6 +92,7 @@ properties:
   
  100 CTString m_strCausedOnlyByClass "Triggerable only by class" = "",
  101 CTString m_strRangeClass        "Send Range Class" = "",
+ 102 CTString m_strRangeName         "Send Range Name"  = "",
   
  106 BOOL m_bMessageForAll "Message for all Players" = FALSE,
  
@@ -132,6 +133,7 @@ functions:
     slUsedMemory += 1* sizeof(CSoundObject);
     slUsedMemory += m_strCausedOnlyByClass.Length();
     slUsedMemory += m_strRangeClass.Length();
+    slUsedMemory += m_strRangeName.Length();
     slUsedMemory += m_strConsoleMsg.Length();
     slUsedMemory += m_strConsoleCmd.Length();
     slUsedMemory += m_strTellCountMsg.Length();
@@ -142,13 +144,37 @@ functions:
     colAmbient = m_colColor;
     return true;
   }
-  
 
   void Stuff(void){
     // if there is event to send in range
     if (m_eetRange != EET_IGNORE) {
-      // send in range also
-      SendInRange(this, m_eetRange, FLOATaabbox3D(GetPlacement().pl_PositionVector, m_fSendRange));
+      BOOL bNoClass = (m_strRangeClass == "" ? TRUE : FALSE);
+      BOOL bNoName = (m_strRangeName == "" ? TRUE : FALSE);
+	  
+      if (bNoClass && bNoName) {
+        // send in range also
+        SendInRange(this, m_eetRange, FLOATaabbox3D(GetPlacement().pl_PositionVector, m_fSendRange));
+      } else {
+        {FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten) {
+          CEntity *pen = iten;
+
+          if (pen == this) {
+            continue;
+          }
+
+          if (pen) {
+            CPlacement3D plEntity = pen->GetPlacement();
+            plEntity.AbsoluteToRelative(this->GetPlacement());
+
+            if (plEntity.pl_PositionVector.Length() <= m_fSendRange &&
+              (bNoClass || IsDerivedFromClass(pen, m_strRangeClass)) &&
+              (bNoName || m_strRangeName == pen->GetName()))
+            {
+              SendToTarget(pen, m_eetRange, m_penCaused);
+            }
+          }
+        }}
+      }
     }
 
     // if trigger gives/steals score
