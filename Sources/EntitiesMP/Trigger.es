@@ -95,6 +95,8 @@ properties:
  121 CTString m_strConsoleCmd   "Console Command" = "",
  
  122 BOOL m_bDestroyOnMaxTriggs "Destroy on Max Triggs" = TRUE,
+ 
+ 125 CTString m_strTellCountMsg "Count tell message" = "%d more to go...",
 
 components:
   1 model   MODEL_MARKER     "Models\\Editor\\Trigger.mdl",
@@ -118,8 +120,9 @@ functions:
     slUsedMemory += 1* sizeof(CSoundObject);
     slUsedMemory += m_strCausedOnlyByClass.Length();
     slUsedMemory += m_strRangeClass.Length();
+    slUsedMemory += m_strConsoleMsg.Length();
     slUsedMemory += m_strConsoleCmd.Length();
-    slUsedMemory += m_strConsoleCmd.Length();
+    slUsedMemory += m_strTellCountMsg.Length();
 	return slUsedMemory;
   }
 
@@ -295,7 +298,6 @@ procedures:
 
       // cascade trigger
       on (ETrigger eTrigger) : {
-	    CPrintF("ETrigger!\n");
         if(m_fMinTime > 0 && m_tmLastTriggered != 0 && (_pTimer->CurrentTick() - m_fMinTime) < m_tmLastTriggered){
           if(m_bDebug){
             CPrintF(TRANS("%s: received Trigger event, but min Time was not reached\n"), m_strName);
@@ -346,9 +348,12 @@ procedures:
                 } else if (m_eTType == TT_DELRAND) {
                   call DelayedRandomly();
                 }
-              } else if (m_bTellCount) {
-                CTString strRemaining;
-                strRemaining.PrintF(TRANS("%d more to go..."), m_iCountTmp);
+              } else if (m_bTellCount && m_strTellCountMsg != "") {
+                CTString strRemaining = TranslateConst(m_strTellCountMsg);
+                CTString strReplace;
+                strReplace.PrintF("%d", m_iCountTmp);
+
+                while(strRemaining.ReplaceSubstr("%d", strReplace)) {}
                 PrintCenterMessage(this, m_penCaused, strRemaining, 3.0f, MSS_INFO);
               }
             }
