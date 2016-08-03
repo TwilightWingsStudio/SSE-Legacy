@@ -1,4 +1,4 @@
-/* Copyright (c) 2002-2012 Croteam Ltd. 
+/* Copyright (c) 2002-2012 Croteam Ltd.
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as published by
 the Free Software Foundation
@@ -16,7 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 /*
   NOTE: New procedures must be after the Main().
   If you change this order you lose compatibility with the old maps.
-  
+
   If you need to use only this entity from SSE addon don't forget
   about piece of code related to m_bCountAsSecret in the MusicHolder
   entity.
@@ -43,7 +43,7 @@ features  "HasName", "IsTargetable";
 
 properties:
    1 CTString m_strName              "Name" 'N' = "Trigger",         // class name
-  
+
    3 CEntityPointer m_penTarget1     "Target 01" 'T' COLOR(C_RED|0xFF),                 // send event to entity
    4 CEntityPointer m_penTarget2     "Target 02" 'Y' COLOR(C_RED|0xFF),
    5 CEntityPointer m_penTarget3     "Target 03" 'U' COLOR(C_RED|0xFF),
@@ -68,7 +68,7 @@ properties:
   14 FLOAT m_fMessageTime            "Message time" = 3.0f,  // how long is message on screen
   15 enum MessageSound m_mssMessageSound "Message sound" = MSS_NONE, // message sound
   16 FLOAT m_fScore                  "Score" 'S' = 0.0f,
-  
+
   30 FLOAT m_fWaitTime             "Wait" 'W' = 0.0f,          // wait before send events
   31 BOOL m_bAutoStart             "Auto start" 'A' = FALSE,   // trigger auto starts
   32 INDEX m_iCount                "Count" 'C' = 1,            // count before send events
@@ -78,38 +78,38 @@ properties:
   36 BOOL m_bActive                "Active" 'V' = TRUE,        // starts in active/inactive state
   37 RANGE m_fSendRange            "Send Range" 'R' = 1.0f,    // for sending event in range
   38 enum EventEType m_eetRange    "Event type Range" = EET_IGNORE,  // type of event to send in range
-  
+
   40 INDEX m_iCountTmp = 0,          // use count value to determine when to send events
   41 CEntityPointer m_penCaused,     // who touched it last time
   42 INDEX m_ctMaxTrigs            "Max trigs" 'X' = -1, // how many times could trig
-  
+
   45 COLOR m_colColor              "Trigger Color" = C_WHITE,
-  
+
   55 enum EventEType m_eetGlobal   "Event type Global" = EET_IGNORE,
- 
+
   93 enum ETType m_eTType  "Type" = TT_NORMAL,
   94 INDEX m_iPos                 = 0,
 
   95 BOOL m_bDebug        "Debug Messages" = FALSE,
-  
+
  100 CTString m_strCausedOnlyByClass "Triggerable only by class" = "",
  101 CTString m_strRangeClass        "Send Range Class" = "",
  102 CTString m_strRangeName         "Send Range Name"  = "",
-  
+
  106 BOOL m_bMessageForAll "Message for all Players" = FALSE,
- 
+
  110 FLOAT m_tmLastTriggered = 0.0f,
  111 FLOAT m_fMinTime           "Min Time between Trigs" = 0.0f,
  112 FLOAT m_fRandDelayFactor   "Random delay factor"    = 0.5F,
  113 FLOAT m_fWaitInternal = 1.0f,
- 
+
  120 CTString m_strConsoleMsg   "Console Message" = "",
  121 CTString m_strConsoleCmd   "Console Command" = "",
- 
+
  122 BOOL m_bDestroyOnMaxTriggs "Destroy on Max Triggs" = TRUE,
- 
+
  125 CTString m_strTellCountMsg "Count tell message" = "%d more to go...",
- 
+
  130 BOOL m_bCountAsSecret "Count as secret" = TRUE,
  131 BOOL m_bGiveScoreOnce "Give score once" = TRUE,
 
@@ -129,7 +129,7 @@ functions:
 
   // get target 1 (there is no property 'm_penTarget')
   CEntity *GetTarget(void) const
-  { 
+  {
     return m_penTarget1;
   }
 
@@ -210,27 +210,27 @@ functions:
         m_fScore = 0;
       }
     }
-  
+
     if (m_bMessageForAll) {
-      for(INDEX i = 0; i < GetMaxPlayers(); i++) {   
-      CEntity *penPlayer = GetPlayerEntity(i);
-        if (penPlayer != NULL) {   
-          PrintCenterMessage(this, penPlayer, 
-          TranslateConst(m_strMessage), 
-          m_fMessageTime, m_mssMessageSound);  
-        }   
-      }    
+      for(INDEX i = 0; i < GetMaxPlayers(); i++) {
+        CEntity *penPlayer = GetPlayerEntity(i);
+        if (penPlayer != NULL) {
+          PrintCenterMessage(this, penPlayer,
+          TranslateConst(m_strMessage),
+          m_fMessageTime, m_mssMessageSound);
+        }
+      }
     } else {
       if (m_strMessage != "") {
-        PrintCenterMessage(this, m_penCaused, 
-          TranslateConst(m_strMessage), 
+        PrintCenterMessage(this, m_penCaused,
+          TranslateConst(m_strMessage),
           m_fMessageTime, m_mssMessageSound);
       }
     }
 
     if (m_strConsoleMsg ! ="") {
       CPrintF(TRANS("%s\n"), m_strConsoleMsg);
-    } 
+    }
 
     if (m_strConsoleCmd != "") {
       _pShell->Execute(m_strConsoleCmd);
@@ -249,7 +249,7 @@ functions:
 
     return;
   }
-  
+
   void UpdateCurrentPos(void) {
     CEntityPointer penCurrent;
     do {
@@ -258,7 +258,7 @@ functions:
       }else{
         m_iPos = 1;
       }
-    
+
       switch(m_iPos) {
         case 1: penCurrent = m_penTarget1; break;
         case 2: penCurrent = m_penTarget2; break;
@@ -274,7 +274,7 @@ functions:
     } while(!penCurrent);
     return;
   }
-  
+
   void SendToSpecifiedTarget(void) {
     switch(m_iPos) {
       case 1: SendToTargetM(m_penTarget1, m_eetEvent1, m_penCaused); break;
@@ -327,7 +327,7 @@ procedures:
 
     //main loop
     wait() {
-      on (EBegin) : { 
+      on (EBegin) : {
         // if auto start send event on init
         if (m_bAutoStart) {
           if (m_eTType == TT_NORMAL) {
@@ -368,7 +368,7 @@ procedures:
         }
 
         m_tmLastTriggered = _pTimer->CurrentTick();
-    
+
         if (m_bDebug) {
           if (eTrigger.penCaused != NULL) {
             CPrintF(TRANS("%s triggered through %s\n"), m_strName,eTrigger.penCaused->GetName());
@@ -427,11 +427,11 @@ procedures:
       }
     }
   };
-  
+
   Inactive() {
     ASSERT(!m_bActive);
     while (TRUE) {
-      // wait 
+      // wait
       wait() {
         // if activated
         on (EActivate) : {
@@ -443,12 +443,12 @@ procedures:
           resume;
         };
       };
-      
+
       // wait a bit to recover
       autowait(0.1f);
     }
   }
-  
+
   Main() {
     InitAsEditorModel();
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
@@ -479,7 +479,7 @@ procedures:
 
   Delayed() {
     Stuff();
-    
+
     // if needed wait some time before event is send
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
@@ -490,7 +490,7 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget1, m_eetEvent1, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
         on (EBegin) : { resume; }
@@ -500,7 +500,7 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget2, m_eetEvent2, m_penCaused);
-    
+
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
         on (EBegin) : { resume; }
@@ -510,7 +510,7 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget3, m_eetEvent3, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
         on (EBegin) : { resume; }
@@ -520,7 +520,7 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget4, m_eetEvent4, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
         on (EBegin) : { resume; }
@@ -530,7 +530,7 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget5, m_eetEvent5, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
         on (EBegin) : { resume; }
@@ -540,7 +540,7 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget6, m_eetEvent6, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
         on (EBegin) : { resume; }
@@ -550,7 +550,7 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget7, m_eetEvent7, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
         on (EBegin) : { resume; }
@@ -560,7 +560,7 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget8, m_eetEvent8, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
         on (EBegin) : { resume; }
@@ -570,7 +570,7 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget9, m_eetEvent9, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
         on (EBegin) : { resume; }
@@ -580,18 +580,18 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget10, m_eetEvent10, m_penCaused);
-  
+
     return;
   };
-  
-  DelayedRandomly() { 
+
+  DelayedRandomly() {
     Stuff();
-  
+
     // if needed wait some time before event is send
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
       if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
-    
+
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
@@ -600,11 +600,11 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget1, m_eetEvent1, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
       if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
-    
+
         wait (m_fWaitInternal) {
           on (EBegin) : { resume; }
           on (ETimer) : { stop; }
@@ -613,11 +613,11 @@ procedures:
         }
     }
     SendToTargetM(m_penTarget2, m_eetEvent2, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
       if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
-    
+
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
@@ -626,11 +626,11 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget3, m_eetEvent3, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
       if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
-    
+
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
@@ -639,11 +639,11 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget4, m_eetEvent4, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
       if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
-    
+
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
@@ -652,11 +652,11 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget5, m_eetEvent5, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
       if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
-    
+
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
@@ -665,11 +665,11 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget6, m_eetEvent6, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
       if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
-    
+
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
@@ -678,11 +678,11 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget7, m_eetEvent7, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
       if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
-    
+
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
@@ -691,11 +691,11 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget8, m_eetEvent8, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
     m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
       if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
-    
+
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
@@ -704,7 +704,7 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget9, m_eetEvent9, m_penCaused);
-  
+
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
       if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
@@ -716,13 +716,13 @@ procedures:
       }
     }
     SendToTargetM(m_penTarget10, m_eetEvent10, m_penCaused);
-  
+
     return;
   };
-  
+
   Procedural() {
     UpdateCurrentPos();
-  
+
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
         on (EBegin) : { resume; }
@@ -731,12 +731,12 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    
+
     SendToSpecifiedTarget();
     Stuff();
     return;
   }
-  
+
   Random() {
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
@@ -746,7 +746,7 @@ procedures:
       otherwise(): { resume; }
       }
     }
-  
+
     m_iPos = FRnd()*9+1;
     SendToSpecifiedTarget();
     Stuff();
