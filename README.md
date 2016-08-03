@@ -38,7 +38,7 @@ Building
 
 To build Serious Engine 1, you'll need Visual Studio 2013 or 2015, Professional or Community edition ( https://www.visualstudio.com/post-download-vs?sku=community ).
 
-Do not use spaces in the path to the solution.
+Do not use spaces, cyrillic letters or special symbols such as ()+/[]' in the path to the solution. If you use described before symbols you will have building errors because Visual Studio can not correctly operate with these symbols. But you can use dash - and underscore _ symbols!
 
 Once you've installed Visual Studio and (optionally) DirectX8 SDK, you can build the engine solution (`/Sources/All.sln`). Press F7 or Build -> Build solution. The libraries and executables will be put into `\Bin\` directory (or `\Bin\Debug\` if you are using the Debug configuration).
 
