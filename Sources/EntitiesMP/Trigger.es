@@ -84,6 +84,8 @@ properties:
   42 INDEX m_ctMaxTrigs            "Max trigs" 'X' = -1, // how many times could trig
   
   45 COLOR m_colColor              "Trigger Color" = C_WHITE,
+  
+  55 enum EventEType m_eetGlobal   "Event type Global" = EET_IGNORE,
  
   93 enum ETType m_eTType  "Type" = TT_NORMAL,
   94 INDEX m_iPos                 = 0,
@@ -115,7 +117,16 @@ components:
   1 model   MODEL_MARKER     "Models\\Editor\\Trigger.mdl",
   2 texture TEXTURE_MARKER   "Models\\Editor\\Camera.tex"
 
-functions:                                        
+functions:
+  void SendToTargetM(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused) {
+    if (m_eetGlobal == EET_IGNORE) {
+      SendToTarget(penSendEvent, eetEventType, m_penCaused);
+      return;
+    }
+    // We have a global? Override eventtype!
+    SendToTarget(penSendEvent, m_eetGlobal, m_penCaused);
+  }
+
   // get target 1 (there is no property 'm_penTarget')
   CEntity *GetTarget(void) const
   { 
@@ -137,20 +148,20 @@ functions:
     slUsedMemory += m_strConsoleMsg.Length();
     slUsedMemory += m_strConsoleCmd.Length();
     slUsedMemory += m_strTellCountMsg.Length();
-	return slUsedMemory;
+    return slUsedMemory;
   }
 
-  BOOL AdjustShadingParameters(FLOAT3D &vLightDirection, COLOR &colLight, COLOR &colAmbient){
+  BOOL AdjustShadingParameters(FLOAT3D &vLightDirection, COLOR &colLight, COLOR &colAmbient) {
     colAmbient = m_colColor;
     return true;
   }
 
-  void Stuff(void){
+  void Stuff(void) {
     // if there is event to send in range
     if (m_eetRange != EET_IGNORE) {
       BOOL bNoClass = (m_strRangeClass == "" ? TRUE : FALSE);
       BOOL bNoName = (m_strRangeName == "" ? TRUE : FALSE);
-	  
+
       if (bNoClass && bNoName) {
         // send in range also
         SendInRange(this, m_eetRange, FLOATaabbox3D(GetPlacement().pl_PositionVector, m_fSendRange));
@@ -188,16 +199,16 @@ functions:
         eScore.iPoints = m_fScore;
         penCaused->SendEvent(eScore);
 
-		if (m_bCountAsSecret) {
-		  penCaused->SendEvent(ESecretFound());
-		}
+        if (m_bCountAsSecret) {
+          penCaused->SendEvent(ESecretFound());
+        }
       }
 
       // kill score to never be reported again
-      // m_bCountAsSecret because multiple calls can break the statistics calcultion.
-	  if (m_bGiveScoreOnce || m_bCountAsSecret) {
+      // m_bCountAsSecret because multiple calls can break the statistics calculation.
+      if (m_bGiveScoreOnce || m_bCountAsSecret) {
         m_fScore = 0;
-	  }
+      }
     }
   
     if (m_bMessageForAll) {
@@ -220,7 +231,7 @@ functions:
     if (m_strConsoleMsg ! ="") {
       CPrintF(TRANS("%s\n"), m_strConsoleMsg);
     } 
-	
+
     if (m_strConsoleCmd != "") {
       _pShell->Execute(m_strConsoleCmd);
     }
@@ -230,7 +241,7 @@ functions:
       // decrease count
       m_ctMaxTrigs -= 1;
       // if we trigged max times
-      if( m_ctMaxTrigs <= 0 && m_bDestroyOnMaxTriggs) {
+      if ( m_ctMaxTrigs <= 0 && m_bDestroyOnMaxTriggs) {
         // cease to exist
         Destroy();
       }
@@ -239,16 +250,16 @@ functions:
     return;
   }
   
-  void UpdateCurrentPos(void){
+  void UpdateCurrentPos(void) {
     CEntityPointer penCurrent;
     do {
-      if(m_iPos < 10) {
+      if (m_iPos < 10) {
         m_iPos++;
       }else{
         m_iPos = 1;
       }
     
-      switch(m_iPos){
+      switch(m_iPos) {
         case 1: penCurrent = m_penTarget1; break;
         case 2: penCurrent = m_penTarget2; break;
         case 3: penCurrent = m_penTarget3; break;
@@ -264,18 +275,18 @@ functions:
     return;
   }
   
-  void SendToSpecifiedTarget(void){
-    switch(m_iPos){
-      case 1: SendToTarget(m_penTarget1, m_eetEvent1, m_penCaused); break;
-      case 2: SendToTarget(m_penTarget2, m_eetEvent2, m_penCaused); break;
-      case 3: SendToTarget(m_penTarget3, m_eetEvent3, m_penCaused); break;
-      case 4: SendToTarget(m_penTarget4, m_eetEvent4, m_penCaused); break;
-      case 5: SendToTarget(m_penTarget5, m_eetEvent5, m_penCaused); break;
-      case 6: SendToTarget(m_penTarget6, m_eetEvent6, m_penCaused); break;
-      case 7: SendToTarget(m_penTarget7, m_eetEvent7, m_penCaused); break;
-      case 8: SendToTarget(m_penTarget8, m_eetEvent8, m_penCaused); break;
-      case 9: SendToTarget(m_penTarget9, m_eetEvent9, m_penCaused); break;
-      case 10: SendToTarget(m_penTarget10, m_eetEvent10, m_penCaused); break;
+  void SendToSpecifiedTarget(void) {
+    switch(m_iPos) {
+      case 1: SendToTargetM(m_penTarget1, m_eetEvent1, m_penCaused); break;
+      case 2: SendToTargetM(m_penTarget2, m_eetEvent2, m_penCaused); break;
+      case 3: SendToTargetM(m_penTarget3, m_eetEvent3, m_penCaused); break;
+      case 4: SendToTargetM(m_penTarget4, m_eetEvent4, m_penCaused); break;
+      case 5: SendToTargetM(m_penTarget5, m_eetEvent5, m_penCaused); break;
+      case 6: SendToTargetM(m_penTarget6, m_eetEvent6, m_penCaused); break;
+      case 7: SendToTargetM(m_penTarget7, m_eetEvent7, m_penCaused); break;
+      case 8: SendToTargetM(m_penTarget8, m_eetEvent8, m_penCaused); break;
+      case 9: SendToTargetM(m_penTarget9, m_eetEvent9, m_penCaused); break;
+      case 10: SendToTargetM(m_penTarget10, m_eetEvent10, m_penCaused); break;
     }
 
     return;
@@ -294,16 +305,16 @@ procedures:
     }
 
     // send event to all targets
-    SendToTarget(m_penTarget1, m_eetEvent1, m_penCaused);
-    SendToTarget(m_penTarget2, m_eetEvent2, m_penCaused);
-    SendToTarget(m_penTarget3, m_eetEvent3, m_penCaused);
-    SendToTarget(m_penTarget4, m_eetEvent4, m_penCaused);
-    SendToTarget(m_penTarget5, m_eetEvent5, m_penCaused);
-    SendToTarget(m_penTarget6, m_eetEvent6, m_penCaused);
-    SendToTarget(m_penTarget7, m_eetEvent7, m_penCaused);
-    SendToTarget(m_penTarget8, m_eetEvent8, m_penCaused);
-    SendToTarget(m_penTarget9, m_eetEvent9, m_penCaused);
-    SendToTarget(m_penTarget10, m_eetEvent10, m_penCaused);
+    SendToTargetM(m_penTarget1, m_eetEvent1, m_penCaused);
+    SendToTargetM(m_penTarget2, m_eetEvent2, m_penCaused);
+    SendToTargetM(m_penTarget3, m_eetEvent3, m_penCaused);
+    SendToTargetM(m_penTarget4, m_eetEvent4, m_penCaused);
+    SendToTargetM(m_penTarget5, m_eetEvent5, m_penCaused);
+    SendToTargetM(m_penTarget6, m_eetEvent6, m_penCaused);
+    SendToTargetM(m_penTarget7, m_eetEvent7, m_penCaused);
+    SendToTargetM(m_penTarget8, m_eetEvent8, m_penCaused);
+    SendToTargetM(m_penTarget9, m_eetEvent9, m_penCaused);
+    SendToTargetM(m_penTarget10, m_eetEvent10, m_penCaused);
 
     Stuff();
     return;
@@ -336,21 +347,21 @@ procedures:
 
       // re-roots start events as triggers
       on (EStart eStart) : {
-        SendToTarget(this, EET_TRIGGER, eStart.penCaused);
+        SendToTargetM(this, EET_TRIGGER, eStart.penCaused);
         resume;
       }
 
       // cascade trigger
       on (ETrigger eTrigger) : {
-        if(m_fMinTime > 0 && m_tmLastTriggered != 0 && (_pTimer->CurrentTick() - m_fMinTime) < m_tmLastTriggered){
-          if(m_bDebug){
+        if (m_fMinTime > 0 && m_tmLastTriggered != 0 && (_pTimer->CurrentTick() - m_fMinTime) < m_tmLastTriggered) {
+          if (m_bDebug) {
             CPrintF(TRANS("%s: received Trigger event, but min Time was not reached\n"), m_strName);
           }
           stop;
         }
 
-        if(!(m_strCausedOnlyByClass == "" || IsOfClass(eTrigger.penCaused, m_strCausedOnlyByClass))){
-          if(m_bDebug){
+        if (!(m_strCausedOnlyByClass == "" || IsOfClass(eTrigger.penCaused, m_strCausedOnlyByClass))) {
+          if (m_bDebug) {
             CPrintF(TRANS("%s: received Trigger event, but from wrong class\n"),m_strName);
           }
           resume;
@@ -358,14 +369,14 @@ procedures:
 
         m_tmLastTriggered = _pTimer->CurrentTick();
     
-        if(m_bDebug){
-          if(eTrigger.penCaused != NULL){
+        if (m_bDebug) {
+          if (eTrigger.penCaused != NULL) {
             CPrintF(TRANS("%s triggered through %s\n"), m_strName,eTrigger.penCaused->GetName());
           }else{
             CPrintF(TRANS("%s triggered through unknown entity\n"), m_strName);
           }
         }
-		
+
         if (m_ctMaxTrigs > 0 || m_ctMaxTrigs == -1) {
           m_penCaused = eTrigger.penCaused;
           // if using count
@@ -397,7 +408,7 @@ procedures:
                 CTString strReplace;
                 strReplace.PrintF("%d", m_iCountTmp);
 
-                while(strRemaining.ReplaceSubstr("%d", strReplace)) {}
+                while (strRemaining.ReplaceSubstr("%d", strReplace)) {}
                 PrintCenterMessage(this, m_penCaused, strRemaining, 3.0f, MSS_INFO);
               }
             }
@@ -405,7 +416,7 @@ procedures:
           } else {
             call SendEventToTargets();
           }
-		}
+        }
         resume;
       }
       // if deactivated
@@ -452,7 +463,7 @@ procedures:
 
     // spawn in world editor
     autowait(0.1F);
-	
+
     // go into active or inactive state
     if (m_bActive) {
       jump Active();
@@ -478,7 +489,7 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget1, m_eetEvent1, m_penCaused);
+    SendToTargetM(m_penTarget1, m_eetEvent1, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
@@ -488,7 +499,7 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget2, m_eetEvent2, m_penCaused);
+    SendToTargetM(m_penTarget2, m_eetEvent2, m_penCaused);
     
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
@@ -498,7 +509,7 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget3, m_eetEvent3, m_penCaused);
+    SendToTargetM(m_penTarget3, m_eetEvent3, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
@@ -508,7 +519,7 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget4, m_eetEvent4, m_penCaused);
+    SendToTargetM(m_penTarget4, m_eetEvent4, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
@@ -518,7 +529,7 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget5, m_eetEvent5, m_penCaused);
+    SendToTargetM(m_penTarget5, m_eetEvent5, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
@@ -528,7 +539,7 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget6, m_eetEvent6, m_penCaused);
+    SendToTargetM(m_penTarget6, m_eetEvent6, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
@@ -538,7 +549,7 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget7, m_eetEvent7, m_penCaused);
+    SendToTargetM(m_penTarget7, m_eetEvent7, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
@@ -548,7 +559,7 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget8, m_eetEvent8, m_penCaused);
+    SendToTargetM(m_penTarget8, m_eetEvent8, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
@@ -558,7 +569,7 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget9, m_eetEvent9, m_penCaused);
+    SendToTargetM(m_penTarget9, m_eetEvent9, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
@@ -568,7 +579,7 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget10, m_eetEvent10, m_penCaused);
+    SendToTargetM(m_penTarget10, m_eetEvent10, m_penCaused);
   
     return;
   };
@@ -579,7 +590,7 @@ procedures:
     // if needed wait some time before event is send
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
-      if(m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
+      if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
     
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
@@ -588,11 +599,11 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget1, m_eetEvent1, m_penCaused);
+    SendToTargetM(m_penTarget1, m_eetEvent1, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
-      if(m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
+      if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
     
         wait (m_fWaitInternal) {
           on (EBegin) : { resume; }
@@ -601,11 +612,11 @@ procedures:
           otherwise(): { resume; }
         }
     }
-    SendToTarget(m_penTarget2, m_eetEvent2, m_penCaused);
+    SendToTargetM(m_penTarget2, m_eetEvent2, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
-      if(m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
+      if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
     
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
@@ -614,11 +625,11 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget3, m_eetEvent3, m_penCaused);
+    SendToTargetM(m_penTarget3, m_eetEvent3, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
-      if(m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
+      if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
     
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
@@ -627,11 +638,11 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget4, m_eetEvent4, m_penCaused);
+    SendToTargetM(m_penTarget4, m_eetEvent4, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
-      if(m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
+      if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
     
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
@@ -640,11 +651,11 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget5, m_eetEvent5, m_penCaused);
+    SendToTargetM(m_penTarget5, m_eetEvent5, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
-      if(m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
+      if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
     
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
@@ -653,11 +664,11 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget6, m_eetEvent6, m_penCaused);
+    SendToTargetM(m_penTarget6, m_eetEvent6, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
-      if(m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
+      if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
     
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
@@ -666,11 +677,11 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget7, m_eetEvent7, m_penCaused);
+    SendToTargetM(m_penTarget7, m_eetEvent7, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
-      if(m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
+      if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
     
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
@@ -679,11 +690,11 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget8, m_eetEvent8, m_penCaused);
+    SendToTargetM(m_penTarget8, m_eetEvent8, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
     m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
-      if(m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
+      if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
     
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
@@ -692,11 +703,11 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget9, m_eetEvent9, m_penCaused);
+    SendToTargetM(m_penTarget9, m_eetEvent9, m_penCaused);
   
     if (m_fWaitTime > 0.0f) {
       m_fWaitInternal=m_fWaitTime+((FRnd()*m_fWaitTime*m_fRandDelayFactor)*((FRnd()>0.5f)?1.0f:-1.0f));
-      if(m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
+      if (m_fWaitInternal<=0.0f) { m_fWaitInternal=0.05f; }
       wait (m_fWaitInternal) {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
@@ -704,7 +715,7 @@ procedures:
         otherwise(): { resume; }
       }
     }
-    SendToTarget(m_penTarget10, m_eetEvent10, m_penCaused);
+    SendToTargetM(m_penTarget10, m_eetEvent10, m_penCaused);
   
     return;
   };
