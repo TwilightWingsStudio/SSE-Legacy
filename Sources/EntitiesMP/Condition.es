@@ -55,15 +55,15 @@ properties:
 
    1 CTString m_strName        "Name" 'N'         = "Condition",
    2 CTString m_strDescription                    = "Condition",
-   
+
    3 CTString m_strProperty1      "If Condition Property 1"    = "",
    4 CTString m_strProperty2      "If Condition Property 2"    = "",
-   
+
    5 CEntityPointer m_penIfCondition1  "If Condition Target 1" COLOR(C_RED|0xFF),
    6 CEntityPointer m_penIfCondition2  "If Condition Target 2" COLOR(C_RED|0xFF),
    7 CEntityPointer m_penIfTarget      "If Target"             COLOR(C_RED|0xFF),
    8 CEntityPointer m_penElseTarget    "Else Target"           COLOR(C_RED|0xFF),
-   
+
    9 enum ECondition m_eCondition "Operation" = EC_SAME,
   10 BOOL m_bActive        "Active"           = TRUE,
   11 BOOL m_bDebug         "Debug Messages"   = FALSE,
@@ -75,10 +75,10 @@ properties:
   16 enum EConType  m_eCT2 "Condition Type 2" = ECT_ENTITY,
   17 BOOL m_bCaused1       "Condition Target 1=penCaused" = FALSE,
   18 BOOL m_bCaused2       "Condition Target 2=penCaused" = FALSE,
-  
-  19 CEntityPointer m_penError "Error Target",      
+
+  19 CEntityPointer m_penError "Error Target",
   20 CTString m_strClass       "Class"  = "",
-  
+
 components:
   1 model   MODEL_CONDITION     "Models\\Editor\\Condition.mdl",
   2 texture TEXTURE_CONDITION   "Models\\Editor\\Condition.tex"
@@ -113,19 +113,19 @@ functions:
     BOOL bResult = 0, be = 0;
     if (m_penIfCondition2) {
       if (m_bDebug && m_eCT1 == ECT_ENTITY && m_eCT2 == ECT_ENTITY && m_penIfCondition1->PropertyForName(m_strProperty1) && m_penIfCondition2->PropertyForName(m_strProperty2) && m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType!=m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType) {
-        CPrintF(TRANS("%s : Different Data Types\n"),m_strName);
+        CPrintF(TRANS("%s : Different Data Types\n"), m_strName);
       }
     } else {
       if (m_bDebug) {
-        CPrintF(TRANS("%s : Second Condition Target not set\n"),m_strName);
+        CPrintF(TRANS("%s : Second Condition Target not set\n"), m_strName);
       }
     }
 
-    if (m_eCT1 == ECT_ENTITY && m_bDebug && m_penIfCondition1->PropertyForName(m_strProperty1) == NULL) { 
+    if (m_eCT1 == ECT_ENTITY && m_bDebug && m_penIfCondition1->PropertyForName(m_strProperty1) == NULL) {
       CPrintF(TRANS("Condition 1 : %s : %s Not Found\n"), m_strName, m_strProperty1);
       return;
     }
-  
+
     if (m_eCT1 == ECT_TYPE) {
       if (IsDerivedFromClass(m_penIfCondition1, m_strClass)) {
         bResult = TRUE;
@@ -138,7 +138,7 @@ functions:
       CTString strValue;
       CTString strValue2;
       BOOL bf1, bf2, bp1, bp2, bs1, bs2;
-      
+
       if (m_eCT1 == ECT_ENTITY) {
         CEntityProperty* pProperty = m_penIfCondition1->PropertyForName(m_strProperty1);
 
@@ -147,13 +147,13 @@ functions:
           CEntityProperty::PropertyType eptType = pProperty->ep_eptType;
 
           if (eptType == CEntityProperty::EPT_FLOAT || eptType == CEntityProperty::EPT_INDEX || eptType == CEntityProperty::EPT_RANGE || eptType == CEntityProperty::EPT_BOOL || eptType == CEntityProperty::EPT_ANGLE) {
-            fValue = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1)); 
+            fValue = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1));
             bf1 = TRUE;
           } else if (eptType== CEntityProperty::EPT_ENTITYPTR) {
-            penPointer = *((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1)); 
+            penPointer = *((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1));
             bp1 = TRUE;
           } else if (eptType == CEntityProperty::EPT_STRING || eptType == CEntityProperty::EPT_FILENAME) {
-            strValue = *((CTString *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1)); 
+            strValue = *((CTString *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1));
             bs1 = TRUE;
           }
         }
@@ -210,7 +210,7 @@ functions:
           fValue = plSpeed.pl_PositionVector(3);
           bf1 = TRUE;
         }
-      
+
       } else {
         be = TRUE;
         if (m_bDebug) {
@@ -227,33 +227,33 @@ functions:
             CEntityProperty::PropertyType eptType = pProperty2->ep_eptType;
 
             if (eptType == CEntityProperty::EPT_FLOAT || eptType == CEntityProperty::EPT_INDEX || eptType == CEntityProperty::EPT_RANGE || eptType == CEntityProperty::EPT_BOOL || eptType == CEntityProperty::EPT_ANGLE) {
-              fValue2 = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2)); 
+              fValue2 = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2));
               bf2 = TRUE;
             } else if (eptType == CEntityProperty::EPT_ENTITYPTR) {
-              penPointer2 = *((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2)); 
+              penPointer2 = *((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2));
               bp2 = TRUE;
             } else if (eptType == CEntityProperty::EPT_STRING || eptType == CEntityProperty::EPT_FILENAME) {
-              strValue2 = *((CTString *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2)); 
+              strValue2 = *((CTString *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2));
               bs2 = TRUE;
             }
           }
         } else if (m_eCT2 == ECT_POSX) {
-          fValue2=m_penIfCondition2->GetPlacement().pl_PositionVector(1);
+          fValue2 = m_penIfCondition2->GetPlacement().pl_PositionVector(1);
           bf2 = TRUE;
         } else if (m_eCT2 == ECT_POSY) {
-          fValue2=m_penIfCondition2->GetPlacement().pl_PositionVector(2);
+          fValue2 = m_penIfCondition2->GetPlacement().pl_PositionVector(2);
           bf2 = TRUE;
         } else if (m_eCT2 == ECT_POSZ) {
-          fValue2=m_penIfCondition2->GetPlacement().pl_PositionVector(3);
+          fValue2 = m_penIfCondition2->GetPlacement().pl_PositionVector(3);
           bf2 = TRUE;
         } else if (m_eCT2 == ECT_ROTH) {
-          fValue2=m_penIfCondition2->GetPlacement().pl_OrientationAngle(1);
+          fValue2 = m_penIfCondition2->GetPlacement().pl_OrientationAngle(1);
           bf2 = TRUE;
         } else if (m_eCT2 == ECT_ROTP) {
-          fValue2=m_penIfCondition2->GetPlacement().pl_OrientationAngle(2);
+          fValue2 = m_penIfCondition2->GetPlacement().pl_OrientationAngle(2);
           bf2 = TRUE;
         } else if (m_eCT2 == ECT_ROTB) {
-          fValue2=m_penIfCondition2->GetPlacement().pl_OrientationAngle(3);
+          fValue2 = m_penIfCondition2->GetPlacement().pl_OrientationAngle(3);
           bf2 = TRUE;
         } else if (m_penIfCondition2->GetFlags()&ENF_ALIVE&&m_eCT2 == ECT_HEALTH) {
           fValue2 = ((CLiveEntity&)*m_penIfCondition2).en_fHealth;
@@ -272,20 +272,20 @@ functions:
             fValue2 = ((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute.Length();
             bf2 = TRUE;
           } else if (m_eCT2 == ECT_SPEEDXREL) {
-            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute,ANGLE3D(0,0,0));
-            CPlacement3D plRot = CPlacement3D(FLOAT3D(0,0,0),m_penIfCondition2->GetPlacement().pl_OrientationAngle);
+            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute,ANGLE3D(0, 0, 0));
+            CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition2->GetPlacement().pl_OrientationAngle);
             plSpeed.AbsoluteToRelative(plRot);
             fValue2 = plSpeed.pl_PositionVector(1);
             bf2 = TRUE;
           } else if (m_eCT2 == ECT_SPEEDYREL) {
-            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute,ANGLE3D(0,0,0));
-            CPlacement3D plRot = CPlacement3D(FLOAT3D(0,0,0),m_penIfCondition2->GetPlacement().pl_OrientationAngle);
+            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute,ANGLE3D(0, 0, 0));
+            CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition2->GetPlacement().pl_OrientationAngle);
             plSpeed.AbsoluteToRelative(plRot);
             fValue2 = plSpeed.pl_PositionVector(2);
             bf2 = TRUE;
           } else if (m_eCT2 == ECT_SPEEDZREL) {
-            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute,ANGLE3D(0,0,0));
-            CPlacement3D plRot = CPlacement3D(FLOAT3D(0,0,0),m_penIfCondition2->GetPlacement().pl_OrientationAngle);
+            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute,ANGLE3D(0, 0, 0));
+            CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition2->GetPlacement().pl_OrientationAngle);
             plSpeed.AbsoluteToRelative(plRot);
             fValue2 = plSpeed.pl_PositionVector(3);
             bf2 = TRUE;
@@ -299,7 +299,7 @@ functions:
       } else {
         CPrintF(TRANS("%s : Set the second condition target goddammit\n"), GetName());
       }
-      
+
       // FLOAT
       if (bf1 && bf2) {
         FLOAT rAbs1 = fValue;
@@ -363,12 +363,12 @@ functions:
             }
           }
         }
-    
+
       // String
       } else if (bs1) {
         if (bs2) {
           if (m_eCondition == EC_SAME) {
-            if (strValue==strValue2) {
+            if (strValue == strValue2) {
               bResult = TRUE;
             }
           }
@@ -382,7 +382,7 @@ functions:
             bResult = TRUE;
           }
         }
-        
+
       // Other
       } else {
         be = TRUE;
@@ -417,9 +417,9 @@ functions:
       }
     }
   }
-   
+
   BOOL HandleEvent(const CEntityEvent &ee)
-  { 
+  {
     if (ee.ee_slEvent == EVENTCODE_ETrigger) {
       HandleETrigger(ee);
     }
@@ -432,7 +432,7 @@ functions:
       m_bActive = FALSE;
     }
 
-    return CEntity::HandleEvent(ee); 
+    return CEntity::HandleEvent(ee);
   }
 
 procedures:
@@ -442,14 +442,14 @@ procedures:
     InitAsEditorModel();
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
     SetCollisionFlags(ECF_IMMATERIAL);
-  
+
     if (m_bCode) {
       m_bCode = FALSE;
       CTString strCode = "if ( ";
-    
+
       if (m_penIfCondition1) {
         strCode += ((CEntity&)*m_penIfCondition1).GetName();
-    
+
         if (m_penIfCondition1->PropertyForName(m_strProperty1) != NULL) {
           strCode += ".";
           strCode += m_strProperty1;
@@ -459,9 +459,9 @@ procedures:
       } else {
         strCode += "NULL";
       }
-      
+
       strCode += " ";
-    
+
       if (m_eCondition == EC_SAME) {
         strCode += "== ";
       } else if (m_eCondition == EC_LARGER) {
@@ -475,7 +475,7 @@ procedures:
       } else if (m_eCondition == EC_DIFFERENT) {
         strCode += "!= ";
       }
-    
+
       if (m_penIfCondition2) {
         strCode += ((CEntity&)*m_penIfCondition2).GetName();
         if (m_penIfCondition2->PropertyForName(m_strProperty2) != NULL) {
@@ -487,9 +487,9 @@ procedures:
       } else {
         strCode += "NULL";
       }
-    
+
       strCode += " ) {\n";
-    
+
       if (m_penIfTarget) {
         strCode += "  Trigger(";
         strCode += ((CEntity&)*m_penIfTarget).GetName();
@@ -497,17 +497,17 @@ procedures:
       } else {
         strCode += "}";
       }
-    
-      if (m_penElseTarget) {  
+
+      if (m_penElseTarget) {
         strCode += " else {\n";
         strCode += "  Trigger(";
         strCode += ((CEntity&)*m_penElseTarget).GetName();
         strCode += ");\n}";
       }
-  
+
       WarningMessage(strCode);
     }
-    
+
     // set appearance
     SetModel(MODEL_CONDITION);
     SetModelMainTexture(TEXTURE_CONDITION);
