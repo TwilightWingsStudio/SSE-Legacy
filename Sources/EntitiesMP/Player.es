@@ -3490,49 +3490,59 @@ functions:
 //    }
   }
 
-
-  // if use is pressed
-  void UsePressed(BOOL bOrComputer)
-  {
+  BOOL UseSomethingUnderCrosshair() {
     // cast ray from weapon
     CPlayerWeapons *penWeapons = GetPlayerWeapons();
     CEntity *pen = penWeapons->m_penRayHit;
-    BOOL bSomethingToUse = FALSE;
+    FLOAT fRayHitDistance = penWeapons->m_fRayHitDistance;
 
     // if hit
-    if (pen!=NULL) {
-      // check switch/messageholder relaying by moving brush
-      if (IsOfClass( pen, "Moving Brush")) {
-        if (((CMovingBrush&)*pen).m_penSwitch!=NULL) {
-          pen = ((CMovingBrush&)*pen).m_penSwitch;
-        }
+    if (pen == NULL) {
+      return FALSE;
+    }
+
+    // check switch/messageholder relaying by moving brush
+    if (IsOfClass( pen, "Moving Brush")) {
+      if (((CMovingBrush&)*pen).m_penSwitch != NULL) {
+        pen = ((CMovingBrush&)*pen).m_penSwitch;
       }
+    }
 
-      // if switch
-      if (IsOfClass( pen, "Switch")) {
-        CSwitch &enSwitch = (CSwitch&)*pen;
+    // if switch
+    if (IsOfClass( pen, "Switch")) {
+      CSwitch &enSwitch = (CSwitch&)*pen;
 
-        // if switch near enough and is useable
-        if (penWeapons->m_fRayHitDistance < enSwitch.m_fUseRange && enSwitch.m_bUseable) {
-          // send it a trigger event
-          SendToTarget(pen, EET_TRIGGER, this);
-          bSomethingToUse = TRUE;
-        }
+      // if switch near enough and is useable
+      if (fRayHitDistance < enSwitch.m_fUseRange && enSwitch.m_bUseable) {
+        // send it a trigger event
+        SendToTarget(pen, EET_TRIGGER, this);
+        return TRUE;
       }
+    }
 
-      // if analyzable
-      if (IsOfClass( pen, "MessageHolder") 
-        && penWeapons->m_fRayHitDistance<((CMessageHolder*)&*pen)->m_fDistance
-        && ((CMessageHolder*)&*pen)->m_bActive) {
-        const CTFileName &fnmMessage = ((CMessageHolder*)&*pen)->m_fnmMessage;
+    // if analyzable messageholder
+    if (IsOfClass( pen, "MessageHolder")) {
+      CMessageHolder &enMsgHolder = (CMessageHolder&)*pen;
+
+      if (fRayHitDistance < enMsgHolder.m_fDistance && enMsgHolder.m_bActive) {
+        const CTFileName &fnmMessage = enMsgHolder.m_fnmMessage;
         // if player doesn't have that message in database
         if (!HasMessage(fnmMessage)) {
           // add the message
           ReceiveComputerMessage(fnmMessage, CMF_ANALYZE);
-          bSomethingToUse = TRUE;
+          return TRUE;
         }
       }
     }
+    
+    return FALSE;
+  }
+
+  // if use is pressed
+  void UsePressed(BOOL bOrComputer)
+  {
+    BOOL bSomethingToUse = UseSomethingUnderCrosshair();
+
     // if nothing usable under cursor, and may call computer
     if (!bSomethingToUse && bOrComputer) {
       // call computer

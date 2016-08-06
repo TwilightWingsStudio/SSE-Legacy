@@ -1259,16 +1259,19 @@ functions:
         }
 
         // if analyzable
-        if( IsOfClass( pen, "MessageHolder") 
-         && m_fRayHitDistance < ((CMessageHolder*)&*pen)->m_fDistance
-         && ((CMessageHolder*)&*pen)->m_bActive) {
-          const CTFileName &fnmMessage = ((CMessageHolder*)&*pen)->m_fnmMessage;
-          // if player doesn't have that message it database
-          CPlayer &pl = (CPlayer&)*m_penPlayer;
-          if( !pl.HasMessage(fnmMessage)) {
-            // show analyse message
-            m_strLastTarget = TRANS("Analyze");
-            m_tmLastTarget  = tmNow+0.5f;
+        if( IsOfClass( pen, "MessageHolder")) {
+          CMessageHolder &enMsgHolder = (CMessageHolder&)*pen;
+
+          // if messageholder near enough and is useable
+          if (m_fRayHitDistance < enMsgHolder.m_fDistance && enMsgHolder.m_bActive) {
+            const CTFileName &fnmMessage = enMsgHolder.m_fnmMessage;
+            // if player doesn't have that message it database
+            CPlayer &pl = (CPlayer&)*m_penPlayer;
+            if( !pl.HasMessage(fnmMessage)) {
+              // show analyse message
+              m_strLastTarget = TRANS("Analyze");
+              m_tmLastTarget  = tmNow+0.5f;
+            }
           }
         }
       }
