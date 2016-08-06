@@ -3508,11 +3508,12 @@ functions:
         }
       }
 
-      // if switch and near enough
-      if (IsOfClass( pen, "Switch") && penWeapons->m_fRayHitDistance < 2.0f) {
+      // if switch
+      if (IsOfClass( pen, "Switch")) {
         CSwitch &enSwitch = (CSwitch&)*pen;
-        // if switch is useable
-        if (enSwitch.m_bUseable) {
+
+        // if switch near enough and is useable
+        if (penWeapons->m_fRayHitDistance < enSwitch.m_fUseRange && enSwitch.m_bUseable) {
           // send it a trigger event
           SendToTarget(pen, EET_TRIGGER, this);
           bSomethingToUse = TRUE;

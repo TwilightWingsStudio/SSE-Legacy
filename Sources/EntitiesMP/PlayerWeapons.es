@@ -1237,21 +1237,27 @@ functions:
         // not targeting player
         m_tmTargetingStarted = 0; 
 
-        // check switch relaying by moving brush
+        // check switch/messageholder relaying by moving brush
         if( IsOfClass( pen, "Moving Brush") && ((CMovingBrush&)*pen).m_penSwitch!=NULL) {
           pen = ((CMovingBrush&)*pen).m_penSwitch;
         }
-        // if switch and near enough
-        if( IsOfClass( pen, "Switch") && m_fRayHitDistance<2.0f) {
+
+        // if switch
+        if( IsOfClass( pen, "Switch")) {
           CSwitch &enSwitch = (CSwitch&)*pen;
-          // if switch is useable
-          if( enSwitch.m_bUseable) {
+
+          // if switch near enough and is useable
+          if ((m_fRayHitDistance < enSwitch.m_fUseRange) && enSwitch.m_bUseable) {
             // show switch message
-            if( enSwitch.m_strMessage!="") { m_strLastTarget = enSwitch.m_strMessage; }
-            else { m_strLastTarget = TRANS("Use"); }
+            if (enSwitch.m_strMessage != "") {
+              m_strLastTarget = enSwitch.m_strMessage;
+            } else {
+              m_strLastTarget = TRANS("Use");
+            }
             m_tmLastTarget = tmNow+0.5f;
           }
         }
+
         // if analyzable
         if( IsOfClass( pen, "MessageHolder") 
          && m_fRayHitDistance < ((CMessageHolder*)&*pen)->m_fDistance

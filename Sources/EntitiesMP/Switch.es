@@ -52,7 +52,8 @@ properties:
  22 BOOL m_bUseable = FALSE,      // set while the switch can be triggered
  23 BOOL m_bInvisible "Invisible" = FALSE,    // make it editor model
 
-
+ 30 FLOAT m_fUseRange "Use Range" = 2.0F,
+ 
 components:
 
 
