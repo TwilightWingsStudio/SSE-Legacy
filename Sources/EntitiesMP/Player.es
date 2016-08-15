@@ -334,6 +334,7 @@ static struct PlayerControls pctlCurrent;
 // cheats
 static INDEX cht_iGoToMarker = -1;
 static INDEX cht_bKillAll    = FALSE;
+static INDEX cht_bKillAllAura = FALSE;
 static INDEX cht_bGiveAll    = FALSE;
 static INDEX cht_bOpen       = FALSE;
 static INDEX cht_bAllMessages= FALSE;
@@ -781,6 +782,7 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("user INDEX cht_bInvisible;", &cht_bInvisible);
   _pShell->DeclareSymbol("user INDEX cht_bGiveAll;",   &cht_bGiveAll);
   _pShell->DeclareSymbol("user INDEX cht_bKillAll;",   &cht_bKillAll);
+  _pShell->DeclareSymbol("user INDEX cht_bKillAllAura;", &cht_bKillAllAura);
   _pShell->DeclareSymbol("user INDEX cht_bOpen;",      &cht_bOpen);
   _pShell->DeclareSymbol("user INDEX cht_bAllMessages;", &cht_bAllMessages);
   _pShell->DeclareSymbol("user FLOAT cht_fTranslationMultiplier ;", &cht_fTranslationMultiplier);
@@ -4676,6 +4678,10 @@ functions:
 
     if (cht_bKillAll) {
       cht_bKillAll = FALSE;
+      KillAllEnemies(this);
+    }
+
+    if (cht_bKillAllAura) {
       KillAllEnemies(this);
     }
 
