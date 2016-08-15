@@ -227,11 +227,11 @@ static void KillAllEnemies(CEntity *penKiller)
     CEntity *pen = iten;
     if (IsDerivedFromClass(pen, "Enemy Base") && !IsOfClass(pen, "Devil")) {
       CEnemyBase *penEnemy = (CEnemyBase *)pen;
-      if (penEnemy->m_penEnemy==NULL) {
+      if (penEnemy->m_penEnemy == NULL) {
         continue;
       }
-      penKiller->InflictDirectDamage(pen, penKiller, DMT_BULLET, 
-        penEnemy->GetHealth()+1, pen->GetPlacement().pl_PositionVector, FLOAT3D(0,1,0));
+      penKiller->InflictDirectDamage(pen, penKiller, DMT_DAMAGER, 
+        penEnemy->GetHealth() + 1, pen->GetPlacement().pl_PositionVector, FLOAT3D(0.0F, 1.0F, 0.0F));
     }
   }}
 }
