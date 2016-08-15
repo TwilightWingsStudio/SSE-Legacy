@@ -19,6 +19,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 204
 %{
 #include "StdH.h"
+
+#define SL_PITCH_MIN (0.01F)
+#define SL_PITCH_MAX (100.0F)
 %}
 
 uses "EntitiesMP/ModelDestruction";
@@ -43,7 +46,10 @@ properties:
  11 BOOL m_bAutoStart      "Auto start" 'A' = FALSE,    // auto start (environment sounds)
  12 INDEX m_iPlayType = 0,
  13 CSoundObject m_soSound,         // sound channel
- 14 BOOL m_bDestroyable     "Destroyable" 'Q' = FALSE,
+ 14 BOOL m_bDestroyable    "Destroyable" 'Q' = FALSE,
+
+ // SSE
+ 15 FLOAT m_fPitch         "Pitch" = 1.0F,
 
   {
     CAutoPrecacheSound m_aps;
@@ -86,18 +92,27 @@ functions:
     return slUsedMemory;
   }
 
-
+  void DoPlay(void)
+  {
+    m_soSound.Set3DParameters(FLOAT(m_rFallOffRange), FLOAT(m_rHotSpotRange), m_fVolume, m_fPitch);
+    PlaySound(m_soSound, m_fnSound, m_iPlayType);
+  }
 
 procedures:
 
   Main(EVoid)
   {
     // validate range
-    if (m_rHotSpotRange<0.0f) { m_rHotSpotRange = 0.0f; }
-    if (m_rFallOffRange<m_rHotSpotRange) { m_rFallOffRange = m_rHotSpotRange; }
+    if (m_rHotSpotRange < 0.0f) { m_rHotSpotRange = 0.0f; }
+    if (m_rFallOffRange < m_rHotSpotRange) { m_rFallOffRange = m_rHotSpotRange; }
+
     // validate volume
-    if (m_fVolume<FLOAT(SL_VOLUME_MIN)) { m_fVolume = FLOAT(SL_VOLUME_MIN); }
-    if (m_fVolume>FLOAT(SL_VOLUME_MAX)) { m_fVolume = FLOAT(SL_VOLUME_MAX); }
+    if (m_fVolume < FLOAT(SL_VOLUME_MIN)) { m_fVolume = FLOAT(SL_VOLUME_MIN); }
+    if (m_fVolume > FLOAT(SL_VOLUME_MAX)) { m_fVolume = FLOAT(SL_VOLUME_MAX); }
+
+    // validate pitch
+    if (m_fPitch < FLOAT(SL_PITCH_MIN)) { m_fPitch = FLOAT(SL_PITCH_MIN); }
+    if (m_fPitch > FLOAT(SL_PITCH_MAX)) { m_fPitch = FLOAT(SL_PITCH_MAX); }
 
     // determine play type
     m_iPlayType = SOF_3D;
@@ -111,10 +126,10 @@ procedures:
     SetCollisionFlags(ECF_IMMATERIAL);
 
     // set stretch factors - MUST BE DONE BEFORE SETTING MODEL!
-    const float SOUND_MINSIZE=1.0f;
+    const float SOUND_MINSIZE = 1.0f;
     FLOAT fFactor = Log2(m_rFallOffRange)*SOUND_MINSIZE;
-    if (fFactor<SOUND_MINSIZE) {
-      fFactor=SOUND_MINSIZE;
+    if (fFactor < SOUND_MINSIZE) {
+      fFactor = SOUND_MINSIZE;
     }
     GetModelObject()->mo_Stretch = FLOAT3D( fFactor, fFactor, fFactor);
 
@@ -125,7 +140,7 @@ procedures:
     m_strDescription.PrintF("%s", (CTString&)m_fnSound.FileName());
 
     // wait for a while to play sound -> Sound Can Be Spawned 
-    if( _pTimer->CurrentTick()<=0.1f)
+    if( _pTimer->CurrentTick() <= 0.1f)
     {
       autowait(0.5f);
     }
@@ -134,15 +149,13 @@ procedures:
       // auto play sound
       on (EBegin) : {
         if (m_bAutoStart) {
-          m_soSound.Set3DParameters(FLOAT(m_rFallOffRange), FLOAT(m_rHotSpotRange), m_fVolume, 1.0f);
-          PlaySound(m_soSound, m_fnSound, m_iPlayType);
+          DoPlay();
         }
         resume;
       }
       // play sound
       on (EStart) : {
-        m_soSound.Set3DParameters(FLOAT(m_rFallOffRange), FLOAT(m_rHotSpotRange), m_fVolume, 1.0f);
-        PlaySound(m_soSound, m_fnSound, m_iPlayType);
+        DoPlay();
         resume;
       }
       // stop playing sound
