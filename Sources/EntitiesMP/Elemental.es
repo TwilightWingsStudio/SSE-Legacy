@@ -1362,12 +1362,14 @@ procedures:
   // overridable called before main enemy loop actually begins
   PreMainLoop(EVoid) : CEnemyBase::PreMainLoop
   {
-    // if spawned by other entity
+    // if spawned by other entity(other elemental)
     if (m_bSpawned) {
       m_bSpawned = FALSE;
       m_bCountAsKill = FALSE;
       // wait till touching the ground
       autocall FallOnFloor() EReturn;
+    } else {
+      m_bSpawned = m_bCountKillInStatistcs;
     }
 
     if (m_EecChar==ELC_LARGE || m_EecChar==ELC_BIG && m_EetType==ELT_LAVA)

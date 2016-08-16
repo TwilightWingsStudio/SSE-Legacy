@@ -61,13 +61,14 @@ properties:
  22 BOOL m_bFirstPass = TRUE,
  
  50 CSoundObject m_soSpawn,    // sound channel
- 51 INDEX m_iInGroup=0,        // in group counter for loops
- 52 INDEX m_iEnemiesTriggered=0,  // number of times enemies triggered the spawner on death
+ 51 INDEX m_iInGroup = 0,        // in group counter for loops
+ 52 INDEX m_iEnemiesTriggered = 0,  // number of times enemies triggered the spawner on death
 
  60 CEntityPointer m_penTacticsHolder  "Tactics Holder",
  61 BOOL m_bTacticsAutostart           "Tactics autostart" = TRUE,
 
- 
+ // SSE
+ 65 BOOL m_bCountInStatistics "Count In Statistics" = TRUE,
 
 components:
 

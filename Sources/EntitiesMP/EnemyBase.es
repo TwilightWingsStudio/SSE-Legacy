@@ -184,6 +184,9 @@ properties:
 
 181 BOOL  m_bResizeAttachments "Stretch attachments" = FALSE, // for small enemies with big guns
 
+200 BOOL  m_bCountEnemyInStatistics "Count As Enemy (statistics)" = TRUE,
+201 BOOL  m_bCountKillInStatistcs   "Count As Kill (statistics)" = TRUE,
+
 //171 INDEX m_iTacticsRetried = 0,
 
   {
@@ -256,7 +259,7 @@ functions:
   // if should be counted as kill
   virtual BOOL CountAsKill(void)
   {
-    return TRUE;
+    return m_bCountKillInStatistcs;
   }
 
   virtual BOOL ForcesCannonballToExplode(void)

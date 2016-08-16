@@ -134,25 +134,34 @@ functions:
     // for each entity in the world
     {FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten) {
       CEntity *pen = iten;
+
       // if enemybase
       if (IsDerivedFromClass(pen, "Enemy Base")) {
         CEnemyBase *penEnemy = (CEnemyBase *)pen;
+
         // if not template
         if (!penEnemy->m_bTemplate) {
-          // count one
-          m_ctEnemiesInWorld++;
-		      // if this is a woman kamikaze carrier, add another one to count
-		      if (IsOfClass(pen, "Woman")) {
-			      if (((CWoman *)&*pen)->m_bKamikazeCarrier) { m_ctEnemiesInWorld++; }
-		      }
+
+          // if has flag count as enemy
+          if (penEnemy->m_bCountEnemyInStatistics) {
+            m_ctEnemiesInWorld++;
+          }
+
+          // if this is a woman kamikaze carrier, add another one to count
+          if (IsOfClass(pen, "Woman")) {
+              if (((CWoman *)&*pen)->m_bKamikazeCarrier) { m_ctEnemiesInWorld++; }
+          }
         }
       // if spawner
       } else if (IsDerivedFromClass(pen, "Enemy Spawner")) {
         CEnemySpawner *penSpawner = (CEnemySpawner *)pen;
-        // if not teleporting
-        if (penSpawner->m_estType!=EST_TELEPORTER) {
+
+        // if not teleporting and count in statistics enabled
+        if (penSpawner->m_estType != EST_TELEPORTER && penSpawner->m_bCountInStatistics) {
+
           // add total count
-          m_ctEnemiesInWorld+=penSpawner->m_ctTotal;
+          m_ctEnemiesInWorld += penSpawner->m_ctTotal;
+
           // if this spawner points to a woman kamikaze carrier template, increase count once more
           if (penSpawner->m_penTarget) {
             if (IsOfClass(penSpawner->m_penTarget, "Woman")) {
