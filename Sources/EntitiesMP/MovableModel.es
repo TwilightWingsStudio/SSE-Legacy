@@ -49,7 +49,7 @@ enum EBlockAction {
 
 class CMovableModel : CMovableModelEntity {
 name      "Movable Model";
-thumbnail "Thumbnails\\ModelHolder.tbn";
+thumbnail "Thumbnails\\MovableModel.tbn";
 features "HasName", "HasDescription", "IsTargetable";
 
 properties:
