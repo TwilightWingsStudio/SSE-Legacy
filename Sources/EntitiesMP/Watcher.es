@@ -1,18 +1,3 @@
-/* Copyright (c) 2002-2012 Croteam Ltd. 
-This program is free software; you can redistribute it and/or modify
-it under the terms of version 2 of the GNU General Public License as published by
-the Free Software Foundation
-
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this program; if not, write to the Free Software Foundation, Inc.,
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
-
 700
 %{
 #include "StdH.h"
@@ -39,115 +24,331 @@ features  "CanBePredictable";
 properties:
 
   1 CEntityPointer m_penOwner,  // entity which owns it
-  2 FLOAT m_tmDelay = 5.0f,     // delay between checking moments - set depending on distance of closest player
+  2 FLOAT m_tmDelay = 2.0f,     // delay between checking moments - set depending on distance of closest player
 
  20 FLOAT m_fClosestPlayer = UpperLimit(0.0f),  // distance from closest player to owner of this watcher
  21 INDEX m_iPlayerToCheck = 0,   // sequence number for checking next player in each turn
+ 22 CEntityPointer m_penAllocatedEnemy,
+ 23 CEntityPointer m_penClosestFriend,
+ 24 FLOAT m_fClosestFriend = UpperLimit(0.0f),
 
 
 components:
 
 
 functions:
-
+  // --------------------------------------------------------------------------------------
+  // Get watcher's owner.
+  // --------------------------------------------------------------------------------------
   class CEnemyBase *GetOwner(void)
   {
-    ASSERT(m_penOwner!=NULL);
+    ASSERT(m_penOwner != NULL);
     return (CEnemyBase*)&*m_penOwner;
   }
-
-  // find one player number by random
+  
+  // --------------------------------------------------------------------------------------
+  // Find one player number by random.
+  // --------------------------------------------------------------------------------------
   INDEX GetRandomPlayer(void)
   {
-//    CPrintF("Getting random number... ");
+    //CPrintF("Getting random number... ");
+
     // get maximum number of players in game
     INDEX ctMaxPlayers = GetMaxPlayers();
+
     // find actual number of players
     INDEX ctActivePlayers = 0;
-    {for(INDEX i=0; i<ctMaxPlayers; i++) {
-      if (GetPlayerEntity(i)!=NULL) {
-        ctActivePlayers++;
+
+    {for(INDEX i = 0; i < ctMaxPlayers; i++) {
+      // Skip invalid players.
+      if (GetPlayerEntity(i) == NULL) {
+        continue;
       }
+
+      ctActivePlayers++;
     }}
-//    CPrintF("active players %d, ", ctActivePlayers);
-    // if none
-    if (ctActivePlayers==0) {
+    
+    //CPrintF("active players %d, ", ctActivePlayers);
+
+    // If no any active players.
+    if (ctActivePlayers == 0) {
       // return first index anyway
       return 0;
     }
 
-
-    // choose one by random
+    // choose one player by random
     INDEX iChosenActivePlayer = IRnd()%ctActivePlayers;
-//    CPrintF("chosen %d, ", iChosenActivePlayer);
+
+    //CPrintF("chosen %d, ", iChosenActivePlayer);
 
     // find its physical index
     INDEX iActivePlayer = 0;
-    {for(INDEX i=0; i<ctMaxPlayers; i++) {
-      if (GetPlayerEntity(i)!=NULL) {
-        if (iActivePlayer==iChosenActivePlayer) {
-//          CPrintF("actual index %d\n", iActivePlayer);
-          return i;
-        }
-        iActivePlayer++;
+
+    {for(INDEX i = 0; i < ctMaxPlayers; i++) {
+      // Skip invalid players.
+      if (GetPlayerEntity(i) == NULL) {
+        continue;
       }
+
+      if (iActivePlayer == iChosenActivePlayer) {
+          //CPrintF("actual index %d\n", iActivePlayer);
+          return i;
+      }
+
+      iActivePlayer++;
     }}
+
     ASSERT(FALSE);
+
     return 0;
   }
 
-  // find closest player
+  // --------------------------------------------------------------------------------------
+  // Cast a ray to entity checking only for brushes.
+  // --------------------------------------------------------------------------------------
+  BOOL IsVisible(CEntity *penEntity) 
+  {
+    ASSERT(penEntity!=NULL);
+    // get ray source and target
+    FLOAT3D vSource, vTarget;
+    GetPositionCastRay(this, penEntity, vSource, vTarget);
+
+    // cast the ray
+    CCastRay crRay(this, vSource, vTarget);
+    crRay.cr_ttHitModels = CCastRay::TT_NONE;     // check for brushes only
+    crRay.cr_bHitTranslucentPortals = FALSE;
+    en_pwoWorld->CastRay(crRay);
+
+    if (crRay.cr_penHit) {
+      if (IsOfClass(crRay.cr_penHit,"Movable Model") || IsOfClass(crRay.cr_penHit, "Movable Brush")) {
+        if ( crRay.cr_penHit == penEntity->GetParent() || penEntity == crRay.cr_penHit->GetParent()) {
+          return true;
+        }
+      }
+    }
+
+    // if hit nothing (no brush) the entity can be seen
+    return (crRay.cr_penHit == NULL);     
+  };
+
+  // --------------------------------------------------------------------------------------
+  // Find Closest CEnemyBase Entity.
+  // --------------------------------------------------------------------------------------
+  CEntity *FindClosestEB(void)
+  {
+    CEntity *penClosestPlayer = NULL;
+    m_penClosestFriend = NULL;
+    FLOAT fClosestPlayer = UpperLimit(0.0f);
+    FLOAT fClosestFriend = UpperLimit(0.0f);
+    //m_fClosestPlayer = UpperLimit(0.0f);
+    m_fClosestFriend = UpperLimit(0.0f);
+
+    // If onwer from player-unfriendly team.
+    if (GetOwner()->GetTeam() != 0) {
+      FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten) {
+        CEntity *pen = iten;
+
+        // Skip invalid entities.
+        if (pen == NULL) {
+          continue;
+        }
+
+        // Skip non enemies.
+        if (!IsDerivedFromClass(pen, "Enemy Base")) {
+          continue;
+        }
+
+        // Skip dead enemies.
+        if (!(pen->GetFlags()&ENF_ALIVE)) {
+          continue;
+        }
+
+        // Cast to CEnemyBase.
+        CEnemyBase &enEB = (CEnemyBase&)*pen;
+
+        // Skip templates.
+        if (enEB.m_bTemplate) {
+          continue;
+        }
+
+        // Calculate distance between onwer and entity.
+        FLOAT fDistance = (pen->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
+
+        // If from different teams.
+        if (enEB.GetTeam() != GetOwner()->GetTeam()) {
+          // If satisfies the distance.
+          if (fDistance < fClosestPlayer) {
+            if (/*IsVisible(pen)*/GetOwner()->SeeEntity(pen, Cos(GetOwner()->m_fViewAngle/2.0f)) || GetOwner()->m_fSenseRange > fDistance) {
+              fClosestPlayer = fDistance;
+              //if (m_fClosestPlayer>fDistance) { m_fClosestPlayer = fDistance; }
+              penClosestPlayer = pen;
+              m_penAllocatedEnemy = pen;
+            }
+          }
+        // If from same team.
+        } else {
+          // If satisfies the distance.
+          if (fDistance < fClosestFriend) {
+            if (GetOwner()->SeeEntity(pen, Cos(GetOwner()->m_fViewAngle/2.0f)) || GetOwner()->m_fSenseRange > fDistance) {
+              fClosestFriend = fDistance;
+              if (m_fClosestFriend>fDistance) { m_fClosestFriend = fDistance; }
+              m_penClosestFriend = pen;          
+            }
+          }            
+        }
+      }
+    // If onwer from player-friendly team.
+    } else {
+      FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten) {
+        CEntity *pen = iten;
+
+        // Skip invalid entities.
+        if (pen == NULL) {
+          continue;
+        }
+
+        // Skip dead entities.
+        if (!(pen->GetFlags()&ENF_ALIVE)) {
+          continue;
+        }
+
+        // If entity based on CEnemyBase.
+        if (IsDerivedFromClass(pen, "Enemy Base")) {
+          // Cast to CEnemyBase.
+          CEnemyBase &enEB = (CEnemyBase&)*pen;
+
+          // Skip templates.
+          if (enEB.m_bTemplate) {
+            continue;
+          }
+
+          // Calculate distance between onwer and entity.
+          FLOAT fDistance = (pen->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
+
+          // If from different teams.
+          if (enEB.GetTeam() != GetOwner()->GetTeam()) {
+            // If satisfies the distance.
+            if (fDistance < fClosestPlayer) {
+              if (/*IsVisible(pen)*/GetOwner()->SeeEntity(pen, Cos(GetOwner()->m_fViewAngle/2.0f)) || GetOwner()->m_fSenseRange > fDistance) {
+                fClosestPlayer = fDistance;
+                //if (m_fClosestPlayer>fDistance) { m_fClosestPlayer = fDistance; }
+                penClosestPlayer = pen;
+                m_penAllocatedEnemy = pen;
+              }
+            }
+          // If from same team.
+          } else {
+            // If satisfies the distance.
+            if (fDistance < fClosestFriend) {
+              if (GetOwner()->SeeEntity(pen, Cos(GetOwner()->m_fViewAngle/2.0f)) || GetOwner()->m_fSenseRange > fDistance) {
+                  fClosestFriend = fDistance;
+                  if (m_fClosestFriend > fDistance) { m_fClosestFriend = fDistance; }
+                  m_penClosestFriend = pen;
+              }
+            }
+          }
+
+          // No any check needed after.
+          continue;
+        }
+
+        // If entity is CPlayer instance.
+        if (IsOfClass(pen, "Player")) {
+          FLOAT fDistance = (pen->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
+          // If satisfies the distance.
+          if (fDistance < fClosestFriend) {
+            if (/*IsVisible(pen)*/GetOwner()->SeeEntity(pen, Cos(GetOwner()->m_fViewAngle/2.0f)) || GetOwner()->m_fSenseRange > fDistance) {
+              fClosestFriend = fDistance;
+              if (m_fClosestFriend > fDistance) { m_fClosestFriend = fDistance; }
+              m_penClosestFriend = pen;          
+            }
+          }                 
+        }   
+      }
+    }
+
+    if (fClosestPlayer < m_fClosestPlayer) { m_fClosestPlayer = fClosestPlayer; }
+    return penClosestPlayer;
+  }
+
+  // --------------------------------------------------------------------------------------
+  // Find Closest CPlayer Entity.
+  // --------------------------------------------------------------------------------------
   CEntity *FindClosestPlayer(void)
   {
     CEntity *penClosestPlayer = NULL;
     FLOAT fClosestPlayer = UpperLimit(0.0f);
-    // for all players
-    for (INDEX iPlayer=0; iPlayer<GetMaxPlayers(); iPlayer++) {
+
+    // Cycle through all players
+    for (INDEX iPlayer = 0; iPlayer < GetMaxPlayers(); iPlayer++) {
       CEntity *penPlayer = GetPlayerEntity(iPlayer);
-      // if player is alive and visible
-      if (penPlayer!=NULL && penPlayer->GetFlags()&ENF_ALIVE && !(penPlayer->GetFlags()&ENF_INVISIBLE)) {
-        // calculate distance to player
-        FLOAT fDistance = 
-          (penPlayer->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
-        // update if closer
-        if (fDistance<fClosestPlayer) {
-          fClosestPlayer = fDistance;
-          penClosestPlayer = penPlayer;
-        }
+
+      // Skip invalid players.
+      if (penPlayer == NULL) {
+        continue;
+      }
+
+      // Skip dead players.
+      if (!(penPlayer->GetFlags()&ENF_ALIVE)) {
+        continue;
+      }
+
+      // Skip invisible players.
+      if (penPlayer->GetFlags()&ENF_INVISIBLE) {
+        continue;
+      }
+
+      // calculate distance to player
+      FLOAT fDistance =  (penPlayer->GetPlacement().pl_PositionVector - m_penOwner->GetPlacement().pl_PositionVector).Length();
+
+      // update if closer
+      if (fDistance < fClosestPlayer) {
+        fClosestPlayer = fDistance;
+        penClosestPlayer = penPlayer;
       }
     }
+
     // if no players found
-    if (penClosestPlayer==NULL) {
+    if (penClosestPlayer == NULL) {
       // behave as if very close - must check for new ones
       fClosestPlayer = 10.0f;
     }
+
     m_fClosestPlayer = fClosestPlayer;
     return penClosestPlayer;
   }
 
+  // --------------------------------------------------------------------------------------
   // notify owner that a player has been seen
+  // --------------------------------------------------------------------------------------
   void SendWatchEvent(CEntity *penPlayer)
   {
     EWatch eWatch;
     eWatch.penSeen = penPlayer;
+//  if (GetOwner()->m_penFriend == NULL) { GetOwner()->m_penFriend = m_penClosestFriend; }
     m_penOwner->SendEvent(eWatch);
   }
 
   void CheckIfPlayerVisible(void)
   {
     // if the owner is blind
-    if( GetOwner()->m_bBlind) {
+    if ( GetOwner()->m_bBlind) {
       // don't even bother checking
       return;
     }
 
     // get maximum number of players in game
     INDEX ctPlayers = GetMaxPlayers();
+
     // find first one after current sequence
     CEntity *penPlayer = NULL;
     m_iPlayerToCheck = (m_iPlayerToCheck+1)%ctPlayers;
     INDEX iFirstChecked = m_iPlayerToCheck;
     FOREVER {
+      if (m_penAllocatedEnemy != NULL ) {
+        penPlayer=(CEntity*)&(*m_penAllocatedEnemy);
+        break;
+      }
       penPlayer = GetPlayerEntity(m_iPlayerToCheck);
       if (penPlayer!=NULL) {
         break;
@@ -166,49 +367,72 @@ functions:
     }
 
     // if inside view angle and visible
-    if (GetOwner()->SeeEntity(penPlayer, Cos(GetOwner()->m_fViewAngle/2.0f))) {
+    if ((GetOwner()->SeeEntity(penPlayer, Cos(GetOwner()->m_fViewAngle/2.0f)) &&
+        GetOwner()->GetTeam() != 0 ) || IsDerivedFromClass(penPlayer, "Enemy Base")) {
       // send event to owner
       SendWatchEvent(penPlayer);
+    } else if (m_penClosestFriend != NULL) { 
+        if (GetOwner()->SeeEntity(m_penClosestFriend,Cos(GetOwner()->m_fViewAngle/2.0f))) { SendWatchEvent(NULL); }
     }
   };
 
-  // set new watch time
+  // --------------------------------------------------------------------------------------
+  // Set new watch time.
+  // --------------------------------------------------------------------------------------
   void SetWatchDelays(void)
   {
     const FLOAT tmMinDelay = 0.1f;   // delay at closest distance
     const FLOAT tmSeeDelay = 5.0f;   // delay at see distance
-    const FLOAT tmTick = _pTimer->TickQuantum;
+    const FLOAT tmTick = _pTimer->TickQuantum; // Tick length.
+
     FLOAT fSeeDistance  = GetOwner()->m_fIgnoreRange;
     FLOAT fNearDistance = Min(GetOwner()->m_fStopDistance, GetOwner()->m_fCloseDistance);
 
-    // if closer than near distance
-    if (m_fClosestPlayer<=fNearDistance) {
+    // if closer than near distance OR after spotting a friend
+    if (m_fClosestPlayer <= fNearDistance || (m_penAllocatedEnemy == NULL && m_penClosestFriend != NULL) ) {
       // always use minimum delay
       m_tmDelay = tmMinDelay;
     // if further than near distance
     } else {
       // interpolate between near and see
-      m_tmDelay = tmMinDelay+
-        (m_fClosestPlayer-fNearDistance)*(tmSeeDelay-tmMinDelay)/(fSeeDistance-fNearDistance);
+      m_tmDelay = tmMinDelay + (m_fClosestPlayer-fNearDistance)*(tmSeeDelay-tmMinDelay) / (fSeeDistance - fNearDistance);
       // round to nearest tick
       m_tmDelay = floor(m_tmDelay/tmTick)*tmTick;
     }
   };
 
-  // watch
+  // --------------------------------------------------------------------------------------
+  // Do watch.
+  // --------------------------------------------------------------------------------------
   void Watch(void)
   {
     // remember original distance
     FLOAT fOrgDistance = m_fClosestPlayer;
 
+    if (m_penAllocatedEnemy != NULL) {
+      if (!IsVisible(m_penAllocatedEnemy) || (!(m_penAllocatedEnemy->GetFlags()&ENF_ALIVE) || (m_penAllocatedEnemy->GetFlags()&ENF_INVISIBLE))) 
+      {
+        m_penAllocatedEnemy = NULL;
+      }
+    }
+
     // find closest player
-    CEntity *penClosest = FindClosestPlayer();
+    CEntity *penClosest = NULL;
+    penClosest = FindClosestPlayer();
+    CEntity *penClosestEB = NULL;
+
+    if (GetOwner()->m_bUseTeams) { penClosestEB = FindClosestEB(); } 
+    if (penClosestEB != NULL) {
+      penClosest = penClosestEB;
+    }
+    GetOwner()->m_penFriend = m_penClosestFriend;
+
 
     FLOAT fSeeDistance  = GetOwner()->m_fIgnoreRange;
     FLOAT fStopDistance  = Max(fSeeDistance*1.5f, GetOwner()->m_fActivityRange);
 
     // if players exited enemy's scope
-    if (fOrgDistance<fStopDistance && m_fClosestPlayer>=fStopDistance) {
+    if (fOrgDistance<fStopDistance && m_fClosestPlayer >= fStopDistance) {
       // stop owner
       m_penOwner->SendEvent(EStop());
     // if players entered enemy's scope
@@ -218,50 +442,66 @@ functions:
     }
 
     // if the closest player is close enough to be seen
-    if (m_fClosestPlayer<fSeeDistance) {
+    if (m_fClosestPlayer<fSeeDistance || m_fClosestFriend<fSeeDistance) {
       // check for seeing any of the players
+      if (m_penAllocatedEnemy == NULL) { m_penAllocatedEnemy = penClosest; }
       CheckIfPlayerVisible();
     }
 
     // if the closest player is inside sense range
     FLOAT fSenseRange = GetOwner()->m_fSenseRange;
-    if (penClosest!=NULL && fSenseRange>0 && m_fClosestPlayer<fSenseRange) {
+    if (penClosest != NULL && fSenseRange > 0 && m_fClosestPlayer < fSenseRange) {
       // detect it immediately
       SendWatchEvent(penClosest);
     }
-  
+
     // set new watch time
-    SetWatchDelays();
+    //SetWatchDelays();
   };
 
-  // this is called directly from enemybase to check if another player has come too close
+  // --------------------------------------------------------------------------------------
+  // This is called directly from CEnemyBase to check if another player has come too close.
+  // --------------------------------------------------------------------------------------
   CEntity *CheckCloserPlayer(CEntity *penCurrentTarget, FLOAT fRange)
   {
     // if the owner is blind
-    if( GetOwner()->m_bBlind) {
+    if ( GetOwner()->m_bBlind) {
       // don't even bother checking
       return NULL;
     }
 
     CEntity *penClosestPlayer = NULL;
-    FLOAT fClosestPlayer = 
-      (penCurrentTarget->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
+    FLOAT fClosestPlayer;
+
+    if (penCurrentTarget != NULL) { 
+        fClosestPlayer = (penCurrentTarget->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length(); 
+    } else { 
+        fClosestPlayer = UpperLimit(0.0f);
+        fRange = fClosestPlayer - 0.1f;
+    }
+
     fClosestPlayer = Min(fClosestPlayer, fRange);  // this is maximum considered range
 
+    CEntity *penAllocatedEnemy = FindClosestEB();
+
+    if (GetOwner()->GetTeam()==0 && penAllocatedEnemy != penCurrentTarget && penAllocatedEnemy != NULL) {
+      return /*FindClosestEB();*/penAllocatedEnemy;
+    }
+
     // for all other players
-    for (INDEX iPlayer=0; iPlayer<GetMaxPlayers(); iPlayer++) {
+    for (INDEX iPlayer = 0; iPlayer < GetMaxPlayers(); iPlayer++) {
       CEntity *penPlayer = GetPlayerEntity(iPlayer);
-      if (penPlayer==NULL || penPlayer==penCurrentTarget) {
+
+      if (penPlayer == NULL || penPlayer == penCurrentTarget) {
         continue;
       }
+
       // if player is alive and visible
       if ((penPlayer->GetFlags()&ENF_ALIVE) && !(penPlayer->GetFlags()&ENF_INVISIBLE)) {
         // calculate distance to player
-        FLOAT fDistance = 
-          (penPlayer->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
+        FLOAT fDistance = (penPlayer->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
         // if closer than current and you can see him
-        if (fDistance<fClosestPlayer && 
-            GetOwner()->SeeEntity(penPlayer, Cos(GetOwner()->m_fViewAngle/2.0f))) {
+        if (fDistance < fClosestPlayer && GetOwner()->SeeEntity(penPlayer, Cos(GetOwner()->m_fViewAngle/2.0f))) {
           // update
           fClosestPlayer = fDistance;
           penClosestPlayer = penPlayer;
@@ -272,20 +512,28 @@ functions:
     return penClosestPlayer;
   }
 
-  // this is called directly from enemybase to attack multiple players (for really big enemies)
+  // --------------------------------------------------------------------------------------
+  // This is called directly from enemybase to attack multiple players (for really big enemies).
+  // --------------------------------------------------------------------------------------
   CEntity *CheckAnotherPlayer(CEntity *penCurrentTarget)
   {
     // if the owner is blind, or no current target
-    if( GetOwner()->m_bBlind || penCurrentTarget==NULL) {
+    if ( GetOwner()->m_bBlind || penCurrentTarget==NULL) {
       // don't even check
       return NULL;
     }
 
     // get allowed distance
     CEntity *penClosestPlayer = NULL;
-    FLOAT fCurrentDistance = 
-      (penCurrentTarget->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
-    FLOAT fRange = fCurrentDistance*1.5f;
+    FLOAT fCurrentDistance;
+    FLOAT fRange;
+    if (penCurrentTarget != NULL) { 
+        fCurrentDistance = (penCurrentTarget->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
+        fRange = fCurrentDistance*1.5f; 
+    } else { 
+        fRange = UpperLimit(0.0f);
+        fCurrentDistance = fRange/1.5f;
+    }
 
     // find a random offset to start searching
     INDEX iOffset = GetRandomPlayer();
@@ -314,9 +562,9 @@ functions:
     return penCurrentTarget;
   }
 
-
-
-  // returns bytes of memory used by this object
+  // --------------------------------------------------------------------------------------
+  // Returns bytes of memory used by this object.
+  // --------------------------------------------------------------------------------------
   SLONG GetUsedMemory(void)
   {
     return( sizeof(CWatcher) - sizeof(CRationalEntity) + CRationalEntity::GetUsedMemory());
@@ -324,7 +572,6 @@ functions:
 
 
 procedures:
-
 
   // watching
   Active() {
