@@ -109,6 +109,11 @@ functions:
     // skip base enemy damage handling
     CMovableModelEntity::ReceiveDamage(penInflictor, dmtType, fDamageAmmount, vHitPoint, vDirection);
 
+    // if santa dead he can't play sound and spawn items!
+    if (!(GetFlags()&ENF_ALIVE)) {
+      return;
+    }
+
     // if not enough time passed since lst item spawning
     if (_pTimer->CurrentTick()-m_tmLastSpawnTime<m_tmMinSpawnInterval) {
       // do nothing
