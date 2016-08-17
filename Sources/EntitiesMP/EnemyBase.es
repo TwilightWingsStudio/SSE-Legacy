@@ -201,6 +201,8 @@ properties:
 //
 240 FLOAT m_fSpeedMultiplier "Speed Multiplier" = 1.0f,
 
+245 BOOL m_bTouchSenseless "Touch Senseless" = FALSE,
+
 260 BOOL m_bCoward   "Coward" = FALSE,
 
 //171 INDEX m_iTacticsRetried = 0,
@@ -1154,26 +1156,28 @@ functions:
   }
 
   // --------------------------------------------------------------------------------------
-  // Set new player as hard target if possible.
+  // Set new entity as hard target if possible.
   // --------------------------------------------------------------------------------------
-  BOOL SetTargetHard(CEntity *penPlayer)
+  BOOL SetTargetHard(CEntity *penNewTarget)
   {
     // if invalid target
-    if (!IsValidForEnemy(penPlayer)) {
+    if (!IsValidForEnemy(penNewTarget)) {
       // do nothing
       return FALSE;
     }
+
     // if we already have hard target
-    if (m_ttTarget==TT_HARD) {
+    if (m_ttTarget == TT_HARD) {
       // do nothing
       return FALSE;
     }
+
     // remember new hard target
     CEntity *penOld = m_penEnemy;
     m_ttTarget = TT_HARD;
     m_dtDestination = DT_PLAYERCURRENT;
-    m_penEnemy = penPlayer;
-    return penOld!=penPlayer;
+    m_penEnemy = penNewTarget;
+    return penOld != penNewTarget;
   }
 
   // --------------------------------------------------------------------------------------
@@ -3291,10 +3295,11 @@ procedures:
         SendEvent(EReconsiderBehavior());
         resume;
       }
+
       // if new behavior is requested
       on (EReconsiderBehavior) : {
         // if we have an enemy
-        if (m_penEnemy!=NULL) {
+        if (m_penEnemy != NULL) {
           // attack it
           call AttackEnemy();
         // if we have a marker to walk to
@@ -3307,8 +3312,9 @@ procedures:
           m_bOnStartPosition = FALSE;
           call BeIdle();
         } else if (m_penFriend != NULL && !m_bRunningToFriend) {
-          if (CalcDist(m_penFriend)>GetProp(m_fCloseDistance)) { call Friendship(); }
-          else {
+          if (CalcDist(m_penFriend)>GetProp(m_fCloseDistance)) {
+            call Friendship();
+          } else {
             StopMoving();
             StandingAnim(); 
             m_bRunningToFriend=FALSE;    
@@ -3320,18 +3326,21 @@ procedures:
         }
         resume;
       }
+
       // on return from some of the sub-procedures
       on (EReturn) : {
         // start new behavior
         SendEvent(EReconsiderBehavior());
         resume;
       }
+
       // if attack restart is requested
       on (ERestartAttack) : {
         // start new behavior
         SendEvent(EReconsiderBehavior());
         resume;
       }
+
       // if enemy has been seen
       on (EWatch eWatch) : {
         // if new enemy
@@ -3357,6 +3366,7 @@ procedures:
         }
         resume;
       }
+
       // if you get damaged by someone
       on (EDamage eDamage) : {
         // eventually set new hard target
@@ -3380,6 +3390,7 @@ procedures:
         call BeWounded(EDamage());
         resume;
       }
+
       // if you hear something
       on (ESound eSound) : {
         // if deaf
@@ -3395,23 +3406,35 @@ procedures:
         }
         resume;
       }
+
       // on touch
       on (ETouch eTouch) : {
-        // set the new target if needed
-        if (IsDerivedFromClass(eTouch.penOther,"Enemy Base")) { 
-            if (((CEnemyBase&)(*eTouch.penOther)).GetTeam()==GetTeam()) { m_penFriend = eTouch.penOther; } 
-        }
-        if (IsOfClass(eTouch.penOther,"Player") && GetTeam() == 0) { m_penFriend = eTouch.penOther; }
-        BOOL bTargetChanged = SetTargetHard(eTouch.penOther);
-        // if target changed
-        if (bTargetChanged) {
-          // make sound that you spotted the player
-          SightSound();
-          // start new behavior
-          SendEvent(EReconsiderBehavior());
+        if (!m_bTouchSenseless) {
+          // If touched by EnemyBase.
+          if (IsDerivedFromClass(eTouch.penOther,"Enemy Base")) {
+            // If enemy from the same team make him a friend.  
+            if (((CEnemyBase&)(*eTouch.penOther)).GetTeam() == GetTeam()) {
+              m_penFriend = eTouch.penOther;
+            }
+          }
+          
+          // If touched by Player.
+          if (IsOfClass(eTouch.penOther,"Player") && GetTeam() == 0) {
+            m_penFriend = eTouch.penOther;
+          }
+          
+          BOOL bTargetChanged = SetTargetHard(eTouch.penOther);
+          // if target changed
+          if (bTargetChanged) {
+            // make sound that you spotted the player
+            SightSound();
+            // start new behavior
+            SendEvent(EReconsiderBehavior());
+          }
         }
         pass;
       }
+
       // if triggered manually
       on (ETrigger eTrigger) : {
         CEntity *penCaused = FixupCausedToPlayer(this, eTrigger.penCaused);
@@ -3424,6 +3447,7 @@ procedures:
         }
         resume;
       }
+
       // on stop -> stop enemy
       on (EStop) : {
         jump Inactive();
