@@ -225,11 +225,11 @@ functions:
    /* Get anim data for given animation property - return NULL for none. */
   CAnimData *GetAnimData(SLONG slPropertyOffset) 
   {
-    if (slPropertyOffset == offsetof(CModelHolder2, m_iModelAnimation)) {
+    if (slPropertyOffset == offsetof(CMovableModel, m_iModelAnimation)) {
       return GetModelObject()->GetData();
-    } else if (slPropertyOffset == offsetof(CModelHolder2, m_iTextureAnimation)) {
+    } else if (slPropertyOffset == offsetof(CMovableModel, m_iTextureAnimation)) {
       return GetModelObject()->mo_toTexture.GetData();
-    } else if (slPropertyOffset == offsetof(CModelHolder2, m_iLightAnimation)) {
+    } else if (slPropertyOffset == offsetof(CMovableModel, m_iLightAnimation)) {
       return m_aoLightAnimation.GetData();
     } else {
       return CEntity::GetAnimData(slPropertyOffset);
