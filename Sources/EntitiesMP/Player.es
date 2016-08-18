@@ -2920,7 +2920,7 @@ functions:
                   FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection)
   {
     // if exploded
-    if (GetRenderType()!=RT_MODEL) {
+    if (GetRenderType() !=RT_MODEL) {
       // do nothing
       return;
     }
@@ -2932,15 +2932,16 @@ functions:
     fDamageAmmount = Clamp(fDamageAmmount, 0.0f, 5000.0f);
 
     FLOAT fKickDamage = fDamageAmmount;
-    if( (dmtType == DMT_EXPLOSION) || (dmtType == DMT_IMPACT) || (dmtType == DMT_CANNONBALL_EXPLOSION) )
-    {
+
+    if ((dmtType == DMT_EXPLOSION) || (dmtType == DMT_IMPACT) || (dmtType == DMT_CANNONBALL_EXPLOSION)) {
       fKickDamage*=1.5;
     }
-    if (dmtType==DMT_DROWNING || dmtType==DMT_CLOSERANGE) {
+
+    if (dmtType == DMT_DROWNING || dmtType==DMT_CLOSERANGE) {
       fKickDamage /= 10;
     }
-    if (dmtType==DMT_CHAINSAW)
-    {
+
+    if (dmtType == DMT_CHAINSAW) {
       fKickDamage /= 10;
     }
 
@@ -2987,8 +2988,7 @@ functions:
       break;
     default:
     {
-      if(fOldLen != 0.0f)
-      {
+      if(fOldLen != 0.0f) {
         // cancel last push
         GiveImpulseTranslationAbsolute( -vDamageOld/fOldRootLen*fMassFactor);
       }
@@ -3003,31 +3003,34 @@ functions:
     }
     }
 
-    if( m_fMaxDamageAmmount<fDamageAmmount)
-    {
+    if (m_fMaxDamageAmmount < fDamageAmmount) {
       m_fMaxDamageAmmount = fDamageAmmount;
     }
+
     // if it has no spray, or if this damage overflows it
-    if ((m_tmSpraySpawned<=_pTimer->CurrentTick()-_pTimer->TickQuantum*8 || 
+    if ((m_tmSpraySpawned <= _pTimer->CurrentTick()-_pTimer->TickQuantum*8 || 
       m_fSprayDamage+fDamageAmmount>50.0f)) {
 
+      FLOAT3D vHitPointNew = vHitPoint;
+
+      // Fix incorrect spray spawn position.
+      if(vHitPointNew == FLOAT3D(0.0F, 0.0F, 0.0F)) {
+         vHitPointNew = GetPlacement().pl_PositionVector;
+      }
+
+      CPlacement3D plSpray = CPlacement3D(vHitPointNew, ANGLE3D(0, 0, 0));
+
       // spawn blood spray
-      CPlacement3D plSpray = CPlacement3D( vHitPoint, ANGLE3D(0, 0, 0));
       m_penSpray = CreateEntity( plSpray, CLASS_BLOOD_SPRAY);
       m_penSpray->SetParent( this);
       ESpawnSpray eSpawnSpray;
       eSpawnSpray.colBurnColor=C_WHITE|CT_OPAQUE;
       
-      if( m_fMaxDamageAmmount > 10.0f)
-      {
+      if (m_fMaxDamageAmmount > 10.0f) {
         eSpawnSpray.fDamagePower = 3.0f;
-      }
-      else if(m_fSprayDamage+fDamageAmmount>50.0f)
-      {
+      } else if (m_fSprayDamage + fDamageAmmount > 50.0f) {
         eSpawnSpray.fDamagePower = 2.0f;
-      }
-      else
-      {
+      } else {
         eSpawnSpray.fDamagePower = 1.0f;
       }
 
@@ -3054,7 +3057,7 @@ functions:
       m_fSprayDamage = 0.0f;
       m_fMaxDamageAmmount = 0.0f;
     }
-    m_fSprayDamage+=fDamageAmmount;
+    m_fSprayDamage += fDamageAmmount;
   }
 
 
@@ -3063,7 +3066,7 @@ functions:
                       FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection)
   {
     // don't harm yourself with knife or with rocket in easy/tourist mode
-    if( penInflictor==this && (dmtType==DMT_CLOSERANGE || dmtType==DMT_CHAINSAW ||
+    if( penInflictor == this && (dmtType==DMT_CLOSERANGE || dmtType==DMT_CHAINSAW ||
         ((dmtType==DMT_EXPLOSION||dmtType==DMT_CANNONBALL_EXPLOSION||dmtType==DMT_PROJECTILE) &&
           GetSP()->sp_gdGameDifficulty<=CSessionProperties::GD_EASY)) ) {
       return;
@@ -3076,7 +3079,7 @@ functions:
     }
 
     // god mode -> no one can harm you
-    if( cht_bGod && CheatsEnabled() ) { return; }
+    if (cht_bGod && CheatsEnabled()) { return; }
 
     // if invulnerable, nothing can harm you except telefrag or abyss
     const TIME tmDelta = m_tmInvulnerability - _pTimer->CurrentTick();
@@ -3084,20 +3087,20 @@ functions:
 
     // if invunerable after spawning
     FLOAT tmSpawnInvulnerability = GetSP()->sp_tmSpawnInvulnerability;
-    if (tmSpawnInvulnerability>0 && _pTimer->CurrentTick()-m_tmSpawned<tmSpawnInvulnerability) {
+    if (tmSpawnInvulnerability>0 && _pTimer->CurrentTick()-m_tmSpawned < tmSpawnInvulnerability) {
       // ignore damage
       return;
     }
 
     // check for friendly fire
     if (!GetSP()->sp_bFriendlyFire && GetSP()->sp_bCooperative) {
-      if (IsOfClass(penInflictor, "Player") && penInflictor!=this) {
+      if (IsOfClass(penInflictor, "Player") && penInflictor != this) {
         return;
       }
     }
 
     // ignore heat damage if dead
-    if (dmtType==DMT_HEAT && !(GetFlags()&ENF_ALIVE)) {
+    if (dmtType == DMT_HEAT && !(GetFlags()&ENF_ALIVE)) {
       return;
     }
 
@@ -3108,7 +3111,7 @@ functions:
     }
 
     // ignore zero damages
-    if (fDamageAmmount<=0) {
+    if (fDamageAmmount <= 0) {
       return;
     }
 
@@ -3116,8 +3119,7 @@ functions:
     if( dmtType == DMT_DROWNING) {
       // drowning
       fSubHealth = fDamageAmmount;
-    }
-    else {
+    } else {
       // damage and armor
       fSubArmor  = fDamageAmmount*2.0f/3.0f;      // 2/3 on armor damage
       fSubHealth = fDamageAmmount - fSubArmor;    // 1/3 on health damage
@@ -3129,9 +3131,9 @@ functions:
     }
 
     // if any damage
-    if( fSubHealth>0) { 
+    if( fSubHealth > 0) { 
       // if camera is active
-      if (m_penCamera!=NULL) {
+      if (m_penCamera != NULL) {
         // if the camera has onbreak
         CEntity *penOnBreak = ((CCamera&)*m_penCamera).m_penOnBreak;
         if (penOnBreak!=NULL) {
@@ -3147,7 +3149,7 @@ functions:
     }
 
     // if the player is doing autoactions
-    if (m_penActionMarker!=NULL) {
+    if (m_penActionMarker != NULL) {
       // ignore all damage
       return;
     }
@@ -3158,7 +3160,7 @@ functions:
     CPlayerEntity::ReceiveDamage( penInflictor, dmtType, fSubHealth, vHitPoint, vDirection);
 
     // red screen and hit translation
-    if( fDamageAmmount>1.0f) {
+    if( fDamageAmmount > 1.0f) {
 // !!!! this is obsolete, DamageImpact is used instead!
       if( dmtType==DMT_EXPLOSION || dmtType==DMT_PROJECTILE || dmtType==DMT_BULLET
        || dmtType==DMT_IMPACT    || dmtType==DMT_CANNONBALL || dmtType==DMT_CANNONBALL_EXPLOSION) {
@@ -3178,7 +3180,7 @@ functions:
     SendEventInRange( eSound, FLOATaabbox3D( GetPlacement().pl_PositionVector, 10.0f));
 
     // play hurting sound
-    if( dmtType==DMT_DROWNING) {
+    if (dmtType == DMT_DROWNING) {
       SetRandomMouthPitch( 0.9f, 1.1f);
       PlaySound( m_soMouth, GenderSound(SOUND_DROWN), SOF_3D);
       if(_pNetwork->IsPlayerLocal(this)) {IFeel_PlayEffect("WoundWater");}
@@ -3192,11 +3194,11 @@ functions:
         // determine corresponding sound
         INDEX iSound;
         char *strIFeel = NULL;
-        if( m_fDamageAmmount<5.0f) {
+        if( m_fDamageAmmount < 5.0f) {
           iSound = GenderSound(SOUND_WOUNDWEAK);
           strIFeel = "WoundWeak";
         }
-        else if( m_fDamageAmmount<25.0f) {
+        else if( m_fDamageAmmount < 25.0f) {
           iSound = GenderSound(SOUND_WOUNDMEDIUM);
           strIFeel = "WoundMedium";
         }
@@ -3204,10 +3206,13 @@ functions:
           iSound = GenderSound(SOUND_WOUNDSTRONG);
           strIFeel = "WoundStrong";
         }
+
         if( m_pstState==PST_DIVE) {
           iSound = GenderSound(SOUND_WOUNDWATER);
           strIFeel = "WoundWater";
-        } // override for diving
+        }
+
+        // override for diving
         SetRandomMouthPitch( 0.9f, 1.1f);
         // give some pause inbetween screaming
         TIME tmNow = _pTimer->CurrentTick();
