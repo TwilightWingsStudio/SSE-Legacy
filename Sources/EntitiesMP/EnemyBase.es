@@ -248,11 +248,17 @@ functions:
     m_tmPredict = 0;
   }
   
+  // --------------------------------------------------------------------------------------
+  // It's obvious.
+  // --------------------------------------------------------------------------------------
   virtual void ReminderEventProcessor(void)
   {
     return;
   }
   
+  // --------------------------------------------------------------------------------------
+  // Returns pointer to faction holder.
+  // --------------------------------------------------------------------------------------
   class CEnemyFactionHolder *GetFactionHolder(BOOL bClassCheck)
   {
     if (bClassCheck && !IsOfClass(m_penFactionHolder, "EnemyFactionHolder")) {
@@ -262,6 +268,9 @@ functions:
     return (CEnemyFactionHolder*)&*m_penFactionHolder;
   }
 
+  // --------------------------------------------------------------------------------------
+  // WTF?
+  // --------------------------------------------------------------------------------------
   void PutTextHere() {
     CPrintF("REACHED THIS SPOT --------------------------- \n");
   }
@@ -293,6 +302,9 @@ functions:
     return str;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Returns maximum health of object which will be crushed on touch.
+  // --------------------------------------------------------------------------------------
   virtual FLOAT GetCrushHealth(void)
   {
     return 0.0f;
@@ -355,6 +367,9 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
+  // Returns pointer to Watcher.
+  // --------------------------------------------------------------------------------------
   class CWatcher *GetWatcher(void)
   {
     ASSERT(m_penWatcher != NULL);
@@ -577,8 +592,8 @@ functions:
     FLOAT fLastTime = 0.0f;
 
     INDEX iIterations = 0;
-    do
-    {
+
+    do {
       iIterations++;
       FLOAT3D vDistance = vNewTarget-vShooting;
       FLOAT3D vXt, vYt;
@@ -591,8 +606,7 @@ functions:
       fLastTime=fTime;
       fTime = Sqrt(2.0f)*Sqrt((fA*fXt+fShootHeight-fYt)/en_fGravityA);
       vNewTarget = vTarget+vSpeedDest*fTime;
-    }
-    while( (Abs(fTime-fLastTime) > _pTimer->TickQuantum) && (iIterations<10) );
+    } while( (Abs(fTime-fLastTime) > _pTimer->TickQuantum) && (iIterations<10) );
 
     // calculate launch speed
     fLaunchSpeed = fXt/(fTime*Cos(aPitch));
@@ -617,8 +631,7 @@ functions:
     FLOAT3D vDistance = vNewTarget-vShootPos;
 
     // iterate to obtain accurate position
-    do
-    {
+    do {
       iIterations++;
       fLastTime=fTime;
       fTime = vDistance.Length()/fSpeedSrc;
@@ -626,6 +639,7 @@ functions:
       vNewTarget(2) = ClampDn( vNewTarget(2), fClampY);
       vDistance = vNewTarget-vShootPos;
     }
+
     while( (Abs(fTime-fLastTime) > _pTimer->TickQuantum) && (iIterations<10) );
     return vNewTarget;
   }
@@ -646,6 +660,10 @@ functions:
     strTargetProperty = "Marker";
     return TRUE;
   }
+  
+  // --------------------------------------------------------------------------------------
+  // Returns description to show it in SED.
+  // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const {
     ((CTString&)m_strDescription).PrintF("-><none>");
     if (m_penMarker!=NULL) {
@@ -654,6 +672,9 @@ functions:
     return m_strDescription;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Returns computer message filename.
+  // --------------------------------------------------------------------------------------
   virtual const CTFileName &GetComputerMessageName(void) const {
     static CTFileName fnm(CTString(""));
     return fnm;
@@ -684,7 +705,7 @@ functions:
   {
     CMovableModelEntity ::DumpSync_t(strm, iExtensiveSyncCheck);
     strm.FPrintF_t("enemy: ");
-    if (m_penEnemy!=NULL) {
+    if (m_penEnemy != NULL) {
       strm.FPrintF_t("id: %08X\n", m_penEnemy->en_ulID);
     } else {
       strm.FPrintF_t("none\n");
@@ -696,7 +717,6 @@ functions:
       SLONG slState = en_stslStateStack[iState];
       strm.FPrintF_t("  0x%08x %s\n", slState, en_pecClass->ec_pdecDLLClass->HandlerNameForState(slState));
     }*/
-
   }
 
   // --------------------------------------------------------------------------------------
@@ -1031,7 +1051,7 @@ functions:
       return;
     }
     // if no music holder remembered
-    if (m_penMainMusicHolder==NULL) {
+    if (m_penMainMusicHolder == NULL) {
       // not in fuss
       return;
     }
@@ -1483,7 +1503,7 @@ functions:
   // --------------------------------------------------------------------------------------
   virtual void StartPathFinding(void)
   {
-    ASSERT(m_dtDestination==DT_PATHPERSISTENT || m_dtDestination==DT_PATHTEMPORARY);
+    ASSERT(m_dtDestination == DT_PATHPERSISTENT || m_dtDestination == DT_PATHTEMPORARY);
 
     CEntity *penMarker;
     FLOAT3D vPath;

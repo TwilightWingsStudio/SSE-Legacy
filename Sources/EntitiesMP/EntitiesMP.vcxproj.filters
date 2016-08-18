@@ -2468,41 +2468,41 @@
     <CustomBuild Include="..\..\Flesh\Data\Messages\Enemies\Woman.txt">
       <Filter>Messages</Filter>
     </CustomBuild>
-    <CustomBuild Include="VariableHolder.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
-    <CustomBuild Include="Condition.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
-    <CustomBuild Include="BulletShooter.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
-    <CustomBuild Include="PropertyChanger.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
-    <CustomBuild Include="RayCaster.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
-    <CustomBuild Include="PlayerInfo.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
-    <CustomBuild Include="PlayerParenter.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
-    <CustomBuild Include="Explosion.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
-    <CustomBuild Include="MovableModel.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
-    <CustomBuild Include="MovableBrush.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
-    <CustomBuild Include="MBTeleporter.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
     <CustomBuild Include="EnemyFactionHolder.es">
       <Filter>Class Files\Enemies</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Condition.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Explosion.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MBTeleporter.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="BulletShooter.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="PlayerInfo.es">
+      <Filter>Class Files\Players</Filter>
+    </CustomBuild>
+    <CustomBuild Include="RayCaster.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="PlayerParenter.es">
+      <Filter>Class Files\Players</Filter>
+    </CustomBuild>
+    <CustomBuild Include="PropertyChanger.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MovableBrush.es">
+      <Filter>Class Files\Brushes</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MovableModel.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="VariableHolder.es">
+      <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
