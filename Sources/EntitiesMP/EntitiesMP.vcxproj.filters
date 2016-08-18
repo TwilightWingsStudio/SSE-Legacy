@@ -577,6 +577,9 @@
     <ClCompile Include="MBTeleporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EnemyFactionHolder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1587,6 +1590,12 @@
     <ClInclude Include="MBTeleporter_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EnemyFactionHolder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyFactionHolder_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2459,40 +2468,41 @@
     <CustomBuild Include="..\..\Flesh\Data\Messages\Enemies\Woman.txt">
       <Filter>Messages</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="VariableHolder.es">
-      <Filter>Class Files\Tools</Filter>
-    </None>
-    <None Include="Condition.es">
-      <Filter>Class Files\Tools</Filter>
-    </None>
-    <None Include="BulletShooter.es">
-      <Filter>Class Files\Tools</Filter>
-    </None>
-    <None Include="PropertyChanger.es">
-      <Filter>Class Files\Tools</Filter>
-    </None>
-    <None Include="RayCaster.es">
-      <Filter>Class Files\Tools</Filter>
-    </None>
-    <None Include="PlayerInfo.es">
-      <Filter>Class Files\Players</Filter>
-    </None>
-    <None Include="PlayerParenter.es">
-      <Filter>Class Files\Players</Filter>
-    </None>
-    <None Include="Explosion.es">
-      <Filter>Class Files\Effects</Filter>
-    </None>
-    <None Include="MovableModel.es">
-      <Filter>Class Files\Tools</Filter>
-    </None>
-    <None Include="MovableBrush.es">
-      <Filter>Class Files\Brushes</Filter>
-    </None>
-    <None Include="MBTeleporter.es">
-      <Filter>Class Files\Brushes</Filter>
-    </None>
+    <CustomBuild Include="VariableHolder.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Condition.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="BulletShooter.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="PropertyChanger.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="RayCaster.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="PlayerInfo.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="PlayerParenter.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Explosion.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MovableModel.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MovableBrush.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MBTeleporter.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="EnemyFactionHolder.es">
+      <Filter>Class Files\Enemies</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

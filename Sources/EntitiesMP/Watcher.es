@@ -40,7 +40,7 @@ functions:
   // --------------------------------------------------------------------------------------
   // Get watcher's owner.
   // --------------------------------------------------------------------------------------
-  class CEnemyBase *GetOwner(void)
+  class CEnemyBase* GetOwner(void)
   {
     ASSERT(m_penOwner != NULL);
     return (CEnemyBase*)&*m_penOwner;
@@ -106,6 +106,7 @@ functions:
   // --------------------------------------------------------------------------------------
   // Cast a ray to entity checking only for brushes.
   // --------------------------------------------------------------------------------------
+  /*
   BOOL IsVisible(CEntity *penEntity) 
   {
     ASSERT(penEntity!=NULL);
@@ -130,11 +131,12 @@ functions:
     // if hit nothing (no brush) the entity can be seen
     return (crRay.cr_penHit == NULL);     
   };
+  */
 
   // --------------------------------------------------------------------------------------
   // Find Closest CEnemyBase Entity.
   // --------------------------------------------------------------------------------------
-  CEntity *FindClosestEB(void)
+  CEntity* FindClosestEB(void)
   {
     CEntity *penClosestPlayer = NULL;
     m_penClosestFriend = NULL;
@@ -143,9 +145,9 @@ functions:
     //m_fClosestPlayer = UpperLimit(0.0f);
     m_fClosestFriend = UpperLimit(0.0f);
 
-    // If onwer from player-unfriendly team.
-    if (GetOwner()->GetTeam() != 0) {
-      FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten) {
+    CEnemyFactionHolder* penEFH = GetOwner()->GetFactionHolder(TRUE);
+
+    {FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten) {
         CEntity *pen = iten;
 
         // Skip invalid entities.
@@ -171,101 +173,42 @@ functions:
           continue;
         }
 
+        CEnemyFactionHolder* penEnemyEFH = enEB.GetFactionHolder(TRUE);
+
+        // Skip enemies without faction holders.
+        if (penEnemyEFH == NULL) {
+          continue;
+        }
+
+        // Skip enemies with invalid faction index.
+        if (!penEnemyEFH->IsIndexValid()) {
+          continue;
+        }
+
+        // Skip enemies from the same faction as owner.
+        if (penEFH->m_iFactionIndex == penEnemyEFH->m_iFactionIndex) {
+          continue;
+        }
+
+        // Skip enmies from ally and neutral factions.
+        EFRelationToPlayers efrtpRelation = penEFH->GetRelationToFaction(penEnemyEFH->m_iFactionIndex);
+        if (efrtpRelation == FRT_ALLY || efrtpRelation == FRT_NEUTRAL) {
+          continue;
+        }
+
         // Calculate distance between onwer and entity.
         FLOAT fDistance = (pen->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
 
-        // If from different teams.
-        if (enEB.GetTeam() != GetOwner()->GetTeam()) {
-          // If satisfies the distance.
-          if (fDistance < fClosestPlayer) {
-            if (/*IsVisible(pen)*/GetOwner()->SeeEntity(pen, Cos(GetOwner()->m_fViewAngle/2.0f)) || GetOwner()->m_fSenseRange > fDistance) {
-              fClosestPlayer = fDistance;
-              //if (m_fClosestPlayer>fDistance) { m_fClosestPlayer = fDistance; }
-              penClosestPlayer = pen;
-              m_penAllocatedEnemy = pen;
-            }
+        // If satisfies the distance.
+        if (fDistance < fClosestPlayer) {
+          if (GetOwner()->SeeEntity(pen, Cos(GetOwner()->m_fViewAngle/2.0f)) || GetOwner()->m_fSenseRange > fDistance) {
+            fClosestPlayer = fDistance;
+            //if (m_fClosestPlayer>fDistance) { m_fClosestPlayer = fDistance; }
+            penClosestPlayer = pen;
+            m_penAllocatedEnemy = pen;
           }
-        // If from same team.
-        } else {
-          // If satisfies the distance.
-          if (fDistance < fClosestFriend) {
-            if (GetOwner()->SeeEntity(pen, Cos(GetOwner()->m_fViewAngle/2.0f)) || GetOwner()->m_fSenseRange > fDistance) {
-              fClosestFriend = fDistance;
-              if (m_fClosestFriend>fDistance) { m_fClosestFriend = fDistance; }
-              m_penClosestFriend = pen;          
-            }
-          }            
         }
-      }
-    // If onwer from player-friendly team.
-    } else {
-      FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten) {
-        CEntity *pen = iten;
-
-        // Skip invalid entities.
-        if (pen == NULL) {
-          continue;
-        }
-
-        // Skip dead entities.
-        if (!(pen->GetFlags()&ENF_ALIVE)) {
-          continue;
-        }
-
-        // If entity based on CEnemyBase.
-        if (IsDerivedFromClass(pen, "Enemy Base")) {
-          // Cast to CEnemyBase.
-          CEnemyBase &enEB = (CEnemyBase&)*pen;
-
-          // Skip templates.
-          if (enEB.m_bTemplate) {
-            continue;
-          }
-
-          // Calculate distance between onwer and entity.
-          FLOAT fDistance = (pen->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
-
-          // If from different teams.
-          if (enEB.GetTeam() != GetOwner()->GetTeam()) {
-            // If satisfies the distance.
-            if (fDistance < fClosestPlayer) {
-              if (/*IsVisible(pen)*/GetOwner()->SeeEntity(pen, Cos(GetOwner()->m_fViewAngle/2.0f)) || GetOwner()->m_fSenseRange > fDistance) {
-                fClosestPlayer = fDistance;
-                //if (m_fClosestPlayer>fDistance) { m_fClosestPlayer = fDistance; }
-                penClosestPlayer = pen;
-                m_penAllocatedEnemy = pen;
-              }
-            }
-          // If from same team.
-          } else {
-            // If satisfies the distance.
-            if (fDistance < fClosestFriend) {
-              if (GetOwner()->SeeEntity(pen, Cos(GetOwner()->m_fViewAngle/2.0f)) || GetOwner()->m_fSenseRange > fDistance) {
-                  fClosestFriend = fDistance;
-                  if (m_fClosestFriend > fDistance) { m_fClosestFriend = fDistance; }
-                  m_penClosestFriend = pen;
-              }
-            }
-          }
-
-          // No any check needed after.
-          continue;
-        }
-
-        // If entity is CPlayer instance.
-        if (IsOfClass(pen, "Player")) {
-          FLOAT fDistance = (pen->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
-          // If satisfies the distance.
-          if (fDistance < fClosestFriend) {
-            if (/*IsVisible(pen)*/GetOwner()->SeeEntity(pen, Cos(GetOwner()->m_fViewAngle/2.0f)) || GetOwner()->m_fSenseRange > fDistance) {
-              fClosestFriend = fDistance;
-              if (m_fClosestFriend > fDistance) { m_fClosestFriend = fDistance; }
-              m_penClosestFriend = pen;          
-            }
-          }                 
-        }   
-      }
-    }
+    }}
 
     if (fClosestPlayer < m_fClosestPlayer) { m_fClosestPlayer = fClosestPlayer; }
     return penClosestPlayer;
@@ -274,37 +217,46 @@ functions:
   // --------------------------------------------------------------------------------------
   // Find Closest CPlayer Entity.
   // --------------------------------------------------------------------------------------
-  CEntity *FindClosestPlayer(void)
+  CEntity* FindClosestPlayer(void)
   {
     CEntity *penClosestPlayer = NULL;
     FLOAT fClosestPlayer = UpperLimit(0.0f);
 
-    // Cycle through all players
-    for (INDEX iPlayer = 0; iPlayer < GetMaxPlayers(); iPlayer++) {
-      CEntity *penPlayer = GetPlayerEntity(iPlayer);
+    CEnemyFactionHolder* penEFH = GetOwner()->GetFactionHolder(TRUE);
 
-      // Skip invalid players.
-      if (penPlayer == NULL) {
-        continue;
-      }
+    // If invalid index in faction holder we cant' use this faction holder!
+    if (penEFH != NULL && !penEFH->IsIndexValid()) {
+      penEFH = NULL;
+    }
 
-      // Skip dead players.
-      if (!(penPlayer->GetFlags()&ENF_ALIVE)) {
-        continue;
-      }
-
-      // Skip invisible players.
-      if (penPlayer->GetFlags()&ENF_INVISIBLE) {
-        continue;
-      }
-
-      // calculate distance to player
-      FLOAT fDistance =  (penPlayer->GetPlacement().pl_PositionVector - m_penOwner->GetPlacement().pl_PositionVector).Length();
-
-      // update if closer
-      if (fDistance < fClosestPlayer) {
-        fClosestPlayer = fDistance;
-        penClosestPlayer = penPlayer;
+    if (penEFH != NULL && penEFH->m_efrtRelationToPlayers == FRT_ENEMY) {
+      // Cycle through all players
+      for (INDEX iPlayer = 0; iPlayer < GetMaxPlayers(); iPlayer++) {
+        CEntity *penPlayer = GetPlayerEntity(iPlayer);
+      
+        // Skip invalid players.
+        if (penPlayer == NULL) {
+          continue;
+        }
+      
+        // Skip dead players.
+        if (!(penPlayer->GetFlags()&ENF_ALIVE)) {
+          continue;
+        }
+      
+        // Skip invisible players.
+        if (penPlayer->GetFlags()&ENF_INVISIBLE) {
+          continue;
+        }
+      
+        // calculate distance to player
+        FLOAT fDistance =  (penPlayer->GetPlacement().pl_PositionVector - m_penOwner->GetPlacement().pl_PositionVector).Length();
+      
+        // update if closer
+        if (fDistance < fClosestPlayer) {
+          fClosestPlayer = fDistance;
+          penClosestPlayer = penPlayer;
+        }
       }
     }
 
@@ -329,6 +281,7 @@ functions:
     m_penOwner->SendEvent(eWatch);
   }
 
+  // --------------------------------------------------------------------------------------
   void CheckIfPlayerVisible(void)
   {
     // if the owner is blind
@@ -367,12 +320,13 @@ functions:
     }
 
     // if inside view angle and visible
-    if ((GetOwner()->SeeEntity(penPlayer, Cos(GetOwner()->m_fViewAngle/2.0f)) &&
-        GetOwner()->GetTeam() != 0 ) || IsDerivedFromClass(penPlayer, "Enemy Base")) {
+    if ((GetOwner()->SeeEntity(penPlayer, Cos(GetOwner()->m_fViewAngle/2.0f))) || IsDerivedFromClass(penPlayer, "Enemy Base")) {
       // send event to owner
       SendWatchEvent(penPlayer);
     } else if (m_penClosestFriend != NULL) { 
-        if (GetOwner()->SeeEntity(m_penClosestFriend,Cos(GetOwner()->m_fViewAngle/2.0f))) { SendWatchEvent(NULL); }
+      if (GetOwner()->SeeEntity(m_penClosestFriend,Cos(GetOwner()->m_fViewAngle/2.0f))) {
+        SendWatchEvent(NULL);
+      }
     }
   };
 
@@ -410,7 +364,8 @@ functions:
     FLOAT fOrgDistance = m_fClosestPlayer;
 
     if (m_penAllocatedEnemy != NULL) {
-      if (!IsVisible(m_penAllocatedEnemy) || (!(m_penAllocatedEnemy->GetFlags()&ENF_ALIVE) || (m_penAllocatedEnemy->GetFlags()&ENF_INVISIBLE))) 
+      // If dead or invisible.
+      if (!(m_penAllocatedEnemy->GetFlags()&ENF_ALIVE) || (m_penAllocatedEnemy->GetFlags()&ENF_INVISIBLE) /*|| !IsVisible(m_penAllocatedEnemy)*/) 
       {
         m_penAllocatedEnemy = NULL;
       }
@@ -421,7 +376,9 @@ functions:
     penClosest = FindClosestPlayer();
     CEntity *penClosestEB = NULL;
 
-    if (GetOwner()->m_bUseTeams) { penClosestEB = FindClosestEB(); } 
+    // We have faction holder? We can EnemyBase as target!
+    if (GetOwner()->GetFactionHolder(TRUE) && GetOwner()->GetFactionHolder(FALSE)->IsIndexValid()) { penClosestEB = FindClosestEB(); } 
+
     if (penClosestEB != NULL) {
       penClosest = penClosestEB;
     }
@@ -432,17 +389,17 @@ functions:
     FLOAT fStopDistance  = Max(fSeeDistance*1.5f, GetOwner()->m_fActivityRange);
 
     // if players exited enemy's scope
-    if (fOrgDistance<fStopDistance && m_fClosestPlayer >= fStopDistance) {
+    if (fOrgDistance < fStopDistance && m_fClosestPlayer >= fStopDistance) {
       // stop owner
       m_penOwner->SendEvent(EStop());
     // if players entered enemy's scope
-    } else if (fOrgDistance>=fStopDistance && m_fClosestPlayer<fStopDistance) {
+    } else if (fOrgDistance >= fStopDistance && m_fClosestPlayer < fStopDistance) {
       // start owner
       m_penOwner->SendEvent(EStart());
     }
 
     // if the closest player is close enough to be seen
-    if (m_fClosestPlayer<fSeeDistance || m_fClosestFriend<fSeeDistance) {
+    if (penClosest != NULL && m_fClosestPlayer < fSeeDistance/* || m_fClosestFriend < fSeeDistance*/) {
       // check for seeing any of the players
       if (m_penAllocatedEnemy == NULL) { m_penAllocatedEnemy = penClosest; }
       CheckIfPlayerVisible();
@@ -462,7 +419,7 @@ functions:
   // --------------------------------------------------------------------------------------
   // This is called directly from CEnemyBase to check if another player has come too close.
   // --------------------------------------------------------------------------------------
-  CEntity *CheckCloserPlayer(CEntity *penCurrentTarget, FLOAT fRange)
+  CEntity* CheckCloserPlayer(CEntity *penCurrentTarget, FLOAT fRange)
   {
     // if the owner is blind
     if ( GetOwner()->m_bBlind) {
@@ -484,9 +441,9 @@ functions:
 
     CEntity *penAllocatedEnemy = FindClosestEB();
 
-    if (GetOwner()->GetTeam()==0 && penAllocatedEnemy != penCurrentTarget && penAllocatedEnemy != NULL) {
-      return /*FindClosestEB();*/penAllocatedEnemy;
-    }
+    //if (GetOwner()->GetTeam()==0 && penAllocatedEnemy != penCurrentTarget && penAllocatedEnemy != NULL) {
+    //  return /*FindClosestEB();*/penAllocatedEnemy;
+    //}
 
     // for all other players
     for (INDEX iPlayer = 0; iPlayer < GetMaxPlayers(); iPlayer++) {
@@ -515,7 +472,7 @@ functions:
   // --------------------------------------------------------------------------------------
   // This is called directly from enemybase to attack multiple players (for really big enemies).
   // --------------------------------------------------------------------------------------
-  CEntity *CheckAnotherPlayer(CEntity *penCurrentTarget)
+  CEntity* CheckAnotherPlayer(CEntity *penCurrentTarget)
   {
     // if the owner is blind, or no current target
     if ( GetOwner()->m_bBlind || penCurrentTarget==NULL) {
@@ -542,9 +499,10 @@ functions:
     INDEX ctPlayers = GetMaxPlayers();
     for (INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
       CEntity *penPlayer = GetPlayerEntity((iPlayer+iOffset)%ctPlayers);
-      if (penPlayer==NULL || penPlayer==penCurrentTarget) {
+      if (penPlayer == NULL || penPlayer == penCurrentTarget) {
         continue;
       }
+
       // if player is alive and visible
       if ((penPlayer->GetFlags()&ENF_ALIVE) && !(penPlayer->GetFlags()&ENF_INVISIBLE)) {
         // calculate distance to player
@@ -569,7 +527,6 @@ functions:
   {
     return( sizeof(CWatcher) - sizeof(CRationalEntity) + CRationalEntity::GetUsedMemory());
   }
-
 
 procedures:
 

@@ -30,6 +30,7 @@ uses "EntitiesMP/Debris";
 uses "EntitiesMP/EnemyMarker";
 uses "EntitiesMP/MusicHolder";
 uses "EntitiesMP/BloodSpray";
+uses "EntitiesMP/EnemyFactionHolder";
 
 event ERestartAttack {
 };
@@ -193,17 +194,13 @@ properties:
 213 CEntityPointer m_penFriend,
 214 BOOL m_bRunningToFriend = FALSE,
 
-// Temporary.
-220 INDEX m_iTeam "T Team" = 1,
-221 BOOL m_bUseTeams "T Use Teams" = FALSE,
-222 BOOL m_bFriendlyFire  "T Friendly Fire" = FALSE,
+220 CEntityPointer m_penFactionHolder "Faction Holder",
 
-//
 240 FLOAT m_fSpeedMultiplier "Speed Multiplier" = 1.0f,
 
 245 BOOL m_bTouchSenseless "Touch Senseless" = FALSE,
 
-260 BOOL m_bCoward   "Coward" = FALSE,
+250 BOOL m_bCoward   "Coward" = FALSE,
 
 //171 INDEX m_iTacticsRetried = 0,
 
@@ -255,24 +252,32 @@ functions:
   {
     return;
   }
-
-  INDEX GetTeam(void)
+  
+  class CEnemyFactionHolder *GetFactionHolder(BOOL bClassCheck)
   {
-    return m_iTeam;
+    if (bClassCheck && !IsOfClass(m_penFactionHolder, "EnemyFactionHolder")) {
+      return NULL;
+    }
+
+    return (CEnemyFactionHolder*)&*m_penFactionHolder;
   }
 
   void PutTextHere() {
     CPrintF("REACHED THIS SPOT --------------------------- \n");
   }
 
-  // called by other entities to set time prediction parameter
+  // --------------------------------------------------------------------------------------
+  // Called by other entities to set time prediction parameter.
+  // --------------------------------------------------------------------------------------
   void SetPredictionTime(TIME tmAdvance)   // give time interval in advance to set
   {
     ASSERT(!IsPredictor());
     m_tmPredict = _pTimer->CurrentTick()+tmAdvance;
   }
 
-  // called by engine to get the upper time limit 
+  // --------------------------------------------------------------------------------------
+  // Called by engine to get the upper time limit.
+  // --------------------------------------------------------------------------------------
   TIME GetPredictionTime(void)   // return moment in time up to which to predict this entity
   {
     return m_tmPredict;
@@ -301,6 +306,9 @@ functions:
     return m_bCountKillInStatistcs;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Causes cannonballs explode when touching them.
+  // --------------------------------------------------------------------------------------
   virtual BOOL ForcesCannonballToExplode(void)
   {
     return FALSE;
@@ -335,13 +343,13 @@ functions:
     }
 
     // if current player is inside threat distance
-    if (CalcDist(m_penEnemy)<GetThreatDistance()) {
+    if (CalcDist(m_penEnemy) < GetThreatDistance()) {
       // do not switch
       return;
     }
     // maybe switch
     CEntity *penNewEnemy = GetWatcher()->CheckAnotherPlayer(m_penEnemy);
-    if (penNewEnemy!=m_penEnemy && penNewEnemy!=NULL) {
+    if (penNewEnemy!=m_penEnemy && penNewEnemy != NULL) {
       m_penEnemy = penNewEnemy;
       SendEvent(EReconsiderBehavior());
     }
@@ -349,9 +357,10 @@ functions:
 
   class CWatcher *GetWatcher(void)
   {
-    ASSERT(m_penWatcher!=NULL);
+    ASSERT(m_penWatcher != NULL);
     return (CWatcher*)&*m_penWatcher;
   }
+
   export void Copy(CEntity &enOther, ULONG ulFlags)
   {
     CMovableModelEntity::Copy(enOther, ulFlags);
@@ -431,7 +440,7 @@ functions:
   // --------------------------------------------------------------------------------------
   FLOAT3D CalcPlaneDelta(CEntity *penEntity) 
   {
-    ASSERT(penEntity!=NULL);
+    ASSERT(penEntity != NULL);
     FLOAT3D vPlaneDelta;
     // find vector from you to target in XZ plane
     GetNormalComponent(
@@ -731,11 +740,27 @@ functions:
       return;
     }
 
+    // Friendly fire for factions.
     if (IsDerivedFromClass(penInflictor, "Enemy Base")) {
-      if (m_bFriendlyFire == FALSE && ((CEnemyBase*)penInflictor)->GetTeam()==m_iTeam) {
-        return;
+      CEnemyFactionHolder* penEFH = GetFactionHolder(TRUE);
+      
+      if (penEFH && penEFH->IsIndexValid()) {
+        CEnemyFactionHolder* penEnemyEFH = ((CEnemyBase*)penInflictor)->GetFactionHolder(TRUE);
+        
+        if (penEnemyEFH && penEnemyEFH->IsIndexValid()) {
+          INDEX iEnemyFactionIndex = penEnemyEFH->m_iFactionIndex;
+
+          if (penEFH->m_iFactionIndex == iEnemyFactionIndex && !penEFH->m_bDamageFromMembers) {
+            return;
+          }
+
+          if (penEFH->GetRelationToFaction(iEnemyFactionIndex) == FRT_ALLY && !penEFH->m_bDamageFromAllies) {
+            return;
+          }
+        }
       }
     }
+
     FLOAT fNewDamage = fDamageAmmount;
 
     // adjust damage
@@ -744,19 +769,21 @@ functions:
     fNewDamage *=GetGameDamageMultiplier();
 
     // if no damage
-    if (fNewDamage==0) {
+    if (fNewDamage == 0) {
       // do nothing
       return;
     }
+
     FLOAT fKickDamage = fNewDamage;
-    if ( (dmtType == DMT_EXPLOSION) || (dmtType == DMT_IMPACT) || (dmtType == DMT_CANNONBALL_EXPLOSION) )
-    {
+    if ( (dmtType == DMT_EXPLOSION) || (dmtType == DMT_IMPACT) || (dmtType == DMT_CANNONBALL_EXPLOSION) ) {
       fKickDamage*=1.5;
     }
-    if (dmtType==DMT_DROWNING || dmtType==DMT_CLOSERANGE || dmtType==DMT_CHAINSAW) {
+
+    if (dmtType == DMT_DROWNING || dmtType == DMT_CLOSERANGE || dmtType == DMT_CHAINSAW) {
       fKickDamage /= 10;
     }
-    if (dmtType==DMT_BURNING)
+
+    if (dmtType == DMT_BURNING)
     {
       fKickDamage /= 100000;
       UBYTE ubR, ubG, ubB, ubA;
@@ -772,12 +799,12 @@ functions:
     m_tmLastDamage = tmNow;
 
     // fade damage out
-    if (tmDelta>=_pTimer->TickQuantum*3) {
-      m_vDamage=FLOAT3D(0,0,0);
+    if (tmDelta >= _pTimer->TickQuantum*3) {
+      m_vDamage = FLOAT3D(0, 0, 0);
     }
     // add new damage
     FLOAT3D vDirectionFixed;
-    if (vDirection.ManhattanNorm()>0.5f) {
+    if (vDirection.ManhattanNorm() > 0.5f) {
       vDirectionFixed = vDirection;
     } else {
       vDirectionFixed = -en_vGravityDir;
@@ -904,8 +931,7 @@ functions:
         colAlpha = GetModelInstance()->GetModelColor();
         colAlpha = (colAlpha&0xFFFFFF00) + (COLOR(fTimeRemain/m_fFadeTime*0xFF)&0xFF);
         GetModelInstance()->SetModelColor(colAlpha);
-      }
-      else {
+      } else {
         colAlpha = GetModelObject()->mo_colBlendColor;
         colAlpha = (colAlpha&0xFFFFFF00) + (COLOR(fTimeRemain/m_fFadeTime*0xFF)&0xFF);
         GetModelObject()->mo_colBlendColor = colAlpha;
@@ -1092,11 +1118,38 @@ functions:
 
     CEntity *penCurEnemy = (CEntity*)this;
 
-    // If target instanceof CPlayer.
-    if (m_iTeam != 0 && IsDerivedFromClass(penNewTarget, "Player")) {
+    CEnemyFactionHolder* penEFH = GetFactionHolder(TRUE);
+
+    if (IsOfClass(penNewTarget, "Player")) {
+      // If no faction holder.
+      if (penEFH == NULL) {
+        return TRUE;
+      }
+
+      // Invalid faction index? Ignore faction holder!
+      if (!penEFH->IsIndexValid()) {
+        return TRUE;
+      }
+      
+      // Allies can't be attacked.
+      if (penEFH->m_efrtRelationToPlayers == FRT_ALLY) {
+        return FALSE;
+      }
+
       return TRUE;
-    // If target instanceof CEnemyBase
-    } else if (IsDerivedFromClass(penNewTarget, "Enemy Base")) {
+    }
+
+    // Enemies without faction holder can't attack EnemyBase.
+    if (penEFH == NULL) {
+      return FALSE;
+    }
+
+    // Invalid faction index? Ignore faction holder! Without faction holder our enemy can't attack EnemyBase.
+    if (!penEFH->IsIndexValid()) {
+      return FALSE;
+    }
+
+    if (IsDerivedFromClass(penNewTarget, "Enemy Base")) {
       CEnemyBase &enEB = (CEnemyBase&)*penNewTarget;
 
       // Templates can't be attacked!
@@ -1104,17 +1157,29 @@ functions:
         return FALSE;
       }
 
-      if (m_iTeam != 0 && penNewTarget != penCurEnemy) {
-        if (enEB.GetTeam() != m_iTeam) {
-          return TRUE;
-        } else {
-          return FALSE;
-        }
-      } else if (penNewTarget != penCurEnemy) {
-        if (enEB.GetTeam() != m_iTeam) {
-          return TRUE;
-        }
+      CEnemyFactionHolder* penEnemyEFH = enEB.GetFactionHolder(TRUE);
+
+      // Skip EnemyBase without faction holder.
+      if (penEnemyEFH == NULL) {
+        return FALSE;
       }
+
+      // Skip EnemyBase with invalid faction index.
+      if (!penEnemyEFH->IsIndexValid()) {
+        return FALSE;
+      }
+
+      // Skip EnemyBase with the same team.
+      if (penEFH->m_iFactionIndex == penEnemyEFH->m_iFactionIndex) {
+        return FALSE;
+      }
+      
+      // Skip EnemyBases from ally faction.
+      if (penEFH->GetRelationToFaction(penEnemyEFH->m_iFactionIndex) == FRT_ALLY) {
+        return FALSE;
+      }
+
+      return TRUE;
     }
 
     return FALSE;
@@ -1142,11 +1207,13 @@ functions:
       // do nothing
       return FALSE;
     }
+
     // if we already have any kind of target
     if (m_ttTarget!=TT_NONE) {
       // do nothing
       return FALSE;
     }
+
     // remember new soft target
     CEntity *penOld = m_penEnemy;
     m_ttTarget = TT_SOFT;
@@ -1190,6 +1257,7 @@ functions:
       // do nothing
       return FALSE;
     }
+
     // remember new hard target
     CEntity *penOld = m_penEnemy;
     m_ttTarget = TT_HARD;
@@ -1290,7 +1358,7 @@ functions:
     } else if (ulFlags&MF_ROTATEH) {
       RotatingAnim();
     } else {
-      if (m_penEnemy!=NULL) {
+      if (m_penEnemy != NULL) {
         StandingAnimFight();
       } else {
         StandingAnim();
@@ -1426,7 +1494,7 @@ functions:
       GetPlacement().pl_PositionVector, m_penEnemy->GetPlacement().pl_PositionVector,
       penMarker, vPath);
     // if not found, or not visible
-    if (penMarker==NULL || !IsVisible(penMarker)) {
+    if (penMarker == NULL || !IsVisible(penMarker)) {
       // no path finding
       m_dtDestination=DT_PLAYERSPOTTED;
       // remember as if spotted position
@@ -1503,7 +1571,7 @@ functions:
         m_dtDestination = DT_PATHTEMPORARY;
       }
       StartPathFinding();
-      return m_penPathMarker!=NULL;
+      return m_penPathMarker != NULL;
     } else {
       return FALSE;
     }
@@ -1615,8 +1683,7 @@ functions:
     
     // return if there is no tactics manager or if it points to wrong type of entity
     // or if there is no enemy
-    if (m_penTacticsHolder==NULL || !IsOfClass(m_penTacticsHolder, "TacticsHolder")
-        || m_penEnemy==NULL) {
+    if (m_penTacticsHolder == NULL || !IsOfClass(m_penTacticsHolder, "TacticsHolder") || m_penEnemy == NULL) {
       return;
     }
   
@@ -1651,14 +1718,14 @@ functions:
           m_bTacticActive = FALSE;
         }
         
-        fDistanceRatio=1.0f;
+        fDistanceRatio = 1.0f;
         if (m_fTacticVar3>0) {
           // get enemy distance
           FLOAT fClamped=Clamp(CalcDist(m_penEnemy)-(m_fTacticVar4*m_fTacticVar3), 0.0f, m_fTacticVar4);
           fDistanceRatio=fClamped/(m_fTacticVar4*(1-m_fTacticVar3));
         }
         
-        fTimeRatio=1.0f;
+        fTimeRatio = 1.0f;
         if (m_fTacticVar2>0) {
           fTimeRatio=1.0f-(ClampUp((_pTimer->CurrentTick() - m_tmTacticsActivation)/m_fTacticVar2, 1.0f));
         }
@@ -1907,7 +1974,8 @@ functions:
       MakeRotationMatrixFast(mRotation, m_penEnemy->GetPlacement().pl_OrientationAngle);
       vShootTarget = vPredictedPos + vBody*mRotation;
     }
-    // launch
+
+    // launch projectile
     CPlacement3D pl;
     PreparePropelledProjectile(pl, vShootTarget, vOffset, aOffset);
     CEntityPointer penProjectile = CreateEntity(pl, CLASS_PROJECTILE);
@@ -1998,7 +2066,7 @@ functions:
     FLOAT3D vBodySpeed = en_vCurrentTranslationAbsolute-en_vGravityDir*(en_vGravityDir%en_vCurrentTranslationAbsolute);
 
     // if allowed and fleshy
-    if ( bGibs && !m_bRobotBlowup)
+    if (bGibs && !m_bRobotBlowup)
     {
       // readout blood type
       const INDEX iBloodType = GetSP()->sp_iBlood;
@@ -3080,7 +3148,7 @@ procedures:
     }
 
     // if killed by someone
-    if (penKiller!=NULL) {
+    if (penKiller != NULL) {
       // give him score
       EReceiveScore eScore;
       eScore.iPoints = m_iScore;
@@ -3182,6 +3250,7 @@ procedures:
   // --------------------------------------------------------------------------------------
   Death(EVoid) 
   {
+
     StopMoving();     // stop moving
     DeathSound();     // death sound
     LeaveStain(FALSE);
@@ -3200,24 +3269,22 @@ procedures:
     // start death anim
     INDEX iAnim = AnimForDeath();
     // use tactic variables for temporary data
-    m_vTacticsStartPosition=FLOAT3D(1,1,1);
-    m_fTacticVar4=WaitForDust(m_vTacticsStartPosition);
+    m_vTacticsStartPosition = FLOAT3D(1, 1, 1);
+    m_fTacticVar4 = WaitForDust(m_vTacticsStartPosition);
     // remember start time
-    m_fTacticVar5=_pTimer->CurrentTick();
+    m_fTacticVar5 = _pTimer->CurrentTick();
     // mark that we didn't spawned dust yet
-    m_fTacticVar3=-1;
+    m_fTacticVar3 =- 1;
+
     // if no dust should be spawned
-    if ( m_fTacticVar4<0)
-    {
+    if (m_fTacticVar4 < 0) {
       autowait(GetAnimLength(iAnim));
-    }
     // should spawn dust
-    else if ( TRUE)
-    {
-      while(_pTimer->CurrentTick()<m_fTacticVar5+GetCurrentAnimLength())
+    } else if (TRUE) {
+      while(_pTimer->CurrentTick() < m_fTacticVar5 + GetCurrentAnimLength())
       {
         autowait(_pTimer->TickQuantum);
-        if (en_penReference!=NULL && _pTimer->CurrentTick()>=m_fTacticVar5+m_fTacticVar4 && m_fTacticVar3<0)
+        if (en_penReference != NULL && _pTimer->CurrentTick() >= m_fTacticVar5 + m_fTacticVar4 && m_fTacticVar3 < 0)
         {
           // spawn dust effect
           CPlacement3D plFX=GetPlacement();
@@ -3234,6 +3301,7 @@ procedures:
           // mark that we spawned dust
           m_fTacticVar3=1;
         }
+
       }
     }
 
@@ -3251,10 +3319,11 @@ procedures:
     // start bloody stain growing out from beneath the corpse
     LeaveStain(TRUE);
 
-    // check if you have attached flame
+    // try to get attached flame
     CEntityPointer penFlame = GetChildOfClass("Flame");
-    if (penFlame!=NULL)
-    {
+
+    // check if you have attached flame
+    if (penFlame != NULL) {
       // send the event to stop burning
       EStopFlaming esf;
       esf.m_bNow=FALSE;
@@ -3409,7 +3478,27 @@ procedures:
 
       // on touch
       on (ETouch eTouch) : {
-        if (!m_bTouchSenseless) {
+        if (m_bTouchSenseless) {
+          pass;
+        }
+
+        CEnemyFactionHolder* penEFH = GetFactionHolder(TRUE);
+
+        // Use Default behavior when haven't faction holder.
+        if (penEFH == NULL) {
+          // set the new target if needed
+          BOOL bTargetChanged = SetTargetHard(eTouch.penOther);
+          // if target changed
+          if (bTargetChanged) {
+            // make sound that you spotted the player
+            SightSound();
+            // start new behavior
+            SendEvent(EReconsiderBehavior());
+          }
+          pass;
+        }
+
+          /*
           // If touched by EnemyBase.
           if (IsDerivedFromClass(eTouch.penOther,"Enemy Base")) {
             // If enemy from the same team make him a friend.  
@@ -3431,7 +3520,9 @@ procedures:
             // start new behavior
             SendEvent(EReconsiderBehavior());
           }
-        }
+          */
+          // TODO: Faction touch event.
+
         pass;
       }
 
