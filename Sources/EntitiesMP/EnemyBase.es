@@ -776,7 +776,7 @@ functions:
 
     FLOAT fKickDamage = fNewDamage;
     if ( (dmtType == DMT_EXPLOSION) || (dmtType == DMT_IMPACT) || (dmtType == DMT_CANNONBALL_EXPLOSION) ) {
-      fKickDamage*=1.5;
+      fKickDamage *= 1.5;
     }
 
     if (dmtType == DMT_DROWNING || dmtType == DMT_CLOSERANGE || dmtType == DMT_CHAINSAW) {
@@ -826,13 +826,11 @@ functions:
 
     FLOAT fMassFactor = 300.0f/((EntityInfo*)GetEntityInfo())->fMass;
     
-    if ( !(en_ulFlags & ENF_ALIVE))
-    {
+    if ( !(en_ulFlags & ENF_ALIVE)) {
       fMassFactor /= 3;
     }
 
-    if (fOldLen != 0.0f)
-    {
+    if (fOldLen != 0.0f) {
       // cancel last push
       GiveImpulseTranslationAbsolute( -vDamageOld/fOldRootLen*fMassFactor);
     }
@@ -846,38 +844,38 @@ functions:
       m_fSprayDamage+fNewDamage>50.0f)
       && m_fSpiritStartTime==0) {*/
     
-    if ( m_fMaxDamageAmmount<fDamageAmmount)
-    {
+    if ( m_fMaxDamageAmmount < fDamageAmmount) {
       m_fMaxDamageAmmount = fDamageAmmount;
     }
-    // if it has no spray, or if this damage overflows it, and not already disappearing
-    if ((m_tmSpraySpawned<=_pTimer->CurrentTick()-_pTimer->TickQuantum*8 || 
-      m_fSprayDamage+fNewDamage>50.0f)
-      && m_fSpiritStartTime==0 &&
-      dmtType!=DMT_CHAINSAW && 
-      !(dmtType==DMT_BURNING && GetHealth()<0) ) {
 
-      // spawn blood spray
-      CPlacement3D plSpray = CPlacement3D( vHitPoint, ANGLE3D(0, 0, 0));
+    // if it has no spray, or if this damage overflows it, and not already disappearing
+    if ((m_tmSpraySpawned <= _pTimer->CurrentTick()-_pTimer->TickQuantum*8 || 
+      m_fSprayDamage+fNewDamage > 50.0f) && m_fSpiritStartTime == 0 &&
+      dmtType!=DMT_CHAINSAW && !(dmtType==DMT_BURNING && GetHealth() < 0) ) {
+
+      FLOAT3D vHitPointNew = vHitPoint;
+      // Fix incorrect spray spawn position.
+      if(vHitPointNew == FLOAT3D(0.0F, 0.0F, 0.0F)) {
+         vHitPointNew = GetPlacement().pl_PositionVector;
+      }
+
+      CPlacement3D plSpray = CPlacement3D( vHitPointNew, ANGLE3D(0, 0, 0));
+
+      // Spawn the blood spray.
       m_penSpray = CreateEntity( plSpray, CLASS_BLOOD_SPRAY);
-      if (m_sptType != SPT_ELECTRICITY_SPARKS)
-      {
+
+      if (m_sptType != SPT_ELECTRICITY_SPARKS) {
         m_penSpray->SetParent( this);
       }
 
       ESpawnSpray eSpawnSpray;
       eSpawnSpray.colBurnColor=C_WHITE|CT_OPAQUE;
       
-      if ( m_fMaxDamageAmmount > 10.0f)
-      {
+      if ( m_fMaxDamageAmmount > 10.0f) {
         eSpawnSpray.fDamagePower = 3.0f;
-      }
-      else if (m_fSprayDamage+fNewDamage>50.0f)
-      {
+      } else if (m_fSprayDamage+fNewDamage>50.0f) {
         eSpawnSpray.fDamagePower = 2.0f;
-      }
-      else
-      {
+      } else {
         eSpawnSpray.fDamagePower = 1.0f;
       }
 
@@ -890,7 +888,7 @@ functions:
       GetNormalComponent( vHitPointRelative, en_vGravityDir, vReflectingNormal);
       vReflectingNormal.SafeNormalize();
       
-      vReflectingNormal(1)/=5.0f;
+      vReflectingNormal(1) /= 5.0f;
     
       FLOAT3D vProjectedComponent = vReflectingNormal*(vDirection%vReflectingNormal);
       FLOAT3D vSpilDirection = vDirection-vProjectedComponent*2.0f-en_vGravityDir*0.5f;
