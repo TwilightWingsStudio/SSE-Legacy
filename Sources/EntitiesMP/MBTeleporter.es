@@ -54,30 +54,34 @@ functions:
 procedures:
   Reset() {
     if (!m_penMB || !m_penMarker || (!IsOfClass(m_penMB, "Movable Brush") && !IsOfClass(m_penMB, "Moving Brush") && !IsOfClass(m_penMB, "MovingBrush") && !IsOfClass(m_penMB,"Movable Model")) || !IsOfClass(m_penMarker, "Moving Brush Marker")) {
-      WarningMessage("MB Teleporter: No Targets selected or Targets of wrong class");
+      WarningMessage("MB Teleporter: No Targets selected or Targets of wrong class.");
       return EReturn();
     }
 
     if (IsOfClass(m_penMB,"Moving Brush")) {
-      CMovingBrush mb = (CMovingBrush&)*m_penMB;
+      CMovingBrush &mb = (CMovingBrush&)*m_penMB;
 
       mb.MovingOn();
-      mb.en_plLastPlacement=m_penMarker->GetPlacement();
+      mb.en_plLastPlacement = m_penMarker->GetPlacement();
       mb.ForceFullStop();
+
+      // Stop playing all sounds
       mb.m_soStart.Stop();
       mb.m_soStop.Stop();
       mb.m_soFollow.Stop();
       mb.m_bMoveToMarker = FALSE;
       mb.MovingOff();
+
       mb.m_penTarget = ((CMovingBrushMarker&)*m_penMarker).m_penTarget;
       mb.m_bMoving = FALSE;
       mb.m_bValidMarker = TRUE;
+
       //mb.m_bForceStop = TRUE;
       //mb.m_bStopMoving = TRUE;
       //mb.SendEvent(EEnd());
     
     } else if (IsOfClass(m_penMB, "Movable Brush")) {
-      CMovableBrush mb = (CMovableBrush&)*m_penMB;
+      CMovableBrush &mb = (CMovableBrush&)*m_penMB;
       
       mb.m_fTransX = mb.m_fbTransX;
       mb.m_fTransY = mb.m_fbTransY;
@@ -88,7 +92,7 @@ procedures:
       mb.m_fRotB = mb.m_fbRotB;
 
     } else if (IsOfClass(m_penMB, "Movable Model")) {
-      CMovableModel mm = (CMovableModel&)*m_penMB;
+      CMovableModel &mm = (CMovableModel&)*m_penMB;
 
       mm.m_fTransX = mm.m_fbTransX;
       mm.m_fTransY = mm.m_fbTransY;
