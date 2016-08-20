@@ -761,8 +761,17 @@ functions:
     }
 
     // Friendly fire for factions.
-    if (IsDerivedFromClass(penInflictor, "Enemy Base")) {
-      CEnemyFactionHolder* penEFH = GetFactionHolder(TRUE);
+
+    CEnemyFactionHolder* penEFH = GetFactionHolder(TRUE);
+
+    if (IsOfClass(penInflictor, "Player")) {
+      if (penEFH && penEFH->IsIndexValid()) {
+        if (!penEFH->m_bDamageFromPlayers) {
+          return;
+        }
+      }
+
+    } else if (IsDerivedFromClass(penInflictor, "Enemy Base")) {
       
       if (penEFH && penEFH->IsIndexValid()) {
         CEnemyFactionHolder* penEnemyEFH = ((CEnemyBase*)penInflictor)->GetFactionHolder(TRUE);

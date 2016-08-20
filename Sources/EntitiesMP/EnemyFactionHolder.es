@@ -39,10 +39,11 @@ properties:
  10 INDEX m_ulAlliesMask  "Allies Mask" = 0,
  11 INDEX m_ulEnemiesMask "Enemies Mask" = 0,
 
- 15 BOOL m_bDamageFromAllies   "Damage From Allies" = FALSE,
- //16 BOOL m_bDamageToAllies     "Damage To Allies" = FALSE,
+ 15 BOOL m_bDamageFromAllies   "Damage From Allies"  = FALSE,
+ //16 BOOL m_bDamageToAllies   "Damage To Allies"    = FALSE,
  17 BOOL m_bDamageFromMembers  "Damage From Members" = FALSE,
- //18 BOOL m_bDamageToMembers    "Damage To Members" = FALSE,
+ //18 BOOL m_bDamageToMembers  "Damage To Members"   = FALSE,
+ 19 BOOL m_bDamageFromPlayers  "Damage From Players" = TRUE,
  
  30 enum EFRelationToPlayers m_efrtRelationToPlayers "Relation To Player(s)" = FRT_NEUTRAL,
 
