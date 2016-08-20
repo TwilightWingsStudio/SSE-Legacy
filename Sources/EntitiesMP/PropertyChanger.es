@@ -37,31 +37,31 @@ properties:
    1 CTString m_strName        "Name" 'N'        = "Property Changer",
    3 CTString m_strDescription                   = "Property Changer",
 
-   4 CTString m_strProperty      "Target Property to Change" = "",
+   4 CTString m_strProperty      "Target Property Name" = "",
    5 CEntityPointer  m_penTarget "Target" COLOR(C_RED|0xFF),
    
    6 BOOL m_bActive            "Active"          = TRUE,
    
-   //different types start here
-   7 CTString   m_strValue     "String Value"    = "",
-   8 INDEX      m_iValue       "Integer Value"   = 0,
-   9 FLOAT      m_fValue       "Float Value"     = 0,
-  10 CTFileName m_fnValue      "File Name Value" = CTFILENAME(""),
-  11 RANGE      m_rValue       "Range Value"     = 1.0F,
-  12 CEntityPointer m_penValue "Target Value" COLOR(C_RED|0xFF),
-  13 BOOL      m_bValue        "Bool Value"      = FALSE,
-  14 COLOR     m_cValue        "Color Value"     = COLOR(C_WHITE|0xFF),
-  15 ANIMATION m_aValue        "Animation Value" = 0,
-  16 ANGLE     m_anValue       "Angle Value"     = 0,
-  17 ANGLE3D   m_an3dValue     "Angle 3D Value"  = ANGLE3D(0,0,0),
+   // different types start here
+   7 CTString   m_strValue     "Value String"    = "",
+   8 INDEX      m_iValue       "Value Integer"   = 0,
+   9 FLOAT      m_fValue       "Value Float"     = 0,
+  10 CTFileName m_fnValue      "Value File Name" = CTFILENAME(""),
+  11 RANGE      m_rValue       "Value Range"     = 1.0F,
+  12 CEntityPointer m_penValue "Value Target" COLOR(C_RED|0xFF),
+  13 BOOL      m_bValue        "Value Bool"      = FALSE,
+  14 COLOR     m_cValue        "Value Color"     = COLOR(C_WHITE|0xFF),
+  15 ANIMATION m_aValue        "Value Animation" = 0,
+  16 ANGLE     m_anValue       "Value Angle"     = 0,
+  17 ANGLE3D   m_an3dValue     "Value Angle 3D"  = ANGLE3D(0,0,0),
   
   18 enum EOperation m_eOperation "Operation"      = EO_SET,
   19 BOOL m_bDebug                "Debug Messages" = FALSE,
   20 CEntityPointer  m_penSource  "Source Target",
-  21 CTString  m_strSource      "Source Property"  = "",
+  21 CTString  m_strSource  "Source Property Name" = "",
   22 enum EConType  m_ePT   "Target Property Type" = ECT_ENTITY,
   23 BOOL m_bCaused1     "Source Target=penCaused" = FALSE,
-  24 BOOL m_bCaused2        "Target=penCaused"     = FALSE,
+  24 BOOL m_bCaused2            "Target=penCaused" = FALSE,
 
 components:
   1 model   MODEL_MARKER     "Models\\Editor\\PropertyChanger.mdl",
