@@ -3486,6 +3486,19 @@ procedures:
           resume;
         }
 
+        // If player shooting.
+        if (IsOfClass(eSound.penTarget, "Player")) {
+          CEnemyFactionHolder* penEFH = GetFactionHolder(TRUE);
+          
+          // if we have faction holder with valid faction index/
+          if (penEFH && penEFH->IsIndexValid()) {
+            // Skip if player not enemy.
+            if (penEFH->m_efrtRelationToPlayers != FRT_ENEMY) {
+              resume;
+            }
+          }
+        }
+
         // if the target is visible and can be set as new enemy
         if (IsVisible(eSound.penTarget) && SetTargetSoft(eSound.penTarget)) {
           // react to it
