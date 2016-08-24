@@ -535,6 +535,7 @@ procedures:
     EntityInfo *peiTarget = (EntityInfo*) (m_penEnemy->GetEntityInfo());
     FLOAT3D vShootTarget;
     GetEntityInfoPosition(m_penEnemy, peiTarget->vTargetCenter, vShootTarget);
+
     // launch
     CPlacement3D pl;
     PrepareFreeFlyingProjectile(pl, vShootTarget, BOMBERMAN_LAUNCH, ANGLE3D(0, BOMBERMAN_ANGLE, 0));
@@ -565,19 +566,19 @@ procedures:
     autowait(0.15f);
     PlaySound(m_soSound, SOUND_FIREFIRECRACKER, SOF_3D);
     autowait(0.52f);
-    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f), ANGLE3D(-16.0f, 0, 0));
+    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f)*m_fStretchMultiplier, ANGLE3D(-16.0f, 0, 0));
 
     autowait(0.05f);
-    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f), ANGLE3D(-8, 0, 0));
+    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f)*m_fStretchMultiplier, ANGLE3D(-8, 0, 0));
 
     autowait(0.05f);
-    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f), ANGLE3D(0.0f, 0, 0));
+    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f)*m_fStretchMultiplier, ANGLE3D(0.0f, 0, 0));
 
     autowait(0.05f);
-    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f), ANGLE3D(8.0f, 0, 0));
+    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f)*m_fStretchMultiplier, ANGLE3D(8.0f, 0, 0));
 
     autowait(0.05f);
-    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f), ANGLE3D(16.0f, 0, 0));
+    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f)*m_fStretchMultiplier, ANGLE3D(16.0f, 0, 0));
 
     autowait(0.5f + FRnd()/3);
     return EEnd();
@@ -589,7 +590,7 @@ procedures:
     autowait(0.2f + FRnd()/4);
 
     StartModelAnim(HEADMAN_ANIM_ROCKETMAN_ATTACK, 0);
-    ShootProjectile(PRT_HEADMAN_ROCKETMAN, FLOAT3D(0.0f, 1.0f, 0.0f), ANGLE3D(0, 0, 0));
+    ShootProjectile(PRT_HEADMAN_ROCKETMAN, FLOAT3D(0.0f, 1.0f, 0.0f)*m_fStretchMultiplier, ANGLE3D(0, 0, 0));
     PlaySound(m_soSound, SOUND_FIREROCKETMAN, SOF_3D);
 
     autowait(1.0f + FRnd()/3);
