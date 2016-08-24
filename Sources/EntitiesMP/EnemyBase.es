@@ -3407,14 +3407,14 @@ procedures:
           // just wait here
           m_bOnStartPosition = FALSE;
           call BeIdle();
-        } else if (m_penFriend != NULL && !m_bRunningToFriend) {
+        /*} else if (m_penFriend != NULL && !m_bRunningToFriend) {
           if (CalcDist(m_penFriend)>GetProp(m_fCloseDistance)) {
             call Friendship();
           } else {
             StopMoving();
             StandingAnim(); 
             m_bRunningToFriend=FALSE;    
-          }
+          }*/
         // otherwise
         } else {
           // return to start position
@@ -3449,7 +3449,7 @@ procedures:
             // react to it
             call NewEnemySpotted();
           }
-        } else {
+        } /*else {
             if (m_penFriend != NULL && !m_bRunningToFriend) { 
                 if (CalcDist(m_penFriend) > GetProp(m_fCloseDistance)) {
                   call Friendship();
@@ -3459,7 +3459,7 @@ procedures:
                     m_bRunningToFriend = FALSE;
                 }
             }
-        }
+        }*/
         resume;
       }
 
@@ -3752,8 +3752,8 @@ procedures:
         // start in active or inactive state
         if (m_penEnemy!=NULL) {
           call Active();
-        } else if (m_penFriend != NULL) {
-          call Friendship();
+        /*} else if (m_penFriend != NULL) {
+          call Friendship();*/
         } else {
           call Inactive();
         }
@@ -3808,50 +3808,51 @@ procedures:
   // --------------------------------------------------------------------------------------
   // Friendship companion AI.
   // --------------------------------------------------------------------------------------
-  Friendship() 
-  {
-    m_bRunningToFriend = TRUE;
-    GetWatcher()->SendEvent(EStart());
-  
-    // while there is a valid marker, take values from it
-    if (m_penFriend != NULL) {
-      if (!(m_penFriend->GetFlags()&ENF_ALIVE)) {
-        StopMoving();
-        StandingAnim(); 
-        m_penFriend = NULL;
-        m_bRunningToFriend = FALSE;
-        return EReturn(); 	 
-      }
 
-      CEntity *pem = &*m_penFriend;
-      // the marker position is our new start position for attack range
-      CPlacement3D plFriend = m_penFriend->GetPlacement();
-      /*plFriend.AbsoluteToRelative(GetPlacement());
-      plFriend=CPlacement3D(plFriend.pl_PositionVector/2.0f,plFriend.pl_OrientationAngle);
-      plFriend.RelativeToAbsolute(GetPlacement());*/
-      m_vStartPosition = plFriend.pl_PositionVector;
-      m_vDesiredPosition = m_vStartPosition;
-
-        // use attack speeds
-      m_fMoveSpeed = GetProp(m_fAttackRunSpeed)*m_fSpeedMultiplier;
-      m_aRotateSpeed = GetProp(m_aAttackRotateSpeed);
-
-      // start running anim
-      // TODO: Fix bug with anim here.
-      RunningAnim();
-
-      autocall MoveToDestination() EReturn;
-
-      // wait a bit always (to prevent eventual busy-looping)
-      autowait(0.05f);
-    } // when no more markers
-
-    // stop where you are
-    StopMoving();
-    StandingAnim();
-    m_bRunningToFriend = FALSE;
-
-    // return to called
-    return EReturn();
-  };
+  //Friendship() 
+  //{
+  //  m_bRunningToFriend = TRUE;
+  //  GetWatcher()->SendEvent(EStart());
+  //
+  //  // while there is a valid marker, take values from it
+  //  if (m_penFriend != NULL) {
+  //    if (!(m_penFriend->GetFlags()&ENF_ALIVE)) {
+  //      StopMoving();
+  //      StandingAnim(); 
+  //      m_penFriend = NULL;
+  //      m_bRunningToFriend = FALSE;
+  //      return EReturn();
+  //    }
+  //
+  //    CEntity *pem = &*m_penFriend;
+  //    // the marker position is our new start position for attack range
+  //    CPlacement3D plFriend = m_penFriend->GetPlacement();
+  //    /*plFriend.AbsoluteToRelative(GetPlacement());
+  //    plFriend=CPlacement3D(plFriend.pl_PositionVector/2.0f,plFriend.pl_OrientationAngle);
+  //    plFriend.RelativeToAbsolute(GetPlacement());*/
+  //    m_vStartPosition = plFriend.pl_PositionVector;
+  //    m_vDesiredPosition = m_vStartPosition;
+  //
+  //      // use attack speeds
+  //    m_fMoveSpeed = GetProp(m_fAttackRunSpeed)*m_fSpeedMultiplier;
+  //    m_aRotateSpeed = GetProp(m_aAttackRotateSpeed);
+  //
+  //    // start running anim
+  //    // TODO: Fix bug with anim here.
+  //    RunningAnim();
+  //
+  //    autocall MoveToDestination() EReturn;
+  //
+  //    // wait a bit always (to prevent eventual busy-looping)
+  //    autowait(0.05f);
+  //  } // when no more markers
+  //
+  //  // stop where you are
+  //  StopMoving();
+  //  StandingAnim();
+  //  m_bRunningToFriend = FALSE;
+  //
+  //  // return to called
+  //  return EReturn();
+  //};
 };
