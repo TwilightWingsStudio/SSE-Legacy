@@ -22,7 +22,7 @@ uses "EntitiesMP/Marker";
 
 class CSummonerMarker: CMarker {
 name      "SummonerMarker";
-thumbnail "Thumbnails\\EnemyMarker.tbn";
+thumbnail "Thumbnails\\SummonerMarker.tbn";
 features  "HasName", "IsTargetable";
 
 properties:

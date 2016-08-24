@@ -47,7 +47,7 @@ enum DevilActionType {
 
 class CDevilMarker: CMarker {
 name      "Devil Marker";
-thumbnail "Thumbnails\\EnemyMarker.tbn";
+thumbnail "Thumbnails\\DevilMarker.tbn";
 
 properties:
  1 enum DevilActionType m_datType    "Action"  'A' = DAT_NONE,

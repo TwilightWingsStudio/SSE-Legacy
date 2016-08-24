@@ -23,7 +23,7 @@ uses "EntitiesMP/Projectile";
 
 class CMeteorShower : CRationalEntity {
 name      "MeteorShower";
-thumbnail "Thumbnails\\Eruptor.tbn";
+thumbnail "Thumbnails\\MeteorShower.tbn";
 features  "IsTargetable", "HasName";
 
 properties:

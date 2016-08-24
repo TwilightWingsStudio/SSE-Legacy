@@ -38,7 +38,7 @@ static EntityInfo eiCrate = {
 
 class CCrateRider: CEnemyBase {
 name      "CrateRider";
-thumbnail "Thumbnails\\Mental.tbn";
+thumbnail "Thumbnails\\CrateRider.tbn";
 
 properties:
   // class internal
