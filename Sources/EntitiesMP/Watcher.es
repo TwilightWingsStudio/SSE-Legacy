@@ -383,8 +383,10 @@ functions:
     penClosest = FindClosestPlayer();
     CEntity *penClosestEB = NULL;
 
+    CEnemyFactionHolder* penEFH = GetOwner()->GetFactionHolder(TRUE);
+
     // We have faction holder with valid faction index? Then we can EnemyBase as target!
-    if (GetOwner()->GetFactionHolder(TRUE) && GetOwner()->GetFactionHolder(FALSE)->IsIndexValid()) {
+    if (penEFH && penEFH->IsIndexValid()) {
       penClosestEB = FindClosestEB();
     } 
 
@@ -448,8 +450,7 @@ functions:
 
     fClosestPlayer = Min(fClosestPlayer, fRange);  // this is maximum considered range
 
-    CEntity *penAllocatedEnemy = FindClosestEB();
-
+    //CEntity *penAllocatedEnemy = FindClosestEB();
     //if (GetOwner()->GetTeam()==0 && penAllocatedEnemy != penCurrentTarget && penAllocatedEnemy != NULL) {
     //  return /*FindClosestEB();*/penAllocatedEnemy;
     //}
