@@ -40,6 +40,7 @@ uses "EntitiesMP/Item";
 
 // weapon type 
 enum WeaponItemType {
+  0 WIT_KNIFE             "Knife",
   1 WIT_COLT              "Colt",
   2 WIT_SINGLESHOTGUN     "Single shotgun",
   3 WIT_DOUBLESHOTGUN     "Double shotgun",
@@ -76,6 +77,10 @@ properties:
 
 components:
   0 class   CLASS_BASE        "Classes\\Item.ecl",
+  
+// ************** KNIFE **************
+ 20 model   MODEL_KNIFE                 "Models\\Weapons\\Knife\\KnifeItem.mdl",
+ 21 texture TEXTURE_KNIFE               "Models\\Weapons\\Knife\\KnifeItem.tex",
 
 // ************** COLT **************
  30 model   MODEL_COLT                  "Models\\Weapons\\Colt\\ColtItem.mdl",
@@ -193,6 +198,7 @@ functions:
   void Precache(void) {
     PrecacheSound(SOUND_PICK);
     switch (m_EwitType) {
+      case WIT_KNIFE:           CPlayerWeapons_Precache(1<<(INDEX(WEAPON_KNIFE          )-1)); break;
       case WIT_COLT:            CPlayerWeapons_Precache(1<<(INDEX(WEAPON_COLT           )-1)); break;
       case WIT_SINGLESHOTGUN:   CPlayerWeapons_Precache(1<<(INDEX(WEAPON_SINGLESHOTGUN  )-1)); break;
       case WIT_DOUBLESHOTGUN:   CPlayerWeapons_Precache(1<<(INDEX(WEAPON_DOUBLESHOTGUN  )-1)); break;
@@ -226,7 +232,11 @@ functions:
     {
       return;
     }
+
+    // If you lazy ass you can uncomment this shit for making different effects.
+    /*
     switch (m_EwitType) {
+      case WIT_KNIFE:            Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
       case WIT_COLT:             Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
       case WIT_SINGLESHOTGUN:    Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
       case WIT_DOUBLESHOTGUN:    Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
@@ -241,6 +251,8 @@ functions:
       case WIT_GHOSTBUSTER:      Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
       case WIT_CANNON:           Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
     }
+    */
+    Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);
   }
 
 
@@ -251,6 +263,14 @@ functions:
     FLOAT3D vDMStretch = FLOAT3D( 2.0f, 2.0f, 2.0f);
     
     switch (m_EwitType) {
+    // *********** KNIFE ***********
+      case WIT_KNIFE:
+        m_fRespawnTime = (m_fCustomRespawnTime > 0) ? m_fCustomRespawnTime : 10.0f; 
+        m_strDescription.PrintF("Knife");
+        AddItem(MODEL_KNIFE, TEXTURE_KNIFE, 0, 0, 0);
+        StretchItem( bDM ?  vDMStretch : FLOAT3D(4.5f, 4.5f, 4.5f));
+        break;
+
     // *********** COLT ***********
       case WIT_COLT:
         m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 

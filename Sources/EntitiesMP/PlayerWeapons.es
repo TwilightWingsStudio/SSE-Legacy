@@ -2805,7 +2805,7 @@ functions:
         ASSERT(FALSE);
       case WEAPON_NONE: return;
 
-      case WEAPON_KNIFE:
+      case WEAPON_KNIFE: wit = WIT_KNIFE; break;
       case WEAPON_COLT:
       case WEAPON_DOUBLECOLT:
         NOTHING; break;
@@ -2841,6 +2841,7 @@ functions:
     EWeaponItem &Ewi = (EWeaponItem&)ee;
     INDEX wit = Ewi.iWeapon;
     switch (Ewi.iWeapon) {
+      case WIT_KNIFE: Ewi.iWeapon = WEAPON_KNIFE; break;
       case WIT_COLT: Ewi.iWeapon = WEAPON_COLT; break;
       case WIT_SINGLESHOTGUN: Ewi.iWeapon = WEAPON_SINGLESHOTGUN; break;
       case WIT_DOUBLESHOTGUN: Ewi.iWeapon = WEAPON_DOUBLESHOTGUN; break;
@@ -2854,7 +2855,7 @@ functions:
       case WIT_LASER: Ewi.iWeapon = WEAPON_LASER; break;
       case WIT_CANNON: Ewi.iWeapon = WEAPON_IRONCANNON; break;
       default:
-        ASSERTALWAYS("Uknown weapon type");
+        ASSERTALWAYS("Unknown weapon type");
     }
 
     // add weapon
@@ -2879,6 +2880,10 @@ functions:
 
     CTFileName fnmMsg;
     switch (wit) {
+      case WIT_KNIFE:
+        ((CPlayer&)*m_penPlayer).ItemPicked(TRANS("Knife"), 0);
+        fnmMsg = CTFILENAME("Data\\Messages\\Weapons\\knife.txt"); 
+        break;
       case WIT_COLT:            
         ((CPlayer&)*m_penPlayer).ItemPicked(TRANS("Shofield .45 w/ TMAR"), 0);
         fnmMsg = CTFILENAME("Data\\Messages\\Weapons\\colt.txt"); 
