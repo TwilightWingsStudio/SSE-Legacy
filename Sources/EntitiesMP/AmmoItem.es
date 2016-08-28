@@ -32,17 +32,17 @@ uses "EntitiesMP/Item";
 
 // ammo type 
 enum AmmoItemType {
-  1 AIT_SHELLS          "Shells",
-  2 AIT_BULLETS         "Bullets",
-  3 AIT_ROCKETS         "Rockets",
-  4 AIT_GRENADES        "Grenades",
-  5 AIT_ELECTRICITY     "Electricity",
-  6 AIT_NUKEBALL        "obsolete",
-  7 AIT_IRONBALLS       "IronBalls",
-  8 AIT_SERIOUSPACK     "SeriousPack - don't use",
-  9 AIT_BACKPACK        "BackPack - don't use",
-  10 AIT_NAPALM         "Napalm",
-  11 AIT_SNIPERBULLETS  "Sniper bullets"
+   1 AIT_SHELLS          "00 Shells",
+   2 AIT_BULLETS         "01 Bullets",
+   3 AIT_ROCKETS         "02 Rockets",
+   4 AIT_GRENADES        "03 Grenades",
+   5 AIT_ELECTRICITY     "04 Electricity",
+   6 AIT_NUKEBALL        "05 obsolete",
+   7 AIT_IRONBALLS       "06 IronBalls",
+   8 AIT_SERIOUSPACK     "07 SeriousPack - don't use",
+   9 AIT_BACKPACK        "08 BackPack - don't use",
+  10 AIT_NAPALM          "09 Napalm",
+  11 AIT_SNIPERBULLETS   "10 Sniper bullets"
 };
 
 // event for sending through receive item

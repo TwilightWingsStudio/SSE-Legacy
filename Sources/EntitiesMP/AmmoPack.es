@@ -23,8 +23,8 @@ uses "EntitiesMP/Item";
 
 // ammo type 
 enum AmmoPackType {
-  1 APT_CUSTOM        "Custom pack",
-  2 APT_SERIOUS       "Serious pack",
+  1 APT_CUSTOM        "1 Custom pack",
+  2 APT_SERIOUS       "2 Serious pack",
 };
 
 // event for sending through receive item

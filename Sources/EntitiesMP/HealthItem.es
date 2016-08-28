@@ -23,11 +23,11 @@ uses "EntitiesMP/Item";
 
 // health type 
 enum HealthItemType {
-  0 HIT_PILL      "Pill",       // pill health
-  1 HIT_SMALL     "Small",      // small health
-  2 HIT_MEDIUM    "Medium",     // medium health
-  3 HIT_LARGE     "Large",      // large health
-  4 HIT_SUPER     "Super",      // super health
+  0 HIT_PILL      "0 Pill (+1)",       // pill health
+  1 HIT_SMALL     "1 Small (+10)",      // small health
+  2 HIT_MEDIUM    "2 Medium (+25)",     // medium health
+  3 HIT_LARGE     "3 Large (+50)",      // large health
+  4 HIT_SUPER     "4 Super (+100)",      // super health
 };
 
 // event for sending through receive item

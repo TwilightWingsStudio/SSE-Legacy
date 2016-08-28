@@ -23,12 +23,12 @@ uses "EntitiesMP/Item";
 
 // health type 
 enum ArmorItemType {
-  0 ARIT_SHARD        "Shard",    // shard
-  1 ARIT_SMALL        "Small",    // small armor
-  2 ARIT_MEDIUM       "Medium",   // medium armor
-  3 ARIT_STRONG       "Strong",   // strong armor
-  4 ARIT_SUPER        "Super",    // super armor
-  5 ARIT_HELM         "Helm",     // helm
+  0 ARIT_SHARD        "0 Shard (+1)",    // shard
+  1 ARIT_SMALL        "1 Small (+25)",   // small armor
+  2 ARIT_MEDIUM       "2 Medium (+50)",  // medium armor
+  3 ARIT_STRONG       "3 Strong (+100)", // strong armor
+  4 ARIT_SUPER        "4 Super (+200)",  // super armor
+  5 ARIT_HELM         "5 Helm (+5)",     // helm
 };
 
 // event for sending through receive item
