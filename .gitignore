@@ -47,6 +47,10 @@ Debug/
 *.hm
 *.exp
 *.res
+*.bsc
+*.cnt
+*.p
+*.aps
 
 # Generated configuration files
 *.plr
@@ -58,6 +62,7 @@ Temp/*.wld
 *.rpt	# crashinfo
 *.gms
 *.vis
+Controls/Controls*.ctl
 Data/*.pri
 Data/*.bin
 Scripts/PersistentSymbols.ini
