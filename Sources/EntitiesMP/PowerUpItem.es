@@ -24,11 +24,11 @@ uses "EntitiesMP/Player";
 
 // health type 
 enum PowerUpItemType {
-  0 PUIT_INVISIB  "Invisibility",
-  1 PUIT_INVULNER "Invulnerability",
-  2 PUIT_DAMAGE   "SeriousDamage",
-  3 PUIT_SPEED    "SeriousSpeed",
-  4 PUIT_BOMB     "SeriousBomb",
+  0 PUIT_INVISIB  "0 Invisibility",
+  1 PUIT_INVULNER "1 Invulnerability",
+  2 PUIT_DAMAGE   "2 SeriousDamage",
+  3 PUIT_SPEED    "3 SeriousSpeed",
+  4 PUIT_BOMB     "4 SeriousBomb",
 };
 
 // event for sending through receive item
