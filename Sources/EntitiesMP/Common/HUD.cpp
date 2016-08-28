@@ -1498,6 +1498,7 @@ extern void InitHUD(void)
     FatalError( strError);
   }
 
+  CPrintF("  done.\n");
 }
 
 
