@@ -138,12 +138,12 @@ procedures:
         }
 
         on (EActivate) : {
-          m_bActive=TRUE;
+          m_bActive = TRUE;
           resume;
         }
 
         on (EDeactivate) : {
-          m_bActive=FALSE;
+          m_bActive = FALSE;
           resume;
         }
     
@@ -158,6 +158,7 @@ procedures:
 
           SetFlags( GetFlags()|ENF_HIDDEN);
           SetCollisionFlags(ECF_IMMATERIAL);
+          stop;
         }
 
         on (ETimer) : { stop; }
