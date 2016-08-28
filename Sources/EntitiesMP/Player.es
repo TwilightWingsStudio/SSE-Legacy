@@ -4083,14 +4083,15 @@ functions:
   {
     // translation
     FLOAT3D vTranslation = paAction.pa_vTranslation;
+
     // turbo speed cheat
     if (cht_fTranslationMultiplier && CheatsEnabled()) { 
       vTranslation *= cht_fTranslationMultiplier;
     }
 
     // enable faster moving if holding knife in DM
-    if( ((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon==WEAPON_KNIFE &&
-         !GetSP()->sp_bCooperative) {
+    INDEX iCurrentWeapon = ((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon;
+    if( (iCurrentWeapon == WEAPON_NONE || iCurrentWeapon == WEAPON_KNIFE) && !GetSP()->sp_bCooperative) {
       vTranslation *= 1.3f;
     }
 
