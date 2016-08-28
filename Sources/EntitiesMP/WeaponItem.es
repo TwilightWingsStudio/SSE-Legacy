@@ -40,20 +40,20 @@ uses "EntitiesMP/Item";
 
 // weapon type 
 enum WeaponItemType {
-  0 WIT_KNIFE             "Knife",
-  1 WIT_COLT              "Colt",
-  2 WIT_SINGLESHOTGUN     "Single shotgun",
-  3 WIT_DOUBLESHOTGUN     "Double shotgun",
-  4 WIT_TOMMYGUN          "Tommygun",
-  5 WIT_MINIGUN           "Minigun",
-  6 WIT_ROCKETLAUNCHER    "Rocket launcher",
-  7 WIT_GRENADELAUNCHER   "Grenade launcher",
-  8 WIT_SNIPER            "Sniper",
-  9 WIT_FLAMER            "Flamer",
- 10 WIT_LASER             "Laser",
- 11 WIT_CHAINSAW          "Chainsaw",
- 12 WIT_CANNON            "Cannon",
- 13 WIT_GHOSTBUSTER       "obsolete",
+  0 WIT_KNIFE             "00 Knife",
+  1 WIT_COLT              "01 Colt",
+  2 WIT_SINGLESHOTGUN     "02 Single shotgun",
+  3 WIT_DOUBLESHOTGUN     "03 Double shotgun",
+  4 WIT_TOMMYGUN          "04 Tommygun",
+  5 WIT_MINIGUN           "05 Minigun",
+  6 WIT_ROCKETLAUNCHER    "06 Rocket launcher",
+  7 WIT_GRENADELAUNCHER   "07 Grenade launcher",
+  8 WIT_SNIPER            "08 Sniper",
+  9 WIT_FLAMER            "09 Flamer",
+ 10 WIT_LASER             "10 Laser",
+ 11 WIT_CHAINSAW          "11 Chainsaw",
+ 12 WIT_CANNON            "12 Cannon",
+ 13 WIT_GHOSTBUSTER       "13 GhostBuser !!!obsolete!!!",
 };
 
 // event for sending through receive item
