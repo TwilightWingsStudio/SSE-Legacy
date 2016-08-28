@@ -43,7 +43,7 @@ enum EConType{
   12 ECT_SPEEDYREL "Relative Speed(Y)",
   13 ECT_SPEEDZREL "Relative Speed(Z)",
   14 ECT_HEALTH    "Health",
-  15 ECT_TYPE      "Entity Class",
+  15 ECT_TYPE      "Entity Class (unchangeable)",
 };
 
 class CCondition: CEntity {
@@ -272,20 +272,20 @@ functions:
             fValue2 = ((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute.Length();
             bf2 = TRUE;
           } else if (m_eCT2 == ECT_SPEEDXREL) {
-            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute,ANGLE3D(0, 0, 0));
-            CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition2->GetPlacement().pl_OrientationAngle);
+            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute, ANGLE3D(0, 0, 0));
+            CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0), m_penIfCondition2->GetPlacement().pl_OrientationAngle);
             plSpeed.AbsoluteToRelative(plRot);
             fValue2 = plSpeed.pl_PositionVector(1);
             bf2 = TRUE;
           } else if (m_eCT2 == ECT_SPEEDYREL) {
-            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute,ANGLE3D(0, 0, 0));
-            CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition2->GetPlacement().pl_OrientationAngle);
+            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute, ANGLE3D(0, 0, 0));
+            CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0), m_penIfCondition2->GetPlacement().pl_OrientationAngle);
             plSpeed.AbsoluteToRelative(plRot);
             fValue2 = plSpeed.pl_PositionVector(2);
             bf2 = TRUE;
           } else if (m_eCT2 == ECT_SPEEDZREL) {
-            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute,ANGLE3D(0, 0, 0));
-            CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition2->GetPlacement().pl_OrientationAngle);
+            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute, ANGLE3D(0, 0, 0));
+            CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0), m_penIfCondition2->GetPlacement().pl_OrientationAngle);
             plSpeed.AbsoluteToRelative(plRot);
             fValue2 = plSpeed.pl_PositionVector(3);
             bf2 = TRUE;
@@ -387,33 +387,35 @@ functions:
       } else {
         be = TRUE;
         if (m_bDebug) {
-          CPrintF(TRANS("%s : Unsupported Data Type\n"),m_strName);
+          CPrintF(TRANS("%s : Unsupported Data Type\n"), m_strName);
         }
       }
     }
 
     if (be) {
-      m_penError->SendEvent(ETrigger());
+      SendToTarget(m_penError, EET_TRIGGER, eTrigger.penCaused);
     }
 
     // trigger proper target
     if (bResult) {
       if (m_penIfTarget) {
         if (m_bDebug) {
-          CPrintF(TRANS("%s : Triggering if Target: %s\n"),m_strName,m_penIfTarget->GetName());
+          CPrintF(TRANS("%s : Triggering if Target: %s\n"), m_strName, m_penIfTarget->GetName());
         }
-        m_penIfTarget->SendEvent(ETrigger());
+
+        SendToTarget(m_penIfTarget, EET_TRIGGER, eTrigger.penCaused);
       } else if (m_bDebug) {
-        CPrintF(TRANS("%s : Result=TRUE, but no if Target to trigger\n"),m_strName);
+        CPrintF(TRANS("%s : Result=TRUE, but no if Target to trigger\n"), m_strName);
       }
     } else {
       if (m_penElseTarget) {
         if (m_bDebug) {
-          CPrintF(TRANS("%s : Triggering else Target:%s\n"),m_strName,m_penElseTarget->GetName());
+          CPrintF(TRANS("%s : Triggering else Target:%s\n"), m_strName, m_penElseTarget->GetName());
         }
-        m_penElseTarget->SendEvent(ETrigger());
+
+        SendToTarget(m_penElseTarget, EET_TRIGGER, eTrigger.penCaused);
       } else if (m_bDebug) {
-        CPrintF(TRANS("%s : Result=FALSE, but no else Target to trigger\n"),m_strName);
+        CPrintF(TRANS("%s : Result=FALSE, but no else Target to trigger\n"), m_strName);
       }
     }
   }
