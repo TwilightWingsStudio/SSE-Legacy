@@ -21,6 +21,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 uses "EntitiesMP/Marker";
 
+enum PSGiveTakeMode {
+  0 PSGTM_OLD  "0 Always Give Knife + Colt",
+  1 PSGTM_FULL "1 Control All Weapons",
+};
+
 %{
   extern void CPlayerWeapons_Precache(ULONG ulAvailable);
 %}
@@ -44,6 +49,9 @@ properties:
  11 INDEX m_iTakeAmmo        "Take Ammo"  = 0x0,
  12 BOOL m_bNoRespawnInPlace "No Respawn In Place" 'R'  = FALSE,
 
+ // SSE
+ 20 enum PSGiveTakeMode m_psgtmGiveTakeMod "Give/Take Wpns Mode" = PSGTM_OLD,
+ 
 components:
   1 model   MODEL_MARKER     "Models\\Editor\\PlayerStart.mdl",
   2 texture TEXTURE_MARKER   "Models\\Editor\\PlayerStart.tex",
@@ -54,6 +62,7 @@ functions:
       CPlayerWeapons_Precache(m_iGiveWeapons);
     }
   }
+
   BOOL HandleEvent(const CEntityEvent &ee) {
     if (ee.ee_slEvent == EVENTCODE_ETrigger) {
       CEntity *penMainMusicHolder = _pNetwork->GetEntityWithName("MusicHolder", 0);

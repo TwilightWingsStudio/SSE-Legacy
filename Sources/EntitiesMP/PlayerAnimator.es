@@ -571,6 +571,9 @@ functions:
     CPlayer &pl = (CPlayer&)*m_penPlayer;
     pmoModel = &(pl.GetModelObject()->GetAttachmentModel(PLAYER_ATTACHMENT_TORSO)->amo_moModelObject);
     switch (iWeapon) {
+    // *********** NONE ***********
+      case WEAPON_NONE: break;
+
     // *********** KNIFE ***********
       case WEAPON_KNIFE:
         AddWeaponAttachment(BODY_ATTACHMENT_KNIFE, MODEL_KNIFE,

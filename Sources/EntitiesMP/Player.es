@@ -810,6 +810,7 @@ void CPlayer_OnInitClass(void)
     _pShell->DeclareSymbol("user FLOAT plr_fSpeedSide;",     &plr_fSpeedSide);
     _pShell->DeclareSymbol("user FLOAT plr_fSpeedUp;",       &plr_fSpeedUp);
   #endif
+
   _pShell->DeclareSymbol("persistent user FLOAT plr_fFOV;", &plr_fFOV);
   _pShell->DeclareSymbol("persistent user FLOAT plr_fFrontClipDistance;", &plr_fFrontClipDistance);
   _pShell->DeclareSymbol("persistent user INDEX plr_bRenderPicked;", &plr_bRenderPicked);
@@ -5169,9 +5170,10 @@ functions:
     strLevelName.ScanF("%01d_%01d_", &u, &v);
     iLevel = u*10+v;
     
-	  RemapLevelNames(iLevel);
-            
-    if (iLevel>0) {
+    RemapLevelNames(iLevel);
+
+    // If valid level index.
+    if (iLevel > 0) {
       ((CSessionProperties*)GetSP())->sp_ulLevelsMask|=1<<(iLevel-1);
     }
 
@@ -5179,8 +5181,10 @@ functions:
     INDEX iPlayer = GetMyPlayerIndex();
     // player placement
     CPlacement3D plSet = GetPlacement();
+
     // teleport in dummy space to avoid auto teleport frag
     Teleport(CPlacement3D(FLOAT3D(32000.0f+100.0f*iPlayer, 32000.0f, 0), ANGLE3D(0, 0, 0)));
+
     // force yourself to standing state
     ForceCollisionBoxIndexChange(PLAYER_COLLISION_BOX_STAND);
     en_plViewpoint.pl_PositionVector(2) = plr_fViewHeightStand;
@@ -5195,8 +5199,9 @@ functions:
     BOOL bSetHealth = FALSE;      // for getting health from marker
     BOOL bAdjustHealth = FALSE;   // for getting adjusting health to 50-100 interval
     CEntity *pen = NULL;
+
     if (GetSP()->sp_bCooperative) {
-      if (cht_iGoToMarker>=0) {
+      if (cht_iGoToMarker >= 0) {
         // try to find fast go marker
         CTString strPlayerStart;
         strPlayerStart.PrintF("Player Start - %d", (INDEX)cht_iGoToMarker);
@@ -5206,9 +5211,9 @@ functions:
         bSetHealth = TRUE;
         bAdjustHealth = FALSE;
       // if there is coop respawn marker
-      } else if (m_penMainMusicHolder!=NULL && !(m_ulFlags&PLF_CHANGINGLEVEL)) {
+      } else if (m_penMainMusicHolder != NULL && !(m_ulFlags&PLF_CHANGINGLEVEL)) {
         CMusicHolder *pmh = (CMusicHolder *)&*m_penMainMusicHolder;
-        if (pmh->m_penRespawnMarker!=NULL) {
+        if (pmh->m_penRespawnMarker != NULL) {
           // get it
           pen = pmh->m_penRespawnMarker;
           bSetHealth = TRUE;
@@ -5217,7 +5222,7 @@ functions:
       }
 
       // if quick start is enabled (in wed)
-      if (pen==NULL && GetSP()->sp_bQuickTest && m_strGroup=="") {
+      if (pen == NULL && GetSP()->sp_bQuickTest && m_strGroup == "") {
         // try to find quick start marker
         CTString strPlayerStart;
         strPlayerStart.PrintF("Player Quick Start");
@@ -5225,8 +5230,9 @@ functions:
         bSetHealth = TRUE;
         bAdjustHealth = FALSE;
       }
+
       // if no start position yet
-      if (pen==NULL) {
+      if (pen == NULL) {
         // try to find normal start marker
         CTString strPlayerStart;
         strPlayerStart.PrintF("Player Start - %s", m_strGroup);
@@ -5244,8 +5250,9 @@ functions:
           }
         }
       }
+
       // if no start position yet
-      if (pen==NULL) {
+      if (pen == NULL) {
         // try to find normal start marker without group anyway
         CTString strPlayerStart;
         strPlayerStart.PrintF("Player Start - ");
@@ -5258,13 +5265,13 @@ functions:
       bAdjustHealth = FALSE;
       // try to find start marker by random
       pen = GetDeathmatchStartMarker();
-      if (pen!=NULL) {
+      if (pen != NULL) {
         ((CPlayerMarker&)*pen).m_tmLastSpawned = _pTimer->CurrentTick();
       }
     }
 
     // if respawning in place
-    if ((m_ulFlags&PLF_RESPAWNINPLACE) && pen!=NULL && !((CPlayerMarker*)&*pen)->m_bNoRespawnInPlace) {
+    if ((m_ulFlags&PLF_RESPAWNINPLACE) && pen != NULL && !((CPlayerMarker*)&*pen)->m_bNoRespawnInPlace) {
       m_ulFlags &= ~PLF_RESPAWNINPLACE;
       // set default params
       SetHealth(TopHealth());
@@ -5274,7 +5281,7 @@ functions:
       Teleport(CPlacement3D(m_vDied, m_aDied));
 
     // if start marker is found
-    } else if (pen!=NULL) {
+    } else if (pen != NULL) {
       // if there is no respawn marker yet
       if (m_penMainMusicHolder!=NULL) {
         CMusicHolder *pmh = (CMusicHolder *)&*m_penMainMusicHolder;
@@ -5285,6 +5292,7 @@ functions:
       }
 
       CPlayerMarker &CpmStart = (CPlayerMarker&)*pen;
+
       // set player characteristics
       if (bSetHealth) {
         SetHealth(CpmStart.m_fHealth/100.0f*TopHealth());
@@ -5298,7 +5306,7 @@ functions:
         }
       }
 
-      // if should start in computer
+      // If should start in computer and singleplayer.
       if (CpmStart.m_bStartInComputer && GetSP()->sp_bSinglePlayer) {
         // mark that
         if (_pNetwork->IsPlayerLocal(this)) {
@@ -5310,25 +5318,34 @@ functions:
       // start with first message linked to the marker
       CMessageHolder *penMessage = (CMessageHolder *)&*CpmStart.m_penMessage;
       // while there are some messages to add
-      while (penMessage!=NULL && IsOfClass(penMessage, "MessageHolder")) {
+      while (penMessage != NULL && IsOfClass(penMessage, "MessageHolder")) {
         const CTFileName &fnmMessage = penMessage->m_fnmMessage;
+
         // if player doesn't have that message in database
         if (!HasMessage(fnmMessage)) {
           // add the message
           ReceiveComputerMessage(fnmMessage, 0);
         }
+
         // go to next message holder in list
         penMessage = (CMessageHolder *)&*penMessage->m_penNext;
       }
 
-      // set weapons
-      if (!GetSP()->sp_bCooperative) {
-        ((CPlayerWeapons&)*m_penWeapons).InitializeWeapons(CpmStart.m_iGiveWeapons, 0, 0,
-          CpmStart.m_fMaxAmmoRatio);
-      } else {
-        ((CPlayerWeapons&)*m_penWeapons).InitializeWeapons(CpmStart.m_iGiveWeapons, CpmStart.m_iTakeWeapons,
-          GetSP()->sp_bInfiniteAmmo?0:CpmStart.m_iTakeAmmo, CpmStart.m_fMaxAmmoRatio);
+      // Initialize variables for taking shit.
+      INDEX iTakeWeapons = 0;
+      INDEX iTakeAmmo = 0;
+
+      BOOL bGiveKnifeAndColt = (CpmStart.m_psgtmGiveTakeMod == PSGTM_OLD);
+
+      // If cooperative mode.
+      if (GetSP()->sp_bCooperative) {
+        iTakeWeapons = CpmStart.m_iTakeWeapons;
+        iTakeAmmo = GetSP()->sp_bInfiniteAmmo ? 0 : CpmStart.m_iTakeAmmo;
       }
+
+      // Give weapons.
+      ((CPlayerWeapons&)*m_penWeapons).InitializeWeapons(CpmStart.m_iGiveWeapons, iTakeWeapons, iTakeAmmo, CpmStart.m_fMaxAmmoRatio, bGiveKnifeAndColt);
+
       // start position relative to link
       if (EwltType == WLT_RELATIVE) {
         plSet.AbsoluteToRelative(_SwcWorldChange.plLink);   // relative to link position
@@ -5345,24 +5362,29 @@ functions:
         ASSERTALWAYS("Unknown world link type");
         Teleport(CPlacement3D(FLOAT3D(0, 0, 0)+vOffsetRel, ANGLE3D(0, 0, 0)));
       }
+
       // if there is a start trigger target
-      if(CpmStart.m_penTarget!=NULL) {
+      if(CpmStart.m_penTarget != NULL) {
         SendToTarget(CpmStart.m_penTarget, EET_TRIGGER, this);
       }
 
-    // default start position
+    // If no any PlayerStart then using default start position.
     } else {
       // set player characteristics
       SetHealth(TopHealth());
       m_iMana = GetSP()->sp_iInitialMana;
       m_fArmor = 0.0f;
+
       // set weapons
-      ((CPlayerWeapons&)*m_penWeapons).InitializeWeapons(0, 0, 0, 0);
-      // start position
+      ((CPlayerWeapons&)*m_penWeapons).InitializeWeapons(0, 0, 0, 0, FALSE);
+
+      // put player to start position
       Teleport(CPlacement3D(FLOAT3D(0, 0, 0)+vOffsetRel, ANGLE3D(0, 0, 0)));
     }
+
     // send teleport event to all entities in range
     SendEventInRange(ETeleport(), FLOATaabbox3D(GetPlacement().pl_PositionVector, 200.0f));
+
     // stop moving
     ForceFullStop();
 
@@ -5379,11 +5401,13 @@ functions:
         _pShell->Execute("gam_bQuickSave=1;");
       }
     }
+
     // remember level start time
     if (!(m_ulFlags&PLF_LEVELSTARTED)) {
       m_ulFlags |= PLF_LEVELSTARTED;
       m_tmLevelStarted = _pNetwork->GetGameTime();
     }
+
     // reset model appearance
     CTString strDummy;
     SetPlayerAppearance(GetModelObject(), NULL, strDummy, /*bPreview=*/FALSE);
@@ -5395,6 +5419,7 @@ functions:
 
     // spawn teleport effect
     SpawnTeleport();
+
     // return from editor model (if was fragged into pieces)
     SwitchToModel();
     m_tmSpawned = _pTimer->CurrentTick();
@@ -5746,8 +5771,7 @@ procedures:
       GetPlayerWeapons()->DropWeapon();
     }
 
-
-    // play death
+    // play death animations
     INDEX iAnim1;
     INDEX iAnim2;
     if (m_pstState == PST_SWIM || m_pstState == PST_DIVE) {
@@ -5970,6 +5994,7 @@ procedures:
 
     // restore last view
     m_iViewState = m_iLastViewState;
+
     // clear ammunition
     if (!(m_ulFlags&PLF_RESPAWNINPLACE)) {
       GetPlayerWeapons()->ClearWeapons();
