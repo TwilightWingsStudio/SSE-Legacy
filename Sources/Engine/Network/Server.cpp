@@ -871,7 +871,7 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
     iMinor = 1;
   }
   // if wrong
-  if (iMajor!=_SE_BUILD_MAJOR || iMinor!=_SE_BUILD_MINOR) {
+  if (iMajor != _SE_BUILD_MAJOR || iMinor != _SE_BUILD_MINOR) {
     // disconnect the client
     CTString strExplanation;
     strExplanation.PrintF(TRANS(
@@ -881,12 +881,15 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
     SendDisconnectMessage(iClient, strExplanation, /*bStream=*/TRUE);
     return;
   }
+  
   extern CTString net_strConnectPassword;
   extern CTString net_strVIPPassword;
   extern CTString net_strObserverPassword;
   extern INDEX net_iVIPReserve;
   extern INDEX net_iMaxObservers;
   extern INDEX net_iMaxClients;
+  extern INDEX net_iMaxLocalPlayersPerClient;
+  
   CTString strGivenMod;
   CTString strGivenPassword;
   nm>>strGivenMod>>strGivenPassword;
@@ -909,10 +912,12 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
   }
   INDEX ctMaxAllowedVIPPlayers = 0;
   INDEX ctMaxAllowedVIPClients = 0;
-  if (net_iVIPReserve>0 && net_strVIPPassword!="") {
+
+  if (net_iVIPReserve > 0 && net_strVIPPassword != "") {
     ctMaxAllowedVIPPlayers = ClampDn(net_iVIPReserve-GetVIPPlayersCount(), 0L);
     ctMaxAllowedVIPClients = ClampDn(net_iVIPReserve-GetVIPClientsCount(), 0L);
   }
+
   INDEX ctMaxAllowedObservers = net_iMaxObservers;
 
   // get current counts
@@ -929,10 +934,13 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
     bAutorizedAsPlayer = TRUE;
     bAutorizedAsObserver = TRUE;
   }
-  if (net_strConnectPassword=="" || net_strConnectPassword==strGivenPassword) {
+
+  // If server hasn't password or client sent valid password.
+  if (net_strConnectPassword == "" || net_strConnectPassword == strGivenPassword) {
     bAutorizedAsPlayer = TRUE;
   }
-  if ((net_strObserverPassword==""&&bAutorizedAsPlayer) || net_strObserverPassword==strGivenPassword) {
+
+  if ((net_strObserverPassword == "" && bAutorizedAsPlayer) || net_strObserverPassword == strGivenPassword) {
     bAutorizedAsObserver = TRUE;
   }
 
@@ -944,15 +952,14 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
   }
 
   // if too many clients or players
-  if (ctCurrentPlayers+ctWantedLocalPlayers>ctMaxAllowedPlayers
-    ||ctCurrentClients+1>ctMaxAllowedClients) {
+  if (ctCurrentPlayers + ctWantedLocalPlayers > ctMaxAllowedPlayers || ctCurrentClients+1 > ctMaxAllowedClients) {
     // disconnect the client
     SendDisconnectMessage(iClient, TRANS("Server full!"), /*bStream=*/TRUE);
     return;
   }
 
   // if the user is trying to connect as observer
-  if (ctWantedLocalPlayers==0) {
+  if (ctWantedLocalPlayers == 0) {
     // if too many observers already
     if (ctCurrentObservers>=ctMaxAllowedObservers && !bAutorizedAsVIP) {
       // disconnect the client
@@ -962,24 +969,39 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
     // if observer password is wrong
     if (!bAutorizedAsObserver) {
       // disconnect the client
-      if (strGivenPassword=="") {
+      if (strGivenPassword == "") {
         SendDisconnectMessage(iClient, TRANS("This server requires password for observers!"), /*bStream=*/TRUE);
       } else {
         SendDisconnectMessage(iClient, TRANS("Wrong observer password!"), /*bStream=*/TRUE);
       }
+
+      return;
     }
   // if the user is trying to connect as player
   } else {
     // if player password is wrong
     if (!bAutorizedAsPlayer) {
       // disconnect the client
-      if (strGivenPassword=="") {
+      if (strGivenPassword == "") {
         SendDisconnectMessage(iClient, TRANS("This server requires password to connect!"), /*bStream=*/TRUE);
       } else {
         SendDisconnectMessage(iClient, TRANS("Wrong password!"), /*bStream=*/TRUE);
       }
+
+      return;
     }
-    
+
+    // If client want to join with split-screen mode.
+    if (ctWantedLocalPlayers > 1) {
+      if (net_iMaxLocalPlayersPerClient <= 1) {
+        SendDisconnectMessage(iClient, TRANS("Split-screen are not allowed on this server!"), /*bStream=*/TRUE);
+        return;
+      } else if (ctWantedLocalPlayers > net_iMaxLocalPlayersPerClient) {
+        CTString strMod(0, "Too many split-screen players! Maximum = %d!", net_iMaxLocalPlayersPerClient);
+        SendDisconnectMessage(iClient, strMod, /*bStream=*/TRUE);
+        return;
+      }
+    }
   }
 
   // activate it

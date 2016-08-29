@@ -166,6 +166,10 @@ extern INDEX net_bReportCRC = FALSE;
 extern FLOAT net_fDropPackets = 0.0f;
 extern FLOAT net_tmLatency = 0.0f;
 
+// SSE
+extern INDEX net_iMaxLocalPlayersPerClient = 4;
+//
+
 extern INDEX ent_bReportSpawnInWall = FALSE;
 
 extern FLOAT cmd_tmTick = 0.0f;
@@ -787,6 +791,9 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user INDEX net_iVIPReserve;", &net_iVIPReserve);
   _pShell->DeclareSymbol("user INDEX net_iMaxObservers;", &net_iMaxObservers);
   _pShell->DeclareSymbol("user INDEX net_iMaxClients;", &net_iMaxClients);
+  // SSE
+  _pShell->DeclareSymbol("user INDEX net_iMaxLocalPlayersPerClient;", &net_iMaxLocalPlayersPerClient);
+  //
   _pShell->DeclareSymbol("user CTString net_strConnectPassword;", &net_strConnectPassword);
   _pShell->DeclareSymbol("user CTString net_strAdminPassword;", &net_strAdminPassword);
   _pShell->DeclareSymbol("user FLOAT net_tmConnectionTimeout;", &net_tmConnectionTimeout);
