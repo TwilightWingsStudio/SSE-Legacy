@@ -360,6 +360,10 @@ extern FLOAT hud_tmWeaponsOnScreen = 3.0f;
 extern FLOAT hud_tmLatencySnapshot = 1.0f;
 extern INDEX hud_bShowMatchInfo = TRUE;
 
+// SSE
+extern BOOL hud_bSniperScopeBackground = TRUE;
+extern BOOL hud_bSniperScopeColoring = TRUE;
+
 extern FLOAT plr_fBreathingStrength = 0.0f;
 extern FLOAT plr_tmSnoopingTime;
 extern INDEX cht_bKillFinalBoss = FALSE;
@@ -760,6 +764,12 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("persistent user FLOAT hud_tmWeaponsOnScreen;",  &hud_tmWeaponsOnScreen);
   _pShell->DeclareSymbol("persistent user FLOAT hud_tmLatencySnapshot;",  &hud_tmLatencySnapshot);
   _pShell->DeclareSymbol("persistent user FLOAT plr_fBreathingStrength;", &plr_fBreathingStrength);
+  
+  // SSE
+  _pShell->DeclareSymbol("persistent user FLOAT hud_bSniperScopeBackground;",  &hud_bSniperScopeBackground);
+  _pShell->DeclareSymbol("persistent user FLOAT hud_bSniperScopeColoring;",  &hud_bSniperScopeColoring);
+  //
+  
   _pShell->DeclareSymbol("INDEX cht_bKillFinalBoss;",  &cht_bKillFinalBoss);
   _pShell->DeclareSymbol("INDEX cht_bDebugFinalBoss;", &cht_bDebugFinalBoss);
   _pShell->DeclareSymbol("INDEX cht_bDumpFinalBossData;", &cht_bDumpFinalBossData);
@@ -3117,7 +3127,7 @@ functions:
     }
 
     FLOAT fSubHealth, fSubArmor;
-    if( dmtType == DMT_DROWNING) {
+    if (dmtType == DMT_DROWNING) {
       // drowning
       fSubHealth = fDamageAmmount;
     } else {
@@ -3125,7 +3135,8 @@ functions:
       fSubArmor  = fDamageAmmount*2.0f/3.0f;      // 2/3 on armor damage
       fSubHealth = fDamageAmmount - fSubArmor;    // 1/3 on health damage
       m_fArmor  -= fSubArmor;                     // decrease armor
-      if( m_fArmor<0) {                          // armor below zero -> add difference to health damage
+
+      if (m_fArmor < 0) {                         // armor below zero -> add difference to health damage
         fSubHealth -= m_fArmor;
         m_fArmor    = 0.0f;
       }
@@ -3146,7 +3157,6 @@ functions:
           m_penCamera = NULL; 
         }
       }
-
     }
 
     // if the player is doing autoactions

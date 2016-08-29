@@ -51,6 +51,10 @@ extern FLOAT hud_fScaling;
 extern FLOAT hud_tmWeaponsOnScreen;
 extern INDEX hud_bShowMatchInfo;
 
+// SSE
+extern BOOL hud_bSniperScopeBackground;
+extern BOOL hud_bSniperScopeColoring;
+
 // player statistics sorting keys
 enum SortKeys {
   PSK_NAME    = 1,
@@ -598,14 +602,16 @@ static void HUD_DrawSniperMask( void )
   const FLOAT fTexSizeJ = ptd->GetPixHeight();
 
   // main sniper mask
-  _pDP->InitTexture( &_toSniperMask);
-  _pDP->AddTexture( fBlackStrip, 0, fCenterI, fCenterJ, 0.98f, 0.02f, 0, 1.0f, colMask);
-  _pDP->AddTexture( fCenterI, 0, fSizeI-fBlackStrip, fCenterJ, 0, 0.02f, 0.98f, 1.0f, colMask);
-  _pDP->AddTexture( fBlackStrip, fCenterJ, fCenterI, fSizeJ, 0.98f, 1.0f, 0, 0.02f, colMask);
-  _pDP->AddTexture( fCenterI, fCenterJ, fSizeI-fBlackStrip, fSizeJ, 0, 1, 0.98f, 0.02f, colMask);
-  _pDP->FlushRenderingQueue();
-  _pDP->Fill( 0, 0, fBlackStrip+1, fSizeJ, C_BLACK|CT_OPAQUE);
-  _pDP->Fill( fSizeI-fBlackStrip-1, 0, fBlackStrip+1, fSizeJ, C_BLACK|CT_OPAQUE);
+  if (hud_bSniperScopeBackground) {
+    _pDP->InitTexture( &_toSniperMask);
+    _pDP->AddTexture( fBlackStrip, 0, fCenterI, fCenterJ, 0.98f, 0.02f, 0, 1.0f, colMask);
+    _pDP->AddTexture( fCenterI, 0, fSizeI-fBlackStrip, fCenterJ, 0, 0.02f, 0.98f, 1.0f, colMask);
+    _pDP->AddTexture( fBlackStrip, fCenterJ, fCenterI, fSizeJ, 0.98f, 1.0f, 0, 0.02f, colMask);
+    _pDP->AddTexture( fCenterI, fCenterJ, fSizeI-fBlackStrip, fSizeJ, 0, 1, 0.98f, 0.02f, colMask);
+    _pDP->FlushRenderingQueue();
+    _pDP->Fill( 0, 0, fBlackStrip+1, fSizeJ, C_BLACK|CT_OPAQUE);
+    _pDP->Fill( fSizeI-fBlackStrip-1, 0, fBlackStrip+1, fSizeJ, C_BLACK|CT_OPAQUE);
+  }
 
   colMask = LerpColor(SE_COL_BLUE_LIGHT, C_WHITE, 0.25f);
 
@@ -622,8 +628,24 @@ static void HUD_DrawSniperMask( void )
   FLOAT fAFact = (Clamp(aFOV, 14.2f, 53.1f)-14.2f)/(53.1f-14.2f); // only for zooms 2x-4x !!!!!!
   ANGLE aAngle = 314.0f+fAFact*292.0f;
 
-  DrawRotatedQuad(&_toSniperWheel, fCenterI, fCenterJ, 40.0f*_fYResolutionScaling,
-                  aAngle, colMask|0x44);
+  COLOR colWhell = colMask;
+  
+  if (hud_bSniperScopeColoring && _penWeapons->m_penRayHit != NULL) {
+    // if required, show enemy health thru crosshair color
+    if (_penWeapons->m_fEnemyHealth > 0) {
+      if ( _penWeapons->m_fEnemyHealth < 0.25f) {
+        colWhell = C_RED;
+      } else if ( _penWeapons->m_fEnemyHealth < 0.50f) {
+        colWhell = C_ORANGE;
+      } else if ( _penWeapons->m_fEnemyHealth < 0.75f) {
+        colWhell = C_YELLOW;
+      } else {
+        colWhell = C_GREEN;
+      }
+    }
+  }
+
+  DrawRotatedQuad(&_toSniperWheel, fCenterI, fCenterJ, 40.0f*_fYResolutionScaling, aAngle, colWhell|0x44);
 
   FLOAT fTM = _pTimer->GetLerpedCurrentTick();
 
