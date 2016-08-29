@@ -52,7 +52,7 @@ extern FLOAT hud_tmWeaponsOnScreen;
 extern INDEX hud_bShowMatchInfo;
 
 // SSE
-extern BOOL hud_bSniperScopeBackground;
+extern FLOAT hud_fSniperScopeBaseOpacity;
 extern BOOL hud_bSniperScopeColoring;
 
 // player statistics sorting keys
@@ -600,17 +600,25 @@ static void HUD_DrawSniperMask( void )
   CTextureData *ptd = (CTextureData*)_toSniperMask.GetData();
   const FLOAT fTexSizeI = ptd->GetPixWidth();
   const FLOAT fTexSizeJ = ptd->GetPixHeight();
+  
+  // SSE
+  hud_fSniperScopeBaseOpacity = Clamp(hud_fSniperScopeBaseOpacity, 0.0f, 1.0f);
 
   // main sniper mask
-  if (hud_bSniperScopeBackground) {
+  if (hud_fSniperScopeBaseOpacity > 0.0F) {
+    ULONG ulSniperScopeBaseOpacity = NormFloatToByte(hud_fSniperScopeBaseOpacity);
+
+    colMask = C_WHITE|ulSniperScopeBaseOpacity;
+  
     _pDP->InitTexture( &_toSniperMask);
     _pDP->AddTexture( fBlackStrip, 0, fCenterI, fCenterJ, 0.98f, 0.02f, 0, 1.0f, colMask);
     _pDP->AddTexture( fCenterI, 0, fSizeI-fBlackStrip, fCenterJ, 0, 0.02f, 0.98f, 1.0f, colMask);
     _pDP->AddTexture( fBlackStrip, fCenterJ, fCenterI, fSizeJ, 0.98f, 1.0f, 0, 0.02f, colMask);
     _pDP->AddTexture( fCenterI, fCenterJ, fSizeI-fBlackStrip, fSizeJ, 0, 1, 0.98f, 0.02f, colMask);
+
     _pDP->FlushRenderingQueue();
-    _pDP->Fill( 0, 0, fBlackStrip+1, fSizeJ, C_BLACK|CT_OPAQUE);
-    _pDP->Fill( fSizeI-fBlackStrip-1, 0, fBlackStrip+1, fSizeJ, C_BLACK|CT_OPAQUE);
+    _pDP->Fill( 0, 0, fBlackStrip/*+1*/, fSizeJ, C_BLACK|ulSniperScopeBaseOpacity);
+    _pDP->Fill( fSizeI-fBlackStrip/*-1*/, 0, fBlackStrip+1, fSizeJ, C_BLACK|ulSniperScopeBaseOpacity);
   }
 
   colMask = LerpColor(SE_COL_BLUE_LIGHT, C_WHITE, 0.25f);
@@ -820,6 +828,7 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
   // cache local variables
   hud_fOpacity = Clamp( hud_fOpacity, 0.1f, 1.0f);
   hud_fScaling = Clamp( hud_fScaling, 0.5f, 1.2f);
+  
   _penPlayer  = penPlayerCurrent;
   _penWeapons = (CPlayerWeapons*)&*_penPlayer->m_penWeapons;
   _pDP        = pdpCurrent;
