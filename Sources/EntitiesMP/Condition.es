@@ -19,31 +19,32 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 enum ECondition{
-   0 EC_SAME         "==",
-   2 EC_DIFFERENT    "!=",
-   1 EC_LARGER       ">",
-   3 EC_SMALLER      "<",
-   4 EC_SMALLER_SAME "<=",
-   5 EC_LARGER_SAME  ">=",
+   0 EC_SAME         "0 ==",
+   2 EC_DIFFERENT    "1 !=",
+   1 EC_LARGER       "2 >",
+   3 EC_SMALLER      "3 <",
+   4 EC_SMALLER_SAME "4 <=",
+   5 EC_LARGER_SAME  "5 >=",
+   // TODO: Add & and !& opeation
 };
 
 enum EConType{
-   0 ECT_ENTITY    "Property",
-   1 ECT_POSX      "Pos(X)",
-   2 ECT_POSY      "Pos(Y)",
-   3 ECT_POSZ      "Pos(Z)",
-   4 ECT_SPEEDX    "Speed(X)",
-   5 ECT_SPEEDY    "Speed(Y)",
-   6 ECT_SPEEDZ    "Speed(Z)",
-   7 ECT_SPEEDALL  "Speed(Total)",
-   8 ECT_ROTH      "Rotation(H)",
-   9 ECT_ROTB      "Rotation(P)",
-  10 ECT_ROTP      "Rotation(B)",
-  11 ECT_SPEEDXREL "Relative Speed(X)",
-  12 ECT_SPEEDYREL "Relative Speed(Y)",
-  13 ECT_SPEEDZREL "Relative Speed(Z)",
-  14 ECT_HEALTH    "Health",
-  15 ECT_TYPE      "Entity Class (unchangeable)",
+   0 ECT_ENTITY    "00 Property",
+   1 ECT_POSX      "01 Pos(X)",
+   2 ECT_POSY      "02 Pos(Y)",
+   3 ECT_POSZ      "03 Pos(Z)",
+   4 ECT_SPEEDX    "04 Speed(X)",
+   5 ECT_SPEEDY    "05 Speed(Y)",
+   6 ECT_SPEEDZ    "06 Speed(Z)",
+   7 ECT_SPEEDALL  "07 Speed(Total)",
+   8 ECT_ROTH      "08 Rotation(H)",
+   9 ECT_ROTB      "09 Rotation(P)",
+  10 ECT_ROTP      "10 Rotation(B)",
+  11 ECT_SPEEDXREL "11 Relative Speed(X)",
+  12 ECT_SPEEDYREL "12 Relative Speed(Y)",
+  13 ECT_SPEEDZREL "13 Relative Speed(Z)",
+  14 ECT_HEALTH    "14 Health",
+  15 ECT_TYPE      "15 Entity Class (unchangeable)",
 };
 
 class CCondition: CEntity {
@@ -56,28 +57,30 @@ properties:
    1 CTString m_strName        "Name" 'N'         = "Condition",
    2 CTString m_strDescription                    = "Condition",
 
-   3 CTString m_strProperty1      "If Condition Property 1"    = "",
-   4 CTString m_strProperty2      "If Condition Property 2"    = "",
+   3 CTString m_strProperty1      "Target 1 Property Name"    = "",
+   4 CTString m_strProperty2      "Target 2 Property Name"    = "",
 
-   5 CEntityPointer m_penIfCondition1  "If Condition Target 1" COLOR(C_RED|0xFF),
-   6 CEntityPointer m_penIfCondition2  "If Condition Target 2" COLOR(C_RED|0xFF),
+   5 CEntityPointer m_penIfCondition1  "Target 1" COLOR(C_RED|0xFF),
+   6 CEntityPointer m_penIfCondition2  "Target 2" COLOR(C_RED|0xFF),
+
    7 CEntityPointer m_penIfTarget      "If Target"             COLOR(C_RED|0xFF),
    8 CEntityPointer m_penElseTarget    "Else Target"           COLOR(C_RED|0xFF),
 
    9 enum ECondition m_eCondition "Operation" = EC_SAME,
   10 BOOL m_bActive        "Active"           = TRUE,
   11 BOOL m_bDebug         "Debug Messages"   = FALSE,
-  12 BOOL m_bAbs1          "Absolute 1"       = FALSE,
-  13 BOOL m_bAbs2          "Absolute 2"       = FALSE,
+  12 BOOL m_bAbs1          "Property 1 As Absolute" = FALSE,
+  13 BOOL m_bAbs2          "Property 2 As Absolute" = FALSE,
   14 BOOL m_bCode          "Output as Script" = FALSE,
 
-  15 enum EConType  m_eCT1 "Condition Type 1" = ECT_ENTITY,
-  16 enum EConType  m_eCT2 "Condition Type 2" = ECT_ENTITY,
-  17 BOOL m_bCaused1       "Condition Target 1=penCaused" = FALSE,
-  18 BOOL m_bCaused2       "Condition Target 2=penCaused" = FALSE,
+  15 enum EConType  m_eCT1 "Target 1 Property Type" = ECT_ENTITY,
+  16 enum EConType  m_eCT2 "Target 2 Property Type" = ECT_ENTITY,
+
+  17 BOOL m_bCaused1       "Target 1=penCaused" = FALSE,
+  18 BOOL m_bCaused2       "Target 2=penCaused" = FALSE,
 
   19 CEntityPointer m_penError "Error Target",
-  20 CTString m_strClass       "Class"  = "",
+  20 CTString m_strClass       "Class Name"  = "",
 
 components:
   1 model   MODEL_CONDITION     "Models\\Editor\\Condition.mdl",
