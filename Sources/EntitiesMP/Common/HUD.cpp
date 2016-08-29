@@ -712,14 +712,19 @@ static void FillWeaponAmmoTables(void)
   // prepare ammo table for weapon possesion
   INDEX i, iAvailableWeapons = _penWeapons->m_iAvailableWeapons;
   for( i = 0; i < 8; i++) _aaiAmmo[i].ai_bHasWeapon = FALSE;
+
   // weapon possesion
   for( i = WEAPON_NONE + 1; i < WEAPON_LAST; i++)
   {
-    if ( _awiWeapons[i].wi_wtWeapon != WEAPON_NONE)
-    {
-      // regular weapons
-      _awiWeapons[i].wi_bHasWeapon = (iAvailableWeapons&(1<<(_awiWeapons[i].wi_wtWeapon-1)));
-      if ( _awiWeapons[i].wi_paiAmmo!=NULL) _awiWeapons[i].wi_paiAmmo->ai_bHasWeapon |= _awiWeapons[i].wi_bHasWeapon;
+    if ( _awiWeapons[i].wi_wtWeapon == WEAPON_NONE) {
+      continue;
+    }
+
+    // regular weapons
+    _awiWeapons[i].wi_bHasWeapon = (iAvailableWeapons&(1<<(_awiWeapons[i].wi_wtWeapon-1)));
+
+    if (_awiWeapons[i].wi_paiAmmo != NULL) {
+      _awiWeapons[i].wi_paiAmmo->ai_bHasWeapon |= _awiWeapons[i].wi_bHasWeapon;
     }
   }
 }
@@ -983,10 +988,12 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
       AmmoInfo &ai = _aaiAmmo[i];
       ASSERT( ai.ai_iAmmoAmmount>=0);
       if ( ai.ai_iAmmoAmmount==0 && !ai.ai_bHasWeapon) continue;
+
       // display ammo info
       colIcon = C_WHITE /*_colHUD*/;
-      if ( ai.ai_iAmmoAmmount==0) colIcon = C_mdGRAY;
       if ( ptoCurrentAmmo == ai.ai_ptoAmmo) colIcon = C_WHITE;
+      if ( ai.ai_iAmmoAmmount <= 0) colIcon = C_mdGRAY;
+
       fNormValue = (FLOAT)ai.ai_iAmmoAmmount / ai.ai_iMaxAmmoAmmount;
       colBar = AddShaker( 4, ai.ai_iAmmoAmmount, ai.ai_iLastAmmoAmmount, ai.ai_tmAmmoChanged, fMoverX, fMoverY);
       HUD_DrawBorder( fCol,         fRow+fMoverY, fOneUnitS, fOneUnitS, colBorder);
