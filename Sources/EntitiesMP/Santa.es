@@ -26,7 +26,7 @@ uses "EntitiesMP/EnemyBase";
 %{
 // info structure
 static EntityInfo eiSanta = {
-  EIBT_AIR, 100.0f,
+  EIBT_FLESH, 1000.0f, //  One tonn mass isn't typo! I just don't want kick santa on damage.
   0, 1.6f, 0,     // source (eyes)
   0.0f, 1.0f, 0.0f,     // target (body)
 };
@@ -94,12 +94,20 @@ functions:
   /* Handle an event, return false if the event is not handled. */
   BOOL HandleEvent(const CEntityEvent &ee)
   {
+    //if (ee.ee_slEvent == EVENTCODE_EDamage && GetFlags()&ENF_ALIVE) {
+    //  return TRUE;
+    //}
+
     // ignore touching, damaging...
-    if (ee.ee_slEvent==EVENTCODE_ETouch || ee.ee_slEvent==EVENTCODE_EDamage) {
+    if (ee.ee_slEvent == EVENTCODE_ETouch/* || ee.ee_slEvent == EVENTCODE_EDamage*/) {
       return TRUE;
     }
 
     return CEnemyBase::HandleEvent(ee);
+  }
+  
+  virtual BOOL ShouldSelectTargetOnDamage() {
+    return FALSE;
   }
 
   /* Receive damage */
@@ -107,7 +115,7 @@ functions:
     FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection) 
   {
     // skip base enemy damage handling
-    CMovableModelEntity::ReceiveDamage(penInflictor, dmtType, fDamageAmmount, vHitPoint, vDirection);
+    CEnemyBase::ReceiveDamage(penInflictor, dmtType, fDamageAmmount, vHitPoint, vDirection);
 
     // if santa dead he can't play sound and spawn items!
     if (!(GetFlags()&ENF_ALIVE)) {
@@ -125,21 +133,24 @@ functions:
 
     // remember time
     m_tmLastSpawnTime = _pTimer->CurrentTick();
+
     // choose an item to spawn
     INDEX ctTemplates = 0;
-    if (m_penTemplate0!=NULL) { ctTemplates++; }
-    if (m_penTemplate1!=NULL) { ctTemplates++; }
-    if (m_penTemplate2!=NULL) { ctTemplates++; }
-    if (m_penTemplate3!=NULL) { ctTemplates++; }
-    if (m_penTemplate4!=NULL) { ctTemplates++; }
-    if (ctTemplates==0) {
+    if (m_penTemplate0 != NULL) { ctTemplates++; }
+    if (m_penTemplate1 != NULL) { ctTemplates++; }
+    if (m_penTemplate2 != NULL) { ctTemplates++; }
+    if (m_penTemplate3 != NULL) { ctTemplates++; }
+    if (m_penTemplate4 != NULL) { ctTemplates++; }
+
+    if (ctTemplates == 0) {
       return;
     }
+
     INDEX iTemplate = IRnd()%ctTemplates;
     CEntity *penItem = (&m_penTemplate0)[iTemplate];
 
     // if the target doesn't exist, or is destroyed
-    if (penItem==NULL || (penItem->GetFlags()&ENF_DELETED)) {
+    if (penItem == NULL || (penItem->GetFlags()&ENF_DELETED)) {
       // do nothing
       return;
     }
@@ -153,9 +164,7 @@ functions:
     penSpawned->Teleport(pl, FALSE);
   };
 
-  void LeaveStain( BOOL bGrow)
-  {
-  }
+  void LeaveStain( BOOL bGrow) {}
 
   // damage anim
   INDEX AnimForDamage(FLOAT fDamage) {
@@ -186,16 +195,19 @@ functions:
 //    StartModelAnim(PLAYER_ANIM_STAND, AOF_LOOPING|AOF_NORESTART);
 //    GetBody()->PlayAnim(BODY_ANIM_WAIT, AOF_LOOPING|AOF_NORESTART);
   };
+
   void WalkingAnim(void) {
     ActivateRunningSound();
 //    StartModelAnim(PLAYER_ANIM_NORMALWALK, AOF_LOOPING|AOF_NORESTART);
 //    GetBody()->PlayAnim(BODY_ANIM_NORMALWALK, AOF_LOOPING|AOF_NORESTART);
   };
+
   void RunningAnim(void) {
     ActivateRunningSound();
 //    StartModelAnim(PLAYER_ANIM_RUN, AOF_LOOPING|AOF_NORESTART);
 //    GetBody()->PlayAnim(BODY_ANIM_NORMALWALK, AOF_LOOPING|AOF_NORESTART);
   };
+
   void RotatingAnim(void) {
     ActivateRunningSound();
 //    StartModelAnim(BODY_ANIM_NORMALWALK, AOF_LOOPING|AOF_NORESTART);
@@ -206,16 +218,18 @@ functions:
   void IdleSound(void) {
 //    PlaySound(m_soSound, SOUND_IDLE, SOF_3D);
   };
+
   void SightSound(void) {
 //    PlaySound(m_soSound, SOUND_SIGHT, SOF_3D);
   };
+
   void WoundSound(void) {
     PlaySound(m_soSound, SOUND_WOUND, SOF_3D);
   };
+
   void DeathSound(void) {
     PlaySound(m_soSound, SOUND_DEATH, SOF_3D);
   };
-
 
   // adjust sound and watcher parameters here if needed
   void EnemyPostInit(void) 
@@ -258,10 +272,13 @@ procedures:
 
     SetHealth(m_fSantaHealth);
     m_fMaxHealth = m_fSantaHealth;
+
     // damage/explode properties
     m_fDamageWounded = 1E10f;
-    m_fBlowUpAmount = 1E10f;
-    m_fBodyParts = 30;
+    m_fBlowUpAmount = 60.0f;
+    m_fBodyParts = 4;
+    m_fBlowUpSize = 2.0f;
+
     // setup attack distances
     m_fAttackDistance = 150.0f;
     m_fCloseDistance = 5.0f;
@@ -270,6 +287,7 @@ procedures:
     m_fCloseFireTime = 1.0f;
     m_fIgnoreRange = 300.0f;
     m_iScore = 1000;
+
     // setup moving speed
     m_fWalkSpeed = (FRnd() + 1.5f)*1.5f;
     m_aWalkRotateSpeed = AngleDeg(FRnd()*20.0f + 550.0f);
@@ -282,6 +300,7 @@ procedures:
     CEnemyBase::SizeModel();
     m_soRunning.Set3DParameters(500.0f, 50.0f, 1.0f, 1.0f);
     m_bRunSoundPlaying = FALSE;
+
     // continue behavior in base class
     jump CEnemyBase::MainLoop();
 

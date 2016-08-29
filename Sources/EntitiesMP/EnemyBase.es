@@ -747,19 +747,15 @@ functions:
     pes->es_iScore = m_iScore;
     return TRUE;
   }
+  
+  virtual BOOL ShouldSelectTargetOnDamage() {
+    return TRUE;
+  }
 
   // --------------------------------------------------------------------------------------
-  /* Receive damage */
+  // Check for faction system.
   // --------------------------------------------------------------------------------------
-  void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
-    FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection) 
-  {
-    // if template
-    if (m_bTemplate) {
-      // do nothing
-      return;
-    }
-
+  BOOL ShouldReceiveDamageFromInflictor(CEntity *penInflictor) {
     // Friendly fire for factions.
 
     CEnemyFactionHolder* penEFH = GetFactionHolder(TRUE);
@@ -767,7 +763,7 @@ functions:
     if (IsOfClass(penInflictor, "Player")) {
       if (penEFH && penEFH->IsIndexValid()) {
         if (!penEFH->m_bDamageFromPlayers) {
-          return;
+          return FALSE;
         }
       }
 
@@ -780,22 +776,68 @@ functions:
           INDEX iEnemyFactionIndex = penEnemyEFH->m_iFactionIndex;
 
           if (penEFH->m_iFactionIndex == iEnemyFactionIndex && !penEFH->m_bDamageFromMembers) {
-            return;
+            return FALSE;
           }
 
           if (penEFH->GetRelationToFaction(iEnemyFactionIndex) == FRT_ALLY && !penEFH->m_bDamageFromAllies) {
-            return;
+            return FALSE;
           }
         }
       }
     }
 
+    return TRUE;
+  }
+  
+  virtual void CalcKickDamageByDamageType(FLOAT& fKickDamage, enum DamageType dmtType)
+  {
+    switch (dmtType) {
+      // Strong kinetical damage types must have strong kick damage.
+      case DMT_EXPLOSION:
+      case DMT_IMPACT:
+      case DMT_CANNONBALL_EXPLOSION:
+        fKickDamage *= 1.5;
+        break;
+
+      // Low kinetical damage types.
+      case DMT_DROWNING:
+      case DMT_CLOSERANGE:
+      case DMT_CHAINSAW:
+        fKickDamage /= 10;
+        break;
+
+      // Burning can't kick normally.
+      case DMT_BURNING:
+        fKickDamage /= 100000;
+        break;
+
+      default: break;
+    }
+  }
+  
+  // --------------------------------------------------------------------------------------
+  /* Receive damage */
+  // --------------------------------------------------------------------------------------
+  void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
+    FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection) 
+  {
+    // if template
+    if (m_bTemplate) {
+      // do nothing
+      return;
+    }
+
+    if (!ShouldReceiveDamageFromInflictor(penInflictor)) {
+      return;
+    }
+
     FLOAT fNewDamage = fDamageAmmount;
 
     // adjust damage
-    fNewDamage *=DamageStrength( ((EntityInfo*)GetEntityInfo())->Eeibt, dmtType);
+    fNewDamage *= DamageStrength( ((EntityInfo*)GetEntityInfo())->Eeibt, dmtType);
+
     // apply game extra damage per enemy and per player
-    fNewDamage *=GetGameDamageMultiplier();
+    fNewDamage *= GetGameDamageMultiplier();
 
     // if no damage
     if (fNewDamage == 0) {
@@ -803,23 +845,17 @@ functions:
       return;
     }
 
+    // Copy damage amount to this shit.
     FLOAT fKickDamage = fNewDamage;
-    if ( (dmtType == DMT_EXPLOSION) || (dmtType == DMT_IMPACT) || (dmtType == DMT_CANNONBALL_EXPLOSION) ) {
-      fKickDamage *= 1.5;
-    }
 
-    if (dmtType == DMT_DROWNING || dmtType == DMT_CLOSERANGE || dmtType == DMT_CHAINSAW) {
-      fKickDamage /= 10;
-    }
+    CalcKickDamageByDamageType(fKickDamage, dmtType);
 
-    if (dmtType == DMT_BURNING)
-    {
-      fKickDamage /= 100000;
+    if (dmtType == DMT_BURNING) {
       UBYTE ubR, ubG, ubB, ubA;
-      FLOAT fColorFactor=fNewDamage/m_fMaxHealth*255.0f;
+      FLOAT fColorFactor = fNewDamage/m_fMaxHealth*255.0f;
       ColorToRGBA(m_colBurning, ubR, ubG, ubB, ubA);
-      ubR=ClampDn(ubR-fColorFactor, 32.0f);
-      m_colBurning=RGBAToColor(ubR, ubR, ubR, ubA);
+      ubR = ClampDn(ubR-fColorFactor, 32.0f);
+      m_colBurning = RGBAToColor(ubR, ubR, ubR, ubA);
     }
 
     // get passed time since last damage
@@ -831,6 +867,7 @@ functions:
     if (tmDelta >= _pTimer->TickQuantum*3) {
       m_vDamage = FLOAT3D(0, 0, 0);
     }
+
     // add new damage
     FLOAT3D vDirectionFixed;
     if (vDirection.ManhattanNorm() > 0.5f) {
@@ -838,6 +875,7 @@ functions:
     } else {
       vDirectionFixed = -en_vGravityDir;
     }
+
     FLOAT3D vDamageOld = m_vDamage;
 /*    if ( (dmtType == DMT_EXPLOSION) || (dmtType == DMT_CANNONBALL_EXPLOSION) )
     {
@@ -848,6 +886,7 @@ functions:
       m_vDamage+=(vDirectionFixed-en_vGravityDir/2)*fKickDamage;
     }
     
+    // Prepare some shit.
     FLOAT fOldLen = vDamageOld.Length();
     FLOAT fNewLen = m_vDamage.Length();
     FLOAT fOldRootLen = Sqrt(fOldLen);
@@ -879,8 +918,8 @@ functions:
 
     // if it has no spray, or if this damage overflows it, and not already disappearing
     if ((m_tmSpraySpawned <= _pTimer->CurrentTick()-_pTimer->TickQuantum*8 || 
-      m_fSprayDamage+fNewDamage > 50.0f) && m_fSpiritStartTime == 0 &&
-      dmtType!=DMT_CHAINSAW && !(dmtType==DMT_BURNING && GetHealth() < 0) ) {
+      m_fSprayDamage + fNewDamage > 50.0f) && m_fSpiritStartTime == 0 &&
+      dmtType!=DMT_CHAINSAW && !(dmtType == DMT_BURNING && GetHealth() < 0) ) {
 
       FLOAT3D vHitPointNew = vHitPoint;
       // Fix incorrect spray spawn position.
@@ -936,7 +975,8 @@ functions:
       m_fSprayDamage = 0.0f;
       m_fMaxDamageAmmount = 0.0f;
     }
-    m_fSprayDamage+=fNewDamage;
+
+    m_fSprayDamage += fNewDamage;
 
     CMovableModelEntity::ReceiveDamage(penInflictor, 
       dmtType, fNewDamage, vHitPoint, vDirection);
@@ -3465,8 +3505,10 @@ procedures:
 
       // if you get damaged by someone
       on (EDamage eDamage) : {
-        // eventually set new hard target
-        SetTargetHard(eDamage.penInflictor);
+        if (ShouldSelectTargetOnDamage()) {
+          // eventually set new hard target
+          SetTargetHard(eDamage.penInflictor);
+        }
 
         // if confused
         m_fDamageConfused -= eDamage.fAmount;
@@ -3479,6 +3521,7 @@ procedures:
           // play wounding animation
           call BeWounded(eDamage);
         }
+
         resume;
       }
       on (EForceWound) :
@@ -3631,6 +3674,10 @@ procedures:
       }
       // if you get damaged by someone
       on (EDamage eDamage) : {
+        if (!ShouldSelectTargetOnDamage()) {
+          resume;
+        }
+
         // if can set the damager as hard target
         if (SetTargetHard(eDamage.penInflictor)) {
           // notify wounding to others
@@ -3642,6 +3689,7 @@ procedures:
         }
         return;
       }
+
       on (EWatch eWatch) : {
         if (m_penFriend != NULL) {
             jump Active();
