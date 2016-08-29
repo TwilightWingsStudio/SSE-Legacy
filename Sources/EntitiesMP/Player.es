@@ -361,8 +361,11 @@ extern FLOAT hud_tmLatencySnapshot = 1.0f;
 extern INDEX hud_bShowMatchInfo = TRUE;
 
 // SSE
+extern BOOL hud_bRedScreenOnDamage = TRUE;
+
 extern BOOL hud_bSniperScopeBackground = TRUE;
 extern BOOL hud_bSniperScopeColoring = TRUE;
+//
 
 extern FLOAT plr_fBreathingStrength = 0.0f;
 extern FLOAT plr_tmSnoopingTime;
@@ -766,6 +769,8 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("persistent user FLOAT plr_fBreathingStrength;", &plr_fBreathingStrength);
   
   // SSE
+  _pShell->DeclareSymbol("persistent user FLOAT hud_bRedScreenOnDamage;",  &hud_bRedScreenOnDamage);
+  
   _pShell->DeclareSymbol("persistent user FLOAT hud_bSniperScopeBackground;",  &hud_bSniperScopeBackground);
   _pShell->DeclareSymbol("persistent user FLOAT hud_bSniperScopeColoring;",  &hud_bSniperScopeColoring);
   //
@@ -4895,6 +4900,7 @@ functions:
   {
     CPlacement3D plViewOld = prProjection.ViewerPlacementR();
     BOOL bSniping = ((CPlayerWeapons&)*m_penWeapons).m_bSniping;
+
     // render weapon models if needed
     // do not render weapon if sniping
     BOOL bRenderModels = _pShell->GetINDEX("gfx_bRenderModels");
@@ -4934,20 +4940,22 @@ functions:
 
     // get your prediction tail
     CPlayer *pen = (CPlayer*)GetPredictionTail();
+
     // do screen blending
     ULONG ulR=255, ulG=0, ulB=0; // red for wounding
     ULONG ulA = pen->m_fDamageAmmount*5.0f;
     
     // if less than few seconds elapsed since last damage
     FLOAT tmSinceWounding = _pTimer->CurrentTick() - pen->m_tmWoundedTime;
-    if( tmSinceWounding<4.0f) {
+
+    if (tmSinceWounding<4.0f) {
       // decrease damage ammount
       if( tmSinceWounding<0.001f) { ulA = (ulA+64)/2; }
     }
 
     // add rest of blend ammount
     ulA = ClampUp( ulA, (ULONG)224);
-    if (m_iViewState == PVT_PLAYEREYES) {
+    if (hud_bRedScreenOnDamage && m_iViewState == PVT_PLAYEREYES) {
       pdp->dp_ulBlendingRA += ulR*ulA;
       pdp->dp_ulBlendingGA += ulG*ulA;
       pdp->dp_ulBlendingBA += ulB*ulA;
