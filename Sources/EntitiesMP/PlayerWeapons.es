@@ -1360,11 +1360,18 @@ functions:
       prProjection.ObjectPlacementL() = CPlacement3D( FLOAT3D(0.0f, 0.0f, 0.0f), ANGLE3D( 0, 0, 0));
       prProjection.Prepare();
       prProjection.ProjectCoordinate( vRayHit, vOnScreen);
+
       // if required, show enemy health thru crosshair color
-      if ( hud_bCrosshairColoring && m_fEnemyHealth>0) {
-             if ( m_fEnemyHealth<0.25f) { colCrosshair = C_RED;    }
-        else if ( m_fEnemyHealth<0.60f) { colCrosshair = C_YELLOW; }
-        else                         { colCrosshair = C_GREEN;  }
+      if ( hud_bCrosshairColoring && m_fEnemyHealth > 0) {
+        if ( m_fEnemyHealth < 0.25f) {
+          colCrosshair = C_RED;
+        } else if ( m_fEnemyHealth < 0.50f) {
+          colCrosshair = C_ORANGE;
+        } else if ( m_fEnemyHealth < 0.75f) {
+          colCrosshair = C_YELLOW;
+        } else {
+          colCrosshair = C_GREEN;
+        }
       }
     }
     // if didn't hit anything
@@ -1389,6 +1396,7 @@ functions:
     hud_fCrosshairRatio   = Clamp( hud_fCrosshairRatio,   0.1f, 1.0f);
     hud_fCrosshairOpacity = Clamp( hud_fCrosshairOpacity, 0.1f, 1.0f);
     const ULONG ulAlpha = NormFloatToByte( hud_fCrosshairOpacity);
+
     // draw crosshair if needed
     if ( iCrossHair>0) {
       // determine crosshair size
