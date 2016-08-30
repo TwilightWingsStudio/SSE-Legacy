@@ -29,11 +29,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 enum ETType {
-  0 TT_NORMAL     "Normal",
-  1 TT_DELAYED    "Delayed",
-  2 TT_PROCEDURAL "Procedural",
-  3 TT_RANDOM     "Random",
-  4 TT_DELRAND    "Delayed randomly",
+  0 TT_NORMAL     "0 Normal",
+  1 TT_DELAYED    "1 Delayed",
+  2 TT_PROCEDURAL "2 Procedural",
+  3 TT_RANDOM     "3 Random",
+  4 TT_DELRAND    "4 Delayed randomly",
 };
 
 class CTrigger: CRationalEntity {
@@ -211,24 +211,24 @@ functions:
       }
     }
 
-    if (m_bMessageForAll) {
-      for(INDEX i = 0; i < GetMaxPlayers(); i++) {
-        CEntity *penPlayer = GetPlayerEntity(i);
-        if (penPlayer != NULL) {
-          PrintCenterMessage(this, penPlayer,
-          TranslateConst(m_strMessage),
-          m_fMessageTime, m_mssMessageSound);
+    if (m_strMessage != "") {
+      if (m_bMessageForAll) {
+        for(INDEX i = 0; i < GetMaxPlayers(); i++) {
+          CEntity *penPlayer = GetPlayerEntity(i);
+          if (penPlayer != NULL) {
+            PrintCenterMessage(this, penPlayer,
+            TranslateConst(m_strMessage),
+            m_fMessageTime, m_mssMessageSound);
+          }
         }
-      }
-    } else {
-      if (m_strMessage != "") {
+      } else {
         PrintCenterMessage(this, m_penCaused,
           TranslateConst(m_strMessage),
           m_fMessageTime, m_mssMessageSound);
       }
     }
 
-    if (m_strConsoleMsg ! ="") {
+    if (m_strConsoleMsg != "") {
       CPrintF(TRANS("%s\n"), m_strConsoleMsg);
     }
 
