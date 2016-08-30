@@ -3883,7 +3883,7 @@ functions:
     CPlayerAction paAction = pa;
 
     // if camera is active
-    if (m_penCamera!=NULL) {
+    if (m_penCamera != NULL && ((CCamera&)*m_penCamera).m_bDisablePlayerControl) {
       // ignore keyboard/mouse/joystick commands
       paAction.pa_vTranslation  = FLOAT3D(0,0,0);
       paAction.pa_aRotation     = ANGLE3D(0,0,0);
@@ -3891,7 +3891,7 @@ functions:
       // if fire or use is pressed
       if (ulNewButtons&(PLACT_FIRE|PLACT_USE)) {
         // stop camera
-        m_penCamera=NULL;
+        m_penCamera = NULL;
       }
     } else {
       ButtonsActions(paAction);
