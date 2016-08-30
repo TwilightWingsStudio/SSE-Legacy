@@ -50,6 +50,7 @@ properties:
 
  // SSE
  15 FLOAT m_fPitch         "Pitch" = 1.0F,
+ 16 BOOL m_bPauseable      "Pauseable" = FALSE,
 
   {
     CAutoPrecacheSound m_aps;
@@ -153,16 +154,35 @@ procedures:
         }
         resume;
       }
+
       // play sound
       on (EStart) : {
         DoPlay();
         resume;
       }
+
+      on (ETrigger) : {
+        if (!m_bPauseable) {
+          resume;
+        }
+
+        if (m_soSound.IsPlaying()) {
+          if (m_soSound.IsPaused()) {
+            m_soSound.Resume();
+          } else {
+            m_soSound.Pause();
+          }
+        }
+
+        resume;
+      }
+
       // stop playing sound
       on (EStop) : {
         m_soSound.Stop();
         resume;
       }
+
       // when someone in range is destroyed
       on (ERangeModelDestruction) : {
         // if range destruction is enabled
