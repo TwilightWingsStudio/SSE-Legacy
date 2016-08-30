@@ -51,23 +51,24 @@ event EKey {
 const char *GetKeyName(enum KeyItemType kit)
 {
   switch(kit) {
-  case KIT_BOOKOFWISDOM     :  return TRANS("Book of wisdom"); break;
-  case KIT_CROSSWOODEN      :  return TRANS("Wooden cross"); break;
-  case KIT_CROSSGOLD        :  return TRANS("Gold cross"); break;
-  case KIT_CROSSMETAL       :  return TRANS("Silver cross"); break;
-  case KIT_JAGUARGOLDDUMMY  :  return TRANS("Gold jaguar"); break;
-  case KIT_HAWKWINGS01DUMMY :  return TRANS("Hawk wings - part 1"); break;
-  case KIT_HAWKWINGS02DUMMY :  return TRANS("Hawk wings - part 2"); break;
-  case KIT_HOLYGRAIL        :  return TRANS("Holy grail"); break;
-  case KIT_TABLESDUMMY      :  return TRANS("Tablet of wisdom"); break;
-  case KIT_WINGEDLION       :  return TRANS("Winged lion"); break;
-  case KIT_ELEPHANTGOLD     :  return TRANS("Gold elephant"); break;    
-  case KIT_STATUEHEAD01     :  return TRANS("Seriously scary ceremonial mask"); break;
-  case KIT_STATUEHEAD02     :  return TRANS("Hilariously happy ceremonial mask"); break;
-  case KIT_STATUEHEAD03     :  return TRANS("Ix Chel mask"); break;   
-  case KIT_KINGSTATUE       :  return TRANS("Statue of King Tilmun"); break;   
-  case KIT_CRYSTALSKULL     :  return TRANS("Crystal Skull"); break;   
-  default: return TRANS("unknown item"); break;
+    case KIT_BOOKOFWISDOM     :  return TRANS("Book of wisdom"); break;
+    case KIT_CROSSWOODEN      :  return TRANS("Wooden cross"); break;
+    case KIT_CROSSGOLD        :  return TRANS("Gold cross"); break;
+    case KIT_CROSSMETAL       :  return TRANS("Silver cross"); break;
+    case KIT_JAGUARGOLDDUMMY  :  return TRANS("Gold jaguar"); break;
+    case KIT_HAWKWINGS01DUMMY :  return TRANS("Hawk wings - part 1"); break;
+    case KIT_HAWKWINGS02DUMMY :  return TRANS("Hawk wings - part 2"); break;
+    case KIT_HOLYGRAIL        :  return TRANS("Holy grail"); break;
+    case KIT_TABLESDUMMY      :  return TRANS("Tablet of wisdom"); break;
+    case KIT_WINGEDLION       :  return TRANS("Winged lion"); break;
+    case KIT_ELEPHANTGOLD     :  return TRANS("Gold elephant"); break;    
+    case KIT_STATUEHEAD01     :  return TRANS("Seriously scary ceremonial mask"); break;
+    case KIT_STATUEHEAD02     :  return TRANS("Hilariously happy ceremonial mask"); break;
+    case KIT_STATUEHEAD03     :  return TRANS("Ix Chel mask"); break;   
+    case KIT_KINGSTATUE       :  return TRANS("Statue of King Tilmun"); break;   
+    case KIT_CRYSTALSKULL     :  return TRANS("Crystal Skull"); break;   
+
+    default: return TRANS("unknown item"); break;
   };
 }
 
@@ -139,10 +140,16 @@ components:
 300 sound   SOUND_KEY         "Sounds\\Items\\Key.wav",
 
 functions:
+  // --------------------------------------------------------------------------------------
+  // No comments.
+  // --------------------------------------------------------------------------------------
   void Precache(void) {
     PrecacheSound(SOUND_KEY);
   }
-  /* Fill in entity statistics - for AI purposes only */
+
+  // --------------------------------------------------------------------------------------
+  // Fill in entity statistics - for AI purposes only.
+  // --------------------------------------------------------------------------------------
   BOOL FillEntityStatistics(EntityStats *pes)
   {
     pes->es_strName = GetKeyName(m_kitType);
@@ -153,42 +160,45 @@ functions:
     return TRUE;
   }
   
-  // render particles
+  // --------------------------------------------------------------------------------------
+  // Render particles.
+  // --------------------------------------------------------------------------------------
   void RenderParticles(void) {
     // no particles when not existing
-    if (GetRenderType()!=CEntity::RT_MODEL || !ShowItemParticles()) {
+    if (GetRenderType() != CEntity::RT_MODEL || !ShowItemParticles()) {
       return;
     }
+
     switch (m_kitType) {
-    case KIT_BOOKOFWISDOM    :
-    case KIT_CRYSTALSKULL    :   
-    case KIT_HOLYGRAIL       :
-      Particles_Stardust(this, 1.0f, 0.5f, PT_STAR08, 64);
-      break;
-    case KIT_JAGUARGOLDDUMMY :
-      Particles_Stardust(this, 2.0f, 2.0f, PT_STAR08, 64);
-      break;
-    case KIT_CROSSWOODEN     :
-    case KIT_CROSSMETAL      :   
-    case KIT_CROSSGOLD       :      
-    case KIT_HAWKWINGS01DUMMY:
-    case KIT_HAWKWINGS02DUMMY:
-    case KIT_TABLESDUMMY     :
-    case KIT_WINGEDLION      :
-    case KIT_ELEPHANTGOLD    :
-    case KIT_STATUEHEAD01    :
-    case KIT_STATUEHEAD02    :
-    case KIT_STATUEHEAD03    :
-    case KIT_KINGSTATUE      :
-    default:
-      Particles_Stardust(this, 1.5f, 1.1f, PT_STAR08, 64);
-      break;    
+      case KIT_BOOKOFWISDOM    :
+      case KIT_CRYSTALSKULL    :   
+      case KIT_HOLYGRAIL       :
+        Particles_Stardust(this, 1.0f, 0.5f, PT_STAR08, 64);
+        break;
+      case KIT_JAGUARGOLDDUMMY :
+        Particles_Stardust(this, 2.0f, 2.0f, PT_STAR08, 64);
+        break;
+      case KIT_CROSSWOODEN     :
+      case KIT_CROSSMETAL      :   
+      case KIT_CROSSGOLD       :      
+      case KIT_HAWKWINGS01DUMMY:
+      case KIT_HAWKWINGS02DUMMY:
+      case KIT_TABLESDUMMY     :
+      case KIT_WINGEDLION      :
+      case KIT_ELEPHANTGOLD    :
+      case KIT_STATUEHEAD01    :
+      case KIT_STATUEHEAD02    :
+      case KIT_STATUEHEAD03    :
+      case KIT_KINGSTATUE      :
+      default:
+        Particles_Stardust(this, 1.5f, 1.1f, PT_STAR08, 64);
+        break;    
     }
   }
-  
 
-
-  // set health properties depending on type
+  // --------------------------------------------------------------------------------------
+  // Set health properties depending on type.
+  // --------------------------------------------------------------------------------------
   void SetProperties(void)
   {
     m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
@@ -324,6 +334,7 @@ functions:
         m_iSoundComponent = SOUND_KEY;
         break;
     }
+
     GetModelObject()->StretchModel(FLOAT3D(m_fSize, m_fSize, m_fSize));
   };
 
@@ -334,15 +345,18 @@ procedures:
     // send key to entity
     EKey eKey;
     eKey.kitType = m_kitType;
-    // if health is received
+
+    // if key is received
     if (epass.penOther->ReceiveItem(eKey)) {
       if(_pNetwork->IsPlayerLocal(epass.penOther)) {IFeel_PlayEffect("PU_Key");}
+
       // play the pickup sound
       m_soPick.Set3DParameters(50.0f, 1.0f, 1.0f, 1.0f);
       PlaySound(m_soPick, m_iSoundComponent, SOF_3D);
       m_fPickSoundLen = GetSoundLength(m_iSoundComponent);
       jump CItem::ItemReceived();
     }
+
     return;
   };
 
