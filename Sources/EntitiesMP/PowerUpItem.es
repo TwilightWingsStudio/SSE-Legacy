@@ -86,20 +86,24 @@ components:
 305 sound   SOUND_BOMB     "SoundsMP\\Items\\SeriousBomb.wav",
 
 functions:
-
+  // --------------------------------------------------------------------------------------
+  // No comments.
+  // --------------------------------------------------------------------------------------
   void Precache(void)
   {
     switch( m_puitType) {
-    case PUIT_INVISIB :  /*PrecacheSound(SOUND_INVISIB );  break;*/
-    case PUIT_INVULNER:  /*PrecacheSound(SOUND_INVULNER);  break; */                                    
-    case PUIT_DAMAGE  :  /*PrecacheSound(SOUND_DAMAGE  );  break;*/
-    case PUIT_SPEED   :  /*PrecacheSound(SOUND_SPEED   );  break;*/
-                         PrecacheSound(SOUND_PICKUP  );  break;
-    case PUIT_BOMB    :  PrecacheSound(SOUND_BOMB    );  break;
+      case PUIT_INVISIB :  /*PrecacheSound(SOUND_INVISIB );  break;*/
+      case PUIT_INVULNER:  /*PrecacheSound(SOUND_INVULNER);  break; */                                    
+      case PUIT_DAMAGE  :  /*PrecacheSound(SOUND_DAMAGE  );  break;*/
+      case PUIT_SPEED   :  /*PrecacheSound(SOUND_SPEED   );  break;*/
+                           PrecacheSound(SOUND_PICKUP  );  break;
+      case PUIT_BOMB    :  PrecacheSound(SOUND_BOMB    );  break;
     }
   }
 
-  /* Fill in entity statistics - for AI purposes only */
+  // --------------------------------------------------------------------------------------
+  // Fill in entity statistics - for AI purposes only.
+  // --------------------------------------------------------------------------------------
   BOOL FillEntityStatistics(EntityStats *pes)
   {
     pes->es_strName = "PowerUp"; 
@@ -109,23 +113,26 @@ functions:
     pes->es_iScore = 0;//m_iScore;
     
     switch( m_puitType) {
-    case PUIT_INVISIB :  pes->es_strName += " invisibility";     break;
-    case PUIT_INVULNER:  pes->es_strName += " invulnerability";  break;
-    case PUIT_DAMAGE  :  pes->es_strName += " serious damage";   break;
-    case PUIT_SPEED   :  pes->es_strName += " serious speed";    break;
-    case PUIT_BOMB    :  pes->es_strName = "Serious Bomb!"; 
+      case PUIT_INVISIB :  pes->es_strName += " invisibility";     break;
+      case PUIT_INVULNER:  pes->es_strName += " invulnerability";  break;
+      case PUIT_DAMAGE  :  pes->es_strName += " serious damage";   break;
+      case PUIT_SPEED   :  pes->es_strName += " serious speed";    break;
+      case PUIT_BOMB    :  pes->es_strName = "Serious Bomb!"; 
     }
+
     return TRUE;
   }
 
-  // render particles
+  // --------------------------------------------------------------------------------------
+  // Render particles.
+  // --------------------------------------------------------------------------------------
   void RenderParticles(void)
   {
     // no particles when not existing or in DM modes
-    if( GetRenderType()!=CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE
-      || !ShowItemParticles()) {
+    if ( GetRenderType() != CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE || !ShowItemParticles()) {
       return;
     }
+
     switch( m_puitType) {
       case PUIT_INVISIB:
         Particles_Stardust( this, 2.0f*0.75f, 1.00f*0.75f, PT_STAR08, 320);
@@ -145,7 +152,9 @@ functions:
     }
   }
 
-  // set health properties depending on health type
+  // --------------------------------------------------------------------------------------
+  // Set health properties depending on health type.
+  // --------------------------------------------------------------------------------------
   void SetProperties(void)
   {
     switch( m_puitType)
@@ -203,7 +212,7 @@ procedures:
 
   ItemCollected( EPass epass) : CItem::ItemCollected
   {
-    ASSERT( epass.penOther!=NULL);
+    ASSERT(epass.penOther != NULL);
  
     // don't pick up more bombs then you can carry
     if (m_puitType == PUIT_BOMB) {
@@ -214,10 +223,10 @@ procedures:
       }
     }
 
-    if( !(m_bPickupOnce||m_bRespawn)) {
+    if (!(m_bPickupOnce||m_bRespawn)) {
       // if already picked by this player
       BOOL bWasPicked = MarkPickedBy(epass.penOther);
-      if( bWasPicked) {
+      if ( bWasPicked) {
         // don't pick again
         return;
       }
@@ -226,11 +235,10 @@ procedures:
     // send powerup to entity
     EPowerUp ePowerUp;
     ePowerUp.puitType = m_puitType;
-    // if powerup is received
-    if( epass.penOther->ReceiveItem(ePowerUp)) {
 
-      if(_pNetwork->IsPlayerLocal(epass.penOther))
-      {
+    // if powerup is received
+    if (epass.penOther->ReceiveItem(ePowerUp)) {
+      if (_pNetwork->IsPlayerLocal(epass.penOther)) {
         switch (m_puitType)
         {
           case PUIT_INVISIB:  IFeel_PlayEffect("PU_Invulnerability"); break;
@@ -250,7 +258,10 @@ procedures:
         PlaySound(m_soPick, SOUND_PICKUP, SOF_3D);
         m_fPickSoundLen = GetSoundLength(SOUND_PICKUP);
       }
-      if( (m_bPickupOnce||m_bRespawn)) { jump CItem::ItemReceived(); }
+
+      if (m_bPickupOnce || m_bRespawn) {
+        jump CItem::ItemReceived();
+      }
     }
     return;
   };
