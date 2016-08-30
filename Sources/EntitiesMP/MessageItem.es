@@ -53,10 +53,16 @@ components:
 301 sound   SOUND_KEY         "Sounds\\Items\\Key.wav",
 
 functions:
+  // --------------------------------------------------------------------------------------
+  // No comments.
+  // --------------------------------------------------------------------------------------
   void Precache(void) {
     PrecacheSound(SOUND_KEY);
   }
-  /* Fill in entity statistics - for AI purposes only */
+
+  // --------------------------------------------------------------------------------------
+  // Fill in entity statistics - for AI purposes only.
+  // --------------------------------------------------------------------------------------
   BOOL FillEntityStatistics(EntityStats *pes)
   {
     pes->es_strName = "Pergament";
@@ -64,19 +70,25 @@ functions:
     pes->es_ctAmmount = 1;
     pes->es_fValue = 1;
     pes->es_iScore = 0;//m_iScore;
+
     return TRUE;
   }
-  // render particles
+  
+  // --------------------------------------------------------------------------------------
+  // Render particles.
+  // --------------------------------------------------------------------------------------
   void RenderParticles(void) {
     // no particles when not existing
-    if (GetRenderType()!=CEntity::RT_MODEL) {
+    if (GetRenderType() != CEntity::RT_MODEL) {
       return;
     }
+
     Particles_Stardust(this, 0.9f, 0.70f, PT_STAR08, 32);
   }
 
-
-  // set health properties depending on type
+  // --------------------------------------------------------------------------------------
+  // Set item properties.
+  // --------------------------------------------------------------------------------------
   void SetProperties(void)
   {
     m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
@@ -84,19 +96,21 @@ functions:
 
     // set appearance
     AddItem(MODEL_PERGAMENT, TEXTURE_PERGAMENT, 0, 0, 0);
+
     // add flare
-    AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
+    AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0, 0.2f, 0), FLOAT3D(1, 1, 0.3f) );
     StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
     m_iSoundComponent = SOUND_KEY;
   };
 
 procedures:
   ItemCollected(EPass epass) : CItem::ItemCollected {
-    ASSERT(epass.penOther!=NULL);
+    ASSERT(epass.penOther != NULL);
 
     // send key to entity
     EMessageItem eMessage;
     eMessage.fnmMessage = m_fnmMessage;
+
     // if health is received
     if (epass.penOther->ReceiveItem(eMessage)) {
       // play the pickup sound
@@ -105,6 +119,7 @@ procedures:
       m_fPickSoundLen = GetSoundLength(m_iSoundComponent);
       jump CItem::ItemReceived();
     }
+
     return;
   };
 
