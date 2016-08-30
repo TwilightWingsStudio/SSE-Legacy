@@ -907,7 +907,7 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
   // get counts of allowed players, clients, vips and  check for connection allowance
   INDEX ctMaxAllowedPlayers = _pNetwork->ga_sesSessionState.ses_ctMaxPlayers;
   INDEX ctMaxAllowedClients = ctMaxAllowedPlayers;
-  if (net_iMaxClients>0) {
+  if (net_iMaxClients > 0) {
     ctMaxAllowedClients = ClampUp(net_iMaxClients, (INDEX)NET_MAXGAMECOMPUTERS);
   }
   INDEX ctMaxAllowedVIPPlayers = 0;

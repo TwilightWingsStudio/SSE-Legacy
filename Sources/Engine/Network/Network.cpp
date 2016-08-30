@@ -388,6 +388,40 @@ static void NetworkInfo(void)
     }
 }
 
+static void ListObservers(void)
+{
+  CPrintF("observer list:\n");
+  if (!_pNetwork->ga_srvServer.srv_bActive) {
+    CPrintF("  <not a server>\n");
+    return;
+  }
+
+  CPrintF("  client# ip\n");
+  CPrintF("  ----------------------------------------\n");
+  
+  INDEX ctObservers = 0;
+
+  for(INDEX iSession = 0; iSession<_pNetwork->ga_srvServer.srv_assoSessions.Count(); iSession++) {
+    CSessionSocket &sso = _pNetwork->ga_srvServer.srv_assoSessions[iSession];
+
+    // Skip inactive sessions.
+    if (iSession > 0 && !sso.sso_bActive) {
+      continue;
+    }
+
+    if (sso.sso_ctLocalPlayers == 0) {
+      ctObservers++;
+      CPrintF("     %-2d   %s\n", iSession, _cmiComm.Server_GetClientName(iSession));
+    }
+  }
+  
+  if (ctObservers == 0) {
+    CPrintF("    There are no observers!\n");
+  }
+  
+  CPrintF("  ----------------------------------------\n");
+}
+
 static void ListPlayers(void)
 {
   CPrintF("player list:\n");
@@ -397,14 +431,15 @@ static void ListPlayers(void)
   }
 
   CPrintF("  client# name\n");
-  CPrintF("  ----------------------\n");
+  CPrintF("  ----------------------------------------\n");
   for(INDEX iplb=0; iplb<_pNetwork->ga_srvServer.srv_aplbPlayers.Count(); iplb++) {
     CPlayerBuffer &plb = _pNetwork->ga_srvServer.srv_aplbPlayers[iplb];
     if (plb.plb_Active) {
       CPrintF("     %-2d   %s\n", plb.plb_iClient, plb.plb_pcCharacter.GetNameForPrinting());
     }
   }
-  CPrintF("  ----------------------\n");
+  
+  CPrintF("  ----------------------------------------\n");
 }
 
 static void KickClient(INDEX iClient, const CTString &strReason)
@@ -745,6 +780,9 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user void KickClient(INDEX, CTString);", &KickClientCfunc);
   _pShell->DeclareSymbol("user void KickByName(CTString, CTString);", &KickByNameCfunc);
   _pShell->DeclareSymbol("user void ListPlayers(void);", &ListPlayers);
+  // SSE
+  _pShell->DeclareSymbol("user void ListObservers(void);", &ListObservers);
+  //
   _pShell->DeclareSymbol("user void Admin(CTString);", &Admin);
 
   _pShell->DeclareSymbol("user void AddIPMask(CTString);", &AddIPMask);
