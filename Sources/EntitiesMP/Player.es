@@ -364,7 +364,10 @@ extern INDEX hud_bShowMatchInfo = TRUE;
 extern BOOL hud_bRedScreenOnDamage = TRUE;
 
 extern FLOAT hud_fSniperScopeBaseOpacity = 1.0F;
-extern BOOL hud_bSniperScopeColoring = TRUE;
+extern FLOAT hud_fSniperScopeWheelOpacity = 0.25F;
+extern FLOAT hud_fSniperScopeLedOpacity = 0.75F;
+
+extern BOOL  hud_bSniperScopeWheelColoring = TRUE;
 //
 
 extern FLOAT plr_fBreathingStrength = 0.0f;
@@ -772,7 +775,9 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("persistent user INDEX hud_bRedScreenOnDamage;",  &hud_bRedScreenOnDamage);
   
   _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeBaseOpacity;",  &hud_fSniperScopeBaseOpacity);
-  _pShell->DeclareSymbol("persistent user INDEX hud_bSniperScopeColoring;",  &hud_bSniperScopeColoring);
+  _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeWheelOpacity;",  &hud_fSniperScopeWheelOpacity);
+  _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeLedOpacity;",  &hud_fSniperScopeLedOpacity);
+  _pShell->DeclareSymbol("persistent user INDEX hud_bSniperScopeWheelColoring;",  &hud_bSniperScopeWheelColoring);
   //
   
   _pShell->DeclareSymbol("INDEX cht_bKillFinalBoss;",  &cht_bKillFinalBoss);

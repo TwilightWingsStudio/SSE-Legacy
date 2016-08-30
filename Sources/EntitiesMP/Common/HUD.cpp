@@ -53,7 +53,11 @@ extern INDEX hud_bShowMatchInfo;
 
 // SSE
 extern FLOAT hud_fSniperScopeBaseOpacity;
-extern BOOL hud_bSniperScopeColoring;
+extern FLOAT hud_fSniperScopeWheelOpacity;
+extern FLOAT hud_fSniperScopeLedOpacity;
+
+extern BOOL hud_bSniperScopeWheelColoring;
+//
 
 // player statistics sorting keys
 enum SortKeys {
@@ -603,6 +607,8 @@ static void HUD_DrawSniperMask( void )
   
   // SSE
   hud_fSniperScopeBaseOpacity = Clamp(hud_fSniperScopeBaseOpacity, 0.0f, 1.0f);
+  hud_fSniperScopeWheelOpacity = Clamp(hud_fSniperScopeWheelOpacity, 0.0f, 1.0f);
+  hud_fSniperScopeLedOpacity = Clamp(hud_fSniperScopeLedOpacity, 0.0f, 1.0f);
 
   // main sniper mask
   if (hud_fSniperScopeBaseOpacity > 0.0F) {
@@ -629,44 +635,53 @@ static void HUD_DrawSniperMask( void )
   FLOAT aFOV = Lerp(_penWeapons->m_fSniperFOVlast, _penWeapons->m_fSniperFOV,
                     _pTimer->GetLerpFactor());
   CTString strTmp;
-
-  // wheel
+  
+  
   FLOAT fZoom = 1.0f/tan(RadAngle(aFOV)*0.5f);  // 2.0 - 8.0
 
-  FLOAT fAFact = (Clamp(aFOV, 14.2f, 53.1f)-14.2f)/(53.1f-14.2f); // only for zooms 2x-4x !!!!!!
-  ANGLE aAngle = 314.0f+fAFact*292.0f;
+  // wheel
+  if (hud_fSniperScopeWheelOpacity > 0.0F) {
+    ULONG ulSniperScopeWheelOpacity = NormFloatToByte(hud_fSniperScopeWheelOpacity);
 
-  COLOR colWhell = colMask;
-  
-  if (hud_bSniperScopeColoring && _penWeapons->m_penRayHit != NULL) {
-    // if required, show enemy health thru crosshair color
-    if (_penWeapons->m_fEnemyHealth > 0) {
-      if ( _penWeapons->m_fEnemyHealth < 0.25f) {
-        colWhell = C_RED;
-      } else if ( _penWeapons->m_fEnemyHealth < 0.50f) {
-        colWhell = C_ORANGE;
-      } else if ( _penWeapons->m_fEnemyHealth < 0.75f) {
-        colWhell = C_YELLOW;
-      } else {
-        colWhell = C_GREEN;
+    FLOAT fAFact = (Clamp(aFOV, 14.2f, 53.1f)-14.2f)/(53.1f-14.2f); // only for zooms 2x-4x !!!!!!
+    ANGLE aAngle = 314.0f+fAFact*292.0f;
+    
+    COLOR colWhell = colMask;
+    
+    if (hud_bSniperScopeWheelColoring && _penWeapons->m_penRayHit != NULL) {
+      // if required, show enemy health thru crosshair color
+      if (_penWeapons->m_fEnemyHealth > 0) {
+        if ( _penWeapons->m_fEnemyHealth < 0.25f) {
+          colWhell = C_RED;
+        } else if ( _penWeapons->m_fEnemyHealth < 0.50f) {
+          colWhell = C_ORANGE;
+        } else if ( _penWeapons->m_fEnemyHealth < 0.75f) {
+          colWhell = C_YELLOW;
+        } else {
+          colWhell = C_GREEN;
+        }
       }
     }
+    
+    DrawRotatedQuad(&_toSniperWheel, fCenterI, fCenterJ, 40.0f*_fYResolutionScaling, aAngle, colWhell|ulSniperScopeWheelOpacity);
   }
-
-  DrawRotatedQuad(&_toSniperWheel, fCenterI, fCenterJ, 40.0f*_fYResolutionScaling, aAngle, colWhell|0x44);
 
   FLOAT fTM = _pTimer->GetLerpedCurrentTick();
 
-  COLOR colLED;
-  if (_penWeapons->m_tmLastSniperFire+1.25f<fTM) { // blinking
-    colLED = 0x44FF22BB;
-  } else {
-    colLED = 0xFF4422DD;
-  }
-
   // reload indicator
-  DrawAspectCorrectTextureCentered(&_toSniperLed, fCenterI-37.0f*_fYResolutionScaling,
-    fCenterJ+36.0f*_fYResolutionScaling, 15.0f*_fYResolutionScaling, colLED);
+  if (hud_fSniperScopeLedOpacity > 0.0F) {
+    ULONG ulSniperScopeLedOpacity = NormFloatToByte(hud_fSniperScopeLedOpacity);
+
+    COLOR colLED;
+    if (_penWeapons->m_tmLastSniperFire+1.25f < fTM) { // blinking
+      colLED = 0x44FF2200;
+    } else {
+      colLED = 0xFF442200;
+    }
+    
+    DrawAspectCorrectTextureCentered(&_toSniperLed, fCenterI-37.0f*_fYResolutionScaling,
+      fCenterJ+36.0f*_fYResolutionScaling, 15.0f*_fYResolutionScaling, colLED|ulSniperScopeLedOpacity);
+  }
 
   if (_fResolutionScaling >= 1.0f)
   {
