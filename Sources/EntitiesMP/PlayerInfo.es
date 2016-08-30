@@ -29,6 +29,8 @@ properties:
    1 CTString m_strName "Name" 'N'      = "Player Info",
    3 CTString m_strDescription = "",
    
+   5 BOOL m_bDebugMessages "Debug Messages" = FALSE,
+   
    6 INDEX m_iIOPlayerIndex   "IO Player ID" = -1,
    7 INDEX m_iCurrentPlayerIndex        = -1,
 
@@ -83,8 +85,17 @@ functions:
 
     m_fHealth = penPlayer.GetHealth();
     m_fArmor = penPlayer.m_fArmor;
-    m_strPlayerName = penPlayer.m_strName;
+    m_strPlayerName = penPlayer.GetName();
     m_bDead = !(penPlayer.GetFlags()&ENF_ALIVE);
+
+    if (m_bDebugMessages) {
+      CPrintF("[%s] : Applied:\n", GetName());
+      CPrintF("  Player Index: %d\n", m_iCurrentPlayerIndex);
+      CPrintF("  Name: %s\n", m_strPlayerName);
+      CPrintF("  Health: %f\n", m_fHealth);
+      CPrintF("  Armor: %f\n", m_fArmor);
+      CPrintF("  Is Dead: %d\n", m_bDead);
+    }
 
     CPlayerWeapons *penWeapons = penPlayer.GetPlayerWeapons();
 
@@ -95,6 +106,11 @@ functions:
 
     m_iCurrentWeapon = penWeapons->m_iCurrentWeapon;
     m_iAvailableWeapons = penWeapons->m_iAvailableWeapons;
+
+    if (m_bDebugMessages) {
+      CPrintF("  Current Weapon ID: %d\n", m_iCurrentWeapon);
+      CPrintF("  Available Weapons: %d\n", m_iAvailableWeapons);
+    }
   }
 
   void UpdateInfo()
