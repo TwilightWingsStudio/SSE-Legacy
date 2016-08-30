@@ -4158,6 +4158,7 @@ functions:
         // increase fall time
         m_fFallTime += _pTimer->TickQuantum;
       }
+
       // if not wanting to jump
       if (vTranslation(2)<0.1f) {
         // allow jumping

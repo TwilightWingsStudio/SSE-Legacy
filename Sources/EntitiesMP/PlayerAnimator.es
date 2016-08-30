@@ -1211,6 +1211,7 @@ functions:
     SpawnReminder(this, pl.GetModelObject()->GetAnimLength(PLAYER_ANIM_CROUCH), (INDEX) AA_CROUCH);
     m_iCrouchDownWait++;
     m_bCrouch = TRUE;
+    m_bSwim = FALSE;
   };
 
   // rise
@@ -1223,6 +1224,7 @@ functions:
     SpawnReminder(this, pl.GetModelObject()->GetAnimLength(PLAYER_ANIM_RISE), (INDEX) AA_RISE);
     m_iRiseUpWait++;
     m_bCrouch = FALSE;
+    m_bSwim = FALSE;
   };
 
   // fall
@@ -1230,6 +1232,7 @@ functions:
     if (m_bDisableAnimating) {
       return;
     }
+
     CPlayer &pl = (CPlayer&)*m_penPlayer;
     pl.StartModelAnim(PLAYER_ANIM_JUMPSTART, AOF_NORESTART);
     if (_pNetwork->ga_ulDemoMinorVersion>6) { m_bCrouch = FALSE; }
@@ -1241,6 +1244,7 @@ functions:
     if (m_bDisableAnimating) {
       return;
     }
+
     CPlayer &pl = (CPlayer&)*m_penPlayer;
     pl.StartModelAnim(PLAYER_ANIM_SWIM, AOF_LOOPING|AOF_NORESTART);
     if (_pNetwork->ga_ulDemoMinorVersion>2) { m_bCrouch = FALSE; }
@@ -1252,6 +1256,7 @@ functions:
     if (m_bDisableAnimating) {
       return;
     }
+
     CPlayer &pl = (CPlayer&)*m_penPlayer;
     pl.StartModelAnim(PLAYER_ANIM_STAND, AOF_LOOPING|AOF_NORESTART);
     if (_pNetwork->ga_ulDemoMinorVersion>2) { m_bCrouch = FALSE; }
