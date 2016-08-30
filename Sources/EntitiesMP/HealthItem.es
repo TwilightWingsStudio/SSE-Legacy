@@ -86,6 +86,9 @@ components:
 305 sound   SOUND_SUPER        "Sounds\\Items\\HealthSuper.wav",
 
 functions:
+  // --------------------------------------------------------------------------------------
+  // No comments.
+  // --------------------------------------------------------------------------------------
   void Precache(void) {
     switch (m_EhitType) {
       case HIT_PILL:   PrecacheSound(SOUND_PILL  ); break;
@@ -95,7 +98,10 @@ functions:
       case HIT_SUPER:  PrecacheSound(SOUND_SUPER ); break;
     }
   }
-  /* Fill in entity statistics - for AI purposes only */
+
+  // --------------------------------------------------------------------------------------
+  // Fill in entity statistics - for AI purposes only.
+  // --------------------------------------------------------------------------------------
   BOOL FillEntityStatistics(EntityStats *pes)
   {
     pes->es_strName = "Health"; 
@@ -115,14 +121,15 @@ functions:
     return TRUE;
   }
 
-  // render particles
+  // --------------------------------------------------------------------------------------
+  // Render particles.
+  // --------------------------------------------------------------------------------------
   void RenderParticles(void) {
     // no particles when not existing or in DM modes
-    if (GetRenderType()!=CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE
-      || !ShowItemParticles())
-    {
+    if (GetRenderType()!=CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE || !ShowItemParticles()) {
       return;
     }
+
     switch (m_EhitType) {
       case HIT_PILL:
         Particles_Stardust(this, 0.9f*0.75f, 0.70f*0.75f, PT_STAR08, 32);
@@ -142,7 +149,9 @@ functions:
     }
   }
 
-  // set health properties depending on health type
+  // --------------------------------------------------------------------------------------
+  // Set health properties depending on health type.
+  // --------------------------------------------------------------------------------------
   void SetProperties(void) {
     switch (m_EhitType) {
       case HIT_PILL:
@@ -218,18 +227,22 @@ functions:
     }
   };
 
+  // --------------------------------------------------------------------------------------
+  // Change item by session properties.
+  // --------------------------------------------------------------------------------------
   void AdjustDifficulty(void)
   {
-    if (!GetSP()->sp_bAllowHealth && m_penTarget==NULL) {
+    if (!GetSP()->sp_bAllowHealth && m_penTarget == NULL) {
       Destroy();
     }
   }
+
 procedures:
   ItemCollected(EPass epass) : CItem::ItemCollected {
     ASSERT(epass.penOther!=NULL);
 
     // if health stays
-    if (GetSP()->sp_bHealthArmorStays && !(m_bPickupOnce||m_bRespawn)) {
+    if (GetSP()->sp_bHealthArmorStays && !(m_bPickupOnce || m_bRespawn)) {
       // if already picked by this player
       BOOL bWasPicked = MarkPickedBy(epass.penOther);
       if (bWasPicked) {
@@ -242,13 +255,11 @@ procedures:
     EHealth eHealth;
     eHealth.fHealth = m_fValue;
     eHealth.bOverTopHealth = m_bOverTopHealth;
+
     // if health is received
     if (epass.penOther->ReceiveItem(eHealth)) {
-
-      if(_pNetwork->IsPlayerLocal(epass.penOther))
-      {
-        switch (m_EhitType)
-        {
+      if (_pNetwork->IsPlayerLocal(epass.penOther)) {
+        switch (m_EhitType) {
           case HIT_PILL:  IFeel_PlayEffect("PU_HealthPill"); break;
           case HIT_SMALL: IFeel_PlayEffect("PU_HealthSmall"); break;
           case HIT_MEDIUM:IFeel_PlayEffect("PU_HealthMedium"); break;
@@ -261,7 +272,8 @@ procedures:
       m_soPick.Set3DParameters(50.0f, 1.0f, 1.0f, 1.0f);
       PlaySound(m_soPick, m_iSoundComponent, SOF_3D);
       m_fPickSoundLen = GetSoundLength(m_iSoundComponent);
-      if (!GetSP()->sp_bHealthArmorStays || (m_bPickupOnce||m_bRespawn)) {
+
+      if (!GetSP()->sp_bHealthArmorStays || (m_bPickupOnce || m_bRespawn)) {
         jump CItem::ItemReceived();
       }
     }
