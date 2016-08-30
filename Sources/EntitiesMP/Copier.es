@@ -42,20 +42,27 @@ components:
 
 
 functions:
-
+  // --------------------------------------------------------------------------------------
+  // Returns short entity description to show it in SED.
+  // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const
   {
     ((CTString&)m_strDescription).PrintF("-><none>");
-    if (m_penTarget!=NULL) {
+
+    if (m_penTarget != NULL) {
       ((CTString&)m_strDescription).PrintF("->%s", m_penTarget->GetName());
     }
+
     return m_strDescription;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Create copy of entity at copier posision.
+  // --------------------------------------------------------------------------------------
   void TeleportEntity()
   {
     // if the target doesn't exist, or is destroyed
-    if (m_penTarget==NULL || (m_penTarget->GetFlags()&ENF_DELETED)) {
+    if (m_penTarget == NULL || (m_penTarget->GetFlags()&ENF_DELETED)) {
       // do nothing
       return;
     }
@@ -78,27 +85,28 @@ functions:
       pen->GetBoundingBox(box);
       FLOAT fEntitySize = box.Size().MaxNorm()*2;
       ese.vStretch = FLOAT3D(fEntitySize, fEntitySize, fEntitySize);
+
       CEntityPointer penEffect = CreateEntity(GetPlacement(), CLASS_BASIC_EFFECT);
       penEffect->Initialize(ese);
     }
   }
 
-
-  // returns bytes of memory used by this object
+  // --------------------------------------------------------------------------------------
+  // Returns bytes of memory used by this object.
+  // --------------------------------------------------------------------------------------
   SLONG GetUsedMemory(void)
   {
     // initial
     SLONG slUsedMemory = sizeof(CCopier) - sizeof(CRationalEntity) + CRationalEntity::GetUsedMemory();
+
     // add some more
     slUsedMemory += m_strDescription.Length();
     slUsedMemory += m_strName.Length();
+
     return slUsedMemory;
   }
 
-
-
 procedures:
-
 
   Main()
   {
@@ -114,11 +122,13 @@ procedures:
       // wait to someone enter and teleport it
       wait() {
         on (ETrigger eTrigger) : {
-          if (m_penTarget!=NULL) {
+          if (m_penTarget != NULL) {
             TeleportEntity();
           }
+
           stop;
         }
+
         otherwise() : {
           resume;
         };
