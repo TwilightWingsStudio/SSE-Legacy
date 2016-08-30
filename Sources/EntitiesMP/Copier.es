@@ -77,6 +77,10 @@ functions:
     CPlacement3D pl = GetPlacement();
 
     if (m_fInnerCircle > 0.0F && m_fOuterCircle > 0.0F) {
+      if (m_fInnerCircle > m_fOuterCircle) {
+        m_fInnerCircle = m_fOuterCircle;
+      }
+
       FLOAT fOuterCircle = ClampDn(m_fOuterCircle, 0.0f);
       FLOAT fInnerCircle = ClampUp(m_fInnerCircle, fOuterCircle);
       
