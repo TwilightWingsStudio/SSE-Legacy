@@ -195,6 +195,9 @@ components:
 213 sound SOUND_PICK             "Sounds\\Items\\Weapon.wav",
 
 functions:
+  // --------------------------------------------------------------------------------------
+  // No comments.
+  // --------------------------------------------------------------------------------------
   void Precache(void) {
     PrecacheSound(SOUND_PICK);
     switch (m_EwitType) {
@@ -213,7 +216,10 @@ functions:
       case WIT_CANNON:          CPlayerWeapons_Precache(1<<(INDEX(WEAPON_IRONCANNON     )-1)); break;
     }
   }
-  /* Fill in entity statistics - for AI purposes only */
+  
+  // --------------------------------------------------------------------------------------
+  // Fill in entity statistics - for AI purposes only.
+  // --------------------------------------------------------------------------------------
   BOOL FillEntityStatistics(EntityStats *pes)
   {
     pes->es_strName = m_strDescription; 
@@ -224,7 +230,9 @@ functions:
     return TRUE;
   }
 
-  // render particles
+  // --------------------------------------------------------------------------------------
+  // Render particles.
+  // --------------------------------------------------------------------------------------
   void RenderParticles(void) {
     // no particles when not existing or in DM modes
     if (GetRenderType()!=CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE
@@ -255,12 +263,13 @@ functions:
     Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);
   }
 
-
-  // set weapon properties depending on weapon type
+  // --------------------------------------------------------------------------------------
+  // Set weapon properties depending on weapon type.
+  // --------------------------------------------------------------------------------------
   void SetProperties(void)
   {
     BOOL bDM = FALSE;//m_bRespawn || m_bDropped;
-    FLOAT3D vDMStretch = FLOAT3D( 2.0f, 2.0f, 2.0f);
+    FLOAT3D vDMStretch = FLOAT3D(2.0f, 2.0f, 2.0f);
     
     switch (m_EwitType) {
     // *********** KNIFE ***********
@@ -414,6 +423,7 @@ functions:
         StretchItem( bDM ? vDMStretch : (FLOAT3D(3.0f, 3.0f, 3.0f)));
         break;
     }
+
       // add flare
     AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.6f,0), FLOAT3D(3,3,0.3f) );
 };
@@ -423,13 +433,13 @@ procedures:
     ASSERT(epass.penOther!=NULL);
 
     // if weapons stays
-    if (GetSP()->sp_bWeaponsStay && !(m_bPickupOnce||m_bRespawn)) {
+    if (GetSP()->sp_bWeaponsStay && !(m_bPickupOnce || m_bRespawn)) {
       // if already picked by this player
       BOOL bWasPicked = MarkPickedBy(epass.penOther);
       if (bWasPicked) {
         // don't pick again
         return;
-        }
+      }
     }
 
     // send weapon to entity
@@ -437,6 +447,7 @@ procedures:
     eWeapon.iWeapon = m_EwitType;
     eWeapon.iAmmo = -1; // use default ammo amount
     eWeapon.bDropped = m_bDropped;
+
     // if weapon is received
     if (epass.penOther->ReceiveItem(eWeapon)) {
       if(_pNetwork->IsPlayerLocal(epass.penOther)) {IFeel_PlayEffect("PU_Weapon");}
@@ -444,17 +455,19 @@ procedures:
       m_soPick.Set3DParameters(50.0f, 1.0f, 1.0f, 1.0f);
       PlaySound(m_soPick, SOUND_PICK, SOF_3D);
       m_fPickSoundLen = GetSoundLength(SOUND_PICK);
-      if (!GetSP()->sp_bWeaponsStay || m_bDropped || (m_bPickupOnce||m_bRespawn)) {
+
+      if (!GetSP()->sp_bWeaponsStay || m_bDropped || (m_bPickupOnce || m_bRespawn)) {
         jump CItem::ItemReceived();
       }
     }
+
     return;
   };
 
   Main()
   {
-    if ( m_EwitType==WIT_GHOSTBUSTER) {
-      m_EwitType=WIT_LASER;
+    if ( m_EwitType == WIT_GHOSTBUSTER) {
+      m_EwitType = WIT_LASER;
     }
 
     Initialize();     // initialize base class
@@ -470,6 +483,7 @@ procedures:
           SpawnReminder(this, m_fRespawnTime, 0);
           call CItem::ItemLoop();
         }
+
         on (EReminder) : {
           SendEvent(EEnd()); 
           resume;
