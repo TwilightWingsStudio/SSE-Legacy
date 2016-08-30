@@ -50,17 +50,16 @@ components:
   1 model   MODEL_ITEM      "Models\\Items\\ItemHolder\\ItemHolder.mdl",
 
 functions:
-  virtual void AdjustDifficulty(void)
-  {
-  }
+  virtual void AdjustDifficulty(void) {}
 
-  /* Adjust model mip factor if needed. */
+  // --------------------------------------------------------------------------------------
+  // Adjust model mip factor if needed.
+  // --------------------------------------------------------------------------------------
   void AdjustMipFactor(FLOAT &fMipFactor)
   {
     // adjust flare glow, to decrease power with how you get closer
     CAttachmentModelObject *pamo = GetModelObject()->GetAttachmentModel(ITEMHOLDER_ATTACHMENT_FLARE);
-    if( pamo != NULL)
-    {
+    if (pamo != NULL) {
       FLOAT fRatio = (Clamp( fMipFactor, 5.0f, 7.0f)-5.0f)/2.0f;
       UBYTE ubRatio = UBYTE(255*fRatio);
       COLOR colMutiply = RGBToColor(ubRatio,ubRatio,ubRatio)|CT_OPAQUE;
@@ -68,12 +67,13 @@ functions:
     }
 
     // if never picked
-    if (m_ulPickedMask==0) {
+    if (m_ulPickedMask == 0) {
       // don't bother testing
       return;
     }
 
     BOOL bFlare = TRUE;
+
     // if current player has already picked this item
     if (_ulPlayerRenderingMask&m_ulPickedMask) {
       // if picked items are not rendered
@@ -93,42 +93,54 @@ functions:
     // implement flare on/off ?
   }
 
-  // check whether should render particles for this item
+  // --------------------------------------------------------------------------------------
+  // Check whether should render particles for this item.
+  // --------------------------------------------------------------------------------------
   BOOL ShowItemParticles(void)
   {
-    // if current player has already picked this item
+    // If current player has already picked this item
     if (_ulPlayerRenderingMask&m_ulPickedMask) {
-      // if picked item particles are not rendered
+      // Get some external stuff.
       extern INDEX plr_bRenderPickedParticles;
+
+      // If picked item particles are not rendered
       if (!plr_bRenderPickedParticles) {
         // don't render
         return FALSE;
       }
     }
+
     // otherwise, render
     return TRUE;
   }
 
-  // check if given player already picked this item, and mark if not
+  // --------------------------------------------------------------------------------------
+  // Check if given player already picked this item, and mark if not.
+  // --------------------------------------------------------------------------------------
   BOOL MarkPickedBy(CEntity *pen)
   {
     if (!IsOfClass(pen, "Player")) {
       return FALSE;
     }
+
     INDEX iPlayer = ((CPlayerEntity*)pen)->GetMyPlayerIndex();
     BOOL bPickedAlready = (1<<iPlayer)&m_ulPickedMask;
     m_ulPickedMask |= (1<<iPlayer);
     return bPickedAlready;
   }
 
-  // get maximum allowed range for predicting this entity
+  // --------------------------------------------------------------------------------------
+  // Get maximum allowed range for predicting this entity.
+  // --------------------------------------------------------------------------------------
   FLOAT GetPredictionRange(void)
   {
     extern FLOAT cli_fPredictItemsRange;
     return cli_fPredictItemsRange;
   }
 
-  /* Adjust model shading parameters if needed. */
+  // --------------------------------------------------------------------------------------
+  // Adjust model shading parameters if needed.
+  // --------------------------------------------------------------------------------------
   BOOL AdjustShadingParameters(FLOAT3D &vLightDirection, COLOR &colLight, COLOR &colAmbient)
   {
     // in DM, glares are off, so add some light to items
@@ -184,7 +196,9 @@ functions:
 /************************************************************
  *                   SET MODEL AND ATTACHMENT               *
  ************************************************************/
+  // --------------------------------------------------------------------------------------
   // Add item
+  // --------------------------------------------------------------------------------------
   void AddItem(ULONG ulIDModel, ULONG ulIDTexture,
                ULONG ulIDReflectionTexture, ULONG ulIDSpecularTexture, ULONG ulIDBumpTexture) {
     AddAttachmentToModel(this, *GetModelObject(), ITEMHOLDER_ATTACHMENT_ITEM, ulIDModel, ulIDTexture,
@@ -196,14 +210,19 @@ functions:
                          ulIDReflectionTexture, ulIDSpecularTexture, ulIDBumpTexture);
   };
 
-  // Add attachment to item
+  // --------------------------------------------------------------------------------------
+  // Add attachment to item.
+  // --------------------------------------------------------------------------------------
   void AddItemAttachment(INDEX iAttachment, ULONG ulIDModel, ULONG ulIDTexture,
                          ULONG ulIDReflectionTexture, ULONG ulIDSpecularTexture, ULONG ulIDBumpTexture) {
     CModelObject &mo = GetModelObject()->GetAttachmentModel(ITEMHOLDER_ATTACHMENT_ITEM)->amo_moModelObject;
     AddAttachmentToModel(this, mo, iAttachment, ulIDModel, ulIDTexture,
                          ulIDReflectionTexture, ulIDSpecularTexture, ulIDBumpTexture);
   };
-  // set animation of attachment
+
+  // --------------------------------------------------------------------------------------
+  // Set animation of attachment.
+  // --------------------------------------------------------------------------------------
   void SetItemAttachmentAnim(INDEX iAttachment, INDEX iAnim)
   {
     CModelObject &mo = 
@@ -212,12 +231,14 @@ functions:
     mo.PlayAnim(iAnim, 0);
   }
 
+  // --------------------------------------------------------------------------------------
   // Add flare
+  // --------------------------------------------------------------------------------------
   void AddFlare(ULONG ulIDModel, ULONG ulIDTexture, 
     const FLOAT3D &vPos, const FLOAT3D &vStretch)
   {
     // add flare to items if not respawn
-    if( !m_bRespawn && !m_bDropped)
+    if (!m_bRespawn && !m_bDropped)
     {
       AddAttachmentToModel(this, *GetModelObject(), 
         ITEMHOLDER_ATTACHMENT_FLARE, ulIDModel, ulIDTexture, 0,0,0);
@@ -227,16 +248,18 @@ functions:
     }
   };
 
-  // Stretch item
+  // --------------------------------------------------------------------------------------
+  // Stretch item.
+  // --------------------------------------------------------------------------------------
   void StretchItem(const FLOAT3D &vStretch) {
     CModelObject &mo = GetModelObject()->GetAttachmentModel(ITEMHOLDER_ATTACHMENT_ITEM)->amo_moModelObject;
     mo.StretchModel(vStretch);
     ModelChangeNotify();
   };
 
-
-
-  // returns bytes of memory used by this object
+  // --------------------------------------------------------------------------------------
+  // Returns bytes of memory used by this object.
+  // --------------------------------------------------------------------------------------
   SLONG GetUsedMemory(void)
   {
     // initial
@@ -257,8 +280,6 @@ procedures:
  ************************************************************/
   ItemCollected(EPass epass) { return; };
 
-
-
 /************************************************************
  *                I  T  E  M    L  O  O  P                  *
  ************************************************************/
@@ -277,18 +298,23 @@ procedures:
         if (!IsOfClass(epass.penOther, "Player")) {
           pass;
         }
-        if (!(m_bPickupOnce||m_bRespawn)) {
+
+        if (!(m_bPickupOnce || m_bRespawn)) {
           SendToTarget(m_penTarget, EET_TRIGGER, epass.penOther);
           m_penTarget = NULL;
         }
+
         call ItemCollected(epass); 
       }
       on (EEnd) : { stop; }
     }
+
     // wait for sound to end
     autowait(m_fPickSoundLen+0.5f);
+
     // cease to exist
     Destroy();
+
     return;
   };
 
@@ -297,13 +323,14 @@ procedures:
   {
     // hide yourself
     SwitchToEditorModel();
-    if ((m_bPickupOnce||m_bRespawn)) {
+
+    if ((m_bPickupOnce || m_bRespawn)) {
       SendToTarget(m_penTarget, EET_TRIGGER, NULL);
     }
 
     // respawn item
     if (m_bRespawn) {
-      ASSERT(m_fRespawnTime>0.0f);
+      ASSERT(m_fRespawnTime > 0.0f);
 
       // wait to respawn
       wait(m_fRespawnTime) {
@@ -318,6 +345,7 @@ procedures:
     } else {
       return EEnd();
     }
+
     return;
   };
 };
