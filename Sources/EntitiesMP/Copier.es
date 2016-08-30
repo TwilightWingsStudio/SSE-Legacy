@@ -32,7 +32,10 @@ properties:
   2 CEntityPointer m_penTarget  "Target" 'T' COLOR(C_BROWN|0xFF),
   4 BOOL m_bSpawnEffect "Spawn Effect" 'X' = TRUE,
   5 BOOL m_bTelefrag "Telefrag" 'F' = TRUE,
-
+  
+  // SSE
+  6 RANGE m_fInnerCircle        "Circle inner" 'V' = 0.0f,    // inner circle for creation
+  7 RANGE m_fOuterCircle        "Circle outer" 'B' = 0.0f,    // outer circle for creation
 
 components:
 
@@ -72,7 +75,22 @@ functions:
 
     // teleport back
     CPlacement3D pl = GetPlacement();
-    pl.pl_PositionVector += GetRotationMatrix().GetColumn(2)*0.05f;
+
+    if (m_fInnerCircle > 0.0F && m_fOuterCircle > 0.0F) {
+      FLOAT fOuterCircle = ClampDn(m_fOuterCircle, 0.0f);
+      FLOAT fInnerCircle = ClampUp(m_fInnerCircle, fOuterCircle);
+      
+      // calculate new position
+      FLOAT fR = fInnerCircle + FRnd()*(fOuterCircle-fInnerCircle);
+      FLOAT fA = FRnd()*360.0f;
+      CPlacement3D pl1 (FLOAT3D(CosFast(fA)*fR, 0.05f, SinFast(fA)*fR), ANGLE3D(0, 0, 0));
+      pl1.RelativeToAbsolute(GetPlacement());
+      
+      pl = pl1;
+    } else {
+      pl.pl_PositionVector += GetRotationMatrix().GetColumn(2)*0.05f;
+    }
+
     pen->Teleport(pl, m_bTelefrag);
 
     // spawn teleport effect
@@ -117,6 +135,11 @@ procedures:
     // set appearance
     SetModel(MODEL_TELEPORT);
     SetModelMainTexture(TEXTURE_TELEPORT);
+
+    // set range
+    if (m_fInnerCircle > m_fOuterCircle) {
+      m_fInnerCircle = m_fOuterCircle;
+    }
 
     while (TRUE) {
       // wait to someone enter and teleport it
