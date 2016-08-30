@@ -37,16 +37,16 @@ properties:
   7 BOOL m_bPlayersOnly         "Players only" 'P' = TRUE,
   8 BOOL m_bForceStop           "Force stop" 'F' = FALSE,
 
-
 components:
 
   1 model   MODEL_TELEPORT     "Models\\Editor\\Teleport.mdl",
   2 texture TEXTURE_TELEPORT   "Models\\Editor\\Teleport.tex",
   3 class   CLASS_BASIC_EFFECT  "Classes\\BasicEffect.ecl",
 
-
 functions:
-
+  // --------------------------------------------------------------------------------------
+  // Returns short entity description to show it in SED.
+  // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const {
     ((CTString&)m_strDescription).PrintF("-><none>");
     if (m_penTarget!=NULL) {
@@ -55,6 +55,9 @@ functions:
     return m_strDescription;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Teleport entity to target.
+  // --------------------------------------------------------------------------------------
   void TeleportEntity(CEntity *pen, const CPlacement3D &pl)
   {
     // teleport back
@@ -69,25 +72,27 @@ functions:
     pen->GetBoundingBox(box);
     FLOAT fEntitySize = box.Size().MaxNorm()*2;
     ese.vStretch = FLOAT3D(fEntitySize, fEntitySize, fEntitySize);
+
     CEntityPointer penEffect = CreateEntity(pl, CLASS_BASIC_EFFECT);
     penEffect->Initialize(ese);
   }
 
-
-  // returns bytes of memory used by this object
+  // --------------------------------------------------------------------------------------
+  // Returns bytes of memory used by this object.
+  // --------------------------------------------------------------------------------------
   SLONG GetUsedMemory(void)
   {
     // initial
     SLONG slUsedMemory = sizeof(CTeleport) - sizeof(CRationalEntity) + CRationalEntity::GetUsedMemory();
+
     // add some more
     slUsedMemory += m_strName.Length();
     slUsedMemory += m_strDescription.Length();
+
     return slUsedMemory;
   }
 
-
 procedures:
-
 
   Main()
   {
@@ -96,9 +101,8 @@ procedures:
     SetCollisionFlags(ECF_TOUCHMODEL);
 
     // correct height so teleport could collide as sphere
-    if(m_fHeight<m_fWidth)
-    {
-      m_fHeight=m_fWidth;
+    if (m_fHeight < m_fWidth) {
+      m_fHeight = m_fWidth;
     }
 
     // set appearance
@@ -111,26 +115,32 @@ procedures:
       // wait to someone enter and teleport it
       wait() {
         on (EPass ePass) : {
-          if (m_penTarget!=NULL && m_bActive) {
+          if (m_penTarget != NULL && m_bActive) {
             if (m_bPlayersOnly && !IsOfClass(ePass.penOther, "Player")) {
-            resume;
+              resume;
             }
+
             TeleportEntity(ePass.penOther, m_penTarget->GetPlacement());
+
             if (m_bForceStop && (ePass.penOther->GetPhysicsFlags()&EPF_MOVABLE) ) {
               ((CMovableEntity*)&*ePass.penOther)->ForceFullStop();
             }
+
             stop;
           }
           resume;
         }
+
         on (EActivate) : {
           m_bActive = TRUE;
           resume;
         }
+
         on (EDeactivate) : {
           m_bActive = FALSE;
           resume;
         }
+
         otherwise() : {
           resume;
         };
