@@ -102,7 +102,10 @@ functions:
       case ARIT_HELM:   PrecacheSound(SOUND_HELM  ); break;
     }
   }
-  /* Fill in entity statistics - for AI purposes only */
+  
+  // --------------------------------------------------------------------------------------
+  // Fill in entity statistics - for AI purposes only.
+  // --------------------------------------------------------------------------------------
   BOOL FillEntityStatistics(EntityStats *pes)
   {
     pes->es_strName = "Armor"; 
@@ -110,6 +113,7 @@ functions:
     pes->es_ctAmmount = m_fValue;
     pes->es_fValue = m_fValue*2;
     pes->es_iScore = 0;//m_iScore;
+
     switch (m_EaitType) {
       case ARIT_SHARD:  pes->es_strName+=" shard";  break;
       case ARIT_SMALL:  pes->es_strName+=" small";  break;                                      
@@ -118,10 +122,13 @@ functions:
       case ARIT_SUPER:  pes->es_strName+=" super";  break;
       case ARIT_HELM:   pes->es_strName+=" helm";   break;
     }
+
     return TRUE;
   }
 
-  // render particles
+  // --------------------------------------------------------------------------------------
+  // Render particles.
+  // --------------------------------------------------------------------------------------
   void RenderParticles(void) {
     // no particles when not existing or in DM modes
     if (GetRenderType()!=CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE
@@ -151,7 +158,9 @@ functions:
     }
   }
 
-  // set health properties depending on health type
+  // --------------------------------------------------------------------------------------
+  // Set health properties depending on health type.
+  // --------------------------------------------------------------------------------------
   void SetProperties(void) {
     switch (m_EaitType) {
       case ARIT_SHARD:
@@ -230,9 +239,12 @@ functions:
     }
   };
 
+  // --------------------------------------------------------------------------------------
+  // Change item by session properties.
+  // --------------------------------------------------------------------------------------
   void AdjustDifficulty(void)
   {
-    if (!GetSP()->sp_bAllowArmor && m_penTarget==NULL) {
+    if (!GetSP()->sp_bAllowArmor && m_penTarget == NULL) {
       Destroy();
     }
   }
@@ -242,7 +254,7 @@ procedures:
     ASSERT(epass.penOther!=NULL);
 
     // if armor stays
-    if (GetSP()->sp_bHealthArmorStays && !(m_bPickupOnce||m_bRespawn)) {
+    if (GetSP()->sp_bHealthArmorStays && !(m_bPickupOnce || m_bRespawn)) {
       // if already picked by this player
       BOOL bWasPicked = MarkPickedBy(epass.penOther);
       if (bWasPicked) {
@@ -255,6 +267,7 @@ procedures:
     EArmor eArmor;
     eArmor.fArmor = m_fValue;
     eArmor.bOverTopArmor = m_bOverTopArmor;
+
     // if health is received
     if (epass.penOther->ReceiveItem(eArmor)) {
 
@@ -276,10 +289,11 @@ procedures:
       PlaySound(m_soPick, m_iSoundComponent, SOF_3D);
       m_fPickSoundLen = GetSoundLength(m_iSoundComponent);
 
-      if (!GetSP()->sp_bHealthArmorStays || (m_bPickupOnce||m_bRespawn)) {
+      if (!GetSP()->sp_bHealthArmorStays || (m_bPickupOnce || m_bRespawn)) {
         jump CItem::ItemReceived();
       }
     }
+
     return;
   };
 
