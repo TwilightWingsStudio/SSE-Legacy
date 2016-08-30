@@ -51,6 +51,7 @@ properties:
  // SSE
  15 FLOAT m_fPitch         "Pitch" = 1.0F,
  16 BOOL m_bPauseable      "Pauseable" = FALSE,
+ 17 BOOL m_bNoRestart      "No Restart" = FALSE,
 
   {
     CAutoPrecacheSound m_aps;
@@ -95,6 +96,10 @@ functions:
 
   void DoPlay(void)
   {
+    if (m_soSound.IsPlaying() && m_bNoRestart) {
+      return;
+    }
+
     m_soSound.Set3DParameters(FLOAT(m_rFallOffRange), FLOAT(m_rHotSpotRange), m_fVolume, m_fPitch);
     PlaySound(m_soSound, m_fnSound, m_iPlayType);
   }
