@@ -20,11 +20,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 %{
-
 BOOL ConsiderAll(CEntity*pen) 
 {
   return TRUE;
 }
+
 BOOL ConsiderPlayers(CEntity*pen) 
 {
   return IsDerivedFromClass(pen, "Player");
@@ -49,42 +49,49 @@ properties:
   9 BOOL m_bBlockNonPlayers       "Block non-players" 'B' = FALSE,  // everything except players cannot pass
 
   100 CEntityPointer m_penLastIn,
-{
-  CFieldSettings m_fsField;
-}
 
+  {
+    CFieldSettings m_fsField;
+  }
 
 components:
 
  1 texture TEXTURE_FIELD  "Models\\Editor\\CollisionBox.tex",
 
-
 functions:
 
+  // --------------------------------------------------------------------------------------
+  // Sets field settings.
+  // --------------------------------------------------------------------------------------
   void SetupFieldSettings(void)
   {
     m_fsField.fs_toTexture.SetData(GetTextureDataForComponent(TEXTURE_FIELD));
     m_fsField.fs_colColor = C_WHITE|CT_OPAQUE;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Returns field's settings.
+  // --------------------------------------------------------------------------------------
   CFieldSettings *GetFieldSettings(void) {
-    if (m_fsField.fs_toTexture.GetData()==NULL) {
+    if (m_fsField.fs_toTexture.GetData() == NULL) {
       SetupFieldSettings();      
     }
+
     return &m_fsField;
   };
 
-
-  // returns bytes of memory used by this object
+  // --------------------------------------------------------------------------------------
+  // Returns bytes of memory used by this object.
+  // --------------------------------------------------------------------------------------
   SLONG GetUsedMemory(void)
   {
     // initial
     SLONG slUsedMemory = sizeof(CTouchField) - sizeof(CRationalEntity) + CRationalEntity::GetUsedMemory();
+
     // add some more
     slUsedMemory += m_strName.Length();
     return slUsedMemory;
   }
-
 
 procedures:
 
@@ -98,8 +105,7 @@ procedures:
       on (EPass ep) : {
 
         // stop enemy projectiles if blocks non players 
-        if (m_bBlockNonPlayers && IsOfClass(ep.penOther, "Projectile"))
-        {
+        if (m_bBlockNonPlayers && IsOfClass(ep.penOther, "Projectile")) {
           if (!IsOfClass(((CProjectile *)&*ep.penOther)->m_penLauncher, "Player")) {
             EPass epass;
             epass.penOther = this;
@@ -115,19 +121,23 @@ procedures:
         
         // send event
         SendToTarget(m_penEnter, m_eetEnter, ep.penOther);
+
         // if checking for exit
-        if (m_tmExitCheck>0) {
+        if (m_tmExitCheck > 0) {
           // remember who entered
           m_penLastIn = ep.penOther;
           // wait for exit
           jump WaitingExit();
         }
+
         resume;
       }
     }
   };
 
-  // waiting for entity to exit
+  // --------------------------------------------------------------------------------------
+  // Waiting for entity to exit.
+  // --------------------------------------------------------------------------------------
   WaitingExit() {
     while(TRUE) {
       // wait
@@ -137,39 +147,49 @@ procedures:
         on (ETimer) : {
           // check for entities inside
           CEntity *penNewIn;
+
           if (m_bPlayersOnly) {
             penNewIn = TouchingEntity(ConsiderPlayers, m_penLastIn);
           } else {
             penNewIn = TouchingEntity(ConsiderAll, m_penLastIn);
           }
+
           // if there are no entities in anymore
-          if (penNewIn==NULL) {
+          if (penNewIn == NULL) {
             // send event
             SendToTarget(m_penExit, m_eetExit, m_penLastIn);
             // wait new entry
             jump WaitingEntry();
           }
+
           m_penLastIn = penNewIn;
+
           stop;
         }
       }
     }
   };
-
-  // field is frozen
+  
+  // --------------------------------------------------------------------------------------
+  // Field is frozen.
+  // --------------------------------------------------------------------------------------
   Frozen() {
     m_bActive = FALSE;
+
     wait() {
       on (EBegin) : { resume; }
       on (EActivate) : { jump WaitingEntry(); }
     }
   };
 
-  // main initialization
+  // --------------------------------------------------------------------------------------
+  // Main initialization.
+  // -------------------------------------------------------------------------------------- 
   Main(EVoid) {
     InitAsFieldBrush();
     SetPhysicsFlags(EPF_BRUSH_FIXED);
-    if ( !m_bBlockNonPlayers ) {
+
+    if (!m_bBlockNonPlayers) {
       SetCollisionFlags( ((ECBI_MODEL)<<ECB_TEST) | ((ECBI_BRUSH)<<ECB_IS) | ((ECBI_MODEL)<<ECB_PASS) );
     } else {
       SetCollisionFlags( ((ECBI_MODEL|ECBI_PLAYER|ECBI_PROJECTILE_SOLID|ECBI_PROJECTILE_MAGIC)<<ECB_TEST) 
