@@ -327,7 +327,7 @@ functions:
     }
 
     // if inside view angle and visible
-    if (GetOwner()->m_fViewAngle >= 360.0F || (GetOwner()->SeeEntity(penPlayer, Cos(GetOwner()->m_fViewAngle/2.0f))) || IsDerivedFromClass(penPlayer, "Enemy Base")) {
+    if ((GetOwner()->m_fViewAngle >= 360.0F && GetOwner()->IsVisible(penPlayer)) || (GetOwner()->SeeEntity(penPlayer, Cos(GetOwner()->m_fViewAngle/2.0f))) || IsDerivedFromClass(penPlayer, "Enemy Base")) {
       // send event to owner
       SendWatchEvent(penPlayer);
     }/* else if (m_penClosestFriend != NULL) { 
