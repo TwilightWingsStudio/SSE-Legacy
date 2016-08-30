@@ -41,41 +41,58 @@ components:
 functions:
 
 procedures:
-  
+  // --------------------------------------------------------------------------------------
+  // Changes time factor.
+  // --------------------------------------------------------------------------------------
   ChangeTimeStretch(EVoid)
   {
-    m_fMyTimer=0.0f;
-    while( m_fMyTimer<m_tmFadeIn-_pTimer->TickQuantum/2.0f)
+    m_fMyTimer = 0.0f;
+
+    while (m_fMyTimer < m_tmFadeIn-_pTimer->TickQuantum/2.0f)
     {
       autowait(_pTimer->TickQuantum);
-      m_fMyTimer+=_pTimer->TickQuantum/_pNetwork->GetRealTimeFactor();
+      m_fMyTimer += _pTimer->TickQuantum/_pNetwork->GetRealTimeFactor();
       FLOAT fNewStretch=Lerp(m_fOldTimeStretch, m_fNewTimeStretch, Clamp(m_fMyTimer/m_tmFadeIn, 0.0f, 1.0f));
       _pNetwork->SetRealTimeFactor(fNewStretch);
     }
+
     _pNetwork->SetRealTimeFactor(m_fNewTimeStretch);
+
     return EReturn();
   }
-
+  
+  // --------------------------------------------------------------------------------------
+  // Main stuff here.
+  // --------------------------------------------------------------------------------------
   ApplyTimeStretch(EVoid)
   {
     autocall ChangeTimeStretch() EReturn;
-    if( m_tmInterval>0)
-    {
+
+    if (m_tmInterval > 0) {
       autowait(m_tmInterval);
       autocall ResetTimeStretch() EReturn;
     }
+
     return EReturn();
   }
 
+  // --------------------------------------------------------------------------------------
+  // Changes time factor to default.
+  // --------------------------------------------------------------------------------------
   ResetTimeStretch(EVoid)
   {
     if(_pNetwork->GetRealTimeFactor()==1) {return EReturn(); };
-    m_fOldTimeStretch=_pNetwork->GetRealTimeFactor();
-    m_fNewTimeStretch=1.0f;
+
+    m_fOldTimeStretch = _pNetwork->GetRealTimeFactor();
+    m_fNewTimeStretch = 1.0f;
     autocall ChangeTimeStretch(EVoid()) EReturn;
+
     return EReturn();
   }
-
+  
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main(EVoid)
   {
     // set appearance
@@ -92,25 +109,24 @@ procedures:
 
     wait()
     {
-      on (EBegin) :
-      {
+      on (EBegin) : {
         resume;
       }
+
       // immediate
-      on (EStart eStart) :
-      {
-        m_fOldTimeStretch=_pNetwork->GetRealTimeFactor();
-        m_fNewTimeStretch=m_fTimeStretch;
+      on (EStart eStart) : {
+        m_fOldTimeStretch = _pNetwork->GetRealTimeFactor();
+        m_fNewTimeStretch = m_fTimeStretch;
         call ApplyTimeStretch();
         resume;
       }
-      on (EStop) :
-      {
+
+      on (EStop) : {
         _pNetwork->SetRealTimeFactor(1.0f);
         resume;
       }
-      on (EReturn) :
-      {
+
+      on (EReturn) : {
         resume;
       }
     }
