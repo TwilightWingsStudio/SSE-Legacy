@@ -96,7 +96,8 @@ properties:
  101 CTString m_strRangeClass        "Send Range Class" = "",
  102 CTString m_strRangeName         "Send Range Name"  = "",
 
- 106 BOOL m_bMessageForAll "Message for all Players" = FALSE,
+ 106 BOOL m_bMessageForAll            "Message for all Players" = FALSE,
+ 107 BOOL m_bMessageShowTriggererName "Message %s=penCaused" = FALSE,
 
  110 FLOAT m_tmLastTriggered = 0.0f,
  111 FLOAT m_fMinTime           "Min Time between Trigs" = 0.0f,
@@ -212,18 +213,28 @@ functions:
     }
 
     if (m_strMessage != "") {
+      CEntity *penCaused = FixupCausedToPlayer(this, m_penCaused);
+
+      CTString strCookedMessage;
+
+      if (m_bMessageShowTriggererName) {
+        strCookedMessage.PrintF(TranslateConst(m_strMessage), (penCaused ? penCaused->GetName() : "<null>"));
+      } else {
+        strCookedMessage = TranslateConst(m_strMessage);
+      }
+
       if (m_bMessageForAll) {
         for(INDEX i = 0; i < GetMaxPlayers(); i++) {
           CEntity *penPlayer = GetPlayerEntity(i);
           if (penPlayer != NULL) {
             PrintCenterMessage(this, penPlayer,
-            TranslateConst(m_strMessage),
+            strCookedMessage,
             m_fMessageTime, m_mssMessageSound);
           }
         }
       } else {
         PrintCenterMessage(this, m_penCaused,
-          TranslateConst(m_strMessage),
+          strCookedMessage,
           m_fMessageTime, m_mssMessageSound);
       }
     }
@@ -371,7 +382,7 @@ procedures:
 
         if (m_bDebug) {
           if (eTrigger.penCaused != NULL) {
-            CPrintF(TRANS("%s triggered through %s\n"), m_strName,eTrigger.penCaused->GetName());
+            CPrintF(TRANS("%s triggered through %s\n"), m_strName, eTrigger.penCaused->GetName());
           }else{
             CPrintF(TRANS("%s triggered through unknown entity\n"), m_strName);
           }
