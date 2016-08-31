@@ -147,8 +147,8 @@ procedures:
 
   Main()
   {
-    //if (m_iFactionIndex < 0) { m_iFactionIndex = 0; }
-    //if (m_iFactionIndex > 31) { m_iFactionIndex = 31; }
+    if (m_iFactionIndex < EFHI_00) { m_iFactionIndex = EFHI_00; }
+    if (m_iFactionIndex > EFHI_31) { m_iFactionIndex = EFHI_31; }
   
     InitAsEditorModel();
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
