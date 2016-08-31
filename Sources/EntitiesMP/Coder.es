@@ -32,7 +32,7 @@ thumbnail "Thumbnails\\Coder.tbn";
 features  "HasName", "IsTargetable";
 
 properties:
-   1 CTString m_strName "Name" 'N'      = "Player Info",
+   1 CTString m_strName "Name" 'N'      = "Coder",
    3 CTString m_strDescription = "",
    4 BOOL m_bDebugMessages "Debug Messages" = FALSE,
    5 enum ECoderModeType m_etType "Type" = ECMT_IDECODER,
@@ -86,8 +86,8 @@ properties:
 
  100 enum EventEType m_eetDefaultType "Default Event Type" = EET_TRIGGER,
  101 CEntityPointer m_penDefaultTarget "Default Target",
- 102 INDEX m_iDefaultIndex "Dafault Index" = 0,
- 102 INDEX m_fDefaultFloat "Dafault Float" = 0.0F,
+ 102 INDEX m_iDefaultIndex "Default Index" = 0,
+ 102 INDEX m_fDefaultFloat "Default Float" = 0.0F,
  
  150 CEntityPointer m_penCaused,
   
