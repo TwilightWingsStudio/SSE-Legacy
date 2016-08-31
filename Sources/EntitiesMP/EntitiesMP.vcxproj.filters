@@ -580,6 +580,9 @@
     <ClCompile Include="EnemyFactionHolder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Coder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1596,6 +1599,12 @@
     <ClInclude Include="EnemyFactionHolder_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Coder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Coder_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2504,5 +2513,10 @@
     <CustomBuild Include="VariableHolder.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Coder.es">
+      <Filter>Class Files\Tools</Filter>
+    </None>
   </ItemGroup>
 </Project>
