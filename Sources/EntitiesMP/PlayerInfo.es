@@ -40,9 +40,10 @@ properties:
   15 BOOL m_bPerTickCheck "Per Tick Check" = FALSE,
   
   // info comes now
-  20 FLOAT m_fHealth "Player Health" = -1.0f,
-  21 FLOAT m_fArmor  "Player Armor"  = -1.0f,
-  25 BOOL m_bDead    "Is Dead"       = FALSE,
+  19 BOOL m_bPlayerExists      "Is Player Exists" = FALSE,
+  20 FLOAT m_fHealth           "Player Health" = -1.0f,
+  21 FLOAT m_fArmor            "Player Armor"  = -1.0f,
+  25 BOOL m_bDead              "Is Dead"       = FALSE,
   35 CTString m_strPlayerName  "Player Name" = "",
   
   50 INDEX m_iAvailableWeapons "W Available Weapons" = 0,
@@ -151,9 +152,11 @@ functions:
 
     // If we have target then update info.
     if (m_penCurrentTarget) {
+      m_bPlayerExists = TRUE;
       ApplyInfo();
     // Else reset info.
     } else {
+      m_bPlayerExists = FALSE;
       ResetInfo();
     }
   };
