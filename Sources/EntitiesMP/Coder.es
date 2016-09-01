@@ -296,9 +296,13 @@ functions:
 
     EventEType ett = EventCodeToEventType(ee.ee_slEvent);
 
-    if (ett != EET_IGNORE) {
-      i = GetIDByEventType(ett);
+    // Here is exists shit like EPass/EBegin etc. it's way to filter not allowed events.
+    if (ett == EET_IGNORE) {
+      return;
     }
+
+    i = GetIDByEventType(ett);
+
 
     m_iIOIndex = GetIValueByID(i);
     m_fIOFloat = GetFValueByID(i);
