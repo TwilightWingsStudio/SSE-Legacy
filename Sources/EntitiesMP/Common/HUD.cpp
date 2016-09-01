@@ -52,9 +52,15 @@ extern FLOAT hud_tmWeaponsOnScreen;
 extern INDEX hud_bShowMatchInfo;
 
 // SSE
+extern BOOL hud_bSniperScopeDraw;
+
 extern FLOAT hud_fSniperScopeBaseOpacity;
 extern FLOAT hud_fSniperScopeWheelOpacity;
 extern FLOAT hud_fSniperScopeLedOpacity;
+extern FLOAT hud_fSniperScopeZoomTextOpacity;
+extern FLOAT hud_fSniperScopeZoomIconOpacity;
+extern FLOAT hud_fSniperScopeRangeTextOpacity;
+extern FLOAT hud_fSniperScopeRangeIconOpacity;
 
 extern BOOL hud_bSniperScopeWheelColoring;
 //
@@ -609,6 +615,10 @@ static void HUD_DrawSniperMask( void )
   hud_fSniperScopeBaseOpacity = Clamp(hud_fSniperScopeBaseOpacity, 0.0f, 1.0f);
   hud_fSniperScopeWheelOpacity = Clamp(hud_fSniperScopeWheelOpacity, 0.0f, 1.0f);
   hud_fSniperScopeLedOpacity = Clamp(hud_fSniperScopeLedOpacity, 0.0f, 1.0f);
+  hud_fSniperScopeRangeTextOpacity = Clamp(hud_fSniperScopeRangeTextOpacity, 0.0f, 1.0f);
+  hud_fSniperScopeRangeIconOpacity = Clamp(hud_fSniperScopeRangeIconOpacity, 0.0f, 1.0f);
+  hud_fSniperScopeZoomTextOpacity = Clamp(hud_fSniperScopeZoomTextOpacity, 0.0f, 1.0f);
+  hud_fSniperScopeZoomIconOpacity = Clamp(hud_fSniperScopeZoomIconOpacity, 0.0f, 1.0f);
 
   // main sniper mask
   if (hud_fSniperScopeBaseOpacity > 0.0F) {
@@ -673,6 +683,7 @@ static void HUD_DrawSniperMask( void )
     ULONG ulSniperScopeLedOpacity = NormFloatToByte(hud_fSniperScopeLedOpacity);
 
     COLOR colLED;
+
     if (_penWeapons->m_tmLastSniperFire+1.25f < fTM) { // blinking
       colLED = 0x44FF2200;
     } else {
@@ -713,20 +724,44 @@ static void HUD_DrawSniperMask( void )
       _fRightYD = 6.0f;
     }
 
-    // arrow + distance
-    DrawAspectCorrectTextureCentered(&_toSniperArrow, fCenterI-_fLeftX*_fYResolutionScaling,
-      fCenterJ-_fLeftYU*_fYResolutionScaling, _fIconSize*_fYResolutionScaling, 0xFFCC3399 );
-    if (fDistance>9999.9f) { strTmp.PrintF("---.-");           }
-    else if (TRUE)         { strTmp.PrintF("%.1f", fDistance); }
-    _pDP->PutTextC( strTmp, fCenterI-_fLeftX*_fYResolutionScaling,
-      fCenterJ+_fLeftYD*_fYResolutionScaling, colMask|0xaa);
+    // rangefinder icon
+    if (hud_fSniperScopeRangeIconOpacity > 0.0F) {
+      ULONG ulSniperScopeRangeIconOpacity = NormFloatToByte(hud_fSniperScopeRangeIconOpacity);
 
-    // eye + zoom level
-    DrawAspectCorrectTextureCentered(&_toSniperEye,   fCenterI+_fRightX*_fYResolutionScaling,
-      fCenterJ-_fRightYU*_fYResolutionScaling, _fIconSize*_fYResolutionScaling, 0xFFCC3399 ); //SE_COL_ORANGE_L
-    strTmp.PrintF("%.1fx", fZoom);
-    _pDP->PutTextC( strTmp, fCenterI+_fRightX*_fYResolutionScaling,
-      fCenterJ+_fRightYD*_fYResolutionScaling, colMask|0xaa);
+      DrawAspectCorrectTextureCentered(&_toSniperArrow, fCenterI-_fLeftX*_fYResolutionScaling,
+        fCenterJ-_fLeftYU*_fYResolutionScaling, _fIconSize*_fYResolutionScaling, 0xFFCC3300|ulSniperScopeRangeIconOpacity );
+    }
+
+    // rangefinder text
+    if (hud_fSniperScopeRangeTextOpacity > 0.0F) {
+      ULONG ulSniperScopeRangeTextOpacity = NormFloatToByte(hud_fSniperScopeRangeTextOpacity);
+
+      if (fDistance > 9999.9f) {
+        strTmp.PrintF("---.-");
+      } else {
+        strTmp.PrintF("%.1f", fDistance);
+      }
+
+      _pDP->PutTextC( strTmp, fCenterI-_fLeftX*_fYResolutionScaling,
+        fCenterJ+_fLeftYD*_fYResolutionScaling, colMask|ulSniperScopeRangeTextOpacity);
+    }
+
+    // zoom level icon
+    if (hud_fSniperScopeZoomIconOpacity > 0.0F) {
+      ULONG ulSniperScopeZoomIconOpacity = NormFloatToByte(hud_fSniperScopeZoomIconOpacity);
+
+      DrawAspectCorrectTextureCentered(&_toSniperEye,   fCenterI+_fRightX*_fYResolutionScaling,
+        fCenterJ-_fRightYU*_fYResolutionScaling, _fIconSize*_fYResolutionScaling, 0xFFCC3300|ulSniperScopeZoomIconOpacity ); //SE_COL_ORANGE_L
+    }
+
+    // zoom level text
+    if (hud_fSniperScopeZoomTextOpacity > 0.0F) {
+      ULONG ulSniperScopeZoomTextOpacity = NormFloatToByte(hud_fSniperScopeZoomTextOpacity);
+
+      strTmp.PrintF("%.1fx", fZoom);
+      _pDP->PutTextC( strTmp, fCenterI+_fRightX*_fYResolutionScaling,
+        fCenterJ+_fRightYD*_fYResolutionScaling, colMask|ulSniperScopeZoomTextOpacity);
+    }
   }
 }
 
@@ -874,8 +909,8 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
   }
 
   // draw sniper mask (original mask even if snooping)
-  if (((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_iCurrentWeapon==WEAPON_SNIPER
-    &&((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_bSniping) {
+  if (((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_iCurrentWeapon == WEAPON_SNIPER
+    && ((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_bSniping && hud_bSniperScopeDraw) {
     HUD_DrawSniperMask();
   }
 
