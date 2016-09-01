@@ -21,9 +21,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 enum ECoderModeType {
-  0 ECMT_IDECODER "0 Decoder Index",
-  1 ECMT_FDECODER "1 Decoder Float",
-//  2 ECMT_ENCODER  "2 Encoder",
+  0 ECMT_IDECODER  "0 Decoder Index",
+  1 ECMT_FDECODER  "1 Decoder Float",
+  2 ECMT_ETENCODER "3 Encoder Event Type",
+  
+  //3 ECMT_TENCODER  "2 Encoder Target",
 };
 
 class CCoder: CEntity {
@@ -38,7 +40,7 @@ properties:
    5 enum ECoderModeType m_etType "Type" = ECMT_IDECODER,
    
   10 INDEX m_iIOIndex "IO Index" = 0,
-  11 INDEX m_iIOFloat "IO Float" = 0.0F,
+  11 FLOAT m_fIOFloat "IO Float" = 0.0F,
   
   30 CEntityPointer m_penTarget01    "Target 01" 'T',
   31 CEntityPointer m_penTarget02    "Target 02" 'Y',
@@ -51,38 +53,38 @@ properties:
   38 CEntityPointer m_penTarget09    "Target 09",
   39 CEntityPointer m_penTarget10    "Target 10",
   
-  40 enum EventEType m_eetEvent01    "Target 01 Event Type" 'G' = EET_TRIGGER,  // type of event to send
-  41 enum EventEType m_eetEvent02    "Target 02 Event Type" 'H' = EET_TRIGGER,
-  42 enum EventEType m_eetEvent03    "Target 03 Event Type" 'J' = EET_TRIGGER,
-  43 enum EventEType m_eetEvent04    "Target 04 Event Type" 'K' = EET_TRIGGER,
-  44 enum EventEType m_eetEvent05    "Target 05 Event Type" 'L' = EET_TRIGGER,
-  45 enum EventEType m_eetEvent06    "Target 06 Event Type" = EET_TRIGGER,
-  46 enum EventEType m_eetEvent07    "Target 07 Event Type" = EET_TRIGGER,
-  47 enum EventEType m_eetEvent08    "Target 08 Event Type" = EET_TRIGGER,
-  48 enum EventEType m_eetEvent09    "Target 09 Event Type" = EET_TRIGGER,
-  49 enum EventEType m_eetEvent10    "Target 10 Event Type" = EET_TRIGGER,
+  40 enum EventEType m_eetEvent01    "Event Type Target 01" 'G' = EET_TRIGGER,  // type of event to send
+  41 enum EventEType m_eetEvent02    "Event Type Target 02" 'H' = EET_TRIGGER,
+  42 enum EventEType m_eetEvent03    "Event Type Target 03" 'J' = EET_TRIGGER,
+  43 enum EventEType m_eetEvent04    "Event Type Target 04" 'K' = EET_TRIGGER,
+  44 enum EventEType m_eetEvent05    "Event Type Target 05" 'L' = EET_TRIGGER,
+  45 enum EventEType m_eetEvent06    "Event Type Target 06" = EET_TRIGGER,
+  46 enum EventEType m_eetEvent07    "Event Type Target 07" = EET_TRIGGER,
+  47 enum EventEType m_eetEvent08    "Event Type Target 08" = EET_TRIGGER,
+  48 enum EventEType m_eetEvent09    "Event Type Target 09" = EET_TRIGGER,
+  49 enum EventEType m_eetEvent10    "Event Type Target 10" = EET_TRIGGER,
   
-  50 INDEX m_iIndex01    "Target 01 Index" = 0,
-  51 INDEX m_iIndex02    "Target 02 Index" = 0,
-  52 INDEX m_iIndex03    "Target 03 Index" = 0,
-  53 INDEX m_iIndex04    "Target 04 Index" = 0,
-  54 INDEX m_iIndex05    "Target 05 Index" = 0,
-  55 INDEX m_iIndex06    "Target 06 Index" = 0,
-  56 INDEX m_iIndex07    "Target 07 Index" = 0,
-  57 INDEX m_iIndex08    "Target 08 Index" = 0,
-  58 INDEX m_iIndex09    "Target 09 Index" = 0,
-  59 INDEX m_iIndex10    "Target 10 Index" = 0,
+  50 INDEX m_iIndex01    "Index For Target 01" = 0,
+  51 INDEX m_iIndex02    "Index For Target 02" = 0,
+  52 INDEX m_iIndex03    "Index For Target 03" = 0,
+  53 INDEX m_iIndex04    "Index For Target 04" = 0,
+  54 INDEX m_iIndex05    "Index For Target 05" = 0,
+  55 INDEX m_iIndex06    "Index For Target 06" = 0,
+  56 INDEX m_iIndex07    "Index For Target 07" = 0,
+  57 INDEX m_iIndex08    "Index For Target 08" = 0,
+  58 INDEX m_iIndex09    "Index For Target 09" = 0,
+  59 INDEX m_iIndex10    "Index For Target 10" = 0,
   
-  50 FLOAT m_fFloat01    "Target 01 Float" = 0.0F,
-  51 FLOAT m_fFloat02    "Target 02 Float" = 0.0F,
-  52 FLOAT m_fFloat03    "Target 03 Float" = 0.0F,
-  53 FLOAT m_fFloat04    "Target 04 Float" = 0.0F,
-  54 FLOAT m_fFloat05    "Target 05 Float" = 0.0F,
-  55 FLOAT m_fFloat06    "Target 06 Float" = 0.0F,
-  56 FLOAT m_fFloat07    "Target 07 Float" = 0.0F,
-  57 FLOAT m_fFloat08    "Target 08 Float" = 0.0F,
-  58 FLOAT m_fFloat09    "Target 09 Float" = 0.0F,
-  59 FLOAT m_fFloat10    "Target 10 Float" = 0.0F,
+  50 FLOAT m_fFloat01    "Float For Target 01" = 0.0F,
+  51 FLOAT m_fFloat02    "Float For Target 02" = 0.0F,
+  52 FLOAT m_fFloat03    "Float For Target 03" = 0.0F,
+  53 FLOAT m_fFloat04    "Float For Target 04" = 0.0F,
+  54 FLOAT m_fFloat05    "Float For Target 05" = 0.0F,
+  55 FLOAT m_fFloat06    "Float For Target 06" = 0.0F,
+  56 FLOAT m_fFloat07    "Float For Target 07" = 0.0F,
+  57 FLOAT m_fFloat08    "Float For Target 08" = 0.0F,
+  58 FLOAT m_fFloat09    "Float For Target 09" = 0.0F,
+  59 FLOAT m_fFloat10    "Float For Target 10" = 0.0F,
 
  100 enum EventEType m_eetDefaultType "Default Event Type" = EET_TRIGGER,
  101 CEntityPointer m_penDefaultTarget "Default Target",
@@ -101,8 +103,10 @@ functions:
       ((CTString&)m_strDescription).PrintF("IDecoder");
     } else if (m_etType == ECMT_FDECODER) {
       ((CTString&)m_strDescription).PrintF("FDecoder");
+    } else if (m_etType == ECMT_ETENCODER) {
+      ((CTString&)m_strDescription).PrintF("ETEncoder");
     } else {
-      ((CTString&)m_strDescription).PrintF("Encoder");
+      ((CTString&)m_strDescription).PrintF("TEncoder");
     }
 
     return m_strDescription;
@@ -123,6 +127,71 @@ functions:
       
       default: SendToTarget(m_penDefaultTarget, m_eetDefaultType, NULL); break;
     }
+  }
+
+  INDEX GetIValueByID(INDEX i) {
+    switch (i) {
+      case  1: return m_iIndex01;
+      case  2: return m_iIndex02;
+      case  3: return m_iIndex03;
+      case  4: return m_iIndex04;
+      case  5: return m_iIndex05;
+      case  6: return m_iIndex06;
+      case  7: return m_iIndex07;
+      case  8: return m_iIndex08;
+      case  9: return m_iIndex09;
+      case 10: return m_iIndex10;
+      
+      default: break;
+    }
+
+    return m_iDefaultIndex;
+  }
+
+  FLOAT GetFValueByID(INDEX i) {
+    switch (i) {
+      case  1: return m_fFloat01;
+      case  2: return m_fFloat02;
+      case  3: return m_fFloat03;
+      case  4: return m_fFloat04;
+      case  5: return m_fFloat05;
+      case  6: return m_fFloat06;
+      case  7: return m_fFloat07;
+      case  8: return m_fFloat08;
+      case  9: return m_fFloat09;
+      case 10: return m_fFloat10;
+      
+      default: break;
+    }
+
+    return m_fDefaultFloat;
+  }
+  
+  INDEX GetIDByEventType(EventEType eet) {
+
+    if (eet == m_eetEvent01) {
+      return 1;
+    } else if (eet == m_eetEvent02) {
+      return 2;
+    } else if (eet == m_eetEvent03) {
+      return 3;
+    } else if (eet == m_eetEvent04) {
+      return 4;
+    } else if (eet == m_eetEvent05) {
+      return 5;
+    } else if (eet == m_eetEvent06) {
+      return 6;
+    } else if (eet == m_eetEvent07) {
+      return 7;
+    } else if (eet == m_eetEvent08) {
+      return 8;
+    } else if (eet == m_eetEvent09) {
+      return 9;
+    } else if (eet == m_eetEvent10) {
+      return 10;
+    }
+
+    return -1;
   }
 
   void DoIDecoder(const CEntityEvent &ee)
@@ -162,36 +231,57 @@ functions:
     // Send event to target depending on input value.
     SendToSpecifiedTarget(i);
   }
+  
+  EventEType EventCodeToEventType(INDEX iEvent) {
+    switch (iEvent) {
+      case EVENTCODE_EStart: return EET_START;
+      case EVENTCODE_EStop: return EET_STOP;
+      case EVENTCODE_ETrigger: return EET_TRIGGER;
+      case EVENTCODE_EActivate: return EET_ACTIVATE;
+      case EVENTCODE_EDeactivate: return EET_DEACTIVATE;
+      case EVENTCODE_EEnvironmentStart: return EET_ENVIRONMENTSTART;
+      case EVENTCODE_EEnvironmentStop: return EET_ENVIRONMENTSTOP;
+      case EVENTCODE_EStartAttack: return EET_STARTATTACK;
+      case EVENTCODE_EStopAttack: return EET_STOPATTACK;
+      case EVENTCODE_EStopBlindness: return EET_STOPBLINDNESS;
+      case EVENTCODE_EStopDeafness: return EET_STOPDEAFNESS;
+      case EVENTCODE_ETeleportMovingBrush: return EET_TELEPORTMOVINGBRUSH;
+
+      default: break;
+    }
+
+    return EET_IGNORE;
+  }
 
   void DoFDecoder(const CEntityEvent &ee)
   {
     INDEX i = -1;
 
-    if (m_iIOFloat == m_fFloat01) {
+    if (m_fIOFloat == m_fFloat01) {
       i = 1;
-    } else if (m_iIOFloat == m_fFloat02) {
+    } else if (m_fIOFloat == m_fFloat02) {
       i = 2;
-    } else if (m_iIOFloat == m_fFloat03) {
+    } else if (m_fIOFloat == m_fFloat03) {
       i = 3;
-    } else if (m_iIOFloat == m_fFloat04) {
+    } else if (m_fIOFloat == m_fFloat04) {
       i = 4;
-    } else if (m_iIOFloat == m_fFloat05) {
+    } else if (m_fIOFloat == m_fFloat05) {
       i = 5;
-    } else if (m_iIOFloat == m_fFloat06) {
+    } else if (m_fIOFloat == m_fFloat06) {
       i = 6;
-    } else if (m_iIOFloat == m_fFloat07) {
+    } else if (m_fIOFloat == m_fFloat07) {
       i = 7;
-    } else if (m_iIOFloat == m_fFloat08) {
+    } else if (m_fIOFloat == m_fFloat08) {
       i = 8;
-    } else if (m_iIOFloat == m_fFloat09) {
+    } else if (m_fIOFloat == m_fFloat09) {
       i = 9;
-    } else if (m_iIOFloat == m_fFloat10) {
+    } else if (m_fIOFloat == m_fFloat10) {
       i = 10;
     }
 
     if (m_bDebugMessages) {
       if (i > 0 && i < 11) {
-        CPrintF("[%s] (FDecoder) : Sending event to Target %d\n", GetName(), i);
+        CPrintF("[%s] (FDecoder) : Sending event to Target %d.\n", GetName(), i);
       } else {
         CPrintF("[%s] (FDecoder) : Sending event to default target.\n", GetName());
       }
@@ -201,9 +291,25 @@ functions:
     SendToSpecifiedTarget(i);
   }
   
-  void DoEncoder(const CEntityEvent &ee) {
-    m_iIOIndex = m_iDefaultIndex;
-    m_iIOFloat = m_fDefaultFloat;
+  void DoETEncoder(const CEntityEvent &ee) {
+    INDEX i = -1;
+
+    EventEType ett = EventCodeToEventType(ee.ee_slEvent);
+
+    if (ett != EET_IGNORE) {
+      i = GetIDByEventType(ett);
+    }
+
+    m_iIOIndex = GetIValueByID(i);
+    m_fIOFloat = GetFValueByID(i);
+
+    if (m_bDebugMessages) {
+      if (i > 0 && i < 11) {
+        CPrintF("[%s] (ETEncoder) : Ouputing I=%d F=%f taken from input %d.\n", GetName(), m_iIOIndex, m_fIOFloat, i);
+      } else {
+        CPrintF("[%s] (ETEncoder) : Ouputing I=%d F=%f taken from default input.\n", GetName(), m_iIOIndex, m_fIOFloat);
+      }
+    }
   }
 
   BOOL HandleEvent(const CEntityEvent &ee)
@@ -218,9 +324,12 @@ functions:
       } else {
         DoFDecoder(ee);
       }
-    } else {
-      m_penCaused = NULL;
+    } else if (m_etType == ECMT_ETENCODER) {
+      DoETEncoder(ee);
     }
+
+    // Clean up the target after event processing.
+    m_penCaused = NULL;
 
     return CEntity::HandleEvent(ee);
   }
