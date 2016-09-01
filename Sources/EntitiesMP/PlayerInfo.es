@@ -38,6 +38,7 @@ properties:
   11 CEntityPointer m_penCurrentTarget,
   
   15 BOOL m_bPerTickCheck "Per Tick Check" = FALSE,
+  16 BOOL m_bStaticPlayerIndex "Disable Player ID Output" = FALSE,
   
   // info comes now
   19 BOOL m_bPlayerExists      "Is Player Exists" = FALSE,
@@ -62,7 +63,10 @@ functions:
   void ResetInfo()
   {
     // Reset both indexes.
-    m_iIOPlayerIndex = -1;
+    if (!m_bStaticPlayerIndex) {
+      m_iIOPlayerIndex = -1;
+    }
+
     m_iCurrentPlayerIndex = -1;
 
     // Reset target.
@@ -116,10 +120,8 @@ functions:
 
   void UpdateInfo()
   {
-    INDEX i = 0;
-
-    // If player index changed since last time
-    if (m_iCurrentPlayerIndex != m_iIOPlayerIndex) {
+    // If player index changed since last time.
+    if (m_bStaticPlayerIndex || m_iCurrentPlayerIndex != m_iIOPlayerIndex) {
       // If valid input player index.
       if ((m_iIOPlayerIndex > -1) && (m_iIOPlayerIndex < 16)) {
         // Update index.
