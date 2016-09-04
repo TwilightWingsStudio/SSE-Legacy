@@ -90,7 +90,7 @@ functions:
 
   const CTString &GetDescription(void) const{
     return m_strDescription;
-  }
+  } 
 
   void HandleETrigger(const CEntityEvent &ee)
   {
@@ -101,10 +101,12 @@ functions:
 
     ETrigger eTrigger = ((ETrigger &) ee);
 
+    // If enabled then set penCaused as condition target 1.
     if (m_bCaused1 && eTrigger.penCaused) {
       m_penIfCondition1 = eTrigger.penCaused;
     }
 
+    // If enabled then set penCaused as condition target 2.
     if (m_bCaused2 && eTrigger.penCaused) {
       m_penIfCondition2 = eTrigger.penCaused;
     }
@@ -113,21 +115,23 @@ functions:
       return;
     }
 
-    BOOL bResult = 0, be = 0;
+    // Check condition target 2 existance and compare data types.
     if (m_penIfCondition2) {
       if (m_bDebug && m_eCT1 == ECT_ENTITY && m_eCT2 == ECT_ENTITY && m_penIfCondition1->PropertyForName(m_strProperty1) && m_penIfCondition2->PropertyForName(m_strProperty2) && m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType!=m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType) {
-        CPrintF(TRANS("%s : Different Data Types\n"), m_strName);
+        CPrintF(TRANS("%s : Different Data Types!\n"), m_strName);
       }
     } else {
       if (m_bDebug) {
-        CPrintF(TRANS("%s : Second Condition Target not set\n"), m_strName);
+        CPrintF(TRANS("%s : Second Condition Target Not Set!\n"), m_strName);
       }
     }
 
     if (m_eCT1 == ECT_ENTITY && m_bDebug && m_penIfCondition1->PropertyForName(m_strProperty1) == NULL) {
-      CPrintF(TRANS("Condition 1 : %s : %s Not Found\n"), m_strName, m_strProperty1);
+      CPrintF(TRANS("%s : Condition 1 : %s Not Found\n"), m_strName, m_strProperty1);
       return;
     }
+
+    BOOL bResult = 0, be = 0;
 
     if (m_eCT1 == ECT_TYPE) {
       if (IsDerivedFromClass(m_penIfCondition1, m_strClass)) {
@@ -196,19 +200,19 @@ functions:
           bf1 = TRUE;
         } else if (m_eCT1 == ECT_SPEEDXREL) {
           CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition1).en_vCurrentTranslationAbsolute,ANGLE3D(0,0,0));
-          CPlacement3D plRot = CPlacement3D(FLOAT3D(0,0,0),m_penIfCondition1->GetPlacement().pl_OrientationAngle);
+          CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition1->GetPlacement().pl_OrientationAngle);
           plSpeed.AbsoluteToRelative(plRot);
           fValue = plSpeed.pl_PositionVector(1);
           bf1 = TRUE;
         } else if (m_eCT1 == ECT_SPEEDYREL) {
           CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition1).en_vCurrentTranslationAbsolute,ANGLE3D(0,0,0));
-          CPlacement3D plRot = CPlacement3D(FLOAT3D(0,0,0),m_penIfCondition1->GetPlacement().pl_OrientationAngle);
+          CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition1->GetPlacement().pl_OrientationAngle);
           plSpeed.AbsoluteToRelative(plRot);
           fValue = plSpeed.pl_PositionVector(2);
           bf1 = TRUE;
         } else if (m_eCT1 == ECT_SPEEDZREL) {
           CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition1).en_vCurrentTranslationAbsolute,ANGLE3D(0,0,0));
-          CPlacement3D plRot = CPlacement3D(FLOAT3D(0,0,0),m_penIfCondition1->GetPlacement().pl_OrientationAngle);
+          CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition1->GetPlacement().pl_OrientationAngle);
           plSpeed.AbsoluteToRelative(plRot);
           fValue = plSpeed.pl_PositionVector(3);
           bf1 = TRUE;
@@ -296,7 +300,7 @@ functions:
         } else {
           be = true;
           if (m_bDebug) {
-            CPrintF(TRANS("%s 2 : Don't use speeds on not moving entities or health on entities without health\n"),m_strName);
+            CPrintF(TRANS("%s 2 : Don't use speeds on not moving entities or health on entities without health\n"), m_strName);
           }
         }
       } else {
@@ -352,6 +356,7 @@ functions:
                 bResult = TRUE;
               }
             }
+
             if (m_eCondition == EC_DIFFERENT) {
               if (penPointer != penPointer2) {
                 bResult = TRUE;
@@ -359,7 +364,7 @@ functions:
             }
           } else {
             if (m_bDebug) {
-              CPrintF(TRANS("%s : Second Condition Pointer not set, checking if %s.%s exists instead\n"),m_strName,((CEntity&)*m_penIfCondition1).GetName(),m_strProperty1);
+              CPrintF(TRANS("%s : Second Condition Pointer not set, checking if %s.%s exists instead\n"), m_strName,((CEntity&)*m_penIfCondition1).GetName(), m_strProperty1);
             }
             if (penPointer!=NULL) {
               bResult = TRUE;
@@ -455,11 +460,35 @@ procedures:
       if (m_penIfCondition1) {
         strCode += ((CEntity&)*m_penIfCondition1).GetName();
 
-        if (m_penIfCondition1->PropertyForName(m_strProperty1) != NULL) {
-          strCode += ".";
-          strCode += m_strProperty1;
+        if (m_eCT1 == ECT_ENTITY) {
+          if (m_penIfCondition1->PropertyForName(m_strProperty1) != NULL) {
+            strCode += ".";
+            strCode += m_strProperty1;
+          } else {
+            strCode += ".[Property not found]";
+          }
         } else {
-          strCode += ".[Property not found]";
+          strCode += ".";
+
+          switch (m_eCT1) {
+            case ECT_POSX:      strCode += "PosX"; break;
+            case ECT_POSY:      strCode += "PosY"; break;
+            case ECT_POSZ:      strCode += "PosZ"; break;
+            case ECT_SPEEDX:    strCode += "SpeedX"; break;
+            case ECT_SPEEDY:    strCode += "SpeedY"; break;
+            case ECT_SPEEDZ:    strCode += "SpeedZ"; break;
+            case ECT_SPEEDALL:  strCode += "SpeedTotal"; break;
+            case ECT_ROTH:      strCode += "RotH"; break;
+            case ECT_ROTB:      strCode += "RotP"; break;
+            case ECT_ROTP:      strCode += "RotB"; break;
+            case ECT_SPEEDXREL: strCode += "SpeedXRel"; break;
+            case ECT_SPEEDYREL: strCode += "SpeedYRel"; break;
+            case ECT_SPEEDZREL: strCode += "SpeedZRel"; break;
+            case ECT_HEALTH:    strCode += "Health"; break;
+            case ECT_TYPE:      strCode += "EntityClass"; break;
+          
+            default: break;
+          };
         }
       } else {
         strCode += "NULL";
@@ -483,11 +512,36 @@ procedures:
 
       if (m_penIfCondition2) {
         strCode += ((CEntity&)*m_penIfCondition2).GetName();
-        if (m_penIfCondition2->PropertyForName(m_strProperty2) != NULL) {
-          strCode += ".";
-          strCode += m_strProperty2;
+
+        if (m_eCT2 == ECT_ENTITY) {
+          if (m_penIfCondition2->PropertyForName(m_strProperty2) != NULL) {
+            strCode += ".";
+            strCode += m_strProperty2;
+          } else {
+            strCode += ".[Property not found]";
+          }
         } else {
-          strCode += ".[Property not found]";
+          strCode += ".";
+
+          switch (m_eCT2) {
+            case ECT_POSX:      strCode += "PosX"; break;
+            case ECT_POSY:      strCode += "PosY"; break;
+            case ECT_POSZ:      strCode += "PosZ"; break;
+            case ECT_SPEEDX:    strCode += "SpeedX"; break;
+            case ECT_SPEEDY:    strCode += "SpeedY"; break;
+            case ECT_SPEEDZ:    strCode += "SpeedZ"; break;
+            case ECT_SPEEDALL:  strCode += "SpeedTotal"; break;
+            case ECT_ROTH:      strCode += "RotH"; break;
+            case ECT_ROTB:      strCode += "RotP"; break;
+            case ECT_ROTP:      strCode += "RotB"; break;
+            case ECT_SPEEDXREL: strCode += "SpeedXRel"; break;
+            case ECT_SPEEDYREL: strCode += "SpeedYRel"; break;
+            case ECT_SPEEDZREL: strCode += "SpeedZRel"; break;
+            case ECT_HEALTH:    strCode += "Health"; break;
+            case ECT_TYPE:      strCode += "EntityClass"; break;
+          
+            default: break;
+          };
         }
       } else {
         strCode += "NULL";
