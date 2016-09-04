@@ -19,12 +19,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "Condition.h"
 %}
 
-enum EOperation{
+enum EOperation {
   0  EO_SET  "=",
   1  EO_ADD  "+",
   2  EO_SUBSTRACT "-",
   3  EO_MULTIPLY "*",
   4  EO_DIVIDE "/",
+  // TODO: Add ~ and | operations.
 };
 
 class CPropertyChanger: CEntity {
@@ -53,15 +54,15 @@ properties:
   14 COLOR     m_cValue        "Value Color"     = COLOR(C_WHITE|0xFF),
   15 ANIMATION m_aValue        "Value Animation" = 0,
   16 ANGLE     m_anValue       "Value Angle"     = 0,
-  17 ANGLE3D   m_an3dValue     "Value Angle 3D"  = ANGLE3D(0,0,0),
+  17 ANGLE3D   m_an3dValue     "Value Angle 3D"  = ANGLE3D(0, 0, 0),
   
   18 enum EOperation m_eOperation "Operation"      = EO_SET,
   19 BOOL m_bDebug                "Debug Messages" = FALSE,
   20 CEntityPointer  m_penSource  "Source Target",
-  21 CTString  m_strSource  "Source Property Name" = "",
+  21 CTString  m_strSourceProperty "Source Property Name" = "",
   22 enum EConType  m_ePT   "Target Property Type" = ECT_ENTITY,
   23 BOOL m_bCaused1     "Source Target=penCaused" = FALSE,
-  24 BOOL m_bCaused2            "Target=penCaused" = FALSE,
+  24 BOOL m_bPenCausedAsTarget  "Target=penCaused" = FALSE,
 
 components:
   1 model   MODEL_MARKER     "Models\\Editor\\PropertyChanger.mdl",
@@ -81,8 +82,9 @@ functions:
 
     ETrigger eTrigger = ((ETrigger &) ee);
 
-    if (m_bCaused2&&eTrigger.penCaused) {
-      m_penTarget=eTrigger.penCaused;
+    // Target=penCaused
+    if (m_bPenCausedAsTarget && eTrigger.penCaused) {
+      m_penTarget = eTrigger.penCaused;
     }
 
     // If invalid target.
@@ -90,35 +92,47 @@ functions:
       return;
     }
 
+    // Get the target property.
+    CEntityProperty *pTargetProperty = m_penTarget->PropertyForName(m_strProperty);
+
     // If invalid property.
-    if (m_penTarget->PropertyForName(m_strProperty) == NULL) { 
+    if (pTargetProperty == NULL) { 
       if (m_bDebug) {
-        CPrintF(TRANS("%s : %s Not Found\n"), m_strName, m_strProperty);
+        CPrintF(TRANS("%s : Property with name '%s' not found!\n"), m_strName, m_strProperty);
       }
+
       return;
     }
 
-    if (m_ePT == ECT_ENTITY) {
-      SLONG offset = m_penTarget->PropertyForName(m_strProperty)->ep_slOffset; 
+    CEntityProperty *pSourceProperty = NULL;
 
-      CEntityProperty::PropertyType eptType = m_penTarget->PropertyForName(m_strProperty)->ep_eptType;
+    // We have source entity? Then receive its property!
+    if (m_penSource != NULL) {
+      pSourceProperty = m_penSource->PropertyForName(m_strSourceProperty);
+    }
+
+    if (m_ePT == ECT_ENTITY) {
+      SLONG offset = pTargetProperty->ep_slOffset; 
+      CEntityProperty::PropertyType eptType = pTargetProperty->ep_eptType;
 
       // FLOAT
       if (eptType == CEntityProperty::EPT_FLOAT) {
-        FLOAT *fValue = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penTarget)+offset)); 
+        FLOAT *fValue = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penTarget) + offset)); 
         FLOAT fOld = *fValue;
         FLOAT *fNew = &m_fValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource) != NULL) {
-          if (m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-            SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
+        if (m_penSource != NULL && pSourceProperty != NULL) {
+          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+
+          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+            SLONG offset1 = pSourceProperty->ep_slOffset; 
             fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-          } else if (m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-            SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
+          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+            SLONG offset1 = pSourceProperty->ep_slOffset;
             *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
           }
         } else if (m_bDebug) {
-          CPrintF(TRANS("%s : Source Property %s not found\n"),GetName(),m_strSource);
+          CPrintF(TRANS("%s : Source Property %s not found\n"), GetName(), m_strSourceProperty);
         }
 
         if (m_eOperation == EO_SET) {
@@ -143,8 +157,8 @@ functions:
         CEntityPointer penOld = *penPointer;
         CEntityPointer *penNew = &m_penValue;
         
-        if (m_penSource && m_penSource->PropertyForName(m_strSource) != NULL && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_ENTITYPTR) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
+        if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_ENTITYPTR) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
           penNew = ((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
         }
 
@@ -173,12 +187,16 @@ functions:
         INDEX iOld = *iValue;
         INDEX *iNew = &m_iValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-          iNew = ((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-        } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-          *iNew = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        if (m_penSource != NULL && pSourceProperty != NULL) {
+          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+
+          if (eptSourceType == CEntityProperty::EPT_INDEX) {
+            SLONG offset1 = pSourceProperty->ep_slOffset; 
+            iNew = ((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+          } else if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+            SLONG offset1 = pSourceProperty->ep_slOffset;
+            *iNew = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          }
         }
 
         if (m_eOperation == EO_SET) {
@@ -198,12 +216,13 @@ functions:
         }
 
         if (m_bDebug) {
-          CPrintF(TRANS("%s : Target Entity Property: %s.%s is currently (INDEX)%d\n"),m_strName,((CEntity&)*m_penTarget).GetName(),m_strProperty,iOld);
-          if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-            CPrintF(TRANS("%s : Source Entity Property: %s.%s is currently (INDEX)%d\n"),m_strName,((CEntity&)*m_penSource).GetName(),m_strSource,*iNew);
+          CPrintF(TRANS("%s : Target Entity Property: %s.%s is currently (INDEX)%d\n"), m_strName,((CEntity&)*m_penTarget).GetName(), m_strProperty, iOld);
+          if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_INDEX) {
+            CPrintF(TRANS("%s : Source Entity Property: %s.%s is currently (INDEX)%d\n"), m_strName,((CEntity&)*m_penSource).GetName(), m_strSourceProperty, *iNew);
           } else {
-            CPrintF(TRANS("%s: Source Value: (INDEX)%d\n"),m_strName,m_iValue);
+            CPrintF(TRANS("%s: Source Value: (INDEX)%d\n"), m_strName, m_iValue);
           }
+
           if (m_eOperation == EO_SET) {
             CPrintF(TRANS("%s : %s=(INDEX)%d\n") ,m_strName, m_strProperty,*iValue);
           } else if (m_eOperation == EO_ADD) {
@@ -226,8 +245,8 @@ functions:
         BOOL *bValue = ((BOOL *)(((UBYTE *)(CEntity*)&*m_penTarget) + offset)); 
         BOOL *bNew = &m_bValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_BOOL) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
+        if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_BOOL) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
           bNew = ((BOOL *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
         }
 
@@ -242,8 +261,8 @@ functions:
         COLOR *cValue = ((COLOR *)(((UBYTE *)(CEntity*)&*m_penTarget) + offset)); 
         COLOR *cNew = &m_cValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_COLOR) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
+        if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_COLOR) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
           cNew=((COLOR *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
         }
 
@@ -254,8 +273,8 @@ functions:
         CTString *strValue = ((CTString *)(((UBYTE *)(CEntity*)&*m_penTarget) + offset)); 
         CTString *strNew = &m_strValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_STRING) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
+        if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_STRING) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
           strNew = ((CTString *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
         }
 
@@ -270,8 +289,8 @@ functions:
         RANGE *rValue = ((RANGE *)(((UBYTE *)(CEntity*)&*m_penTarget) + offset)); 
         RANGE *rNew = &m_rValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_RANGE) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
+        if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_RANGE) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
           rNew = ((RANGE *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
         }
 
@@ -295,10 +314,12 @@ functions:
       } else if (eptType == CEntityProperty::EPT_FILENAME) {
         CTFileName *fnValue = ((CTFileName *)(((UBYTE *)(CEntity*)&*m_penTarget)+offset)); 
         CTFileName *fnNew = &m_fnValue;
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FILENAME) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
+
+        if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_FILENAME) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
           fnNew = ((CTFileName *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
         }
+
         *fnValue = *fnNew;
 
       // Animation
@@ -306,8 +327,8 @@ functions:
         ANIMATION *aValue = ((ANIMATION *)(((UBYTE *)(CEntity*)&*m_penTarget)+offset)); 
         ANIMATION *aNew = &m_aValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_ANIMATION) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
+        if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_ANIMATION) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
           aNew = ((ANIMATION *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
         }
 
@@ -318,8 +339,8 @@ functions:
         ANGLE *anValue = ((ANGLE *)(((UBYTE *)(CEntity*)&*m_penTarget) + offset)); 
         ANGLE *anNew = &m_anValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_ANGLE) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
+        if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_ANGLE) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
           anNew = ((ANGLE *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
         }
 
@@ -344,8 +365,8 @@ functions:
         ANGLE3D *an3dValue = ((ANGLE3D *)(((UBYTE *)(CEntity*)&*m_penTarget)+offset)); 
         ANGLE3D *anNew = &m_an3dValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_ANGLE3D) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
+        if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_ANGLE3D) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
           anNew = ((ANGLE3D *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
         }
 
@@ -359,17 +380,22 @@ functions:
           *an3dValue = *anNew;
         }
       }
+
     } else if (m_ePT == ECT_POSX) {
       FLOAT *fValue = &((CEntity&)*m_penTarget).en_plPlacement.pl_PositionVector(1); 
       FLOAT fOld = *fValue;
       FLOAT *fNew = &m_fValue;
 
-      if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-        fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-      } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-        *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+      if (m_penSource != NULL && pSourceProperty != NULL) {
+        CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+
+        if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
+          fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+        } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+          SLONG offset1 = pSourceProperty->ep_slOffset;
+          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        }
       }
 
       if (m_eOperation == EO_SET) {
@@ -387,17 +413,22 @@ functions:
           CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
         }
       }
+
     } else if (m_ePT == ECT_POSY) {
       FLOAT *fValue = &((CEntity&)*m_penTarget).en_plPlacement.pl_PositionVector(2); 
       FLOAT fOld = *fValue;
       FLOAT *fNew = &m_fValue;
 
-      if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-        fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-      } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-        *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+      if (m_penSource != NULL && pSourceProperty != NULL) {
+        CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+
+        if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
+          fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+        } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+          SLONG offset1 = pSourceProperty->ep_slOffset;
+          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        }
       }
 
       if (m_eOperation == EO_SET) {
@@ -415,17 +446,22 @@ functions:
           CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
         }
       }
+
     } else if (m_ePT == ECT_POSZ) {
       FLOAT *fValue = &((CEntity&)*m_penTarget).en_plPlacement.pl_PositionVector(3); 
       FLOAT fOld = *fValue;
       FLOAT *fNew = &m_fValue;
 
-      if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-        fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-      } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-        *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+      if (m_penSource != NULL && pSourceProperty != NULL) {
+        CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+
+        if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
+          fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+        } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+          SLONG offset1 = pSourceProperty->ep_slOffset;
+          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        }
       }
 
       if (m_eOperation == EO_SET) {
@@ -443,17 +479,22 @@ functions:
           CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
         }
       }
+
     } else if (m_ePT == ECT_ROTH) {
       FLOAT *fValue = &((CEntity&)*m_penTarget).en_plPlacement.pl_OrientationAngle(1); 
       FLOAT fOld = *fValue;
       FLOAT *fNew = &m_fValue;
 
-      if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-        fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-      } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-        *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+      if (m_penSource != NULL && pSourceProperty != NULL) {
+        CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+
+        if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
+          fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+        } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+          SLONG offset1 = pSourceProperty->ep_slOffset;
+          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        }
       }
 
       if (m_eOperation == EO_SET) {
@@ -471,17 +512,22 @@ functions:
           CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
         }
       }
+
     } else if (m_ePT == ECT_ROTP) {
       FLOAT *fValue = &((CEntity&)*m_penTarget).en_plPlacement.pl_OrientationAngle(2); 
       FLOAT fOld = *fValue;
       FLOAT *fNew = &m_fValue;
 
-      if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-        fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-      } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-        *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+      if (m_penSource != NULL && pSourceProperty != NULL) {
+        CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+
+        if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
+          fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+        } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+          SLONG offset1 = pSourceProperty->ep_slOffset;
+          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        }
       }
 
       if (m_eOperation == EO_SET) {
@@ -499,17 +545,22 @@ functions:
           CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
         }
       }
+
     } else if (m_ePT == ECT_ROTB) {
       FLOAT *fValue = &((CEntity&)*m_penTarget).en_plPlacement.pl_OrientationAngle(3); 
       FLOAT fOld = *fValue;
       FLOAT *fNew = &m_fValue;
 
-      if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-        fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-      } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-        *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+      if (m_penSource != NULL && pSourceProperty != NULL) {
+        CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+
+        if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
+          fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+        } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+          SLONG offset1 = pSourceProperty->ep_slOffset;
+          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        }
       }
 
       if (m_eOperation == EO_SET) {
@@ -527,17 +578,22 @@ functions:
           CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
         }
       }
-    } else if (m_penTarget->GetFlags()&ENF_ALIVE&&m_ePT == ECT_HEALTH) {
+
+    } else if (m_penTarget->GetFlags()&ENF_ALIVE && m_ePT == ECT_HEALTH) {
       FLOAT fValue = ((CLiveEntity&)*m_penTarget).en_fHealth;
       FLOAT fOld = fValue;
       FLOAT *fNew = &m_fValue;
 
-      if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-        *fNew = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-      } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-        SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-        *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+      if (m_penSource != NULL && pSourceProperty != NULL) {
+        CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+
+        if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+          SLONG offset1 = pSourceProperty->ep_slOffset; 
+          fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+        } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+          SLONG offset1 = pSourceProperty->ep_slOffset;
+          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        }
       }
 
       if (m_eOperation == EO_SET) {
@@ -561,12 +617,16 @@ functions:
         FLOAT fOld = *fValue;
         FLOAT *fNew = &m_fValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-          *fNew = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-        } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        if (m_penSource != NULL && pSourceProperty != NULL) {
+          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+        
+          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+            SLONG offset1 = pSourceProperty->ep_slOffset; 
+            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+            SLONG offset1 = pSourceProperty->ep_slOffset;
+            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          }
         }
 
         if (m_eOperation == EO_SET) {
@@ -584,18 +644,24 @@ functions:
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
+
         ((CMovableEntity&)*m_penTarget).AddToMovers();
+
       } else if (m_ePT == ECT_SPEEDY) {
         FLOAT *fValue = &((CMovableEntity&)*m_penTarget).en_vCurrentTranslationAbsolute(2); 
         FLOAT fOld = *fValue;
         FLOAT *fNew = &m_fValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-          fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-        } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        if (m_penSource != NULL && pSourceProperty != NULL) {
+          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+        
+          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+            SLONG offset1 = pSourceProperty->ep_slOffset; 
+            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+            SLONG offset1 = pSourceProperty->ep_slOffset;
+            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          }
         }
 
         if (m_eOperation == EO_SET) {
@@ -613,6 +679,7 @@ functions:
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
+
         ((CMovableEntity&)*m_penTarget).AddToMovers();
 
       } else if (m_ePT == ECT_SPEEDZ) {
@@ -620,12 +687,16 @@ functions:
         FLOAT fOld = *fValue;
         FLOAT *fNew = &m_fValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-          fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-        } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        if (m_penSource != NULL && pSourceProperty != NULL) {
+          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+        
+          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+            SLONG offset1 = pSourceProperty->ep_slOffset; 
+            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+            SLONG offset1 = pSourceProperty->ep_slOffset;
+            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          }
         }
 
         if (m_eOperation == EO_SET) {
@@ -643,18 +714,24 @@ functions:
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
+
         ((CMovableEntity&)*m_penTarget).AddToMovers();
+
       } else if (m_ePT == ECT_SPEEDX) {
         FLOAT *fValue = &((CMovableEntity&)*m_penTarget).en_vCurrentTranslationAbsolute(1); 
         FLOAT fOld = *fValue;
         FLOAT *fNew = &m_fValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-          fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-        } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        if (m_penSource != NULL && pSourceProperty != NULL) {
+          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+        
+          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+            SLONG offset1 = pSourceProperty->ep_slOffset; 
+            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+            SLONG offset1 = pSourceProperty->ep_slOffset;
+            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          }
         }
 
         if (m_eOperation == EO_SET) {
@@ -672,18 +749,24 @@ functions:
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
+
         ((CMovableEntity&)*m_penTarget).AddToMovers();
+
       } else if (m_ePT == ECT_SPEEDXREL) {
         FLOAT *fValue = &((CMovableEntity&)*m_penTarget).en_vDesiredTranslationRelative(1); 
         FLOAT fOld = *fValue;
         FLOAT *fNew = &m_fValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-          fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-        } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        if (m_penSource != NULL && pSourceProperty != NULL) {
+          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+        
+          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+            SLONG offset1 = pSourceProperty->ep_slOffset; 
+            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+            SLONG offset1 = pSourceProperty->ep_slOffset;
+            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          }
         }
 
         if (m_eOperation == EO_SET) {
@@ -701,6 +784,7 @@ functions:
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
+
         ((CMovableEntity&)*m_penTarget).AddToMovers();
 
       } else if (m_ePT == ECT_SPEEDYREL) {
@@ -708,12 +792,16 @@ functions:
         FLOAT fOld = *fValue;
         FLOAT *fNew = &m_fValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-          fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-        } else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        if (m_penSource != NULL && pSourceProperty != NULL) {
+          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+        
+          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+            SLONG offset1 = pSourceProperty->ep_slOffset; 
+            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+            SLONG offset1 = pSourceProperty->ep_slOffset;
+            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          }
         }
 
         if (m_eOperation == EO_SET) {
@@ -731,6 +819,7 @@ functions:
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
+
         ((CMovableEntity&)*m_penTarget).AddToMovers();
 
       } else if (m_ePT == ECT_SPEEDXREL) {
@@ -738,13 +827,16 @@ functions:
         FLOAT fOld = *fValue;
         FLOAT *fNew = &m_fValue;
 
-        if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_FLOAT) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset; 
-          fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-        }
-        else if (m_penSource && m_penSource->PropertyForName(m_strSource)->ep_eptType == CEntityProperty::EPT_INDEX) {
-          SLONG offset1 = m_penSource->PropertyForName(m_strSource)->ep_slOffset;
-          *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        if (m_penSource != NULL && pSourceProperty != NULL) {
+          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+        
+          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+            SLONG offset1 = pSourceProperty->ep_slOffset; 
+            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+            SLONG offset1 = pSourceProperty->ep_slOffset;
+            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          }
         }
     
         if (m_eOperation == EO_SET) {
