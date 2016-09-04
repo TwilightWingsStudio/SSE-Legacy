@@ -20,6 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 uses "EntitiesMP/ModelHolder2";
+uses "EntitiesMP/MovableModel";
 uses "EntitiesMP/Light";
 
 // event sent to the entity that should change animation
@@ -97,6 +98,17 @@ functions:
         return penModel->m_aoLightAnimation.GetData();
       }
 
+    // if movablemodel
+    } else if (IsOfClass(penTarget, "Movable Model")) {
+      CMovableModel *penModel = (CMovableModel*)&*penTarget;
+      if (slPropertyOffset == offsetof(CAnimationChanger, m_iModelAnim)) {
+        return penModel->GetModelObject()->GetData();
+      } else if (slPropertyOffset == offsetof(CAnimationChanger, m_iTextureAnim)) {
+        return penModel->GetModelObject()->mo_toTexture.GetData();
+      } else if (slPropertyOffset == offsetof(CAnimationChanger, m_iLightAnim)) {
+        return penModel->m_aoLightAnimation.GetData();
+      }
+
     // if light
     } else if (IsOfClass(penTarget, "Light")) {
       CLight *penLight = (CLight*)&*penTarget;
@@ -129,11 +141,12 @@ procedures:
     if (m_penTarget!=NULL && 
       !IsOfClass(m_penTarget, "AnimationHub") &&
       !IsOfClass(m_penTarget, "ModelHolder2") &&
+      !IsOfClass(m_penTarget, "Movable Model") &&
       !IsOfClass(m_penTarget, "Light")) {
-      WarningMessage("Target must be AnimationHub ModelHolder2 or Light!");
-      m_penTarget=NULL;
+      WarningMessage("Target must be AnimationHub, ModelHolder2, MovableModel or Light!");
+      m_penTarget = NULL;
     }
-    if (m_penTarget==NULL) {
+    if (m_penTarget == NULL) {
       return;
     }
     
