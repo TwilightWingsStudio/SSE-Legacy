@@ -67,6 +67,7 @@ properties:
 
   50 BOOL m_bPenCausedAsSource     "Source Target=penCaused" = FALSE,
   51 BOOL m_bPenCausedAsTarget     "Target=penCaused" = FALSE,
+  52 BOOL m_bPenCausedAsTargetValue "Value Traget=penCaused" = FALSE,
 
 components:
   1 model   MODEL_MARKER     "Models\\Editor\\PropertyChanger.mdl",
@@ -185,6 +186,11 @@ functions:
 
     ETrigger eTrigger = ((ETrigger &) ee);
 
+    //
+    if (m_bPenCausedAsSource && eTrigger.penCaused) {
+      m_penSource = eTrigger.penCaused;
+    }
+
     // Target=penCaused
     if (m_bPenCausedAsTarget && eTrigger.penCaused) {
       m_penTarget = eTrigger.penCaused;
@@ -199,7 +205,7 @@ functions:
     CEntityProperty *pTargetProperty = m_penTarget->PropertyForName(m_strTargetProperty);
 
     // If invalid property.
-    if (pTargetProperty == NULL) { 
+    if (pTargetProperty == NULL && m_eSourcePT == ECT_ENTITY) { 
       if (m_bDebug) {
         CPrintF(TRANS("%s : Property with name '%s' not found!\n"), m_strName, m_strTargetProperty);
       }
@@ -226,34 +232,57 @@ functions:
 
         // If we have source target.
         if (m_penSource != NULL) {
-          // If property is entity property and property exists.
-          if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-            
-            // Here is support for both FLOAT and INDEX.
-            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-              SLONG offset1 = pSourceProperty->ep_slOffset; 
-              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-              SLONG offset1 = pSourceProperty->ep_slOffset;
-              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          // If property is entity property.
+          if (m_eSourcePT == ECT_ENTITY) {
+            // If entity property exists.
+            if (pSourceProperty != NULL) {
+              CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+              
+              // Here is support for both FLOAT and INDEX.
+              if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+                SLONG offset1 = pSourceProperty->ep_slOffset; 
+                fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+              } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+                SLONG offset1 = pSourceProperty->ep_slOffset;
+                *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+              }
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
             FLOAT fSrc = GetFSource();
-            fNew = &fSrc;
+            *fNew = *((FLOAT*)&fSrc);
           }
         }
 
         if (m_eOperation == EO_SET) {
+          if (m_bDebug) {
+            CPrintF("%s : Setting target float to value=%f.\n", GetName(), *fNew);
+          }
+
           *fValue = *fNew;
         } else if (m_eOperation == EO_ADD) {
+          if (m_bDebug) {
+            CPrintF("%s : Adding target float to value=%f.\n", GetName(), *fNew);
+          }
+
           *fValue += *fNew;
         } else if (m_eOperation == EO_SUBSTRACT) {
+          if (m_bDebug) {
+            CPrintF("%s : Substracting target float from value=%f.\n", GetName(), *fNew);
+          }
+
           *fValue -= *fNew;
         } else if (m_eOperation == EO_MULTIPLY) {
+          if (m_bDebug) {
+            CPrintF("%s : Multiplying target float with value=%f.\n", GetName(), *fNew);
+          }
+
           *fValue *= *fNew;
         } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
+          if (m_bDebug) {
+            CPrintF("%s : Diving target float with value=%f.\n", GetName(), *fNew);
+          }
+
           *fValue /= *fNew;
         } else {
           if (m_bDebug) {
@@ -272,7 +301,7 @@ functions:
           penNew = ((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
         }
 
-        if (m_bPenCausedAsSource && eTrigger.penCaused) {
+        if (m_bPenCausedAsTargetValue && eTrigger.penCaused) {
           penNew = &eTrigger.penCaused;
         }
 
@@ -301,17 +330,20 @@ functions:
 
         // If we have source target.
         if (m_penSource != NULL) {
-          // If property is entity property and property exists.
-          if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-            
-            // Here is support for both INDEX and FLOAT.
-            if (eptSourceType == CEntityProperty::EPT_INDEX) {
-              SLONG offset1 = pSourceProperty->ep_slOffset; 
-              iNew = ((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-            } else if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-              SLONG offset1 = pSourceProperty->ep_slOffset;
-              *iNew = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          // If property is entity property.
+          if (m_eSourcePT == ECT_ENTITY) {
+            // If entity property exists.
+            if (pSourceProperty != NULL) {
+              CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+              
+              // Here is support for both INDEX and FLOAT.
+              if (eptSourceType == CEntityProperty::EPT_INDEX) {
+                SLONG offset1 = pSourceProperty->ep_slOffset; 
+                iNew = ((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+              } else if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+                SLONG offset1 = pSourceProperty->ep_slOffset;
+                *iNew = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+              }
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
@@ -514,17 +546,20 @@ functions:
 
       // If we have source target.
       if (m_penSource != NULL) {
-        // If property is entity property and property exists.
-        if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-          
-          // Here is support for both FLOAT and INDEX.
-          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-            SLONG offset1 = pSourceProperty->ep_slOffset; 
-            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-            SLONG offset1 = pSourceProperty->ep_slOffset;
-            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        // If property is entity property.
+        if (m_eSourcePT == ECT_ENTITY) {
+          // If entity property exists.
+          if (pSourceProperty != NULL) {
+            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+            
+            // Here is support for both FLOAT and INDEX.
+            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+              SLONG offset1 = pSourceProperty->ep_slOffset; 
+              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+              SLONG offset1 = pSourceProperty->ep_slOffset;
+              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+            }
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
@@ -560,17 +595,20 @@ functions:
 
       // If we have source target.
       if (m_penSource != NULL) {
-        // If property is entity property and property exists.
-        if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-          
-          // Here is support for both FLOAT and INDEX.
-          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-            SLONG offset1 = pSourceProperty->ep_slOffset; 
-            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-            SLONG offset1 = pSourceProperty->ep_slOffset;
-            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        // If property is entity property.
+        if (m_eSourcePT == ECT_ENTITY) {
+          // If entity property exists.
+          if (pSourceProperty != NULL) {
+            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+            
+            // Here is support for both FLOAT and INDEX.
+            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+              SLONG offset1 = pSourceProperty->ep_slOffset; 
+              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+              SLONG offset1 = pSourceProperty->ep_slOffset;
+              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+            }
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
@@ -606,17 +644,20 @@ functions:
 
       // If we have source target.
       if (m_penSource != NULL) {
-        // If property is entity property and property exists.
-        if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-          
-          // Here is support for both FLOAT and INDEX.
-          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-            SLONG offset1 = pSourceProperty->ep_slOffset; 
-            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-            SLONG offset1 = pSourceProperty->ep_slOffset;
-            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        // If property is entity property.
+        if (m_eSourcePT == ECT_ENTITY) {
+          // If entity property exists.
+          if (pSourceProperty != NULL) {
+            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+            
+            // Here is support for both FLOAT and INDEX.
+            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+              SLONG offset1 = pSourceProperty->ep_slOffset; 
+              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+              SLONG offset1 = pSourceProperty->ep_slOffset;
+              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+            }
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
@@ -652,17 +693,20 @@ functions:
 
       // If we have source target.
       if (m_penSource != NULL) {
-        // If property is entity property and property exists.
-        if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-          
-          // Here is support for both FLOAT and INDEX.
-          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-            SLONG offset1 = pSourceProperty->ep_slOffset; 
-            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-            SLONG offset1 = pSourceProperty->ep_slOffset;
-            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        // If property is entity property.
+        if (m_eSourcePT == ECT_ENTITY) {
+          // If entity property exists.
+          if (pSourceProperty != NULL) {
+            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+            
+            // Here is support for both FLOAT and INDEX.
+            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+              SLONG offset1 = pSourceProperty->ep_slOffset; 
+              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+              SLONG offset1 = pSourceProperty->ep_slOffset;
+              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+            }
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
@@ -698,17 +742,20 @@ functions:
 
       // If we have source target.
       if (m_penSource != NULL) {
-        // If property is entity property and property exists.
-        if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-          
-          // Here is support for both FLOAT and INDEX.
-          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-            SLONG offset1 = pSourceProperty->ep_slOffset; 
-            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-            SLONG offset1 = pSourceProperty->ep_slOffset;
-            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        // If property is entity property.
+        if (m_eSourcePT == ECT_ENTITY) {
+          // If entity property exists.
+          if (pSourceProperty != NULL) {
+            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+            
+            // Here is support for both FLOAT and INDEX.
+            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+              SLONG offset1 = pSourceProperty->ep_slOffset; 
+              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+              SLONG offset1 = pSourceProperty->ep_slOffset;
+              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+            }
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
@@ -744,17 +791,20 @@ functions:
 
       // If we have source target.
       if (m_penSource != NULL) {
-        // If property is entity property and property exists.
-        if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-          
-          // Here is support for both FLOAT and INDEX.
-          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-            SLONG offset1 = pSourceProperty->ep_slOffset; 
-            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-            SLONG offset1 = pSourceProperty->ep_slOffset;
-            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        // If property is entity property.
+        if (m_eSourcePT == ECT_ENTITY) {
+          // If entity property exists.
+          if (pSourceProperty != NULL) {
+            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+            
+            // Here is support for both FLOAT and INDEX.
+            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+              SLONG offset1 = pSourceProperty->ep_slOffset; 
+              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+              SLONG offset1 = pSourceProperty->ep_slOffset;
+              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+            }
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
@@ -790,17 +840,20 @@ functions:
 
       // If we have source target.
       if (m_penSource != NULL) {
-        // If property is entity property and property exists.
-        if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-          CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-          
-          // Here is support for both FLOAT and INDEX.
-          if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-            SLONG offset1 = pSourceProperty->ep_slOffset; 
-            fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-          } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-            SLONG offset1 = pSourceProperty->ep_slOffset;
-            *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+        // If property is entity property.
+        if (m_eSourcePT == ECT_ENTITY) {
+          // If entity property exists.
+          if (pSourceProperty != NULL) {
+            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+            
+            // Here is support for both FLOAT and INDEX.
+            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+              SLONG offset1 = pSourceProperty->ep_slOffset; 
+              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+              SLONG offset1 = pSourceProperty->ep_slOffset;
+              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+            }
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
@@ -836,17 +889,20 @@ functions:
 
         // If we have source target.
         if (m_penSource != NULL) {
-          // If property is entity property and property exists.
-          if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-            
-            // Here is support for both FLOAT and INDEX.
-            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-              SLONG offset1 = pSourceProperty->ep_slOffset; 
-              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-              SLONG offset1 = pSourceProperty->ep_slOffset;
-              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          // If property is entity property.
+          if (m_eSourcePT == ECT_ENTITY) {
+            // If entity property exists.
+            if (pSourceProperty != NULL) {
+              CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+              
+              // Here is support for both FLOAT and INDEX.
+              if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+                SLONG offset1 = pSourceProperty->ep_slOffset; 
+                fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+              } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+                SLONG offset1 = pSourceProperty->ep_slOffset;
+                *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+              }
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
@@ -884,17 +940,20 @@ functions:
 
         // If we have source target.
         if (m_penSource != NULL) {
-          // If property is entity property and property exists.
-          if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-            
-            // Here is support for both FLOAT and INDEX.
-            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-              SLONG offset1 = pSourceProperty->ep_slOffset; 
-              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-              SLONG offset1 = pSourceProperty->ep_slOffset;
-              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          // If property is entity property.
+          if (m_eSourcePT == ECT_ENTITY) {
+            // If entity property exists.
+            if (pSourceProperty != NULL) {
+              CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+              
+              // Here is support for both FLOAT and INDEX.
+              if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+                SLONG offset1 = pSourceProperty->ep_slOffset; 
+                fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+              } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+                SLONG offset1 = pSourceProperty->ep_slOffset;
+                *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+              }
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
@@ -932,17 +991,20 @@ functions:
 
         // If we have source target.
         if (m_penSource != NULL) {
-          // If property is entity property and property exists.
-          if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-            
-            // Here is support for both FLOAT and INDEX.
-            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-              SLONG offset1 = pSourceProperty->ep_slOffset; 
-              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-              SLONG offset1 = pSourceProperty->ep_slOffset;
-              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          // If property is entity property.
+          if (m_eSourcePT == ECT_ENTITY) {
+            // If entity property exists.
+            if (pSourceProperty != NULL) {
+              CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+              
+              // Here is support for both FLOAT and INDEX.
+              if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+                SLONG offset1 = pSourceProperty->ep_slOffset; 
+                fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+              } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+                SLONG offset1 = pSourceProperty->ep_slOffset;
+                *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+              }
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
@@ -980,17 +1042,20 @@ functions:
 
         // If we have source target.
         if (m_penSource != NULL) {
-          // If property is entity property and property exists.
-          if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-            
-            // Here is support for both FLOAT and INDEX.
-            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-              SLONG offset1 = pSourceProperty->ep_slOffset; 
-              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-              SLONG offset1 = pSourceProperty->ep_slOffset;
-              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          // If property is entity property.
+          if (m_eSourcePT == ECT_ENTITY) {
+            // If entity property exists.
+            if (pSourceProperty != NULL) {
+              CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+              
+              // Here is support for both FLOAT and INDEX.
+              if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+                SLONG offset1 = pSourceProperty->ep_slOffset; 
+                fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+              } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+                SLONG offset1 = pSourceProperty->ep_slOffset;
+                *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+              }
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
@@ -1028,17 +1093,20 @@ functions:
 
         // If we have source target.
         if (m_penSource != NULL) {
-          // If property is entity property and property exists.
-          if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-            
-            // Here is support for both FLOAT and INDEX.
-            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-              SLONG offset1 = pSourceProperty->ep_slOffset; 
-              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-              SLONG offset1 = pSourceProperty->ep_slOffset;
-              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          // If property is entity property.
+          if (m_eSourcePT == ECT_ENTITY) {
+            // If entity property exists.
+            if (pSourceProperty != NULL) {
+              CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+              
+              // Here is support for both FLOAT and INDEX.
+              if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+                SLONG offset1 = pSourceProperty->ep_slOffset; 
+                fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+              } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+                SLONG offset1 = pSourceProperty->ep_slOffset;
+                *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+              }
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
@@ -1076,17 +1144,20 @@ functions:
 
         // If we have source target.
         if (m_penSource != NULL) {
-          // If property is entity property and property exists.
-          if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL) {
-            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
-            
-            // Here is support for both FLOAT and INDEX.
-            if (eptSourceType == CEntityProperty::EPT_FLOAT) {
-              SLONG offset1 = pSourceProperty->ep_slOffset; 
-              fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-            } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
-              SLONG offset1 = pSourceProperty->ep_slOffset;
-              *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+          // If property is entity property.
+          if (m_eSourcePT == ECT_ENTITY) {
+            // If entity property exists.
+            if (pSourceProperty != NULL) {
+              CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+              
+              // Here is support for both FLOAT and INDEX.
+              if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+                SLONG offset1 = pSourceProperty->ep_slOffset; 
+                fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+              } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+                SLONG offset1 = pSourceProperty->ep_slOffset;
+                *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
+              }
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
