@@ -583,6 +583,9 @@
     <ClCompile Include="Coder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleTeleport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1605,6 +1608,12 @@
     <ClInclude Include="Coder_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SimpleTeleport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleTeleport_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2516,6 +2525,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Coder.es">
+      <Filter>Class Files\Tools</Filter>
+    </None>
+    <None Include="SimpleTeleport.es">
       <Filter>Class Files\Tools</Filter>
     </None>
   </ItemGroup>
