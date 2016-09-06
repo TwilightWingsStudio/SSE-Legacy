@@ -368,7 +368,7 @@ procedures:
           if (m_bDebug) {
             CPrintF(TRANS("%s: received Trigger event, but min Time was not reached\n"), m_strName);
           }
-          stop;
+          resume;
         }
 
         if (!(m_strCausedOnlyByClass == "" || IsOfClass(eTrigger.penCaused, m_strCausedOnlyByClass))) {
