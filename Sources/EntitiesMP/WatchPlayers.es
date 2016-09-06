@@ -115,8 +115,8 @@ procedures:
     SetModel(MODEL_WATCHPLAYERS);
     SetModelMainTexture(TEXTURE_WATCHPLAYERS);
 
-    if (m_fWaitTime<0.1f) {
-      m_fWaitTime=0.1f;
+    if (m_fWaitTime < 0.05f) {
+      m_fWaitTime = 0.05f;
     }
 
     if (m_bActive) {
