@@ -363,11 +363,17 @@ extern INDEX hud_bShowMatchInfo = TRUE;
 // SSE
 extern BOOL hud_bRedScreenOnDamage = TRUE;
 
+extern BOOL hud_bSniperScopeDraw = TRUE;
+
 extern FLOAT hud_fSniperScopeBaseOpacity = 1.0F;
 extern FLOAT hud_fSniperScopeWheelOpacity = 0.25F;
 extern FLOAT hud_fSniperScopeLedOpacity = 0.75F;
+extern FLOAT hud_fSniperScopeRangeTextOpacity = 0.7F;
+extern FLOAT hud_fSniperScopeRangeIconOpacity = 0.6F;
+extern FLOAT hud_fSniperScopeZoomTextOpacity = 0.7F;
+extern FLOAT hud_fSniperScopeZoomIconOpacity = 0.6F;
 
-extern BOOL  hud_bSniperScopeWheelColoring = TRUE;
+extern BOOL hud_bSniperScopeWheelColoring = TRUE;
 //
 
 extern FLOAT plr_fBreathingStrength = 0.0f;
@@ -774,9 +780,15 @@ void CPlayer_OnInitClass(void)
   // SSE
   _pShell->DeclareSymbol("persistent user INDEX hud_bRedScreenOnDamage;",  &hud_bRedScreenOnDamage);
   
+  _pShell->DeclareSymbol("persistent user INDEX hud_bSniperScopeDraw;",  &hud_bSniperScopeDraw);
+
   _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeBaseOpacity;",  &hud_fSniperScopeBaseOpacity);
   _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeWheelOpacity;",  &hud_fSniperScopeWheelOpacity);
   _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeLedOpacity;",  &hud_fSniperScopeLedOpacity);
+  _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeRangeTextOpacity;",  &hud_fSniperScopeRangeTextOpacity);
+  _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeRangeIconOpacity;",  &hud_fSniperScopeRangeIconOpacity);
+  _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeZoomTextOpacity;",  &hud_fSniperScopeZoomTextOpacity);
+  _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeZoomIconOpacity;",  &hud_fSniperScopeZoomIconOpacity);
   _pShell->DeclareSymbol("persistent user INDEX hud_bSniperScopeWheelColoring;",  &hud_bSniperScopeWheelColoring);
   //
   
