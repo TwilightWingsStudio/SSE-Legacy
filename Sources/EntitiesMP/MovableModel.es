@@ -43,6 +43,7 @@ enum EBlockAction {
   };
 
   #define MIPRATIO 0.003125F //(2*tan(90/2))/640
+
   // used to render certain entities only for certain players (like picked items, etc.)
   extern ULONG _ulPlayerRenderingMask;
 %}
@@ -53,8 +54,11 @@ thumbnail "Thumbnails\\MovableModel.tbn";
 features "HasName", "HasDescription", "IsTargetable";
 
 properties:
+   // Paths to common assets.
    1 CTFileName m_fnModel      "Model" 'M'      = CTFILENAME("Models\\Editor\\Axis.mdl"),
    2 CTFileName m_fnTexture    "Texture" 'T'    = CTFILENAME("Models\\Editor\\Vector.tex"),
+  
+  // Paths to additional textures.
   22 CTFileName m_fnReflection "Reflection"     = CTString(""),
   23 CTFileName m_fnSpecular   "Specular"       = CTString(""),
   24 CTFileName m_fnBump       "Bump"           = CTString(""),
@@ -73,7 +77,7 @@ properties:
   13 BOOL m_bBackground            "Background" 'B'    = FALSE,   // set if model is rendered in background
   21 BOOL m_bTargetable                                = TRUE, // st if model should be targetable
  
-  // parameters for custom shading of a model (overrides automatic shading calculation)
+  // Parameters for custom shading of a model (overrides automatic shading calculation).
   14 enum CustomShadingType m_cstCustomShading "Custom shading" 'H' = CST_NONE,
   15 ANGLE3D m_aShadingDirection               "Light direction" 'D' = ANGLE3D( AngleDeg(45.0F), AngleDeg(45.0F), AngleDeg(45.0F)),
   16 COLOR m_colLight                          "Light color" 'O' = C_WHITE,
@@ -92,7 +96,7 @@ properties:
   35 RANGE m_rMipFadeDistMetric "Mip Fade Dist (Metric)" = -1.0F,
   36 FLOAT m_fMipFadeLenMetric  "Mip Fade Len (Metric)" = -1.0F,
   
-  // random values variables
+  // Random values variables.
   50 BOOL m_bRandomStretch   "Apply RND stretch"   = FALSE, // apply random stretch
   52 FLOAT m_fStretchRndX    "Stretch RND X (%)"   = 0.2F, // random stretch width
   51 FLOAT m_fStretchRndY    "Stretch RND Y (%)"   = 0.2F, // random stretch height
@@ -100,7 +104,7 @@ properties:
   54 FLOAT m_fStretchRndAll  "Stretch RND All (%)" = 0.0F, // random stretch all
   55 FLOAT3D m_fStretchRandom = FLOAT3D(1.0F, 1.0F, 1.0F),
  
-  // destruction values
+  // Destruction values.
   60 CEntityPointer m_penDestruction ,    // model destruction entity
   61 FLOAT3D m_vDamage    = FLOAT3D(0.0F, 0.0F, 0.0F),    // current damage impact
   62 FLOAT m_tmLastDamage = -1000.0F,
@@ -119,6 +123,7 @@ properties:
   93 INDEX m_iFirstRandomAnimation "First random animation" 'R' = -1,
  100 FLOAT m_fMaxTessellationLevel "Max tessellation level" = 0.0F,
  
+ // Translations and angular speeds.
  102 FLOAT m_fTransX       "X Translation"    = 0.0F,
  103 FLOAT m_fTransY       "Y Translation"    = 0.0F,
  104 FLOAT m_fTransZ       "Z Translation"    = 0.0F,
@@ -136,6 +141,7 @@ properties:
  
  120 BOOL m_bOriented  "Oriented by Gravity" = TRUE,
  121 BOOL m_bTranslated "Translated by Gravity" = TRUE,
+
  122 enum EBlockAction m_eBA  "On Block:" = EBA_STOP,
  123 FLOAT m_fAcceleration "Acceleration" = 1000,
  124 FLOAT m_fDeceleration "Deceleration" = 1000,
@@ -149,7 +155,7 @@ properties:
  132 FLOAT m_fMaxRotation "Max Rotation Speed" = 1000.0F,
  133 FLOAT m_fMaxHealth "Max Health" = -1.0F,
  134 BOOL m_bPPhys "Plane physic test" = FALSE,
- 135 BOOL b_HeadingOnly "VT Heading only" = FALSE,
+ 135 BOOL m_bVTHeadingOnly "VT Heading only" = FALSE,
  
  141 FLOAT m_fAddedTransX = 0.0F,
  142 FLOAT m_fAddedTransY = 0.0F,
@@ -176,12 +182,16 @@ functions:
     return TRUE;
   }
 
-  // classification box multiplier
+  // --------------------------------------------------------------------------------------
+  // Classification box multiplier.
+  // --------------------------------------------------------------------------------------
   FLOAT3D GetClassificationBoxStretch(void) {
     return FLOAT3D( m_fClassificationStretch, m_fClassificationStretch, m_fClassificationStretch);
   }
 
-  // maximum allowed tessellation level for this model (for Truform/N-Patches support)
+  // --------------------------------------------------------------------------------------
+  // Maximum allowed tessellation level for this model (for Truform/N-Patches support)
+  // --------------------------------------------------------------------------------------
   FLOAT GetMaxTessellationLevel(void) {
     return m_fMaxTessellationLevel;
   }
@@ -211,7 +221,9 @@ functions:
     CMovableModelEntity::ReceiveDamage(penInflictor, dmtType, fDamageAmmount, vHitPoint, vDirection);
   };
 
-  // Entity info
+  // --------------------------------------------------------------------------------------
+  // Entity info.
+  // --------------------------------------------------------------------------------------
   void *GetEntityInfo(void) {
     return CEntity::GetEntityInfo();
   };
@@ -222,7 +234,9 @@ functions:
     return (CModelDestruction*)&*m_penDestruction;
   }
 
-   /* Get anim data for given animation property - return NULL for none. */
+  // --------------------------------------------------------------------------------------
+  // Get anim data for given animation property - return NULL for none.
+  // --------------------------------------------------------------------------------------
   CAnimData *GetAnimData(SLONG slPropertyOffset) 
   {
     if (slPropertyOffset == offsetof(CMovableModel, m_iModelAnimation)) {
@@ -236,7 +250,9 @@ functions:
     }
   };
 
-  // calculate rotation matrix that points in direction of a target entity
+  // --------------------------------------------------------------------------------------
+  // Calculate rotation matrix that points in direction of a target entity.
+  // --------------------------------------------------------------------------------------
   void CalcTargetedRotation(const FLOAT3D &vMyPos, CEntity *penViewTarget,
     FLOAT3D vPosRatio, FLOATmatrix3D &mRotTarget, BOOL bLerping) const
   {
@@ -252,7 +268,9 @@ functions:
     MakeRotationMatrixFast(mRotTarget, aDir);
   }
 
-  /* Adjust model mip factor if needed. */
+  // --------------------------------------------------------------------------------------
+  // Adjust model mip factor if needed.
+  // --------------------------------------------------------------------------------------
   void AdjustMipFactor(FLOAT &fMipFactor)
   {
     if (m_ulVisibleMask != 0 && m_ulVisibleMask != _ulPlayerRenderingMask) {
@@ -313,7 +331,9 @@ functions:
     fMipFactor = fMipFactor*m_fMipMul+m_fMipAdd;
   }
 
-  /* Adjust model shading parameters if needed. */
+  // --------------------------------------------------------------------------------------
+  // Adjust model shading parameters if needed.
+  // --------------------------------------------------------------------------------------
   BOOL AdjustShadingParameters(FLOAT3D &vLightDirection, COLOR &colLight, COLOR &colAmbient)
   {
     switch( m_cstCustomShading)
@@ -323,7 +343,7 @@ functions:
         if (m_aoLightAnimation.GetData() != NULL) {
           // get lerping info
           SLONG colFrame0, colFrame1;
-		  FLOAT fRatio;
+          FLOAT fRatio;
 
           m_aoLightAnimation.GetFrame(colFrame0, colFrame1, fRatio);
           UBYTE ubAnimR0, ubAnimG0, ubAnimB0;
@@ -391,7 +411,9 @@ functions:
     return m_stClusterShadows != ST_NONE;
   };
 
-  // apply mirror and stretch to the entity
+  // --------------------------------------------------------------------------------------
+  // Apply mirror and stretch to the entity.
+  // --------------------------------------------------------------------------------------
   void MirrorAndStretch(FLOAT fStretch, BOOL bMirrorX)
   {
     m_fStretchAll *= fStretch;
@@ -400,7 +422,9 @@ functions:
     }
   }
 
-  // Stretch model
+  // --------------------------------------------------------------------------------------
+  // Stretch model.
+  // --------------------------------------------------------------------------------------
   void StretchModel(void) {
     // stretch factors must not have extreme values
     if (Abs(m_fStretchX)  < 0.01F) { m_fStretchX   = 0.01F;  }
@@ -438,7 +462,9 @@ functions:
     ModelChangeNotify();
   };
 
-  /* Init model holder*/
+  // --------------------------------------------------------------------------------------
+  // Init model holder.
+  // --------------------------------------------------------------------------------------
   void InitModelHolder(void) {
 
     // must not crash when model is removed
@@ -558,8 +584,9 @@ functions:
     return;
   }
 
-
-  // returns bytes of memory used by this object
+  // --------------------------------------------------------------------------------------
+  // Returns bytes of memory used by this object.
+  // --------------------------------------------------------------------------------------
   SLONG GetUsedMemory(void)
   {
     // initial
@@ -577,6 +604,9 @@ functions:
     return slUsedMemory;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Here is pre-moving calculations.
+  // --------------------------------------------------------------------------------------
   void PreMoving()
   {
     // start moving
@@ -596,13 +626,15 @@ functions:
         //direction vector to target
         FLOAT3D vTarget = (m_penFace->GetPlacement().pl_PositionVector-GetPlacement().pl_PositionVector).Normalize();
         FLOAT3D vRot = FLOAT3D(0.0F, 0.0F, 0.0F);
+
         //convert to absolute angles to target
         DirectionVectorToAngles(vTarget,vRot);
 
-        if (b_HeadingOnly) {
+        if (m_bVTHeadingOnly) {
           vRot(2) = 0.0F;
           vRot(3) = 0.0F;
         }
+
         //angle distance between this and wanted rotation
         //FLOAT3D vRotDist=vRot-GetPlacement().pl_OrientationAngle;
         //scale rotation speed to match distance
@@ -616,10 +648,10 @@ functions:
         //if not too close, set rotation speed
         if (plAbs.pl_OrientationAngle.Length() > 0.5) {
           SetDesiredRotation(plAbs.pl_OrientationAngle*20);
-        }else{
+        } else {
           SetDesiredRotation(FLOAT3D(0.0F, 0.0F, 0.0F));
         }
-      }else{
+      } else {
         if (abs(fRot(1))>m_fMaxRotation) {
           fRot(1) *= m_fMaxRotation / abs(fRot(1));
         }
@@ -629,9 +661,11 @@ functions:
         if (abs(fRot(3))>m_fMaxRotation) {
           fRot(3) *= m_fMaxRotation / abs(fRot(3));
         }
+
         SetDesiredRotation(fRot);
       }
-      SetDesiredTranslation(FLOAT3D(m_fTransX+m_fAddedTransX,m_fTransY+m_fAddedTransY,m_fTransZ+m_fAddedTransZ));
+
+      SetDesiredTranslation(FLOAT3D(m_fTransX+m_fAddedTransX, m_fTransY+m_fAddedTransY, m_fTransZ+m_fAddedTransZ));
     }else{
       SetDesiredTranslation(FLOAT3D(0.0F, 0.0F, 0.0F));
       SetDesiredRotation(FLOAT3D(0.0F, 0.0F, 0.0F));
@@ -666,6 +700,7 @@ procedures:
     
     SetPhysicsFlags(EPF_MODEL_WALKING);
     SetFlags(GetFlags()|ENF_ALIVE);
+
     switch(m_eBA) {
       case EBA_STOP:{
         SetPhysicsFlags(GetPhysicsFlags()|EPF_ONBLOCK_STOP);
@@ -733,9 +768,10 @@ procedures:
     } 
 
     autowait(_pTimer->TickQuantum);
+
     while(TRUE) {
-      en_fAcceleration=m_fAcceleration;
-      en_fDeceleration=m_fDeceleration;
+      en_fAcceleration = m_fAcceleration;
+      en_fDeceleration = m_fDeceleration;
 
       if (GetHealth() != m_fHealth) {
         m_fHealth = GetHealth();
@@ -840,7 +876,7 @@ procedures:
         
         // when dead
         on(EDeath): {
-          SendToTarget(m_penDeathTarget,EET_TRIGGER,m_penLastDamager);
+          SendToTarget(m_penDeathTarget, EET_TRIGGER, m_penLastDamager);
           ForceFullStop();
           SendEvent(EDeactivate());
           SetHealth(m_fRealHealth);
@@ -868,9 +904,9 @@ procedures:
         }
         
         on(EStart eStart):{
-          if (IsOfClass(eStart.penCaused,"Player")) {
+          if (IsOfClass(eStart.penCaused, "Player")) {
             m_ulVisibleMask = 1<<((CPlayer&)*eStart.penCaused).GetMyPlayerIndex();
-            m_penPlayer=eStart.penCaused;
+            m_penPlayer = eStart.penCaused;
           }
           resume;
         }
