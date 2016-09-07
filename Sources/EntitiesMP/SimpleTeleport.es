@@ -142,31 +142,27 @@ procedures:
   
     autowait(0.1f);
   
-    while (TRUE) {
-      wait(_pTimer->TickQuantum) {
-        on (EBegin) : { 
-          resume;
+    wait() {
+      on (EBegin) : { 
+        resume;
+      }
+
+      on(ETrigger eTrigger) : {
+        if (m_bActive) {
+          DoTeleportation(eTrigger);
         }
 
-        on(ETrigger eTrigger) : {
-          if (m_bActive) {
-            DoTeleportation(eTrigger);
-          }
+        resume;
+      }
 
-          resume;
-        }
+      on (EActivate) : {
+        m_bActive = TRUE;
+        resume;
+      }
 
-        on (EActivate) : {
-          m_bActive = TRUE;
-          resume;
-        }
-
-        on (EDeactivate) : {
-          m_bActive = FALSE;
-          resume;
-        }
-
-        on(ETimer) : { stop; }
+      on (EDeactivate) : {
+        m_bActive = FALSE;
+        resume;
       }
     }
   }
