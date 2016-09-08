@@ -101,12 +101,13 @@ functions:
     crRay.cr_ttHitModels = (CCastRay::TestType)m_ercttType;
     crRay.cr_bPhysical = FALSE;
 
+    // Perform first cast,
+    GetWorld()->CastRay(crRay);  
+
     INDEX ctCasts = 0;
     while (ctCasts < 10){
-      if (ctCasts == 0){
-        // perform first cast
-        GetWorld()->CastRay(crRay);  
-      }
+
+
       if (crRay.cr_penHit && crRay.cr_fHitDistance < 1.0f && !(crRay.cr_penHit->GetRenderType() != RT_BRUSH)){
         // next casts
         GetWorld()->ContinueCast(crRay);
