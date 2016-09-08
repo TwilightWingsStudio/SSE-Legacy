@@ -75,16 +75,16 @@ properties:
   58 INDEX m_iIndex09    "Index For Target 09" = 0,
   59 INDEX m_iIndex10    "Index For Target 10" = 0,
   
-  50 FLOAT m_fFloat01    "Float For Target 01" = 0.0F,
-  51 FLOAT m_fFloat02    "Float For Target 02" = 0.0F,
-  52 FLOAT m_fFloat03    "Float For Target 03" = 0.0F,
-  53 FLOAT m_fFloat04    "Float For Target 04" = 0.0F,
-  54 FLOAT m_fFloat05    "Float For Target 05" = 0.0F,
-  55 FLOAT m_fFloat06    "Float For Target 06" = 0.0F,
-  56 FLOAT m_fFloat07    "Float For Target 07" = 0.0F,
-  57 FLOAT m_fFloat08    "Float For Target 08" = 0.0F,
-  58 FLOAT m_fFloat09    "Float For Target 09" = 0.0F,
-  59 FLOAT m_fFloat10    "Float For Target 10" = 0.0F,
+  60 FLOAT m_fFloat01    "Float For Target 01" = 0.0F,
+  61 FLOAT m_fFloat02    "Float For Target 02" = 0.0F,
+  62 FLOAT m_fFloat03    "Float For Target 03" = 0.0F,
+  63 FLOAT m_fFloat04    "Float For Target 04" = 0.0F,
+  64 FLOAT m_fFloat05    "Float For Target 05" = 0.0F,
+  65 FLOAT m_fFloat06    "Float For Target 06" = 0.0F,
+  66 FLOAT m_fFloat07    "Float For Target 07" = 0.0F,
+  67 FLOAT m_fFloat08    "Float For Target 08" = 0.0F,
+  68 FLOAT m_fFloat09    "Float For Target 09" = 0.0F,
+  69 FLOAT m_fFloat10    "Float For Target 10" = 0.0F,
 
  100 enum EventEType m_eetDefaultType "Default Event Type" = EET_TRIGGER,
  101 CEntityPointer m_penDefaultTarget "Default Target",
@@ -198,26 +198,14 @@ functions:
   {
     INDEX i = -1;
 
-    if (m_iIOIndex == m_iIndex01) {
-      i = 1;
-    } else if (m_iIOIndex == m_iIndex02) {
-      i = 2;
-    } else if (m_iIOIndex == m_iIndex03) {
-      i = 3;
-    } else if (m_iIOIndex == m_iIndex04) {
-      i = 4;
-    } else if (m_iIOIndex == m_iIndex05) {
-      i = 5;
-    } else if (m_iIOIndex == m_iIndex06) {
-      i = 6;
-    } else if (m_iIOIndex == m_iIndex07) {
-      i = 7;
-    } else if (m_iIOIndex == m_iIndex08) {
-      i = 8;
-    } else if (m_iIOIndex == m_iIndex09) {
-      i = 9;
-    } else if (m_iIOIndex == m_iIndex10) {
-      i = 10;
+    const INDEX* aiValues = &m_iIndex01;
+
+    for (INDEX b = 0; b < 10; b++) {
+      //CPrintF("%d - %d\n", (b+1), aiValues[b]);
+      if (m_iIOIndex == aiValues[b]) {
+        i = b + 1;
+        break;
+      }
     }
 
     if (m_bDebugMessages) {
@@ -257,26 +245,14 @@ functions:
   {
     INDEX i = -1;
 
-    if (m_fIOFloat == m_fFloat01) {
-      i = 1;
-    } else if (m_fIOFloat == m_fFloat02) {
-      i = 2;
-    } else if (m_fIOFloat == m_fFloat03) {
-      i = 3;
-    } else if (m_fIOFloat == m_fFloat04) {
-      i = 4;
-    } else if (m_fIOFloat == m_fFloat05) {
-      i = 5;
-    } else if (m_fIOFloat == m_fFloat06) {
-      i = 6;
-    } else if (m_fIOFloat == m_fFloat07) {
-      i = 7;
-    } else if (m_fIOFloat == m_fFloat08) {
-      i = 8;
-    } else if (m_fIOFloat == m_fFloat09) {
-      i = 9;
-    } else if (m_fIOFloat == m_fFloat10) {
-      i = 10;
+    const FLOAT* afValues = &m_fFloat01;
+
+    for (INDEX b = 0; b < 10; b++) {
+      //CPrintF("%d - %f\n", (b+1), afValues[b]);
+      if (m_fIOFloat == afValues[b]) {
+        i = b + 1;
+        break;
+      }
     }
 
     if (m_bDebugMessages) {
