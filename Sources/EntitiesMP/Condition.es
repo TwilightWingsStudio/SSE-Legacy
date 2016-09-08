@@ -38,8 +38,8 @@ enum EConType{
    6 ECT_SPEEDZ    "06 Speed(Z)",
    7 ECT_SPEEDALL  "07 Speed(Total)",
    8 ECT_ROTH      "08 Rotation(H)",
-   9 ECT_ROTB      "09 Rotation(P)",
-  10 ECT_ROTP      "10 Rotation(B)",
+   9 ECT_ROTP      "09 Rotation(P)",
+  10 ECT_ROTB      "10 Rotation(B)",
   11 ECT_SPEEDXREL "11 Relative Speed(X)",
   12 ECT_SPEEDYREL "12 Relative Speed(Y)",
   13 ECT_SPEEDZREL "13 Relative Speed(Z)",
@@ -112,6 +112,10 @@ functions:
     }
 
     if (m_penIfCondition1 == NULL) {
+      if (m_bDebug) {
+        CPrintF(TRANS("%s : First Condition Target Not Set!\n"), m_strName);
+      }
+
       return;
     }
 
