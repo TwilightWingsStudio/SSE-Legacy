@@ -37,7 +37,7 @@ enum AmmoItemType {
    3 AIT_ROCKETS         "03 Rockets",
    4 AIT_GRENADES        "04 Grenades",
    5 AIT_ELECTRICITY     "05 Electricity",
-   6 AIT_NUKEBALL        "06 obsolete",
+   6 AIT_NUKEBALL        "06 NukeBall !!!obsolete!!!",
    7 AIT_IRONBALLS       "07 IronBalls",
    8 AIT_SERIOUSPACK     "08 SeriousPack - don't use",
    9 AIT_BACKPACK        "09 BackPack - don't use",
