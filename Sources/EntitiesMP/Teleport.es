@@ -36,6 +36,7 @@ properties:
   6 BOOL m_bActive              "Active" 'A' = TRUE,
   7 BOOL m_bPlayersOnly         "Players only" 'P' = TRUE,
   8 BOOL m_bForceStop           "Force stop" 'F' = FALSE,
+  9 BOOL m_bTelefrag            "Telefrag" = TRUE,
 
 components:
 
@@ -61,7 +62,7 @@ functions:
   void TeleportEntity(CEntity *pen, const CPlacement3D &pl)
   {
     // teleport back
-    pen->Teleport(pl);
+    pen->Teleport(pl, m_bTelefrag);
 
     // spawn teleport effect
     ESpawnEffect ese;
