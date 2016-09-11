@@ -37,6 +37,7 @@ properties:
   7 BOOL m_bPlayersOnly         "Players only" 'P' = TRUE,
   8 BOOL m_bForceStop           "Force stop" 'F' = FALSE,
   9 BOOL m_bTelefrag            "Telefrag" = TRUE,
+ 10 BOOL m_bSpawnEffect         "Spawn effect" 'S' = TRUE,
 
 components:
 
@@ -64,18 +65,20 @@ functions:
     // teleport back
     pen->Teleport(pl, m_bTelefrag);
 
-    // spawn teleport effect
-    ESpawnEffect ese;
-    ese.colMuliplier = C_WHITE|CT_OPAQUE;
-    ese.betType = BET_TELEPORT;
-    ese.vNormal = FLOAT3D(0,1,0);
-    FLOATaabbox3D box;
-    pen->GetBoundingBox(box);
-    FLOAT fEntitySize = box.Size().MaxNorm()*2;
-    ese.vStretch = FLOAT3D(fEntitySize, fEntitySize, fEntitySize);
-
-    CEntityPointer penEffect = CreateEntity(pl, CLASS_BASIC_EFFECT);
-    penEffect->Initialize(ese);
+    // if enabled spawn teleport effect
+    if (m_bSpawnEffect) {
+      ESpawnEffect ese;
+      ese.colMuliplier = C_WHITE|CT_OPAQUE;
+      ese.betType = BET_TELEPORT;
+      ese.vNormal = FLOAT3D(0,1,0);
+      FLOATaabbox3D box;
+      pen->GetBoundingBox(box);
+      FLOAT fEntitySize = box.Size().MaxNorm()*2;
+      ese.vStretch = FLOAT3D(fEntitySize, fEntitySize, fEntitySize);
+      
+      CEntityPointer penEffect = CreateEntity(pl, CLASS_BASIC_EFFECT);
+      penEffect->Initialize(ese);
+    }
   }
 
   // --------------------------------------------------------------------------------------
