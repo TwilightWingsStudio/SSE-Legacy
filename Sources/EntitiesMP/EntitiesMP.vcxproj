@@ -385,6 +385,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="TextFXHolder.cpp" />
     <ClCompile Include="TimeController.cpp" />
     <ClCompile Include="TouchField.cpp" />
+    <ClCompile Include="TrickyExecutor.cpp" />
     <ClCompile Include="Trigger.cpp" />
     <ClCompile Include="Twister.cpp" />
     <ClCompile Include="VariableHolder.cpp" />
@@ -724,6 +725,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="TimeController_tables.h" />
     <ClInclude Include="TouchField.h" />
     <ClInclude Include="TouchField_tables.h" />
+    <ClInclude Include="TrickyExecutor.h" />
+    <ClInclude Include="TrickyExecutor_tables.h" />
     <ClInclude Include="Trigger.h" />
     <ClInclude Include="Trigger_tables.h" />
     <ClInclude Include="Twister.h" />
@@ -2874,6 +2877,19 @@ ecc EntitiesMP/%(Filename).es </Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="TrickyExecutor.es">
+      <FileType>Document</FileType>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
 ecc EntitiesMP/%(Filename).es </Command>
     </CustomBuild>

@@ -586,6 +586,9 @@
     <ClCompile Include="SimpleTeleport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TrickyExecutor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1614,6 +1617,12 @@
     <ClInclude Include="SimpleTeleport_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TrickyExecutor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrickyExecutor_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2522,12 +2531,15 @@
     <CustomBuild Include="VariableHolder.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
+    <CustomBuild Include="Coder.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SimpleTeleport.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Coder.es">
-      <Filter>Class Files\Tools</Filter>
-    </None>
-    <None Include="SimpleTeleport.es">
+    <None Include="TrickyExecutor.es">
       <Filter>Class Files\Tools</Filter>
     </None>
   </ItemGroup>
