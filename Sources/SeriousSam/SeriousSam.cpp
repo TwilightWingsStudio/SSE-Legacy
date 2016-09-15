@@ -111,13 +111,13 @@ extern CTextureObject *_ptoLogoODI = NULL;
 extern CTextureObject *_ptoLogoEAX = NULL;
 
 extern CTString sam_strVersion = "1.10";
-extern CTString sam_strModName = TRANS("-   O P E N   S O U R C E   -");
+extern CTString sam_strModName = TRANS("-   E V O L U T I O N   -");
 
 extern CTString sam_strFirstLevel = "Levels\\LevelsMP\\1_0_InTheLastEpisode.wld";
 extern CTString sam_strIntroLevel = "Levels\\LevelsMP\\Intro.wld";
 extern CTString sam_strGameName = "serioussamse";
 
-extern CTString sam_strTechTestLevel = "Levels\\LevelsMP\\TechTest.wld";
+extern CTString sam_strTechTestLevel = "Levels\\LevelsMP\\Technology\\TechTest.wld";
 extern CTString sam_strTrainingLevel = "Levels\\KarnakDemo.wld";
 
 ENGINE_API extern INDEX snd_iFormat;
