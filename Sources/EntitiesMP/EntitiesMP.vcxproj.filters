@@ -589,6 +589,9 @@
     <ClCompile Include="TrickyExecutor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CausedKeeper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1623,6 +1626,12 @@
     <ClInclude Include="TrickyExecutor_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CausedKeeper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CausedKeeper_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2537,9 +2546,12 @@
     <CustomBuild Include="SimpleTeleport.es">
       <Filter>Class Files\AI</Filter>
     </CustomBuild>
+    <CustomBuild Include="TrickyExecutor.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="TrickyExecutor.es">
+    <None Include="CausedKeeper.es">
       <Filter>Class Files\Tools</Filter>
     </None>
   </ItemGroup>
