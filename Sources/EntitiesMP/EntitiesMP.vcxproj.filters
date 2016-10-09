@@ -565,9 +565,6 @@
     <ClCompile Include="PlayerParenter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Explosion.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MovableModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1581,12 +1578,6 @@
     <ClInclude Include="PlayerParenter_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Explosion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Explosion_tables.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MovableModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2517,9 +2508,6 @@
       <Filter>Class Files\Enemies</Filter>
     </CustomBuild>
     <CustomBuild Include="Condition.es">
-      <Filter>Class Files\Tools</Filter>
-    </CustomBuild>
-    <CustomBuild Include="Explosion.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
     <CustomBuild Include="MBTeleporter.es">
