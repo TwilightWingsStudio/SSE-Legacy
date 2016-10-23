@@ -499,6 +499,10 @@ procedures:
   };
 
   Delayed() {
+    if (m_bDebug) {
+      CPrintF(TRANS("  Type=Delayed\n"));
+    }
+
     Stuff();
 
     // if needed wait some time before event is send
@@ -606,6 +610,10 @@ procedures:
   };
 
   DelayedRandomly() {
+    if (m_bDebug) {
+      CPrintF(TRANS("  Type=DelayedRandomly\n"));
+    }
+
     Stuff();
 
     // if needed wait some time before event is send
@@ -753,6 +761,11 @@ procedures:
       }
     }
 
+    if (m_bDebug) {
+      CPrintF(TRANS("  Type=Procedural\n"));
+      CPrintF(TRANS("  Sending event to Target %d\n"), m_iPos);
+    }
+
     SendToSpecifiedTarget();
     Stuff();
     return;
@@ -769,6 +782,12 @@ procedures:
     }
 
     m_iPos = FRnd()*9+1;
+
+    if (m_bDebug) {
+      CPrintF(TRANS("  Type=Random\n"));
+      CPrintF(TRANS("  Sending event to Target %d\n"), m_iPos);
+    }
+
     SendToSpecifiedTarget();
     Stuff();
     return;
