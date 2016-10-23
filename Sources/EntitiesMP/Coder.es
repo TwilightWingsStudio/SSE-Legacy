@@ -23,9 +23,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 enum ECoderModeType {
   0 ECMT_IDECODER  "0 Decoder Index",
   1 ECMT_FDECODER  "1 Decoder Float",
-  2 ECMT_ETENCODER "3 Encoder Event Type",
+  2 ECMT_ETENCODER "2 Encoder Event Type",
   
-  //3 ECMT_TENCODER  "2 Encoder Target",
+  //3 ECMT_TENCODER  "3 Encoder Target",
 };
 
 class CCoder: CEntity {
