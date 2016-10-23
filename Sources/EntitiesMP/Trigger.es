@@ -425,7 +425,17 @@ procedures:
             }
           // else send event
           } else {
-            call SendEventToTargets();
+            if (m_eTType == TT_NORMAL) {
+              call SendEventToTargets();
+            } else if (m_eTType == TT_DELAYED) {
+              call Delayed();
+            } else if (m_eTType == TT_PROCEDURAL) {
+              call Procedural();
+            } else if (m_eTType == TT_RANDOM) {
+              call Random();
+            } else if (m_eTType == TT_DELRAND) {
+              call DelayedRandomly();
+            }
           }
         }
         resume;
