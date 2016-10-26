@@ -89,7 +89,7 @@ properties:
  100 enum EventEType m_eetDefaultType "Default Event Type" = EET_TRIGGER,
  101 CEntityPointer m_penDefaultTarget "Default Target",
  102 INDEX m_iDefaultIndex "Default Index" = 0,
- 102 INDEX m_fDefaultFloat "Default Float" = 0.0F,
+ 103 INDEX m_fDefaultFloat "Default Float" = 0.0F,
  
  150 CEntityPointer m_penCaused,
   
