@@ -1167,22 +1167,29 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
   fAdvUnit  *= fUpperSize;
   fNextUnit *= fUpperSize;
 
-  // draw oxygen info if needed
+  
   BOOL bOxygenOnScreen = FALSE;
-  fValue = _penPlayer->en_tmMaxHoldBreath - (_pTimer->CurrentTick() - _penPlayer->en_tmLastBreathed);
-  if ( _penPlayer->IsConnected() && (_penPlayer->GetFlags()&ENF_ALIVE) && fValue<30.0f) {
-    // prepare and draw oxygen info
-    fRow = pixTopBound + fOneUnit + fNextUnit;
-    fCol = 280.0f;
-    fAdv = fAdvUnit + fOneUnit*4/2 - fHalfUnit;
-    PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
-    fNormValue = fValue/30.0f;
-    fNormValue = ClampDn(fNormValue, 0.0f);
-    HUD_DrawBorder( fCol,      fRow, fOneUnit,         fOneUnit, colBorder);
-    HUD_DrawBorder( fCol+fAdv, fRow, fOneUnit*4,       fOneUnit, colBorder);
-    HUD_DrawBar(    fCol+fAdv, fRow, fOneUnit*4*0.975, fOneUnit*0.9375, BO_LEFT, NONE, fNormValue);
-    HUD_DrawIcon(   fCol,      fRow, _toOxygen, C_WHITE /*_colHUD*/, fNormValue, TRUE);
-    bOxygenOnScreen = TRUE;
+  const TIME tmMaxHoldBreath = _penPlayer->en_tmMaxHoldBreath;
+  
+  if (tmMaxHoldBreath > 0.0F)
+  {
+    fValue = tmMaxHoldBreath - (_pTimer->CurrentTick() - _penPlayer->en_tmLastBreathed);
+
+    if ( _penPlayer->IsConnected() && (_penPlayer->GetFlags()&ENF_ALIVE) && fValue < (tmMaxHoldBreath - 1.0F)) {
+      // prepare and draw oxygen info
+      fRow = pixTopBound + fOneUnit + fNextUnit;
+      fCol = 280.0f;
+      fAdv = fAdvUnit + fOneUnit*4/2 - fHalfUnit;
+      PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+      fNormValue = fValue / tmMaxHoldBreath;
+      fNormValue = ClampDn(fNormValue, 0.0f);
+
+      HUD_DrawBorder( fCol,      fRow, fOneUnit,         fOneUnit, colBorder);
+      HUD_DrawBorder( fCol+fAdv, fRow, fOneUnit*4,       fOneUnit, colBorder);
+      HUD_DrawBar(    fCol+fAdv, fRow, fOneUnit*4*0.975, fOneUnit*0.9375, BO_LEFT, NONE, fNormValue);
+      HUD_DrawIcon(   fCol,      fRow, _toOxygen, C_WHITE /*_colHUD*/, fNormValue, TRUE);
+      bOxygenOnScreen = TRUE;
+    }
   }
 
   // draw boss energy if needed
