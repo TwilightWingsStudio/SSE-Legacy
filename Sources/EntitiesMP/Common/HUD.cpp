@@ -51,7 +51,7 @@ extern FLOAT hud_fScaling;
 extern FLOAT hud_tmWeaponsOnScreen;
 extern INDEX hud_bShowMatchInfo;
 
-// SSE
+// [SSE] Sniper Scope Settings
 extern BOOL hud_bSniperScopeDraw;
 
 extern FLOAT hud_fSniperScopeBaseOpacity;
@@ -225,7 +225,9 @@ struct WeaponInfo _awiWeapons[18] = {
   { WEAPON_NONE,            NULL,                 NULL,         FALSE },   // 17
 };
 
-// compare functions for qsort()
+// --------------------------------------------------------------------------------------
+// Compare functions for qsort().
+// --------------------------------------------------------------------------------------
 static int qsort_CompareNames( const void *ppPEN0, const void *ppPEN1) {
   CPlayer &en0 = **(CPlayer**)ppPEN0;
   CPlayer &en1 = **(CPlayer**)ppPEN1;
@@ -294,7 +296,9 @@ static int qsort_CompareLatencies( const void *ppPEN0, const void *ppPEN1) {
   else              return  0;
 }
 
-// prepare color transitions
+// --------------------------------------------------------------------------------------
+// Prepare color transitions.
+// --------------------------------------------------------------------------------------
 static void PrepareColorTransitions( COLOR colFine, COLOR colHigh, COLOR colMedium, COLOR colLow,
                                      FLOAT fMediumHigh, FLOAT fLowMedium, BOOL bSmooth)
 {
@@ -307,8 +311,9 @@ static void PrepareColorTransitions( COLOR colFine, COLOR colHigh, COLOR colMedi
   _cttHUD.ctt_bSmooth     = bSmooth;
 }
 
-
-// calculates shake ammount and color value depanding on value change
+// --------------------------------------------------------------------------------------
+// Calculates shake ammount and color value depanding on value change.
+// --------------------------------------------------------------------------------------
 #define SHAKE_TIME (2.0f)
 static COLOR AddShaker( PIX const pixAmmount, INDEX const iCurrentValue, INDEX &iLastValue,
                         TIME &tmChanged, FLOAT &fMoverX, FLOAT &fMoverY)
@@ -344,8 +349,9 @@ static COLOR AddShaker( PIX const pixAmmount, INDEX const iCurrentValue, INDEX &
 //return FloatToInt(tmDelta*4) & 1 ? C_WHITE : NONE;
 }
 
-
-// get current color from local color transitions table
+// --------------------------------------------------------------------------------------
+// Get current color from local color transitions table.
+// --------------------------------------------------------------------------------------
 static COLOR GetCurrentColor( FLOAT fNormalizedValue)
 {
   // if value is in 'low' zone just return plain 'low' alert color
@@ -393,9 +399,9 @@ static COLOR GetCurrentColor( FLOAT fNormalizedValue)
   return( col & 0xFFFFFF00);
 }
 
-
-
-// fill array with players' statistics (returns current number of players in game)
+// --------------------------------------------------------------------------------------
+// Fill array with players' statistics (returns current number of players in game).
+// --------------------------------------------------------------------------------------
 extern INDEX SetAllPlayersStats( INDEX iSortKey)
 {
   // determine maximum number of players for this session
@@ -429,11 +435,11 @@ extern INDEX SetAllPlayersStats( INDEX iSortKey)
   return iPlayers;
 }
 
-
-
 // ----------------------- drawing functions
 
-// draw border with filter
+// --------------------------------------------------------------------------------------
+// Draw border with filter.
+// --------------------------------------------------------------------------------------
 static void HUD_DrawBorder( FLOAT fCenterX, FLOAT fCenterY, FLOAT fSizeX, FLOAT fSizeY, COLOR colTiles)
 {
   // determine location
@@ -474,8 +480,9 @@ static void HUD_DrawBorder( FLOAT fCenterX, FLOAT fCenterY, FLOAT fSizeX, FLOAT 
   _pDP->FlushRenderingQueue();
 }
 
-
-// draw icon texture (if color = NONE, use colortransitions structure)
+// --------------------------------------------------------------------------------------
+// Draw icon texture (if color = NONE, use colortransitions structure).
+// --------------------------------------------------------------------------------------
 static void HUD_DrawIcon( FLOAT fCenterX, FLOAT fCenterY, CTextureObject &toIcon,
                           COLOR colDefault, FLOAT fNormValue, BOOL bBlink)
 {
@@ -505,8 +512,9 @@ static void HUD_DrawIcon( FLOAT fCenterX, FLOAT fCenterY, CTextureObject &toIcon
   _pDP->FlushRenderingQueue();
 }
 
-
-// draw text (or numbers, whatever)
+// --------------------------------------------------------------------------------------
+// Draw text (or numbers, whatever).
+// --------------------------------------------------------------------------------------
 static void HUD_DrawText( FLOAT fCenterX, FLOAT fCenterY, const CTString &strText,
                           COLOR colDefault, FLOAT fNormValue)
 {
@@ -523,8 +531,9 @@ static void HUD_DrawText( FLOAT fCenterX, FLOAT fCenterY, const CTString &strTex
   _pDP->PutTextCXY( strText, pixCenterI, pixCenterJ, col|_ulAlphaHUD);
 }
 
-
-// draw bar
+// --------------------------------------------------------------------------------------
+// Draw bar.
+// --------------------------------------------------------------------------------------
 static void HUD_DrawBar( FLOAT fCenterX, FLOAT fCenterY, PIX pixSizeX, PIX pixSizeY,
                          enum BarOrientations eBarOrientation, COLOR colDefault, FLOAT fNormValue)
 {
@@ -563,6 +572,7 @@ static void HUD_DrawBar( FLOAT fCenterX, FLOAT fCenterY, PIX pixSizeX, PIX pixSi
   _pDP->Fill( pixLeft, pixUpper, pixSizeI, pixSizeJ, col|_ulAlphaHUD);
 }
 
+// --------------------------------------------------------------------------------------
 static void DrawRotatedQuad( class CTextureObject *_pTO, FLOAT fX, FLOAT fY, FLOAT fSize, ANGLE aAngle, COLOR col)
 {
   FLOAT fSinA = Sin(aAngle);
@@ -583,6 +593,7 @@ static void DrawRotatedQuad( class CTextureObject *_pTO, FLOAT fX, FLOAT fY, FLO
 
 }
 
+// --------------------------------------------------------------------------------------
 static void DrawAspectCorrectTextureCentered( class CTextureObject *_pTO, FLOAT fX, FLOAT fY, FLOAT fWidth, COLOR col)
 {
   CTextureData *ptd = (CTextureData*)_pTO->GetData();
@@ -595,7 +606,9 @@ static void DrawAspectCorrectTextureCentered( class CTextureObject *_pTO, FLOAT 
   _pDP->FlushRenderingQueue();
 }
 
-// draw sniper mask
+// --------------------------------------------------------------------------------------
+// Draw sniper mask.
+// --------------------------------------------------------------------------------------
 static void HUD_DrawSniperMask( void )
 {
   // determine location
@@ -768,7 +781,9 @@ static void HUD_DrawSniperMask( void )
 
 // helper functions
 
-// fill weapon and ammo table with current state
+// --------------------------------------------------------------------------------------
+// Fill weapon and ammo table with current state.
+// --------------------------------------------------------------------------------------
 static void FillWeaponAmmoTables(void)
 {
   // ammo quantities
@@ -857,10 +872,13 @@ static void HUD_DrawEntityStack()
 #endif
 //<<<<<<< DEBUG FUNCTIONS >>>>>>>
 
+
+// --------------------------------------------------------------------------------------
 // main
 
 // render interface (frontend) to drawport
 // (units are in pixels for 640x480 resolution - for other res HUD will be scalled automatically)
+// --------------------------------------------------------------------------------------
 extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner)
 {
   // no player - no info, sorry
@@ -1474,8 +1492,9 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
 
 }
 
-
-// initialize all that's needed for drawing the HUD
+// --------------------------------------------------------------------------------------
+// Initialize all that's needed for drawing the HUD.
+// --------------------------------------------------------------------------------------
 extern void InitHUD(void)
 {
   CPrintF("Loading HUD assets...\n");
@@ -1596,7 +1615,7 @@ extern void InitHUD(void)
   CPrintF("  done.\n");
 }
 
-
-// clean up
+// --------------------------------------------------------------------------------------
+// Clean up.
+// --------------------------------------------------------------------------------------
 extern void EndHUD(void) {}
-
