@@ -191,6 +191,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="MovableModel.cpp" />
     <ClCompile Include="PlayerInfo.cpp" />
     <ClCompile Include="PlayerParenter.cpp" />
+    <ClCompile Include="PlayerSettings.cpp" />
     <ClCompile Include="PropertyChanger.cpp" />
     <ClCompile Include="RangeDamager.cpp" />
     <ClCompile Include="RayCaster.cpp" />
@@ -433,6 +434,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="PlayerInfo_tables.h" />
     <ClInclude Include="PlayerParenter.h" />
     <ClInclude Include="PlayerParenter_tables.h" />
+    <ClInclude Include="PlayerSettings.h" />
+    <ClInclude Include="PlayerSettings_tables.h" />
     <ClInclude Include="PropertyChanger.h" />
     <ClInclude Include="PropertyChanger_tables.h" />
     <ClInclude Include="RangeDamager.h" />
@@ -2899,6 +2902,19 @@ ecc EntitiesMP/%(Filename).es </Command>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="RangeDamager.es">
+      <FileType>Document</FileType>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="PlayerSettings.es">
       <FileType>Document</FileType>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>

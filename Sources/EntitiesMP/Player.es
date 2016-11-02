@@ -27,6 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "ModelsMP/Player/SeriousSam/Body.h"
 #include "ModelsMP/Player/SeriousSam/Head.h"
 
+#include "EntitiesMP/PlayerSettings.h"
 #include "EntitiesMP/PlayerMarker.h"
 #include "EntitiesMP/PlayerWeapons.h"
 #include "EntitiesMP/PlayerAnimator.h"
@@ -339,6 +340,7 @@ static INDEX cht_bGiveAll    = FALSE;
 static INDEX cht_bOpen       = FALSE;
 static INDEX cht_bAllMessages= FALSE;
 static INDEX cht_bRefresh    = FALSE;
+extern INDEX cht_bRevive     = FALSE;
 extern INDEX cht_bGod        = FALSE;
 extern INDEX cht_bFly        = FALSE;
 extern INDEX cht_bGhost      = FALSE;
@@ -815,6 +817,7 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("user INDEX cht_bGiveAll;",   &cht_bGiveAll);
   _pShell->DeclareSymbol("user INDEX cht_bKillAll;",   &cht_bKillAll);
   _pShell->DeclareSymbol("user INDEX cht_bKillAllAura;", &cht_bKillAllAura);
+  _pShell->DeclareSymbol("user INDEX cht_bRevive;", &cht_bRevive);
   _pShell->DeclareSymbol("user INDEX cht_bOpen;",      &cht_bOpen);
   _pShell->DeclareSymbol("user INDEX cht_bAllMessages;", &cht_bAllMessages);
   _pShell->DeclareSymbol("user FLOAT cht_fTranslationMultiplier ;", &cht_fTranslationMultiplier);
@@ -869,6 +872,7 @@ void CPlayer_OnInitClass(void)
   CPlayer_Precache();
 }
 
+
 // clean up
 void CPlayer_OnEndClass(void)
 {
@@ -880,43 +884,47 @@ CTString GetDifficultyString(void)
   if (GetSP()->sp_bMental) { return TRANS("Mental"); }
 
   switch (GetSP()->sp_gdGameDifficulty) {
-  case CSessionProperties::GD_TOURIST:  return TRANS("Tourist");
-  case CSessionProperties::GD_EASY:     return TRANS("Easy");
-  default:
-  case CSessionProperties::GD_NORMAL:   return TRANS("Normal");
-  case CSessionProperties::GD_HARD:     return TRANS("Hard");
-  case CSessionProperties::GD_EXTREME:  return TRANS("Serious");
+    case CSessionProperties::GD_TOURIST:  return TRANS("Tourist");
+    case CSessionProperties::GD_EASY:     return TRANS("Easy");
+    default:
+    case CSessionProperties::GD_NORMAL:   return TRANS("Normal");
+    case CSessionProperties::GD_HARD:     return TRANS("Hard");
+    case CSessionProperties::GD_EXTREME:  return TRANS("Serious");
   }
 }
+
 // armor & health constants getters
 
 FLOAT MaxArmor(void)
 {
-  if (GetSP()->sp_gdGameDifficulty<=CSessionProperties::GD_EASY) {
+  if (GetSP()->sp_gdGameDifficulty <= CSessionProperties::GD_EASY) {
     return 300;
   } else {
     return 200;
   }
 }
+
 FLOAT TopArmor(void)
 {
-  if (GetSP()->sp_gdGameDifficulty<=CSessionProperties::GD_EASY) {
+  if (GetSP()->sp_gdGameDifficulty <= CSessionProperties::GD_EASY) {
     return 200;
   } else {
     return 100;
   }
 }
+
 FLOAT MaxHealth(void)
 {
-  if (GetSP()->sp_gdGameDifficulty<=CSessionProperties::GD_EASY) {
+  if (GetSP()->sp_gdGameDifficulty <= CSessionProperties::GD_EASY) {
     return 300;
   } else {
     return 200;
   }
 }
+
 FLOAT TopHealth(void)
 {
-  if (GetSP()->sp_gdGameDifficulty<=CSessionProperties::GD_EASY) {
+  if (GetSP()->sp_gdGameDifficulty <= CSessionProperties::GD_EASY) {
     return 200;
   } else {
     return 100;
@@ -950,23 +958,24 @@ static EntityInfo eiPlayerSwim = {
 const char *NameForState(PlayerState pst)
 {
   switch(pst) {
-  case PST_STAND: return "stand";
-  case PST_CROUCH: return "crouch";
-  case PST_FALL: return "fall";
-  case PST_SWIM: return "swim";
-  case PST_DIVE: return "dive";
-  default: return "???";
+    case PST_STAND: return "stand";
+    case PST_CROUCH: return "crouch";
+    case PST_FALL: return "fall";
+    case PST_SWIM: return "swim";
+    case PST_DIVE: return "dive";
+    default: return "???";
   };
 }
 
-
-// print explanation on how a player died
+// --------------------------------------------------------------------------------------
+// Print explanation on how a player died.
+// --------------------------------------------------------------------------------------
 void PrintPlayerDeathMessage(CPlayer *ppl, const EDeath &eDeath)
 {
   CTString strMyName = ppl->GetPlayerName();
   CEntity *penKiller = eDeath.eLastDamage.penInflictor;
   // if killed by a valid entity
-  if (penKiller!=NULL) {
+  if (penKiller != NULL) {
     // if killed by a player
     if (IsOfClass(penKiller, "Player")) {
       // if not self
@@ -1048,6 +1057,7 @@ properties:
   6 FLOAT m_fMaxHealth = 1,                 // default health supply player can have
   7 INDEX m_ulFlags = 0,                      // various flags
   
+ 15 CEntityPointer m_penSettings,             // SSE: player settings
  16 CEntityPointer m_penWeapons,              // player weapons
  17 CEntityPointer m_penAnimator,             // player animator
  18 CEntityPointer m_penView,                 // player view
@@ -1329,11 +1339,13 @@ components:
 
 functions:
 
+  // --------------------------------------------------------------------------------------
   INDEX GenderSound(INDEX iSound)
   {
     return iSound+m_iGender*GENDEROFFSET;
   }
 
+  // --------------------------------------------------------------------------------------
   void AddBouble( FLOAT3D vPos, FLOAT3D vSpeedRelative)
   {
     ShellLaunchData &sld = m_asldData[m_iFirstEmptySLD];
@@ -1348,6 +1360,7 @@ functions:
     m_iFirstEmptySLD = (m_iFirstEmptySLD+1) % MAX_FLYING_SHELLS;
   }
 
+  // --------------------------------------------------------------------------------------
   void ClearShellLaunchData( void)
   {
     // clear flying shells data array
@@ -1358,6 +1371,7 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   void AddBulletSpray( FLOAT3D vPos, EffectParticlesType eptType, FLOAT3D vStretch)
   {
     BulletSprayLaunchData &bsld = m_absldData[m_iFirstEmptyBSLD];
@@ -1371,6 +1385,7 @@ functions:
     m_iFirstEmptyBSLD = (m_iFirstEmptyBSLD+1) % MAX_BULLET_SPRAYS;
   }
 
+  // --------------------------------------------------------------------------------------
   void ClearBulletSprayLaunchData( void)
   {
     m_iFirstEmptyBSLD = 0;
@@ -1380,6 +1395,7 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   void AddGoreSpray( FLOAT3D vPos, FLOAT3D v3rdPos, SprayParticlesType sptType, FLOAT3D vSpilDirection,
     FLOATaabbox3D boxHitted, FLOAT fDamagePower, COLOR colParticles)
   {
@@ -1398,6 +1414,7 @@ functions:
     m_iFirstEmptyGSLD = (m_iFirstEmptyGSLD+1) % MAX_GORE_SPRAYS;
   }
 
+  // --------------------------------------------------------------------------------------
   void ClearGoreSprayLaunchData( void)
   {
     m_iFirstEmptyGSLD = 0;
@@ -1407,6 +1424,7 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   void CPlayer(void) 
   {
     // clear flying shells data array
@@ -1422,22 +1440,27 @@ functions:
     // ... or not
   }
 
+  // --------------------------------------------------------------------------------------
   class CPlayerWeapons *GetPlayerWeapons(void)
   {
     ASSERT(m_penWeapons!=NULL);
     return (CPlayerWeapons *)&*m_penWeapons;
   }
+
+  // --------------------------------------------------------------------------------------
   class CPlayerAnimator *GetPlayerAnimator(void)
   {
     ASSERT(m_penAnimator!=NULL);
     return (CPlayerAnimator *)&*m_penAnimator;
   }
 
+  // --------------------------------------------------------------------------------------
   CPlayerSettings *GetSettings(void)
   {
     return (CPlayerSettings *)en_pcCharacter.pc_aubAppearance;
   }
 
+  // --------------------------------------------------------------------------------------
   export void Copy(CEntity &enOther, ULONG ulFlags)
   {
     CPlayerEntity::Copy(enOther, ulFlags);
@@ -1468,7 +1491,9 @@ functions:
     }
   }
 
-  // update smoothed (average latency)
+  // --------------------------------------------------------------------------------------
+  // Update smoothed (average latency).
+  // --------------------------------------------------------------------------------------
   void UpdateLatency(FLOAT tmLatencyNow)
   {
     TIME tmNow = _pTimer->GetHighPrecisionTimer().GetSeconds();
@@ -1495,7 +1520,9 @@ functions:
     }
   }
 
-  // check character data for invalid values
+  // --------------------------------------------------------------------------------------
+  // Check character data for invalid values.
+  // --------------------------------------------------------------------------------------
   void ValidateCharacter(void)
   {
     // if in single player or flyover
@@ -1505,7 +1532,10 @@ functions:
       memset(pps->ps_achModelFile, 0, sizeof(pps->ps_achModelFile));
     }
   }
-  // parse gender from your name
+
+  // --------------------------------------------------------------------------------------
+  // Parse gender from your name.
+  // --------------------------------------------------------------------------------------
   void ParseGender(CTString &strName)
   {
     if (strName.RemovePrefix("#male#")) {
@@ -1517,6 +1547,7 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   void CheckHighScore(void)
   {
     // if not playing a demo
@@ -1540,6 +1571,7 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   CTString GetPredictName(void) const
   {
     if (IsPredicted()) {
@@ -1552,7 +1584,10 @@ functions:
       return "no prediction";
     }
   }
+
+  // --------------------------------------------------------------------------------------
   /* Write to stream. */
+  // --------------------------------------------------------------------------------------
   void Write_t( CTStream *ostr) // throw char *
   {
     CPlayerEntity::Write_t(ostr);
@@ -1568,7 +1603,10 @@ functions:
     ostr->Write_t(&m_psGameStats , sizeof(m_psGameStats ));
     ostr->Write_t(&m_psGameTotal , sizeof(m_psGameTotal ));
   }
+
+  // --------------------------------------------------------------------------------------
   /* Read from stream. */
+  // --------------------------------------------------------------------------------------
   void Read_t( CTStream *istr) // throw char *
   { 
     CPlayerEntity::Read_t(istr);
@@ -1607,7 +1645,9 @@ functions:
     SetupLightSource();
   };
 
+  // --------------------------------------------------------------------------------------
   /* Get static light source information. */
+  // --------------------------------------------------------------------------------------
   CLightSource *GetLightSource(void)
   {
     if (!IsPredictor()) {
@@ -1623,19 +1663,25 @@ functions:
     m_tmPredict = _pTimer->CurrentTick()+tmAdvance;
   }
 
-  // called by engine to get the upper time limit 
+  // --------------------------------------------------------------------------------------
+  // Called by engine to get the upper time limit 
+  // --------------------------------------------------------------------------------------
   TIME GetPredictionTime(void)   // return moment in time up to which to predict this entity
   {
     return m_tmPredict;
   }
 
-  // get maximum allowed range for predicting this entity
+  // --------------------------------------------------------------------------------------
+  // Get maximum allowed range for predicting this entity
+  // --------------------------------------------------------------------------------------
   FLOAT GetPredictionRange(void)
   {
     return cli_fPredictPlayersRange;
   }
 
-  // add to prediction any entities that this entity depends on
+  // --------------------------------------------------------------------------------------
+  // Add to prediction any entities that this entity depends on.
+  // --------------------------------------------------------------------------------------
   void AddDependentsToPrediction(void)
   {
     m_penWeapons->AddToPrediction();
@@ -1644,7 +1690,9 @@ functions:
     m_pen3rdPersonView->AddToPrediction();
   }
 
-  // get in-game time for statistics
+  // --------------------------------------------------------------------------------------
+  // Get in-game time for statistics.
+  // --------------------------------------------------------------------------------------
   TIME GetStatsInGameTimeLevel(void)
   {
     if (m_bEndOfLevel) {
@@ -1653,6 +1701,8 @@ functions:
       return _pNetwork->GetGameTime()-m_tmLevelStarted;
     }
   }
+
+  // --------------------------------------------------------------------------------------
   TIME GetStatsInGameTimeGame(void)
   {
     if (m_bEndOfLevel) {
@@ -1662,6 +1712,7 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   FLOAT GetStatsRealWorldTime(void)
   {
     time_t timeNow;
@@ -1673,6 +1724,7 @@ functions:
     return (FLOAT)difftime( timeNow, m_iStartTime);
   }
 
+  // --------------------------------------------------------------------------------------
   CTString GetStatsRealWorldStarted(void)
   {
     struct tm *newtime;
@@ -1687,7 +1739,9 @@ functions:
     return strTimeline;
   }
 
-  // fill in player statistics
+  // --------------------------------------------------------------------------------------
+  // Fill in player statistics.
+  // --------------------------------------------------------------------------------------
   export void GetStats( CTString &strStats, const CompStatType csType, INDEX ctCharsPerRow)
   {
 
@@ -1712,7 +1766,9 @@ functions:
     }
   }
 
-  // get short one-line statistics - used for savegame descriptions and similar
+  // --------------------------------------------------------------------------------------
+  // Get short one-line statistics - used for savegame descriptions and similar.
+  // --------------------------------------------------------------------------------------
   void GetShortStats(CTString &strStats)
   {
     strStats.PrintF( TRANS("%s %s Score: %d Kills: %d/%d"), 
@@ -1720,7 +1776,9 @@ functions:
                      m_psLevelStats.ps_iScore, m_psLevelStats.ps_iKills, m_psLevelTotal.ps_iKills);
   }
 
-  // get detailed statistics for deathmatch game
+  // --------------------------------------------------------------------------------------
+  // Get detailed statistics for deathmatch game.
+  // --------------------------------------------------------------------------------------
   void GetDetailStatsDM(CTString &strStats)
   {
     extern INDEX SetAllPlayersStats( INDEX iSortKey);
@@ -1795,7 +1853,9 @@ functions:
     }}
   }
 
-  // get singleplayer statistics
+  // --------------------------------------------------------------------------------------
+  // Get singleplayer statistics.
+  // --------------------------------------------------------------------------------------
   void GetDetailStatsCoop(CTString &strStats)
   {
     // first put in your full stats
@@ -1873,7 +1933,9 @@ functions:
     }}
   }
 
-  // get singleplayer statistics
+  // --------------------------------------------------------------------------------------
+  // Get singleplayer statistics.
+  // --------------------------------------------------------------------------------------
   void GetDetailStatsSP(CTString &strStats, INDEX iCoopType)
   {
     if (iCoopType<=1) {
@@ -1961,7 +2023,9 @@ functions:
     }
   }
 
-  // provide info for GameAgent enumeration
+  // --------------------------------------------------------------------------------------
+  // Provide info for GameAgent enumeration.
+  // --------------------------------------------------------------------------------------
   void GetGameAgentPlayerInfo( INDEX iPlayer, CTString &strOut) 
   {
     CTString strPlayerName = GetPlayerName();
@@ -1991,8 +2055,10 @@ functions:
     strKey.PrintF("ping_%d\x02%d\x03", iPlayer, INDEX(ceil(en_tmPing*1000.0f)));
     strOut+=strKey;
   };
-  
-  // provide info for MSLegacy enumeration
+
+  // --------------------------------------------------------------------------------------
+  // Provide info for MSLegacy enumeration.
+  // --------------------------------------------------------------------------------------
   void GetMSLegacyPlayerInf( INDEX iPlayer, CTString &strOut)
   {
     CTString strKey;
@@ -2009,7 +2075,9 @@ functions:
     strOut+=strKey;
   };
   
-  // check if message is in inbox
+  // --------------------------------------------------------------------------------------
+  // Check if message is in inbox.
+  // --------------------------------------------------------------------------------------
   BOOL HasMessage( const CTFileName &fnmMessage)
   {
     ULONG ulHash = fnmMessage.GetHash();
@@ -2023,7 +2091,9 @@ functions:
     return FALSE;
   }
 
-  // receive a computer message and put it in inbox if not already there
+  // --------------------------------------------------------------------------------------
+  // Receive a computer message and put it in inbox if not already there.
+  // --------------------------------------------------------------------------------------
   void ReceiveComputerMessage(const CTFileName &fnmMessage, ULONG ulFlags)
   {
     // if already received
@@ -2046,6 +2116,7 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   void SayVoiceMessage(const CTFileName &fnmMessage)
   {
     if (GetSettings()->ps_ulFlags&PSF_NOQUOTES) {
@@ -2055,7 +2126,9 @@ functions:
     PlaySound( m_soSpeech, fnmMessage, SOF_3D|SOF_VOLUMETRIC);
   }
 
-  // receive all messages in one directory - cheat
+  // --------------------------------------------------------------------------------------
+  // Receive all messages in one directory - cheat.
+  // --------------------------------------------------------------------------------------
   void CheatAllMessagesDir(const CTString &strDir, ULONG ulFlags)
   {
     // list the directory
@@ -2070,7 +2143,9 @@ functions:
     }
   }
 
-  // receive all messages - cheat
+  // --------------------------------------------------------------------------------------
+  // Receive all messages - cheat.
+  // --------------------------------------------------------------------------------------
   void CheatAllMessages(void)
   {
     //CheatAllMessagesDir("Data\\Messages\\information\\");
@@ -2085,7 +2160,9 @@ functions:
     CheatAllMessagesDir("DataMP\\Messages\\background\\", 0);
   }
 
-  // mark that an item was picked
+  // --------------------------------------------------------------------------------------
+  // Mark that an item was picked.
+  // --------------------------------------------------------------------------------------
   void ItemPicked(const CTString &strName, FLOAT fAmmount)
   {
     // if nothing picked too long
@@ -2107,7 +2184,9 @@ functions:
     m_tmLastPicked = _pTimer->CurrentTick();
   }
 
-  // Setup light source
+  // --------------------------------------------------------------------------------------
+  // Setup light source.
+  // --------------------------------------------------------------------------------------
   void SetupLightSource(void)
   {
     // setup light source
@@ -2124,14 +2203,16 @@ functions:
     m_lsLightSource.SetLightSource(lsNew);
   };
 
-  // play light animation
+  // --------------------------------------------------------------------------------------
+  // Play light animation.
+  // --------------------------------------------------------------------------------------
   void PlayLightAnim(INDEX iAnim, ULONG ulFlags) {
     if (m_aoLightAnimation.GetData()!=NULL) {
       m_aoLightAnimation.PlayAnim(iAnim, ulFlags);
     }
   };
 
-
+  // --------------------------------------------------------------------------------------
   BOOL AdjustShadingParameters(FLOAT3D &vLightDirection, COLOR &colLight, COLOR &colAmbient) 
   {
     if ( cht_bDumpPlayerShading)
@@ -2159,7 +2240,9 @@ functions:
     return CPlayerEntity::AdjustShadingParameters(vLightDirection, colLight, colAmbient);
   };
 
-  // get a different model object for rendering
+  // --------------------------------------------------------------------------------------
+  // Get a different model object for rendering.
+  // --------------------------------------------------------------------------------------
   CModelObject *GetModelForRendering(void)
   {
     // if not yet initialized
@@ -2229,12 +2312,16 @@ functions:
     return &m_moRender;
   }
 
-  // wrapper for action marker getting
+  // --------------------------------------------------------------------------------------
+  // Wrapper for action marker getting.
+  // --------------------------------------------------------------------------------------
   class CPlayerActionMarker *GetActionMarker(void) {
     return (CPlayerActionMarker *)&*m_penActionMarker;
   }
 
-  // find main music holder if not remembered
+  // --------------------------------------------------------------------------------------
+  // Find main music holder if not remembered.
+  // --------------------------------------------------------------------------------------
   void FindMusicHolder(void)
   {
     if (m_penMainMusicHolder==NULL) {
@@ -2242,7 +2329,9 @@ functions:
     }
   }
 
-  // update per-level stats
+  // --------------------------------------------------------------------------------------
+  // Update per-level stats.
+  // --------------------------------------------------------------------------------------
   void UpdateLevelStats(void)
   {
     // clear stats for this level
@@ -2265,7 +2354,9 @@ functions:
     m_psGameTotal.ps_iSecrets += mh.m_ctSecretsInWorld;
   }
 
-  // check if there is fuss
+  // --------------------------------------------------------------------------------------
+  // Check if there is fuss.
+  // --------------------------------------------------------------------------------------
   BOOL IsFuss(void)
   {
     // if no music holder
@@ -2277,20 +2368,27 @@ functions:
     return ((CMusicHolder*)&*m_penMainMusicHolder)->m_cenFussMakers.Count()>0;
   }
 
+  // --------------------------------------------------------------------------------------
   void SetDefaultMouthPitch(void)
   {
     m_soMouth.Set3DParameters(50.0f, 10.0f, 1.0f, 1.0f);
   }
+
+  // --------------------------------------------------------------------------------------
   void SetRandomMouthPitch(FLOAT fMin, FLOAT fMax)
   {
     m_soMouth.Set3DParameters(50.0f, 10.0f, 1.0f, Lerp(fMin, fMax, FRnd()));
   }
+
+  // --------------------------------------------------------------------------------------
   void SetSpeakMouthPitch(void)
   {
     m_soSpeech.Set3DParameters(50.0f, 10.0f, 2.0f, 1.0f);
   }
 
-  // added: also shake view because of chainsaw firing
+  // --------------------------------------------------------------------------------------
+  // Added: also shake view because of chainsaw firing.
+  // --------------------------------------------------------------------------------------
   void ApplyShaking(CPlacement3D &plViewer)
   {
     // chainsaw shaking
@@ -2344,6 +2442,7 @@ functions:
     
   }
 
+  // --------------------------------------------------------------------------------------
   COLOR GetWorldGlaring(void)
   {
     CWorldSettingsController *pwsc = GetWSC(this);
@@ -2357,6 +2456,7 @@ functions:
     return colResult;
   }
 
+  // --------------------------------------------------------------------------------------
   void RenderScroll(CDrawPort *pdp)
   {
     CWorldSettingsController *pwsc = GetWSC(this);
@@ -2367,6 +2467,7 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   void RenderCredits(CDrawPort *pdp)
   {
     CWorldSettingsController *pwsc = GetWSC(this);
@@ -2377,6 +2478,7 @@ functions:
     }
   }
   
+  // --------------------------------------------------------------------------------------
   void RenderTextFX(CDrawPort *pdp)
   {
     CWorldSettingsController *pwsc = GetWSC(this);
@@ -2387,6 +2489,7 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   void RenderHudPicFX(CDrawPort *pdp)
   {
     CWorldSettingsController *pwsc = GetWSC(this);
@@ -2401,7 +2504,9 @@ functions:
  *                    RENDER GAME VIEW                      *
  ************************************************************/
 
-  // setup viewing parameters for viewing from player or camera
+  // --------------------------------------------------------------------------------------
+  // Setup viewing parameters for viewing from player or camera.
+  // --------------------------------------------------------------------------------------
   void SetupView(CDrawPort *pdp, CAnyProjection3D &apr, CEntity *&penViewer, 
     CPlacement3D &plViewer, COLOR &colBlend, BOOL bCamera)
   {
@@ -2475,7 +2580,9 @@ functions:
     prPlayerProjection->Prepare();
   }
 
-  // listen from a given viewer
+  // --------------------------------------------------------------------------------------
+  // Listen from a given viewer.
+  // --------------------------------------------------------------------------------------
   void ListenFromEntity(CEntity *penListener, const CPlacement3D &plSound)
   {
     FLOATmatrix3D mRotation;
@@ -2506,7 +2613,9 @@ functions:
     _pSound->Listen(sliSound);
   }
 
-  // render dummy view (not connected yet)
+  // --------------------------------------------------------------------------------------
+  // Render dummy view (not connected yet).
+  // --------------------------------------------------------------------------------------
   void RenderDummyView(CDrawPort *pdp)
   {
     // clear screen
@@ -2527,7 +2636,9 @@ functions:
     }
   }
 
-  // render view from player
+  // --------------------------------------------------------------------------------------
+  // Render view from player.
+  // --------------------------------------------------------------------------------------
   void RenderPlayerView(CDrawPort *pdp, BOOL bShowExtras)
   {
 
@@ -2612,7 +2723,9 @@ functions:
     }
   }
 
-  // render view from camera
+  // --------------------------------------------------------------------------------------
+  // Render view from camera.
+  // --------------------------------------------------------------------------------------
   void RenderCameraView(CDrawPort *pdp, BOOL bListen)
   {
     CDrawPort dpCamera;
@@ -2693,7 +2806,7 @@ functions:
     }
   }
 
-
+  // --------------------------------------------------------------------------------------
   void RenderGameView(CDrawPort *pdp, void *pvUserData)
   {
     BOOL bShowExtras = (ULONG(pvUserData)&GRV_SHOWEXTRAS);
@@ -2763,13 +2876,13 @@ functions:
   };
 
 
-
-
 /************************************************************
  *                   PRE/DO/POST MOVING                     *
  ************************************************************/
 
-  // premoving for soft player up-down movement
+  // --------------------------------------------------------------------------------------
+  // Premoving for soft player up-down movement.
+  // --------------------------------------------------------------------------------------
   void PreMoving(void) {
     /*CPrintF("pos(%s): %g,%g,%g\n", GetPredictName(), 
       GetPlacement().pl_PositionVector(1),
@@ -2781,7 +2894,9 @@ functions:
     CPlayerEntity::PreMoving();
   };
 
-  // do moving
+  // --------------------------------------------------------------------------------------
+  // Do moving.
+  // --------------------------------------------------------------------------------------
   void DoMoving(void) {
     CPlayerEntity::DoMoving();
     ((CPlayerAnimator&)*m_penAnimator).AnimateBanking();
@@ -2793,9 +2908,106 @@ functions:
       ((CPlayerView&)*m_pen3rdPersonView).DoMoving();
     }
   };
+  
+  // --------------------------------------------------------------------------------------
+  void ProcessRegen(void)
+  {
+    // [SSE] CPlayerSettingsEntity
+    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive)
+    {
+      CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
+      
+      const FLOAT tmLastDamageDelta = _pTimer->CurrentTick() - m_tmLastDamage;
 
+      FLOAT fValue = GetHealth();
+      FLOAT fTopValue = enSettings.m_fTopHealth;
+      FLOAT fMaxValue = enSettings.m_fMaxHealth;
 
-  // postmoving for soft player up-down movement
+      FLOAT fRegenValue = enSettings.m_fHealthRegenValue;
+      FLOAT fMinRegenValue = enSettings.m_fHealthRegenMin;
+      FLOAT fMaxRegenValue = enSettings.m_fHealthRegenMax;
+
+      if (fRegenValue != 0.0F && tmLastDamageDelta > enSettings.m_fHealthRegenTimer)
+      {
+        // Value
+        switch (enSettings.m_etrvtHealthRegenValType) {
+          case PSHRT_PERCENT_OF_CURHEALTH: fRegenValue *= fValue; break;
+          case PSHRT_PERCENT_OF_TOPHEALTH: fRegenValue *= fTopValue; break;
+          case PSHRT_PERCENT_OF_MAXHEALTH: fRegenValue *= fMaxValue; break;
+        }
+        
+        // Min Value
+        switch (enSettings.m_etrvtHealthRegenMinType) {
+          case PSHRT_PERCENT_OF_CURHEALTH: fMinRegenValue *= fValue; break;
+          case PSHRT_PERCENT_OF_TOPHEALTH: fMinRegenValue *= fTopValue; break;
+          case PSHRT_PERCENT_OF_MAXHEALTH: fMinRegenValue *= fMaxValue; break;
+        }
+        
+        // Max Value
+        switch (enSettings.m_etrvtHealthRegenMaxType) {
+          case PSHRT_PERCENT_OF_CURHEALTH: fMaxRegenValue *= fValue; break;
+          case PSHRT_PERCENT_OF_TOPHEALTH: fMaxRegenValue *= fTopValue; break;
+          case PSHRT_PERCENT_OF_MAXHEALTH: fMaxRegenValue *= fMaxValue; break;
+        }
+        
+        if (fValue >= fMinRegenValue && fValue < fMaxRegenValue) {
+          SetHealth(ClampUp(fValue + fRegenValue, fMaxRegenValue));
+        } 
+      }
+
+      // ARMOR REGENERATION CODE NEXT
+      fRegenValue = enSettings.m_fArmorRegenValue;
+
+      if (fRegenValue != 0.0F && tmLastDamageDelta > enSettings.m_fArmorRegenTimer)
+      {
+        fValue = m_fArmor;
+        fTopValue = enSettings.m_fTopArmor;
+        fMaxValue = enSettings.m_fMaxArmor;
+        
+        fMinRegenValue = enSettings.m_fArmorRegenMin;
+        fMaxRegenValue = enSettings.m_fArmorRegenMax;
+        
+        // Value
+        switch (enSettings.m_etrvtArmorRegenValType) {
+          case PSART_PERCENT_OF_CURARMOR: fRegenValue *= fValue; break;
+          case PSART_PERCENT_OF_TOPARMOR: fRegenValue *= fTopValue; break;
+          case PSART_PERCENT_OF_MAXARMOR: fRegenValue *= fMaxValue; break;
+        }
+        
+        // Min Value
+        switch (enSettings.m_etrvtArmorRegenMinType) {
+          case PSART_PERCENT_OF_CURARMOR: fMinRegenValue *= fValue; break;
+          case PSART_PERCENT_OF_TOPARMOR: fMinRegenValue *= fTopValue; break;
+          case PSART_PERCENT_OF_MAXARMOR: fMinRegenValue *= fMaxValue; break;
+        }
+        
+        // Max Value
+        switch (enSettings.m_etrvtArmorRegenMaxType) {
+          case PSART_PERCENT_OF_CURARMOR: fMaxRegenValue *= fValue; break;
+          case PSART_PERCENT_OF_TOPARMOR: fMaxRegenValue *= fTopValue; break;
+          case PSART_PERCENT_OF_MAXARMOR: fMaxRegenValue *= fMaxValue; break;
+        }
+        
+        if (fValue >= fMinRegenValue && fValue < fMaxRegenValue) {
+          m_fArmor = ClampUp(fValue + fRegenValue, fMaxRegenValue);
+        }
+      }
+    } else {
+      // if in tourist mode
+      if (GetSP()->sp_gdGameDifficulty == CSessionProperties::GD_TOURIST) {
+        // slowly increase health with time
+        FLOAT fHealth = GetHealth();
+        FLOAT fTopHealth = TopHealth();
+        if (fHealth < fTopHealth) {
+          SetHealth(ClampUp(fHealth + _pTimer->TickQuantum, fTopHealth));  // one unit per second
+        }
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------------------------
+  // Postmoving for soft player up-down movement.
+  // --------------------------------------------------------------------------------------
   void PostMoving(void)
   {
     CPlayerEntity::PostMoving();
@@ -2814,16 +3026,9 @@ functions:
       INDEX iNewMana = m_fManaFraction;
       m_iMana         += iNewMana;
       m_fManaFraction -= iNewMana;
-    }
 
-    // if in tourist mode
-    if (GetSP()->sp_gdGameDifficulty==CSessionProperties::GD_TOURIST && GetFlags()&ENF_ALIVE) {
-      // slowly increase health with time
-      FLOAT fHealth = GetHealth();
-      FLOAT fTopHealth = TopHealth();
-      if (fHealth<fTopHealth) {
-        SetHealth(ClampUp(fHealth+_pTimer->TickQuantum, fTopHealth));  // one unit per second
-      }
+      // RENERATION
+      ProcessRegen();
     }
 
     // update ray hit for weapon target
@@ -2846,7 +3051,9 @@ functions:
     m_ulFlags&=~PLF_APPLIEDACTION;
   }
 
-  // set player parameters for unconnected state (between the server loads and player reconnects)
+  // --------------------------------------------------------------------------------------
+  // Set player parameters for unconnected state (between the server loads and player reconnects).
+  // --------------------------------------------------------------------------------------
   void SetUnconnected(void)
   {
     if (m_ulFlags&PLF_NOTCONNECTED) {
@@ -2866,7 +3073,9 @@ functions:
       AOF_LOOPING|AOF_NORESTART);
   }
 
-  // set player parameters for connected state
+  // --------------------------------------------------------------------------------------
+  // Set player parameters for connected state.
+  // --------------------------------------------------------------------------------------
   void SetConnected(void)
   {
     if (!(m_ulFlags&PLF_NOTCONNECTED)) {
@@ -2878,13 +3087,17 @@ functions:
     SetCollisionFlags(GetCollisionFlags() | ((ECBI_BRUSH|ECBI_MODEL)<<ECB_TEST));
   }
 
-  // check if player is connected or not
+  // --------------------------------------------------------------------------------------
+  // Check if player is connected or not.
+  // --------------------------------------------------------------------------------------
   BOOL IsConnected(void) const
   {
     return !(m_ulFlags&PLF_NOTCONNECTED);
   }
 
-  // create a checksum value for sync-check
+  // --------------------------------------------------------------------------------------
+  // Create a checksum value for sync-check.
+  // --------------------------------------------------------------------------------------
   void ChecksumForSync(ULONG &ulCRC, INDEX iExtensiveSyncCheck)
   {
     CPlayerEntity::ChecksumForSync(ulCRC, iExtensiveSyncCheck);
@@ -2896,8 +3109,9 @@ functions:
     CRC_AddFLOAT(ulCRC, m_fArmor);
   }
 
-
-  // dump sync data to text file
+  // --------------------------------------------------------------------------------------
+  // Dump sync data to text file.
+  // --------------------------------------------------------------------------------------
   void DumpSync_t(CTStream &strm, INDEX iExtensiveSyncCheck)  // throw char *
   {
     CPlayerEntity::DumpSync_t(strm, iExtensiveSyncCheck);
@@ -2910,9 +3124,9 @@ functions:
 /************************************************************
  *         DAMAGE OVERRIDE (PLAYER HAS ARMOR)               *
  ************************************************************/
-
-
-  // leave stain
+  // --------------------------------------------------------------------------------------
+  // Leave stain.
+  // --------------------------------------------------------------------------------------
   virtual void LeaveStain( BOOL bGrow)
   {
     ESpawnEffect ese;
@@ -2948,7 +3162,7 @@ functions:
     }
   };
 
-
+  // --------------------------------------------------------------------------------------
   void DamageImpact(enum DamageType dmtType,
                   FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection)
   {
@@ -3093,8 +3307,9 @@ functions:
     m_fSprayDamage += fDamageAmmount;
   }
 
-
+  // --------------------------------------------------------------------------------------
   /* Receive damage */
+  // --------------------------------------------------------------------------------------
   void ReceiveDamage( CEntity *penInflictor, enum DamageType dmtType,
                       FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection)
   {
@@ -3139,8 +3354,15 @@ functions:
 
     // adjust for difficulty
     FLOAT fDifficultyDamage = GetSP()->sp_fDamageStrength;
-    if ( fDifficultyDamage<=1.0f || penInflictor!=this) {
+    if ( fDifficultyDamage <= 1.0f || penInflictor != this) {
       fDamageAmmount *= fDifficultyDamage;
+    }
+
+    // [SSE] CPlayerSettingsEntity
+    CPlayerSettingsEntity *penSettings = NULL;
+    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+      fDamageAmmount *=  ((CPlayerSettingsEntity&)*m_penSettings).m_fDamageReceiveMul;
+      penSettings = (CPlayerSettingsEntity *)&*m_penSettings;
     }
 
     // ignore zero damages
@@ -3154,7 +3376,12 @@ functions:
       fSubHealth = fDamageAmmount;
     } else {
       // damage and armor
-      fSubArmor  = fDamageAmmount*2.0f/3.0f;      // 2/3 on armor damage
+      if (penSettings) {
+        fSubArmor  = fDamageAmmount * penSettings->m_fArmorAbsorbtionMul;
+      } else {
+        fSubArmor  = fDamageAmmount * 2.0f / 3.0f;      // 2/3 on armor damage
+      }
+
       fSubHealth = fDamageAmmount - fSubArmor;    // 1/3 on health damage
       m_fArmor  -= fSubArmor;                     // decrease armor
 
@@ -3258,7 +3485,9 @@ functions:
     }
   };
 
-  // should this player blow up (spawn debris)
+  // --------------------------------------------------------------------------------------
+  // Should this player blow up (spawn debris).
+  // --------------------------------------------------------------------------------------
   BOOL ShouldBlowUp(void) 
   {
     // blow up if
@@ -3273,7 +3502,9 @@ functions:
       GetRenderType()==RT_MODEL;
   };
 
-  // spawn body parts
+  // --------------------------------------------------------------------------------------
+  // Spawn body parts.
+  // --------------------------------------------------------------------------------------
   void BlowUp(void)
   {
     FLOAT3D vNormalizedDamage = m_vDamage-m_vDamage*(_fBlowUpAmmount/m_vDamage.Length());
@@ -3327,7 +3558,9 @@ functions:
 /************************************************************
  *                 OVERRIDEN FUNCTIONS                      *
  ************************************************************/
+  // --------------------------------------------------------------------------------------
   /* Entity info */
+  // --------------------------------------------------------------------------------------
   void *GetEntityInfo(void)
   {
     switch (m_pstState) {
@@ -3344,29 +3577,53 @@ functions:
     return &eiPlayerGround;
   };
 
-
+  // --------------------------------------------------------------------------------------
   /* Receive item */
+  // --------------------------------------------------------------------------------------
   BOOL ReceiveItem(const CEntityEvent &ee)
   {
     // *********** HEALTH ***********
     if ( ee.ee_slEvent == EVENTCODE_EHealth)
     {
+      FLOAT fHealth = ((EHealth&)ee).fHealth;
+      FLOAT fTopHealth = TopHealth();
+      FLOAT fMaxHealth = MaxHealth();
+
+      // [SSE] CPlayerSettingsEntity
+      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+        CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
+
+        if (!enSettings.m_bCanPickUpHealth) {
+          return FALSE;
+        }
+
+        fHealth *= enSettings.m_fHeathPickUpMul;
+        fTopHealth = enSettings.m_fTopHealth;
+        fMaxHealth = enSettings.m_fMaxHealth;
+      }
+
+      // If item won't give any health then pickup it always.
+      if (fHealth <= 0.0F) {
+        return TRUE;
+      }
+
       // determine old and new health values
       FLOAT fHealthOld = GetHealth();
-      FLOAT fHealthNew = fHealthOld + ((EHealth&)ee).fHealth;
+      FLOAT fHealthNew = fHealthOld + fHealth;
+
       if ( ((EHealth&)ee).bOverTopHealth) {
-        fHealthNew = ClampUp( fHealthNew, MaxHealth());
+        fHealthNew = ClampUp( fHealthNew, fMaxHealth);
       } else {
-        fHealthNew = ClampUp( fHealthNew, TopHealth());
+        fHealthNew = ClampUp( fHealthNew, fTopHealth);
       }
 
       // if value can be changed
       if ( ceil(fHealthNew) > ceil(fHealthOld)) {
         // receive it
         SetHealth(fHealthNew);
-        ItemPicked( TRANS("Health"), ((EHealth&)ee).fHealth);
-        m_iMana += (INDEX)(((EHealth&)ee).fHealth);
-        m_fPickedMana   += ((EHealth&)ee).fHealth;
+        ItemPicked( TRANS("Health"), fHealth);
+        m_iMana += (INDEX)fHealth;
+        m_fPickedMana   += fHealth;
         return TRUE;
       }
     } 
@@ -3374,21 +3631,45 @@ functions:
     // *********** ARMOR ***********
     else if ( ee.ee_slEvent == EVENTCODE_EArmor)
     {
+      FLOAT fArmor = ((EArmor&)ee).fArmor;
+      FLOAT fTopArmor = TopArmor();
+      FLOAT fMaxArmor = MaxArmor();
+
+      // [SSE] CPlayerSettingsEntity
+      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+        CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
+
+        if (!enSettings.m_bCanPickUpArmor) {
+          return FALSE;
+        }
+
+        fArmor *= enSettings.m_fArmorPickUpMul;
+        fTopArmor = enSettings.m_fTopArmor;
+        fMaxArmor = enSettings.m_fMaxArmor;
+      }
+
+      // If item won't give any armor then pickup it always.
+      if (fArmor <= 0.0F) {
+        return TRUE;
+      }
+
       // determine old and new health values
       FLOAT fArmorOld = m_fArmor;
-      FLOAT fArmorNew = fArmorOld + ((EArmor&)ee).fArmor;
+      FLOAT fArmorNew = fArmorOld + fArmor;
+
       if ( ((EArmor&)ee).bOverTopArmor) {
-        fArmorNew = ClampUp( fArmorNew, MaxArmor());
+        fArmorNew = ClampUp( fArmorNew, fMaxArmor);
       } else {
-        fArmorNew = ClampUp( fArmorNew, TopArmor());
+        fArmorNew = ClampUp( fArmorNew, fTopArmor);
       }
+
       // if value can be changed
       if ( ceil(fArmorNew) > ceil(fArmorOld)) {
         // receive it
         m_fArmor = fArmorNew;
-        ItemPicked( TRANS("Armor"), ((EArmor&)ee).fArmor);
-        m_iMana += (INDEX)(((EArmor&)ee).fArmor);
-        m_fPickedMana   += ((EArmor&)ee).fArmor;
+        ItemPicked( TRANS("Armor"), fArmor);
+        m_iMana += (INDEX)fArmor;
+        m_fPickedMana   += fArmor;
         return TRUE;
       }
     }
@@ -3403,15 +3684,37 @@ functions:
 
     // *********** WEAPON ***********
     else if (ee.ee_slEvent == EVENTCODE_EWeaponItem) {
+      // [SSE] CPlayerSettingsEntity
+      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+        if (!((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpWeapons) {
+          return FALSE;
+        }
+      }
+
       return ((CPlayerWeapons&)*m_penWeapons).ReceiveWeapon(ee);
     }
 
     // *********** AMMO ***********
     else if (ee.ee_slEvent == EVENTCODE_EAmmoItem) {
+      // [SSE] CPlayerSettingsEntity
+      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+        if (!((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpAmmo) {
+          return FALSE;
+        }
+      }
+
       return ((CPlayerWeapons&)*m_penWeapons).ReceiveAmmo(ee);
     }
 
+    // *********** AMMO PACK ***********
     else if (ee.ee_slEvent == EVENTCODE_EAmmoPackItem) {
+      // [SSE] CPlayerSettingsEntity
+      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+        if (!((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpAmmo) {
+          return FALSE;
+        }
+      }
+
       return ((CPlayerWeapons&)*m_penWeapons).ReceivePackAmmo(ee);
     }
 
@@ -3421,6 +3724,14 @@ functions:
       if (m_penActionMarker!=NULL) {
         return FALSE;
       }
+
+      // [SSE] CPlayerSettingsEntity
+      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+        if (((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpKeys) {
+          return FALSE;
+        }
+      }
+
       // make key mask
       ULONG ulKey = 1<<INDEX(((EKey&)ee).kitType);
       EKey &eKey = (EKey&)ee;
@@ -3449,7 +3760,15 @@ functions:
 
     // *********** POWERUPS ***********
     else if ( ee.ee_slEvent == EVENTCODE_EPowerUp) {
+      // [SSE] CPlayerSettingsEntity
+      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+        if (((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpPUPS) {
+          return FALSE;
+        }
+      }
+
       const FLOAT tmNow = _pTimer->CurrentTick();
+
       switch( ((EPowerUp&)ee).puitType) {
       case PUIT_INVISIB :  m_tmInvisibility    = tmNow + m_tmInvisibilityMax;
         ItemPicked(TRANS("^cABE3FFInvisibility"), 0);
@@ -3481,9 +3800,9 @@ functions:
     return FALSE;
   };
 
-
-
-  // Change Player view
+  // --------------------------------------------------------------------------------------
+  // Change Player view.
+  // --------------------------------------------------------------------------------------
   void ChangePlayerView()
   {
     // change from eyes to 3rd person
@@ -3514,7 +3833,9 @@ functions:
     }
   };
 
-  // if computer is pressed
+  // --------------------------------------------------------------------------------------
+  // If computer is pressed.
+  // --------------------------------------------------------------------------------------
   void ComputerPressed(void)
   {
     // call computer if not holding sniper
@@ -3530,6 +3851,7 @@ functions:
 //    }
   }
 
+  // --------------------------------------------------------------------------------------
   BOOL UseSomethingUnderCrosshair() {
     // cast ray from weapon
     CPlayerWeapons *penWeapons = GetPlayerWeapons();
@@ -3578,7 +3900,9 @@ functions:
     return FALSE;
   }
 
-  // if use is pressed
+  // --------------------------------------------------------------------------------------
+  // If use is pressed.
+  // --------------------------------------------------------------------------------------
   void UsePressed(BOOL bOrComputer)
   {
     BOOL bSomethingToUse = UseSomethingUnderCrosshair();
@@ -3618,6 +3942,7 @@ functions:
 /************************************************************
  *                      PLAYER ACTIONS                      *
  ************************************************************/
+  // --------------------------------------------------------------------------------------
   void SetGameEnd(void)
   {
     _pNetwork->SetGameFinished();
@@ -3631,7 +3956,10 @@ functions:
       }
     }
   }
-  // check if game should be finished
+
+  // --------------------------------------------------------------------------------------
+  // Check if game should be finished.
+  // --------------------------------------------------------------------------------------
   void CheckGameEnd(void)
   {
     BOOL bFinished = FALSE;
@@ -3656,12 +3984,16 @@ functions:
     }
   }
 
-  // Preapply the action packet for local mouselag elimination
+  // --------------------------------------------------------------------------------------
+  // Preapply the action packet for local mouselag elimination.
+  // --------------------------------------------------------------------------------------
   void PreapplyAction( const CPlayerAction &paAction)
   {
   }
 
+  // --------------------------------------------------------------------------------------
   // Called to apply player action to player entity each tick.
+  // --------------------------------------------------------------------------------------
   void ApplyAction( const CPlayerAction &paOriginal, FLOAT tmLatency)
   {
     if (!(m_ulFlags&PLF_INITIALIZED)) { return; }
@@ -3719,15 +4051,25 @@ functions:
     paAction.pa_vTranslation(3) = Clamp( paAction.pa_vTranslation(3), -plr_fSpeedForward, plr_fSpeedBackward);
 
     // if speeds are like walking
-    if (Abs(paAction.pa_vTranslation(3))< plr_fSpeedForward/1.99f
-      &&Abs(paAction.pa_vTranslation(1))< plr_fSpeedSide/1.99f) {
-      // don't allow falling
-      en_fStepDnHeight = 1.5f;
+    BOOL bLikeWalking = Abs(paAction.pa_vTranslation(3)) < plr_fSpeedForward/1.99f && Abs(paAction.pa_vTranslation(1)) < plr_fSpeedSide/1.99f;
 
-    // if speeds are like running
+    // [SSE] CPlayerSettingsEntity
+    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+      CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
+
+      if (bLikeWalking) {
+        en_fStepDnHeight = 1.5f; // don't allow falling
+      } else { // if speeds are like running
+        en_fStepDnHeight = enSettings.m_fStepDownHeight; 
+      }
+
+      en_fStepUpHeight = enSettings.m_fStepUpHeight;
     } else {
-      // allow falling
-      en_fStepDnHeight = -1;
+      if (bLikeWalking) {
+        en_fStepDnHeight = 1.5f; // don't allow falling
+      } else { // if speeds are like running
+        en_fStepDnHeight = -1; // allow falling
+      }
     }
 
     // limit diagonal speed against abusing
@@ -3826,8 +4168,9 @@ functions:
     CheckHighScore();
   };
 
-
-  // Called when player is disconnected
+  // --------------------------------------------------------------------------------------
+  // Called when player is disconnected.
+  // --------------------------------------------------------------------------------------
   void Disconnect(void)
   {
     // remember name
@@ -3838,7 +4181,9 @@ functions:
     SendEvent(EDisconnected());
   };
 
-  // Called when player character is changed
+  // --------------------------------------------------------------------------------------
+  // Called when player character is changed.
+  // --------------------------------------------------------------------------------------
   void CharacterChanged(const CPlayerCharacter &pcNew) 
   {
     // remember original character
@@ -3893,8 +4238,9 @@ functions:
     }
   };
 
-
-  // Alive actions
+  // --------------------------------------------------------------------------------------
+  // Alive actions.
+  // --------------------------------------------------------------------------------------
   void AliveActions(const CPlayerAction &pa) 
   {
     CPlayerAction paAction = pa;
@@ -3928,7 +4274,9 @@ functions:
     }
   }
 
-  // Auto-actions
+  // --------------------------------------------------------------------------------------
+  // Auto-actions.
+  // --------------------------------------------------------------------------------------
   void AutoActions(const CPlayerAction &pa) 
   {
     // if fire, use or computer is pressed
@@ -4015,6 +4363,7 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   void GetLerpedWeaponPosition( FLOAT3D vRel, CPlacement3D &pl)
   {
     pl = CPlacement3D( vRel, ANGLE3D(0,0,0));
@@ -4024,6 +4373,7 @@ functions:
     pl.RelativeToAbsolute( plView);
   }
 
+  // --------------------------------------------------------------------------------------
   void SpawnBubbles( INDEX ctBubbles)
   {
     for( INDEX iBouble=0; iBouble<ctBubbles; iBouble++)
@@ -4039,11 +4389,13 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   void PlayPowerUpSound ( void ) {
     m_soPowerUpBeep.Set3DParameters(50.0f, 10.0f, 4.0f, 1.0f);
     PlaySound(m_soPowerUpBeep, SOUND_POWERUP_BEEP, SOF_3D|SOF_VOLUMETRIC|SOF_LOCAL);
   }
 
+  // --------------------------------------------------------------------------------------
   void DoStand() {
     // If can't stand here don't stand!
     if (!ChangeCollisionBoxIndexNow(PLAYER_COLLISION_BOX_STAND)) { return; }
@@ -4058,7 +4410,8 @@ functions:
 
     m_pstState = PST_STAND;
   }
-  
+
+  // --------------------------------------------------------------------------------------
   void DoCrouch() {
     // try to prevent swim bug by forcing a stand
     // after you come out of the water. this doesn't
@@ -4076,7 +4429,8 @@ functions:
 
     ((CPlayerAnimator&)*m_penAnimator).Crouch();
   }
-  
+
+  // --------------------------------------------------------------------------------------
   void DoSwim() {
     // If can't swim here don't swim!
     if (!ChangeCollisionBoxIndexNow(PLAYER_COLLISION_BOX_SWIMSMALL)) { return; }
@@ -4089,7 +4443,8 @@ functions:
 
     m_fSwimTime = _pTimer->CurrentTick();
   }
-  
+
+  // --------------------------------------------------------------------------------------
   void DoDive() {
     // if can't dive here don't dive!
     if (!ChangeCollisionBoxIndexNow(PLAYER_COLLISION_BOX_SWIMSMALL)) { return; }
@@ -4100,7 +4455,8 @@ functions:
 
     ((CPlayerAnimator&)*m_penAnimator).Swim();
   }
-  
+ 
+  // --------------------------------------------------------------------------------------
   void DoFall() {
     // if can fall here
     if (!ChangeCollisionBoxIndexNow(PLAYER_COLLISION_BOX_STAND)) { return; }
@@ -4121,26 +4477,74 @@ functions:
       vTranslation *= cht_fTranslationMultiplier;
     }
 
-    // enable faster moving if holding knife in DM
-    INDEX iCurrentWeapon = ((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon;
-    if ( (iCurrentWeapon == WEAPON_NONE || iCurrentWeapon == WEAPON_KNIFE) && !GetSP()->sp_bCooperative) {
-      vTranslation *= 1.3f;
+    if (!GetSP()->sp_bCooperative) {
+      // enable faster moving if holding knife in DM
+      INDEX iCurrentWeapon = ((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon;
+      if (iCurrentWeapon == WEAPON_NONE || iCurrentWeapon == WEAPON_KNIFE) {
+        vTranslation *= 1.3f;
+      }
+
+      // Player running faster in DM
+      vTranslation(1) *= 1.35f;
+      vTranslation(3) *= 1.35f;
     }
 
     // enable faster moving (but not higher jumping!) if having SerousSpeed powerup
     const TIME tmDelta = m_tmSeriousSpeed - _pTimer->CurrentTick();
-    if ( tmDelta>0 && m_fAutoSpeed==0.0f) { 
+    if (tmDelta > 0 && m_fAutoSpeed == 0.0f) { 
       vTranslation(1) *= 2.0f;
       vTranslation(3) *= 2.0f;
     }
-    
-    en_fAcceleration = plr_fAcceleration;
-    en_fDeceleration = plr_fDeceleration;
-    if ( !GetSP()->sp_bCooperative)
-    {
-      vTranslation(1) *= 1.35f;
-      vTranslation(3) *= 1.35f;
-    //en_fDeceleration *= 0.8f;
+
+    FLOAT fDensity = 1000.0F;
+    FLOAT fDensitySwim = 500.0F;
+
+    // [SSE] CPlayerSettingsEntity
+    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+      CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
+
+      vTranslation *= enSettings.m_fSpeedAllMultiplier;
+
+      // X - Left / Right
+      if (vTranslation(1) < 0.0F) {
+        vTranslation(1) *= enSettings.m_fSpeedLeftMultiplier;
+      } else {
+        vTranslation(1) *= enSettings.m_fSpeedRightMultiplier;
+      }
+
+      // Y - Up / Down
+      if (vTranslation(2) > 0.0F) {
+        vTranslation(2) *= enSettings.m_fSpeedUpMultiplier;
+      } else {
+        vTranslation(2) *= enSettings.m_fSpeedDownMultiplier;
+      }
+
+      // Z - Forward / Backward
+      if (vTranslation(3) < 0.0F) {
+        vTranslation(3) *= enSettings.m_fSpeedForwardMultiplier;
+      } else {
+        vTranslation(3) *= enSettings.m_fSpeedBackwardMultiplier;
+      }
+
+      en_fAcceleration = enSettings.m_fAcceleration;
+      en_fDeceleration = enSettings.m_fDeceleration;
+      en_tmMaxHoldBreath = enSettings.m_fMaxHoldBreath;
+      en_tmMaxJumpControl = enSettings.m_fMaxJumpControl;
+      en_fJumpControlMultiplier = enSettings.m_fJumpControlMultiplier;
+      en_fCollisionDamageFactor = enSettings.m_fCollisionDamageFactor;
+      en_fCollisionSpeedLimit = enSettings.m_fCollisionSpeedLimit;
+
+      fDensity = enSettings.m_fDensity;
+      fDensitySwim = enSettings.m_fDensity;
+    // Else set default values.
+    } else {
+      en_fAcceleration = plr_fAcceleration;
+      en_fDeceleration = plr_fDeceleration;
+      en_tmMaxJumpControl = 0.5F;
+      en_fJumpControlMultiplier = 0.5F;
+      en_tmMaxHoldBreath = 60.0F;
+      en_fCollisionDamageFactor = 20.0F;
+      en_fCollisionSpeedLimit = 20.0F;
     }
 
     CContentType &ctUp = GetWorld()->wo_actContentTypes[en_iUpContent];
@@ -4283,9 +4687,9 @@ functions:
       // set density
       if (m_pstState == PST_SWIM || pstWanted == PST_SWIM
         ||(pstWanted == PST_DIVE && m_pstState != pstWanted)) {
-        en_fDensity = 500.0f;  // lower density than water
+        en_fDensity = fDensitySwim;  // lower density than water
       } else {
-        en_fDensity = 1000.0f; // same density as water
+        en_fDensity = fDensity; // same density as water
       }
 
       if (_pTimer->CurrentTick()>=m_tmNextAmbientOnce)
@@ -4299,7 +4703,6 @@ functions:
         }
         m_tmNextAmbientOnce = _pTimer->CurrentTick()+5.0f+FRnd();
       }
-
 
       // if crouching
       if (m_pstState == PST_CROUCH) {
@@ -4427,8 +4830,7 @@ functions:
         en_pbpoStandOn->bpo_bppProperties.bpp_ubSurfaceType==SURFACE_SNOW) {
         iSoundWalkL = SOUND_WALK_SNOW_L;
         iSoundWalkR = SOUND_WALK_SNOW_R;
-      }
-      else {
+      } else {
       }
       iSoundWalkL+=m_iGender*GENDEROFFSET;
       iSoundWalkR+=m_iGender*GENDEROFFSET;
@@ -4475,13 +4877,18 @@ functions:
       }
     
       // if player is almost out of air
-      TIME tmBreathDelay = tmNow-en_tmLastBreathed;
-      if (en_tmMaxHoldBreath-tmBreathDelay<20.0f) {
-        // play drowning sound once in a while
-        if (m_tmMouthSoundLast+2.0f<tmNow) {
-          m_tmMouthSoundLast = tmNow;
-          SetRandomMouthPitch(0.9f, 1.1f);
-          PlaySound(m_soMouth, GenderSound(SOUND_DROWN), SOF_3D);
+      // [SSE] This condition is for custom oxygen capacity
+      if (en_tmMaxHoldBreath > 0.0F)
+      {
+        FLOAT fOxygenLeft = (en_tmMaxHoldBreath - (tmNow - en_tmLastBreathed)) / en_tmMaxHoldBreath;
+
+        if (fOxygenLeft < 0.33F) {
+          // play drowning sound once in a while
+          if (m_tmMouthSoundLast+2.0f < tmNow) {
+            m_tmMouthSoundLast = tmNow;
+            SetRandomMouthPitch(0.9f, 1.1f);
+            PlaySound(m_soMouth, GenderSound(SOUND_DROWN), SOF_3D);
+          }
         }
       }
 
@@ -4490,7 +4897,9 @@ functions:
     }
   };
 
-  // Round view angle
+  // --------------------------------------------------------------------------------------
+  // Round view angle.
+  // --------------------------------------------------------------------------------------
   void RoundViewAngle(ANGLE &aViewAngle, ANGLE aRound) {
     if (aViewAngle > aRound) {
       aViewAngle = aRound;
@@ -4500,7 +4909,9 @@ functions:
     }
   };
 
-  // Death actions
+  // --------------------------------------------------------------------------------------
+  // Death actions.
+  // --------------------------------------------------------------------------------------
   void DeathActions(const CPlayerAction &paAction) {
     // set heading, pitch and banking from the normal rotation into the camera view rotation
     if (m_penView!=NULL) {
@@ -4514,8 +4925,10 @@ functions:
 
     // if death is finished and fire just released again and this is not a predictor
     if (m_iMayRespawn==2 && (ulReleasedButtons&PLACT_FIRE) && !IsPredictor()) {
+      if ((GetSP()->sp_bQuickTest || GetSP()->sp_bSinglePlayer) && cht_bRevive) {
+        SendEvent(EEnd());
       // if singleplayer
-      if ( GetSP()->sp_bSinglePlayer) {
+      } else if ( GetSP()->sp_bSinglePlayer) {
         // load quick savegame
         _pShell->Execute("gam_bQuickLoad=1;");
       // if deathmatch or similar
@@ -4564,8 +4977,9 @@ functions:
     }
   };
 
-
-  // Buttons actions
+  // --------------------------------------------------------------------------------------
+  // Buttons actions.
+  // --------------------------------------------------------------------------------------
   void ButtonsActions( CPlayerAction &paAction)
   {
     // if selecting a new weapon select it
@@ -4677,6 +5091,7 @@ functions:
     }
   };
 
+  // --------------------------------------------------------------------------------------
   void ApplySniperZoom( BOOL bZoomIn )
   {
     // do nothing if not holding sniper and if not in sniping mode
@@ -4699,13 +5114,17 @@ functions:
     }
   }
 
-  // check if cheats can be active
+  // --------------------------------------------------------------------------------------
+  // Check if cheats can be active.
+  // --------------------------------------------------------------------------------------
   BOOL CheatsEnabled(void)
   {
     return (GetSP()->sp_ctMaxPlayers==1||GetSP()->sp_bQuickTest) && m_penActionMarker==NULL && !_SE_DEMO;
   }
 
-  // Cheats
+  // --------------------------------------------------------------------------------------
+  // Cheats.
+  // --------------------------------------------------------------------------------------
   void Cheats(void)
   {
     BOOL bFlyOn = cht_bFly || cht_bGhost;
@@ -4771,8 +5190,9 @@ functions:
  *                 END OF PLAYER ACTIONS                    *
  ************************************************************/
 
-
+  // --------------------------------------------------------------------------------------
   // Get current placement that the player views from in absolute space.
+  // --------------------------------------------------------------------------------------
   void GetLerpedAbsoluteViewPlacement(CPlacement3D &plView) {
     if (!(m_ulFlags&PLF_INITIALIZED)) {
       plView = GetPlacement();
@@ -4847,7 +5267,9 @@ functions:
     _bDiscard3rdView=FALSE;
   };
 
+  // --------------------------------------------------------------------------------------
   // Get current entity that the player views from.
+  // --------------------------------------------------------------------------------------
   CEntity *GetViewEntity(void) {
     // player eyes
     if (m_iViewState == PVT_PLAYEREYES) {
@@ -4876,6 +5298,7 @@ functions:
     }
   };
 
+  // --------------------------------------------------------------------------------------
   void RenderChainsawParticles(BOOL bThird)
   {
     FLOAT fStretch=1.0f;
@@ -4911,7 +5334,9 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   // Draw player interface on screen.
+  // --------------------------------------------------------------------------------------
   void RenderHUD( CPerspectiveProjection3D &prProjection, CDrawPort *pdp,
                   FLOAT3D vViewerLightDirection, COLOR colViewerLight, COLOR colViewerAmbient,
                   BOOL bRenderWeapon, INDEX iEye)
@@ -5025,7 +5450,9 @@ functions:
 /************************************************************
  *                  SPECIAL FUNCTIONS                       *
  ************************************************************/
-  // try to find start marker for deathmatch (re)spawning
+  // --------------------------------------------------------------------------------------
+  // Try to find start marker for deathmatch (re)spawning.
+  // --------------------------------------------------------------------------------------
   CEntity *GetDeathmatchStartMarker(void)
   {
     // get number of markers
@@ -5095,6 +5522,7 @@ functions:
  *                  INITIALIZE PLAYER                       *
  ************************************************************/
 
+  // --------------------------------------------------------------------------------------
   void InitializePlayer()
   {
     // set viewpoint position inside the entity
@@ -5130,7 +5558,7 @@ functions:
     TeleportPlayer(WLT_FIXED);
   };
 
-
+  // --------------------------------------------------------------------------------------
   FLOAT3D GetTeleportingOffset(void)
   {
     // find player index
@@ -5148,56 +5576,56 @@ functions:
     return vOffsetRel;
   }
   
-
+  // --------------------------------------------------------------------------------------
   void RemapLevelNames(INDEX &iLevel)
   {
-	  switch(iLevel) {
-    case 10:
-      iLevel = 1;
-      break;
-    case 11:
-		  iLevel = 2;
-		  break;
-	  case 12:
-		  iLevel = 3;
-		  break;
-	  case 13:
-		  iLevel = 4;
-		  break;
-	  case 14:
-		  iLevel = 5;
-		  break;
-	  case 15:
-		  iLevel = 6;
-		  break;
-	  case 21:
-		  iLevel = 7;
-		  break;
-	  case 22:
-		  iLevel = 8;
-		  break;
-	  case 23:
-		  iLevel = 9;
-		  break;
-	  case 24:
-		  iLevel = 10;
-		  break;
-	  case 31:
-		  iLevel = 11;
-		  break;
-	  case 32:
-		  iLevel = 12;
-		  break;
-	  case 33:
-		  iLevel = 13;
-		  break;
-	  default:
-		  iLevel = -1;
-		  break;
-	  }
+    switch(iLevel) {
+      case 10:
+        iLevel = 1;
+        break;
+      case 11:
+        iLevel = 2;
+        break;
+      case 12:
+        iLevel = 3;
+        break;
+      case 13:
+        iLevel = 4;
+        break;
+      case 14:
+        iLevel = 5;
+        break;
+      case 15:
+        iLevel = 6;
+        break;
+      case 21:
+        iLevel = 7;
+        break;
+      case 22:
+        iLevel = 8;
+        break;
+      case 23:
+        iLevel = 9;
+        break;
+      case 24:
+        iLevel = 10;
+        break;
+      case 31:
+        iLevel = 11;
+        break;
+      case 32:
+        iLevel = 12;
+        break;
+      case 33:
+        iLevel = 13;
+        break;
+      default:
+        iLevel = -1;
+        break;
+    }
   }
   
-  
+  // --------------------------------------------------------------------------------------
   void TeleportPlayer(enum WorldLinkType EwltType) 
   {
     INDEX iLevel = -1;
@@ -5312,8 +5740,14 @@ functions:
     // if respawning in place
     if ((m_ulFlags&PLF_RESPAWNINPLACE) && pen != NULL && !((CPlayerMarker*)&*pen)->m_bNoRespawnInPlace) {
       m_ulFlags &= ~PLF_RESPAWNINPLACE;
-      // set default params
-      SetHealth(TopHealth());
+      
+      // [SSE] CPlayerSettingsEntity
+      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+        SetHealth(((CPlayerSettingsEntity&)*m_penSettings).m_fTopHealth);
+      } else {
+        SetHealth(TopHealth()); // set default params
+      }
+
       m_iMana  = GetSP()->sp_iInitialMana;
       m_fArmor = 0.0f;
       // teleport where you were when you were killed
@@ -5431,9 +5865,9 @@ functions:
     m_fMaxHealth = TopHealth();
 
     // if in singleplayer mode
-    if (GetSP()->sp_bSinglePlayer && GetSP()->sp_gmGameMode!=CSessionProperties::GM_FLYOVER) {
+    if (GetSP()->sp_bSinglePlayer && GetSP()->sp_gmGameMode != CSessionProperties::GM_FLYOVER) {
       CWorldSettingsController *pwsc = GetWSC(this);
-      if (pwsc!=NULL && pwsc->m_bNoSaveGame) {
+      if (pwsc != NULL && pwsc->m_bNoSaveGame) {
         NOTHING;
       } else {
         // save quick savegame
@@ -5466,7 +5900,9 @@ functions:
     en_tmLastBreathed = _pTimer->CurrentTick()+0.1f;  // do not take breath when spawned in air
   };
 
-  // note: set estimated time in advance
+  // --------------------------------------------------------------------------------------
+  // Note: Set estimated time in advance.
+  // --------------------------------------------------------------------------------------
   void RecordEndOfLevelData(void)
   {
     // must not be called multiple times
@@ -5499,7 +5935,9 @@ functions:
     m_strLevelStats += strStats;
   }
 
-  // spawn teleport effect
+  // --------------------------------------------------------------------------------------
+  // Spawn teleport effect.
+  // --------------------------------------------------------------------------------------
   void SpawnTeleport(void)
   {
     // if in singleplayer
@@ -5519,9 +5957,9 @@ functions:
     penEffect->Initialize(ese);
   }
 
-
-
-  // render particles
+  // --------------------------------------------------------------------------------------
+  // Render particles.
+  // --------------------------------------------------------------------------------------
   void RenderParticles(void)
   {
     FLOAT tmNow = _pTimer->GetLerpedCurrentTick();
@@ -5569,6 +6007,7 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   void TeleportToAutoMarker(CPlayerActionMarker *ppam) 
   {
     // if we are in coop
@@ -5598,7 +6037,9 @@ functions:
     }
   }
 
-  // check whether this time we respawn in place or on marker
+  // --------------------------------------------------------------------------------------
+  // Check whether this time we respawn in place or on marker.
+  // --------------------------------------------------------------------------------------
   void CheckDeathForRespawnInPlace(EDeath eDeath)
   {
     // if respawning in place is not allowed
@@ -5628,6 +6069,7 @@ procedures:
 /************************************************************
  *                     WORLD CHANGE                         *
  ************************************************************/
+  // --------------------------------------------------------------------------------------
   WorldChange() {
     // if in single player
     if (GetSP()->sp_bSinglePlayer) {
@@ -5649,9 +6091,10 @@ procedures:
     penWeapon->m_bSniping=FALSE;
     m_ulFlags&=~PLF_ISZOOMING;
 
-	// turn off possible chainsaw engine sound
-	PlaySound(m_soWeaponAmbient, SOUND_SILENCE, SOF_3D);
-	
+    
+    // turn off possible chainsaw engine sound
+    PlaySound(m_soWeaponAmbient, SOUND_SILENCE, SOF_3D);
+
     // update per-level stats
     UpdateLevelStats();
     m_ulFlags |= PLF_INITIALIZED;
@@ -5659,6 +6102,7 @@ procedures:
     return;
   };
 
+  // --------------------------------------------------------------------------------------
   WorldChangeDead() 
   {
     // forbid respawning in-place when changing levels while dead
@@ -5689,11 +6133,17 @@ procedures:
 /************************************************************
  *                       D E A T H                          *
  ************************************************************/
-
+  // --------------------------------------------------------------------------------------
   Death(EDeath eDeath)
   {
     // stop firing when dead
     ((CPlayerWeapons&)*m_penWeapons).SendEvent(EReleaseWeapon());
+
+    // [SSE] CPlayerSettingsEntity
+    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bUntilDeath) {
+      m_penSettings = NULL;
+    }
+
     // stop all looping ifeel effects
     if (_pNetwork->IsPlayerLocal(this))
     {
@@ -5714,8 +6164,8 @@ procedures:
     PlaySound(m_soSniperZoom, SOUND_SILENCE, SOF_3D);
     PlaySound(m_soWeaponAmbient, SOUND_SILENCE, SOF_3D);
 
-	// stop rotating minigun
-	penWeapon->m_aMiniGunLast = penWeapon->m_aMiniGun;
+    // stop rotating minigun
+    penWeapon->m_aMiniGunLast = penWeapon->m_aMiniGun;
     
     // if in single player, or if this is a predictor entity
     if (GetSP()->sp_bSinglePlayer || IsPredictor()) {
@@ -5853,11 +6303,15 @@ procedures:
     SetPhysicsFlags(EPF_MODEL_CORPSE);
     SetCollisionFlags(ECF_CORPSE);
 
-    // set density to float out of water
-    en_fDensity = 400.0f;
+    // [SSE] CPlayerSettingsEntity
+    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+      en_fDensity = ((CPlayerSettingsEntity&)*m_penSettings).m_fDensityDead; // set density from player settings entity
+    } else {
+      en_fDensity = 400.0f; // set density to float out of water
+    }
 
     // play sound
-    if (m_pstState==PST_DIVE) {
+    if (m_pstState == PST_DIVE) {
       SetDefaultMouthPitch();
       PlaySound(m_soMouth, GenderSound(SOUND_DEATHWATER), SOF_3D);
       if (_pNetwork->IsPlayerLocal(this)) {IFeel_PlayEffect("DeathWater");}
@@ -5949,6 +6403,7 @@ procedures:
     return ERebirth();
   };
 
+  // --------------------------------------------------------------------------------------
   TheEnd() {
     // if not playing demo
     if (!_pNetwork->IsPlayingDemo()) {
@@ -6027,6 +6482,7 @@ procedures:
     return;
   };
 
+  // --------------------------------------------------------------------------------------
   Rebirth() {
     
     bUseButtonHeld = FALSE;
@@ -6068,8 +6524,9 @@ procedures:
     return EReturn();
   };
 
-
-  // auto action - go to current marker
+  // --------------------------------------------------------------------------------------
+  // Auto action - go to current marker.
+  // --------------------------------------------------------------------------------------
   AutoGoToMarker(EVoid)
   {
     ULONG ulFlags = AOF_LOOPING|AOF_NORESTART;
@@ -6101,7 +6558,9 @@ procedures:
     return EReturn();
   }
 
-  // auto action - go to current marker and stop there
+  // --------------------------------------------------------------------------------------
+  // Auto action - go to current marker and stop there.
+  // --------------------------------------------------------------------------------------
   AutoGoToMarkerAndStop(EVoid)
   {
     ULONG ulFlags = AOF_LOOPING|AOF_NORESTART;
@@ -6141,7 +6600,9 @@ procedures:
     return EReturn();
   }
 
-  // auto action - use an item
+  // --------------------------------------------------------------------------------------
+  // Auto action - use an item.
+  // --------------------------------------------------------------------------------------
   AutoUseItem(EVoid)
   {
 
@@ -6186,7 +6647,9 @@ procedures:
     return EReturn();
   }
 
-  // auto action - pick an item
+  // --------------------------------------------------------------------------------------
+  // Auto action - pick an item.
+  // --------------------------------------------------------------------------------------
   AutoPickItem(EVoid)
   {
 
@@ -6222,6 +6685,7 @@ procedures:
     return EReturn();
   }
 
+  // --------------------------------------------------------------------------------------
   AutoFallDown(EVoid)
   {
     StartModelAnim(PLAYER_ANIM_BRIDGEFALLPOSE, 0);
@@ -6234,6 +6698,7 @@ procedures:
     return EReturn();
   }
 
+  // --------------------------------------------------------------------------------------
   AutoFallToAbys(EVoid)
   {
     StartModelAnim(PLAYER_ANIM_ABYSSFALL, AOF_LOOPING);
@@ -6246,7 +6711,9 @@ procedures:
     return EReturn();
   }
 
-  // auto action - look around
+  // --------------------------------------------------------------------------------------
+  // Auto action - look around.
+  // --------------------------------------------------------------------------------------
   AutoLookAround(EVoid)
   {
     StartModelAnim(PLAYER_ANIM_BACKPEDAL, 0);
@@ -6271,6 +6738,7 @@ procedures:
     return EReturn();
   }
 
+  // --------------------------------------------------------------------------------------
   AutoTeleport(EVoid)
   {
     // teleport there
@@ -6280,6 +6748,7 @@ procedures:
     return EReturn();
   }
 
+  // --------------------------------------------------------------------------------------
   AutoAppear(EVoid)
   {
     // hide the model
@@ -6332,6 +6801,7 @@ procedures:
     return EReturn();
   }
 
+  // --------------------------------------------------------------------------------------
   TravellingInBeam()
   {
     // put it at marker
@@ -6446,7 +6916,9 @@ procedures:
     return EReturn();
   }
 
-  // perform player auto actions
+  // --------------------------------------------------------------------------------------
+  // Perform player auto actions.
+  // --------------------------------------------------------------------------------------
   DoAutoActions(EVoid)
   {
     // don't look up/down
@@ -6753,6 +7225,7 @@ procedures:
         m_ulFlags &= ~PLF_LEVELSTARTED;
         resume; 
       }
+
       on (EPostLevelChange) : {
         if (GetSP()->sp_bSinglePlayer || (GetFlags()&ENF_ALIVE)) {
           call WorldChange(); 
@@ -6760,6 +7233,7 @@ procedures:
           call WorldChangeDead(); 
         }
       }
+
       on (ETakingBreath eTakingBreath ) : {
         SetDefaultMouthPitch();
         if (eTakingBreath.fBreathDelay<0.2f) {
@@ -6771,6 +7245,7 @@ procedures:
         }
         resume;
       }
+
       on (ECameraStart eStart) : {
         m_penCamera = eStart.penCamera;
         // stop player
@@ -6782,12 +7257,14 @@ procedures:
         ((CPlayerWeapons&)*m_penWeapons).SendEvent(EReleaseWeapon());
         resume;
       }
+
       on (ECameraStop eCameraStop) : {
         if (m_penCamera==eCameraStop.penCamera) {
           m_penCamera = NULL;
         }
         resume;
       }
+
       on (ECenterMessage eMsg) : {
         m_strCenterMessage = eMsg.strMessage;
         m_tmCenterMessageEnd = _pTimer->CurrentTick()+eMsg.tmLength;
@@ -6797,37 +7274,51 @@ procedures:
         }
         resume;
       }
+
       on (EComputerMessage eMsg) : {
         ReceiveComputerMessage(eMsg.fnmMessage, CMF_ANALYZE);
         resume;
       }
+
       on (EVoiceMessage eMsg) : {
         SayVoiceMessage(eMsg.fnmMessage);
         resume;
       }
+
       on (EAutoAction eAutoAction) : {
         // remember first marker
         m_penActionMarker = eAutoAction.penFirstMarker;
         // do the actions
         call DoAutoActions();
       }
+
       on (EReceiveScore eScore) : {
-        m_psLevelStats.ps_iScore += eScore.iPoints;
-        m_psGameStats.ps_iScore += eScore.iPoints;
-        m_iMana  += eScore.iPoints*GetSP()->sp_fManaTransferFactor;
+        INDEX iScore = eScore.iPoints;
+
+        // [SSE] CPlayerSettingsEntity
+        if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+          iScore *= ((CPlayerSettingsEntity&)*m_penSettings).m_fScoreReceiveMul;
+        }
+
+        m_psLevelStats.ps_iScore += iScore;
+        m_psGameStats.ps_iScore += iScore;
+        m_iMana  += iScore * GetSP()->sp_fManaTransferFactor;
         CheckHighScore();
         resume;
       }
+
       on (EKilledEnemy) : {
         m_psLevelStats.ps_iKills += 1;
         m_psGameStats.ps_iKills += 1;
         resume;
       }
+
       on (ESecretFound) : {
         m_psLevelStats.ps_iSecrets += 1;
         m_psGameStats.ps_iSecrets += 1;
         resume;
       }
+
       on (EWeaponChanged) : {
         // make sure we discontinue zooming (even if not changing from sniper)
         ((CPlayerWeapons&)*m_penWeapons).m_bSniping=FALSE;
@@ -6836,6 +7327,7 @@ procedures:
         if (_pNetwork->IsPlayerLocal(this)) {IFeel_StopEffect("SniperZoom");}
         resume;
       }
+
       // EEnd should not arrive here
       on (EEnd) : {
         ASSERT(FALSE);
@@ -6887,12 +7379,15 @@ procedures:
     // cease to exist
     m_penWeapons->Destroy();
     m_penAnimator->Destroy();
-    if (m_penView!=NULL) {
+
+    if (m_penView != NULL) {
       m_penView->Destroy();
     }
-    if (m_pen3rdPersonView!=NULL) {
+
+    if (m_pen3rdPersonView != NULL) {
       m_pen3rdPersonView->Destroy();
     }
+
     Destroy();
     return;
   };
