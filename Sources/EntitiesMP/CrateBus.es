@@ -53,7 +53,7 @@ INDEX _aiRightAnimations[] = {
 
 class CCrateBus: CMovableModelEntity {
 name      "CrateBus";
-thumbnail "Thumbnails\\Mental.tbn";
+thumbnail "Thumbnails\\CrateBus.tbn";
 features  "IsTargetable", "HasName", "IsImportant";
 
 properties:
