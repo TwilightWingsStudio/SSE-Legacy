@@ -806,7 +806,7 @@ void Particles_GrenadeTrail_Prepare(CEntity *pen)
 {
   pen->GetLastPositions(GRENADE_TRAIL_POSITIONS);
 }
-void Particles_GrenadeTrail(CEntity *pen)
+void Particles_GrenadeTrail(CEntity *pen, COLOR colMultiply/*=C_WHITE|CT_OPAQUE*/)
 {
   CLastPositions *plp = pen->GetLastPositions(GRENADE_TRAIL_POSITIONS);
   FLOAT fSeconds = _pTimer->GetLerpedCurrentTick();
@@ -833,7 +833,9 @@ void Particles_GrenadeTrail(CEntity *pen)
       vPos(2) += FLOAT(sin(fRatio*0.704*PI))*0.05f;
       vPos(3) += FLOAT(sin(fRatio*0.964*PI))*0.05f;
       UBYTE ub = 255-(UBYTE)((ULONG)iParticle*255/iParticlesLiving);
-      Particle_RenderSquare( vPos, fSize, fAngle, RGBToColor(ub,ub,ub)|ub);
+      COLOR colSquare = RGBToColor(ub,ub,ub)|ub;
+      colSquare = MulColors(colSquare, colMultiply); // [SSE] Colors for ParticlesHolder
+      Particle_RenderSquare( vPos, fSize, fAngle, colSquare);
       iParticle++;
     }
   }
@@ -1383,7 +1385,7 @@ void Particles_ExplosionSmoke(CEntity *pen, FLOAT tmStart, FLOAT3D vStretch, COL
 }
 
 #define TM_CS_TOTAL_LIFE 10.0f
-void Particles_ChimneySmoke(CEntity *pen, INDEX ctCount, FLOAT fStretchAll, FLOAT fMipDisappearDistance)
+void Particles_ChimneySmoke(CEntity *pen, INDEX ctCount, FLOAT fStretchAll, FLOAT fMipDisappearDistance, COLOR colMultiply/*=C_WHITE|CT_OPAQUE*/)
 {
   FLOAT fMipFactor = Particle_GetMipFactor();
   if( fMipFactor>fMipDisappearDistance) return;
@@ -1418,6 +1420,7 @@ void Particles_ChimneySmoke(CEntity *pen, INDEX ctCount, FLOAT fStretchAll, FLOA
     COLOR colA = pTD->GetTexel(PIX(ClampUp(fT*1024.0f, 1023.0f)), 0);
     UBYTE ubA=UBYTE((colA&0xFF)*0.75f*fMipBlender);
     COLOR colCombined=(col&0xFFFFFF00)|ubA;
+    colCombined = MulColors(colCombined, colMultiply); // [SSE] Colors for ParticlesHolder
     Particle_RenderSquare( vPos, fSize, fAngle, colCombined);
   }
   // all done
@@ -1426,7 +1429,7 @@ void Particles_ChimneySmoke(CEntity *pen, INDEX ctCount, FLOAT fStretchAll, FLOA
 
 void DECL_DLL Particles_Waterfall(CEntity *pen, INDEX ctCount, FLOAT fStretchAll, FLOAT fStretchX, FLOAT fStretchY,
                                   FLOAT fStretchZ, FLOAT fSize, FLOAT fMipDisappearDistance,
-                                  FLOAT fParam1)
+                                  FLOAT fParam1, COLOR colMultiply/*=C_WHITE|CT_OPAQUE*/)
 {
   FLOAT fMipFactor = Particle_GetMipFactor();
   if( fMipFactor>fMipDisappearDistance) return;
@@ -1472,6 +1475,8 @@ void DECL_DLL Particles_Waterfall(CEntity *pen, INDEX ctCount, FLOAT fStretchAll
     COLOR colA = pTD->GetTexel(PIX(ClampUp(fT*1024.0f, 1023.0f)), 0);
     UBYTE ubA=UBYTE((colA&0xFF)*0.75f*fMipBlender);
     COLOR colCombined=(col&0xFFFFFF00)|ubA;
+    
+    colCombined = MulColors(colCombined, colMultiply); // [SSE] Colors for ParticlesHolder
     //colCombined = C_WHITE|CT_OPAQUE;
     Particle_RenderSquare( vPos, fFinalSize, fAngle, colCombined);
   }
@@ -1823,7 +1828,7 @@ void Particles_ShooterFlame(const CPlacement3D &plEnd, const CPlacement3D &plSta
 
 #define STARDUST_EXIST_TIME 0.15f
 void Particles_Stardust( CEntity *pen, FLOAT fSize, FLOAT fHeight,
-                        enum ParticleTexture ptTexture, INDEX ctParticles)
+                        enum ParticleTexture ptTexture, INDEX ctParticles, COLOR colMultiply/*=C_WHITE|CT_OPAQUE*/)
 {
   INDEX ctOffsetSpace = 128;
 
@@ -1856,6 +1861,7 @@ void Particles_Stardust( CEntity *pen, FLOAT fSize, FLOAT fHeight,
     COLOR colStar = RGBToColor( auStarsColors[iMemeber][0]*fFade,
                                 auStarsColors[iMemeber][1]*fFade,
                                 auStarsColors[iMemeber][2]*fFade);
+    colStar = MulColors(colStar, colMultiply); // [SSE] Colors for ParticlesHolder
     Particle_RenderSquare( vPos, 0.15f, 0, colStar|0xFF);
   }
   // all done
@@ -1916,7 +1922,7 @@ void Particles_Rising(CEntity *pen, FLOAT fStartTime, FLOAT fStopTime, FLOAT fSt
 #define CT_SPIRAL_PARTICLES 4
 #define CT_SPIRAL_TRAIL 10
 void Particles_Spiral( CEntity *pen, FLOAT fSize, FLOAT fHeight,
-                      enum ParticleTexture ptTexture, INDEX ctParticles)
+                      enum ParticleTexture ptTexture, INDEX ctParticles, COLOR colMultiply/*=C_WHITE|CT_OPAQUE*/)
 {
   ASSERT( ctParticles<=CT_MAX_PARTICLES_TABLE);
 
@@ -1945,6 +1951,7 @@ void Particles_Spiral( CEntity *pen, FLOAT fSize, FLOAT fHeight,
       vPos(3)+=sin((fT-iTrail*fTrailDelta)*4.0f*(afStarsPositions[iStar][2]*3.0f)+0.1f)*0.5f*fSize;
       UBYTE ub = NormFloatToByte( (FLOAT)(ctSpiralTrail-iTrail) / (FLOAT)(ctSpiralTrail));
       COLOR colStar = RGBToColor( ub, ub, ub>>1);
+      colStar = MulColors(colStar, colMultiply); // [SSE] Colors for ParticlesHolder
       Particle_RenderSquare( vPos, 0.2f, 0, colStar|0xFF);
     }
   }
@@ -1957,7 +1964,7 @@ void Particles_Spiral( CEntity *pen, FLOAT fSize, FLOAT fHeight,
 #define EMANATE_TOTAL_TIME 1.0f
 #define EMANATE_EXIST_TIME 0.5f
 void Particles_Emanate( CEntity *pen, FLOAT fSize, FLOAT fHeight,
-                       enum ParticleTexture ptTexture, INDEX ctParticles, FLOAT fMipFactorDisappear)
+                       enum ParticleTexture ptTexture, INDEX ctParticles, FLOAT fMipFactorDisappear, COLOR colMultiply/*=C_WHITE|CT_OPAQUE*/)
 {
   ASSERT( ctParticles<=CT_MAX_PARTICLES_TABLE);
   if( Particle_GetMipFactor()>fMipFactorDisappear) return;
@@ -1990,6 +1997,7 @@ void Particles_Emanate( CEntity *pen, FLOAT fSize, FLOAT fHeight,
     
     UBYTE ub = NormFloatToByte( fFade*fDisappearRatio);
     COLOR colStar = RGBToColor( ub, ub, ub>>1);
+    colStar = MulColors(colStar, colMultiply); // [SSE] Colors for ParticlesHolder
     Particle_RenderSquare( vPos, 0.1f, 0, colStar|0xFF);
   }
   // all done
@@ -1999,7 +2007,7 @@ void Particles_Emanate( CEntity *pen, FLOAT fSize, FLOAT fHeight,
 #define WATERFALL_FOAM_FADE_IN 0.1f
 #define WATERFALL_FOAM_FADE_OUT 0.4f
 void Particles_WaterfallFoam(CEntity *pen, FLOAT fSizeX, FLOAT fSizeY, FLOAT fSizeZ, 
-                             FLOAT fParticleSize, FLOAT fSpeed, FLOAT fSpeedY, FLOAT fLife, INDEX ctParticles)
+                             FLOAT fParticleSize, FLOAT fSpeed, FLOAT fSpeedY, FLOAT fLife, INDEX ctParticles, COLOR colMultiply/*=C_WHITE|CT_OPAQUE*/)
 {
   if(fLife<=0) return;
 
@@ -2029,6 +2037,7 @@ void Particles_WaterfallFoam(CEntity *pen, FLOAT fSizeX, FLOAT fSizeY, FLOAT fSi
     FLOAT fRndRotation = afStarsPositions[iFoam*3][1];
     UBYTE ub = NormFloatToByte( fFade);
     COLOR colStar = RGBToColor( ub, ub, ub);
+    colStar = MulColors(colStar, colMultiply); // [SSE] Colors for ParticlesHolder
     Particle_RenderSquare( vPos, fParticleSize*(1.0f+afStarsPositions[iFoam][1]*0.25f), fRndRotation*300*fT, colStar|0xFF);
   }
   // all done
@@ -2037,7 +2046,7 @@ void Particles_WaterfallFoam(CEntity *pen, FLOAT fSizeX, FLOAT fSizeY, FLOAT fSi
 
 void Particles_EmanatePlane(CEntity *pen, FLOAT fSizeX, FLOAT fSizeY, FLOAT fSizeZ, 
                             FLOAT fParticleSize, FLOAT fAway, FLOAT fSpeed, 
-                            enum ParticleTexture ptTexture, INDEX ctParticles, FLOAT fMipFactorDisappear)
+                            enum ParticleTexture ptTexture, INDEX ctParticles, FLOAT fMipFactorDisappear, COLOR colMultiply/*=C_WHITE|CT_OPAQUE*/)
 {
   ASSERT( ctParticles<=CT_MAX_PARTICLES_TABLE);
   if( Particle_GetMipFactor()>fMipFactorDisappear) return;
@@ -2072,6 +2081,7 @@ void Particles_EmanatePlane(CEntity *pen, FLOAT fSizeX, FLOAT fSizeY, FLOAT fSiz
     
     UBYTE ub = NormFloatToByte( fFade*fDisappearRatio);
     COLOR colStar = RGBToColor( ub, ub, ub);
+    colStar = MulColors(colStar, colMultiply); // [SSE] Colors for ParticlesHolder
     Particle_RenderSquare( vPos, fParticleSize, 0, colStar|0xFF);
   }
   // all done
@@ -2083,7 +2093,7 @@ void Particles_EmanatePlane(CEntity *pen, FLOAT fSizeX, FLOAT fSizeY, FLOAT fSiz
 #define FOUNTAIN_FADE_OUT 0.4f
 #define FOUNTAIN_TOTAL_TIME 0.6f
 void Particles_Fountain( CEntity *pen, FLOAT fSize, FLOAT fHeight,
-                        enum ParticleTexture ptTexture, INDEX ctParticles)
+                        enum ParticleTexture ptTexture, INDEX ctParticles, COLOR colMultiply/*=C_WHITE|CT_OPAQUE*/)
 {
   ASSERT( ctParticles<=CT_MAX_PARTICLES_TABLE);
   FLOAT fNow = _pTimer->GetLerpedCurrentTick();
@@ -2118,6 +2128,7 @@ void Particles_Fountain( CEntity *pen, FLOAT fSize, FLOAT fHeight,
       COLOR colStar = pTD->GetTexel( FloatToInt(fFade*2048), 0);
       ULONG ulA = FloatToInt( ((colStar&CT_AMASK)>>CT_ASHIFT) * fFade);
       colStar = (colStar&~CT_AMASK) | (ulA<<CT_ASHIFT);
+      colStar = MulColors(colStar, colMultiply); // [SSE] Colors for ParticlesHolder
       Particle_RenderSquare( vPos, 0.05f, 0, colStar);
     }
   }
@@ -2382,7 +2393,7 @@ void Particles_LavaErupting(CEntity *pen, FLOAT fStretchAll, FLOAT fSize,
 
 #define CT_ATOMIC_TRAIL 32
 void Particles_Atomic( CEntity *pen, FLOAT fSize, FLOAT fHeight,
-                      enum ParticleTexture ptTexture, INDEX ctEllipses)
+                      enum ParticleTexture ptTexture, INDEX ctEllipses, COLOR colMultiply/*=C_WHITE|CT_OPAQUE*/)
 {
   ASSERT( ctEllipses<=CT_MAX_PARTICLES_TABLE);
   FLOAT fMipFactor = Particle_GetMipFactor();
@@ -2420,6 +2431,7 @@ void Particles_Atomic( CEntity *pen, FLOAT fSize, FLOAT fHeight,
       vPos+=vB*(sin((fT-iTrail*fTrailDelta)/*+afStarsPositions[iEllipse][0]*/)*1.0f*fSize);
       UBYTE ub = NormFloatToByte( (FLOAT)(ctAtomicTrail-iTrail) / (FLOAT)(ctAtomicTrail));
       COLOR colStar = RGBToColor( ub>>3, ub>>3, ub>>2);
+      colStar = MulColors(colStar, colMultiply); // [SSE] Colors for ParticlesHolder
       Particle_RenderSquare( vPos, 0.2f, 0, colStar|0xFF);
     }
   }
@@ -5053,7 +5065,7 @@ void Particles_SummonerExplode(CEntity *pen, FLOAT3D vCenter, FLOAT fArea, FLOAT
 }
 
 #define TM_TWISTER_TOTAL_LIFE 10.0f
-void Particles_Twister( CEntity *pen, FLOAT fStretch, FLOAT fStartTime, FLOAT fFadeOutStartTime, FLOAT fParticleStretch)
+void Particles_Twister( CEntity *pen, FLOAT fStretch, FLOAT fStartTime, FLOAT fFadeOutStartTime, FLOAT fParticleStretch, COLOR colMultiply/*=C_WHITE|CT_OPAQUE*/)
 {
   FLOAT fMipFactor = Particle_GetMipFactor();
   FLOAT fMipStretch = 1.0f+ClampDn(7.0f-fMipFactor,0.0f)/2.0f;
@@ -5123,6 +5135,7 @@ void Particles_Twister( CEntity *pen, FLOAT fStretch, FLOAT fStartTime, FLOAT fF
     COLOR colA = pTD->GetTexel(PIX(ClampUp(fT*1024.0f, 1023.0f)), 0);
     UBYTE ubA=UBYTE((colA&0xFF)*0.75f*fFadeOut);
     COLOR colCombined=(col&0xFFFFFF00)|ubA;
+    colCombined = MulColors(colCombined, colMultiply); // [SSE] Colors for ParticlesHolder
     Particle_RenderSquare( vPos, fSize*fParticleStretch, fAngle, colCombined);
     Particle_SetTexturePart( 128, 128, 0, 0);
     Particle_RenderLine( vPos, vPos2, (0.25f+2.0f*fT)*fParticleStretch, colCombined);
@@ -5269,7 +5282,7 @@ void Particles_Windblast( CEntity *pen, FLOAT fStretch, FLOAT fFadeOutStartTime)
 
 #define CT_COLLECT_ENERGY_PARTICLES 128
 #define CT_PROJECTILE_SPAWN_STARS 32
-void Particles_CollectEnergy(CEntity *pen, FLOAT tmStart, FLOAT tmStop)
+void Particles_CollectEnergy(CEntity *pen, FLOAT tmStart, FLOAT tmStop, COLOR colMultiply1/*=C_WHITE|CT_OPAQUE*/, COLOR colMultiply2/*=C_WHITE|CT_OPAQUE*/)
 {
   Particle_PrepareTexture( &_toElectricitySparks, PBT_BLEND);
   Particle_SetTexturePart( 512, 1024, 0, 0);
@@ -5306,6 +5319,7 @@ void Particles_CollectEnergy(CEntity *pen, FLOAT tmStart, FLOAT tmStop)
     UBYTE ubB = 16+afStarsPositions[iRnd][3]*32+(1.0f-fT)*64;
     UBYTE ubA = CalculateRatio( fT, 0.0f, 1.0f, 0.4f, 0.01f)*255;
     COLOR colLine = RGBToColor( ubR, ubG, ubB) | ubA;
+    colLine = MulColors(colLine, colMultiply2); // [SSE] Colors for ParticlesHolder
     
     FLOAT fSize = 0.125f;
     Particle_RenderLine( vPos2, vPos, fSize, colLine);
@@ -5345,7 +5359,9 @@ void Particles_CollectEnergy(CEntity *pen, FLOAT tmStart, FLOAT tmStop)
     UBYTE ubA = fFader*fPulser*255;
     COLOR colLine = RGBToColor( ubA, ubA, ubA) | CT_OPAQUE;
     FLOAT fSize = 2;
-    Particle_RenderSquare( vPos, fSize, 0.0f, C_ORANGE|ubA);
+    
+    colLine = MulColors(C_ORANGE|ubA, colMultiply1); // [SSE] Colors for ParticlesHolder
+    Particle_RenderSquare( vPos, fSize, 0.0f, colLine);
     ctRendered++;
   }
 

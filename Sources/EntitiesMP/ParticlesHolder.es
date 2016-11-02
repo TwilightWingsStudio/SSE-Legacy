@@ -19,25 +19,25 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 enum ParticlesHolderType {
-  1 PHT_SPIRAL        "Spiral",
-  2 PHT_EMANATE       "Emanate",
-  3 PHT_STARDUST      "Stardust",
-  4 PHT_ATOMIC        "Atomic",
-  5 PHT_RISING        "Rising",
-  6 PHT_FOUNTAIN      "Fountain",
-  7 PHT_SMOKE         "Smoke",
-  8 PHT_BLOOD         "Blood",
-  9 PHT_EMANATEPLANE  "EmanatePlane",
-  10 PHT_SANDFLOW     "SandFlow",
-  11 PHT_WATERFLOW    "WaterFlow",
-  12 PHT_LAVAFLOW     "Lava Flow",
-  13 PHT_LAVAERUPTING "Lava Erupting",
-  14 PHT_WATERFALLFOAM "Waterfall foam",
-  15 PHT_CHIMNEYSMOKE "Chimney smoke",
-  16 PHT_WATERFALL    "Waterfall",
-  17 PHT_TWISTER      "Twister",
-  18 PHT_ROCKETMOTOR  "Rocket motor",
-  19 PHT_COLLECT_ENERGY "Collect energy",
+   1 PHT_SPIRAL         "01 Spiral",
+   2 PHT_EMANATE        "02 Emanate",
+   3 PHT_STARDUST       "03 Stardust",
+   4 PHT_ATOMIC         "04 Atomic",
+   5 PHT_RISING         "05 Rising",
+   6 PHT_FOUNTAIN       "06 Fountain",
+   7 PHT_SMOKE          "07 Smoke Trail (not working)",
+   8 PHT_BLOOD          "08 Blood Trail (not working)",
+   9 PHT_EMANATEPLANE   "09 EmanatePlane",
+  10 PHT_SANDFLOW       "10 SandFlow",
+  11 PHT_WATERFLOW      "11 WaterFlow",
+  12 PHT_LAVAFLOW       "12 Lava Flow",
+  13 PHT_LAVAERUPTING   "13 Lava Erupting",
+  14 PHT_WATERFALLFOAM  "14 Waterfall foam",
+  15 PHT_CHIMNEYSMOKE   "15 Chimney smoke",
+  16 PHT_WATERFALL      "16 Waterfall",
+  17 PHT_TWISTER        "17 Twister",
+  18 PHT_ROCKETMOTOR    "18 Rocket motor",
+  19 PHT_COLLECT_ENERGY "19 Collect energy",
 };
 
 class CParticlesHolder : CMovableModelEntity {
@@ -68,6 +68,9 @@ properties:
  36 FLOAT m_fDeactivateTime = -10000.0f,
  37 FLOAT m_fMipFactorDisappear "Disappear mip factor" = 8.0f,
 
+ // [SSE]
+ 40 COLOR m_colColor1         "Color 1" = COLOR(C_WHITE|CT_OPAQUE),
+ 41 COLOR m_colColor2         "Color 2" = COLOR(C_WHITE|CT_OPAQUE),
 
 components:
 
@@ -80,32 +83,32 @@ functions:
   // render particles
   void RenderParticles(void)
   {
-    if( !m_bActive)
-    {
+    if (!m_bActive) {
       return;
     }
+
     switch (m_phtType)
     {
       case PHT_SPIRAL     :
-        Particles_Spiral(this, m_fStretchAll, m_fStretchAll/2, m_ptTexture, m_ctCount);
+        Particles_Spiral(this, m_fStretchAll, m_fStretchAll/2, m_ptTexture, m_ctCount, m_colColor1);
         break;
       case PHT_EMANATE    :
-        Particles_Emanate(this, m_fStretchAll, m_fStretchAll/2, m_ptTexture, m_ctCount, m_fMipFactorDisappear);
+        Particles_Emanate(this, m_fStretchAll, m_fStretchAll/2, m_ptTexture, m_ctCount, m_fMipFactorDisappear, m_colColor1);
         break;
       case PHT_STARDUST   :
-        Particles_Stardust(this, m_fStretchAll, m_fStretchAll/2, m_ptTexture, m_ctCount);
+        Particles_Stardust(this, m_fStretchAll, m_fStretchAll/2, m_ptTexture, m_ctCount, m_colColor1);
         break;
       case PHT_ATOMIC     :
-        Particles_Atomic(this, m_fStretchAll, m_fStretchAll/2, m_ptTexture, m_ctCount);
+        Particles_Atomic(this, m_fStretchAll, m_fStretchAll/2, m_ptTexture, m_ctCount, m_colColor1);
         break;
       case PHT_RISING     :
         Particles_Rising(this, m_fActivateTime, m_fDeactivateTime, m_fStretchAll, m_fStretchX, m_fStretchY, m_fStretchZ, m_fSize, m_ptTexture, m_ctCount);
         break;
       case PHT_FOUNTAIN   :
-        Particles_Fountain(this, m_fStretchAll, m_fStretchAll/2, m_ptTexture, m_ctCount);
+        Particles_Fountain(this, m_fStretchAll, m_fStretchAll/2, m_ptTexture, m_ctCount, m_colColor1);
         break;
       case PHT_SMOKE      :
-        Particles_GrenadeTrail(this);
+        Particles_GrenadeTrail(this, m_colColor1);
         break;
       case PHT_BLOOD      :
         Particles_BloodTrail(this);
@@ -113,7 +116,7 @@ functions:
       case PHT_EMANATEPLANE:
         Particles_EmanatePlane(this, 
           m_fStretchX, m_fStretchY, m_fStretchZ, m_fSize, 
-          m_fParam1, m_fParam2, m_ptTexture, m_ctCount, m_fMipFactorDisappear);
+          m_fParam1, m_fParam2, m_ptTexture, m_ctCount, m_fMipFactorDisappear, m_colColor1);
         break;
       case PHT_SANDFLOW   :
         Particles_SandFlow(this, m_fStretchAll, m_fSize, m_fParam1, m_fActivateTime, m_fDeactivateTime, m_ctCount);
@@ -130,24 +133,24 @@ functions:
       case PHT_WATERFALLFOAM:
         Particles_WaterfallFoam(this, 
           m_fStretchX, m_fStretchY, m_fStretchZ, m_fSize, 
-          m_fParam1, m_fParam2, m_fParam3, m_ctCount);
+          m_fParam1, m_fParam2, m_fParam3, m_ctCount, m_colColor1);
         break;
       case PHT_CHIMNEYSMOKE:
-        Particles_ChimneySmoke(this, m_ctCount, m_fStretchAll, m_fMipFactorDisappear);
+        Particles_ChimneySmoke(this, m_ctCount, m_fStretchAll, m_fMipFactorDisappear, m_colColor1);
         break;
       case PHT_ROCKETMOTOR:
         Particles_RocketMotorBurning(this, m_ctCount,
           FLOAT3D(m_fStretchX,m_fStretchY,m_fStretchZ), m_fSize, m_ctCount);
         break;
       case PHT_COLLECT_ENERGY:
-        Particles_CollectEnergy(this, m_fActivateTime, m_fActivateTime+2.0f);
+        Particles_CollectEnergy(this, m_fActivateTime, m_fActivateTime+2.0f, m_colColor1, m_colColor2);
         break;
       case PHT_TWISTER:
-        Particles_Twister(this, 1.0f, 0.0f, 1e6, 1.0f);
+        Particles_Twister(this, 1.0f, 0.0f, 1e6, 1.0f, m_colColor1);
         break;
       case PHT_WATERFALL:
         Particles_Waterfall(this, m_ctCount, m_fStretchAll, m_fStretchX, m_fStretchY, m_fStretchZ,
-          m_fSize, m_fMipFactorDisappear, m_fParam1);
+          m_fSize, m_fMipFactorDisappear, m_fParam1, m_colColor1);
         break;
     }
   }

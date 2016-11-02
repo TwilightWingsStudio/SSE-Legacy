@@ -34,7 +34,7 @@ void DECL_DLL Particles_WhiteLineTrail(CEntity *pen);
 void DECL_DLL Particles_WhiteLineTrail_Prepare(CEntity *pen);
 void DECL_DLL Particles_Fireball01Trail(CEntity *pen);
 void DECL_DLL Particles_Fireball01Trail_Prepare(CEntity *pen);
-void DECL_DLL Particles_GrenadeTrail(CEntity *pen);
+void DECL_DLL Particles_GrenadeTrail(CEntity *pen, COLOR colMultiply=C_WHITE|CT_OPAQUE);
 void DECL_DLL Particles_GrenadeTrail_Prepare(CEntity *pen);
 void DECL_DLL Particles_CannonBall(CEntity *pen, FLOAT fSpeedRatio);
 void DECL_DLL Particles_CannonBall_Prepare(CEntity *pen);
@@ -59,29 +59,30 @@ void DECL_DLL Particles_FlameThrower(const CPlacement3D &plLeader, const CPlacem
                             FLOAT fLeaderLiving, FLOAT fFollowerLiving,
                             INDEX iRndSeed, BOOL bFollowerIsPipe);
 void DECL_DLL Particles_FlameThrowerStart(const CPlacement3D &plPipe, FLOAT fStartTime, FLOAT fStopTime);
-void DECL_DLL Particles_Twister( CEntity *pen, FLOAT fStretch, FLOAT fStartTime, FLOAT fFadeOutStartTime, FLOAT fParticleStretch);
+void DECL_DLL Particles_Twister( CEntity *pen, FLOAT fStretch, FLOAT fStartTime, FLOAT fFadeOutStartTime, FLOAT fParticleStretch, COLOR colMultiply=C_WHITE|CT_OPAQUE);
 INDEX DECL_DLL Particles_FireBreath(CEntity *pen, FLOAT3D vSource, FLOAT3D vTarget, FLOAT tmStart, FLOAT tmStop);
 INDEX DECL_DLL Particles_Regeneration(CEntity *pen, FLOAT tmStart, FLOAT tmStop, FLOAT fYFactor, BOOL bDeath);
 
-void DECL_DLL Particles_Stardust(CEntity *pen, FLOAT fSize, FLOAT fHeight, enum ParticleTexture ptTexture, INDEX ctParticles);
+// Some Basic Particles
+void DECL_DLL Particles_Stardust(CEntity *pen, FLOAT fSize, FLOAT fHeight, enum ParticleTexture ptTexture, INDEX ctParticles, COLOR colMultiply=C_WHITE|CT_OPAQUE);
 void DECL_DLL Particles_Rising(CEntity *pen, FLOAT m_fActivateTime, FLOAT m_fDeactivateTime, FLOAT fStretchAll, FLOAT fStretchX, FLOAT fStretchY, FLOAT fStretchZ, FLOAT fSize,
                       enum ParticleTexture ptTexture, INDEX ctParticles);
-void DECL_DLL Particles_Spiral(CEntity *pen, FLOAT fSize, FLOAT fHeight, enum ParticleTexture ptTexture, INDEX ctParticles);
-void DECL_DLL Particles_Emanate(CEntity *pen, FLOAT fSize, FLOAT fHeight, enum ParticleTexture ptTexture, INDEX ctParticles, FLOAT fMipFactorDisappear);
-void DECL_DLL Particles_Fountain(CEntity *pen, FLOAT fSize, FLOAT fHeight, enum ParticleTexture ptTexture, INDEX ctParticles);
-void DECL_DLL Particles_Atomic(CEntity *pen, FLOAT fSize, FLOAT fHeight, enum ParticleTexture ptTexture, INDEX ctParticles);
+void DECL_DLL Particles_Spiral(CEntity *pen, FLOAT fSize, FLOAT fHeight, enum ParticleTexture ptTexture, INDEX ctParticles, COLOR colMultiply=C_WHITE|CT_OPAQUE);
+void DECL_DLL Particles_Emanate(CEntity *pen, FLOAT fSize, FLOAT fHeight, enum ParticleTexture ptTexture, INDEX ctParticles, FLOAT fMipFactorDisappear, COLOR colMultiply=C_WHITE|CT_OPAQUE);
+void DECL_DLL Particles_Fountain(CEntity *pen, FLOAT fSize, FLOAT fHeight, enum ParticleTexture ptTexture, INDEX ctParticles, COLOR colMultiply=C_WHITE|CT_OPAQUE);
+void DECL_DLL Particles_Atomic(CEntity *pen, FLOAT fSize, FLOAT fHeight, enum ParticleTexture ptTexture, INDEX ctParticles, COLOR colMultiply=C_WHITE|CT_OPAQUE);
 void DECL_DLL Particles_PowerUpIndicator( CEntity *pen, enum ParticleTexture ptTexture, FLOAT fSize,
               FLOAT fScale, FLOAT fHeight, INDEX ctEllipses, INDEX iTrailCount);
 void DECL_DLL Particles_BloodSpray( enum SprayParticlesType sptType, FLOAT3D vPos, FLOAT3D vGDir, FLOAT fGA, FLOATaabbox3D boxOwner, FLOAT3D vSpilDirection,
                                    FLOAT tmStarted, FLOAT fDamagePower, COLOR colMultiply=C_WHITE|CT_OPAQUE);
 void DECL_DLL Particles_EmanatePlane(CEntity *pen, FLOAT fSizeX, FLOAT fSizeY, FLOAT fSizeZ, 
                             FLOAT fParticleSize, FLOAT fAway, FLOAT fSpeed, 
-                            enum ParticleTexture ptTexture, INDEX ctParticles, FLOAT fMipFactorDisappear);
+                            enum ParticleTexture ptTexture, INDEX ctParticles, FLOAT fMipFactorDisappear, COLOR colMultiply=C_WHITE|CT_OPAQUE);
 void DECL_DLL Particles_WaterfallFoam(CEntity *pen, FLOAT fSizeX, FLOAT fSizeY, FLOAT fSizeZ, 
-                             FLOAT fParticleSize, FLOAT fSpeed, FLOAT fSpeedY, FLOAT fLife, INDEX ctParticles);
-void DECL_DLL Particles_ChimneySmoke(CEntity *pen, INDEX ctCount, FLOAT fStretchAll, FLOAT fMipDisappearDistance);
+                             FLOAT fParticleSize, FLOAT fSpeed, FLOAT fSpeedY, FLOAT fLife, INDEX ctParticles, COLOR colMultiply=C_WHITE|CT_OPAQUE);
+void DECL_DLL Particles_ChimneySmoke(CEntity *pen, INDEX ctCount, FLOAT fStretchAll, FLOAT fMipDisappearDistance, COLOR colMultiply=C_WHITE|CT_OPAQUE);
 void DECL_DLL Particles_Waterfall(CEntity *pen, INDEX ctCount, FLOAT fStretchAll, FLOAT fStretchX, FLOAT fStretchY,
-                                  FLOAT fStretchZ, FLOAT fSize, FLOAT fMipDisappearDistance, FLOAT fParam1);
+                                  FLOAT fStretchZ, FLOAT fSize, FLOAT fMipDisappearDistance, FLOAT fParam1, COLOR colMultiply=C_WHITE|CT_OPAQUE);
 void DECL_DLL Particles_SandFlow(CEntity *pen, FLOAT fStretchAll, FLOAT fSize, FLOAT fHeight, FLOAT fBirthTime, FLOAT fDeathTime,
                         INDEX ctParticles);
 void DECL_DLL Particles_WaterFlow( CEntity *pen, FLOAT fStretchAll, FLOAT fSize, FLOAT fHeight, FLOAT fStartTime, FLOAT fStopTime,
@@ -152,7 +153,7 @@ void DECL_DLL Particles_SummonerExplode(CEntity *pen, FLOAT3D vCenter, FLOAT fAr
 void DECL_DLL Particles_ExotechLarvaLaser(CEntity *pen, FLOAT3D vSource, FLOAT3D vTarget);
 void DECL_DLL Particles_Smoke(CEntity *pen, FLOAT3D vOffset, INDEX ctCount, FLOAT fLife, FLOAT fSpread, FLOAT fStretchAll, FLOAT fYSpeed);
 void DECL_DLL Particles_Windblast( CEntity *pen, FLOAT fStretch, FLOAT fFadeOutStartTime);
-void DECL_DLL Particles_CollectEnergy(CEntity *pen, FLOAT tmStart, FLOAT tmStop);
+void DECL_DLL Particles_CollectEnergy(CEntity *pen, FLOAT tmStart, FLOAT tmStop, COLOR colMultiply1=C_WHITE|CT_OPAQUE, COLOR colMultiply2=C_WHITE|CT_OPAQUE);
 void DECL_DLL Particles_SniperResidue(CEntity *pen, FLOAT3D vSource, FLOAT3D vTarget); 
 void DECL_DLL Particles_GrowingSwirl( CEntity *pen, FLOAT fStretch, FLOAT fStartTime);
 void DECL_DLL Particles_SummonerDisappear( CEntity *pen, FLOAT tmStart);
