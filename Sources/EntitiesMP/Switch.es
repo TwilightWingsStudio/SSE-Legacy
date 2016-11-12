@@ -52,33 +52,40 @@ properties:
  22 BOOL m_bUseable = FALSE,      // set while the switch can be triggered
  23 BOOL m_bInvisible "Invisible" = FALSE,    // make it editor model
 
+ // [SSE]
  30 FLOAT m_fUseRange "Use Range" = 2.0F,
+ // TODO:
+ //31 BOOL m_bUseOnLook "Use On Look" = FALSE,
  
 components:
 
 
 functions:                                        
-
-  /* Get anim data for given animation property - return NULL for none. */
+  // --------------------------------------------------------------------------------------
+  // Returns anim data for given animation property - returns NULL for none.
+  // --------------------------------------------------------------------------------------
   CAnimData *GetAnimData(SLONG slPropertyOffset) 
   {
-    if (slPropertyOffset==offsetof(CSwitch, m_iModelONAnimation) ||
-        slPropertyOffset==offsetof(CSwitch, m_iModelOFFAnimation)) {
+    if (slPropertyOffset == offsetof(CSwitch, m_iModelONAnimation) ||
+        slPropertyOffset == offsetof(CSwitch, m_iModelOFFAnimation)) {
       return GetModelObject()->GetData();
-    } else if (slPropertyOffset==offsetof(CSwitch, m_iTextureONAnimation) ||
-               slPropertyOffset==offsetof(CSwitch, m_iTextureOFFAnimation)) {
+    } else if (slPropertyOffset == offsetof(CSwitch, m_iTextureONAnimation) ||
+               slPropertyOffset == offsetof(CSwitch, m_iTextureOFFAnimation)) {
       return GetModelObject()->mo_toTexture.GetData();
     } else {
       return CModelHolder2::GetAnimData(slPropertyOffset);
     }
   }
 
-  // test if this door reacts on this entity
+  // --------------------------------------------------------------------------------------
+  // Returns TRUE if this door reacts on this entity.
+  // --------------------------------------------------------------------------------------
   BOOL CanReactOnEntity(CEntity *pen)
   {
-    if (pen==NULL) {
+    if (pen == NULL) {
       return FALSE;
     }
+
     // never react on non-live or dead entities
     if (!(pen->GetFlags()&ENF_ALIVE)) {
       return FALSE;
@@ -87,35 +94,37 @@ functions:
     return TRUE;
   }
 
-
-  // returns bytes of memory used by this object
+  // --------------------------------------------------------------------------------------
+  // Returns bytes of memory used by this object.
+  // --------------------------------------------------------------------------------------
   SLONG GetUsedMemory(void)
   {
     // initial
     SLONG slUsedMemory = sizeof(CSwitch) - sizeof(CModelHolder2) + CModelHolder2::GetUsedMemory();
+
     // add some more
     slUsedMemory += m_strMessage.Length();
     return slUsedMemory;
   }
 
-
-
 procedures:
-
-
-  // turn the switch on
+  // --------------------------------------------------------------------------------------
+  // Turn the switch on.
+  // --------------------------------------------------------------------------------------
   SwitchON() {
-    // if already on
-    if (m_bSwitchON) {
-      // do nothing
+    // If already on then do nothing!
+    if (!m_bSwitchON) {
       return;
     }
+
     // switch ON
     GetModelObject()->PlayAnim(m_iModelONAnimation, 0);
     GetModelObject()->mo_toTexture.PlayAnim(m_iTextureONAnimation, 0);
     m_bSwitchON = TRUE;
+
     // send event to target
     SendToTarget(m_penTarget, m_eetEvent, m_penCaused);
+
     // wait for anim end
     wait(GetModelObject()->GetAnimLength(m_iModelONAnimation)) {
       on (EBegin) : { resume; } on (ETimer) : { stop; } on (EDeath) : { pass; } otherwise(): { resume; }
@@ -124,24 +133,24 @@ procedures:
     return EReturn();  // to notify that can be usable
   };
 
-  // turn the switch off
+  // --------------------------------------------------------------------------------------
+  // Turn the switch off.
+  // --------------------------------------------------------------------------------------
   SwitchOFF() {
-    // if already off
+    // If already off then do nothing!
     if (!m_bSwitchON) {
-      // do nothing
       return;
     }
+
     // switch off
     GetModelObject()->PlayAnim(m_iModelOFFAnimation, 0);
     GetModelObject()->mo_toTexture.PlayAnim(m_iTextureOFFAnimation, 0);
     m_bSwitchON = FALSE;
+
     // if exists off target
-    if(m_penOffTarget!=NULL)
-    {
+    if (m_penOffTarget != NULL) {
       SendToTarget(m_penOffTarget, m_eetOffEvent, m_penCaused);
-    }
-    else
-    {
+    } else {
       // send off event to target
       SendToTarget(m_penTarget, m_eetOffEvent, m_penCaused);
     }
@@ -153,6 +162,9 @@ procedures:
     return EReturn();  // to notify that can be usable
   };
 
+  // --------------------------------------------------------------------------------------
+  // MainLoop for Switch with Type=Once.
+  // --------------------------------------------------------------------------------------
   MainLoop_Once() {
     m_bUseable = TRUE;
 
@@ -166,16 +178,19 @@ procedures:
           call SwitchON();
         }
       }
+
       // start -> switch ON
       on (EStart) : {
         m_bUseable = FALSE;
         call SwitchON();
       }
+
       // stop -> switch OFF
       on (EStop) : {
         m_bUseable = FALSE;
         call SwitchOFF();
       }
+
       on (EReturn) : {
         m_bUseable = !m_bSwitchON;
         resume;
@@ -183,6 +198,9 @@ procedures:
     }
   };
 
+  // --------------------------------------------------------------------------------------
+  // MainLoop for Switch with Type=OnOff.
+  // --------------------------------------------------------------------------------------
   MainLoop_OnOff() {
     m_bUseable = TRUE;
 
@@ -202,23 +220,28 @@ procedures:
           }
         }
       }
+
       // start -> switch ON
       on (EStart) : {
         m_bUseable = FALSE;
         call SwitchON();
       }
+
       // stop -> switch OFF
       on (EStop) : {
         m_bUseable = FALSE;
         call SwitchOFF();
       }
+
       // when dead
       on(EDeath): {
-        if (m_penDestruction!=NULL) {
+        if (m_penDestruction != NULL) {
           jump CModelHolder2::Die();
         }
+
         resume;
       }
+
       on (EReturn) : {
         m_bUseable = TRUE;
         resume;
@@ -226,6 +249,9 @@ procedures:
     }
   };
 
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main() {
     // init as model
     CModelHolder2::InitModelHolder();
@@ -234,7 +260,7 @@ procedures:
       SwitchToEditorModel();
     }
 
-    if (m_swtType==SWT_ONCE) {
+    if (m_swtType == SWT_ONCE) {
       jump MainLoop_Once();
     } else {
       jump MainLoop_OnOff();
