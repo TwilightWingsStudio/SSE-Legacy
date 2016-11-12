@@ -150,8 +150,10 @@ functions:
   INDEX AnimForDeath(void) {
     INDEX iAnim;
     FLOAT3D vFront;
+
     GetHeadingDirection(0, vFront);
     FLOAT fDamageDir = m_vDamage%vFront;
+
     if (fDamageDir<0) {
       iAnim = GRUNT_ANIM_DEATHBACKWARD;
     } else {
@@ -164,12 +166,9 @@ functions:
 
   FLOAT WaitForDust(FLOAT3D &vStretch) {
     vStretch=FLOAT3D(1,1,2);
-    if(GetModelObject()->GetAnim()==GRUNT_ANIM_DEATHBACKWARD)
-    {
+    if (GetModelObject()->GetAnim()==GRUNT_ANIM_DEATHBACKWARD) {
       return 0.5f;
-    }
-    else if(GetModelObject()->GetAnim()==GRUNT_ANIM_DEATHFORWARD)
-    {
+    } else if(GetModelObject()->GetAnim()==GRUNT_ANIM_DEATHFORWARD) {
       return 1.0f;
     }
     return -1.0f;
@@ -318,6 +317,7 @@ procedures:
         // set your texture
         SetModelMainTexture(TEXTURE_SOLDIER);
         AddAttachment(GRUNT_ATTACHMENT_GUN_SMALL, MODEL_GUN_SOLDIER, TEXTURE_GUN_SOLDIER);
+
         // setup moving speed
         m_fWalkSpeed = FRnd() + 2.5f;
         m_aWalkRotateSpeed = AngleDeg(FRnd()*10.0f + 500.0f);
@@ -325,6 +325,7 @@ procedures:
         m_aAttackRotateSpeed = AngleDeg(FRnd()*50 + 245.0f);
         m_fCloseRunSpeed = FRnd() + 6.5f;
         m_aCloseRotateSpeed = AngleDeg(FRnd()*50 + 245.0f);
+
         // setup attack distances
         m_fAttackDistance = 80.0f;
         m_fCloseDistance = 0.0f;
@@ -332,21 +333,25 @@ procedures:
         m_fAttackFireTime = 2.0f;
         m_fCloseFireTime = 1.0f;
         m_fIgnoreRange = 200.0f;
+
+        // damage/explode properties
         //m_fBlowUpAmount = 65.0f;
         m_fBlowUpAmount = 80.0f;
         m_fBodyParts = 4;
-        m_fDamageWounded = 0.0f;
+        m_fDamageWounded = 5.0f; // [SSE] Balance Change. Default=0.0F.
         m_iScore = 500;
         SetHealth(40.0f);
         m_fMaxHealth = 40.0f;
+
         // set stretch factors for height and width
         GetModelObject()->StretchModel(FLOAT3D(STRETCH_SOLDIER, STRETCH_SOLDIER, STRETCH_SOLDIER));
         break;
   
       case GT_COMMANDER:
-        // set your texture
+        // set your texturel
         SetModelMainTexture(TEXTURE_COMMANDER);
         AddAttachment(GRUNT_ATTACHMENT_GUN_COMMANDER, MODEL_GUN_COMMANDER, TEXTURE_GUN_COMMANDER);
+
         // setup moving speed
         m_fWalkSpeed = FRnd() + 2.5f;
         m_aWalkRotateSpeed = AngleDeg(FRnd()*10.0f + 500.0f);
@@ -354,20 +359,23 @@ procedures:
         m_aAttackRotateSpeed = AngleDeg(FRnd()*50 + 245.0f);
         m_fCloseRunSpeed = FRnd() + 8.0f;
         m_aCloseRotateSpeed = AngleDeg(FRnd()*50 + 245.0f);
+
         // setup attack distances
         m_fAttackDistance = 90.0f;
         m_fCloseDistance = 0.0f;
         m_fStopDistance = 15.0f;
         m_fAttackFireTime = 4.0f;
         m_fCloseFireTime = 2.0f;
-        //m_fBlowUpAmount = 180.0f;
         m_fIgnoreRange = 200.0f;
+
         // damage/explode properties
+        //m_fBlowUpAmount = 180.0f;
         m_fBodyParts = 5;
-        m_fDamageWounded = 0.0f;
+        m_fDamageWounded = 5.0f; // [SSE] Balance Change. Default=0.0F.
         m_iScore = 800;
         SetHealth(60.0f);
         m_fMaxHealth = 60.0f;
+
         // set stretch factors for height and width
         GetModelObject()->StretchModel(FLOAT3D(STRETCH_COMMANDER, STRETCH_COMMANDER, STRETCH_COMMANDER));
         break;
