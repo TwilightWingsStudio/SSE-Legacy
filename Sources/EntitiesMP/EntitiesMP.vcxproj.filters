@@ -595,6 +595,9 @@
     <ClCompile Include="PlayerSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sequencer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1641,6 +1644,12 @@
     <ClInclude Include="PlayerSettings_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Sequencer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sequencer_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2563,6 +2572,9 @@
     </CustomBuild>
     <CustomBuild Include="PlayerSettings.es">
       <Filter>Class Files\Players</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Sequencer.es">
+      <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
