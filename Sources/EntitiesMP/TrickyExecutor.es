@@ -40,10 +40,16 @@ components:
   2 texture TEXTURE_TELEPORTER "Models\\Editor\\TrickyExecutor.tex",
 
 functions:
+  // --------------------------------------------------------------------------------------
+  // Returns short entity description to show it in SED.
+  // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const {
     return m_strDescription;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Called every time when entity receiving ETrigger entity event.
+  // --------------------------------------------------------------------------------------
   void DoExecution() {
     if (m_bDontIfNoEntity && m_penEnityToTrick == NULL) {
       return;
@@ -59,6 +65,9 @@ functions:
   }
 
 procedures:
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     InitAsEditorModel();
