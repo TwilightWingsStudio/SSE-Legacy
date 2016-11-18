@@ -87,11 +87,16 @@ components:
   2 texture TEXTURE_CONDITION   "Models\\Editor\\Condition.tex"
 
 functions:
-
+  // --------------------------------------------------------------------------------------
+  // Returns short entity description to show it in SED.
+  // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const{
     return m_strDescription;
   } 
 
+  // --------------------------------------------------------------------------------------
+  // Called every time when entity receives ETrigger event and it's active.
+  // --------------------------------------------------------------------------------------
   void HandleETrigger(const CEntityEvent &ee)
   {
     // If non-active.
@@ -315,33 +320,41 @@ functions:
       if (bf1 && bf2) {
         FLOAT rAbs1 = fValue;
         FLOAT rAbs2 = fValue2;
+
+        // Take absolute values if it enabled.
         if (m_bAbs1) {rAbs1 = abs(rAbs1);}
         if (m_bAbs2) {rAbs2 = abs(rAbs2);}
+
         if (m_eCondition == EC_SAME) {
           if (rAbs1 == rAbs2) {
             bResult = TRUE;
           }
         }
+
         if (m_eCondition == EC_DIFFERENT) {
           if (rAbs1 != rAbs2) {
             bResult = TRUE;
           }
         }
+
         if (m_eCondition == EC_LARGER) {
           if (rAbs1 > rAbs2) {
             bResult = TRUE;
           }
         }
+
         if (m_eCondition == EC_LARGER_SAME) {
           if (rAbs1 >= rAbs2) {
             bResult = TRUE;
           }
         }
+
         if (m_eCondition == EC_SMALLER) {
           if (rAbs1 < rAbs2) {
             bResult = TRUE;
           }
         }
+
         if (m_eCondition == EC_SMALLER_SAME) {
           if (rAbs1 <= rAbs2) {
             bResult = TRUE;
@@ -351,6 +364,7 @@ functions:
         if (fValue > 0) {
           bResult = TRUE;
         }
+
       // POINTER
       } else if (bp1 && bp2) {
         if (penPointer) {
@@ -370,7 +384,8 @@ functions:
             if (m_bDebug) {
               CPrintF(TRANS("%s : Second Condition Pointer not set, checking if %s.%s exists instead\n"), m_strName,((CEntity&)*m_penIfCondition1).GetName(), m_strProperty1);
             }
-            if (penPointer!=NULL) {
+
+            if (penPointer != NULL) {
               bResult = TRUE;
             }
           }
@@ -432,6 +447,9 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
+  // The entity event handler.
+  // --------------------------------------------------------------------------------------
   BOOL HandleEvent(const CEntityEvent &ee)
   {
     if (ee.ee_slEvent == EVENTCODE_ETrigger) {
@@ -450,7 +468,9 @@ functions:
   }
 
 procedures:
-
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     InitAsEditorModel();
@@ -474,7 +494,9 @@ procedures:
         } else {
           strCode += ".";
 
-          switch (m_eCT1) {
+          // Select first operand's name.
+          switch (m_eCT1)
+          {
             case ECT_POSX:      strCode += "PosX"; break;
             case ECT_POSY:      strCode += "PosY"; break;
             case ECT_POSZ:      strCode += "PosZ"; break;
@@ -527,7 +549,9 @@ procedures:
         } else {
           strCode += ".";
 
-          switch (m_eCT2) {
+          // Select second operand's name.
+          switch (m_eCT2)
+          {
             case ECT_POSX:      strCode += "PosX"; break;
             case ECT_POSY:      strCode += "PosY"; break;
             case ECT_POSZ:      strCode += "PosZ"; break;
