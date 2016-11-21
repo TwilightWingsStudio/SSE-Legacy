@@ -116,6 +116,10 @@ extern CTString ser_strNameMask = "";
 extern INDEX ser_bInverseBanning = FALSE;
 extern CTString ser_strMOTD = "";
 
+// [SSE] Netcode Update - For Debugging Player Detaching
+extern INDEX ser_bReportMsgActionsWrongClient = FALSE;
+//
+
 extern INDEX cli_bEmulateDesync  = FALSE;
 extern INDEX cli_bDumpSync       = FALSE;
 extern INDEX cli_bDumpSyncEachTick = FALSE;
@@ -166,7 +170,7 @@ extern INDEX net_bReportCRC = FALSE;
 extern FLOAT net_fDropPackets = 0.0f;
 extern FLOAT net_tmLatency = 0.0f;
 
-// SSE
+// [SSE] Split Screen Restriction
 extern INDEX net_iMaxLocalPlayersPerClient = 4;
 //
 
@@ -755,6 +759,32 @@ CNetworkLibrary::~CNetworkLibrary(void)
   delete &ga_srvServer;
 }
 
+static void DetachPlayerTest(void* pArgs)
+{
+  INDEX iPlayer = NEXTARGUMENT(INDEX);
+
+  CPrintF("remplayertest:\n");
+  if (!_pNetwork->ga_srvServer.srv_bActive) {
+    CPrintF("  <not a server>\n");
+    return;
+  }
+
+  iPlayer = Clamp(iPlayer, (INDEX)0, (INDEX)15);
+
+  if (! _pNetwork->ga_sesSessionState.ses_apltPlayers[iPlayer].IsActive()) {
+    CPrintF("  <invalid player>\n");
+	return;
+  }
+
+  // create message for removing player from all session
+  CNetworkStreamBlock nsbRemPlayerData(MSG_SEQ_DETACHPLAYER, ++_pNetwork->ga_srvServer.srv_iLastProcessedSequence);
+  nsbRemPlayerData<<iPlayer;      // player index
+  // put the message in buffer to be sent to all sessions
+  _pNetwork->ga_srvServer.AddBlockToAllSessions(nsbRemPlayerData);
+
+  // deactivate it
+  _pNetwork->ga_srvServer.srv_aplbPlayers[iPlayer].Deactivate();
+}
 
 /*
  * Initialize game management.
@@ -763,8 +793,11 @@ void CNetworkLibrary::Init(const CTString &strGameID)
 {
   // remember the game ID
   CMessageDispatcher::Init(strGameID);
+  
+  // [SSE] Netcode Update - Test For Detaching
+  _pShell->DeclareSymbol("user void DetachPlayerTest(INDEX);", &DetachPlayerTest);
 
-  // add shell symbols
+  // Add shell symbols.
   _pShell->DeclareSymbol("user INDEX dbg_bBreak;", &dbg_bBreak);
   _pShell->DeclareSymbol("persistent user INDEX gam_bPretouch;", &gam_bPretouch);
 
@@ -780,9 +813,11 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user void KickClient(INDEX, CTString);", &KickClientCfunc);
   _pShell->DeclareSymbol("user void KickByName(CTString, CTString);", &KickByNameCfunc);
   _pShell->DeclareSymbol("user void ListPlayers(void);", &ListPlayers);
-  // SSE
+
+  // [SSE] Server Utilites
   _pShell->DeclareSymbol("user void ListObservers(void);", &ListObservers);
   //
+
   _pShell->DeclareSymbol("user void Admin(CTString);", &Admin);
 
   _pShell->DeclareSymbol("user void AddIPMask(CTString);", &AddIPMask);
@@ -811,6 +846,11 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user INDEX ser_bReportSyncBad;",   &ser_bReportSyncBad);
   _pShell->DeclareSymbol("user INDEX ser_bReportSyncLate;",  &ser_bReportSyncLate);
   _pShell->DeclareSymbol("user INDEX ser_bReportSyncEarly;", &ser_bReportSyncEarly);
+
+  // [SSE] Netcode Update - For Debugging Player Detaching
+  _pShell->DeclareSymbol("user INDEX ser_bReportMsgActionsWrongClient;", &ser_bReportMsgActionsWrongClient);
+  //
+
   _pShell->DeclareSymbol("user INDEX ser_bPauseOnSyncBad;",  &ser_bPauseOnSyncBad);
   _pShell->DeclareSymbol("user INDEX ser_iKickOnSyncBad;",   &ser_iKickOnSyncBad);
   _pShell->DeclareSymbol("user INDEX ser_bKickOnSyncLate;",  &ser_bKickOnSyncLate);
@@ -829,9 +869,11 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user INDEX net_iVIPReserve;", &net_iVIPReserve);
   _pShell->DeclareSymbol("user INDEX net_iMaxObservers;", &net_iMaxObservers);
   _pShell->DeclareSymbol("user INDEX net_iMaxClients;", &net_iMaxClients);
-  // SSE
+
+  // [SSE] Split Screen Restriction
   _pShell->DeclareSymbol("user INDEX net_iMaxLocalPlayersPerClient;", &net_iMaxLocalPlayersPerClient);
   //
+
   _pShell->DeclareSymbol("user CTString net_strConnectPassword;", &net_strConnectPassword);
   _pShell->DeclareSymbol("user CTString net_strAdminPassword;", &net_strAdminPassword);
   _pShell->DeclareSymbol("user FLOAT net_tmConnectionTimeout;", &net_tmConnectionTimeout);
