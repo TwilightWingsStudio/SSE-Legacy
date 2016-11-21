@@ -426,6 +426,36 @@ static void ListObservers(void)
   CPrintF("  ----------------------------------------\n");
 }
 
+static void ListAllPlayers(void)
+{
+  CPrintF("player list:\n");
+  if (!_pNetwork->ga_srvServer.srv_bActive) {
+    CPrintF("  <not a server>\n");
+    return;
+  }
+  
+  CPrintF("  entityid# ip\n");
+  CPrintF("  ----------------------------------------\n");
+  
+  INDEX ctPlayers = 0;
+
+  FOREACHINDYNAMICCONTAINER(_pNetwork->ga_World.wo_cenEntities, CEntity, iten) {
+    CEntity *pen = &*iten;
+    // if it is player entity
+    if (IsDerivedFromClass(pen, "PlayerEntity")) {
+      CPlayerEntity *penPlayer = (CPlayerEntity *)pen;
+      CPrintF("     %-4d   %s\n", penPlayer->en_ulID, penPlayer->GetPlayerName());
+      ctPlayers++;
+    }
+  }
+  
+  if (ctPlayers == 0) {
+    CPrintF("    There are no players!\n");
+  }
+  
+  CPrintF("  ----------------------------------------\n");
+}
+
 static void ListPlayers(void)
 {
   CPrintF("player list:\n");
@@ -816,6 +846,7 @@ void CNetworkLibrary::Init(const CTString &strGameID)
 
   // [SSE] Server Utilites
   _pShell->DeclareSymbol("user void ListObservers(void);", &ListObservers);
+  _pShell->DeclareSymbol("user void ListAllPlayers(void);", &ListAllPlayers);
   //
 
   _pShell->DeclareSymbol("user void Admin(CTString);", &Admin);
