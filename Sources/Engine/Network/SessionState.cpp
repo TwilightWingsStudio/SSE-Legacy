@@ -1396,6 +1396,42 @@ void CSessionState::ProcessGameStreamBlock(CNetworkMessage &nmMessage)
 
     } break;
 
+  // [SSE] Netcode Update - Attaching player to client
+  case MSG_SEQ_ATTACHPLAYER:
+  {
+    _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
+
+    INDEX iNewPlayerIndex, iEntity;
+    
+    nmMessage>>iNewPlayerIndex;
+    nmMessage>>iEntity;      // entity id
+    
+    CEntity *pen = _pNetwork->ga_World.EntityFromID(iEntity);
+
+    // Ignore if target entity is NULL!
+    if (pen == NULL) {
+      break;
+    }
+
+    // Ignore if target entity isn't player entity!
+    if (!IsDerivedFromClass(pen, "PlayerEntity")) {
+      break;
+    }
+    
+    // activate the player
+    ses_apltPlayers[iNewPlayerIndex].Activate();
+    
+    CPlayerEntity *penNewPlayer = (CPlayerEntity*)pen;
+    
+    // Atach entity to client data.
+    ses_apltPlayers[iNewPlayerIndex].AttachEntity(penNewPlayer);
+
+    //if (!_pNetwork->IsPlayerLocal(penNewPlayer)) {
+    CPrintF(TRANS("%s attached\n"), penNewPlayer->GetPlayerName());
+    //}
+    
+  } break;
+    
   // [SSE] Netcode Update - Detaching player from client
   case MSG_SEQ_DETACHPLAYER: {
     _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
@@ -1408,10 +1444,19 @@ void CSessionState::ProcessGameStreamBlock(CNetworkMessage &nmMessage)
     // receive a pointer to player entity
     CPlayerEntity *penPlayerEntity = ses_apltPlayers[iPlayer].plt_penPlayerEntity;
     
-    // NOTE: [SSE] Netcode Update - Just a check for safety!
+    // Just a check for safety!
     if (penPlayerEntity != NULL) {
       CPrintF(TRANS("%s detached\n"), penPlayerEntity->GetPlayerName());
       //penPlayerEntity->Disconnect();
+    }
+    
+    FOREACHINSTATICARRAY(_pNetwork->ga_aplsPlayers, CPlayerSource, itcls)
+    {
+      if (itcls->IsActive()) {
+        if (itcls->pls_Index == iPlayer) {
+          itcls->Stop();
+        }
+      }
     }
     
     // deactivate the player
@@ -2080,6 +2125,37 @@ void CSessionState::SessionStateLoop(void)
         CPrintF(TRANS("Disconnected: %s\n"), strReason);
         // disconnect
         _cmiComm.Client_Close();
+      // [SSE] Netcode Update - Attaching player to client (phase 2)
+      } else if (nmReliable.GetType() == MSG_S2C_ATTACHPLAYER) {
+        INDEX iNewPlayer;
+        nmReliable>>iNewPlayer;
+        
+        BOOL bAlreadyInList = FALSE;
+        CPlayerSource *ppls = NULL;
+        
+        FOREACHINSTATICARRAY(_pNetwork->ga_aplsPlayers, CPlayerSource, itcls)
+        {
+          if (itcls->IsActive()) {
+            if (itcls->pls_Index == iNewPlayer) {
+              bAlreadyInList = TRUE;
+            }
+          } else {
+            if (ppls == NULL) {
+              ppls = itcls;
+            }
+          }
+        }
+        
+        if (!bAlreadyInList && ppls != NULL)
+        {
+          ppls->pls_Index = iNewPlayer;
+          ppls->pls_paAction.Clear();
+          for(INDEX ipa = 0; ipa< PLS_MAXLASTACTIONS; ipa++) {
+            ppls->pls_apaLastActions[ipa].Clear();
+          }
+          ppls->pls_Active = TRUE;
+        }
+        
       // if this is recon response
       } else if (nmReliable.GetType() == MSG_ADMIN_RESPONSE) {
         // just print it
