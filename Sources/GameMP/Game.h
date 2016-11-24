@@ -118,7 +118,7 @@ public:
   virtual void SwitchAxesToDefaults(void);
   virtual void SwitchToDefaults(void);
   virtual void DoButtonActions(void);
-  virtual void CreateAction(const CPlayerCharacter &pc, CPlayerAction &paAction, BOOL bPreScan);
+  virtual void CreateAction(INDEX iPlayer, CPlayerAction &paAction, BOOL bPreScan);
   virtual CButtonAction &AddButtonAction(void);
   virtual void RemoveButtonAction( CButtonAction &baButtonAction);
   virtual void Load_t( CTFileName fnFile); // throw char *

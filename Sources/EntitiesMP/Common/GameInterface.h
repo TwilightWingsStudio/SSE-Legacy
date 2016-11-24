@@ -25,8 +25,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // these define address and size of player controls structure
 DECL_DLL extern void *ctl_pvPlayerControls;
 DECL_DLL extern const SLONG ctl_slPlayerControlsSize;
+
 // called to compose action packet from current controls
-DECL_DLL extern void ctl_ComposeActionPacket(const CPlayerCharacter &pc, CPlayerAction &paAction, BOOL bPreScan);
+DECL_DLL extern void ctl_ComposeActionPacket(INDEX iPlayer, CPlayerAction &paAction, BOOL bPreScan);
 
 // game sets this for player hud and statistics
 DECL_DLL extern INDEX plr_iHiScore;

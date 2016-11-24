@@ -332,23 +332,23 @@ struct PlayerControls {
 
 static struct PlayerControls pctlCurrent;
 
-// cheats
-static INDEX cht_iGoToMarker = -1;
-static INDEX cht_bKillAll    = FALSE;
-static INDEX cht_bKillAllAura = FALSE;
-static INDEX cht_bGiveAll    = FALSE;
-static INDEX cht_bOpen       = FALSE;
-static INDEX cht_bAllMessages= FALSE;
-static INDEX cht_bRefresh    = FALSE;
-extern INDEX cht_bRevive     = FALSE;
-extern INDEX cht_bGod        = FALSE;
-extern INDEX cht_bFly        = FALSE;
-extern INDEX cht_bGhost      = FALSE;
-extern INDEX cht_bInvisible  = FALSE;
+// Cheats
+static INDEX cht_iGoToMarker  = -1;
+static INDEX cht_bKillAll     = FALSE;
+static INDEX cht_bKillAllAura = FALSE; // [SSE]
+static INDEX cht_bGiveAll     = FALSE;
+static INDEX cht_bOpen        = FALSE;
+static INDEX cht_bAllMessages = FALSE;
+static INDEX cht_bRefresh     = FALSE;
+extern INDEX cht_bRevive      = FALSE; // [SSe]
+extern INDEX cht_bGod         = FALSE;
+extern INDEX cht_bFly         = FALSE;
+extern INDEX cht_bGhost       = FALSE;
+extern INDEX cht_bInvisible   = FALSE;
 extern FLOAT cht_fTranslationMultiplier = 1.0f;
 extern INDEX cht_bEnable     = 0;   
 
-// interface control
+// Interface Control
 static INDEX hud_bShowAll	    = TRUE; // used internaly in menu/console
 extern INDEX hud_bShowWeapon  = TRUE;
 extern INDEX hud_bShowMessages = TRUE;
@@ -362,7 +362,7 @@ extern FLOAT hud_tmWeaponsOnScreen = 3.0f;
 extern FLOAT hud_tmLatencySnapshot = 1.0f;
 extern INDEX hud_bShowMatchInfo = TRUE;
 
-// SSE
+// [SSE] HUD
 extern BOOL hud_bRedScreenOnDamage = TRUE;
 
 extern BOOL hud_bSniperScopeDraw = TRUE;
@@ -376,7 +376,7 @@ extern FLOAT hud_fSniperScopeZoomTextOpacity = 0.7F;
 extern FLOAT hud_fSniperScopeZoomIconOpacity = 0.6F;
 
 extern BOOL hud_bSniperScopeWheelColoring = TRUE;
-//
+// [SSE] END
 
 extern FLOAT plr_fBreathingStrength = 0.0f;
 extern FLOAT plr_tmSnoopingTime;
@@ -394,7 +394,7 @@ extern FLOAT wpn_fRecoilOffset[17]  = {0};
 extern FLOAT wpn_fRecoilFactorP[17] = {0};
 extern FLOAT wpn_fRecoilFactorZ[17] = {0};
 
-// misc
+// Misc stuff
 static FLOAT plr_fAcceleration  = 100.0f;
 static FLOAT plr_fDeceleration  = 60.0f;
 static FLOAT plr_fSpeedForward  = 10.0f;
@@ -423,7 +423,7 @@ extern FLOAT ent_tmMentalFade = 0.5f;
 extern FLOAT gfx_fEnvParticlesDensity = 1.0f;
 extern FLOAT gfx_fEnvParticlesRange = 1.0f;
 
-// prediction control vars
+// Prediction control vars
 extern FLOAT cli_fPredictPlayersRange = 0.0f;
 extern FLOAT cli_fPredictItemsRange = 3.0f;
 extern FLOAT cli_tmPredictFoe = 10.0f;
@@ -438,11 +438,12 @@ static FLOAT plr_fRunSoundDelay  = 0.3f;
 static FLOAT ctl_tmComputerDoubleClick = 0.5f; // double click delay for calling computer
 static FLOAT _tmLastUseOrCompPressed = -10.0f;  // for computer doubleclick
 
-// speeds for button rotation
+// Speeds for button rotation
 static FLOAT ctl_fButtonRotationSpeedH = 300.0f;
 static FLOAT ctl_fButtonRotationSpeedP = 150.0f;
 static FLOAT ctl_fButtonRotationSpeedB = 150.0f;
-// modifier for axis strafing
+
+// Modifier for axis strafing
 static FLOAT ctl_fAxisStrafingModifier = 1.0f;
 
 // !=NULL if some player wants to call computer
@@ -461,20 +462,23 @@ DECL_DLL extern INDEX plr_iHiScore = 0.0f;
 DECL_DLL extern void *ctl_pvPlayerControls = &pctlCurrent;
 DECL_DLL extern const SLONG ctl_slPlayerControlsSize = sizeof(pctlCurrent);
 
-// called to compose action packet from current controls
-DECL_DLL void ctl_ComposeActionPacket(const CPlayerCharacter &pc, CPlayerAction &paAction, BOOL bPreScan)
+// --------------------------------------------------------------------------------------
+// Called to compose action packet from current controls.
+// --------------------------------------------------------------------------------------
+DECL_DLL void ctl_ComposeActionPacket(INDEX iPlayer/*const CPlayerCharacter &pc*/, CPlayerAction &paAction, BOOL bPreScan)
 {
   // allow double axis controls
   paAction.pa_aRotation += paAction.pa_aViewRotation;
+  
+  //CPrintF("compose: prescan %d, x:%g\n", bPreScan, paAction.pa_aRotation(1));
 
-  CPlayerSettings *pps = (CPlayerSettings *)pc.pc_aubAppearance;
-//  CPrintF("compose: prescan %d, x:%g\n", bPreScan, paAction.pa_aRotation(1));
   // if strafing
   if (pctlCurrent.bStrafe) {
     // move rotation left/right into translation left/right
     paAction.pa_vTranslation(1) = -paAction.pa_aRotation(1)*ctl_fAxisStrafingModifier;
     paAction.pa_aRotation(1) = 0;
   }
+
   // if centering view
   if (pctlCurrent.bCenterView) {
     // don't allow moving view up/down
@@ -492,28 +496,37 @@ DECL_DLL void ctl_ComposeActionPacket(const CPlayerCharacter &pc, CPlayerAction 
 
   // find local player, if any
   CPlayer *penThis = NULL;
+  
+  // [SSE] Netcode Update
+  // I deprected this shit
+  /*
   INDEX ctPlayers = CEntity::GetMaxPlayers();
-  for (INDEX iPlayer = 0; iPlayer<ctPlayers; iPlayer++) {
-    CPlayer *pen=(CPlayer *)CEntity::GetPlayerEntity(iPlayer);
-    if (pen!=NULL && pen->en_pcCharacter==pc) {
+
+  for (INDEX iPlayer = 0; iPlayer < ctPlayers; iPlayer++) {
+    CPlayer *pen = (CPlayer *)CEntity::GetPlayerEntity(iPlayer);
+    if (pen != NULL && pen->en_pcCharacter == pc) {
       penThis = pen;
       break;
     }
   }
-  // if not found
-  if (penThis==NULL) {
-    // do nothing
+  */
+
+  penThis = (CPlayer *)CEntity::GetPlayerEntity(iPlayer);
+  
+  // if not found then do nothing
+  if (penThis == NULL) {
     return;
   }
 
+  CPlayerSettings *pps = (CPlayerSettings *)penThis->en_pcCharacter.pc_aubAppearance;
+  
   // accumulate local rotation
-  penThis->m_aLocalRotation    +=paAction.pa_aRotation;
-  penThis->m_aLocalViewRotation+=paAction.pa_aViewRotation;
-  penThis->m_vLocalTranslation +=paAction.pa_vTranslation;
+  penThis->m_aLocalRotation     += paAction.pa_aRotation;
+  penThis->m_aLocalViewRotation += paAction.pa_aViewRotation;
+  penThis->m_vLocalTranslation  += paAction.pa_vTranslation;
 
-  // if prescanning
+  // if prescanning then no button checking
   if (bPreScan) {
-    // no button checking
     return;
   }
 
@@ -598,6 +611,7 @@ DECL_DLL void ctl_ComposeActionPacket(const CPlayerCharacter &pc, CPlayerAction 
     }
     _tmLastUseOrCompPressed = _pTimer->GetRealTimeTick();
   }
+
   // remember old userorcomp pressed state
   pctlCurrent.bUseOrComputerLast = pctlCurrent.bUseOrComputer;
 };
@@ -809,7 +823,7 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("persistent user FLOAT wpn_fRecoilFactorP[17];", &wpn_fRecoilFactorP);
   _pShell->DeclareSymbol("persistent user FLOAT wpn_fRecoilFactorZ[17];", &wpn_fRecoilFactorZ);
 
-  // cheats
+  // Cheats
   _pShell->DeclareSymbol("user INDEX cht_bGod;",       &cht_bGod);
   _pShell->DeclareSymbol("user INDEX cht_bFly;",       &cht_bFly);
   _pShell->DeclareSymbol("user INDEX cht_bGhost;",     &cht_bGhost);
@@ -872,7 +886,6 @@ void CPlayer_OnInitClass(void)
   CPlayer_Precache();
 }
 
-
 // clean up
 void CPlayer_OnEndClass(void)
 {
@@ -894,7 +907,6 @@ CTString GetDifficultyString(void)
 }
 
 // armor & health constants getters
-
 FLOAT MaxArmor(void)
 {
   if (GetSP()->sp_gdGameDifficulty <= CSessionProperties::GD_EASY) {
@@ -937,17 +949,18 @@ static EntityInfo eiPlayerGround = {
   0.0f, 1.7f, 0.0f,     // source (eyes)
   0.0f, 1.0f, 0.0f,     // target (body)
 };
+
 static EntityInfo eiPlayerCrouch = {
   EIBT_FLESH, 80.0f,
   0.0f, 1.2f, 0.0f,     // source (eyes)
   0.0f, 0.7f, 0.0f,     // target (body)
 };
+
 static EntityInfo eiPlayerSwim = {
   EIBT_FLESH, 40.0f,
   0.0f, 0.0f, 0.0f,     // source (eyes)
   0.0f, 0.0f, 0.0f,     // target (body)
 };
-
 
 // animation light specific
 #define LIGHT_ANIM_MINIGUN 2
