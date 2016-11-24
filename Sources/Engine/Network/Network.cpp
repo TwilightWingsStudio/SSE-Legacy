@@ -392,6 +392,29 @@ static void NetworkInfo(void)
     }
 }
 
+static void DumpPlayerTargets(void)
+{
+  CPrintF("players targets:\n");
+  
+  // for all remote clients on this machine
+  for(INDEX ipl=0; ipl < _pNetwork->ga_sesSessionState.ses_apltPlayers.Count(); ipl++)
+  {
+    CPlayerTarget &plt = _pNetwork->ga_sesSessionState.ses_apltPlayers[ipl];
+    CPrintF("  %2d %s %s\n", ipl, plt.IsActive() ? "ACTIVE  " : "INACTIVE", plt.plt_penPlayerEntity == NULL ? "NULL " : plt.plt_penPlayerEntity->GetPlayerName());
+  }
+}
+
+static void DumpPlayerSources(void)
+{
+  CPrintF("players sources:\n");
+  
+  // for all local clients on this machine
+  FOREACHINSTATICARRAY(_pNetwork->ga_aplsPlayers, CPlayerSource, itcls)
+  {
+    CPrintF("  %2d %s\n", itcls->pls_Index, itcls->IsActive() ? "ACTIVE  " : "INACTIVE");
+  }
+}
+
 static void ListObservers(void)
 {
   CPrintF("observer list:\n");
@@ -464,12 +487,12 @@ static void ListPlayers(void)
     return;
   }
 
-  CPrintF("  client# name\n");
+  CPrintF("  CLID# PLID# name\n");
   CPrintF("  ----------------------------------------\n");
   for(INDEX iplb=0; iplb<_pNetwork->ga_srvServer.srv_aplbPlayers.Count(); iplb++) {
     CPlayerBuffer &plb = _pNetwork->ga_srvServer.srv_aplbPlayers[iplb];
     if (plb.plb_Active) {
-      CPrintF("     %-2d   %s\n", plb.plb_iClient, plb.plb_pcCharacter.GetNameForPrinting());
+      CPrintF("     %-2d    %-2d %s\n", plb.plb_iClient, iplb, plb.plb_pcCharacter.GetNameForPrinting());
     }
   }
   
@@ -789,6 +812,72 @@ CNetworkLibrary::~CNetworkLibrary(void)
   delete &ga_srvServer;
 }
 
+static void AttachPlayerTest(void* pArgs)
+{
+  INDEX iClient = NEXTARGUMENT(INDEX);
+  INDEX iEntity = NEXTARGUMENT(INDEX);
+  
+  CPrintF("attachplayertest:\n");
+  if (!_pNetwork->ga_srvServer.srv_bActive) {
+    CPrintF("  <not a server>\n");
+    return;
+  }
+  
+  if (!_pNetwork->ga_srvServer.srv_assoSessions[iClient].IsActive()) {
+    CPrintF(TRANS("  <invalid client>\n"));
+    return;
+  }
+  
+  CEntity *pen = _pNetwork->ga_World.EntityFromID(iEntity);
+
+  // Skip invalid entities.
+  if (pen == NULL) {
+    CPrintF("  <invalid entity>\n");
+    return;
+  }
+
+  // Skip non-players.
+  if (!IsDerivedFromClass(pen, "PlayerEntity")) {
+    CPrintF("  <not a player>\n");
+    return;
+  }
+  
+  FOREACHINSTATICARRAY(_pNetwork->ga_sesSessionState.ses_apltPlayers, CPlayerTarget, itplt)
+  {
+    if (!itplt->IsActive()) {
+      continue;
+    }
+    
+    if (itplt->plt_penPlayerEntity == ((CPlayerEntity*)pen)) {
+      CPrintF("  <already attached>\n");
+      return;
+    }
+  }
+  
+  CPlayerBuffer *pplbNewClient;
+  pplbNewClient = _pNetwork->ga_srvServer.FirstInactivePlayer(); // find some inactive player
+  
+  if (pplbNewClient == NULL) {
+    CPrintF("  <too many players in the session>\n");
+    return;
+  }
+  
+  pplbNewClient->Activate(iClient);
+  INDEX iNewPlayer = pplbNewClient->plb_Index;
+  
+  // create message for attaching player to all sessions
+  CNetworkStreamBlock nsbAttachPlayer(MSG_SEQ_ATTACHPLAYER, ++_pNetwork->ga_srvServer.srv_iLastProcessedSequence);
+  nsbAttachPlayer<<iNewPlayer;
+  nsbAttachPlayer<<iEntity;      // entity id
+  
+  // put the message in buffer to be sent to all sessions
+  _pNetwork->ga_srvServer.AddBlockToAllSessions(nsbAttachPlayer);
+  
+  CNetworkMessage nmPlayerRegistered(MSG_S2C_ATTACHPLAYER);
+  nmPlayerRegistered<<iNewPlayer;   // player index
+  _pNetwork->SendToClientReliable(iClient, nmPlayerRegistered);
+}
+
 static void DetachPlayerTest(void* pArgs)
 {
   INDEX iPlayer = NEXTARGUMENT(INDEX);
@@ -803,17 +892,20 @@ static void DetachPlayerTest(void* pArgs)
 
   if (! _pNetwork->ga_sesSessionState.ses_apltPlayers[iPlayer].IsActive()) {
     CPrintF("  <invalid player>\n");
-	return;
+    return;
   }
 
-  // create message for removing player from all session
+  // create message for detaching player from all sessions
   CNetworkStreamBlock nsbRemPlayerData(MSG_SEQ_DETACHPLAYER, ++_pNetwork->ga_srvServer.srv_iLastProcessedSequence);
-  nsbRemPlayerData<<iPlayer;      // player index
+  nsbRemPlayerData<<iPlayer;      // write in player index
+
   // put the message in buffer to be sent to all sessions
   _pNetwork->ga_srvServer.AddBlockToAllSessions(nsbRemPlayerData);
 
   // deactivate it
   _pNetwork->ga_srvServer.srv_aplbPlayers[iPlayer].Deactivate();
+
+  CPrintF("  Detached!\n");
 }
 
 /*
@@ -824,7 +916,8 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   // remember the game ID
   CMessageDispatcher::Init(strGameID);
   
-  // [SSE] Netcode Update - Test For Detaching
+  // [SSE] Netcode Update - Test For Attaching/Detaching
+  _pShell->DeclareSymbol("user void AttachPlayerTest(INDEX, INDEX);", &AttachPlayerTest);
   _pShell->DeclareSymbol("user void DetachPlayerTest(INDEX);", &DetachPlayerTest);
 
   // Add shell symbols.
@@ -843,6 +936,10 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user void KickClient(INDEX, CTString);", &KickClientCfunc);
   _pShell->DeclareSymbol("user void KickByName(CTString, CTString);", &KickByNameCfunc);
   _pShell->DeclareSymbol("user void ListPlayers(void);", &ListPlayers);
+  
+  // [SSE] Testing
+  _pShell->DeclareSymbol("user void DumpPlayerSources(void);", &DumpPlayerSources);
+  _pShell->DeclareSymbol("user void DumpPlayerTargets(void);", &DumpPlayerTargets);
 
   // [SSE] Server Utilites
   _pShell->DeclareSymbol("user void ListObservers(void);", &ListObservers);
