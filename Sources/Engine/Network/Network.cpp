@@ -908,6 +908,43 @@ static void DetachPlayerTest(void* pArgs)
   CPrintF("  Detached!\n");
 }
 
+static void SwapPlayersTest(void* pArgs)
+{
+  INDEX iFirstPlayer = NEXTARGUMENT(INDEX);
+  INDEX iSecondPlayer = NEXTARGUMENT(INDEX);
+
+  CPrintF("swapplayerstest:\n");
+  if (!_pNetwork->ga_srvServer.srv_bActive) {
+    CPrintF("  <not a server>\n");
+    return;
+  }
+
+  iFirstPlayer = Clamp(iFirstPlayer, (INDEX)0, (INDEX)15);
+  iSecondPlayer = Clamp(iSecondPlayer, (INDEX)0, (INDEX)15);
+
+  if (!_pNetwork->ga_sesSessionState.ses_apltPlayers[iFirstPlayer].IsActive()) {
+    CPrintF("  <invalid first player>\n");
+    return;
+  }
+  
+  if (!_pNetwork->ga_sesSessionState.ses_apltPlayers[iSecondPlayer].IsActive()) {
+    CPrintF("  <invalid second player>\n");
+    return;
+  }
+
+  CServer &srvServer = _pNetwork->ga_srvServer;
+  
+  // create message for detaching player from all sessions
+  CNetworkStreamBlock nsbSwapPlayers(MSG_SEQ_SWAPPLAYERENTITIES, ++srvServer.srv_iLastProcessedSequence);
+  nsbSwapPlayers<<iFirstPlayer;      // write in player index
+  nsbSwapPlayers<<iSecondPlayer;      // write in player index
+
+  // put the message in buffer to be sent to all sessions
+  _pNetwork->ga_srvServer.AddBlockToAllSessions(nsbSwapPlayers);
+
+  CPrintF("  Swapped!\n");
+}
+
 /*
  * Initialize game management.
  */
@@ -916,9 +953,10 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   // remember the game ID
   CMessageDispatcher::Init(strGameID);
   
-  // [SSE] Netcode Update - Test For Attaching/Detaching
+  // [SSE] Netcode Update - Test For Attaching/Detaching/Swapping
   _pShell->DeclareSymbol("user void AttachPlayerTest(INDEX, INDEX);", &AttachPlayerTest);
   _pShell->DeclareSymbol("user void DetachPlayerTest(INDEX);", &DetachPlayerTest);
+  _pShell->DeclareSymbol("user void SwapPlayersTest(INDEX, INDEX);", &SwapPlayersTest);
 
   // Add shell symbols.
   _pShell->DeclareSymbol("user INDEX dbg_bBreak;", &dbg_bBreak);
