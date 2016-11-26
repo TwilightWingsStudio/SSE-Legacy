@@ -1406,6 +1406,9 @@ void CSessionState::ProcessGameStreamBlock(CNetworkMessage &nmMessage)
     nmMessage>>iNewPlayerIndex;
     nmMessage>>iEntity;      // entity id
     
+    // delete all predictors
+    _pNetwork->ga_World.DeletePredictors();
+    
     CEntity *pen = _pNetwork->ga_World.EntityFromID(iEntity);
 
     // Ignore if target entity is NULL!
@@ -1433,7 +1436,8 @@ void CSessionState::ProcessGameStreamBlock(CNetworkMessage &nmMessage)
   } break;
     
   // [SSE] Netcode Update - Detaching player from client
-  case MSG_SEQ_DETACHPLAYER: {
+  case MSG_SEQ_DETACHPLAYER:
+  {
     _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
     INDEX iPlayer;
     nmMessage >> iPlayer;      // player index
@@ -1467,28 +1471,73 @@ void CSessionState::ProcessGameStreamBlock(CNetworkMessage &nmMessage)
     //CEntity::HandleSentEvents();
     //ses_bAllowRandom = FALSE;
   } break;
+  
+    // [SSE] Netcode Update - Swap two active players between.
+  case MSG_SEQ_SWAPPLAYERENTITIES:
+  {
+    _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
+
+    INDEX iFirstPlayer, iSecondPlayer;
+    nmMessage >> iFirstPlayer >> iSecondPlayer; // player indexes
+
+    // If same player indexes then skip this block!
+    if (iFirstPlayer == iSecondPlayer) {
+      break;
+    }
+
+    // If less than zero then skip this stream block!
+    if (iFirstPlayer < 0 || iSecondPlayer < 0) {
+      break;
+    }
+
+    INDEX ctMax = CEntity::GetMaxPlayers();
+
+    // If more than limit then skip this stream block!
+    if (iFirstPlayer >= ctMax || iSecondPlayer >= ctMax) {
+      break;
+    }
+
+    CPlayerTarget &pltFirst = _pNetwork->ga_sesSessionState.ses_apltPlayers[iFirstPlayer];
+    CPlayerTarget &pltSecond = _pNetwork->ga_sesSessionState.ses_apltPlayers[iSecondPlayer];
+
+    // If one of player inactive then skip this stream block!
+    if (!pltFirst.plt_bActive || !pltSecond.plt_bActive) {
+      break;
+    }
+
+    CPlayerEntity *penFirst = pltFirst.plt_penPlayerEntity;
+    pltFirst.AttachEntity(pltSecond.plt_penPlayerEntity);
+    pltSecond.AttachEntity(penFirst);
+
+    // handle all the sent events
+    ses_bAllowRandom = TRUE;
+    CEntity::HandleSentEvents();
+    ses_bAllowRandom = FALSE;
+  } break;
 
   // if changing character
-  case MSG_SEQ_CHARACTERCHANGE: {
-      _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
-      INDEX iPlayer;
-      CPlayerCharacter pcCharacter;
-      nmMessage>>iPlayer>>pcCharacter;
+  case MSG_SEQ_CHARACTERCHANGE:
+  {
+    _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
+    INDEX iPlayer;
+    CPlayerCharacter pcCharacter;
+    nmMessage>>iPlayer>>pcCharacter;
 
-      // delete all predictors
-      _pNetwork->ga_World.DeletePredictors();
+    // delete all predictors
+    _pNetwork->ga_World.DeletePredictors();
 
-      // change the character
-      ses_apltPlayers[iPlayer].plt_penPlayerEntity->CharacterChanged(pcCharacter);
+    // change the character
+    ses_apltPlayers[iPlayer].plt_penPlayerEntity->CharacterChanged(pcCharacter);
 
-      // handle all the sent events
-      ses_bAllowRandom = TRUE;
-      CEntity::HandleSentEvents();
-      ses_bAllowRandom = FALSE;
+    // handle all the sent events
+    ses_bAllowRandom = TRUE;
+    CEntity::HandleSentEvents();
+    ses_bAllowRandom = FALSE;
+  } break;
 
-                                } break;
   // if receiving client actions
-  case MSG_SEQ_ALLACTIONS: {
+  case MSG_SEQ_ALLACTIONS:
+  {
       // read time from packet
       TIME tmPacket;
       nmMessage>>tmPacket;    // packet time
