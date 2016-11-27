@@ -113,7 +113,7 @@ procedures:
   // --------------------------------------------------------------------------------------
   SwitchON() {
     // If already on then do nothing!
-    if (!m_bSwitchON) {
+    if (m_bSwitchON) {
       return;
     }
 
