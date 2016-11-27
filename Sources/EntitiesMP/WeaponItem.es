@@ -198,9 +198,12 @@ functions:
   // --------------------------------------------------------------------------------------
   // No comments.
   // --------------------------------------------------------------------------------------
-  void Precache(void) {
+  void Precache(void)
+  {
     PrecacheSound(SOUND_PICK);
-    switch (m_EwitType) {
+
+    switch (m_EwitType)
+    {
       case WIT_KNIFE:           CPlayerWeapons_Precache(1<<(INDEX(WEAPON_KNIFE          )-1)); break;
       case WIT_COLT:            CPlayerWeapons_Precache(1<<(INDEX(WEAPON_COLT           )-1)); break;
       case WIT_SINGLESHOTGUN:   CPlayerWeapons_Precache(1<<(INDEX(WEAPON_SINGLESHOTGUN  )-1)); break;
@@ -260,7 +263,7 @@ functions:
       case WIT_CANNON:           Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
     }
     */
-    Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);
+    Particles_Atomic(this, 1.5f, m_eotOscillation == 1 ? 0.75F : 1.5f, PT_STAR07, 12);
   }
 
   // --------------------------------------------------------------------------------------
@@ -464,6 +467,9 @@ procedures:
     return;
   };
 
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     if ( m_EwitType == WIT_GHOSTBUSTER) {
@@ -471,7 +477,14 @@ procedures:
     }
 
     Initialize();     // initialize base class
-    StartModelAnim(ITEMHOLDER_ANIM_BIGOSCILATION, AOF_LOOPING|AOF_NORESTART);
+
+    // [SSE] Standart Items Expansion
+    if (m_eotOscillation <= 0) {
+      StartModelAnim(ITEMHOLDER_ANIM_BIGOSCILATION, AOF_LOOPING|AOF_NORESTART);
+    } else {
+      StartModelAnim((m_eotOscillation-1), AOF_LOOPING|AOF_NORESTART);
+    }
+
     ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_BIG);
     SetProperties();  // set properties
 

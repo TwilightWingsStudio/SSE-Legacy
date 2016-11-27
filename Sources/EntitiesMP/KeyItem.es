@@ -173,10 +173,10 @@ functions:
       case KIT_BOOKOFWISDOM    :
       case KIT_CRYSTALSKULL    :   
       case KIT_HOLYGRAIL       :
-        Particles_Stardust(this, 1.0f, 0.5f, PT_STAR08, 64);
+        Particles_Stardust(this, 1.0f, m_eotOscillation == 1 ? 0.25F : 0.5f, PT_STAR08, 64);
         break;
       case KIT_JAGUARGOLDDUMMY :
-        Particles_Stardust(this, 2.0f, 2.0f, PT_STAR08, 64);
+        Particles_Stardust(this, 2.0f, m_eotOscillation == 1 ? 0.5F : 2.0f, PT_STAR08, 64);
         break;
       case KIT_CROSSWOODEN     :
       case KIT_CROSSMETAL      :   
@@ -191,7 +191,7 @@ functions:
       case KIT_STATUEHEAD03    :
       case KIT_KINGSTATUE      :
       default:
-        Particles_Stardust(this, 1.5f, 1.1f, PT_STAR08, 64);
+        Particles_Stardust(this, 1.5f, m_eotOscillation == 1 ? 0.75F : 1.1f, PT_STAR08, 64);
         break;    
     }
   }
@@ -347,7 +347,8 @@ procedures:
     eKey.kitType = m_kitType;
 
     // if key is received
-    if (epass.penOther->ReceiveItem(eKey)) {
+    if (epass.penOther->ReceiveItem(eKey))
+    {
       if(_pNetwork->IsPlayerLocal(epass.penOther)) {IFeel_PlayEffect("PU_Key");}
 
       // play the pickup sound
@@ -360,9 +361,19 @@ procedures:
     return;
   };
 
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main() {
     Initialize();     // initialize base class
-    StartModelAnim(ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
+
+    // [SSE] Standart Items Expansion
+    if (m_eotOscillation <= 0) {
+      StartModelAnim(ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
+    } else {
+      StartModelAnim((m_eotOscillation-1), AOF_LOOPING|AOF_NORESTART);
+    }
+
     ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_BIG);
     SetProperties();  // set properties
 

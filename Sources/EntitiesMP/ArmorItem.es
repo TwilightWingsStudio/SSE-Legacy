@@ -136,25 +136,26 @@ functions:
     {
       return;
     }
+
     switch (m_EaitType) {
       case ARIT_SHARD:
-        Particles_Emanate(this, 0.75f*0.75, 0.75f*0.75, PT_STAR04, 8, 7.0f);
+        Particles_Emanate(this, 0.75F*0.75F, m_eotOscillation == 1 ? 0.3F : 0.75F*0.75F, PT_STAR04, 8, 7.0F);
         break;
       case ARIT_SMALL:
-        Particles_Emanate(this, 1.0f*0.75, 1.0f*0.75, PT_STAR04, 32, 7.0f);
-        break;                                      
+        Particles_Emanate(this, 1.0F*0.75F, m_eotOscillation == 1 ? 0.375F : 1.0F*0.75F, PT_STAR04, 32, 7.0F);
+        break;
       case ARIT_MEDIUM:
-        Particles_Emanate(this, 1.5f*0.75, 1.5f*0.75, PT_STAR04, 64, 7.0f);
+        Particles_Emanate(this, 1.5F*0.75F, m_eotOscillation == 1 ? 0.5625F : 1.5F*0.75F, PT_STAR04, 64, 7.0F);
         break;
       case ARIT_STRONG:                              
-        Particles_Emanate(this, 2.0f*0.75, 1.25f*0.75, PT_STAR04, 96, 7.0f);
+        Particles_Emanate(this, 2.0F*0.75F, m_eotOscillation == 1 ? 0.75F : 1.25F*0.75F, PT_STAR04, 96, 7.0F);
         break;
       case ARIT_SUPER:
-        Particles_Emanate(this, 2.5f*0.75, 1.5f*0.75, PT_STAR04, 128, 7.0f);
+        Particles_Emanate(this, 2.5F*0.75F, m_eotOscillation == 1 ? 0.9375F : 1.5F*0.75F, PT_STAR04, 128, 7.0F);
         break;
       case ARIT_HELM:
-        Particles_Emanate(this, 0.875f*0.75, 0.875f*0.75, PT_STAR04, 16, 7.0f);
-        break;      
+        Particles_Emanate(this, 0.875F*0.75F, m_eotOscillation == 1 ? 0.335F : 0.875F*0.75F, PT_STAR04, 16, 7.0F);
+        break;
     }
   }
 
@@ -269,8 +270,8 @@ procedures:
     eArmor.bOverTopArmor = m_bOverTopArmor;
 
     // if health is received
-    if (epass.penOther->ReceiveItem(eArmor)) {
-
+    if (epass.penOther->ReceiveItem(eArmor))
+    {
       if(_pNetwork->IsPlayerLocal(epass.penOther))
       {
         switch (m_EaitType)
@@ -297,9 +298,19 @@ procedures:
     return;
   };
 
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main() {
     Initialize();     // initialize base class
-    StartModelAnim(ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
+
+    // [SSE] Standart Items Expansion
+    if (m_eotOscillation <= 0) {
+      StartModelAnim(ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
+    } else {
+      StartModelAnim((m_eotOscillation-1), AOF_LOOPING|AOF_NORESTART);
+    }
+
     SetProperties();  // set properties
 
     jump CItem::ItemLoop();

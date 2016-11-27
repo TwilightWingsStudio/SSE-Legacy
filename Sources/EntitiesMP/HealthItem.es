@@ -132,19 +132,19 @@ functions:
 
     switch (m_EhitType) {
       case HIT_PILL:
-        Particles_Stardust(this, 0.9f*0.75f, 0.70f*0.75f, PT_STAR08, 32);
+        Particles_Stardust(this, 0.9F*0.75F, m_eotOscillation == 1 ? 0.375F : 0.70f*0.75F, PT_STAR08, 32);
         break;
       case HIT_SMALL:
-        Particles_Stardust(this, 1.0f*0.75f, 0.75f*0.75f, PT_STAR08, 128);
+        Particles_Stardust(this, 1.0F*0.75F, m_eotOscillation == 1 ? 0.375F : 0.75F*0.75F, PT_STAR08, 128);
         break;
       case HIT_MEDIUM:
-        Particles_Stardust(this, 1.0f*0.75f, 0.75f*0.75f, PT_STAR08, 128);
+        Particles_Stardust(this, 1.0F*0.75F, m_eotOscillation == 1 ? 0.375F : 0.75F*0.75F, PT_STAR08, 128);
         break;
       case HIT_LARGE:
-        Particles_Stardust(this, 2.0f*0.75f, 1.0f*0.75f, PT_STAR08, 192);
+        Particles_Stardust(this, 2.0F*0.75F, m_eotOscillation == 1 ? 0.75F : 1.0F*0.75F, PT_STAR08, 192);
         break;
       case HIT_SUPER:
-        Particles_Stardust(this, 2.3f*0.75f, 1.5f*0.75f, PT_STAR08, 320);
+        Particles_Stardust(this, 2.3F*0.75F, m_eotOscillation == 1 ? 0.8625F : 1.5F*0.75F, PT_STAR08, 320);
         break;
     }
   }
@@ -153,9 +153,9 @@ functions:
   // Set health properties depending on health type.
   // --------------------------------------------------------------------------------------
   void SetProperties(void) {
-    switch (m_EhitType) {
+    switch (m_EhitType)
+    {
       case HIT_PILL:
-        StartModelAnim(ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_SMALL);
         m_fValue = 1.0f;
         m_bOverTopHealth = TRUE;
@@ -168,8 +168,8 @@ functions:
         StretchItem(FLOAT3D(1.0f*0.75f, 1.0f*0.75f, 1.0f*0.75));
         m_iSoundComponent = SOUND_PILL;
         break;
+
       case HIT_SMALL:
-        StartModelAnim(ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
         m_fValue = 10.0f;
         m_bOverTopHealth = FALSE;
@@ -183,7 +183,6 @@ functions:
         break;                                                                 // add flare
 
       case HIT_MEDIUM:
-        StartModelAnim(ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
         m_fValue = 25.0f;
         m_bOverTopHealth = FALSE;
@@ -195,8 +194,8 @@ functions:
         StretchItem(FLOAT3D(1.5f*0.75f, 1.5f*0.75f, 1.5f*0.75));
         m_iSoundComponent = SOUND_MEDIUM;
         break;
+
       case HIT_LARGE:
-        StartModelAnim(ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
         m_fValue = 50.0f;
         m_bOverTopHealth = FALSE;
@@ -208,8 +207,8 @@ functions:
         StretchItem(FLOAT3D(1.2f*0.75f, 1.2f*0.75f, 1.2f*0.75));
         m_iSoundComponent = SOUND_LARGE;
         break;
+
       case HIT_SUPER:
-        StartModelAnim(ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
         m_fValue = 100.0f;
         m_bOverTopHealth = TRUE;
@@ -258,8 +257,10 @@ procedures:
 
     // if health is received
     if (epass.penOther->ReceiveItem(eHealth)) {
-      if (_pNetwork->IsPlayerLocal(epass.penOther)) {
-        switch (m_EhitType) {
+      if (_pNetwork->IsPlayerLocal(epass.penOther))
+      {
+        switch (m_EhitType)
+        {
           case HIT_PILL:  IFeel_PlayEffect("PU_HealthPill"); break;
           case HIT_SMALL: IFeel_PlayEffect("PU_HealthSmall"); break;
           case HIT_MEDIUM:IFeel_PlayEffect("PU_HealthMedium"); break;
@@ -277,11 +278,23 @@ procedures:
         jump CItem::ItemReceived();
       }
     }
+
     return;
   };
 
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main() {
     Initialize();     // initialize base class
+    
+    // [SSE] Standart Items Expansion
+    if (m_eotOscillation <= 0) {
+      StartModelAnim(ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
+    } else {
+      StartModelAnim((m_eotOscillation-1), AOF_LOOPING|AOF_NORESTART);
+    }
+    
     SetProperties();  // set properties
 
     jump CItem::ItemLoop();

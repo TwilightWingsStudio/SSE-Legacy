@@ -19,6 +19,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "Models/Items/ItemHolder/ItemHolder.h"
 %}
 
+enum EOscillationType {
+  0 OT_DEFAULT "0 Default",
+  1 OT_DISABLE "1 Disable oscillation",
+  2 OT_SMALL   "2 Small oscillation",
+  3 OT_MEDIUM  "3 Medium oscillation",
+  4 OT_BIG     "4 Big oscillation",
+};
+
 %{
 // used to render certain entities only for certain players (like picked items, etc.)
 extern ULONG _ulPlayerRenderingMask;
@@ -45,6 +53,13 @@ properties:
  14 BOOL m_bDropped = FALSE,    // dropped by a player during a deathmatch game
  15 INDEX m_ulPickedMask = 0,   // mask for which players picked this item
  16 BOOL m_bFloating "Floating" 'F' = FALSE,
+ 
+ // [SSE] Items Expansion
+ 30 enum EOscillationType m_eotOscillation "Oscillation Type" = OT_DEFAULT,
+ 31 BOOL m_bParticles                      "Particles On" = TRUE,
+ 32 BOOL m_bFlare                          "Flare On" = TRUE,
+ //40 COLOR m_colParticles                   "Particles Color" = COLOR(C_WHITE|CT_OPAQUE),
+ //41 COLOR m_colFlare                       "Flare Color" = COLOR(C_WHITE|CT_OPAQUE),
 
 components:
   1 model   MODEL_ITEM      "Models\\Items\\ItemHolder\\ItemHolder.mdl",
@@ -111,7 +126,7 @@ functions:
     }
 
     // otherwise, render
-    return TRUE;
+    return m_bParticles;
   }
 
   // --------------------------------------------------------------------------------------
@@ -238,7 +253,7 @@ functions:
     const FLOAT3D &vPos, const FLOAT3D &vStretch)
   {
     // add flare to items if not respawn
-    if (!m_bRespawn && !m_bDropped)
+    if (!m_bRespawn && !m_bDropped && m_bFlare)
     {
       AddAttachmentToModel(this, *GetModelObject(), 
         ITEMHOLDER_ATTACHMENT_FLARE, ulIDModel, ulIDTexture, 0,0,0);
@@ -270,8 +285,6 @@ functions:
     slUsedMemory += 1* sizeof(CSoundObject);
     return slUsedMemory;
   }
-
-
 
 procedures:
 

@@ -90,7 +90,7 @@ functions:
       return;
     }
 
-    Particles_Spiral(this, 3.0f*0.5, 2.5f*0.5, PT_STAR04, 10);
+    Particles_Spiral(this, 3.0F*0.5F, m_eotOscillation == 1 ? 0.75F : 2.5F*0.5F, PT_STAR04, 10);
   }
 
   /* Fill in entity statistics - for AI purposes only */
@@ -205,6 +205,9 @@ procedures:
     return;
   };
 
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main() {
     m_iShells = Clamp( m_iShells, INDEX(0), MAX_SHELLS);
     m_iBullets = Clamp( m_iBullets, INDEX(0), MAX_BULLETS);
@@ -217,7 +220,14 @@ procedures:
     m_iSniperBullets = Clamp( m_iSniperBullets, INDEX(0), MAX_SNIPERBULLETS);
 
     Initialize();     // initialize base class
-    StartModelAnim(ITEMHOLDER_ANIM_MEDIUMOSCILATION, AOF_LOOPING|AOF_NORESTART);
+
+    // [SSE] Standart Items Expansion
+    if (m_eotOscillation <= 0) {
+      StartModelAnim(ITEMHOLDER_ANIM_MEDIUMOSCILATION, AOF_LOOPING|AOF_NORESTART);
+    } else {
+      StartModelAnim((m_eotOscillation-1), AOF_LOOPING|AOF_NORESTART);
+    }
+
     ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
     SetProperties();  // set properties
 

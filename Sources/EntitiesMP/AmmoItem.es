@@ -146,37 +146,37 @@ functions:
     }
     switch (m_EaitType) {
       case AIT_SHELLS:
-        Particles_Spiral(this, 1.0f*0.75, 1.0f*0.75, PT_STAR04, 4);
+        Particles_Spiral(this, 1.0F*0.75F, m_eotOscillation == 1 ? 0.375F : 1.0F*0.75F, PT_STAR04, 4); //
         break;
       case AIT_BULLETS:
-        Particles_Spiral(this, 1.5f*0.75, 1.0f*0.75, PT_STAR04, 6);
+        Particles_Spiral(this, 1.5F*0.75F, m_eotOscillation == 1 ? 0.5625F : 1.0F*0.75F, PT_STAR04, 6); //
         break;
       case AIT_ROCKETS:
-        Particles_Spiral(this, 1.5f*0.75, 1.25f*0.75, PT_STAR04, 6);
+        Particles_Spiral(this, 1.5F*0.75F, m_eotOscillation == 1 ? 0.5625F : 1.25F*0.75F, PT_STAR04, 6); //
         break;
       case AIT_GRENADES:
-        Particles_Spiral(this, 2.0f*0.75, 1.25f*0.75, PT_STAR04, 6);
+        Particles_Spiral(this, 2.0F*0.75F, m_eotOscillation == 1 ? 0.75F : 1.25F*0.75F, PT_STAR04, 6); //
         break;
       case AIT_ELECTRICITY:
-        Particles_Spiral(this, 1.5f*0.75, 1.125f*0.75, PT_STAR04, 6);
+        Particles_Spiral(this, 1.5F*0.75F, m_eotOscillation == 1 ? 0.5625F : 1.125F*0.75F, PT_STAR04, 6); //
         break;
       case AIT_NUKEBALL:
-        Particles_Spiral(this, 1.25f*0.75, 1.0f*0.75, PT_STAR04, 4);
+        Particles_Spiral(this, 1.25F*0.75F, m_eotOscillation == 1 ? 0.475F : 1.0F*0.75F, PT_STAR04, 4);
         break;
       case AIT_IRONBALLS:
-        Particles_Spiral(this, 2.0f*0.75, 1.25f*0.75, PT_STAR04, 8);
+        Particles_Spiral(this, 2.0F*0.75F, m_eotOscillation == 1 ? 0.75F : 1.25F*0.75F, PT_STAR04, 8); //
         break;
       case AIT_BACKPACK:
-        Particles_Spiral(this, 3.0f*0.5, 2.5f*0.5, PT_STAR04, 10);
+        Particles_Spiral(this, 3.0F*0.5F, m_eotOscillation == 1 ? 0.75F : 2.5F*0.5F, PT_STAR04, 10); //
         break;
        case AIT_SERIOUSPACK:
-        Particles_Spiral(this, 3.0f*0.5, 2.5f*0.5, PT_STAR04, 10);
+        Particles_Spiral(this, 3.0F*0.5F, m_eotOscillation == 1 ? 0.75F : 2.5F*0.5F, PT_STAR04, 10); //
         break;
        case AIT_NAPALM:
-        Particles_Spiral(this, 3.0f*0.5, 2.5f*0.5, PT_STAR04, 10);
+        Particles_Spiral(this, 3.0F*0.5F, m_eotOscillation == 1 ? 0.75F : 2.5F*0.5F, PT_STAR04, 10); //
         break;
        case AIT_SNIPERBULLETS:
-        Particles_Spiral(this, 1.5f*0.75, 1.25f*0.75, PT_STAR04, 6);
+        Particles_Spiral(this, 1.5F*0.75F, m_eotOscillation == 1 ? 0.5625F : 1.25F*0.75F, PT_STAR04, 6); //
         break;
     }
   }
@@ -375,11 +375,11 @@ procedures:
     ASSERT(epass.penOther!=NULL);
 
     // if ammo stays
-    if (GetSP()->sp_bAmmoStays && !(m_bPickupOnce||m_bRespawn)) {
-      // if already picked by this player
+    if (GetSP()->sp_bAmmoStays && !(m_bPickupOnce||m_bRespawn))
+    {
       BOOL bWasPicked = MarkPickedBy(epass.penOther);
+      // if already picked by this player then don't pick again
       if (bWasPicked) {
-        // don't pick again
         return;
       }
     }
@@ -388,6 +388,7 @@ procedures:
     EAmmoItem eAmmo;
     eAmmo.EaitType = m_EaitType;
     eAmmo.iQuantity = (INDEX) m_fValue;
+
     // if health is received
     if (epass.penOther->ReceiveItem(eAmmo)) {
       // play the pickup sound
@@ -410,12 +411,22 @@ procedures:
     return;
   };
 
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main() {
     if (m_EaitType==AIT_NUKEBALL /*|| m_EaitType==AIT_NAPALM*/) {
       m_EaitType=AIT_SHELLS;
     }
     Initialize();     // initialize base class
-    StartModelAnim(ITEMHOLDER_ANIM_MEDIUMOSCILATION, AOF_LOOPING|AOF_NORESTART);
+
+    // [SSE] Standart Items Expansion
+    if (m_eotOscillation <= 0) {
+      StartModelAnim(ITEMHOLDER_ANIM_MEDIUMOSCILATION, AOF_LOOPING|AOF_NORESTART);
+    } else {
+      StartModelAnim((m_eotOscillation-1), AOF_LOOPING|AOF_NORESTART);
+    }
+
     ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
     SetProperties();  // set properties
 

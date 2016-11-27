@@ -133,21 +133,22 @@ functions:
       return;
     }
 
-    switch( m_puitType) {
+    switch( m_puitType)
+    {
       case PUIT_INVISIB:
-        Particles_Stardust( this, 2.0f*0.75f, 1.00f*0.75f, PT_STAR08, 320);
+        Particles_Stardust( this, 2.0f*0.75f, m_eotOscillation == 1 ? 0.75F : 1.00f*0.75f, PT_STAR08, 320);
         break;
       case PUIT_INVULNER:
-        Particles_Stardust( this, 2.0f*0.75f, 1.00f*0.75f, PT_STAR08, 192);
+        Particles_Stardust( this, 2.0f*0.75f, m_eotOscillation == 1 ? 0.75F : 1.00f*0.75f, PT_STAR08, 192);
         break;
       case PUIT_DAMAGE:
-        Particles_Stardust( this, 1.0f*0.75f, 0.75f*0.75f, PT_STAR08, 128);
+        Particles_Stardust( this, 1.0f*0.75f, m_eotOscillation == 1 ? 0.375F : 0.75f*0.75f, PT_STAR08, 128);
         break;
       case PUIT_SPEED:
-        Particles_Stardust( this, 1.0f*0.75f, 0.75f*0.75f, PT_STAR08, 128);
+        Particles_Stardust( this, 1.0f*0.75f, m_eotOscillation == 1 ? 0.375F : 0.75f*0.75f, PT_STAR08, 128);
         break;
       case PUIT_BOMB:
-        Particles_Atomic(this, 2.0f*0.75f, 2.0f*0.95f, PT_STAR05, 12);
+        Particles_Atomic(this, 2.0f*0.75f, m_eotOscillation == 1 ? 0.75F : 2.0f*0.95f, PT_STAR05, 12);
         break;
     }
   }
@@ -160,7 +161,6 @@ functions:
     switch( m_puitType)
     {
       case PUIT_INVISIB:
-        StartModelAnim( ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
         ForceCollisionBoxIndexChange( ITEMHOLDER_COLLISION_BOX_BIG);
         m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 40.0f; 
         m_strDescription.PrintF("Invisibility");
@@ -169,7 +169,6 @@ functions:
         StretchItem( FLOAT3D(1.0f*0.75f, 1.0f*0.75f, 1.0f*0.75));
         break;
       case PUIT_INVULNER:
-        StartModelAnim( ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
         ForceCollisionBoxIndexChange( ITEMHOLDER_COLLISION_BOX_BIG);
         m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 60.0f; 
         m_strDescription.PrintF("Invulnerability");
@@ -178,7 +177,6 @@ functions:
         StretchItem( FLOAT3D(1.0f*0.75f, 1.0f*0.75f, 1.0f*0.75));
         break;                                                               
       case PUIT_DAMAGE:
-        StartModelAnim( ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
         ForceCollisionBoxIndexChange( ITEMHOLDER_COLLISION_BOX_BIG);
         m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 40.0f; 
         m_strDescription.PrintF("SeriousDamage");
@@ -187,7 +185,6 @@ functions:
         StretchItem( FLOAT3D(1.0f*0.75f, 1.0f*0.75f, 1.0f*0.75));
         break;
       case PUIT_SPEED:
-        StartModelAnim( ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
         ForceCollisionBoxIndexChange( ITEMHOLDER_COLLISION_BOX_BIG);
         m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 40.0f; 
         m_strDescription.PrintF("SeriousSpeed");
@@ -196,7 +193,6 @@ functions:
         StretchItem( FLOAT3D(1.0f*0.75f, 1.0f*0.75f, 1.0f*0.75));
         break;
       case PUIT_BOMB:
-        StartModelAnim( ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
         ForceCollisionBoxIndexChange( ITEMHOLDER_COLLISION_BOX_BIG);
         m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 40.0f; 
         m_strDescription.PrintF("Serious Bomb!");
@@ -266,10 +262,20 @@ procedures:
     return;
   };
 
-
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     Initialize();     // initialize base class
+    
+    // [SSE] Standart Items Expansion
+    if (m_eotOscillation <= 0) {
+      StartModelAnim(ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
+    } else {
+      StartModelAnim((m_eotOscillation-1), AOF_LOOPING|AOF_NORESTART);
+    }
+    
     SetProperties();  // set properties
     jump CItem::ItemLoop();
   };

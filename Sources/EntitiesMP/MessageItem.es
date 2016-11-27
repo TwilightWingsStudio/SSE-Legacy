@@ -83,7 +83,7 @@ functions:
       return;
     }
 
-    Particles_Stardust(this, 0.9f, 0.70f, PT_STAR08, 32);
+    Particles_Stardust(this, 0.9f, m_eotOscillation == 1 ? 0.5F : 0.70f, PT_STAR08, 32);
   }
 
   // --------------------------------------------------------------------------------------
@@ -123,9 +123,19 @@ procedures:
     return;
   };
 
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main() {
     Initialize();     // initialize base class
-    StartModelAnim(ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
+
+    // [SSE] Standart Items Expansion
+    if (m_eotOscillation <= 0) {
+      StartModelAnim(ITEMHOLDER_ANIM_SMALLOSCILATION, AOF_LOOPING|AOF_NORESTART);
+    } else {
+      StartModelAnim((m_eotOscillation-1), AOF_LOOPING|AOF_NORESTART);
+    }
+
     ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_SMALL);
     SetProperties();  // set properties
 
