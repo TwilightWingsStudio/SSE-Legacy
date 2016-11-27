@@ -1377,11 +1377,18 @@ void CSessionState::ProcessGameStreamBlock(CNetworkMessage &nmMessage)
       // delete all predictors
       _pNetwork->ga_World.DeletePredictors();
 
-      // inform entity of disconnnection
-      CPrintF(TRANS("%s left\n"), ses_apltPlayers[iPlayer].plt_penPlayerEntity->GetPlayerName());
-      ses_apltPlayers[iPlayer].plt_penPlayerEntity->Disconnect();
+      // receive a pointer to player entity
+      CPlayerEntity *penPlayerEntity = ses_apltPlayers[iPlayer].plt_penPlayerEntity;
+
+      // NOTE: [SSE] Netcode Update - Just a check for safety!
+      if (penPlayerEntity != NULL) {
+        CPrintF(TRANS("%s left\n"), penPlayerEntity->GetPlayerName());
+        penPlayerEntity->Disconnect();
+      }
+
       // deactivate the player
       ses_apltPlayers[iPlayer].Deactivate();
+
       // handle all the sent events
       ses_bAllowRandom = TRUE;
       CEntity::HandleSentEvents();
@@ -1389,27 +1396,148 @@ void CSessionState::ProcessGameStreamBlock(CNetworkMessage &nmMessage)
 
     } break;
 
+  // [SSE] Netcode Update - Attaching player to client
+  case MSG_SEQ_ATTACHPLAYER:
+  {
+    _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
+
+    INDEX iNewPlayerIndex, iEntity;
+    
+    nmMessage>>iNewPlayerIndex;
+    nmMessage>>iEntity;      // entity id
+    
+    // delete all predictors
+    _pNetwork->ga_World.DeletePredictors();
+    
+    CEntity *pen = _pNetwork->ga_World.EntityFromID(iEntity);
+
+    // Ignore if target entity is NULL!
+    if (pen == NULL) {
+      break;
+    }
+
+    // Ignore if target entity isn't player entity!
+    if (!IsDerivedFromClass(pen, "PlayerEntity")) {
+      break;
+    }
+    
+    // activate the player
+    ses_apltPlayers[iNewPlayerIndex].Activate();
+    
+    CPlayerEntity *penNewPlayer = (CPlayerEntity*)pen;
+    
+    // Atach entity to client data.
+    ses_apltPlayers[iNewPlayerIndex].AttachEntity(penNewPlayer);
+
+    //if (!_pNetwork->IsPlayerLocal(penNewPlayer)) {
+    CPrintF(TRANS("%s attached\n"), penNewPlayer->GetPlayerName());
+    //}
+    
+  } break;
+    
+  // [SSE] Netcode Update - Detaching player from client
+  case MSG_SEQ_DETACHPLAYER:
+  {
+    _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
+    INDEX iPlayer;
+    nmMessage >> iPlayer;      // player index
+    
+    // delete all predictors
+    _pNetwork->ga_World.DeletePredictors();
+    
+    // receive a pointer to player entity
+    CPlayerEntity *penPlayerEntity = ses_apltPlayers[iPlayer].plt_penPlayerEntity;
+    
+    // Just a check for safety!
+    if (penPlayerEntity != NULL) {
+      CPrintF(TRANS("%s detached\n"), penPlayerEntity->GetPlayerName());
+      //penPlayerEntity->Disconnect();
+    }
+    
+    FOREACHINSTATICARRAY(_pNetwork->ga_aplsPlayers, CPlayerSource, itcls)
+    {
+      if (itcls->IsActive()) {
+        if (itcls->pls_Index == iPlayer) {
+          itcls->Stop();
+        }
+      }
+    }
+    
+    // deactivate the player
+    ses_apltPlayers[iPlayer].Deactivate();
+    
+    // handle all the sent events
+    //ses_bAllowRandom = TRUE;
+    //CEntity::HandleSentEvents();
+    //ses_bAllowRandom = FALSE;
+  } break;
+  
+    // [SSE] Netcode Update - Swap two active players between.
+  case MSG_SEQ_SWAPPLAYERENTITIES:
+  {
+    _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
+
+    INDEX iFirstPlayer, iSecondPlayer;
+    nmMessage >> iFirstPlayer >> iSecondPlayer; // player indexes
+
+    // If same player indexes then skip this block!
+    if (iFirstPlayer == iSecondPlayer) {
+      break;
+    }
+
+    // If less than zero then skip this stream block!
+    if (iFirstPlayer < 0 || iSecondPlayer < 0) {
+      break;
+    }
+
+    INDEX ctMax = CEntity::GetMaxPlayers();
+
+    // If more than limit then skip this stream block!
+    if (iFirstPlayer >= ctMax || iSecondPlayer >= ctMax) {
+      break;
+    }
+
+    CPlayerTarget &pltFirst = _pNetwork->ga_sesSessionState.ses_apltPlayers[iFirstPlayer];
+    CPlayerTarget &pltSecond = _pNetwork->ga_sesSessionState.ses_apltPlayers[iSecondPlayer];
+
+    // If one of player inactive then skip this stream block!
+    if (!pltFirst.plt_bActive || !pltSecond.plt_bActive) {
+      break;
+    }
+
+    CPlayerEntity *penFirst = pltFirst.plt_penPlayerEntity;
+    pltFirst.AttachEntity(pltSecond.plt_penPlayerEntity);
+    pltSecond.AttachEntity(penFirst);
+
+    // handle all the sent events
+    ses_bAllowRandom = TRUE;
+    CEntity::HandleSentEvents();
+    ses_bAllowRandom = FALSE;
+  } break;
+
   // if changing character
-  case MSG_SEQ_CHARACTERCHANGE: {
-      _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
-      INDEX iPlayer;
-      CPlayerCharacter pcCharacter;
-      nmMessage>>iPlayer>>pcCharacter;
+  case MSG_SEQ_CHARACTERCHANGE:
+  {
+    _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
+    INDEX iPlayer;
+    CPlayerCharacter pcCharacter;
+    nmMessage>>iPlayer>>pcCharacter;
 
-      // delete all predictors
-      _pNetwork->ga_World.DeletePredictors();
+    // delete all predictors
+    _pNetwork->ga_World.DeletePredictors();
 
-      // change the character
-      ses_apltPlayers[iPlayer].plt_penPlayerEntity->CharacterChanged(pcCharacter);
+    // change the character
+    ses_apltPlayers[iPlayer].plt_penPlayerEntity->CharacterChanged(pcCharacter);
 
-      // handle all the sent events
-      ses_bAllowRandom = TRUE;
-      CEntity::HandleSentEvents();
-      ses_bAllowRandom = FALSE;
+    // handle all the sent events
+    ses_bAllowRandom = TRUE;
+    CEntity::HandleSentEvents();
+    ses_bAllowRandom = FALSE;
+  } break;
 
-                                } break;
   // if receiving client actions
-  case MSG_SEQ_ALLACTIONS: {
+  case MSG_SEQ_ALLACTIONS:
+  {
       // read time from packet
       TIME tmPacket;
       nmMessage>>tmPacket;    // packet time
@@ -2046,6 +2174,37 @@ void CSessionState::SessionStateLoop(void)
         CPrintF(TRANS("Disconnected: %s\n"), strReason);
         // disconnect
         _cmiComm.Client_Close();
+      // [SSE] Netcode Update - Attaching player to client (phase 2)
+      } else if (nmReliable.GetType() == MSG_S2C_ATTACHPLAYER) {
+        INDEX iNewPlayer;
+        nmReliable>>iNewPlayer;
+        
+        BOOL bAlreadyInList = FALSE;
+        CPlayerSource *ppls = NULL;
+        
+        FOREACHINSTATICARRAY(_pNetwork->ga_aplsPlayers, CPlayerSource, itcls)
+        {
+          if (itcls->IsActive()) {
+            if (itcls->pls_Index == iNewPlayer) {
+              bAlreadyInList = TRUE;
+            }
+          } else {
+            if (ppls == NULL) {
+              ppls = itcls;
+            }
+          }
+        }
+        
+        if (!bAlreadyInList && ppls != NULL)
+        {
+          ppls->pls_Index = iNewPlayer;
+          ppls->pls_paAction.Clear();
+          for(INDEX ipa = 0; ipa< PLS_MAXLASTACTIONS; ipa++) {
+            ppls->pls_apaLastActions[ipa].Clear();
+          }
+          ppls->pls_Active = TRUE;
+        }
+        
       // if this is recon response
       } else if (nmReliable.GetType() == MSG_ADMIN_RESPONSE) {
         // just print it

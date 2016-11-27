@@ -435,7 +435,7 @@ FLOAT CControls::GetAxisValue(INDEX iAxis)
   return fReading*aa.aa_fAxisInfluence;
 }
 
-void CControls::CreateAction(const CPlayerCharacter &pc, CPlayerAction &paAction, BOOL bPreScan)
+void CControls::CreateAction(INDEX iPlayer, CPlayerAction &paAction, BOOL bPreScan)
 {
   // set axis-controlled moving
   paAction.pa_vTranslation(1) = -GetAxisValue( AXIS_MOVE_LR);
@@ -457,7 +457,7 @@ void CControls::CreateAction(const CPlayerCharacter &pc, CPlayerAction &paAction
   //CPrintF("creating: prescan %d, x:%g\n", bPreScan, paAction.pa_aRotation(1));
 
   // make the player class create the action packet
-  ctl_ComposeActionPacket(pc, paAction, bPreScan);
+  ctl_ComposeActionPacket(iPlayer, paAction, bPreScan);
 }
 
 CButtonAction &CControls::AddButtonAction(void)
@@ -784,10 +784,12 @@ void CGame::GameHandleTimer(void)
     if (gm_bGameOn && !_pNetwork->IsPaused() && !_pNetwork->GetLocalPause())
     {
       // for all possible local players
-      for( INDEX iPlayer=0; iPlayer<4; iPlayer++)
+      for (INDEX iPlayer = 0; iPlayer < 4; iPlayer++)
       {
-        // if this player exist
-        if( gm_lpLocalPlayers[ iPlayer].lp_pplsPlayerSource != NULL)
+        CPlayerSource *ppls = gm_lpLocalPlayers[iPlayer].lp_pplsPlayerSource;
+        
+        // If this player source exist and valid index and it's active!
+        if (ppls != NULL && ppls >= 0 && ppls->pls_Active)
         {
           // publish player index to console
           ctl_iCurrentPlayerLocal = iPlayer;
@@ -803,7 +805,7 @@ void CGame::GameHandleTimer(void)
           CPlayerAction paAction;
           INDEX iCurrentPlayer = gm_lpLocalPlayers[ iPlayer].lp_iPlayer;
           CControls &ctrls = gm_actrlControls[ iCurrentPlayer];
-          ctrls.CreateAction(gm_apcPlayers[iCurrentPlayer], paAction, FALSE);
+          ctrls.CreateAction(ctl_iCurrentPlayer, paAction, FALSE);
           // set the action in the client source object
           gm_lpLocalPlayers[ iPlayer].lp_pplsPlayerSource->SetAction(paAction);
 
@@ -2178,7 +2180,8 @@ void CGame::GameRedrawView( CDrawPort *pdpDrawPort, ULONG ulFlags)
     for( INDEX i=0; i<4; i++) {
       // if local player
       CPlayerSource *ppls = gm_lpLocalPlayers[i].lp_pplsPlayerSource;
-      if( ppls!=NULL) {
+
+      if (ppls != NULL && ppls->pls_Index >= 0 && ppls->pls_Active) {
         // get local player entity
         apenViewers[ctViewers++] = _pNetwork->GetLocalPlayerEntity(ppls);
         // precreate action for it for this tick
@@ -2193,7 +2196,7 @@ void CGame::GameRedrawView( CDrawPort *pdpDrawPort, ULONG ulFlags)
           CPlayerAction paPreAction;
           INDEX iCurrentPlayer = gm_lpLocalPlayers[i].lp_iPlayer;
           CControls &ctrls = gm_actrlControls[ iCurrentPlayer];
-          ctrls.CreateAction(gm_apcPlayers[iCurrentPlayer], paPreAction, TRUE);
+          ctrls.CreateAction(ppls->pls_Index, paPreAction, TRUE);
 
           // copy the local controls back
           memcpy(
