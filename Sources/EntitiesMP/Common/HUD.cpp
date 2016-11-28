@@ -51,7 +51,11 @@ extern FLOAT hud_fScaling;
 extern FLOAT hud_tmWeaponsOnScreen;
 extern INDEX hud_bShowMatchInfo;
 
+// [SSE]
+extern BOOL hud_bShowEmptyAmmoInList;
+
 // [SSE] Sniper Scope Settings
+
 extern BOOL hud_bSniperScopeDraw;
 
 extern FLOAT hud_fSniperScopeBaseOpacity;
@@ -1080,13 +1084,17 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
   }
 
   // loop thru all ammo types
-  if (!GetSP()->sp_bInfiniteAmmo) {
-    for( INDEX ii=7; ii>=0; ii--) {
+  if (!GetSP()->sp_bInfiniteAmmo)
+  {
+    for( INDEX ii = 7; ii>=0; ii--)
+    {
       i = aiAmmoRemap[ii];
-      // if no ammo and hasn't got that weapon - just skip this ammo
+      
       AmmoInfo &ai = _aaiAmmo[i];
-      ASSERT( ai.ai_iAmmoAmmount>=0);
-      if ( ai.ai_iAmmoAmmount==0 && !ai.ai_bHasWeapon) continue;
+      ASSERT( ai.ai_iAmmoAmmount >= 0);
+      
+      // if no ammo and hasn't got that weapon - just skip this ammo // [SSE] Or if you don't want to see empty ammo types.
+      if (ai.ai_iAmmoAmmount <= 0 && (!ai.ai_bHasWeapon || !hud_bShowEmptyAmmoInList)) continue;
 
       // display ammo info
       colIcon = C_WHITE /*_colHUD*/;

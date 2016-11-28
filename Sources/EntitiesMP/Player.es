@@ -364,6 +364,7 @@ extern INDEX hud_bShowMatchInfo = TRUE;
 
 // [SSE] HUD
 extern BOOL hud_bRedScreenOnDamage = TRUE;
+extern BOOL hud_bShowEmptyAmmoInList = TRUE;
 
 extern BOOL hud_bSniperScopeDraw = TRUE;
 
@@ -793,8 +794,9 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("persistent user FLOAT hud_tmLatencySnapshot;",  &hud_tmLatencySnapshot);
   _pShell->DeclareSymbol("persistent user FLOAT plr_fBreathingStrength;", &plr_fBreathingStrength);
   
-  // SSE
+  // [SSE] HUD
   _pShell->DeclareSymbol("persistent user INDEX hud_bRedScreenOnDamage;",  &hud_bRedScreenOnDamage);
+  _pShell->DeclareSymbol("persistent user INDEX hud_bShowEmptyAmmoInList;",  &hud_bShowEmptyAmmoInList);
   
   _pShell->DeclareSymbol("persistent user INDEX hud_bSniperScopeDraw;",  &hud_bSniperScopeDraw);
 
