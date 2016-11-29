@@ -367,6 +367,7 @@ extern BOOL hud_bRedScreenOnDamage = TRUE;
 extern BOOL hud_bShowEmptyAmmoInList = TRUE;
 
 extern BOOL hud_bSniperScopeDraw = TRUE;
+extern BOOL hud_bSniperScopeRenderFromQuarter = TRUE;
 
 extern FLOAT hud_fSniperScopeBaseOpacity = 1.0F;
 extern FLOAT hud_fSniperScopeWheelOpacity = 0.25F;
@@ -799,6 +800,7 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("persistent user INDEX hud_bShowEmptyAmmoInList;",  &hud_bShowEmptyAmmoInList);
   
   _pShell->DeclareSymbol("persistent user INDEX hud_bSniperScopeDraw;",  &hud_bSniperScopeDraw);
+  _pShell->DeclareSymbol("persistent user INDEX hud_bSniperScopeRenderFromQuarter;",  &hud_bSniperScopeRenderFromQuarter);
 
   _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeBaseOpacity;",  &hud_fSniperScopeBaseOpacity);
   _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeWheelOpacity;",  &hud_fSniperScopeWheelOpacity);

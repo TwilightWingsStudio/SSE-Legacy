@@ -57,6 +57,7 @@ extern BOOL hud_bShowEmptyAmmoInList;
 // [SSE] Sniper Scope Settings
 
 extern BOOL hud_bSniperScopeDraw;
+extern BOOL hud_bSniperScopeRenderFromQuarter;
 
 extern FLOAT hud_fSniperScopeBaseOpacity;
 extern FLOAT hud_fSniperScopeWheelOpacity;
@@ -628,7 +629,7 @@ static void HUD_DrawSniperMask( void )
   const FLOAT fTexSizeI = ptd->GetPixWidth();
   const FLOAT fTexSizeJ = ptd->GetPixHeight();
   
-  // SSE
+  // [SSE] Sniper Scope
   hud_fSniperScopeBaseOpacity = Clamp(hud_fSniperScopeBaseOpacity, 0.0f, 1.0f);
   hud_fSniperScopeWheelOpacity = Clamp(hud_fSniperScopeWheelOpacity, 0.0f, 1.0f);
   hud_fSniperScopeLedOpacity = Clamp(hud_fSniperScopeLedOpacity, 0.0f, 1.0f);
@@ -644,10 +645,16 @@ static void HUD_DrawSniperMask( void )
     colMask = C_WHITE|ulSniperScopeBaseOpacity;
   
     _pDP->InitTexture( &_toSniperMask);
-    _pDP->AddTexture( fBlackStrip, 0, fCenterI, fCenterJ, 0.98f, 0.02f, 0, 1.0f, colMask);
-    _pDP->AddTexture( fCenterI, 0, fSizeI-fBlackStrip, fCenterJ, 0, 0.02f, 0.98f, 1.0f, colMask);
-    _pDP->AddTexture( fBlackStrip, fCenterJ, fCenterI, fSizeJ, 0.98f, 1.0f, 0, 0.02f, colMask);
-    _pDP->AddTexture( fCenterI, fCenterJ, fSizeI-fBlackStrip, fSizeJ, 0, 1, 0.98f, 0.02f, colMask);
+
+    if (hud_bSniperScopeRenderFromQuarter) 
+    {
+      _pDP->AddTexture( fBlackStrip, 0, fCenterI, fCenterJ, 0.98f, 0.02f, 0, 1.0f, colMask);
+      _pDP->AddTexture( fCenterI, 0, fSizeI-fBlackStrip, fCenterJ, 0, 0.02f, 0.98f, 1.0f, colMask);
+      _pDP->AddTexture( fBlackStrip, fCenterJ, fCenterI, fSizeJ, 0.98f, 1.0f, 0, 0.02f, colMask);
+      _pDP->AddTexture( fCenterI, fCenterJ, fSizeI-fBlackStrip, fSizeJ, 0, 1, 0.98f, 0.02f, colMask);
+    } else {
+      _pDP->AddTexture( fBlackStrip, 0, fSizeI-fBlackStrip, fSizeJ, colMask);
+    }
 
     _pDP->FlushRenderingQueue();
     _pDP->Fill( 0, 0, fBlackStrip/*+1*/, fSizeJ, C_BLACK|ulSniperScopeBaseOpacity);
