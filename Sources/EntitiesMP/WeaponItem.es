@@ -64,7 +64,7 @@ event EWeaponItem {
 };
 
 %{
-extern void CPlayerWeapons_Precache(ULONG ulAvailable);
+  extern void CPlayerWeapons_Precache(ULONG ulAvailable);
 %}
 
 
@@ -230,40 +230,45 @@ functions:
     pes->es_ctAmmount = 1;
     pes->es_fValue = 1;
     pes->es_iScore = 0;//m_iScore;
+
     return TRUE;
   }
 
   // --------------------------------------------------------------------------------------
   // Render particles.
   // --------------------------------------------------------------------------------------
-  void RenderParticles(void) {
-    // no particles when not existing or in DM modes
-    if (GetRenderType()!=CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE
-      || !ShowItemParticles())
-    {
+  void RenderParticles(void)
+  {
+    // No particles when not existing!
+    if (GetRenderType() != CEntity::RT_MODEL) {
+      return;
+    }
+    
+    // No particles when in DM modes!
+    if (GetSP()->sp_gmGameMode > CSessionProperties::GM_COOPERATIVE || !ShowItemParticles()) {
       return;
     }
 
     // If you lazy ass you can uncomment this shit for making different effects.
     /*
     switch (m_EwitType) {
-      case WIT_KNIFE:            Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_COLT:             Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_SINGLESHOTGUN:    Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_DOUBLESHOTGUN:    Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_TOMMYGUN:         Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_MINIGUN:          Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_ROCKETLAUNCHER:   Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_GRENADELAUNCHER:  Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_SNIPER:           Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_FLAMER:           Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_CHAINSAW:         Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_LASER:            Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_GHOSTBUSTER:      Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_CANNON:           Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
+      case WIT_KNIFE:            Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
+      case WIT_COLT:             Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
+      case WIT_SINGLESHOTGUN:    Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
+      case WIT_DOUBLESHOTGUN:    Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
+      case WIT_TOMMYGUN:         Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
+      case WIT_MINIGUN:          Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
+      case WIT_ROCKETLAUNCHER:   Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
+      case WIT_GRENADELAUNCHER:  Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
+      case WIT_SNIPER:           Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
+      case WIT_FLAMER:           Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
+      case WIT_CHAINSAW:         Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
+      case WIT_LASER:            Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
+      case WIT_GHOSTBUSTER:      Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
+      case WIT_CANNON:           Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
     }
     */
-    Particles_Atomic(this, 1.5f, m_eotOscillation == 1 ? 0.75F : 1.5f, PT_STAR07, 12);
+    Particles_Atomic(this, 1.5F, m_eotOscillation == 1 ? 0.75F : 1.5F, PT_STAR07, 12);
   }
 
   // --------------------------------------------------------------------------------------
@@ -272,75 +277,74 @@ functions:
   void SetProperties(void)
   {
     BOOL bDM = FALSE;//m_bRespawn || m_bDropped;
-    FLOAT3D vDMStretch = FLOAT3D(2.0f, 2.0f, 2.0f);
+    FLOAT3D vDMStretch = FLOAT3D(2.0F, 2.0F, 2.0F);
     
     switch (m_EwitType) {
     // *********** KNIFE ***********
-      case WIT_KNIFE:
-        m_fRespawnTime = (m_fCustomRespawnTime > 0) ? m_fCustomRespawnTime : 10.0f; 
+      case WIT_KNIFE: {
+        m_fRespawnTime = (m_fCustomRespawnTime > 0) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Knife");
         AddItem(MODEL_KNIFE, TEXTURE_KNIFE, 0, 0, 0);
-        StretchItem( bDM ?  vDMStretch : FLOAT3D(4.5f, 4.5f, 4.5f));
-        break;
+        StretchItem( bDM ?  vDMStretch : FLOAT3D(4.5F, 4.5F, 4.5F));
+      } break;
 
     // *********** COLT ***********
-      case WIT_COLT:
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+      case WIT_COLT: {
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Colt");
         AddItem(MODEL_COLT, TEXTURE_COLTMAIN, 0, 0, 0);
         AddItemAttachment(COLTITEM_ATTACHMENT_BULLETS, MODEL_COLTBULLETS, TEXTURE_COLTBULLETS, TEX_REFL_LIGHTBLUEMETAL01, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(COLTITEM_ATTACHMENT_COCK, MODEL_COLTCOCK, TEXTURE_COLTCOCK, TEX_REFL_LIGHTBLUEMETAL01, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(COLTITEM_ATTACHMENT_BODY, MODEL_COLTMAIN, TEXTURE_COLTMAIN, TEX_REFL_LIGHTBLUEMETAL01, TEX_SPEC_MEDIUM, 0);
-        StretchItem( bDM ?  vDMStretch : FLOAT3D(4.5f, 4.5f, 4.5f));
-        break;
+        StretchItem( bDM ?  vDMStretch : FLOAT3D(4.5F, 4.5F, 4.5F));
+      } break;
 
     // *********** SINGLE SHOTGUN ***********
-      case WIT_SINGLESHOTGUN:
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+      case WIT_SINGLESHOTGUN: {
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Single Shotgun");
         AddItem(MODEL_SINGLESHOTGUN, TEXTURE_SS_HANDLE, 0, 0, 0);
         AddItemAttachment(SINGLESHOTGUNITEM_ATTACHMENT_BARRELS, MODEL_SS_BARRELS, TEXTURE_SS_BARRELS, TEX_REFL_DARKMETAL, TEX_SPEC_WEAK, 0);
         AddItemAttachment(SINGLESHOTGUNITEM_ATTACHMENT_HANDLE, MODEL_SS_HANDLE, TEXTURE_SS_HANDLE, TEX_REFL_DARKMETAL, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(SINGLESHOTGUNITEM_ATTACHMENT_SLIDER, MODEL_SS_SLIDER, TEXTURE_SS_BARRELS, TEX_REFL_DARKMETAL, TEX_SPEC_MEDIUM, 0);
-        StretchItem( bDM ? vDMStretch : (FLOAT3D(3.5f, 3.5f, 3.5f)) );
-        break;
+        StretchItem( bDM ? vDMStretch : (FLOAT3D(3.5F, 3.5F, 3.5F)) );
+      } break;
 
     // *********** DOUBLE SHOTGUN ***********
-      case WIT_DOUBLESHOTGUN:
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+      case WIT_DOUBLESHOTGUN: {
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Double Shotgun");
         AddItem(MODEL_DOUBLESHOTGUN, TEXTURE_DS_HANDLE, 0, 0, 0);
         AddItemAttachment(DOUBLESHOTGUNITEM_ATTACHMENT_BARRELS, MODEL_DS_BARRELS, TEXTURE_DS_BARRELS, TEX_REFL_BWRIPLES01, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(DOUBLESHOTGUNITEM_ATTACHMENT_HANDLE, MODEL_DS_HANDLE, TEXTURE_DS_HANDLE, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(DOUBLESHOTGUNITEM_ATTACHMENT_SWITCH, MODEL_DS_SWITCH, TEXTURE_DS_SWITCH, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-        StretchItem( bDM ? vDMStretch : (FLOAT3D(3.0f, 3.0f, 3.0f)));
-        break;
-
+        StretchItem( bDM ? vDMStretch : (FLOAT3D(3.0F, 3.0F, 3.0F)));
+      } break;
 
     // *********** TOMMYGUN ***********
-      case WIT_TOMMYGUN:
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+      case WIT_TOMMYGUN: {
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Tommygun");
         AddItem(MODEL_TOMMYGUN, TEXTURE_TG_BODY, 0, 0, 0);
         AddItemAttachment(TOMMYGUNITEM_ATTACHMENT_BODY, MODEL_TG_BODY, TEXTURE_TG_BODY, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(TOMMYGUNITEM_ATTACHMENT_SLIDER, MODEL_TG_SLIDER, TEXTURE_TG_BODY, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-        StretchItem( bDM ? vDMStretch : (FLOAT3D(3.0f, 3.0f, 3.0f)));
-        break;
+        StretchItem( bDM ? vDMStretch : (FLOAT3D(3.0F, 3.0F, 3.0F)));
+      } break;
 
     // *********** MINIGUN ***********
-      case WIT_MINIGUN:
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+      case WIT_MINIGUN: {
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Minigun");
         AddItem(MODEL_MINIGUN, TEXTURE_MG_BODY, 0, 0, 0);
         AddItemAttachment(MINIGUNITEM_ATTACHMENT_BARRELS, MODEL_MG_BARRELS, TEXTURE_MG_BARRELS, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(MINIGUNITEM_ATTACHMENT_BODY, MODEL_MG_BODY, TEXTURE_MG_BODY, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(MINIGUNITEM_ATTACHMENT_ENGINE, MODEL_MG_ENGINE, TEXTURE_MG_BARRELS, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-        StretchItem( bDM ? vDMStretch : (FLOAT3D(1.75f, 1.75f, 1.75f)));
-        break;
+        StretchItem( bDM ? vDMStretch : (FLOAT3D(1.75F, 1.75F, 1.75F)));
+      } break;
 
     // *********** ROCKET LAUNCHER ***********
-      case WIT_ROCKETLAUNCHER:
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+      case WIT_ROCKETLAUNCHER: {
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Rocket launcher");
         AddItem(MODEL_ROCKETLAUNCHER, TEXTURE_RL_BODY, 0, 0, 0);
         AddItemAttachment(ROCKETLAUNCHERITEM_ATTACHMENT_BODY, MODEL_RL_BODY, TEXTURE_RL_BODY, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
@@ -349,33 +353,33 @@ functions:
         AddItemAttachment(ROCKETLAUNCHERITEM_ATTACHMENT_ROCKET2, MODEL_RL_ROCKET, TEXTURE_RL_ROCKET, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(ROCKETLAUNCHERITEM_ATTACHMENT_ROCKET3, MODEL_RL_ROCKET, TEXTURE_RL_ROCKET, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(ROCKETLAUNCHERITEM_ATTACHMENT_ROCKET4, MODEL_RL_ROCKET, TEXTURE_RL_ROCKET, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-        StretchItem( bDM ? vDMStretch : (FLOAT3D(2.5f, 2.5f, 2.5f)));
-        break;
+        StretchItem( bDM ? vDMStretch : (FLOAT3D(2.5F, 2.5F, 2.5F)));
+      } break;
 
     // *********** GRENADE LAUNCHER ***********
-      case WIT_GRENADELAUNCHER:
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+      case WIT_GRENADELAUNCHER: {
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Grenade launcher");
         AddItem(MODEL_GRENADELAUNCHER, TEXTURE_GL_BODY, 0, 0, 0);
         AddItemAttachment(GRENADELAUNCHERITEM_ATTACHMENT_BODY, MODEL_GL_BODY, TEXTURE_GL_BODY, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);                   
         AddItemAttachment(GRENADELAUNCHERITEM_ATTACHMENT_MOVING_PART, MODEL_GL_MOVINGPART, TEXTURE_GL_MOVINGPART, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(GRENADELAUNCHERITEM_ATTACHMENT_GRENADE, MODEL_GL_GRENADE, TEXTURE_GL_MOVINGPART, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);       
-        StretchItem( bDM ? vDMStretch : (FLOAT3D(2.5f, 2.5f, 2.5f)));
-        break;
+        StretchItem( bDM ? vDMStretch : (FLOAT3D(2.5F, 2.5F, 2.5F)));
+      } break;
 
     // *********** SNIPER ***********
-      case WIT_SNIPER:
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+      case WIT_SNIPER: {
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Sniper");
         AddItem(MODEL_SNIPER, TEXTURE_SNIPER_BODY, 0, 0, 0);
         AddItemAttachment(SNIPERITEM_ATTACHMENT_BODY, MODEL_SNIPER_BODY, TEXTURE_SNIPER_BODY, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
         SetItemAttachmentAnim(SNIPERITEM_ATTACHMENT_BODY, BODY_ANIM_FORITEM1);
-        StretchItem( bDM ? vDMStretch : (FLOAT3D(3.0f, 3.0f, 3.0f)));
-        break;
+        StretchItem( bDM ? vDMStretch : (FLOAT3D(3.0F, 3.0F, 3.0F)));
+      } break;
 
     // *********** FLAMER ***********
-      case WIT_FLAMER:
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+      case WIT_FLAMER: {
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Flamer");
         AddItem(MODEL_FLAMER, TEXTURE_FL_BODY, 0, 0, 0);
         AddItemAttachment(FLAMERITEM_ATTACHMENT_BODY, MODEL_FL_BODY,
@@ -384,12 +388,12 @@ functions:
                           TEXTURE_FL_FUELRESERVOIR, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(FLAMERITEM_ATTACHMENT_FLAME, MODEL_FL_FLAME,
                           TEXTURE_FL_FLAME, 0, 0, 0);
-        StretchItem( bDM ? vDMStretch : (FLOAT3D(2.5f, 2.5f, 2.5f)));
-        break;
+        StretchItem( bDM ? vDMStretch : (FLOAT3D(2.5F, 2.5F, 2.5F)));
+      } break;
 
     // *********** CHAINSAW ***********
       case WIT_CHAINSAW: {
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Chainsaw");
         AddItem(MODEL_CHAINSAW, TEXTURE_CS_BODY, 0, 0, 0);
         AddItemAttachment(CHAINSAWITEM_ATTACHMENT_CHAINSAW, MODEL_CS_BODY, TEXTURE_CS_BODY, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
@@ -399,12 +403,12 @@ functions:
         pmo = &(pmoMain->GetAttachmentModel(CHAINSAWITEM_ATTACHMENT_BLADE)->amo_moModelObject);
         AddAttachmentToModel(this, *pmo, BLADEFORPLAYER_ATTACHMENT_TEETH, MODEL_CS_TEETH, TEXTURE_CS_TEETH, 0, 0, 0);
         
-        StretchItem( bDM ? vDMStretch : (FLOAT3D(2.0f, 2.0f, 2.0f)));
-        break; }
+        StretchItem( bDM ? vDMStretch : (FLOAT3D(2.0F, 2.0F, 2.0F)));
+      } break; 
         
     // *********** LASER ***********
-      case WIT_LASER:
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+      case WIT_LASER: {
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Laser");
         AddItem(MODEL_LASER, TEXTURE_LS_BODY, 0, 0, 0);
         AddItemAttachment(LASERITEM_ATTACHMENT_BODY, MODEL_LS_BODY, TEXTURE_LS_BODY, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);         
@@ -412,50 +416,56 @@ functions:
         AddItemAttachment(LASERITEM_ATTACHMENT_LEFTDOWN,  MODEL_LS_BARREL, TEXTURE_LS_BARREL, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(LASERITEM_ATTACHMENT_RIGHTUP,   MODEL_LS_BARREL, TEXTURE_LS_BARREL, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
         AddItemAttachment(LASERITEM_ATTACHMENT_RIGHTDOWN, MODEL_LS_BARREL, TEXTURE_LS_BARREL, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-        StretchItem( bDM ? vDMStretch : (FLOAT3D(2.5f, 2.5f, 2.5f)));
-        break;
+        StretchItem( bDM ? vDMStretch : (FLOAT3D(2.5F, 2.5F, 2.5F)));
+      } break;
 
     // *********** CANNON ***********
-      case WIT_CANNON:
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0f; 
+      case WIT_CANNON: {
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 30.0F; 
         m_strDescription.PrintF("Cannon");
         AddItem(MODEL_CANNON, TEXTURE_CANNON, 0, 0, 0);
         AddItemAttachment(CANNON_ATTACHMENT_BODY, MODEL_CN_BODY, TEXTURE_CANNON, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
 //        AddItemAttachment(CANNON_ATTACHMENT_NUKEBOX, MODEL_CN_NUKEBOX, TEXTURE_CANNON, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
 //        AddItemAttachment(CANNON_ATTACHMENT_LIGHT, MODEL_CN_LIGHT, TEXTURE_CANNON, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-        StretchItem( bDM ? vDMStretch : (FLOAT3D(3.0f, 3.0f, 3.0f)));
-        break;
+        StretchItem( bDM ? vDMStretch : (FLOAT3D(3.0F, 3.0F, 3.0F)));
+      } break;
     }
 
       // add flare
-    AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.6f,0), FLOAT3D(3,3,0.3f) );
+    AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.6F, 0.0F), FLOAT3D(3.0F, 3.0F, 0.3F) );
 };
 
 procedures:
-  ItemCollected(EPass epass) : CItem::ItemCollected {
-    ASSERT(epass.penOther!=NULL);
+  // --------------------------------------------------------------------------------------
+  // Called every time when any player trying to pick up item.
+  // --------------------------------------------------------------------------------------
+  ItemCollected(EPass epass) : CItem::ItemCollected
+  {
+    ASSERT(epass.penOther != NULL);
 
-    // if weapons stays
-    if (GetSP()->sp_bWeaponsStay && !(m_bPickupOnce || m_bRespawn)) {
-      // if already picked by this player
+    // if weapons stays...
+    if (GetSP()->sp_bWeaponsStay && !(m_bPickupOnce || m_bRespawn))
+    {
       BOOL bWasPicked = MarkPickedBy(epass.penOther);
+
+      // If already picked by this player then don't pick again.
       if (bWasPicked) {
-        // don't pick again
         return;
       }
     }
 
-    // send weapon to entity
+    // Prepare weapon to send it to entity.
     EWeaponItem eWeapon;
     eWeapon.iWeapon = m_EwitType;
     eWeapon.iAmmo = -1; // use default ammo amount
     eWeapon.bDropped = m_bDropped;
 
-    // if weapon is received
-    if (epass.penOther->ReceiveItem(eWeapon)) {
-      if(_pNetwork->IsPlayerLocal(epass.penOther)) {IFeel_PlayEffect("PU_Weapon");}
-      // play the pickup sound
-      m_soPick.Set3DParameters(50.0f, 1.0f, 1.0f, 1.0f);
+    // If weapon is received...
+    if (epass.penOther->ReceiveItem(eWeapon))
+    {
+      if (_pNetwork->IsPlayerLocal(epass.penOther)) {IFeel_PlayEffect("PU_Weapon");}
+      // Play the pickup sound.
+      m_soPick.Set3DParameters(50.0F, 1.0F, 1.0F, 1.0F);
       PlaySound(m_soPick, SOUND_PICK, SOF_3D);
       m_fPickSoundLen = GetSoundLength(SOUND_PICK);
 
