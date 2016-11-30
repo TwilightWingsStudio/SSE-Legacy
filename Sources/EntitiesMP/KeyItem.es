@@ -82,7 +82,7 @@ features  "IsImportant";
 properties:
   1 enum KeyItemType m_kitType    "Type" 'Y' = KIT_BOOKOFWISDOM, // key type
   3 INDEX m_iSoundComponent = 0,
-  5 FLOAT m_fSize "Size" = 1.0f,
+  5 FLOAT m_fSize "Size" = 1.0F,
 
 components:
   0 class   CLASS_BASE        "Classes\\Item.ecl",
@@ -163,20 +163,28 @@ functions:
   // --------------------------------------------------------------------------------------
   // Render particles.
   // --------------------------------------------------------------------------------------
-  void RenderParticles(void) {
-    // no particles when not existing
-    if (GetRenderType() != CEntity::RT_MODEL || !ShowItemParticles()) {
+  void RenderParticles(void)
+  {
+    // No particles when not existing!
+    if (GetRenderType() != CEntity::RT_MODEL) {
       return;
     }
+    
+    // No particles when in DM modes!
+    if (GetSP()->sp_gmGameMode > CSessionProperties::GM_COOPERATIVE || !ShowItemParticles()) {
+      return;
+    }
+    
+    BOOL bOnGround = m_eotOscillation == 1;
 
     switch (m_kitType) {
       case KIT_BOOKOFWISDOM    :
       case KIT_CRYSTALSKULL    :   
       case KIT_HOLYGRAIL       :
-        Particles_Stardust(this, 1.0f, m_eotOscillation == 1 ? 0.25F : 0.5f, PT_STAR08, 64);
+        Particles_Stardust(this, 1.0F, bOnGround ? 0.25F : 0.5F, PT_STAR08, 64);
         break;
       case KIT_JAGUARGOLDDUMMY :
-        Particles_Stardust(this, 2.0f, m_eotOscillation == 1 ? 0.5F : 2.0f, PT_STAR08, 64);
+        Particles_Stardust(this, 2.0F, bOnGround ? 0.5F : 2.0F, PT_STAR08, 64);
         break;
       case KIT_CROSSWOODEN     :
       case KIT_CROSSMETAL      :   
@@ -191,7 +199,7 @@ functions:
       case KIT_STATUEHEAD03    :
       case KIT_KINGSTATUE      :
       default:
-        Particles_Stardust(this, 1.5f, m_eotOscillation == 1 ? 0.75F : 1.1f, PT_STAR08, 64);
+        Particles_Stardust(this, 1.5F, bOnGround? 0.75F : 1.1f, PT_STAR08, 64);
         break;    
     }
   }
@@ -201,136 +209,137 @@ functions:
   // --------------------------------------------------------------------------------------
   void SetProperties(void)
   {
-    m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+    m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
     m_strDescription = GetKeyName(m_kitType);
 
-    switch (m_kitType) {
+    switch (m_kitType)
+    {
       case KIT_BOOKOFWISDOM :
         // set appearance
-        AddItem(MODEL_BOOKOFWISDOM, TEXTURE_BOOKOFWISDOM , 0, 0, 0);
+        AddItem(MODEL_BOOKOFWISDOM, TEXTURE_BOOKOFWISDOM, 0, 0, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
       case KIT_CROSSWOODEN:
         // set appearance
         AddItem(MODEL_CROSSWOODEN, TEXTURE_CROSSWOODEN, 0, 0, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
       case KIT_CROSSMETAL:
         // set appearance
         AddItem(MODEL_CROSSMETAL, TEXTURE_CROSSMETAL, TEX_REFL_METAL01, TEX_SPEC_MEDIUM, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1,1,0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
       case KIT_CROSSGOLD:
         // set appearance
         AddItem(MODEL_CROSSGOLD, TEXTURE_CROSSGOLD, TEX_REFL_GOLD01, TEX_SPEC_MEDIUM, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1,1,0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
       case KIT_JAGUARGOLDDUMMY:
         // set appearance
         AddItem(MODEL_JAGUARGOLD, TEX_REFL_GOLD01, TEX_REFL_GOLD01, TEX_SPEC_MEDIUM, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.5f,0), FLOAT3D(2,2,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.5F, 0.0F), FLOAT3D(2,2,0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
       case KIT_HAWKWINGS01DUMMY:
         // set appearance
         AddItem(MODEL_HAWKWINGS01, TEXTURE_HAWKWINGS, 0, 0, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1,1,0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
       case KIT_HAWKWINGS02DUMMY:
         // set appearance
         AddItem(MODEL_HAWKWINGS02, TEXTURE_HAWKWINGS, 0, 0, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1,1,0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
       case KIT_HOLYGRAIL:
         // set appearance
         AddItem(MODEL_HOLYGRAIL, TEXTURE_HOLYGRAIL, TEX_REFL_METAL01, TEX_SPEC_MEDIUM, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
       case KIT_TABLESDUMMY:
         // set appearance
         AddItem(MODEL_TABLESOFWISDOM, TEXTURE_TABLESOFWISDOM, TEX_REFL_METAL01, TEX_SPEC_MEDIUM, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
       case KIT_WINGEDLION:
         // set appearance
         AddItem(MODEL_WINGEDLION, TEX_REFL_GOLD01, TEX_REFL_GOLD01, TEX_SPEC_MEDIUM, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
       case KIT_ELEPHANTGOLD:
         // set appearance
         AddItem(MODEL_ELEPHANTGOLD, TEX_REFL_GOLD01, TEX_REFL_GOLD01, TEX_SPEC_MEDIUM, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.5f,0), FLOAT3D(2,2,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.5F, 0.0F), FLOAT3D(2.0F, 2.0F, 0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;      
       case KIT_STATUEHEAD01:
         // set appearance
         AddItem(MODEL_STATUEHEAD01, TEXTURE_STATUEHEAD01, 0, 0, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
       case KIT_STATUEHEAD02:
         // set appearance
         AddItem(MODEL_STATUEHEAD02, TEXTURE_STATUEHEAD02, 0, 0, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;      
       case KIT_STATUEHEAD03:
         // set appearance
         AddItem(MODEL_STATUEHEAD03, TEXTURE_STATUEHEAD03, 0, 0, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
       case KIT_KINGSTATUE:
         // set appearance
         AddItem(MODEL_KINGSTATUE, TEX_REFL_GOLD01, TEX_REFL_GOLD01, TEX_SPEC_MEDIUM, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
       case KIT_CRYSTALSKULL:
         // set appearance
         AddItem(MODEL_CRYSTALSKULL, TEXTURE_CRYSTALSKULL, TEX_REFL_METAL01, TEX_SPEC_MEDIUM, 0);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
+        StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
         m_iSoundComponent = SOUND_KEY;
         break;
     }
@@ -339,22 +348,27 @@ functions:
   };
 
 procedures:
-  ItemCollected(EPass epass) : CItem::ItemCollected {
-    ASSERT(epass.penOther!=NULL);
+  // --------------------------------------------------------------------------------------
+  // Called every time when any player trying to pick up item.
+  // --------------------------------------------------------------------------------------
+  ItemCollected(EPass epass) : CItem::ItemCollected
+  {
+    ASSERT(epass.penOther != NULL);
 
-    // send key to entity
+     // Prepare key to send it to entity.
     EKey eKey;
     eKey.kitType = m_kitType;
 
-    // if key is received
+    // If key is received...
     if (epass.penOther->ReceiveItem(eKey))
     {
       if(_pNetwork->IsPlayerLocal(epass.penOther)) {IFeel_PlayEffect("PU_Key");}
 
-      // play the pickup sound
-      m_soPick.Set3DParameters(50.0f, 1.0f, 1.0f, 1.0f);
+      // Play the pickup sound.
+      m_soPick.Set3DParameters(50.0F, 1.0F, 1.0F, 1.0F);
       PlaySound(m_soPick, m_iSoundComponent, SOF_3D);
       m_fPickSoundLen = GetSoundLength(m_iSoundComponent);
+
       jump CItem::ItemReceived();
     }
 
@@ -364,7 +378,8 @@ procedures:
   // --------------------------------------------------------------------------------------
   // The entry point.
   // --------------------------------------------------------------------------------------
-  Main() {
+  Main()
+  {
     Initialize();     // initialize base class
 
     // [SSE] Standart Items Expansion
