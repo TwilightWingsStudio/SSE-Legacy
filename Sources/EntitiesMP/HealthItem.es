@@ -21,19 +21,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 uses "EntitiesMP/Item";
 
-// health type 
+// Health type.
 enum HealthItemType {
-  0 HIT_PILL      "0 Pill (+1)",       // pill health
-  1 HIT_SMALL     "1 Small (+10)",      // small health
-  2 HIT_MEDIUM    "2 Medium (+25)",     // medium health
-  3 HIT_LARGE     "3 Large (+50)",      // large health
-  4 HIT_SUPER     "4 Super (+100)",      // super health
+  0 HIT_PILL      "0 Pill (+1)",        // Pill health.
+  1 HIT_SMALL     "1 Small (+10)",      // Small health.
+  2 HIT_MEDIUM    "2 Medium (+25)",     // Medium health.
+  3 HIT_LARGE     "3 Large (+50)",      // Large health.
+  4 HIT_SUPER     "4 Super (+100)",     // Super health.
 };
 
-// event for sending through receive item
+// Event for sending through receive item.
 event EHealth {
-  FLOAT fHealth,        // health to receive
-  BOOL bOverTopHealth,  // can be received over top health
+  FLOAT fHealth,        // Health to receive.
+  BOOL bOverTopHealth,  // Can be received over top health?
 };
 
 class CHealthItem : CItem {
@@ -41,8 +41,8 @@ name      "Health Item";
 thumbnail "Thumbnails\\HealthItem.tbn";
 
 properties:
-  1 enum HealthItemType m_EhitType    "Type" 'Y' = HIT_SMALL,     // health type
-  2 BOOL m_bOverTopHealth             = FALSE,  // can be received over top health
+  1 enum HealthItemType m_EhitType    "Type" 'Y' = HIT_SMALL, // Health type.
+  2 BOOL m_bOverTopHealth                        = FALSE,     // Can be received over top health?
   3 INDEX m_iSoundComponent = 0,
 
 components:
@@ -125,26 +125,33 @@ functions:
   // Render particles.
   // --------------------------------------------------------------------------------------
   void RenderParticles(void) {
-    // no particles when not existing or in DM modes
-    if (GetRenderType()!=CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE || !ShowItemParticles()) {
+    // No particles when not existing!
+    if (GetRenderType() != CEntity::RT_MODEL) {
       return;
     }
+    
+    // No particles when in DM modes!
+    if (GetSP()->sp_gmGameMode > CSessionProperties::GM_COOPERATIVE || !ShowItemParticles()) {
+      return;
+    }
+    
+    BOOL bOnGround = m_eotOscillation == 1;
 
     switch (m_EhitType) {
       case HIT_PILL:
-        Particles_Stardust(this, 0.9F*0.75F, m_eotOscillation == 1 ? 0.375F : 0.70f*0.75F, PT_STAR08, 32);
+        Particles_Stardust(this, 0.9F*0.75F, bOnGround ? 0.375F : 0.70F*0.75F, PT_STAR08, 32);
         break;
       case HIT_SMALL:
-        Particles_Stardust(this, 1.0F*0.75F, m_eotOscillation == 1 ? 0.375F : 0.75F*0.75F, PT_STAR08, 128);
+        Particles_Stardust(this, 1.0F*0.75F, bOnGround ? 0.375F : 0.75F*0.75F, PT_STAR08, 128);
         break;
       case HIT_MEDIUM:
-        Particles_Stardust(this, 1.0F*0.75F, m_eotOscillation == 1 ? 0.375F : 0.75F*0.75F, PT_STAR08, 128);
+        Particles_Stardust(this, 1.0F*0.75F, bOnGround ? 0.375F : 0.75F*0.75F, PT_STAR08, 128);
         break;
       case HIT_LARGE:
-        Particles_Stardust(this, 2.0F*0.75F, m_eotOscillation == 1 ? 0.75F : 1.0F*0.75F, PT_STAR08, 192);
+        Particles_Stardust(this, 2.0F*0.75F, bOnGround ? 0.75F : 1.0F*0.75F, PT_STAR08, 192);
         break;
       case HIT_SUPER:
-        Particles_Stardust(this, 2.3F*0.75F, m_eotOscillation == 1 ? 0.8625F : 1.5F*0.75F, PT_STAR08, 320);
+        Particles_Stardust(this, 2.3F*0.75F, bOnGround ? 0.8625F : 1.5F*0.75F, PT_STAR08, 320);
         break;
     }
   }
@@ -152,75 +159,84 @@ functions:
   // --------------------------------------------------------------------------------------
   // Set health properties depending on health type.
   // --------------------------------------------------------------------------------------
-  void SetProperties(void) {
+  void SetProperties(void)
+  {
     switch (m_EhitType)
     {
-      case HIT_PILL:
+      case HIT_PILL: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_SMALL);
-        m_fValue = 1.0f;
+        m_fValue = 1.0F;
         m_bOverTopHealth = TRUE;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Pill - H:%g  T:%g", m_fValue, m_fRespawnTime);
+        
         // set appearance
         AddItem(MODEL_PILL, TEXTURE_PILL, 0, TEXTURE_SPECULAR_STRONG, TEXTURE_PILL_BUMP);
         // add flare
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );
-        StretchItem(FLOAT3D(1.0f*0.75f, 1.0f*0.75f, 1.0f*0.75));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
+        StretchItem(FLOAT3D(1.0F*0.75F, 1.0F*0.75F, 1.0F*0.75F));
         m_iSoundComponent = SOUND_PILL;
-        break;
+      } break;
 
-      case HIT_SMALL:
+      case HIT_SMALL: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
-        m_fValue = 10.0f;
+        m_fValue = 10.0F;
         m_bOverTopHealth = FALSE;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Small - H:%g  T:%g", m_fValue, m_fRespawnTime);
+        
         // set appearance
         AddItem(MODEL_SMALL, TEXTURE_SMALL, TEXTURE_REFLECTION_LIGHTMETAL01, TEXTURE_SPECULAR_MEDIUM, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.4f,0), FLOAT3D(2,2,0.4f) );
-        StretchItem(FLOAT3D(1.0f*0.75f, 1.0f*0.75f, 1.0f*0.75));
+        // add flare
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.4F, 0.0F), FLOAT3D(2.0F, 2.0F, 0.4F) );
+        StretchItem(FLOAT3D(1.0F*0.75F, 1.0F*0.75F, 1.0F*0.75F));
         m_iSoundComponent = SOUND_SMALL;
-        break;                                                                 // add flare
+      } break;
 
       case HIT_MEDIUM:
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
-        m_fValue = 25.0f;
+        m_fValue = 25.0F;
         m_bOverTopHealth = FALSE;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 25.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 25.0F; 
         m_strDescription.PrintF("Medium - H:%g  T:%g", m_fValue, m_fRespawnTime);
+        
         // set appearance
         AddItem(MODEL_MEDIUM, TEXTURE_MEDIUM, TEXTURE_REFLECTION_LIGHTMETAL01, TEXTURE_SPECULAR_MEDIUM, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.6f,0), FLOAT3D(2.5f,2.5f,0.5f) );
-        StretchItem(FLOAT3D(1.5f*0.75f, 1.5f*0.75f, 1.5f*0.75));
+        // add flare
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.6F, 0.0F), FLOAT3D(2.5F, 2.5F, 0.5F) );
+        StretchItem(FLOAT3D(1.5F*0.75F, 1.5F*0.75F, 1.5F*0.75));
         m_iSoundComponent = SOUND_MEDIUM;
         break;
 
       case HIT_LARGE:
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
-        m_fValue = 50.0f;
+        m_fValue = 50.0F;
         m_bOverTopHealth = FALSE;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 60.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 60.0F; 
         m_strDescription.PrintF("Large - H:%g  T:%g", m_fValue, m_fRespawnTime);
+        
         // set appearance
         AddItem(MODEL_LARGE, TEXTURE_LARGE, TEXTURE_REFLECTION_GOLD01, TEXTURE_SPECULAR_STRONG, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.8f,0), FLOAT3D(2.8f,2.8f,1.0f) );
-        StretchItem(FLOAT3D(1.2f*0.75f, 1.2f*0.75f, 1.2f*0.75));
+        // add flare
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.8F, 0.0F), FLOAT3D(2.8F, 2.8F, 1.0F) );
+        StretchItem(FLOAT3D(1.2F*0.75F, 1.2F*0.75F, 1.2F*0.75F));
         m_iSoundComponent = SOUND_LARGE;
         break;
 
       case HIT_SUPER:
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
-        m_fValue = 100.0f;
+        m_fValue = 100.0F;
         m_bOverTopHealth = TRUE;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 120.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 120.0F; 
         m_strDescription.PrintF("Super - H:%g  T:%g", m_fValue, m_fRespawnTime);
+        
         // set appearance
         AddItem(MODEL_SUPER, TEXTURE_SUPER, 0, TEXTURE_SPECULAR_MEDIUM, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,1.0f,0), FLOAT3D(3,3,1.0f) );
-        StretchItem(FLOAT3D(1.0f*0.75f, 1.0f*0.75f, 1.0f*0.75));
+        // add flare
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 1.0F, 0.0F), FLOAT3D(3.0F, 3.0F, 1.0F) );
+        StretchItem(FLOAT3D(1.0F*0.75F, 1.0F*0.75F, 1.0F*0.75));
         CModelObject &mo = GetModelObject()->GetAttachmentModel(ITEMHOLDER_ATTACHMENT_ITEM)->amo_moModelObject;
         mo.PlayAnim(0, AOF_LOOPING);
-
         m_iSoundComponent = SOUND_SUPER;
         break;
     }
@@ -237,25 +253,29 @@ functions:
   }
 
 procedures:
+  // --------------------------------------------------------------------------------------
+  // Called every time when any player trying to pick up item.
+  // --------------------------------------------------------------------------------------
   ItemCollected(EPass epass) : CItem::ItemCollected {
     ASSERT(epass.penOther!=NULL);
 
-    // if health stays
-    if (GetSP()->sp_bHealthArmorStays && !(m_bPickupOnce || m_bRespawn)) {
-      // if already picked by this player
+    // If health stays...
+    if (GetSP()->sp_bHealthArmorStays && !(m_bPickupOnce || m_bRespawn))
+    {
       BOOL bWasPicked = MarkPickedBy(epass.penOther);
+
+      // If already picked by this player then don't pick again.
       if (bWasPicked) {
-        // don't pick again
         return;
       }
     }
 
-    // send health to entity
+    // Prepare health to send it to entity.
     EHealth eHealth;
     eHealth.fHealth = m_fValue;
     eHealth.bOverTopHealth = m_bOverTopHealth;
 
-    // if health is received
+    // If health is received...
     if (epass.penOther->ReceiveItem(eHealth)) {
       if (_pNetwork->IsPlayerLocal(epass.penOther))
       {
@@ -269,8 +289,8 @@ procedures:
         }
       }
 
-      // play the pickup sound
-      m_soPick.Set3DParameters(50.0f, 1.0f, 1.0f, 1.0f);
+      // Play the pickup sound.
+      m_soPick.Set3DParameters(50.0F, 1.0F, 1.0F, 1.0F);
       PlaySound(m_soPick, m_iSoundComponent, SOF_3D);
       m_fPickSoundLen = GetSoundLength(m_iSoundComponent);
 
@@ -285,7 +305,8 @@ procedures:
   // --------------------------------------------------------------------------------------
   // The entry point.
   // --------------------------------------------------------------------------------------
-  Main() {
+  Main()
+  {
     Initialize();     // initialize base class
     
     // [SSE] Standart Items Expansion
