@@ -132,61 +132,77 @@ components:
 214 sound SOUND_DEFAULT          "Sounds\\Default.wav",
 
 functions:
+  // --------------------------------------------------------------------------------------
+  // No comments.
+  // --------------------------------------------------------------------------------------
   void Precache(void) {
     PrecacheSound(SOUND_PICK);
   }
 
-  // render particles
-  void RenderParticles(void) {
-    // no particles when not existing or in DM modes
-    if (GetRenderType()!=CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE
-      || !ShowItemParticles())
-    {
+  // --------------------------------------------------------------------------------------
+  // Render particles.
+  // --------------------------------------------------------------------------------------
+  void RenderParticles(void)
+  {
+    // No particles when not existing!
+    if (GetRenderType() != CEntity::RT_MODEL) {
       return;
     }
+    
+    // No particles when in DM modes!
+    if (GetSP()->sp_gmGameMode > CSessionProperties::GM_COOPERATIVE || !ShowItemParticles()) {
+      return;
+    }
+    
+    BOOL bOnGround = m_eotOscillation == 1;
+
     switch (m_EaitType) {
       case AIT_SHELLS:
-        Particles_Spiral(this, 1.0F*0.75F, m_eotOscillation == 1 ? 0.375F : 1.0F*0.75F, PT_STAR04, 4); //
+        Particles_Spiral(this, 1.0F*0.75F, bOnGround ? 0.375F : 1.0F*0.75F, PT_STAR04, 4); //
         break;
       case AIT_BULLETS:
-        Particles_Spiral(this, 1.5F*0.75F, m_eotOscillation == 1 ? 0.5625F : 1.0F*0.75F, PT_STAR04, 6); //
+        Particles_Spiral(this, 1.5F*0.75F, bOnGround ? 0.5625F : 1.0F*0.75F, PT_STAR04, 6); //
         break;
       case AIT_ROCKETS:
-        Particles_Spiral(this, 1.5F*0.75F, m_eotOscillation == 1 ? 0.5625F : 1.25F*0.75F, PT_STAR04, 6); //
+        Particles_Spiral(this, 1.5F*0.75F, bOnGround ? 0.5625F : 1.25F*0.75F, PT_STAR04, 6); //
         break;
       case AIT_GRENADES:
-        Particles_Spiral(this, 2.0F*0.75F, m_eotOscillation == 1 ? 0.75F : 1.25F*0.75F, PT_STAR04, 6); //
+        Particles_Spiral(this, 2.0F*0.75F, bOnGround ? 0.75F : 1.25F*0.75F, PT_STAR04, 6); //
         break;
       case AIT_ELECTRICITY:
-        Particles_Spiral(this, 1.5F*0.75F, m_eotOscillation == 1 ? 0.5625F : 1.125F*0.75F, PT_STAR04, 6); //
+        Particles_Spiral(this, 1.5F*0.75F, bOnGround ? 0.5625F : 1.125F*0.75F, PT_STAR04, 6); //
         break;
       case AIT_NUKEBALL:
-        Particles_Spiral(this, 1.25F*0.75F, m_eotOscillation == 1 ? 0.475F : 1.0F*0.75F, PT_STAR04, 4);
+        Particles_Spiral(this, 1.25F*0.75F, bOnGround ? 0.475F : 1.0F*0.75F, PT_STAR04, 4);
         break;
       case AIT_IRONBALLS:
-        Particles_Spiral(this, 2.0F*0.75F, m_eotOscillation == 1 ? 0.75F : 1.25F*0.75F, PT_STAR04, 8); //
+        Particles_Spiral(this, 2.0F*0.75F, bOnGround ? 0.75F : 1.25F*0.75F, PT_STAR04, 8); //
         break;
       case AIT_BACKPACK:
-        Particles_Spiral(this, 3.0F*0.5F, m_eotOscillation == 1 ? 0.75F : 2.5F*0.5F, PT_STAR04, 10); //
+        Particles_Spiral(this, 3.0F*0.5F, bOnGround ? 0.75F : 2.5F*0.5F, PT_STAR04, 10); //
         break;
        case AIT_SERIOUSPACK:
-        Particles_Spiral(this, 3.0F*0.5F, m_eotOscillation == 1 ? 0.75F : 2.5F*0.5F, PT_STAR04, 10); //
+        Particles_Spiral(this, 3.0F*0.5F, bOnGround ? 0.75F : 2.5F*0.5F, PT_STAR04, 10); //
         break;
        case AIT_NAPALM:
-        Particles_Spiral(this, 3.0F*0.5F, m_eotOscillation == 1 ? 0.75F : 2.5F*0.5F, PT_STAR04, 10); //
+        Particles_Spiral(this, 3.0F*0.5F, bOnGround ? 0.75F : 2.5F*0.5F, PT_STAR04, 10); //
         break;
        case AIT_SNIPERBULLETS:
-        Particles_Spiral(this, 1.5F*0.75F, m_eotOscillation == 1 ? 0.5625F : 1.25F*0.75F, PT_STAR04, 6); //
+        Particles_Spiral(this, 1.5F*0.75F, bOnGround ? 0.5625F : 1.25F*0.75F, PT_STAR04, 6); //
         break;
     }
   }
 
-  /* Fill in entity statistics - for AI purposes only */
+  // --------------------------------------------------------------------------------------
+  // Fill in entity statistics - for AI purposes only.
+  // --------------------------------------------------------------------------------------
   BOOL FillEntityStatistics(EntityStats *pes)
   {
     pes->es_ctCount = 1;
     pes->es_ctAmmount = m_fValue;
-    switch (m_EaitType) {
+
+    switch (m_EaitType)
+    {
       case AIT_SHELLS:      
         pes->es_strName = "Shells"; 
         pes->es_fValue = m_fValue*AV_SHELLS;
@@ -234,36 +250,41 @@ functions:
         pes->es_fValue = m_fValue*AV_SNIPERBULLETS;
         break;
     }
+
     pes->es_iScore = 0;//m_iScore;
+
     return TRUE;
   }
 
 
-  // set ammo properties depending on ammo type
+  // --------------------------------------------------------------------------------------
+  // Set ammo properties depending on ammo type.
+  // --------------------------------------------------------------------------------------
   void SetProperties(void)
   {
-    switch (m_EaitType) {
+    switch (m_EaitType)
+    {
       case AIT_SHELLS:
-        m_fValue = 10.0f;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0f; 
+        m_fValue = 10.0F;
+        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0F; 
         m_strDescription.PrintF("Shells: %d", (int) m_fValue);
         // set appearance
         AddItem(MODEL_SHELLS, TEXTURE_SHELLS, 0, 0, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.25f,0), FLOAT3D(1.5,1.5,0.75f) );
-        StretchItem(FLOAT3D(0.75f, 0.75f, 0.75f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0, 0.25F, 0), FLOAT3D(1.5,1.5,0.75F) );
+        StretchItem(FLOAT3D(0.75F, 0.75F, 0.75F));
         break;
       case AIT_BULLETS:
-        m_fValue = 50.0f;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0f; 
+        m_fValue = 50.0F;
+        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0F; 
         m_strDescription.PrintF("Bullets: %d", (int) m_fValue);
         // set appearance
         AddItem(MODEL_BULLETS, TEXTURE_BULLETS, 0, 0, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.6f,0), FLOAT3D(3,3,1.0f) );
-        StretchItem(FLOAT3D(0.75f, 0.75f, 0.75f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0, 0.6F, 0), FLOAT3D(3,3,1.0F) );
+        StretchItem(FLOAT3D(0.75F, 0.75F, 0.75F));
         break;
       case AIT_ROCKETS:
-        m_fValue = 5.0f;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0f; 
+        m_fValue = 5.0F;
+        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0F; 
         m_strDescription.PrintF("Rockets: %d", (int) m_fValue);
         // set appearance
         AddItem(MODEL_ROCKETS, TEXTURE_ROCKET, 0, 0, 0);
@@ -277,147 +298,158 @@ functions:
         SetItemAttachmentAnim(ROCKETS_ATTACHMENT_ROCKET3, ROCKET_ANIM_FORAMMO);
         SetItemAttachmentAnim(ROCKETS_ATTACHMENT_ROCKET4, ROCKET_ANIM_FORAMMO);
         SetItemAttachmentAnim(ROCKETS_ATTACHMENT_ROCKET5, ROCKET_ANIM_FORAMMO);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.6f,0), FLOAT3D(2,2,0.75f) );
-        StretchItem(FLOAT3D(0.75f, 0.75f, 0.75f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0, 0.6F, 0), FLOAT3D(2,2,0.75F) );
+        StretchItem(FLOAT3D(0.75F, 0.75F, 0.75F));
         break;
       case AIT_GRENADES:
-        m_fValue = 5.0f;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0f; 
+        m_fValue = 5.0F;
+        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0F; 
         m_strDescription.PrintF("Grenades: %d", (int) m_fValue);
         // set appearance
         AddItem(MODEL_GRENADES, TEXTURE_GRENADES, 0, 0, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.6f,0), FLOAT3D(4,4,1.0f) );
-        StretchItem(FLOAT3D(0.75f, 0.75f, 0.75f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0, 0.6F, 0), FLOAT3D(4,4,1.0F) );
+        StretchItem(FLOAT3D(0.75F, 0.75F, 0.75F));
         break;
       case AIT_ELECTRICITY:
-        m_fValue = 50.0f;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0f; 
+        m_fValue = 50.0F;
+        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0F; 
         m_strDescription.PrintF("Electricity: %d", (int) m_fValue);
         // set appearance
         AddItem(MODEL_ELECTRICITY, TEXTURE_ELECTRICITY, TEXTURE_EL_EFFECT, TEXTURE_EL_EFFECT, 0);
         AddItemAttachment(ELECTRICITY_ATTACHMENT_EFFECT1, MODEL_EL_EFFECT, TEXTURE_EL_EFFECT, 0, 0, 0);
         AddItemAttachment(ELECTRICITY_ATTACHMENT_EFFECT2, MODEL_EL_EFFECT, TEXTURE_EL_EFFECT, 0, 0, 0);
         AddItemAttachment(ELECTRICITY_ATTACHMENT_EFFECT3, MODEL_EL_EFFECT2,TEXTURE_EL_EFFECT, 0, 0, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.6f,0), FLOAT3D(3,3,0.8f) );
-        StretchItem(FLOAT3D(0.75f, 0.75f, 0.75f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0, 0.6F, 0), FLOAT3D(3,3,0.8f) );
+        StretchItem(FLOAT3D(0.75F, 0.75F, 0.75F));
         break;
 /*
       case AIT_NUKEBALL:
-        m_fValue = 1.0f;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0f; 
+        m_fValue = 1.0F;
+        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0F; 
         m_strDescription.PrintF("Nuke ball: %d", (int) m_fValue);
         // set appearance
         AddItem(MODEL_CANNONBALL, TEXTURE_NUKEBALL, TEX_REFL_BWRIPLES01, TEX_SPEC_MEDIUM, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.5f,0), FLOAT3D(2,2,0.5f) );
-        StretchItem(FLOAT3D(0.75f, 0.75f, 0.75f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.5F,0), FLOAT3D(2,2,0.5f) );
+        StretchItem(FLOAT3D(0.75F, 0.75F, 0.75F));
         break;
         */
       case AIT_IRONBALLS:
-        m_fValue = 4.0f;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0f; 
+        m_fValue = 4.0F;
+        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0F; 
         m_strDescription.PrintF("Iron balls: %d", (int) m_fValue);
         // set appearance
         AddItem(MODEL_CANNONBALLS, TEXTURE_IRONBALL, TEX_REFL_DARKMETAL, TEX_SPEC_WEAK, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.75f,0), FLOAT3D(5,5,1.3f) );
-        StretchItem(FLOAT3D(0.75f, 0.75f, 0.75f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0, 0.75F, 0), FLOAT3D(5,5,1.3F) );
+        StretchItem(FLOAT3D(0.75F, 0.75F, 0.75F));
         break;
       case AIT_NAPALM:
-        m_fValue = 100.0f;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0f; 
+        m_fValue = 100.0F;
+        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0F; 
         m_strDescription.PrintF("Napalm: %d", (int) m_fValue);
         // set appearance
         AddItem(MODEL_FL_RESERVOIR, TEXTURE_FL_FUELRESERVOIR, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.75f,0), FLOAT3D(3,3,1.0f) );
-        StretchItem(FLOAT3D(1.25f, 1.25f, 1.25f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0, 0.75F, 0), FLOAT3D(3,3,1.0F) );
+        StretchItem(FLOAT3D(1.25F, 1.25F, 1.25F));
         break;
       case AIT_SERIOUSPACK:
-        m_fValue = 1.0f;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0f; 
+        m_fValue = 1.0F;
+        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0F; 
         m_strDescription.PrintF("SeriousPack: %d", (int) m_fValue);
         // set appearance
         AddItem(MODEL_SERIOUSPACK, TEXTURE_SERIOUSPACK, 0,0,0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.75f,0), FLOAT3D(2,2,1.3f) );
-        StretchItem(FLOAT3D(0.5f, 0.5f, 0.5f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0, 0.75F, 0), FLOAT3D(2,2,1.3F) );
+        StretchItem(FLOAT3D(0.5F, 0.5F, 0.5F));
         break;
       case AIT_BACKPACK:
-        m_fValue = 1.0f;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0f; 
+        m_fValue = 1.0F;
+        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0F; 
         m_strDescription.PrintF("BackPack: %d", (int) m_fValue);
         // set appearance
         AddItem(MODEL_BACKPACK, TEXTURE_BACKPACK, 0,0,0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.75f,0), FLOAT3D(2,2,1.3f) );
-        StretchItem(FLOAT3D(0.5f, 0.5f, 0.5f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0, 0.75F, 0), FLOAT3D(2,2,1.3F) );
+        StretchItem(FLOAT3D(0.5F, 0.5F, 0.5F));
         break;
       case AIT_SNIPERBULLETS:
-        m_fValue = 5.0f;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0f; 
+        m_fValue = 5.0F;
+        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0F; 
         m_strDescription.PrintF("Sniper bullets: %d", (int) m_fValue);
         // set appearance
         AddItem(MODEL_SNIPER_BULLETS, TEXTURE_SNIPER_BULLETS, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.75f,0), FLOAT3D(3,3,1.0f) );
-        StretchItem(FLOAT3D(1.25f, 1.25f, 1.25f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0, 0.75F, 0), FLOAT3D(3,3,1.0F) );
+        StretchItem(FLOAT3D(1.25F, 1.25F, 1.25F));
         break;
       default: ASSERTALWAYS("Uknown ammo");
     }
   };
 
+  // --------------------------------------------------------------------------------------
+  // Make changes based on difficulty settings.
+  // --------------------------------------------------------------------------------------
   void AdjustDifficulty(void)
   {
-    m_fValue = ceil(m_fValue*GetSP()->sp_fAmmoQuantity);
+    m_fValue = ceil(m_fValue * GetSP()->sp_fAmmoQuantity);
 
-    if (GetSP()->sp_bInfiniteAmmo && m_penTarget==NULL) {
+    if (GetSP()->sp_bInfiniteAmmo && m_penTarget == NULL) {
       Destroy();
     }
   }
 
 procedures:
-  ItemCollected(EPass epass) : CItem::ItemCollected {
+  // --------------------------------------------------------------------------------------
+  // Called every time when any player trying to pick up item.
+  // --------------------------------------------------------------------------------------
+  ItemCollected(EPass epass) : CItem::ItemCollected
+  {
     ASSERT(epass.penOther!=NULL);
 
-    // if ammo stays
-    if (GetSP()->sp_bAmmoStays && !(m_bPickupOnce||m_bRespawn))
+    // If ammo stays and not (pickupOnce || respawn)...
+    if (GetSP()->sp_bAmmoStays && !(m_bPickupOnce || m_bRespawn))
     {
       BOOL bWasPicked = MarkPickedBy(epass.penOther);
-      // if already picked by this player then don't pick again
+      // If already picked by this player then don't pick again.
       if (bWasPicked) {
         return;
       }
     }
 
-    // send ammo to entity
+    // Prepare ammo to send it to entity.
     EAmmoItem eAmmo;
     eAmmo.EaitType = m_EaitType;
     eAmmo.iQuantity = (INDEX) m_fValue;
 
-    // if health is received
-    if (epass.penOther->ReceiveItem(eAmmo)) {
+    // If health is received...
+    if (epass.penOther->ReceiveItem(eAmmo))
+    {
       // play the pickup sound
-      m_soPick.Set3DParameters(50.0f, 1.0f, 1.0f, 1.0f);
-      if(_pNetwork->IsPlayerLocal(epass.penOther)) {IFeel_PlayEffect("PU_Ammo");}
-      if( (m_EaitType == AIT_SERIOUSPACK) || (m_EaitType == AIT_BACKPACK) )
-      {
+      m_soPick.Set3DParameters(50.0F, 1.0F, 1.0F, 1.0F);
+      if (_pNetwork->IsPlayerLocal(epass.penOther)) {IFeel_PlayEffect("PU_Ammo");}
+
+      if ((m_EaitType == AIT_SERIOUSPACK) || (m_EaitType == AIT_BACKPACK) ) {
         PlaySound(m_soPick, SOUND_DEFAULT, SOF_3D);
         CPrintF("^cFF0000^f5Warning!!! Replace old serious pack with new, BackPack entity!^r\n");
-      }
-      else
-      {
+      } else {
         PlaySound(m_soPick, SOUND_PICK, SOF_3D);
       }
+
       m_fPickSoundLen = GetSoundLength(SOUND_PICK);
+
       if (!GetSP()->sp_bAmmoStays || (m_bPickupOnce||m_bRespawn)) {
         jump CItem::ItemReceived();
       }
     }
+
     return;
   };
 
   // --------------------------------------------------------------------------------------
   // The entry point.
   // --------------------------------------------------------------------------------------
-  Main() {
-    if (m_EaitType==AIT_NUKEBALL /*|| m_EaitType==AIT_NAPALM*/) {
-      m_EaitType=AIT_SHELLS;
+  Main()
+  {
+    if (m_EaitType == AIT_NUKEBALL) {
+      m_EaitType = AIT_SHELLS;
     }
+
     Initialize();     // initialize base class
 
     // [SSE] Standart Items Expansion
