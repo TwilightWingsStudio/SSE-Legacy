@@ -21,20 +21,20 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 uses "EntitiesMP/Item";
 
-// health type 
+// Armor type.
 enum ArmorItemType {
-  0 ARIT_SHARD        "0 Shard (+1)",    // shard
-  1 ARIT_SMALL        "1 Small (+25)",   // small armor
-  2 ARIT_MEDIUM       "2 Medium (+50)",  // medium armor
-  3 ARIT_STRONG       "3 Strong (+100)", // strong armor
-  4 ARIT_SUPER        "4 Super (+200)",  // super armor
-  5 ARIT_HELM         "5 Helm (+5)",     // helm
+  0 ARIT_SHARD        "0 Shard (+1)",    // Shard
+  1 ARIT_SMALL        "1 Small (+25)",   // Small armor
+  2 ARIT_MEDIUM       "2 Medium (+50)",  // Medium armor
+  3 ARIT_STRONG       "3 Strong (+100)", // Strong armor
+  4 ARIT_SUPER        "4 Super (+200)",  // Super armor
+  5 ARIT_HELM         "5 Helm (+5)",     // Helm
 };
 
-// event for sending through receive item
+// Event for sending through receive item.
 event EArmor {
-  FLOAT fArmor,         // armor to receive
-  BOOL bOverTopArmor,   // can be received over top armor
+  FLOAT fArmor,         // Armor to receive.
+  BOOL bOverTopArmor,   // Can be received over top armor?
 };
 
 class CArmorItem : CItem {
@@ -42,8 +42,8 @@ name      "Armor Item";
 thumbnail "Thumbnails\\ArmorItem.tbn";
 
 properties:
-  1 enum ArmorItemType m_EaitType     "Type" 'Y' = ARIT_SHARD,    // armor type
-  2 BOOL m_bOverTopArmor  = FALSE,   // can be received over top armor
+  1 enum ArmorItemType m_EaitType     "Type" 'Y' = ARIT_SHARD,    // Armor type.
+  2 BOOL m_bOverTopArmor  = FALSE,                                // Can be received over top armor?
   3 INDEX m_iSoundComponent = 0,
 
 components:
@@ -92,6 +92,9 @@ components:
 306 sound   SOUND_HELM         "SoundsMP\\Items\\ArmourHelm.wav",
 
 functions:
+  // --------------------------------------------------------------------------------------
+  // No comments.
+  // --------------------------------------------------------------------------------------
   void Precache(void) {
     switch (m_EaitType) {
       case ARIT_SHARD:  PrecacheSound(SOUND_SHARD ); break;
@@ -129,32 +132,38 @@ functions:
   // --------------------------------------------------------------------------------------
   // Render particles.
   // --------------------------------------------------------------------------------------
-  void RenderParticles(void) {
-    // no particles when not existing or in DM modes
-    if (GetRenderType()!=CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE
-      || !ShowItemParticles())
-    {
+  void RenderParticles(void)
+  {
+    // No particles when not existing!
+    if (GetRenderType() != CEntity::RT_MODEL) {
       return;
     }
+    
+    // No particles when in DM modes!
+    if (GetSP()->sp_gmGameMode > CSessionProperties::GM_COOPERATIVE || !ShowItemParticles()) {
+      return;
+    }
+    
+    BOOL bOnGround = m_eotOscillation == 1;
 
     switch (m_EaitType) {
       case ARIT_SHARD:
-        Particles_Emanate(this, 0.75F*0.75F, m_eotOscillation == 1 ? 0.3F : 0.75F*0.75F, PT_STAR04, 8, 7.0F);
+        Particles_Emanate(this, 0.75F*0.75F, bOnGround ? 0.3F : 0.75F*0.75F, PT_STAR04, 8, 7.0F);
         break;
       case ARIT_SMALL:
-        Particles_Emanate(this, 1.0F*0.75F, m_eotOscillation == 1 ? 0.375F : 1.0F*0.75F, PT_STAR04, 32, 7.0F);
+        Particles_Emanate(this, 1.0F*0.75F, bOnGround ? 0.375F : 1.0F*0.75F, PT_STAR04, 32, 7.0F);
         break;
       case ARIT_MEDIUM:
-        Particles_Emanate(this, 1.5F*0.75F, m_eotOscillation == 1 ? 0.5625F : 1.5F*0.75F, PT_STAR04, 64, 7.0F);
+        Particles_Emanate(this, 1.5F*0.75F, bOnGround ? 0.5625F : 1.5F*0.75F, PT_STAR04, 64, 7.0F);
         break;
       case ARIT_STRONG:                              
-        Particles_Emanate(this, 2.0F*0.75F, m_eotOscillation == 1 ? 0.75F : 1.25F*0.75F, PT_STAR04, 96, 7.0F);
+        Particles_Emanate(this, 2.0F*0.75F, bOnGround ? 0.75F : 1.25F*0.75F, PT_STAR04, 96, 7.0F);
         break;
       case ARIT_SUPER:
-        Particles_Emanate(this, 2.5F*0.75F, m_eotOscillation == 1 ? 0.9375F : 1.5F*0.75F, PT_STAR04, 128, 7.0F);
+        Particles_Emanate(this, 2.5F*0.75F, bOnGround ? 0.9375F : 1.5F*0.75F, PT_STAR04, 128, 7.0F);
         break;
       case ARIT_HELM:
-        Particles_Emanate(this, 0.875F*0.75F, m_eotOscillation == 1 ? 0.335F : 0.875F*0.75F, PT_STAR04, 16, 7.0F);
+        Particles_Emanate(this, 0.875F*0.75F, bOnGround ? 0.335F : 0.875F*0.75F, PT_STAR04, 16, 7.0F);
         break;
     }
   }
@@ -162,81 +171,83 @@ functions:
   // --------------------------------------------------------------------------------------
   // Set health properties depending on health type.
   // --------------------------------------------------------------------------------------
-  void SetProperties(void) {
-    switch (m_EaitType) {
-      case ARIT_SHARD:
+  void SetProperties(void)
+  {
+    switch (m_EaitType)
+    {
+      case ARIT_SHARD: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_SMALL);
-        m_fValue = 1.0f;
+        m_fValue = 1.0F;
         m_bOverTopArmor = TRUE;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Shard - H:%g  T:%g", m_fValue, m_fRespawnTime);
         // set appearance
         AddItem(MODEL_1, TEXTURE_1, 0, TEX_SPEC_MEDIUM, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.4f,0), FLOAT3D(1.0,1.0,0.3f) );
-        StretchItem(FLOAT3D(0.75f*0.75, 0.75f*0.75, 0.75f*0.75));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.4f,0), FLOAT3D(1.0F, 1.0F, 0.3F) );
+        StretchItem(FLOAT3D(0.75F*0.75F, 0.75F*0.75F, 0.75F*0.75F));
         m_iSoundComponent = SOUND_SHARD;
-        break;
-      case ARIT_SMALL:
+      } break;
+      case ARIT_SMALL: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
-        m_fValue = 25.0f;
+        m_fValue = 25.0F;
         m_bOverTopArmor = FALSE;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Small - H:%g  T:%g", m_fValue, m_fRespawnTime);
         // set appearance
         AddItem(MODEL_25, TEXTURE_25, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.6f,0), FLOAT3D(2,2,0.5f) );
-        StretchItem(FLOAT3D(2.0f, 2.0f, 2.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.6F,0), FLOAT3D(2.0F, 2.0F, 0.5F) );
+        StretchItem(FLOAT3D(2.0F, 2.0F, 2.0F));
         m_iSoundComponent = SOUND_SMALL;
-        break;
+      } break;
       case ARIT_MEDIUM: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
-        m_fValue = 50.0f;
+        m_fValue = 50.0F;
         m_bOverTopArmor = FALSE;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 25.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0) ? m_fCustomRespawnTime : 25.0F; 
         m_strDescription.PrintF("Medium - H:%g  T:%g", m_fValue, m_fRespawnTime);
         // set appearance
         AddItem(MODEL_50, TEXTURE_50, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,1.0f,0), FLOAT3D(3,3,0.5f) );
-        StretchItem(FLOAT3D(2.0f, 2.0f, 2.0f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 1.0F, 0.0F), FLOAT3D(3.0F, 3.0F, 0.5F) );
+        StretchItem(FLOAT3D(2.0F, 2.0F, 2.0F));
         m_iSoundComponent = SOUND_MEDIUM;
-                        } break;
-      case ARIT_STRONG:
+      } break;
+      case ARIT_STRONG: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
-        m_fValue = 100.0f;
+        m_fValue = 100.0F;
         m_bOverTopArmor = FALSE;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 60.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0) ? m_fCustomRespawnTime : 60.0F; 
         m_strDescription.PrintF("Strong - H:%g  T:%g", m_fValue, m_fRespawnTime);
         // set appearance
         AddItem(MODEL_100, TEXTURE_100, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.75f,0), FLOAT3D(3.5,3.5,1.0f) );
-        StretchItem(FLOAT3D(2.5f, 2.5f, 2.5f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.75F, 0.0F), FLOAT3D(3.5F, 3.5F, 1.0F) );
+        StretchItem(FLOAT3D(2.5F, 2.5F, 2.5F));
         m_iSoundComponent = SOUND_STRONG;
-        break;
-      case ARIT_SUPER:
+      } break;
+      case ARIT_SUPER: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
-        m_fValue = 200.0f;
+        m_fValue = 200.0F;
         m_bOverTopArmor = TRUE;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 120.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0) ? m_fCustomRespawnTime : 120.0F; 
         m_strDescription.PrintF("Super - H:%g  T:%g", m_fValue, m_fRespawnTime);
         // set appearance
 
         AddItem(MODEL_200, TEXTURE_200, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.75f,0), FLOAT3D(3,3,1.0f) );
-        StretchItem(FLOAT3D(2.5f, 2.5f, 2.5f));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.75F, 0.0F), FLOAT3D(3.0F, 3.0F, 1.0F) );
+        StretchItem(FLOAT3D(2.5F, 2.5F, 2.5F));
         m_iSoundComponent = SOUND_SUPER;
-        break;
-      case ARIT_HELM:
+      } break;
+      case ARIT_HELM: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_SMALL);
-        m_fValue = 5.0f;
+        m_fValue = 5.0F;
         m_bOverTopArmor = FALSE;
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0) ? m_fCustomRespawnTime : 10.0F; 
         m_strDescription.PrintF("Helm - H:%g  T:%g", m_fValue, m_fRespawnTime);
         // set appearance
         AddItem(MODEL_5, TEXTURE_5, 0, TEX_SPEC_MEDIUM, 0);
-        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.5f,0), FLOAT3D(1.5,1.5,0.4f) );
-        StretchItem(FLOAT3D(0.875f*0.75, 0.875f*0.75, 0.875f*0.75));
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.5F, 0.0F), FLOAT3D(1.5F, 1.5F, 0.4F) );
+        StretchItem(FLOAT3D(0.875F*0.75F, 0.875F*0.75F, 0.875F*0.75F));
         m_iSoundComponent = SOUND_HELM;
-        break;        
+      } break;        
     }
   };
 
@@ -251,25 +262,30 @@ functions:
   }
 
 procedures:
-  ItemCollected(EPass epass) : CItem::ItemCollected {
-    ASSERT(epass.penOther!=NULL);
+  // --------------------------------------------------------------------------------------
+  // Called every time when any player trying to pick up item.
+  // --------------------------------------------------------------------------------------
+  ItemCollected(EPass epass) : CItem::ItemCollected
+  {
+    ASSERT(epass.penOther != NULL);
 
-    // if armor stays
-    if (GetSP()->sp_bHealthArmorStays && !(m_bPickupOnce || m_bRespawn)) {
-      // if already picked by this player
+    // If armor stays...
+    if (GetSP()->sp_bHealthArmorStays && !(m_bPickupOnce || m_bRespawn))
+    {
       BOOL bWasPicked = MarkPickedBy(epass.penOther);
+
+      // If already picked by this player then don't pick again.
       if (bWasPicked) {
-        // don't pick again
         return;
       }
     }
 
-    // send health to entity
+    // Prepare armor to send it to entity.
     EArmor eArmor;
     eArmor.fArmor = m_fValue;
     eArmor.bOverTopArmor = m_bOverTopArmor;
 
-    // if health is received
+    // If armor is received..
     if (epass.penOther->ReceiveItem(eArmor))
     {
       if(_pNetwork->IsPlayerLocal(epass.penOther))
@@ -285,8 +301,8 @@ procedures:
         }
       }
 
-      // play the pickup sound
-      m_soPick.Set3DParameters(50.0f, 1.0f, 1.0f, 1.0f);
+      // Play the pickup sound...
+      m_soPick.Set3DParameters(50.0F, 1.0F, 1.0F, 1.0F);
       PlaySound(m_soPick, m_iSoundComponent, SOF_3D);
       m_fPickSoundLen = GetSoundLength(m_iSoundComponent);
 
@@ -301,7 +317,8 @@ procedures:
   // --------------------------------------------------------------------------------------
   // The entry point.
   // --------------------------------------------------------------------------------------
-  Main() {
+  Main()
+  {
     Initialize();     // initialize base class
 
     // [SSE] Standart Items Expansion
