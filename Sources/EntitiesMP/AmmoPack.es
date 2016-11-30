@@ -76,24 +76,34 @@ components:
 213 sound SOUND_PICK             "Sounds\\Items\\Ammo.wav",
 
 functions:
+  // --------------------------------------------------------------------------------------
+  // No comments.
+  // --------------------------------------------------------------------------------------
   void Precache(void) {
     PrecacheSound(SOUND_PICK);
   }
 
-  // render particles
+  // --------------------------------------------------------------------------------------
+  // Render particles.
+  // --------------------------------------------------------------------------------------
   void RenderParticles(void)
   {
-    // no particles when not existing or in DM modes
-    if (GetRenderType()!=CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE
-      || !ShowItemParticles())
-    {
+    // No particles when not existing!
+    if (GetRenderType() != CEntity::RT_MODEL) {
+      return;
+    }
+
+    // No particles when in DM modes!
+    if (GetSP()->sp_gmGameMode > CSessionProperties::GM_COOPERATIVE || !ShowItemParticles()) {
       return;
     }
 
     Particles_Spiral(this, 3.0F*0.5F, m_eotOscillation == 1 ? 0.75F : 2.5F*0.5F, PT_STAR04, 10);
   }
 
-  /* Fill in entity statistics - for AI purposes only */
+  // --------------------------------------------------------------------------------------
+  // Fill in entity statistics - for AI purposes only.
+  // --------------------------------------------------------------------------------------
   BOOL FillEntityStatistics(EntityStats *pes)
   {
     pes->es_ctCount = 1;
@@ -122,7 +132,9 @@ functions:
     return TRUE;
   }
 
-  // set ammo properties depending on ammo type
+  // --------------------------------------------------------------------------------------
+  // Set ammo properties depending on ammo type.
+  // --------------------------------------------------------------------------------------
   void SetProperties(void)
   {
     switch (m_aptPackType)
@@ -144,8 +156,9 @@ functions:
       default: ASSERTALWAYS("Uknown ammo");
     }
 
-    m_fValue = 1.0f;
-    m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0f; 
+    m_fValue = 1.0F;
+    m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 30.0F; 
+
     if( m_iShells != 0) {m_strDescription.PrintF("%s: Shells (%d)", m_strDescription, m_iShells);}
     if( m_iBullets != 0) {m_strDescription.PrintF("%s: Bullets (%d)", m_strDescription, m_iBullets);}
     if( m_iRockets != 0) {m_strDescription.PrintF("%s: Rockets (%d)", m_strDescription, m_iRockets);}
@@ -157,31 +170,38 @@ functions:
     if( m_iSniperBullets != 0) {m_strDescription.PrintF("%s: Sniper bullets (%d)", m_strDescription, m_iSniperBullets);}
   }
 
+  // --------------------------------------------------------------------------------------
+  // Make changes based on difficulty settings.
+  // --------------------------------------------------------------------------------------
   void AdjustDifficulty(void)
   {
     //m_fValue = ceil(m_fValue*GetSP()->sp_fAmmoQuantity);
 
-    if (GetSP()->sp_bInfiniteAmmo && m_penTarget==NULL) {
+    if (GetSP()->sp_bInfiniteAmmo && m_penTarget == NULL) {
       Destroy();
     }
   }
 
 procedures:
+  // --------------------------------------------------------------------------------------
+  // Called every time when any player trying to pick up item.
+  // --------------------------------------------------------------------------------------
   ItemCollected(EPass epass) : CItem::ItemCollected
   {
     ASSERT(epass.penOther!=NULL);
 
-    // if ammo stays
-    if (GetSP()->sp_bAmmoStays && !(m_bPickupOnce||m_bRespawn)) {
-      // if already picked by this player
+    // If ammo stays
+    if (GetSP()->sp_bAmmoStays && !(m_bPickupOnce||m_bRespawn))
+    {
       BOOL bWasPicked = MarkPickedBy(epass.penOther);
+
+      // if already picked by this player then don't pick again.
       if (bWasPicked) {
-        // don't pick again
         return;
       }
     }
 
-    // send ammo to entity
+    // Prepare ammo to send it to entity.
     EAmmoPackItem eAmmo;
     eAmmo.iShells = m_iShells;
     eAmmo.iBullets = m_iBullets;
@@ -192,13 +212,16 @@ procedures:
     eAmmo.iIronBalls = m_iIronBalls;
 //    eAmmo.iNukeBalls = m_iNukeBalls;
     eAmmo.iSniperBullets = m_iSniperBullets;
-    // if health is received
-    if (epass.penOther->ReceiveItem(eAmmo)) {
-      // play the pickup sound
-      m_soPick.Set3DParameters(50.0f, 1.0f, 1.0f, 1.0f);
+
+    // If ammo is received..
+    if (epass.penOther->ReceiveItem(eAmmo))
+    {
+      // Play the pickup sound.
+      m_soPick.Set3DParameters(50.0F, 1.0F, 1.0F, 1.0F);
       PlaySound(m_soPick, SOUND_PICK, SOF_3D);
       m_fPickSoundLen = GetSoundLength(SOUND_PICK);
-      if (!GetSP()->sp_bAmmoStays || (m_bPickupOnce||m_bRespawn)) {
+
+      if (!GetSP()->sp_bAmmoStays || (m_bPickupOnce || m_bRespawn)) {
         jump CItem::ItemReceived();
       }
     }
@@ -208,7 +231,8 @@ procedures:
   // --------------------------------------------------------------------------------------
   // The entry point.
   // --------------------------------------------------------------------------------------
-  Main() {
+  Main()
+  {
     m_iShells = Clamp( m_iShells, INDEX(0), MAX_SHELLS);
     m_iBullets = Clamp( m_iBullets, INDEX(0), MAX_BULLETS);
     m_iRockets = Clamp( m_iRockets, INDEX(0), MAX_ROCKETS);
