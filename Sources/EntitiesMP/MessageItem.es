@@ -21,7 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 uses "EntitiesMP/Item";
 
-// event for sending through receive item
+// Event for sending through receive item.
 event EMessageItem {
   CTFileName fnmMessage,
 };
@@ -78,12 +78,12 @@ functions:
   // Render particles.
   // --------------------------------------------------------------------------------------
   void RenderParticles(void) {
-    // no particles when not existing
+    // No particles when not existing!
     if (GetRenderType() != CEntity::RT_MODEL) {
       return;
     }
 
-    Particles_Stardust(this, 0.9f, m_eotOscillation == 1 ? 0.5F : 0.70f, PT_STAR08, 32);
+    Particles_Stardust(this, 0.9F, m_eotOscillation == 1 ? 0.5F : 0.70F, PT_STAR08, 32);
   }
 
   // --------------------------------------------------------------------------------------
@@ -91,20 +91,24 @@ functions:
   // --------------------------------------------------------------------------------------
   void SetProperties(void)
   {
-    m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+    m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
     m_strDescription = m_fnmMessage.FileName();
 
     // set appearance
     AddItem(MODEL_PERGAMENT, TEXTURE_PERGAMENT, 0, 0, 0);
 
     // add flare
-    AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0, 0.2f, 0), FLOAT3D(1, 1, 0.3f) );
-    StretchItem(FLOAT3D(1.0f, 1.0f, 1.0f));
+    AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2f, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
+    StretchItem(FLOAT3D(1.0F, 1.0F, 1.0F));
     m_iSoundComponent = SOUND_KEY;
   };
 
 procedures:
-  ItemCollected(EPass epass) : CItem::ItemCollected {
+  // --------------------------------------------------------------------------------------
+  // Called every time when any player trying to pick up item.
+  // --------------------------------------------------------------------------------------
+  ItemCollected(EPass epass) : CItem::ItemCollected
+  {
     ASSERT(epass.penOther != NULL);
 
     // send key to entity
@@ -114,7 +118,7 @@ procedures:
     // if health is received
     if (epass.penOther->ReceiveItem(eMessage)) {
       // play the pickup sound
-      m_soPick.Set3DParameters(50.0f, 1.0f, 1.0f, 1.0f);
+      m_soPick.Set3DParameters(50.0F, 1.0F, 1.0F, 1.0F);
       PlaySound(m_soPick, m_iSoundComponent, SOF_3D);
       m_fPickSoundLen = GetSoundLength(m_iSoundComponent);
       jump CItem::ItemReceived();
@@ -126,7 +130,8 @@ procedures:
   // --------------------------------------------------------------------------------------
   // The entry point.
   // --------------------------------------------------------------------------------------
-  Main() {
+  Main()
+  {
     Initialize();     // initialize base class
 
     // [SSE] Standart Items Expansion
