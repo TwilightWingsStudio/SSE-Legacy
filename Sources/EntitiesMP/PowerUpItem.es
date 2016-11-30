@@ -22,7 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 uses "EntitiesMP/Item";
 uses "EntitiesMP/Player";
 
-// health type 
+// PowerUp type. 
 enum PowerUpItemType {
   0 PUIT_INVISIB  "0 Invisibility",
   1 PUIT_INVULNER "1 Invulnerability",
@@ -31,7 +31,7 @@ enum PowerUpItemType {
   4 PUIT_BOMB     "4 SeriousBomb",
 };
 
-// event for sending through receive item
+// Event for sending through receive item.
 event EPowerUp {
   enum PowerUpItemType puitType,
 };
@@ -112,7 +112,7 @@ functions:
     pes->es_fValue = 0;     // !!!!
     pes->es_iScore = 0;//m_iScore;
     
-    switch( m_puitType) {
+    switch (m_puitType) {
       case PUIT_INVISIB :  pes->es_strName += " invisibility";     break;
       case PUIT_INVULNER:  pes->es_strName += " invulnerability";  break;
       case PUIT_DAMAGE  :  pes->es_strName += " serious damage";   break;
@@ -128,27 +128,34 @@ functions:
   // --------------------------------------------------------------------------------------
   void RenderParticles(void)
   {
-    // no particles when not existing or in DM modes
-    if ( GetRenderType() != CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE || !ShowItemParticles()) {
+    // No particles when not existing!
+    if (GetRenderType() != CEntity::RT_MODEL) {
       return;
     }
+    
+    // No particles when in DM modes!
+    if (GetSP()->sp_gmGameMode > CSessionProperties::GM_COOPERATIVE || !ShowItemParticles()) {
+      return;
+    }
+    
+    BOOL bOnGround = m_eotOscillation == 1;
 
     switch( m_puitType)
     {
       case PUIT_INVISIB:
-        Particles_Stardust( this, 2.0f*0.75f, m_eotOscillation == 1 ? 0.75F : 1.00f*0.75f, PT_STAR08, 320);
+        Particles_Stardust( this, 2.0F*0.75F, bOnGround ? 0.75F : 1.00F*0.75F, PT_STAR08, 320);
         break;
       case PUIT_INVULNER:
-        Particles_Stardust( this, 2.0f*0.75f, m_eotOscillation == 1 ? 0.75F : 1.00f*0.75f, PT_STAR08, 192);
+        Particles_Stardust( this, 2.0F*0.75F, bOnGround ? 0.75F : 1.00F*0.75F, PT_STAR08, 192);
         break;
       case PUIT_DAMAGE:
-        Particles_Stardust( this, 1.0f*0.75f, m_eotOscillation == 1 ? 0.375F : 0.75f*0.75f, PT_STAR08, 128);
+        Particles_Stardust( this, 1.0F*0.75F, bOnGround ? 0.375F : 0.75F*0.75F, PT_STAR08, 128);
         break;
       case PUIT_SPEED:
-        Particles_Stardust( this, 1.0f*0.75f, m_eotOscillation == 1 ? 0.375F : 0.75f*0.75f, PT_STAR08, 128);
+        Particles_Stardust( this, 1.0F*0.75F, bOnGround ? 0.375F : 0.75F*0.75F, PT_STAR08, 128);
         break;
       case PUIT_BOMB:
-        Particles_Atomic(this, 2.0f*0.75f, m_eotOscillation == 1 ? 0.75F : 2.0f*0.95f, PT_STAR05, 12);
+        Particles_Atomic(this, 2.0F*0.75F, bOnGround ? 0.75F : 2.0F*0.95F, PT_STAR05, 12);
         break;
     }
   }
@@ -160,81 +167,96 @@ functions:
   {
     switch( m_puitType)
     {
-      case PUIT_INVISIB:
+      case PUIT_INVISIB: {
         ForceCollisionBoxIndexChange( ITEMHOLDER_COLLISION_BOX_BIG);
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 40.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 40.0F; 
         m_strDescription.PrintF("Invisibility");
+
         AddItem(  MODEL_INVISIB, TEXTURE_REFLECTION_METAL, 0, TEXTURE_SPECULAR_STRONG, 0);  // set appearance
-        AddFlare( MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );  // add flare
-        StretchItem( FLOAT3D(1.0f*0.75f, 1.0f*0.75f, 1.0f*0.75));
-        break;
-      case PUIT_INVULNER:
+        AddFlare( MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );  // add flare
+        StretchItem( FLOAT3D(1.0F*0.75F, 1.0F*0.75F, 1.0F*0.75F));
+      } break;
+
+      case PUIT_INVULNER: {
         ForceCollisionBoxIndexChange( ITEMHOLDER_COLLISION_BOX_BIG);
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 60.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 60.0F; 
         m_strDescription.PrintF("Invulnerability");
+
         AddItem(  MODEL_INVULNER, TEXTURE_REFLECTION_GOLD, TEXTURE_REFLECTION_METAL, TEXTURE_SPECULAR_MEDIUM, 0);  // set appearance
-        AddFlare( MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );  // add flare
-        StretchItem( FLOAT3D(1.0f*0.75f, 1.0f*0.75f, 1.0f*0.75));
-        break;                                                               
-      case PUIT_DAMAGE:
+        AddFlare( MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );  // add flare
+        StretchItem( FLOAT3D(1.0F*0.75F, 1.0F*0.75F, 1.0F*0.75));
+      } break;
+
+      case PUIT_DAMAGE: {
         ForceCollisionBoxIndexChange( ITEMHOLDER_COLLISION_BOX_BIG);
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 40.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 40.0F; 
         m_strDescription.PrintF("SeriousDamage");
+
         AddItem(  MODEL_DAMAGE, TEXTURE_DAMAGE, 0, TEXTURE_SPECULAR_STRONG, 0);  // set appearance
-        AddFlare( MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );  // add flare
-        StretchItem( FLOAT3D(1.0f*0.75f, 1.0f*0.75f, 1.0f*0.75));
-        break;
-      case PUIT_SPEED:
+        AddFlare( MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );  // add flare
+        StretchItem( FLOAT3D(1.0F*0.75F, 1.0F*0.75F, 1.0F*0.75));
+      } break;
+
+      case PUIT_SPEED: {
         ForceCollisionBoxIndexChange( ITEMHOLDER_COLLISION_BOX_BIG);
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 40.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 40.0F; 
         m_strDescription.PrintF("SeriousSpeed");
+
         AddItem(  MODEL_SPEED, TEXTURE_SPEED, 0, 0, 0);  // set appearance
-        AddFlare( MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );  // add flare
-        StretchItem( FLOAT3D(1.0f*0.75f, 1.0f*0.75f, 1.0f*0.75));
-        break;
-      case PUIT_BOMB:
+        AddFlare( MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );  // add flare
+        StretchItem( FLOAT3D(1.0F*0.75F, 1.0F*0.75F, 1.0F*0.75));
+      } break;
+
+      case PUIT_BOMB: {
         ForceCollisionBoxIndexChange( ITEMHOLDER_COLLISION_BOX_BIG);
-        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 40.0f; 
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 40.0F; 
         m_strDescription.PrintF("Serious Bomb!");
+
         AddItem(  MODEL_BOMB, TEXTURE_BOMB, 0, 0, 0);  // set appearance
-        AddFlare( MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.2f,0), FLOAT3D(1,1,0.3f) );  // add flare
-        StretchItem( FLOAT3D(1.0f*3.0f, 1.0f*3.0f, 1.0f*3.0));
-        break;
+        AddFlare( MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );  // add flare
+        StretchItem( FLOAT3D(1.0F*3.0F, 1.0F*3.0F, 1.0F*3.0));
+      } break;
     }
   };
-
  
 procedures:
-
+  // --------------------------------------------------------------------------------------
+  // Called every time when any player trying to pick up item.
+  // --------------------------------------------------------------------------------------
   ItemCollected( EPass epass) : CItem::ItemCollected
   {
     ASSERT(epass.penOther != NULL);
  
-    // don't pick up more bombs then you can carry
-    if (m_puitType == PUIT_BOMB) {
-      if (IsOfClass(epass.penOther, "Player")) {
-        if (((CPlayer &)*epass.penOther).m_iSeriousBombCount>=3) {
+    // Don't pick up more bombs then you can carry.
+    if (m_puitType == PUIT_BOMB)
+    {
+      if (IsOfClass(epass.penOther, "Player"))
+      {
+        if (((CPlayer &)*epass.penOther).m_iSeriousBombCount >= 3) {
           return;
         }
       }
     }
 
-    if (!(m_bPickupOnce||m_bRespawn)) {
-      // if already picked by this player
+    if (!(m_bPickupOnce || m_bRespawn))
+    {
       BOOL bWasPicked = MarkPickedBy(epass.penOther);
-      if ( bWasPicked) {
-        // don't pick again
+
+      // If already picked by this player then don't pick again.
+      if (bWasPicked) {
         return;
       }
     }
 
-    // send powerup to entity
+    // Prepare PowerUp to send it to entity.
     EPowerUp ePowerUp;
     ePowerUp.puitType = m_puitType;
 
-    // if powerup is received
-    if (epass.penOther->ReceiveItem(ePowerUp)) {
-      if (_pNetwork->IsPlayerLocal(epass.penOther)) {
+    // If powerup is received...
+    if (epass.penOther->ReceiveItem(ePowerUp))
+    {
+      if (_pNetwork->IsPlayerLocal(epass.penOther))
+      {
         switch (m_puitType)
         {
           case PUIT_INVISIB:  IFeel_PlayEffect("PU_Invulnerability"); break;
@@ -245,8 +267,9 @@ procedures:
         }
       }
       
-      // play the pickup sound
-      m_soPick.Set3DParameters( 50.0f, 1.0f, 2.0f, 1.0f);
+      // Play the pickup sound.
+      m_soPick.Set3DParameters(50.0F, 1.0F, 2.0F, 1.0F);
+
       if (m_puitType == PUIT_BOMB) {
         PlaySound(m_soPick, SOUND_BOMB, SOF_3D);
         m_fPickSoundLen = GetSoundLength(SOUND_BOMB);
