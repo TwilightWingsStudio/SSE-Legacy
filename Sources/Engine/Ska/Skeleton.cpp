@@ -13,7 +13,7 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
 
-#include "stdh.h"
+#include "StdH.h"
 #include "Skeleton.h"
 
 #include <Engine/Graphics/DrawPort.h>
@@ -23,19 +23,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Base/Stream.h>
 #include <Engine/Templates/DynamicContainer.cpp>
 
-#define SKELETON_VERSION  6
-#define SKELETON_ID       "SKEL"
 
 CStaticArray<struct SkeletonBone> _aSortArray;
 INDEX ctSortBones;
 
-CSkeleton::CSkeleton()
-{
-}
+CSkeleton::CSkeleton() {}
 
-CSkeleton::~CSkeleton()
-{
-}
+CSkeleton::~CSkeleton() {}
+
 // Find bone in skeleton lod
 INDEX CSkeleton::FindBoneInLOD(INDEX iBoneID,INDEX iSkeletonLod)
 {
@@ -157,105 +152,6 @@ void CSkeleton::RemoveSkeletonLod(SkeletonLOD *pslodRemove)
   skl_aSkeletonLODs.CopyArray(aTempSLODs);
   // clear temp skleletons lods array
   aTempSLODs.Clear();
-}
-
-// write to stream
-void CSkeleton::Write_t(CTStream *ostrFile)
-{
-  INDEX ctslods = skl_aSkeletonLODs.Count();
-  // write id
-  ostrFile->WriteID_t(CChunkID(SKELETON_ID));
-  // write version
-  (*ostrFile)<<(INDEX)SKELETON_VERSION;
-  // write lods count
-  (*ostrFile)<<ctslods;
-  // for each lod in skeleton
-  for(INDEX islod=0;islod<ctslods;islod++)
-  {
-    SkeletonLOD &slod = skl_aSkeletonLODs[islod];
-    // write source file name
-    (*ostrFile)<<slod.slod_fnSourceFile;
-    // write MaxDistance
-    (*ostrFile)<<slod.slod_fMaxDistance;
-
-    // write bone count
-    INDEX ctb = slod.slod_aBones.Count();
-    (*ostrFile)<<ctb;
-    // write skeleton bones
-    for(INDEX ib=0;ib<ctb;ib++) {
-      CTString strNameID = ska_GetStringFromTable(slod.slod_aBones[ib].sb_iID);
-      CTString strParentID = ska_GetStringFromTable(slod.slod_aBones[ib].sb_iParentID);
-      SkeletonBone &sb = slod.slod_aBones[ib];
-      // write ID
-      (*ostrFile)<<strNameID;
-      // write Parent ID
-      (*ostrFile)<<strParentID;
-      //(*ostrFile)<<slod.slod_aBones[ib].sb_iParentIndex;
-      // write AbsPlacement matrix
-      ostrFile->Write_t(&sb.sb_mAbsPlacement,sizeof(FLOAT)*12);
-      // write RelPlacement Qvect stuct
-      ostrFile->Write_t(&sb.sb_qvRelPlacement,sizeof(QVect));
-      // write offset len
-      (*ostrFile)<<sb.sb_fOffSetLen;
-      // write bone length
-      (*ostrFile)<<sb.sb_fBoneLength;
-    }
-  }
-}
-
-// read from stream
-void CSkeleton::Read_t(CTStream *istrFile)
-{
-  INDEX iFileVersion;
-  INDEX ctslods;
-  // read chunk id
-  istrFile->ExpectID_t(CChunkID(SKELETON_ID));
-  // check file version
-  (*istrFile)>>iFileVersion;
-  if(iFileVersion != SKELETON_VERSION) {
-		ThrowF_t(TRANS("File '%s'.\nInvalid skeleton file version.\nExpected Ver \"%d\" but found \"%d\"\n"),
-      (const char*)istrFile->GetDescription(),SKELETON_VERSION,iFileVersion);
-  }
-  // read skeleton lod count
-  (*istrFile)>>ctslods;
-
-  if(ctslods>0) {
-    skl_aSkeletonLODs.Expand(ctslods);
-  }
-  // for each skeleton lod
-  for(INDEX islod=0;islod<ctslods;islod++) {
-    SkeletonLOD &slod = skl_aSkeletonLODs[islod];
-    // read source file name
-    (*istrFile)>>slod.slod_fnSourceFile;
-    // read MaxDistance
-    (*istrFile)>>slod.slod_fMaxDistance;
-    // read bone count
-    INDEX ctb;
-    (*istrFile)>>ctb;
-    // create bone array
-    slod.slod_aBones.New(ctb);
-    // read skeleton bones
-    for(INDEX ib=0;ib<ctb;ib++) {
-      CTString strNameID;
-      CTString strParentID;
-      SkeletonBone &sb = slod.slod_aBones[ib];
-      // read ID
-      (*istrFile)>>strNameID;
-      // read Parent ID
-      (*istrFile)>>strParentID;
-      //(*istrFile)>>slod.slod_aBones[ib].sb_iParentIndex ;
-      sb.sb_iID = ska_GetIDFromStringTable(strNameID);
-      sb.sb_iParentID = ska_GetIDFromStringTable(strParentID);
-      // read AbsPlacement matrix
-      istrFile->Read_t(&sb.sb_mAbsPlacement,sizeof(FLOAT)*12);
-      // read RelPlacement Qvect stuct
-      istrFile->Read_t(&sb.sb_qvRelPlacement,sizeof(QVect));
-      // read offset len
-      (*istrFile)>>sb.sb_fOffSetLen;
-      // read bone length
-      (*istrFile)>>sb.sb_fBoneLength;
-    }
-  }
 }
 
 // Clear skeleton
