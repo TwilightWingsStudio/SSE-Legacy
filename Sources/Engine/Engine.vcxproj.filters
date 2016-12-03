@@ -754,6 +754,9 @@
     <ClCompile Include="Ska\SkeletonIO.cpp">
       <Filter>Source Files\Ska</Filter>
     </ClCompile>
+    <ClCompile Include="Ska\MeshIO.cpp">
+      <Filter>Source Files\Ska</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base\Anim.h">
