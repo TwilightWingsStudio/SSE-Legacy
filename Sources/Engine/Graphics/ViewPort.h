@@ -64,8 +64,12 @@ public:
 
 	/* Display the back buffer on screen. */
   void SwapBuffers(void);
-  // change size of this viewport, it's raster and all it's drawports to fit it window
+
+  // [SSE] Better Graphics Wrapper
   void Resize(void);
+
+  // change size of this viewport, it's raster and all it's drawports to fit it window
+  void ResizeEx(PIX pixNewWidth, PIX pixNewHeight);
 };
 
 

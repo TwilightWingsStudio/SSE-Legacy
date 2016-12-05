@@ -223,18 +223,23 @@ void CViewPort::CloseCanvas( BOOL bRelease/*=FALSE*/)
 #endif // SE1_D3D
 }
 
+// [SSE] Better Graphics Wrapper
+void CViewPort::Resize()
+{
+  PIX pixNewWidth, pixNewHeight;
+  RECT rectWindow;
+
+  // get the size of the window
+  GetClientRect(vp_hWndParent, &rectWindow);
+  pixNewWidth = rectWindow.right - rectWindow.left;
+  pixNewHeight = rectWindow.bottom - rectWindow.top;
+
+  ResizeEx(pixNewWidth, pixNewHeight);
+}
 
 // Change size of this viewport, it's raster and all it's drawports
-void CViewPort::Resize(void)
+void CViewPort::ResizeEx(PIX pixNewWidth, PIX pixNewHeight)
 {
-	PIX pixNewWidth, pixNewHeight;
-	RECT rectWindow;
-
-	// get the size of the window
-	GetClientRect( vp_hWndParent, &rectWindow);
-	pixNewWidth  = rectWindow.right  - rectWindow.left;
-	pixNewHeight = rectWindow.bottom - rectWindow.top;
-
   // resize child window
   ASSERT( vp_hWnd!=NULL);
   SetWindowPos( vp_hWnd, NULL, 0,0, pixNewWidth, pixNewHeight, SWP_NOZORDER|SWP_NOMOVE);
