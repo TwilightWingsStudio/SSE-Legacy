@@ -313,6 +313,7 @@ copy Release\$(TargetName).lib $(SolutionDir)..\Bin\ &gt;nul</Command>
     <ClCompile Include="Base\Unzip.cpp" />
     <ClCompile Include="Base\Updateable.cpp" />
     <ClCompile Include="GameAgent\GameAgent.cpp" />
+    <ClCompile Include="Graphics\TextureIO.cpp" />
     <ClCompile Include="Math\Float.cpp" />
     <ClCompile Include="Math\Functions.cpp" />
     <ClCompile Include="Math\Geometry.cpp">

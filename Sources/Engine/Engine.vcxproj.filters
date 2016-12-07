@@ -760,6 +760,9 @@
     <ClCompile Include="Ska\AnimSetIO.cpp">
       <Filter>Source Files\Ska</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\TextureIO.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base\Anim.h">
