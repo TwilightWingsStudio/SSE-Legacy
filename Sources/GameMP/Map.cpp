@@ -13,8 +13,21 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "LCDDrawing.h"
+
+// [SSE] Loading Screen Fix
+enum EMapLoadLoadState {
+  EMLS_NOTLOADED = 0,
+  EMLS_LOADED,
+  EMLS_ERROR,
+};
+
+static EMapLoadLoadState _emlsGeneric = EMLS_NOTLOADED;
+
+static EMapLoadLoadState _emlsFEState = EMLS_NOTLOADED;
+static EMapLoadLoadState _emlsSEState = EMLS_NOTLOADED;
+//
 
 extern BOOL map_bIsFirstEncounter;
 
@@ -424,48 +437,30 @@ PIX aPathDotsFE[][10][2] =
   },
 };
 
-BOOL ObtainMapData(void)
+static BOOL ObtainMapDataGeneric(void)
 {
+  CPrintF("Loading generic map textures...\n");
+  
   try {
-    // the second encounter
-    atoIconsSE[ 0].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Book.tex"));
-    atoIconsSE[ 1].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level00.tex"));
-    atoIconsSE[ 2].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level01.tex"));
-    atoIconsSE[ 3].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level02.tex"));
-    atoIconsSE[ 4].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level03.tex"));
-    atoIconsSE[ 5].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level04.tex"));
-    atoIconsSE[ 6].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level05.tex"));
-    atoIconsSE[ 7].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level06.tex"));
-    atoIconsSE[ 8].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level07.tex"));
-    atoIconsSE[ 9].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level08.tex"));
-    atoIconsSE[10].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level09.tex"));
-    atoIconsSE[11].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level10.tex"));
-    atoIconsSE[12].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level11.tex"));
     _toPathDot    .SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\PathDot.tex"));
-    _toMapBcgLDSE .SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\MapBcgLD.tex"));
-    _toMapBcgLUSE .SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\MapBcgLU.tex"));
-    _toMapBcgRDSE .SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\MapBcgRD.tex"));
-    _toMapBcgRUSE .SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\MapBcgRU.tex"));
-    // force constant textures
-    ((CTextureData*)atoIconsSE[ 0].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)atoIconsSE[ 1].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)atoIconsSE[ 2].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)atoIconsSE[ 3].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)atoIconsSE[ 4].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)atoIconsSE[ 5].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)atoIconsSE[ 6].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)atoIconsSE[ 7].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)atoIconsSE[ 8].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)atoIconsSE[ 9].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)atoIconsSE[10].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)atoIconsSE[11].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)atoIconsSE[12].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toPathDot    .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toMapBcgLDSE .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toMapBcgLUSE .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toMapBcgRDSE .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toMapBcgRUSE .GetData())->Force(TEX_CONSTANT);
+    
+    _emlsGeneric = EMLS_LOADED;
 
+    CPrintF("  done!\n");
+  } catch (char *strError) {
+    _emlsGeneric = EMLS_ERROR;
+    CPrintF("canceled! %s\n", strError);
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+static BOOL ObtainMapDataFE(void)
+{
+  CPrintF("Loading FE map textures...\n");
+
+  try {
     // the first encounter
     atoIconsFE[ 0].SetData_t(CTFILENAME("Textures\\Computer\\Map\\Level00.tex"));
     atoIconsFE[ 1].SetData_t(CTFILENAME("Textures\\Computer\\Map\\Level01.tex"));
@@ -486,6 +481,7 @@ BOOL ObtainMapData(void)
     _toMapBcgLUFE .SetData_t(CTFILENAME("Textures\\Computer\\Map\\MapBcgLU.tex"));
     _toMapBcgRDFE .SetData_t(CTFILENAME("Textures\\Computer\\Map\\MapBcgRD.tex"));
     _toMapBcgRUFE .SetData_t(CTFILENAME("Textures\\Computer\\Map\\MapBcgRU.tex"));
+
     // force constant textures
     ((CTextureData*)atoIconsFE[ 0].GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)atoIconsFE[ 1].GetData())->Force(TEX_CONSTANT);
@@ -506,29 +502,83 @@ BOOL ObtainMapData(void)
     ((CTextureData*)_toMapBcgLUFE .GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)_toMapBcgRDFE .GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)_toMapBcgRUFE .GetData())->Force(TEX_CONSTANT);
-  }
-  catch (char *strError) {
-    CPrintF("%s\n", strError);
+    
+    _emlsFEState = EMLS_LOADED;
+
+    CPrintF("  done!\n");
+  } catch (char *strError) {
+    _emlsFEState = EMLS_ERROR;
+    CPrintF("canceled! %s\n", strError);
     return FALSE;
   }
+
   return TRUE;
 }
 
-void ReleaseMapData(void)
+static BOOL ObtainMapDataSE(void)
 {
-  atoIconsSE[0].SetData(NULL);
-  atoIconsSE[1].SetData(NULL);
-  atoIconsSE[2].SetData(NULL);
-  atoIconsSE[3].SetData(NULL);
-  atoIconsSE[4].SetData(NULL);
-  atoIconsSE[5].SetData(NULL);
-  atoIconsSE[6].SetData(NULL);
-  atoIconsSE[7].SetData(NULL);
-  atoIconsSE[8].SetData(NULL);
-  atoIconsSE[9].SetData(NULL);
-  atoIconsSE[10].SetData(NULL);
-  atoIconsSE[11].SetData(NULL);
-  atoIconsSE[12].SetData(NULL);
+  CPrintF("Loading SE map textures...\n");
+  
+  try {
+    // the second encounter
+    atoIconsSE[ 0].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Book.tex"));
+    atoIconsSE[ 1].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level00.tex"));
+    atoIconsSE[ 2].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level01.tex"));
+    atoIconsSE[ 3].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level02.tex"));
+    atoIconsSE[ 4].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level03.tex"));
+    atoIconsSE[ 5].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level04.tex"));
+    atoIconsSE[ 6].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level05.tex"));
+    atoIconsSE[ 7].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level06.tex"));
+    atoIconsSE[ 8].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level07.tex"));
+    atoIconsSE[ 9].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level08.tex"));
+    atoIconsSE[10].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level09.tex"));
+    atoIconsSE[11].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level10.tex"));
+    atoIconsSE[12].SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\Level11.tex"));
+    _toPathDot    .SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\PathDot.tex"));
+    _toMapBcgLDSE .SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\MapBcgLD.tex"));
+    _toMapBcgLUSE .SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\MapBcgLU.tex"));
+    _toMapBcgRDSE .SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\MapBcgRD.tex"));
+    _toMapBcgRUSE .SetData_t(CTFILENAME("TexturesMP\\Computer\\Map\\MapBcgRU.tex"));
+
+    // force constant textures
+    ((CTextureData*)atoIconsSE[ 0].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)atoIconsSE[ 1].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)atoIconsSE[ 2].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)atoIconsSE[ 3].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)atoIconsSE[ 4].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)atoIconsSE[ 5].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)atoIconsSE[ 6].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)atoIconsSE[ 7].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)atoIconsSE[ 8].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)atoIconsSE[ 9].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)atoIconsSE[10].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)atoIconsSE[11].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)atoIconsSE[12].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)_toPathDot    .GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)_toMapBcgLDSE .GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)_toMapBcgLUSE .GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)_toMapBcgRDSE .GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)_toMapBcgRUSE .GetData())->Force(TEX_CONSTANT);
+    
+    _emlsSEState = EMLS_LOADED;
+    
+    CPrintF("  done!\n");
+  } catch (char *strError) {
+    _emlsSEState = EMLS_ERROR;
+    CPrintF("canceled! %s\n", strError);
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+static void ReleaseMapDataGeneric(void)
+{
+  _toPathDot.SetData(NULL);
+}
+
+static void ReleaseMapDataFE(void)
+{
   atoIconsFE[0].SetData(NULL);
   atoIconsFE[1].SetData(NULL);
   atoIconsFE[2].SetData(NULL);
@@ -544,22 +594,66 @@ void ReleaseMapData(void)
   atoIconsFE[12].SetData(NULL);
   atoIconsFE[13].SetData(NULL);
   atoIconsFE[14].SetData(NULL);
-  _toPathDot.SetData(NULL);
-  _toMapBcgLDSE.SetData(NULL);
-  _toMapBcgLUSE.SetData(NULL);
-  _toMapBcgRDSE.SetData(NULL);
-  _toMapBcgRUSE.SetData(NULL);
+
   _toMapBcgLDFE.SetData(NULL);
   _toMapBcgLUFE.SetData(NULL);
   _toMapBcgRDFE.SetData(NULL);
   _toMapBcgRUFE.SetData(NULL);
 }
 
+static void ReleaseMapDataSE(void)
+{
+  atoIconsSE[0].SetData(NULL);
+  atoIconsSE[1].SetData(NULL);
+  atoIconsSE[2].SetData(NULL);
+  atoIconsSE[3].SetData(NULL);
+  atoIconsSE[4].SetData(NULL);
+  atoIconsSE[5].SetData(NULL);
+  atoIconsSE[6].SetData(NULL);
+  atoIconsSE[7].SetData(NULL);
+  atoIconsSE[8].SetData(NULL);
+  atoIconsSE[9].SetData(NULL);
+  atoIconsSE[10].SetData(NULL);
+  atoIconsSE[11].SetData(NULL);
+  atoIconsSE[12].SetData(NULL);
+  
+  _toMapBcgLDSE.SetData(NULL);
+  _toMapBcgLUSE.SetData(NULL);
+  _toMapBcgRDSE.SetData(NULL);
+  _toMapBcgRUSE.SetData(NULL);
+}
+
 void RenderMap( CDrawPort *pdp, ULONG ulLevelMask, CProgressHookInfo *pphi)
 {
-  if( !ObtainMapData())
-  {
-    ReleaseMapData();
+  // Generic Map Data
+  if (_emlsGeneric == EMLS_NOTLOADED) {
+    if (!ObtainMapDataGeneric()) {
+      ReleaseMapDataGeneric();
+    }
+  }
+  
+  // If no generic assets then no any sense to load other stuff;
+  if (_emlsGeneric != EMLS_LOADED) {
+    return;
+  }
+
+  // The First Encounter
+  if (_emlsFEState == EMLS_NOTLOADED) {
+    if (!ObtainMapDataFE()) {
+      ReleaseMapDataFE();
+    }
+  }
+  
+  // The Second Encounter
+  if (_emlsSEState == EMLS_NOTLOADED) {
+    if (!ObtainMapDataSE()) {
+      ReleaseMapDataSE();
+    }
+  }
+  
+  if (map_bIsFirstEncounter && _emlsFEState != EMLS_LOADED) {
+    return;
+  } else if (!map_bIsFirstEncounter && _emlsSEState != EMLS_LOADED) {
     return;
   }
 
@@ -575,7 +669,7 @@ void RenderMap( CDrawPort *pdp, ULONG ulLevelMask, CProgressHookInfo *pphi)
   CTextureObject* _toMapBcgRD = &_toMapBcgRDSE;
   CTextureObject* _toMapBcgRU = &_toMapBcgRUSE;
 
-  if(map_bIsFirstEncounter) {
+  if (map_bIsFirstEncounter) {
     _toMapBcgLD = &_toMapBcgLDFE;
     _toMapBcgLU = &_toMapBcgLUFE;
     _toMapBcgRD = &_toMapBcgRDFE;
@@ -589,11 +683,11 @@ void RenderMap( CDrawPort *pdp, ULONG ulLevelMask, CProgressHookInfo *pphi)
   FLOAT fStretch = 0.25f;
 
   // determine max available picture stretch
-  if( pixdpw>=imgw*2 && pixdph>=imgh*2) {
+  if ( pixdpw>=imgw*2 && pixdph>=imgh*2) {
     fStretch = 2.0f;
-  } else if(pixdpw>=imgw && pixdph>=imgh) {
+  } else if (pixdpw>=imgw && pixdph>=imgh) {
     fStretch = 1.0f;
-  } else if(pixdpw>=imgw/2 && pixdph>=imgh/2) {
+  } else if (pixdpw>=imgw/2 && pixdph>=imgh/2) {
     fStretch = 0.5f;
   }
 
@@ -630,7 +724,7 @@ void RenderMap( CDrawPort *pdp, ULONG ulLevelMask, CProgressHookInfo *pphi)
     for( INDEX iIcon=(!map_bIsFirstEncounter); iIcon<ctLevels; iIcon++)
     {
       // if level's icon should be rendered
-      if( ulLevelMask & (1UL<<iIcon))
+      if ( ulLevelMask & (1UL<<iIcon))
       {
         PIX pixX = aIconCoords[iIcon][0]*fStretch+pixC1S;
         PIX pixY = aIconCoords[iIcon][1]*fStretch+pixR1S;
@@ -650,7 +744,7 @@ void RenderMap( CDrawPort *pdp, ULONG ulLevelMask, CProgressHookInfo *pphi)
 
     // if path dots should be rendered:
     // if path src and dst levels were discovered and secret level isn't inbetween or hasn't been discovered
-    if( ulLevelMask&(1UL<<iPrevLevelBit) &&
+    if ( ulLevelMask&(1UL<<iPrevLevelBit) &&
         ulLevelMask&(1UL<<iNextLevelBit) &&
         ((iNextLevelBit-iPrevLevelBit)==1 || !(ulLevelMask&(1UL<<(iNextLevelBit-1)))))
     {
@@ -658,14 +752,14 @@ void RenderMap( CDrawPort *pdp, ULONG ulLevelMask, CProgressHookInfo *pphi)
       {
         PIX pixDotX=pixC1S+aPathDots[iPath][iDot][0]*fStretch;
         PIX pixDotY=pixR1S+aPathDots[iPath][iDot][1]*fStretch;
-        if(aPathDots[iPath][iDot][0]==-1) break;
+        if (aPathDots[iPath][iDot][0]==-1) break;
         pdp->PutTexture( &_toPathDot, PIXaabbox2D( PIX2D(pixDotX, pixDotY), PIX2D(pixDotX+8*fStretch, pixDotY+8*fStretch)),
           (map_bIsFirstEncounter ? C_WHITE : C_BLACK)|255);
       }
     }
   }
 
-  if( pphi != NULL)
+  if ( pphi != NULL)
   {
     // set font
     pdp->SetFont( _pfdDisplayFont);
@@ -675,7 +769,7 @@ void RenderMap( CDrawPort *pdp, ULONG ulLevelMask, CProgressHookInfo *pphi)
     INDEX iPosX, iPosY;
     COLOR colText = RGBToColor(200,128,56)|CT_OPAQUE;
 
-    if(!map_bIsFirstEncounter) {
+    if (!map_bIsFirstEncounter) {
       // set coordinates and dot colors
       if (ulLevelMask == 0x00000001) {
         iPosX = 200;
@@ -691,7 +785,7 @@ void RenderMap( CDrawPort *pdp, ULONG ulLevelMask, CProgressHookInfo *pphi)
     PIX pixhtcx = pixC1S+iPosX*fStretch;
     PIX pixhtcy = pixR1S+iPosY*fStretch;
 
-    if(map_bIsFirstEncounter) {
+    if (map_bIsFirstEncounter) {
       pixhtcx = pixC1S+116*fStretch;
       pixhtcy = pixR1S+220*fStretch;
     }
@@ -699,12 +793,12 @@ void RenderMap( CDrawPort *pdp, ULONG ulLevelMask, CProgressHookInfo *pphi)
     pdp->PutTextC( pphi->phi_strDescription, pixhtcx, pixhtcy, colText);
     for( INDEX iProgresDot=0; iProgresDot<16; iProgresDot+=1)
     {
-      if(map_bIsFirstEncounter) {
+      if (map_bIsFirstEncounter) {
         PIX pixDotX=pixC1S+(48+iProgresDot*8)*fStretch;
         PIX pixDotY=pixR1S+249*fStretch;
 
         COLOR colDot = C_WHITE|255;
-        if(iProgresDot>pphi->phi_fCompleted*16) {
+        if (iProgresDot>pphi->phi_fCompleted*16) {
           colDot = C_WHITE|64;
         }
         pdp->PutTexture( &_toPathDot, PIXaabbox2D( PIX2D(pixDotX, pixDotY),
@@ -714,7 +808,7 @@ void RenderMap( CDrawPort *pdp, ULONG ulLevelMask, CProgressHookInfo *pphi)
         PIX pixDotY=pixR1S+(iPosY+19)*fStretch;
 
         COLOR colDot = colText|255;
-        if(iProgresDot>pphi->phi_fCompleted*16) {
+        if (iProgresDot>pphi->phi_fCompleted*16) {
           colDot = C_BLACK|64;
         }
         pdp->PutTexture( &_toPathDot, PIXaabbox2D( PIX2D(pixDotX, pixDotY),
@@ -726,5 +820,5 @@ void RenderMap( CDrawPort *pdp, ULONG ulLevelMask, CProgressHookInfo *pphi)
   }
 
   // free textures used in map rendering
-  ReleaseMapData();
+  //ReleaseMapData();
 }
