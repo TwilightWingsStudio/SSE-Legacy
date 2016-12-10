@@ -48,7 +48,7 @@ void RemapLevelNames(INDEX &iLevel)
   case 31:  iLevel = 11;  break;
   case 32:  iLevel = 12;  break;
   case 33:  iLevel = 13;  break;
-  default:  iLevel = -1;	break;
+  default:  iLevel = -1;  break;
   }
 }
 
@@ -151,116 +151,50 @@ static void LoadingHook_t(CProgressHookInfo *pphi)
     tvLast = _pTimer->GetHighPrecisionTimer();
     return;
   }
-
-  // get sizes
+  
+  // Get sizes.
   PIX pixSizeI = dpHook.GetWidth();
   PIX pixSizeJ = dpHook.GetHeight();
-  CFontData *pfd = _pfdConsoleFont;
-  PIX pixCharSizeI = pfd->fd_pixCharWidth  + pfd->fd_pixCharSpacing;
-  PIX pixCharSizeJ = pfd->fd_pixCharHeight + pfd->fd_pixLineSpacing;
+  CFontData *pfd = _pfdDisplayFont;
 
-  PIX pixBarSizeJ = 17;//*pixSizeJ/480;
+  COLOR colOutline = 0x5acdFF00|0xff; 
+  COLOR colBar = 0x2d667f00|0xFF;
 
-  COLOR colBcg = LerpColor(C_BLACK, SE_COL_BLUE_LIGHT, 0.30f)|0xff;
-  COLOR colBar = LerpColor(C_BLACK, SE_COL_BLUE_LIGHT, 0.45f)|0xff;
-  COLOR colLines = colBar; //C_vdGREEN|0xff;
-  COLOR colText = LerpColor(C_BLACK, SE_COL_BLUE_LIGHT, 0.95f)|0xff;
-  COLOR colEsc = C_WHITE|0xFF;
-
-  dpHook.Fill(0, pixSizeJ-pixBarSizeJ, pixSizeI, pixBarSizeJ, colBcg);
-  dpHook.Fill(0, pixSizeJ-pixBarSizeJ, pixSizeI*pphi->phi_fCompleted, pixBarSizeJ, colBar);
-  dpHook.DrawBorder(0, pixSizeJ-pixBarSizeJ, pixSizeI, pixBarSizeJ, colLines);
-
-  dpHook.SetFont( _pfdConsoleFont);
+  // Bar background
+  dpHook.Fill(0, pixSizeJ-30, pixSizeI, 30, C_BLACK|128); 
+ 
+  // BAR
+  dpHook.DrawBorder(8, pixSizeJ-22, pixSizeI-16, 14, colOutline);
+  dpHook.Fill(11, pixSizeJ-19, (pixSizeI-22)*pphi->phi_fCompleted, 8, colBar);
+  
+  dpHook.SetFont( _pfdDisplayFont);
   dpHook.SetTextScaling( 1.0f);
   dpHook.SetTextAspect( 1.0f);
-  // print status text
+  
+  // Fill Data
   setlocale(LC_ALL, "");
-  CTString strDesc(0, "%s", pphi->phi_strDescription);  strupr((char*)(const char*)strDesc);
+  CTString strDesc(0, "%s", pphi->phi_strDescription);
+  strupr((char*)(const char*)strDesc);
+  
   setlocale(LC_ALL, "C");
   CTString strPerc(0, "%3.0f%%", pphi->phi_fCompleted*100);
-  //dpHook.PutText(strDesc, pixCharSizeI/2, pixSizeJ-pixBarSizeJ-2-pixCharSizeJ, C_GREEN|255);
-  //dpHook.PutTextCXY(strPerc, pixSizeI/2, pixSizeJ-pixBarSizeJ/2+1, C_GREEN|255);
-  dpHook.PutText(strDesc, pixCharSizeI/2, pixSizeJ-pixBarSizeJ+pixCharSizeJ/2, colText);
-  dpHook.PutTextR(strPerc, pixSizeI-pixCharSizeI/2, pixSizeJ-pixBarSizeJ+pixCharSizeJ/2, colText);
-  if (_bUserBreakEnabled && !_pGame->gm_bFirstLoading) {
-    dpHook.PutTextC( TRANS( "PRESS ESC TO ABORT"), pixSizeI/2, pixSizeJ-pixBarSizeJ-2-pixCharSizeJ, colEsc);
-  }
-
-/*  
-  //LCDPrepare(1.0f);
-  //LCDSetDrawport(&dpHook);
   
-  // fill the box with background dirt and grid
-  //LCDRenderClouds1();
-  //LCDRenderGrid();
-
-  // draw progress bar
-  PIX pixBarCentI = pixBoxSizeI*1/2;
-  PIX pixBarCentJ = pixBoxSizeJ*3/4;
-  PIX pixBarSizeI = pixBoxSizeI*7/8;
-  PIX pixBarSizeJ = pixBoxSizeJ*3/8;
-  PIX pixBarMinI = pixBarCentI-pixBarSizeI/2;
-  PIX pixBarMaxI = pixBarCentI+pixBarSizeI/2;
-  PIX pixBarMinJ = pixBarCentJ-pixBarSizeJ/2;
-  PIX pixBarMaxJ = pixBarCentJ+pixBarSizeJ/2;
-
-  dpBox.Fill(pixBarMinI, pixBarMinJ, 
-    pixBarMaxI-pixBarMinI, pixBarMaxJ-pixBarMinJ, C_BLACK|255);
-  dpBox.Fill(pixBarMinI, pixBarMinJ, 
-    (pixBarMaxI-pixBarMinI)*pphi->phi_fCompleted, pixBarMaxJ-pixBarMinJ, C_GREEN|255);
-
-  // put more dirt
-  LCDRenderClouds2Light();
-
-  // draw borders
-  COLOR colBorders = LerpColor(C_GREEN, C_BLACK, 200);
-  LCDDrawBox(0,-1, PIXaabbox2D(
-    PIX2D(pixBarMinI, pixBarMinJ), 
-    PIX2D(pixBarMaxI, pixBarMaxJ)), 
-    colBorders|255);
-  LCDDrawBox(0,-1, PIXaabbox2D(
-    PIX2D(0,0), PIX2D(dpBox.GetWidth(), dpBox.GetHeight())), 
-    colBorders|255);
-
-  // print status text
-  dpBox.SetFont( _pfdDisplayFont);
-  dpBox.SetTextScaling( 1.0f);
-  dpBox.SetTextAspect( 1.0f);
-  // print status text
-  CTString strRes;
-  strRes.PrintF( "%s", pphi->phi_strDescription);
-  //strupr((char*)(const char*)strRes);
-  dpBox.PutTextC( strRes, 160, 17, C_GREEN|255);
-  strRes.PrintF( "%3.0f%%", pphi->phi_fCompleted*100);
-  dpBox.PutTextCXY( strRes, pixBarCentI, pixBarCentJ, C_GREEN|255);
-  dpBox.Unlock();
-
-  if( Flesh.gm_bFirstLoading) {
-#if USECUSTOMTEXT
-    FLOAT fScaling = (FLOAT)slSizeI/640.0f;
-    dpHook.Lock();
-    dpHook.SetFont( _pfdDisplayFont);
-    dpHook.SetTextScaling( fScaling);
-    dpHook.SetTextAspect( 1.0f);
-    //dpHook.Fill( 0, 0, slSizeI, pixCenterJ, C_vdGREEN|255, C_vdGREEN|255, C_vdGREEN|0, C_vdGREEN|0);
-    dpHook.PutTextC( TRANS( "SERIOUS SAM - TEST VERSION"), pixCenterI, 5*fScaling, C_WHITE|255);
-    dpHook.PutTextC( TRANS( "THIS IS NOT A DEMO VERSION, THIS IS A COMPATIBILITY TEST!"), pixCenterI, 25*fScaling, C_WHITE|255);
-    dpHook.PutTextC( TRANS( "Serious Sam (c) 2000 Croteam LLC, All Rights Reserved.\n"), pixCenterI, 45*fScaling, C_WHITE|255);
-    dpHook.PutText( _strCustomText, 1*fScaling, 85*fScaling, C_GREEN|255);
-    dpHook.Unlock();
-#endif
-  } else if (_bUserBreakEnabled) {
-    FLOAT fScaling = (FLOAT)slSizeI/640.0f;
-    dpHook.Lock();
-    dpHook.SetFont( _pfdDisplayFont);
-    dpHook.SetTextScaling( fScaling);
-    dpHook.SetTextAspect( 1.0f);
-    //dpHook.Fill( 0, 0, slSizeI, pixCenterJ, C_vdGREEN|255, C_vdGREEN|255, C_vdGREEN|0, C_vdGREEN|0);
-    dpHook.PutTextC( TRANS( "PRESS ESC TO ABORT"), pixCenterI, pixCenterJ+pixBoxSizeJ+5*fScaling, C_WHITE|255);
-  }
-  */
-
+  //
+  PIX pixCharSizeI = pfd->fd_pixCharWidth + pfd->fd_pixCharSpacing;
+  PIX pixCharSizeJ = pfd->fd_pixCharHeight + pfd->fd_pixLineSpacing;
+  
+  // State
+  dpHook.Fill(0, pixSizeJ-44, 256, 14, C_BLACK|128); 
+  
+  // Percent
+  PIX pixPercPanelSizeI = 48;
+  PIX pixPercPanelOffsetI = -16; // e[-640; 0]
+ 
+  dpHook.Fill(pixSizeI+pixPercPanelOffsetI-pixPercPanelSizeI, pixSizeJ-44, pixPercPanelSizeI, 14, C_BLACK|128); 
+  
+  dpHook.PutText(strDesc, 8, pixSizeJ-47+pixCharSizeJ/2, colOutline); // Description
+  dpHook.PutTextC(strPerc, pixSizeI+pixPercPanelOffsetI-pixPercPanelSizeI/2, pixSizeJ-47+pixCharSizeJ/2, colOutline); // Percent
+  
   dpHook.Unlock();
   // finish rendering
   dpHook.dp_Raster->ra_pvpViewPort->SwapBuffers();
