@@ -348,17 +348,23 @@ functions:
   // --------------------------------------------------------------------------------------
   void MaybeSwitchToAnotherPlayer(void)
   {
-    // if in single player
+    // If in single player then no need to check.
     if (GetSP()->sp_bSinglePlayer) {
-      // no need to check
       return;
     }
 
-    // if current player is inside threat distance
+    // If current player is inside threat distance then do not switch.
     if (CalcDist(m_penEnemy) < GetThreatDistance()) {
-      // do not switch
       return;
     }
+    
+    CEnemyFactionHolder* penEFH = GetFactionHolder(FALSE);
+
+    // If invalid index in faction holder we cant' use this faction holder!
+    if (penEFH != NULL && penEFH->IsIndexValid() && penEFH->m_efrtRelationToPlayers != FRT_ENEMY) {
+      return;
+    }
+
     // maybe switch
     CEntity *penNewEnemy = GetWatcher()->CheckAnotherPlayer(m_penEnemy);
     if (penNewEnemy!=m_penEnemy && penNewEnemy != NULL) {
@@ -662,7 +668,7 @@ functions:
   }
   
   // --------------------------------------------------------------------------------------
-  // Returns description to show it in SED.
+  // Returns short entity description to show it in SED.
   // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const {
     ((CTString&)m_strDescription).PrintF("-><none>");
@@ -1276,7 +1282,7 @@ functions:
     }
 
     // if we already have any kind of target
-    if (m_ttTarget!=TT_NONE) {
+    if (m_ttTarget != TT_NONE) {
       // do nothing
       return FALSE;
     }
@@ -2881,7 +2887,6 @@ procedures:
                 stop;
               }
             }
-
 
             // if you can see player
             if (IsVisible(m_penEnemy)) {
