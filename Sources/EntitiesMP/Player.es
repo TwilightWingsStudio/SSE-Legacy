@@ -2545,10 +2545,7 @@ functions:
     CPerspectiveProjection3D prPerspectiveProjection;
     plr_fFOV = Clamp( plr_fFOV, 1.0f, 160.0f);
     ANGLE aFOV = plr_fFOV;
-    // disable zoom in deathmatch
-    if (!GetSP()->sp_bCooperative) {
-      aFOV = 90.0f;
-    }
+
     // if sniper active
     if (((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon==WEAPON_SNIPER)
     {
