@@ -2545,13 +2545,14 @@ functions:
     CPerspectiveProjection3D prPerspectiveProjection;
     plr_fFOV = Clamp( plr_fFOV, 1.0f, 160.0f);
     ANGLE aFOV = plr_fFOV;
+    
+    CPlayerWeapons &enWeapons = (CPlayerWeapons&)*m_penWeapons;
 
+    // [SSE] Fix For FOV forcing to 90 when holding sniper rifle.
     // if sniper active
-    if (((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon==WEAPON_SNIPER)
+    if (enWeapons.m_iCurrentWeapon == WEAPON_SNIPER && /* FIX */ m_ulFlags&PLF_ISZOOMING)
     {
-      aFOV = Lerp(((CPlayerWeapons&)*m_penWeapons).m_fSniperFOVlast,
-                  ((CPlayerWeapons&)*m_penWeapons).m_fSniperFOV,
-                  _pTimer->GetLerpFactor());
+      aFOV = Lerp(enWeapons.m_fSniperFOVlast, enWeapons.m_fSniperFOV, _pTimer->GetLerpFactor());
     }
 
     if (m_pstState==PST_DIVE && iViewState == PVT_PLAYEREYES) {
@@ -2575,6 +2576,7 @@ functions:
     } else {
       prPerspectiveProjection.FOVL() = aFOV;
     }
+
     prPerspectiveProjection.ScreenBBoxL() = FLOATaabbox2D(
       FLOAT2D(0.0f, 0.0f),
       FLOAT2D((FLOAT)pdp->GetWidth(), (FLOAT)pdp->GetHeight())
