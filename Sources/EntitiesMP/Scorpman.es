@@ -15,9 +15,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 306
 %{
-#include "StdH.h"
-#include "Models/Enemies/Scorpman/Scorpman.h"
-#include "Models/Enemies/Scorpman/Gun.h"
+  #include "StdH.h"
+  #include "Models/Enemies/Scorpman/Scorpman.h"
+  #include "Models/Enemies/Scorpman/Gun.h"
 %}
 
 uses "EntitiesMP/EnemyBase";
@@ -25,39 +25,41 @@ uses "EntitiesMP/Bullet";
 uses "EntitiesMP/Reminder";
 
 enum ScorpmanType {
-  0 SMT_SOLDIER    "Soldier",
-  1 SMT_GENERAL    "General",
-  2 SMT_MONSTER    "Obsolete",
+  0 SMT_SOLDIER    "0 Soldier",
+  1 SMT_GENERAL    "1 General",
+  2 SMT_MONSTER    "2 Monster !!!obsolete!!!",
 };
-
 
 %{
-#define GUN_X  0.375f
-#define GUN_Y  0.6f
-#define GUN_Z -1.85f
-#define STRETCH_SOLDIER 2
-#define STRETCH_GENERAL 3
-#define STRETCH_MONSTER 4
-// info structure
-static EntityInfo eiScorpman = {
-  EIBT_FLESH, 1000.0f,
-  0, 1.6f*STRETCH_SOLDIER, 0,     // source (eyes)
-  0.0f, 1.0f*STRETCH_SOLDIER, 0.0f,     // target (body)
-};
+  #define GUN_X  0.375f
+  #define GUN_Y  0.6f
+  #define GUN_Z -1.85f
 
-static EntityInfo eiScorpmanGeneral = {
-  EIBT_FLESH, 1500.0f,
-  0, 1.6f*STRETCH_GENERAL, 0,     // source (eyes)
-  0.0f, 1.0f*STRETCH_GENERAL, 0.0f,     // target (body)
-};
+  #define STRETCH_SOLDIER 2
+  #define STRETCH_GENERAL 3
+  #define STRETCH_MONSTER 4
 
-static EntityInfo eiScorpmanMonster = {
-  EIBT_FLESH, 2000.0f,
-  0, 1.6f*STRETCH_MONSTER, 0,     // source (eyes)
-  0.0f, 1.0f*STRETCH_MONSTER, 0.0f,     // target (body)
-};
-#define LIGHT_ANIM_FIRE 3
-#define LIGHT_ANIM_NONE 5
+  // info structure
+  static EntityInfo eiScorpman = {
+    EIBT_FLESH, 1000.0f,
+    0, 1.6f*STRETCH_SOLDIER, 0,     // source (eyes)
+    0.0f, 1.0f*STRETCH_SOLDIER, 0.0f,     // target (body)
+  };
+
+  static EntityInfo eiScorpmanGeneral = {
+    EIBT_FLESH, 1500.0f,
+    0, 1.6f*STRETCH_GENERAL, 0,     // source (eyes)
+    0.0f, 1.0f*STRETCH_GENERAL, 0.0f,     // target (body)
+  };
+
+  static EntityInfo eiScorpmanMonster = {
+    EIBT_FLESH, 2000.0f,
+    0, 1.6f*STRETCH_MONSTER, 0,     // source (eyes)
+    0.0f, 1.0f*STRETCH_MONSTER, 0.0f,     // target (body)
+  };
+
+  #define LIGHT_ANIM_FIRE 3
+  #define LIGHT_ANIM_NONE 5
 %}
 
 
@@ -110,6 +112,7 @@ functions:
     }
     return str;
   }
+
   void Precache(void) {
     CEnemyBase::Precache();
     PrecacheModel(MODEL_FLARE);
@@ -133,24 +136,32 @@ functions:
   BOOL FillEntityStatistics(EntityStats *pes)
   {
     CEnemyBase::FillEntityStatistics(pes);
-    switch(m_smtType) {
-    case SMT_MONSTER: { pes->es_strName+=" Monster"; } break;
-    case SMT_GENERAL: { pes->es_strName+=" General"; } break;
-    case SMT_SOLDIER: { pes->es_strName+=" Soldier"; } break;
+
+    switch (m_smtType) {
+      case SMT_MONSTER: { pes->es_strName+=" Monster"; } break;
+      case SMT_GENERAL: { pes->es_strName+=" General"; } break;
+      case SMT_SOLDIER: { pes->es_strName+=" Soldier"; } break;
     }
+
     return TRUE;
   }
 
-  virtual const CTFileName &GetComputerMessageName(void) const {
+  virtual const CTFileName &GetComputerMessageName(void) const
+  {
     //static DECLARE_CTFILENAME(fnmMonster, "Data\\Messages\\Enemies\\ScorpmanMonster.txt");
     static DECLARE_CTFILENAME(fnmGeneral, "Data\\Messages\\Enemies\\ScorpmanGeneral.txt");
     static DECLARE_CTFILENAME(fnmSoldier, "Data\\Messages\\Enemies\\ScorpmanSoldier.txt");
-    switch(m_smtType) {
-    default: ASSERT(FALSE);
-    case SMT_MONSTER: //return fnmMonster;
-    case SMT_GENERAL: return fnmGeneral;
-    case SMT_SOLDIER: return fnmSoldier;
+
+    switch (m_smtType)
+    {
+      case SMT_MONSTER: return fnmGeneral;//return fnmMonster;
+      case SMT_GENERAL: return fnmGeneral;
+      case SMT_SOLDIER: return fnmSoldier;
+
+      default: ASSERT(FALSE);
     }
+    
+    return fnmSoldier;
   };
 
   /* Get static light source information. */
@@ -164,9 +175,10 @@ functions:
 
   BOOL ForcesCannonballToExplode(void)
   {
-    if (m_smtType!=SMT_SOLDIER) {
+    if (m_smtType != SMT_SOLDIER) {
       return TRUE;
     }
+
     return CEnemyBase::ForcesCannonballToExplode();
   }
 
@@ -185,9 +197,10 @@ functions:
     m_lsLightSource.ls_penEntity = this;
     m_lsLightSource.SetLightSource(lsNew);
   }
+
   // play light animation
   void PlayLightAnim(INDEX iAnim, ULONG ulFlags) {
-    if (m_aoLightAnimation.GetData()!=NULL) {
+    if (m_aoLightAnimation.GetData() != NULL) {
       m_aoLightAnimation.PlayAnim(iAnim, ulFlags);
     }
   };
@@ -196,24 +209,26 @@ functions:
   void MinigunOn(void)
   {
     PlayLightAnim(LIGHT_ANIM_FIRE, AOF_LOOPING);
-    CModelObject *pmoGun = &GetModelObject()->GetAttachmentModel(SCORPMAN_ATTACHMENT_MINIGUN)->
-      amo_moModelObject;
+    CModelObject *pmoGun = &GetModelObject()->GetAttachmentModel(SCORPMAN_ATTACHMENT_MINIGUN)->amo_moModelObject;
     pmoGun->PlayAnim(GUN_ANIM_FIRE, AOF_LOOPING);
     AddAttachmentToModel(this, *pmoGun, GUN_ATTACHMENT_FLAME, MODEL_FLARE, TEXTURE_GUN, 0, 0, 0);
-    switch (m_smtType) {
+
+    switch (m_smtType)
+    {
       case SMT_SOLDIER: pmoGun->StretchModel(FLOAT3D(2.0f, 2.0f, 2.0f)); break;
       case SMT_GENERAL: pmoGun->StretchModel(FLOAT3D(3.0f, 3.0f, 3.0f)); break;
       case SMT_MONSTER: pmoGun->StretchModel(FLOAT3D(4.0f, 4.0f, 4.0f)); break;
     }
   }
+
   void MinigunOff(void)
   {
     PlayLightAnim(LIGHT_ANIM_NONE, 0);
-    CModelObject *pmoGun = &GetModelObject()->GetAttachmentModel(SCORPMAN_ATTACHMENT_MINIGUN)->
-      amo_moModelObject;
+    CModelObject *pmoGun = &GetModelObject()->GetAttachmentModel(SCORPMAN_ATTACHMENT_MINIGUN)->amo_moModelObject;
     pmoGun->PlayAnim(GUN_ANIM_IDLE, AOF_LOOPING);
     pmoGun->RemoveAttachmentModel(GUN_ATTACHMENT_FLAME);
   }
+
   /* Entity info */
   void *GetEntityInfo(void) {
     if (m_smtType == SMT_MONSTER) {
@@ -237,32 +252,40 @@ functions:
 
 
   // damage anim
-  INDEX AnimForDamage(FLOAT fDamage) {
+  INDEX AnimForDamage(FLOAT fDamage)
+  {
     INDEX iAnim;
+
     switch (IRnd()%3) {
       case 0: iAnim = SCORPMAN_ANIM_WOUND01; break;
       case 1: iAnim = SCORPMAN_ANIM_WOUND02; break;
       case 2: iAnim = SCORPMAN_ANIM_WOUND03; break;
       default: ASSERTALWAYS("Scorpman unknown damage");
     }
+
     StartModelAnim(iAnim, 0);
     MinigunOff();
+
     return iAnim;
   };
 
   // death
-  INDEX AnimForDeath(void) {
+  INDEX AnimForDeath(void)
+  {
     StartModelAnim(SCORPMAN_ANIM_DEATH, 0);
     MinigunOff();
+
     return SCORPMAN_ANIM_DEATH;
   };
 
-  FLOAT WaitForDust(FLOAT3D &vStretch) {
+  FLOAT WaitForDust(FLOAT3D &vStretch)
+  {
     if(GetModelObject()->GetAnim()==SCORPMAN_ANIM_DEATH)
     {
       vStretch=FLOAT3D(1,1,1)*1.5f;
       return 1.3f;
     }
+
     return -1.0f;
   };
 
@@ -275,12 +298,15 @@ functions:
   void StandingAnim(void) {
     StartModelAnim(SCORPMAN_ANIM_IDLE, AOF_LOOPING|AOF_NORESTART);
   };
+
   void WalkingAnim(void) {
     StartModelAnim(SCORPMAN_ANIM_WALK, AOF_LOOPING|AOF_NORESTART);
   };
+
   void RunningAnim(void) {
     StartModelAnim(SCORPMAN_ANIM_WALK, AOF_LOOPING|AOF_NORESTART);
   };
+
   void RotatingAnim(void) {
     StartModelAnim(SCORPMAN_ANIM_WALK, AOF_LOOPING|AOF_NORESTART);
   };
@@ -289,16 +315,18 @@ functions:
   void IdleSound(void) {
     PlaySound(m_soSound, SOUND_IDLE, SOF_3D);
   };
+
   void SightSound(void) {
     PlaySound(m_soSound, SOUND_SIGHT, SOF_3D);
   };
+
   void WoundSound(void) {
     PlaySound(m_soSound, SOUND_WOUND, SOF_3D);
   };
+
   void DeathSound(void) {
     PlaySound(m_soSound, SOUND_DEATH, SOF_3D);
   };
-
 
 /************************************************************
  *                   FIRE BULLET / RAIL                     *
@@ -313,6 +341,7 @@ functions:
     CPlacement3D plBullet;
     plBullet.pl_OrientationAngle = ANGLE3D(0,0,0);
     plBullet.pl_PositionVector = FLOAT3D(GUN_X, GUN_Y, 0);
+
     // offset are changed according to stretch factor
     if (m_smtType == SMT_MONSTER) {
       plBullet.pl_PositionVector*=STRETCH_MONSTER;
@@ -321,6 +350,7 @@ functions:
     } else {
       plBullet.pl_PositionVector*=STRETCH_SOLDIER;
     }
+
     plBullet.RelativeToAbsolute(GetPlacement());
     vSource = plBullet.pl_PositionVector;
 
@@ -331,25 +361,30 @@ functions:
     en_pwoWorld->CastRay(crRay);
 
     // if hit nothing (no brush) the entity can be seen
-    return (crRay.cr_penHit==NULL);     
+    return (crRay.cr_penHit == NULL);     
   }
 
-  void PrepareBullet(FLOAT fDamage) {
+  void PrepareBullet(FLOAT fDamage)
+  {
     // bullet start position
     CPlacement3D plBullet;
     plBullet.pl_OrientationAngle = ANGLE3D(0,0,0);
     plBullet.pl_PositionVector = FLOAT3D(GUN_X, GUN_Y, 0);
+
     // offset are changed according to stretch factor
     if (m_smtType == SMT_MONSTER) {
-      plBullet.pl_PositionVector*=STRETCH_MONSTER;
+      plBullet.pl_PositionVector *= STRETCH_MONSTER;
     } else if (m_smtType == SMT_GENERAL) {
-      plBullet.pl_PositionVector*=STRETCH_GENERAL;
+      plBullet.pl_PositionVector *= STRETCH_GENERAL;
     } else {
-      plBullet.pl_PositionVector*=STRETCH_SOLDIER;
+      plBullet.pl_PositionVector *= STRETCH_SOLDIER;
     }
+
     plBullet.RelativeToAbsolute(GetPlacement());
+
     // create bullet
     penBullet = CreateEntity(plBullet, CLASS_BULLET);
+
     // init bullet
     EBulletInit eInit;
     eInit.penOwner = this;
@@ -358,11 +393,14 @@ functions:
   };
 
   // fire bullet
-  void FireBullet(void) {
+  void FireBullet(void)
+  {
     // binary divide counter
     m_bFireBulletCount++;
-    if (m_bFireBulletCount>1) { m_bFireBulletCount = 0; }
-    if (m_bFireBulletCount==1) { return; }
+
+    if (m_bFireBulletCount > 1) { m_bFireBulletCount = 0; }
+    if (m_bFireBulletCount == 1) { return; }
+
     // bullet
     PrepareBullet(3.0f);
     ((CBullet&)*penBullet).CalcTarget(m_penEnemy, 250);
@@ -375,8 +413,7 @@ functions:
   // adjust sound and watcher parameters here if needed
   void EnemyPostInit(void) 
   {
-    // set sound default parameters
-    m_soSound.Set3DParameters(160.0f, 50.0f, 1.0f, 1.0f);
+    m_soSound.Set3DParameters(160.0f, 50.0f, 1.0f, 1.0f); // set sound default parameters
   };
 
 procedures:
@@ -384,7 +421,8 @@ procedures:
  *                A T T A C K   E N E M Y                   *
  ************************************************************/
   // shoot
-  Fire(EVoid) : CEnemyBase::Fire{
+  Fire(EVoid) : CEnemyBase::Fire
+  {
     if (!CanFireAtPlayer()) {
       return EReturn();
     }
@@ -404,9 +442,11 @@ procedures:
         m_fFireTime = 2.0f;
         break;
     }
+
     if (GetSP()->sp_gdGameDifficulty<=CSessionProperties::GD_EASY) {
       m_fFireTime *= 0.5f;
     }
+
     // to fire
     StartModelAnim(SCORPMAN_ANIM_STANDTOFIRE, 0);
     m_fLockOnEnemyTime = GetModelObject()->GetAnimLength(SCORPMAN_ANIM_STANDTOFIRE) + 0.5f + FRnd()/3;
@@ -419,15 +459,19 @@ procedures:
     PlaySound(m_soSound, SOUND_FIRE, SOF_3D|SOF_LOOP);
     MinigunOn();
 
-    while (m_fFireTime > _pTimer->CurrentTick()) {
+    while (m_fFireTime > _pTimer->CurrentTick())
+    {
       m_fMoveFrequency = 0.1f;
+
       wait(m_fMoveFrequency) {
         on (EBegin) : {
           // make fuss
           AddToFuss();
+
           // fire bullet
           FireBullet();
           m_vDesiredPosition = m_penEnemy->GetPlacement().pl_PositionVector;
+
           // rotate to enemy
           if (!IsInPlaneFrustum(m_penEnemy, CosFast(5.0f))) {
             m_fMoveSpeed = 0.0f;
@@ -439,6 +483,7 @@ procedures:
             m_aRotateSpeed = 0.0f;
             StartModelAnim(SCORPMAN_ANIM_FIRE_MINIGUN, AOF_LOOPING|AOF_NORESTART);
           }
+
           // adjust direction and speed
           SetDesiredMovement(); 
           resume;
@@ -446,8 +491,10 @@ procedures:
         on (ETimer) : { stop; }
       }
     }
+
     m_soSound.Stop();
     MinigunOff();
+
     // set next shoot time
     m_fShootTime = _pTimer->CurrentTick() + m_fAttackFireTime*(1.0f + FRnd()/3.0f);
 
@@ -462,14 +509,18 @@ procedures:
   };
 
   // hit enemy
-  Hit(EVoid) : CEnemyBase::Hit {
+  Hit(EVoid) : CEnemyBase::Hit
+  {
     // close attack
     StartModelAnim(SCORPMAN_ANIM_SPIKEHIT, 0);
     autowait(0.5f);
     PlaySound(m_soSound, SOUND_KICK, SOF_3D);
-    if (CalcDist(m_penEnemy) < m_fCloseDistance) {
+
+    if (CalcDist(m_penEnemy) < m_fCloseDistance)
+    {
       FLOAT3D vDirection = m_penEnemy->GetPlacement().pl_PositionVector-GetPlacement().pl_PositionVector;
       vDirection.Normalize();
+
       if (m_smtType == SMT_MONSTER) {
         InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, 80.0f, FLOAT3D(0, 0, 0), vDirection);
       } else if (m_smtType == SMT_GENERAL) {
@@ -478,6 +529,7 @@ procedures:
         InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, 20.0f, FLOAT3D(0, 0, 0), vDirection);
       }
     }
+
     autowait(0.3f);
     MaybeSwitchToAnotherPlayer();
     return EReturn();
@@ -487,6 +539,7 @@ procedures:
   {
     // start sleeping anim
     StartModelAnim(SCORPMAN_ANIM_SLEEP, AOF_LOOPING);
+
     // repeat
     wait() {
       // if triggered
@@ -496,11 +549,13 @@ procedures:
         // wake up
         jump WakeUp();
       }
+
       // if damaged
       on(EDamage eDamage) : {
         // wake up
         jump WakeUp();
       }
+
       otherwise() : {
         resume;
       }
@@ -516,6 +571,7 @@ procedures:
 
     // trigger your target
     SendToTarget(m_penDeathTarget, m_eetDeathType);
+
     // proceed with normal functioning
     return EReturn();
   }
@@ -524,8 +580,10 @@ procedures:
   PreMainLoop(EVoid) : CEnemyBase::PreMainLoop
   {
     // if sleeping
-    if (m_bSleeping) {
+    if (m_bSleeping)
+    {
       m_bSleeping = FALSE;
+
       // go to sleep until waken up
       wait() {
         on (EBegin) : {
@@ -541,13 +599,15 @@ procedures:
         }
       }
     }
+
     return EReturn();
   }
 
 /************************************************************
  *                       M  A  I  N                         *
  ************************************************************/
-  Main(EVoid) {
+  Main(EVoid)
+  {
     if (m_smtType==SMT_MONSTER) {
       m_smtType=SMT_GENERAL;
     }
@@ -562,6 +622,7 @@ procedures:
 
     // set your appearance
     SetModel(MODEL_SCORPMAN);
+
     switch (m_smtType) {
       case SMT_SOLDIER:
         // set your texture
@@ -647,16 +708,17 @@ procedures:
     CEnemyBase::SizeModel();
     // setup light source
     SetupLightSource();
+
     // set light animation if available
     try {
       m_aoLightAnimation.SetData_t(CTFILENAME("Animations\\BasicEffects.ani"));
     } catch (char *strError) {
       WarningMessage(TRANS("Cannot load Animations\\BasicEffects.ani: %s"), strError);
     }
+
     MinigunOff();
 
     // continue behavior in base class
     jump CEnemyBase::MainLoop();
-
   };
 };
