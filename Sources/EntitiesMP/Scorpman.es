@@ -38,6 +38,16 @@ enum ScorpmanType {
   #define STRETCH_SOLDIER 2
   #define STRETCH_GENERAL 3
   #define STRETCH_MONSTER 4
+  
+  #define MELEE_DAMAGE_SOLDIER 20.0F
+  #define MELEE_DAMAGE_GENERAL 40.0F
+  #define MELEE_DAMAGE_MONSTER 80.0F
+  
+  #define FIRE_TIME_SOLDIER 2.0f
+  #define FIRE_TIME_GENERAL 4.0f
+  #define FIRE_TIME_MONSTER 8.0f
+  
+  #define SCORPMAN_BULLET_DAMAGE 3.0F
 
   // info structure
   static EntityInfo eiScorpman = {
@@ -101,15 +111,19 @@ components:
  55 sound   SOUND_DEATH     "Models\\Enemies\\Scorpman\\Sounds\\Death.wav",
 
 functions:
-  // describe how this enemy killed player
+  // --------------------------------------------------------------------------------------
+  // Describe how this enemy killed player.
+  // --------------------------------------------------------------------------------------
   virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const EDeath &eDeath)
   {
     CTString str;
-    if (eDeath.eLastDamage.dmtType==DMT_CLOSERANGE) {
+
+    if (eDeath.eLastDamage.dmtType == DMT_CLOSERANGE) {
       str.PrintF(TRANS("%s was stabbed by an Arachnoid"), strPlayerName);
     } else {
       str.PrintF(TRANS("An Arachnoid poured lead into %s"), strPlayerName);
     }
+
     return str;
   }
 
@@ -124,7 +138,9 @@ functions:
     PrecacheSound(SOUND_DEATH);
   };
 
+  // --------------------------------------------------------------------------------------
   /* Read from stream. */
+  // --------------------------------------------------------------------------------------
   void Read_t( CTStream *istr) { // throw char *
     CEnemyBase::Read_t(istr);
 
@@ -132,7 +148,9 @@ functions:
     SetupLightSource();
   }
 
+  // --------------------------------------------------------------------------------------
   /* Fill in entity statistics - for AI purposes only */
+  // --------------------------------------------------------------------------------------
   BOOL FillEntityStatistics(EntityStats *pes)
   {
     CEnemyBase::FillEntityStatistics(pes);
@@ -164,7 +182,9 @@ functions:
     return fnmSoldier;
   };
 
+  // --------------------------------------------------------------------------------------
   /* Get static light source information. */
+  // --------------------------------------------------------------------------------------
   CLightSource *GetLightSource(void) {
     if (!IsPredictor()) {
       return &m_lsLightSource;
@@ -173,6 +193,9 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
+  // IF cannonball should be exploded
+  // --------------------------------------------------------------------------------------
   BOOL ForcesCannonballToExplode(void)
   {
     if (m_smtType != SMT_SOLDIER) {
@@ -182,7 +205,9 @@ functions:
     return CEnemyBase::ForcesCannonballToExplode();
   }
 
-  // Setup light source
+  // --------------------------------------------------------------------------------------
+  // Setup light source.
+  // --------------------------------------------------------------------------------------
   void SetupLightSource(void) {
     // setup light source
     CLightSource lsNew;
@@ -198,14 +223,18 @@ functions:
     m_lsLightSource.SetLightSource(lsNew);
   }
 
-  // play light animation
+  // --------------------------------------------------------------------------------------
+  // Play light animation.
+  // --------------------------------------------------------------------------------------
   void PlayLightAnim(INDEX iAnim, ULONG ulFlags) {
     if (m_aoLightAnimation.GetData() != NULL) {
       m_aoLightAnimation.PlayAnim(iAnim, ulFlags);
     }
   };
 
-  // fire minigun on/off
+  // --------------------------------------------------------------------------------------
+  // Fire minigun on/off.
+  // --------------------------------------------------------------------------------------
   void MinigunOn(void)
   {
     PlayLightAnim(LIGHT_ANIM_FIRE, AOF_LOOPING);
@@ -229,7 +258,9 @@ functions:
     pmoGun->RemoveAttachmentModel(GUN_ATTACHMENT_FLAME);
   }
 
+  // --------------------------------------------------------------------------------------
   /* Entity info */
+  // --------------------------------------------------------------------------------------
   void *GetEntityInfo(void) {
     if (m_smtType == SMT_MONSTER) {
       return &eiScorpmanMonster;
@@ -240,7 +271,9 @@ functions:
     }
   };
 
+  // --------------------------------------------------------------------------------------
   /* Receive damage */
+  // --------------------------------------------------------------------------------------
   void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
     FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection) 
   {
@@ -250,8 +283,9 @@ functions:
     }
   };
 
-
-  // damage anim
+  // --------------------------------------------------------------------------------------
+  // Returns damage animation index and starts animation.
+  // --------------------------------------------------------------------------------------
   INDEX AnimForDamage(FLOAT fDamage)
   {
     INDEX iAnim;
@@ -269,7 +303,9 @@ functions:
     return iAnim;
   };
 
-  // death
+  // --------------------------------------------------------------------------------------
+  // Returns death animation index and starts animation.
+  // --------------------------------------------------------------------------------------
   INDEX AnimForDeath(void)
   {
     StartModelAnim(SCORPMAN_ANIM_DEATH, 0);
@@ -280,9 +316,9 @@ functions:
 
   FLOAT WaitForDust(FLOAT3D &vStretch)
   {
-    if(GetModelObject()->GetAnim()==SCORPMAN_ANIM_DEATH)
+    if(GetModelObject()->GetAnim() == SCORPMAN_ANIM_DEATH)
     {
-      vStretch=FLOAT3D(1,1,1)*1.5f;
+      vStretch=FLOAT3D(1, 1, 1)*1.5f;
       return 1.3f;
     }
 
@@ -364,6 +400,9 @@ functions:
     return (crRay.cr_penHit == NULL);     
   }
 
+  // --------------------------------------------------------------------------------------
+  // Prepare bullet entity for launch.
+  // --------------------------------------------------------------------------------------
   void PrepareBullet(FLOAT fDamage)
   {
     // bullet start position
@@ -392,7 +431,9 @@ functions:
     penBullet->Initialize(eInit);
   };
 
-  // fire bullet
+  // --------------------------------------------------------------------------------------
+  // Fire bullet.
+  // --------------------------------------------------------------------------------------
   void FireBullet(void)
   {
     // binary divide counter
@@ -402,15 +443,16 @@ functions:
     if (m_bFireBulletCount == 1) { return; }
 
     // bullet
-    PrepareBullet(3.0f);
+    PrepareBullet(SCORPMAN_BULLET_DAMAGE);
     ((CBullet&)*penBullet).CalcTarget(m_penEnemy, 250);
     ((CBullet&)*penBullet).CalcJitterTarget(10);
     ((CBullet&)*penBullet).LaunchBullet( TRUE, TRUE, TRUE);
     ((CBullet&)*penBullet).DestroyBullet();
   };
 
-
-  // adjust sound and watcher parameters here if needed
+  // --------------------------------------------------------------------------------------
+  // Adjust sound and watcher parameters here if needed.
+  // --------------------------------------------------------------------------------------
   void EnemyPostInit(void) 
   {
     m_soSound.Set3DParameters(160.0f, 50.0f, 1.0f, 1.0f); // set sound default parameters
@@ -420,7 +462,9 @@ procedures:
 /************************************************************
  *                A T T A C K   E N E M Y                   *
  ************************************************************/
-  // shoot
+  // --------------------------------------------------------------------------------------
+  // Shoot.
+  // --------------------------------------------------------------------------------------
   Fire(EVoid) : CEnemyBase::Fire
   {
     if (!CanFireAtPlayer()) {
@@ -431,15 +475,15 @@ procedures:
     switch (m_smtType) {
       case SMT_MONSTER:
         m_fDamageConfused = 200;
-        m_fFireTime = 8.0f;
+        m_fFireTime = FIRE_TIME_MONSTER;
         break;
       case SMT_GENERAL:
         m_fDamageConfused = 100;
-        m_fFireTime = 4.0f;
+        m_fFireTime = FIRE_TIME_GENERAL;
         break;
       case SMT_SOLDIER:
         m_fDamageConfused = 50;
-        m_fFireTime = 2.0f;
+        m_fFireTime = FIRE_TIME_SOLDIER;
         break;
     }
 
@@ -508,7 +552,9 @@ procedures:
     return EReturn();
   };
 
-  // hit enemy
+  // --------------------------------------------------------------------------------------
+  // Hit enemy.
+  // --------------------------------------------------------------------------------------
   Hit(EVoid) : CEnemyBase::Hit
   {
     // close attack
@@ -522,11 +568,11 @@ procedures:
       vDirection.Normalize();
 
       if (m_smtType == SMT_MONSTER) {
-        InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, 80.0f, FLOAT3D(0, 0, 0), vDirection);
+        InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, MELEE_DAMAGE_MONSTER, FLOAT3D(0, 0, 0), vDirection);
       } else if (m_smtType == SMT_GENERAL) {
-        InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, 40.0f, FLOAT3D(0, 0, 0), vDirection);
+        InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, MELEE_DAMAGE_GENERAL, FLOAT3D(0, 0, 0), vDirection);
       } else {
-        InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, 20.0f, FLOAT3D(0, 0, 0), vDirection);
+        InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, MELEE_DAMAGE_SOLDIER, FLOAT3D(0, 0, 0), vDirection);
       }
     }
 
@@ -535,6 +581,9 @@ procedures:
     return EReturn();
   };
 
+  // --------------------------------------------------------------------------------------
+  // Hybernation.
+  // --------------------------------------------------------------------------------------
   Sleep(EVoid)
   {
     // start sleeping anim
@@ -562,6 +611,9 @@ procedures:
     }
   }
 
+  // --------------------------------------------------------------------------------------
+  // Was awaken.
+  // --------------------------------------------------------------------------------------
   WakeUp(EVoid)
   {
     // wakeup anim
@@ -576,7 +628,9 @@ procedures:
     return EReturn();
   }
 
-  // overridable called before main enemy loop actually begins
+  // --------------------------------------------------------------------------------------
+  // Overridable called before main enemy loop actually begins.
+  // --------------------------------------------------------------------------------------
   PreMainLoop(EVoid) : CEnemyBase::PreMainLoop
   {
     // if sleeping
