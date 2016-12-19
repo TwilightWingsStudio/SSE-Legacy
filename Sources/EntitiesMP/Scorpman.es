@@ -662,10 +662,6 @@ procedures:
  ************************************************************/
   Main(EVoid)
   {
-    if (m_smtType==SMT_MONSTER) {
-      m_smtType=SMT_GENERAL;
-    }
-
     // declare yourself as a model
     InitAsModel();
     SetPhysicsFlags(EPF_MODEL_WALKING|EPF_HASLUNGS);
