@@ -15,23 +15,25 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 305
 %{
-#include "StdH.h"
-#include "Models/Enemies/Boneman/Boneman.h"
+  #include "StdH.h"
+  #include "Models/Enemies/Boneman/Boneman.h"
 %}
 
 uses "EntitiesMP/EnemyBase";
 
 %{
-// info structure
-static EntityInfo eiBoneman = {
- EIBT_BONES, 250.0f,
- 0.0f, 1.9f, 0.0f,    // source (eyes)
- 0.0f, 1.9f, 0.0f,    // target (body)
-};
+  // info structure
+  static EntityInfo eiBoneman = {
+    EIBT_BONES, 250.0f,
+    0.0f, 1.9f, 0.0f,    // source (eyes)
+    0.0f, 1.9f, 0.0f,    // target (body)
+  };
 
-#define BONES_HIT 2.8f
-#define FIRE_RIGHT_HAND     FLOAT3D( 0.25f, 1.5f, 0.0f)
-#define FIRE_LEFT_HAND      FLOAT3D(-0.25f, 1.5f, 0.0f)
+  #define BONES_HIT 2.8F
+  #define BONES_HIT_DAMAGE 10.0F
+  #define JUMP_HIT_DAMAGE 20.0F
+  #define FIRE_RIGHT_HAND     FLOAT3D( 0.25F, 1.5F, 0.0F)
+  #define FIRE_LEFT_HAND      FLOAT3D(-0.25F, 1.5F, 0.0F)
 %}
 
 
@@ -67,7 +69,11 @@ components:
  57 sound   SOUND_RUN       "Models\\Enemies\\Boneman\\Sounds\\Run.wav",
 
 functions:
-  void Precache(void) {
+  // --------------------------------------------------------------------------------------
+  // Precache entity components.
+  // --------------------------------------------------------------------------------------
+  void Precache(void)
+  {
     CEnemyBase::Precache();
     PrecacheSound(SOUND_IDLE );
     PrecacheSound(SOUND_SIGHT);
@@ -85,29 +91,41 @@ functions:
     PrecacheClass(CLASS_PROJECTILE, PRT_BONEMAN_FIRE);
   };
 
-  // describe how this enemy killed player
+  // --------------------------------------------------------------------------------------
+  // Describe how this enemy killed player.
+  // --------------------------------------------------------------------------------------
   virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const EDeath &eDeath)
   {
     CTString str;
-    if (eDeath.eLastDamage.dmtType==DMT_CLOSERANGE) {
+    if (eDeath.eLastDamage.dmtType == DMT_CLOSERANGE) {
       str.PrintF(TRANS("%s was ripped apart by a Kleer"), strPlayerName);
     } else {
       str.PrintF(TRANS("%s was killed by a Kleer"), strPlayerName);
     }
+
     return str;
   }
 
-  virtual const CTFileName &GetComputerMessageName(void) const {
+  // --------------------------------------------------------------------------------------
+  // Returns path to computer message with enemy description.
+  // --------------------------------------------------------------------------------------
+  virtual const CTFileName &GetComputerMessageName(void) const
+  {
     static DECLARE_CTFILENAME(fnm, "Data\\Messages\\Enemies\\Boneman.txt");
+
     return fnm;
   };
 
+  // --------------------------------------------------------------------------------------
   /* Entity info */
+  // --------------------------------------------------------------------------------------
   void *GetEntityInfo(void) {
     return &eiBoneman;
   };
 
+  // --------------------------------------------------------------------------------------
   /* Receive damage */
+  // --------------------------------------------------------------------------------------
   void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
     FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection) 
   {
@@ -122,10 +140,15 @@ functions:
     // boneman doesn't leave bloody stain
   }
 
-  // damage anim
-  INDEX AnimForDamage(FLOAT fDamage) {
+  // --------------------------------------------------------------------------------------
+  // Returns damage animation index and starts animation.
+  // --------------------------------------------------------------------------------------
+  INDEX AnimForDamage(FLOAT fDamage)
+  {
     INDEX iAnim;
-    switch (IRnd()%5) {
+
+    switch (IRnd()%5)
+    {
       case 0: iAnim = BONEMAN_ANIM_WOUNDCRITICAL01; break;
       case 1: iAnim = BONEMAN_ANIM_WOUNDCRITICAL02; break;
       case 2: iAnim = BONEMAN_ANIM_WOUNDCRITICAL03; break;
@@ -133,35 +156,47 @@ functions:
       case 4: iAnim = BONEMAN_ANIM_FALL02; break;
       default: ASSERTALWAYS("Boneman unknown damage");
     }
+
     StartModelAnim(iAnim, 0);
     DeactivateRunningSound();
+
     return iAnim;
   };
 
-  // death
-  INDEX AnimForDeath(void) {
+  // --------------------------------------------------------------------------------------
+  // Returns death animation index and starts animation.
+  // --------------------------------------------------------------------------------------
+  INDEX AnimForDeath(void)
+  {
     INDEX iAnim;
-    switch (IRnd()%2) {
+
+    switch (IRnd()%2)
+    {
       case 0: iAnim = BONEMAN_ANIM_DEATHTOBACK; break;
       case 1: iAnim = BONEMAN_ANIM_DEATHTOFRONT; break;
       default: ASSERTALWAYS("Boneman unknown death");
     }
+
     StartModelAnim(iAnim, 0);
     DeactivateRunningSound();
+
     return iAnim;
   };
 
-  FLOAT WaitForDust(FLOAT3D &vStretch) {
+  // --------------------------------------------------------------------------------------
+  // Returns time needed to wait before starting the dust effect.
+  // --------------------------------------------------------------------------------------
+  FLOAT WaitForDust(FLOAT3D &vStretch)
+  {
     if(GetModelObject()->GetAnim()==BONEMAN_ANIM_DEATHTOBACK)
     {
       vStretch=FLOAT3D(1,1,2)*1.0f;
       return 0.48f;
-    }
-    else if(GetModelObject()->GetAnim()==BONEMAN_ANIM_DEATHTOFRONT)
-    {
+    } else if(GetModelObject()->GetAnim() == BONEMAN_ANIM_DEATHTOFRONT) {
       vStretch=FLOAT3D(1,1,2)*0.75f;
       return 0.48f;
     }
+
     return -1.0f;
   };
 
@@ -174,14 +209,17 @@ functions:
     StartModelAnim(BONEMAN_ANIM_STANDLOOP, AOF_LOOPING|AOF_NORESTART);
     DeactivateRunningSound();
   };
+
   void WalkingAnim(void) {
     StartModelAnim(BONEMAN_ANIM_WALKLOOP, AOF_LOOPING|AOF_NORESTART);
     DeactivateRunningSound();
   };
+
   void RunningAnim(void) {
     StartModelAnim(BONEMAN_ANIM_RUNLOOP, AOF_LOOPING|AOF_NORESTART);
     ActivateRunningSound();
   };
+
   void RotatingAnim(void) {
     StartModelAnim(BONEMAN_ANIM_WALKLOOP, AOF_LOOPING|AOF_NORESTART);
     DeactivateRunningSound();
@@ -191,18 +229,22 @@ functions:
   void IdleSound(void) {
     PlaySound(m_soSound, SOUND_IDLE, SOF_3D);
   };
+
   void SightSound(void) {
     PlaySound(m_soSound, SOUND_SIGHT, SOF_3D);
   };
+
   void WoundSound(void) {
     PlaySound(m_soSound, SOUND_WOUND, SOF_3D);
   };
+
   void DeathSound(void) {
     PlaySound(m_soSound, SOUND_DEATH, SOF_3D);
   };
 
-
-  // running sounds
+  // --------------------------------------------------------------------------------------
+  // Starts playing running sounds.
+  // --------------------------------------------------------------------------------------
   void ActivateRunningSound(void)
   {
     if (!m_bRunSoundPlaying) {
@@ -210,6 +252,10 @@ functions:
       m_bRunSoundPlaying = TRUE;
     }
   }
+
+  // --------------------------------------------------------------------------------------
+  // Stops playing running sounds.
+  // --------------------------------------------------------------------------------------
   void DeactivateRunningSound(void)
   {
     m_soFeet.Stop();
@@ -219,8 +265,11 @@ functions:
 /************************************************************
  *                 BLOW UP FUNCTIONS                        *
  ************************************************************/
-  // spawn body parts
-  void BlowUp(void) {
+  // --------------------------------------------------------------------------------------
+  // Spawn body parts.
+  // --------------------------------------------------------------------------------------
+  void BlowUp(void)
+  {
     // get your size
     FLOATaabbox3D box;
     GetBoundingBox(box);
@@ -251,30 +300,37 @@ functions:
     SetCollisionFlags(ECF_IMMATERIAL);
   };
 
-
-
-
-
 procedures:
 /************************************************************
  *                A T T A C K   E N E M Y                   *
  ************************************************************/
-  Fire(EVoid) : CEnemyBase::Fire {
+  // --------------------------------------------------------------------------------------
+  // Shoot into enemy.
+  // --------------------------------------------------------------------------------------
+  Fire(EVoid) : CEnemyBase::Fire
+  {
     // fire projectile
     StartModelAnim(BONEMAN_ANIM_ATTACKCLOSELOOP, 0);
     DeactivateRunningSound();
+
     autowait(0.35f);
     ShootProjectile(PRT_BONEMAN_FIRE, FIRE_RIGHT_HAND, ANGLE3D(0, 0, 0));
     PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+
     autowait(0.45f);
     ShootProjectile(PRT_BONEMAN_FIRE, FIRE_LEFT_HAND, ANGLE3D(0, 0, 0));
     PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+
     autowait(FRnd()/3+0.6f);
 
     return EReturn();
   };
 
-  Hit(EVoid) : CEnemyBase::Hit {
+  // --------------------------------------------------------------------------------------
+  // Hit the enemy.
+  // --------------------------------------------------------------------------------------
+  Hit(EVoid) : CEnemyBase::Hit
+  {
     // hit
     if (CalcDist(m_penEnemy) < BONES_HIT) {
       jump HitWithBones();
@@ -289,14 +345,16 @@ procedures:
     return EReturn();
   };
 
-  // jump on enemy
-  JumpOnEnemy(EVoid) {
+  // --------------------------------------------------------------------------------------
+  // Jump on enemy.
+  // --------------------------------------------------------------------------------------
+  JumpOnEnemy(EVoid)
+  {
     StartModelAnim(BONEMAN_ANIM_ATTACKFAR, 0);
     DeactivateRunningSound();
 
     // jump
-    FLOAT3D vDir = (m_penEnemy->GetPlacement().pl_PositionVector -
-                    GetPlacement().pl_PositionVector).Normalize();
+    FLOAT3D vDir = (m_penEnemy->GetPlacement().pl_PositionVector - GetPlacement().pl_PositionVector).Normalize();
     vDir *= !GetRotationMatrix();
     vDir *= m_fCloseRunSpeed*1.5f;
     vDir(2) = 2.5f;
@@ -306,32 +364,48 @@ procedures:
     // animation - IGNORE DAMAGE WOUND -
     SpawnReminder(this, 0.5f, 0);
     m_iChargeHitAnimation = BONEMAN_ANIM_ATTACKFAR;
-    m_fChargeHitDamage = 20.0f;
+    m_fChargeHitDamage = JUMP_HIT_DAMAGE;
     m_fChargeHitAngle = 0.0f;
     m_fChargeHitSpeed = 15.0f;
     autocall CEnemyBase::ChargeHitEnemy() EReturn;
     autowait(0.3f);
+
     return EReturn();
   };
 
-  // hit with bones
-  HitWithBones(EVoid) {
+  // --------------------------------------------------------------------------------------
+  // Hit enemy with bones.
+  // --------------------------------------------------------------------------------------
+  HitWithBones(EVoid)
+  {
     // attack with bones
     StartModelAnim(BONEMAN_ANIM_ATTACKCLOSELOOP, 0);
     DeactivateRunningSound();
 
     // right hand
     m_bFistHit = FALSE;
+
     autowait(0.35f);
-    if (CalcDist(m_penEnemy)<BONES_HIT) { m_bFistHit = TRUE; }
+
+    if (CalcDist(m_penEnemy) < BONES_HIT) {
+      m_bFistHit = TRUE;
+    }
+
     PlaySound(m_soSound, SOUND_PUNCH, SOF_3D);
+
     autowait(0.10f);
-    if (CalcDist(m_penEnemy)<BONES_HIT) { m_bFistHit = TRUE; }
-    if (m_bFistHit) {
+
+    if (CalcDist(m_penEnemy) < BONES_HIT) {
+      m_bFistHit = TRUE;
+    }
+
+    if (m_bFistHit)
+    {
       FLOAT3D vDirection = m_penEnemy->GetPlacement().pl_PositionVector-GetPlacement().pl_PositionVector;
       vDirection.Normalize();
       // damage enemy
-      InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, 10.0f, FLOAT3D(0, 0, 0), vDirection);
+      InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, BONES_HIT_DAMAGE, FLOAT3D(0, 0, 0), vDirection);
+
       // push target left
       FLOAT3D vSpeed;
       GetHeadingDirection(AngleDeg(90.0f), vSpeed);
@@ -341,31 +415,46 @@ procedures:
 
     // left hand
     m_bFistHit = FALSE;
+
     autowait(0.25f);
-    if (CalcDist(m_penEnemy)<BONES_HIT) { m_bFistHit = TRUE; }
+    if (CalcDist(m_penEnemy) < BONES_HIT) {
+      m_bFistHit = TRUE;
+    }
+
     PlaySound(m_soSound, SOUND_PUNCH, SOF_3D);
+
     autowait(0.10f);
-    if (CalcDist(m_penEnemy)<BONES_HIT) { m_bFistHit = TRUE; }
-    if (m_bFistHit) {
+
+    if (CalcDist(m_penEnemy) < BONES_HIT) {
+      m_bFistHit = TRUE;
+    }
+
+    if (m_bFistHit)
+    {
       // damage enemy
       FLOAT3D vDirection = m_penEnemy->GetPlacement().pl_PositionVector-GetPlacement().pl_PositionVector;
       vDirection.Normalize();
-      InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, 10.0f, FLOAT3D(0, 0, 0), vDirection);
+      InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, BONES_HIT_DAMAGE, FLOAT3D(0, 0, 0), vDirection);
+
       // push target left
       FLOAT3D vSpeed;
       GetHeadingDirection(AngleDeg(-90.0f), vSpeed);
       vSpeed = vSpeed * 5.0f;
       KickEntity(m_penEnemy, vSpeed);
     }
+
     return EReturn();
   };
-
 
 
 /************************************************************
  *                       M  A  I  N                         *
  ************************************************************/
-  Main(EVoid) {
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
+  Main(EVoid)
+  {
     // declare yourself as a model
     InitAsModel();
     SetPhysicsFlags(EPF_MODEL_WALKING);
@@ -380,6 +469,7 @@ procedures:
     SetModelMainTexture(TEXTURE_BONEMAN);
     StandingAnim();
     m_sptType = SPT_BONES;
+
     // setup moving speed
     m_fWalkSpeed = FRnd() + 2.5f;
     m_aWalkRotateSpeed = FRnd()*25.0f + 45.0f;
@@ -387,6 +477,7 @@ procedures:
     m_aAttackRotateSpeed = FRnd()*200 + 600.0f;
     m_fCloseRunSpeed = FRnd() + 13.0f;
     m_aCloseRotateSpeed = FRnd()*100 + 1000.0f;
+
     // setup attack distances
     m_fAttackDistance = 100.0f;
     m_fCloseDistance = 30.0f;
@@ -394,12 +485,14 @@ procedures:
     m_fAttackFireTime = 3.0f;
     m_fCloseFireTime = 2.0f;
     m_fIgnoreRange = 200.0f;
+
     // damage/explode properties
     m_fBlowUpAmount = 70.0f;
     m_fBodyParts = 4;
     m_fDamageWounded = 80.0f;
     m_iScore = 1000;
-    if (m_fStepHeight==-1) {
+
+    if (m_fStepHeight == -1) {
       m_fStepHeight = 4.0f;
     }
 
