@@ -27,7 +27,7 @@ uses "EntitiesMP/Reminder";
 enum ScorpmanType {
   0 SMT_SOLDIER    "0 Soldier",
   1 SMT_GENERAL    "1 General",
-  2 SMT_MONSTER    "2 Monster !!!obsolete!!!",
+  2 SMT_MONSTER    "2 Monster",
 };
 
 %{
@@ -37,7 +37,7 @@ enum ScorpmanType {
 
   #define STRETCH_SOLDIER 2
   #define STRETCH_GENERAL 3
-  #define STRETCH_MONSTER 4
+  #define STRETCH_MONSTER 3.5F // [SSE] Balance Change. Default=4.0F.
   
   #define MELEE_DAMAGE_SOLDIER 20.0F
   #define MELEE_DAMAGE_GENERAL 40.0F
@@ -45,9 +45,10 @@ enum ScorpmanType {
   
   #define FIRE_TIME_SOLDIER 2.0f
   #define FIRE_TIME_GENERAL 4.0f
-  #define FIRE_TIME_MONSTER 8.0f
+  #define FIRE_TIME_MONSTER 5.0f // [SSE] Balance Change. Default=8.0F.
   
-  #define SCORPMAN_BULLET_DAMAGE 3.0F
+  #define BULLET_DAMAGE_SCORPMAN 3.0F
+  #define BULLET_DAMAGE_MONSTER 4.0F // [SSE] Balance Change. Default=3.0F.
 
   // info structure
   static EntityInfo eiScorpman = {
@@ -96,7 +97,7 @@ components:
   5 model   MODEL_SCORPMAN    "Models\\Enemies\\Scorpman\\Scorpman.mdl",
   6 texture TEXTURE_SOLDIER   "Models\\Enemies\\Scorpman\\Soldier.tex",
   7 texture TEXTURE_GENERAL   "Models\\Enemies\\Scorpman\\General.tex",
-//  8 texture TEXTURE_MONSTER   "Models\\Enemies\\Scorpman\\Monster.tex",
+  8 texture TEXTURE_MONSTER   "Models\\Enemies\\Scorpman\\Monster.tex",
  12 texture TEXTURE_SPECULAR  "Models\\SpecularTextures\\Medium.tex",
   9 model   MODEL_GUN         "Models\\Enemies\\Scorpman\\Gun.mdl",
  10 model   MODEL_FLARE       "Models\\Enemies\\Scorpman\\Flare.mdl",
@@ -127,7 +128,11 @@ functions:
     return str;
   }
 
-  void Precache(void) {
+  // --------------------------------------------------------------------------------------
+  // Precache entity components.
+  // --------------------------------------------------------------------------------------
+  void Precache(void)
+  {
     CEnemyBase::Precache();
     PrecacheModel(MODEL_FLARE);
     PrecacheSound(SOUND_IDLE );
@@ -164,15 +169,18 @@ functions:
     return TRUE;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Returns path to computer message with enemy description.
+  // --------------------------------------------------------------------------------------
   virtual const CTFileName &GetComputerMessageName(void) const
   {
-    //static DECLARE_CTFILENAME(fnmMonster, "Data\\Messages\\Enemies\\ScorpmanMonster.txt");
+    static DECLARE_CTFILENAME(fnmMonster, "Data\\Messages\\Enemies\\ScorpmanMonster.txt");
     static DECLARE_CTFILENAME(fnmGeneral, "Data\\Messages\\Enemies\\ScorpmanGeneral.txt");
     static DECLARE_CTFILENAME(fnmSoldier, "Data\\Messages\\Enemies\\ScorpmanSoldier.txt");
 
     switch (m_smtType)
     {
-      case SMT_MONSTER: return fnmGeneral;//return fnmMonster;
+      case SMT_MONSTER: return fnmMonster;
       case SMT_GENERAL: return fnmGeneral;
       case SMT_SOLDIER: return fnmSoldier;
 
@@ -208,7 +216,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Setup light source.
   // --------------------------------------------------------------------------------------
-  void SetupLightSource(void) {
+  void SetupLightSource(void)
+  {
     // setup light source
     CLightSource lsNew;
     lsNew.ls_ulFlags = LSF_NONPERSISTENT|LSF_DYNAMIC;
@@ -226,7 +235,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Play light animation.
   // --------------------------------------------------------------------------------------
-  void PlayLightAnim(INDEX iAnim, ULONG ulFlags) {
+  void PlayLightAnim(INDEX iAnim, ULONG ulFlags)
+  {
     if (m_aoLightAnimation.GetData() != NULL) {
       m_aoLightAnimation.PlayAnim(iAnim, ulFlags);
     }
@@ -250,6 +260,9 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
+  // Disables minigun animation and light.
+  // --------------------------------------------------------------------------------------
   void MinigunOff(void)
   {
     PlayLightAnim(LIGHT_ANIM_NONE, 0);
@@ -314,9 +327,12 @@ functions:
     return SCORPMAN_ANIM_DEATH;
   };
 
+  // --------------------------------------------------------------------------------------
+  // Returns time needed to wait before starting the dust effect.
+  // --------------------------------------------------------------------------------------
   FLOAT WaitForDust(FLOAT3D &vStretch)
   {
-    if(GetModelObject()->GetAnim() == SCORPMAN_ANIM_DEATH)
+    if (GetModelObject()->GetAnim() == SCORPMAN_ANIM_DEATH)
     {
       vStretch=FLOAT3D(1, 1, 1)*1.5f;
       return 1.3f;
@@ -325,7 +341,8 @@ functions:
     return -1.0f;
   };
 
-  void DeathNotify(void) {
+  void DeathNotify(void)
+  {
     ChangeCollisionBoxIndexWhenPossible(SCORPMAN_COLLISION_BOX_DEATH);
     SetCollisionFlags(ECF_MODEL);
   };
@@ -443,7 +460,12 @@ functions:
     if (m_bFireBulletCount == 1) { return; }
 
     // bullet
-    PrepareBullet(SCORPMAN_BULLET_DAMAGE);
+    if (m_smtType == SMT_MONSTER) {
+      PrepareBullet(BULLET_DAMAGE_MONSTER);
+    } else {
+      PrepareBullet(BULLET_DAMAGE_SCORPMAN);
+    }
+
     ((CBullet&)*penBullet).CalcTarget(m_penEnemy, 250);
     ((CBullet&)*penBullet).CalcJitterTarget(10);
     ((CBullet&)*penBullet).LaunchBullet( TRUE, TRUE, TRUE);
@@ -472,7 +494,8 @@ procedures:
     }
 
     // confused amount
-    switch (m_smtType) {
+    switch (m_smtType)
+    {
       case SMT_MONSTER:
         m_fDamageConfused = 200;
         m_fFireTime = FIRE_TIME_MONSTER;
@@ -507,7 +530,8 @@ procedures:
     {
       m_fMoveFrequency = 0.1f;
 
-      wait(m_fMoveFrequency) {
+      wait(m_fMoveFrequency)
+      {
         on (EBegin) : {
           // make fuss
           AddToFuss();
@@ -532,6 +556,7 @@ procedures:
           SetDesiredMovement(); 
           resume;
         }
+
         on (ETimer) : { stop; }
       }
     }
@@ -590,7 +615,8 @@ procedures:
     StartModelAnim(SCORPMAN_ANIM_SLEEP, AOF_LOOPING);
 
     // repeat
-    wait() {
+    wait()
+    {
       // if triggered
       on(ETrigger eTrigger) : {
         // remember enemy
@@ -639,13 +665,16 @@ procedures:
       m_bSleeping = FALSE;
 
       // go to sleep until waken up
-      wait() {
+      wait()
+      {
         on (EBegin) : {
           call Sleep();
         }
+
         on (EReturn) : {
           stop;
         };
+
         // if dead
         on(EDeath eDeath) : {
           // die
@@ -673,7 +702,8 @@ procedures:
     // set your appearance
     SetModel(MODEL_SCORPMAN);
 
-    switch (m_smtType) {
+    switch (m_smtType)
+    {
       case SMT_SOLDIER:
         // set your texture
         SetModelMainTexture(TEXTURE_SOLDIER);
@@ -716,7 +746,7 @@ procedures:
 
       case SMT_MONSTER:
         // set your texture
-        SetModelMainTexture(TEXTURE_GENERAL);
+        SetModelMainTexture(TEXTURE_MONSTER);
         SetModelSpecularTexture(TEXTURE_SPECULAR);
         SetHealth(1200.0f);
         m_fMaxHealth = 1200.0f;
