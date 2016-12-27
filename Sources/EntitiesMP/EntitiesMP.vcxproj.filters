@@ -2558,12 +2558,6 @@
     <CustomBuild Include="Coder.es">
       <Filter>Class Files\AI</Filter>
     </CustomBuild>
-    <CustomBuild Include="SimpleTeleport.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
-    <CustomBuild Include="TrickyExecutor.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
     <CustomBuild Include="CausedKeeper.es">
       <Filter>Class Files\AI</Filter>
     </CustomBuild>
@@ -2574,6 +2568,12 @@
       <Filter>Class Files\Players</Filter>
     </CustomBuild>
     <CustomBuild Include="Sequencer.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="TrickyExecutor.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SimpleTeleport.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>
