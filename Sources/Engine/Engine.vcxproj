@@ -433,6 +433,8 @@ copy Release\$(TargetName).lib $(SolutionDir)..\Bin\ &gt;nul</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">StdH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Models\ModelData.cpp" />
+    <ClCompile Include="Models\ModelDataIO.cpp" />
     <ClCompile Include="Ska\AnimSetIO.cpp" />
     <ClCompile Include="Ska\MeshIO.cpp" />
     <ClCompile Include="Ska\SkeletonIO.cpp" />
