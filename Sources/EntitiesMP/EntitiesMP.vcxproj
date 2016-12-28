@@ -186,6 +186,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="Common\PathFinding.cpp" />
     <ClCompile Include="Condition.cpp" />
     <ClCompile Include="EnemyFactionHolder.cpp" />
+    <ClCompile Include="FlameInflictor.cpp" />
     <ClCompile Include="MBTeleporter.cpp" />
     <ClCompile Include="MovableBrush.cpp" />
     <ClCompile Include="MovableModel.cpp" />
@@ -2942,6 +2943,21 @@ ecc EntitiesMP/%(Filename).es </Command>
 ecc EntitiesMP/%(Filename).es </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
 ecc EntitiesMP/%(Filename).es </Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="FlameInflictor.es">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

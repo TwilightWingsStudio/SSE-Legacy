@@ -598,6 +598,9 @@
     <ClCompile Include="Sequencer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FlameInflictor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -2574,6 +2577,9 @@
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
     <CustomBuild Include="SimpleTeleport.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="FlameInflictor.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>
