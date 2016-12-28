@@ -15,59 +15,60 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 402
 %{
-#include "StdH.h"
-#include "GameMP/SEColors.h"
-  
-#include <Engine/Build.h>
+  #include "StdH.h"
+  #include "GameMP/SEColors.h"
+    
+  #include <Engine/Build.h>
 
-#include "EntitiesMP/Player.h"
-#include "EntitiesMP/Bullet.h"
-#include "Models/Weapons/Knife/Knife.h"
-#include "Models/Weapons/Knife/KnifeItem.h"
-#include "Models/Weapons/Colt/Colt.h"
-#include "Models/Weapons/Colt/ColtMain.h"
-#include "Models/Weapons/SingleShotgun/SingleShotgun.h"
-#include "Models/Weapons/SingleShotgun/Barrels.h"
-#include "Models/Weapons/DoubleShotgun/DoubleShotgun.h"
-#include "Models/Weapons/DoubleShotgun/Dshotgunbarrels.h"
-#include "Models/Weapons/DoubleShotgun/HandWithAmmo.h"
-#include "Models/Weapons/TommyGun/TommyGun.h"
-#include "Models/Weapons/TommyGun/Body.h"
-#include "Models/Weapons/MiniGun/MiniGun.h"
-#include "Models/Weapons/MiniGun/Body.h"
-#include "Models/Weapons/GrenadeLauncher/GrenadeLauncher.h"
-#include "Models/Weapons/RocketLauncher/RocketLauncher.h"
-#include "Models/Weapons/Laser/Laser.h"
-#include "Models/Weapons/Laser/Barrel.h"
-#include "Models/Weapons/Cannon/Cannon.h"
-#include "Models/Weapons/Cannon/Body.h"
-// Mission Pack weapons
-#include "ModelsMP/Weapons/Sniper/Sniper.h"
-#include "ModelsMP/Weapons/Sniper/Body.h"
-#include "ModelsMP/Weapons/Flamer/Flamer.h"
-#include "ModelsMP/Weapons/Flamer/Body.h"
-#include "ModelsMP/Weapons/Flamer/FuelReservoir.h"
-#include "ModelsMP/Weapons/Flamer/Flame.h"  
-#include "ModelsMP/Weapons/Chainsaw/Chainsaw.h"
-#include "ModelsMP/Weapons/Chainsaw/ChainSawForPlayer.h"
-#include "ModelsMP/Weapons/Chainsaw/Body.h"
-#include "ModelsMP/Weapons/Chainsaw/Blade.h"
-#include "ModelsMP/Weapons/Chainsaw/Teeth.h"
+  #include "EntitiesMP/Player.h"
+  #include "EntitiesMP/Bullet.h"
+  #include "Models/Weapons/Knife/Knife.h"
+  #include "Models/Weapons/Knife/KnifeItem.h"
+  #include "Models/Weapons/Colt/Colt.h"
+  #include "Models/Weapons/Colt/ColtMain.h"
+  #include "Models/Weapons/SingleShotgun/SingleShotgun.h"
+  #include "Models/Weapons/SingleShotgun/Barrels.h"
+  #include "Models/Weapons/DoubleShotgun/DoubleShotgun.h"
+  #include "Models/Weapons/DoubleShotgun/Dshotgunbarrels.h"
+  #include "Models/Weapons/DoubleShotgun/HandWithAmmo.h"
+  #include "Models/Weapons/TommyGun/TommyGun.h"
+  #include "Models/Weapons/TommyGun/Body.h"
+  #include "Models/Weapons/MiniGun/MiniGun.h"
+  #include "Models/Weapons/MiniGun/Body.h"
+  #include "Models/Weapons/GrenadeLauncher/GrenadeLauncher.h"
+  #include "Models/Weapons/RocketLauncher/RocketLauncher.h"
+  #include "Models/Weapons/Laser/Laser.h"
+  #include "Models/Weapons/Laser/Barrel.h"
+  #include "Models/Weapons/Cannon/Cannon.h"
+  #include "Models/Weapons/Cannon/Body.h"
 
-// Mission Pack player body instead of the old one
-#include "ModelsMP/Player/SeriousSam/Body.h"
-#include "ModelsMP/Player/SeriousSam/Player.h"
+  // Mission Pack weapons
+  #include "ModelsMP/Weapons/Sniper/Sniper.h"
+  #include "ModelsMP/Weapons/Sniper/Body.h"
+  #include "ModelsMP/Weapons/Flamer/Flamer.h"
+  #include "ModelsMP/Weapons/Flamer/Body.h"
+  #include "ModelsMP/Weapons/Flamer/FuelReservoir.h"
+  #include "ModelsMP/Weapons/Flamer/Flame.h"  
+  #include "ModelsMP/Weapons/Chainsaw/Chainsaw.h"
+  #include "ModelsMP/Weapons/Chainsaw/ChainSawForPlayer.h"
+  #include "ModelsMP/Weapons/Chainsaw/Body.h"
+  #include "ModelsMP/Weapons/Chainsaw/Blade.h"
+  #include "ModelsMP/Weapons/Chainsaw/Teeth.h"
 
-#include "EntitiesMP/Switch.h"
-#include "EntitiesMP/PlayerView.h"
-#include "EntitiesMP/PlayerAnimator.h"
-#include "EntitiesMP/MovingBrush.h"
-#include "EntitiesMP/MessageHolder.h"
-#include "EntitiesMP/EnemyBase.h"
-extern INDEX hud_bShowWeapon;
+  // Mission Pack player body instead of the old one
+  #include "ModelsMP/Player/SeriousSam/Body.h"
+  #include "ModelsMP/Player/SeriousSam/Player.h"
 
-extern const INDEX aiWeaponsRemap[19] = { 0,  1,  10,  2,  3,  4,  5,  6,  7,
-                                          8,  9,  11, 13, 12, 14, 15, 16, 17, 18 };
+  #include "EntitiesMP/Switch.h"
+  #include "EntitiesMP/PlayerView.h"
+  #include "EntitiesMP/PlayerAnimator.h"
+  #include "EntitiesMP/MovingBrush.h"
+  #include "EntitiesMP/MessageHolder.h"
+  #include "EntitiesMP/EnemyBase.h"
+  extern INDEX hud_bShowWeapon;
+
+  extern const INDEX aiWeaponsRemap[19] = { 0,  1,  10,  2,  3,  4,  5,  6,  7,
+                                            8,  9,  11, 13, 12, 14, 15, 16, 17, 18 };
 
 %}
 
@@ -180,6 +181,27 @@ enum WeaponType {
 #define LIGHT_ANIM_COLT_SHOTGUN 4
 #define LIGHT_ANIM_NONE 5
 
+// Balance
+#define COLT_DAMAGE 20.0F
+#define COLT_DAMAGE_COOP 10.0F
+#define COLT_MAG_SIZE 6
+
+#define DOUBLE_COLT_DAMAGE 10.0F
+
+#define SINGLE_SHOTGUN_BULLETS 7
+#define SINGLE_SHOTGUN_DAMAGE 10.0F
+
+#define DOUBLE_SHOTGUN_BULLETS 14
+#define DOUBLE_SHOTGUN_DAMAGE 10.0F
+
+#define TOMMYGUN_DAMAGE 10.0F
+
+#define MINIGUN_DAMAGE 10.0F
+
+#define SNIPER_DAMAGE 30.0F
+#define SNIPER_DAMAGE_COOP 75.0F
+#define SNIPER_DAMAGE_SNIPING 90.0F
+#define SNIPER_DAMAGE_SNIPING_COOP 300.0F
 
 // mana for ammo adjustment (multiplier)
 #define MANA_AMMO (0.1f)
@@ -234,6 +256,7 @@ static INDEX hud_bCrosshairColoring = TRUE;
 static FLOAT hud_fCrosshairScale    = 1.0f;
 static FLOAT hud_fCrosshairOpacity  = 1.0f;
 static FLOAT hud_fCrosshairRatio    = 0.5f;  // max distance size ratio
+
 // misc HUD vars
 static INDEX hud_bShowPlayerName = TRUE;
 static INDEX hud_bShowCoords     = FALSE;
@@ -602,7 +625,7 @@ properties:
 // knife
 210 INDEX m_iKnifeStand = 1,
 // colt
-215 INDEX m_iColtBullets = 6,
+215 INDEX m_iColtBullets = COLT_MAG_SIZE,
 // minigun
 220 FLOAT m_aMiniGun = 0.0f,
 221 FLOAT m_aMiniGunLast = 0.0f,
@@ -1351,9 +1374,9 @@ functions:
     FLOAT   fDistance = m_fRayHitDistance;
     //const FLOAT3D vRayHit = Lerp( m_vRayHitLast, m_vRayHit, _pTimer->GetLerpFactor());
     const FLOAT3D vRayHit = m_vRayHit;  // lerping doesn't seem to work ???
-    // if hit anything
-    if ( m_penRayHit!=NULL) {
 
+    // if hit anything
+    if ( m_penRayHit != NULL) {
       CEntity *pen = m_penRayHit;
       // do screen projection
       prProjection.ViewerPlacementL() = plViewSource;
@@ -1373,10 +1396,8 @@ functions:
           colCrosshair = C_GREEN;
         }
       }
-    }
     // if didn't hit anything
-    else
-    {
+    } else {
       // far away in screen center
       vOnScreen(1) = (FLOAT)pdp->GetWidth()  *0.5f;
       vOnScreen(2) = (FLOAT)pdp->GetHeight() *0.5f;
@@ -2480,10 +2501,11 @@ functions:
   // --------------------------------------------------------------------------------------
   // Clear weapons.
   // --------------------------------------------------------------------------------------
-  void ClearWeapons(void) {
+  void ClearWeapons(void)
+  {
     // give/take weapons
     m_iAvailableWeapons = 0;
-    m_iColtBullets = 6;
+    m_iColtBullets = COLT_MAG_SIZE;
     m_iBullets = 0;
     m_iShells = 0;
     m_iRockets = 0;
@@ -3176,7 +3198,7 @@ functions:
   };
 
   // --------------------------------------------------------------------------------------
-  // Get selected number for weapon.
+  // Get number from selected weapon.
   // --------------------------------------------------------------------------------------
   INDEX GetSelectedWeapon(WeaponType EwtSelectedWeapon) {
     switch(EwtSelectedWeapon) {
@@ -3195,7 +3217,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Get secondary weapon from selected one.
   // --------------------------------------------------------------------------------------
-  WeaponType GetAltWeapon(WeaponType EwtWeapon) {
+  WeaponType GetAltWeapon(WeaponType EwtWeapon)
+  {
     switch (EwtWeapon) {
       case WEAPON_KNIFE: return WEAPON_CHAINSAW;
       case WEAPON_CHAINSAW: return WEAPON_KNIFE;
@@ -3224,7 +3247,7 @@ functions:
     // if player has weapon and has enough ammo
     if (((1<<(INDEX(wtToTry)-1))&m_iAvailableWeapons) && HasAmmo(wtToTry)) {
       // if different weapon
-      if (wtToTry!=m_iCurrentWeapon) {
+      if (wtToTry != m_iCurrentWeapon) {
         // initiate change
         //m_bHasAmmo = FALSE;
         m_iWantedWeapon = wtToTry;
@@ -3324,7 +3347,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Does weapon have ammo?
   // --------------------------------------------------------------------------------------
-  BOOL HasAmmo(WeaponType EwtWeapon) {
+  BOOL HasAmmo(WeaponType EwtWeapon)
+  {
     switch (EwtWeapon) {
       case WEAPON_NONE : return TRUE; // Dummy weapon has infinite ammo.
       case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: return TRUE; // Knife / Colt / Double Colt have infinite ammo.
@@ -3349,7 +3373,8 @@ functions:
   // --------------------------------------------------------------------------------------
   //                             >>>---   DEFAULT ANIM   ---<<<
   // --------------------------------------------------------------------------------------
-  void PlayDefaultAnim(void) {
+  void PlayDefaultAnim(void)
+  {
     switch(m_iCurrentWeapon) {
       case WEAPON_NONE:
         break;
@@ -3410,7 +3435,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Plays knife boring animation.
   // --------------------------------------------------------------------------------------
-  FLOAT KnifeBoring(void) {
+  FLOAT KnifeBoring(void)
+  {
     // play boring anim
     INDEX iAnim;
     switch (m_iKnifeStand) {
@@ -3425,7 +3451,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Plays single colt boring animation.
   // --------------------------------------------------------------------------------------
-  FLOAT ColtBoring(void) {
+  FLOAT ColtBoring(void)
+  {
     // play boring anim
     INDEX iAnim;
     switch (IRnd()%2) {
@@ -3440,7 +3467,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Plays double colt boring animation.
   // --------------------------------------------------------------------------------------
-  FLOAT DoubleColtBoring(void) {
+  FLOAT DoubleColtBoring(void)
+  {
     // play boring anim for one colt
     INDEX iAnim;
     switch (IRnd()%2) {
@@ -3460,7 +3488,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Plays single shothun boring animation.
   // --------------------------------------------------------------------------------------
-  FLOAT SingleShotgunBoring(void) {
+  FLOAT SingleShotgunBoring(void)
+  {
     // play boring anim
     INDEX iAnim;
     switch (IRnd()%2) {
@@ -3474,7 +3503,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Plays double shothun boring animation.
   // --------------------------------------------------------------------------------------
-  FLOAT DoubleShotgunBoring(void) {
+  FLOAT DoubleShotgunBoring(void)
+  {
     // play boring anim
     INDEX iAnim;
     switch (IRnd()%3) {
@@ -3489,7 +3519,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Plays tommygun boring animation.
   // --------------------------------------------------------------------------------------
-  FLOAT TommyGunBoring(void) {
+  FLOAT TommyGunBoring(void)
+  {
     // play boring anim
     INDEX iAnim;
     switch (IRnd()%2) {
@@ -3503,7 +3534,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Plays sniper rifle boring animation.
   // --------------------------------------------------------------------------------------
-  FLOAT SniperBoring(void) {
+  FLOAT SniperBoring(void)
+  {
     // play boring anim
     INDEX iAnim;
     iAnim = SNIPER_ANIM_WAIT01;
@@ -3514,7 +3546,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Plays minigun boring animation.
   // --------------------------------------------------------------------------------------
-  FLOAT MiniGunBoring(void) {
+  FLOAT MiniGunBoring(void)
+  {
     // play boring anim
     INDEX iAnim;
     switch (IRnd()%3) {
@@ -3638,7 +3671,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Plays cannon boring animation.
   // --------------------------------------------------------------------------------------
-  FLOAT CannonBoring(void) {
+  FLOAT CannonBoring(void)
+  {
     // play boring anim
     INDEX iAnim;
     switch (IRnd()%3) {
@@ -3907,17 +3941,20 @@ procedures:
   /*
    *  >>>---   WEAPON CHANGE PROCEDURE  ---<<<
    */
-  ChangeWeapon() {
+  ChangeWeapon()
+  {
     // if really changing weapon, make sure sniping is off and notify owner of the change
     if (m_iCurrentWeapon!=m_iWantedWeapon) {
       m_fSniperFOV = m_fSniperFOVlast = m_fSniperMaxFOV;
       m_bSniping = FALSE;
       m_penPlayer->SendEvent(EWeaponChanged());
     }
+
     // weapon is changed
     m_bChangeWeapon = FALSE;
     // if this is not current weapon change it
-    if (m_iCurrentWeapon != m_iWantedWeapon) {
+    if (m_iCurrentWeapon != m_iWantedWeapon)
+    {
 /*
       // iron/nuke cannon changing is special
       if ( (m_iCurrentWeapon == WEAPON_IRONCANNON) && (m_iWantedWeapon == WEAPON_NUKECANNON) )
@@ -3972,9 +4009,11 @@ procedures:
 
 
   // put weapon down
-  PutDown() {
+  PutDown()
+  {
     // start weapon put down animation
-    switch (m_iCurrentWeapon) {
+    switch (m_iCurrentWeapon)
+    {
       case WEAPON_NONE:
         break;
       // knife have different stands
@@ -4074,7 +4113,7 @@ procedures:
     BOOL bNowColt = m_iCurrentWeapon==WEAPON_COLT || m_iCurrentWeapon==WEAPON_DOUBLECOLT;
     BOOL bWantedColt = m_iWantedWeapon==WEAPON_COLT || m_iWantedWeapon==WEAPON_DOUBLECOLT;
     if (bNowColt&&!bWantedColt) {
-      m_iColtBullets = 6;
+      m_iColtBullets = COLT_MAG_SIZE;
     }
 
     m_moWeapon.PlayAnim(m_iAnim, 0);
@@ -4083,7 +4122,8 @@ procedures:
   };
 
   // bring up weapon
-  BringUp() {
+  BringUp()
+  {
     // reset weapon draw offset
     ResetWeaponMovingOffset();
 
@@ -4264,11 +4304,13 @@ procedures:
       m_bFireWeapon = FALSE;
     }
 
-    while (HoldingFire() && m_bHasAmmo) {
+    while (HoldingFire() && m_bHasAmmo)
+    {
       // boring animation
       ((CPlayerAnimator&)*((CPlayer&)*m_penPlayer).m_penAnimator).m_fLastActionTime = _pTimer->CurrentTick();
 
-      wait() {
+      wait()
+      {
         on (EBegin) : {
           // fire one shot
           switch (m_iCurrentWeapon) {
@@ -4309,14 +4351,16 @@ procedures:
   };
 
   // ***************** FIRE NONE *****************
-  FireNone() {
+  FireNone()
+  {
     m_bFireWeapon = m_bHasAmmo = FALSE;
 
     return EEnd();
   };
     
   // ***************** SWING KNIFE *****************
-  SwingKnife() {
+  SwingKnife()
+  {
     INDEX iSwing;
 
     // animator swing
@@ -4369,12 +4413,13 @@ procedures:
   };
   
   // ***************** FIRE COLT *****************
-  FireColt() {
+  FireColt()
+  {
     GetAnimator()->FireAnimation(BODY_ANIM_COLT_FIRERIGHT, 0);
 
     // fire bullet
     FireOneBullet(wpn_fFX[WEAPON_COLT], wpn_fFY[WEAPON_COLT], 500.0f,
-      ((GetSP()->sp_bCooperative) ? 10.0f : 20.0f));
+      ((GetSP()->sp_bCooperative) ? COLT_DAMAGE_COOP : COLT_DAMAGE));
 
 
     if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Colt_fire");}
@@ -4402,6 +4447,7 @@ procedures:
 
     // random colt fire
     INDEX iAnim;
+
     switch (IRnd()%3) {
       case 0: iAnim = COLT_ANIM_FIRE1; break;
       case 1: iAnim = COLT_ANIM_FIRE2; break;
@@ -4421,8 +4467,9 @@ procedures:
   };
 
   // reload colt
-  ReloadColt() {
-    if (m_iColtBullets >= 6) {
+  ReloadColt()
+  {
+    if (m_iColtBullets >= COLT_MAG_SIZE) {
       return EEnd();
     }
 
@@ -4439,10 +4486,11 @@ procedures:
   };
 
   // ***************** FIRE DOUBLE COLT *****************
-  FireDoubleColt() {
+  FireDoubleColt()
+  {
     // fire first colt - one bullet less in colt
     GetAnimator()->FireAnimation(BODY_ANIM_COLT_FIRERIGHT, 0);
-    FireOneBullet(wpn_fFX[WEAPON_DOUBLECOLT], wpn_fFY[WEAPON_DOUBLECOLT], 500.0f, 10.0f);
+    FireOneBullet(wpn_fFX[WEAPON_DOUBLECOLT], wpn_fFY[WEAPON_DOUBLECOLT], 500.0f, DOUBLE_COLT_DAMAGE);
     if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Colt_fire");}
     
     /*
@@ -4517,8 +4565,9 @@ procedures:
   };
 
   // reload double colt
-  ReloadDoubleColt() {
-    if (m_iColtBullets >= 6) {
+  ReloadDoubleColt()
+  {
+    if (m_iColtBullets >= COLT_MAG_SIZE) {
       return EEnd();
     }
     m_moWeapon.PlayAnim(COLT_ANIM_RELOAD, 0);
@@ -4540,13 +4589,14 @@ procedures:
     // wait second halt minus half shortest fire animation
     autowait(m_moWeapon.GetAnimLength(COLT_ANIM_RELOAD)-0.25f);
 
-    m_iColtBullets = 6;
+    m_iColtBullets = COLT_MAG_SIZE;
 
     return EEnd();
   };
 
   // ***************** FIRE SINGLESHOTGUN *****************
-  FireSingleShotgun() {
+  FireSingleShotgun()
+  {
     // No ammo? Then you can't shoot!
     if (m_iShells <= 0) {
       //ASSERTALWAYS("SingleShotgun - Auto weapon change not working.");
@@ -4556,7 +4606,8 @@ procedures:
 
     GetAnimator()->FireAnimation(BODY_ANIM_SHOTGUN_FIRELONG, 0);
     FireBullets(wpn_fFX[WEAPON_SINGLESHOTGUN], wpn_fFY[WEAPON_SINGLESHOTGUN], 
-      500.0f, 10.0f, 7, afSingleShotgunPellets, 0.2f, 0.03f);
+      500.0f, SINGLE_SHOTGUN_DAMAGE, SINGLE_SHOTGUN_BULLETS, afSingleShotgunPellets, 0.2f, 0.03f);
+
     DoRecoil();
     SpawnRangeSound(60.0f);
     if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Snglshotgun_fire");}
@@ -4645,7 +4696,8 @@ procedures:
   };
 
   // ***************** FIRE DOUBLESHOTGUN *****************
-  FireDoubleShotgun() {
+  FireDoubleShotgun()
+  {
     // No ammo? Then you can't shoot!
     if (m_iShells <= 1) {
       //ASSERTALWAYS("DoubleShotgun - Auto weapon change not working.");
@@ -4656,7 +4708,7 @@ procedures:
     // fire two shells
     GetAnimator()->FireAnimation(BODY_ANIM_SHOTGUN_FIRELONG, 0);
     FireBullets(wpn_fFX[WEAPON_DOUBLESHOTGUN], wpn_fFY[WEAPON_DOUBLESHOTGUN], 
-      500.0f, 10.0f, 14, afDoubleShotgunPellets, 0.3f, 0.03f);
+      500.0f, DOUBLE_SHOTGUN_DAMAGE, DOUBLE_SHOTGUN_BULLETS, afDoubleShotgunPellets, 0.3f, 0.03f);
     DoRecoil();
     SpawnRangeSound(70.0f);
     if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Dblshotgun_fire");}
@@ -4742,7 +4794,8 @@ procedures:
   };
 
   // ***************** FIRE TOMMYGUN *****************
-  TommyGunStart() {
+  TommyGunStart()
+  {
     // fire one ball
     if (m_iBullets <= 0) {
       //ASSERTALWAYS("Cannon - Auto weapon change not working.");
@@ -4761,7 +4814,8 @@ procedures:
     return EEnd();
   };
 
-  TommyGunStop() {
+  TommyGunStop()
+  {
     // smoke
     CPlayer &pl = (CPlayer&)*m_penPlayer;
     if ( pl.m_pstState != PST_DIVE && hud_bShowWeapon)
@@ -4792,7 +4846,8 @@ procedures:
     jump Idle();
   };
 
-  FireTommyGun() {
+  FireTommyGun()
+  {
     // No ammo? Then you can't shoot!
     if (m_iBullets <= 0) {
       //ASSERTALWAYS("TommyGun - Auto weapon change not working.");
@@ -4802,7 +4857,7 @@ procedures:
 
     // fire one bullet
     FireMachineBullet(wpn_fFX[WEAPON_TOMMYGUN], wpn_fFY[WEAPON_TOMMYGUN], 
-      500.0f, 10.0f, ((GetSP()->sp_bCooperative) ? 0.01f : 0.03f),
+      500.0f, TOMMYGUN_DAMAGE, ((GetSP()->sp_bCooperative) ? 0.01f : 0.03f),
       ((GetSP()->sp_bCooperative) ? 0.5f : 0.0f));
     SpawnRangeSound(50.0f);
     if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Tommygun_fire");}
@@ -4858,7 +4913,8 @@ procedures:
   };
 
   // ***************** FIRE SNIPER *****************
-  FireSniper() {
+  FireSniper()
+  {
     // No ammo? Then you can't shoot!
     if (m_iSniperBullets <= 0) {
       //ASSERTALWAYS("Sniper - Auto weapon change not working.");
@@ -4869,11 +4925,10 @@ procedures:
     // fire one bullet
     if (m_bSniping) {
       FireSniperBullet(0.0f, 0.0f, 1500.0f, 
-                       (GetSP()->sp_bCooperative) ? 300.0f : 90.0f, 0.0f);
-    }
-    else {
+                       (GetSP()->sp_bCooperative) ? SNIPER_DAMAGE_SNIPING_COOP : SNIPER_DAMAGE_SNIPING, 0.0f);
+    } else {
       FireSniperBullet(wpn_fFX[WEAPON_SNIPER], wpn_fFY[WEAPON_SNIPER], 1000.0f,
-                       (GetSP()->sp_bCooperative) ? 75.0f : 30.0f, 5.0f);
+                       (GetSP()->sp_bCooperative) ? SNIPER_DAMAGE_COOP : SNIPER_DAMAGE, 5.0f);
     }
 
     m_tmLastSniperFire = _pTimer->CurrentTick();
@@ -4950,7 +5005,8 @@ procedures:
   
   
   // ***************** FIRE MINIGUN *****************
-  MiniGunSpinUp() {
+  MiniGunSpinUp()
+  {
     // steady anim
     m_moWeapon.PlayAnim(MINIGUN_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART);
     // no boring animation
@@ -4994,7 +5050,8 @@ procedures:
     jump MiniGunFire();
   }
 
-  MiniGunFire() {
+  MiniGunFire()
+  {
     // spinning sound
     CPlayer &pl = (CPlayer&)*m_penPlayer;
     PlaySound(pl.m_soWeapon1, SOUND_MINIGUN_ROTATE, SOF_3D|SOF_LOOP|SOF_VOLUMETRIC|SOF_SMOOTHCHANGE);
@@ -5022,10 +5079,11 @@ procedures:
       }
 
       // if has ammo
-      if (m_iBullets > 0) {
+      if (m_iBullets > 0)
+      {
         // fire a bullet
         FireMachineBullet(wpn_fFX[WEAPON_MINIGUN], wpn_fFY[WEAPON_MINIGUN],
-          750.0f, 10.0f, (GetSP()->sp_bCooperative) ? 0.01f : 0.03f, 
+          750.0f, MINIGUN_DAMAGE, (GetSP()->sp_bCooperative) ? 0.01f : 0.03f, 
           ( (GetSP()->sp_bCooperative) ? 0.5f : 0.0f));
         DoRecoil();
         SpawnRangeSound(60.0f);
@@ -5114,7 +5172,8 @@ procedures:
     jump MiniGunSpinDown();
   }
 
-  MiniGunSpinDown() {
+  MiniGunSpinDown()
+  {
     CPlayer &pl = (CPlayer&)*m_penPlayer;
     // spin down sounds
     PlaySound(pl.m_soWeapon3, SOUND_MINIGUN_CLICK, SOF_3D|SOF_VOLUMETRIC);
@@ -5175,7 +5234,8 @@ procedures:
   };
 
   // ***************** FIRE ROCKETLAUNCHER *****************
-  FireRocketLauncher() {
+  FireRocketLauncher()
+  {
     // No ammo? Then you can't shoot!
     if (m_iRockets <= 0) {
       //ASSERTALWAYS("RocketLauncher - Auto weapon change not working.");
