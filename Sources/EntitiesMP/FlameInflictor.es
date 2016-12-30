@@ -80,7 +80,7 @@ procedures:
     SetModel(MODEL_INEDITOR);
     SetModelMainTexture(TEXTURE_INEDITOR);
 
-    m_iStrength = Clamp(m_iStrength, INDEX(0), 100);
+    m_iStrength = Clamp(m_iStrength, INDEX(0), INDEX(100));
     
     while (TRUE)
     {
