@@ -13,10 +13,10 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
 
-229
+389
 %{
-#include "StdH.h"
-#include "EntitiesMP/Projectile.h"
+  #include "StdH.h"
+  #include "EntitiesMP/Projectile.h"
 %}
 
 class CFlameInflictor: CRationalEntity {
@@ -38,28 +38,38 @@ components:
   3 class CLASS_FLAME "Classes\\Flame.ecl",
 
 functions:
-  const CTString &GetDescription(void) const {
-    return m_strDescription;
-  }
-  
+  // --------------------------------------------------------------------------------------
+  // No comments.
+  // --------------------------------------------------------------------------------------
   void Precache(void)
   {
     PrecacheClass(CLASS_FLAME);
   }
 
+  // --------------------------------------------------------------------------------------
+  // Returns short entity description to show it in SED.
+  // --------------------------------------------------------------------------------------
+  const CTString &GetDescription(void) const {
+    return m_strDescription;
+  }
+
+  // --------------------------------------------------------------------------------------
+  // Puts victim on fire.
+  // --------------------------------------------------------------------------------------
   void DoEffect(CEntity* penInflictor, CEntity* penVictim)
   {
     if (penVictim != NULL)
     {
       CPlacement3D placeP3D = penVictim->GetPlacement();
-			const FLOAT3D placeF3D = placeP3D.pl_PositionVector;
+      const FLOAT3D placeF3D = placeP3D.pl_PositionVector;
       SpawnFlame(penInflictor, penVictim, placeF3D);
     }
   }
 
 procedures:
-
-
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     InitAsEditorModel();
@@ -70,37 +80,32 @@ procedures:
     SetModel(MODEL_INEDITOR);
     SetModelMainTexture(TEXTURE_INEDITOR);
 
-    if (m_iStrength < 0)
+    m_iStrength = Clamp(m_iStrength, INDEX(0), 100);
+    
+    while (TRUE)
     {
-      m_iStrength = 0;
-    }
-    else if (m_iStrength > 100)
-    {
-      m_iStrength = 100;
-    }
-
-    while (TRUE) {
-      wait() {
-        on (ETrigger eTrigger) : {
+      wait()
+      {
+        on (ETrigger eTrigger) :
+        {
           int i = m_iStrength;
           CEntity* penInflictor = this;
           CEntity* penVictim    = m_penToDamage;
 
-          if (m_Inflictor){
+          if (m_Inflictor) {
             penInflictor = m_Inflictor;
           } else if (m_bInflictorPenCaused){
             penInflictor = eTrigger.penCaused;
           }
 
-          if (penVictim == NULL){
-              penVictim = eTrigger.penCaused;
+          if (penVictim == NULL) {
+            penVictim = eTrigger.penCaused;
           }
       
           /* Calling SpawnFlame() on the same entity twice causes it to burn, that means taking periodic damage over time,
           * hence strength >= 2 will cause the entity to take that periodic damage.
           */
-          while(i > 0)
-          {
+          while (i > 0) {
             DoEffect(penInflictor, penVictim);
             i--;
           }
@@ -111,9 +116,7 @@ procedures:
         otherwise() : {
           resume;
         };
-
       };
     }
-
   }
 };
