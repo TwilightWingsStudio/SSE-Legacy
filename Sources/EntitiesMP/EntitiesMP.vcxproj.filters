@@ -601,6 +601,9 @@
     <ClCompile Include="FlameInflictor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Randomizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1653,6 +1656,12 @@
     <ClInclude Include="Sequencer_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Randomizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Randomizer_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2580,6 +2589,9 @@
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
     <CustomBuild Include="FlameInflictor.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Randomizer.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>
