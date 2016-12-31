@@ -29,8 +29,8 @@ properties:
  20 FLOAT m_fClosestPlayer = UpperLimit(0.0f),  // distance from closest player to owner of this watcher
  21 INDEX m_iPlayerToCheck = 0,   // sequence number for checking next player in each turn
  22 CEntityPointer m_penAllocatedEnemy,
- 23 CEntityPointer m_penClosestFriend,
- 24 FLOAT m_fClosestFriend = UpperLimit(0.0f),
+ //23 CEntityPointer m_penClosestFriend,
+ //24 FLOAT m_fClosestFriend = UpperLimit(0.0f),
 
 
 components:
@@ -139,15 +139,16 @@ functions:
   CEntity* FindClosestEB(void)
   {
     CEntity *penClosestPlayer = NULL;
-    m_penClosestFriend = NULL;
+    //m_penClosestFriend = NULL;
     FLOAT fClosestPlayer = UpperLimit(0.0f);
-    FLOAT fClosestFriend = UpperLimit(0.0f);
+    //FLOAT fClosestFriend = UpperLimit(0.0f);
     //m_fClosestPlayer = UpperLimit(0.0f);
-    m_fClosestFriend = UpperLimit(0.0f);
+    //m_fClosestFriend = UpperLimit(0.0f);
 
     CEnemyFactionHolder* penEFH = GetOwner()->GetFactionHolder(TRUE);
 
-    {FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten) {
+    {FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten)
+    {
         CEntity *pen = iten;
 
         // Skip invalid entities.
@@ -350,7 +351,7 @@ functions:
     FLOAT fNearDistance = Min(GetOwner()->m_fStopDistance, GetOwner()->m_fCloseDistance);
 
     // if closer than near distance OR after spotting a friend
-    if (m_fClosestPlayer <= fNearDistance || (m_penAllocatedEnemy == NULL && m_penClosestFriend != NULL) ) {
+    if (m_fClosestPlayer <= fNearDistance/* || (m_penAllocatedEnemy == NULL && m_penClosestFriend != NULL)*/) {
       // always use minimum delay
       m_tmDelay = tmMinDelay;
     // if further than near distance
@@ -384,9 +385,13 @@ functions:
     CEntity *penClosestEB = NULL;
 
     CEnemyFactionHolder* penEFH = GetOwner()->GetFactionHolder(TRUE);
+    
+    if (penEFH && !penEFH->IsIndexValid()) {
+      penEFH = NULL;
+    }
 
     // We have faction holder with valid faction index? Then we can EnemyBase as target!
-    if (penEFH && penEFH->IsIndexValid()) {
+    if (penEFH) {
       penClosestEB = FindClosestEB();
     } 
 
@@ -424,7 +429,11 @@ functions:
     }
 
     // set new watch time
-    //SetWatchDelays();
+    if (penEFH == NULL) {
+      SetWatchDelays();
+    } else {
+      m_tmDelay = 2.0F;
+    }
   };
 
   // --------------------------------------------------------------------------------------
