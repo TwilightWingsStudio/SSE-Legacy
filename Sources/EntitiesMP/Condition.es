@@ -118,7 +118,7 @@ functions:
 
     if (m_penIfCondition1 == NULL) {
       if (m_bDebug) {
-        CPrintF(TRANS("%s : First Condition Target Not Set!\n"), m_strName);
+        CPrintF(TRANS("[%s] : First Condition Target Not Set!\n"), m_strName);
       }
 
       return;
@@ -127,16 +127,16 @@ functions:
     // Check condition target 2 existance and compare data types.
     if (m_penIfCondition2) {
       if (m_bDebug && m_eCT1 == ECT_ENTITY && m_eCT2 == ECT_ENTITY && m_penIfCondition1->PropertyForName(m_strProperty1) && m_penIfCondition2->PropertyForName(m_strProperty2) && m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType!=m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType) {
-        CPrintF(TRANS("%s : Different Data Types!\n"), m_strName);
+        CPrintF(TRANS("[%s] : Different Data Types!\n"), m_strName);
       }
     } else {
       if (m_bDebug) {
-        CPrintF(TRANS("%s : Second Condition Target Not Set!\n"), m_strName);
+        CPrintF(TRANS("[%s] : Second Condition Target Not Set!\n"), m_strName);
       }
     }
 
     if (m_eCT1 == ECT_ENTITY && m_bDebug && m_penIfCondition1->PropertyForName(m_strProperty1) == NULL) {
-      CPrintF(TRANS("%s : Condition 1 : %s Not Found\n"), m_strName, m_strProperty1);
+      CPrintF(TRANS("[%s] : Condition 1 : %s Not Found\n"), m_strName, m_strProperty1);
       return;
     }
 
@@ -230,7 +230,7 @@ functions:
       } else {
         be = TRUE;
         if (m_bDebug) {
-          CPrintF(TRANS("%s 1 : Don't use speeds on not moving entities or health on entities without health\n"),m_strName);
+          CPrintF(TRANS("[%s][1] : Don't use speeds on not moving entities or health on entities without health\n"),m_strName);
         }
       }
 
@@ -309,15 +309,20 @@ functions:
         } else {
           be = true;
           if (m_bDebug) {
-            CPrintF(TRANS("%s 2 : Don't use speeds on not moving entities or health on entities without health\n"), m_strName);
+            CPrintF(TRANS("[%s][2] : Don't use speeds on not moving entities or health on entities without health\n"), m_strName);
           }
         }
       } else {
-        CPrintF(TRANS("%s : Set the second condition target goddammit\n"), GetName());
+        CPrintF(TRANS("[%s] : Set the second condition target goddammit\n"), GetName());
       }
 
       // FLOAT
       if (bf1 && bf2) {
+        if (m_bDebug)
+        {
+          CPrintF("[%s] : Comparing two floating point properties...\n", m_strName);
+        }
+        
         FLOAT rAbs1 = fValue;
         FLOAT rAbs2 = fValue2;
 
@@ -326,40 +331,56 @@ functions:
         if (m_bAbs2) {rAbs2 = abs(rAbs2);}
 
         if (m_eCondition == EC_SAME) {
+          if (m_bDebug) {
+            CPrintF("  Condition = [==] (same)\n");
+          }
+
           if (rAbs1 == rAbs2) {
             bResult = TRUE;
           }
-        }
-
-        if (m_eCondition == EC_DIFFERENT) {
+        } else if (m_eCondition == EC_DIFFERENT) {
+          if (m_bDebug) {
+            CPrintF("  Condition = [!=] (different)\n");
+          }
+          
           if (rAbs1 != rAbs2) {
             bResult = TRUE;
           }
-        }
+        } else if (m_eCondition == EC_LARGER) {
+          if (m_bDebug) {
+            CPrintF("  Condition = [>] (larger)\n");
+          }
 
-        if (m_eCondition == EC_LARGER) {
           if (rAbs1 > rAbs2) {
             bResult = TRUE;
           }
-        }
-
-        if (m_eCondition == EC_LARGER_SAME) {
+        } else if (m_eCondition == EC_LARGER_SAME) {
+          if (m_bDebug) {
+            CPrintF("  Condition = [>=] (larger-same)\n");
+          }
+          
           if (rAbs1 >= rAbs2) {
             bResult = TRUE;
           }
-        }
+        } else if (m_eCondition == EC_SMALLER) {
+          if (m_bDebug) {
+            CPrintF("  Condition = [<] (smaller)\n");
+          }
 
-        if (m_eCondition == EC_SMALLER) {
           if (rAbs1 < rAbs2) {
             bResult = TRUE;
           }
-        }
+        } else if (m_eCondition == EC_SMALLER_SAME) {
+          if (m_bDebug) {
+            CPrintF("  Condition = [<=] (smaller-same)\n");
+          }
 
-        if (m_eCondition == EC_SMALLER_SAME) {
           if (rAbs1 <= rAbs2) {
             bResult = TRUE;
           }
         }
+      
+      // ONE FLOAT
       } else if (bf1) {
         if (fValue > 0) {
           bResult = TRUE;
@@ -367,27 +388,39 @@ functions:
 
       // POINTER
       } else if (bp1 && bp2) {
-        if (penPointer) {
-          if (penPointer2) {
-            if (m_eCondition == EC_SAME) {
-              if (penPointer == penPointer2) {
-                bResult = TRUE;
-              }
-            }
+        if (m_bDebug)
+        {
+          CPrintF("[%s] : Comparing two pointers...\n", m_strName);
 
-            if (m_eCondition == EC_DIFFERENT) {
-              if (penPointer != penPointer2) {
-                bResult = TRUE;
-              }
-            }
+          if (penPointer) {
+            CPrintF("  [%s].[%s] = [#%d][%s]\n", ((CEntity&)*m_penIfCondition1).GetName(), m_strProperty1, penPointer->en_ulID, penPointer->GetName());
           } else {
-            if (m_bDebug) {
-              CPrintF(TRANS("%s : Second Condition Pointer not set, checking if %s.%s exists instead\n"), m_strName,((CEntity&)*m_penIfCondition1).GetName(), m_strProperty1);
-            }
+            CPrintF("  [%s].[%s] = NULL\n", ((CEntity&)*m_penIfCondition1).GetName(), m_strProperty1);
+          }
+          
+          if (penPointer2) {
+            CPrintF("  [%s].[%s] = [#%d][%s]\n", ((CEntity&)*m_penIfCondition2).GetName(), m_strProperty2, penPointer2->en_ulID, penPointer2->GetName());
+          } else {
+            CPrintF("  [%s].[%s] = NULL\n", ((CEntity&)*m_penIfCondition2).GetName(), m_strProperty2);
+          }
+        }
+        
+        if (m_eCondition == EC_SAME)
+        {
+          if (m_bDebug) {
+            CPrintF("  Condition = [==] (same)\n");
+          }
 
-            if (penPointer != NULL) {
-              bResult = TRUE;
-            }
+          if (penPointer == penPointer2) {
+            bResult = TRUE;
+          }
+        } else if (m_eCondition == EC_DIFFERENT) {
+          if (m_bDebug) {
+            CPrintF("  Condition = [!=] (different)\n");
+          }
+
+          if (penPointer != penPointer2) {
+            bResult = TRUE;
           }
         }
 
@@ -414,7 +447,7 @@ functions:
       } else {
         be = TRUE;
         if (m_bDebug) {
-          CPrintF(TRANS("%s : Unsupported Data Type\n"), m_strName);
+          CPrintF(TRANS("[%s] : Unsupported Data Type\n"), m_strName);
         }
       }
     }
@@ -427,22 +460,22 @@ functions:
     if (bResult) {
       if (m_penIfTarget) {
         if (m_bDebug) {
-          CPrintF(TRANS("%s : Triggering if Target: %s\n"), m_strName, m_penIfTarget->GetName());
+          CPrintF(TRANS("[%s] : Triggering [If Target]: %s\n"), m_strName, m_penIfTarget->GetName());
         }
 
         SendToTarget(m_penIfTarget, EET_TRIGGER, eTrigger.penCaused);
       } else if (m_bDebug) {
-        CPrintF(TRANS("%s : Result=TRUE, but no if Target to trigger\n"), m_strName);
+        CPrintF(TRANS("[%s] : Result=TRUE, but no [If Target] to trigger\n"), m_strName);
       }
     } else {
       if (m_penElseTarget) {
         if (m_bDebug) {
-          CPrintF(TRANS("%s : Triggering else Target:%s\n"), m_strName, m_penElseTarget->GetName());
+          CPrintF(TRANS("[%s] : Triggering [Else Target]:%s\n"), m_strName, m_penElseTarget->GetName());
         }
 
         SendToTarget(m_penElseTarget, EET_TRIGGER, eTrigger.penCaused);
       } else if (m_bDebug) {
-        CPrintF(TRANS("%s : Result=FALSE, but no else Target to trigger\n"), m_strName);
+        CPrintF(TRANS("[%s] : Result=FALSE, but no [Else Target] to trigger\n"), m_strName);
       }
     }
   }
