@@ -39,8 +39,8 @@ properties:
   11 BOOL m_bPenCausedAsDestination "Destination=penCaused" = FALSE,
   12 BOOL m_bThisAsDestination      "Destination=this" = FALSE,
    
-  25 BOOL m_bForceStop              "Force stop" 'F' = FALSE,
-  26 BOOL m_bSaveOrintation         "Save Orientation" = FALSE,
+  25 BOOL m_bForceStop              "Force Stop" 'F' = FALSE,
+  26 BOOL m_bKeepOrientation        "Keep Orientation" = FALSE,
   27 BOOL m_bTelefrag               "Telefrag" 'F' = TRUE,
 
   30 BOOL m_bSpawnEffect "Spawn Effect" 'X' = FALSE,
@@ -51,11 +51,18 @@ components:
   3 class   CLASS_BASIC_EFFECT  "Classes\\BasicEffect.ecl",
 
 functions:
+  // --------------------------------------------------------------------------------------
+  // Returns short entity description to show it in SED.
+  // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const {
     return m_strDescription;
   }
 
-  void DoTeleportation(const ETrigger &eTrigger) {
+  // --------------------------------------------------------------------------------------
+  // Teleports selected entity to destination if possible.
+  // --------------------------------------------------------------------------------------
+  void DoTeleportation(const ETrigger &eTrigger)
+  {
     CEntity *penEntityToTP = m_penEnityToTP;
 
     if (m_bPenCausedAsEntityToTP && eTrigger.penCaused) {
@@ -65,7 +72,7 @@ functions:
     // If no any entity to teleport then stop.
     if (penEntityToTP == NULL) {
       if (m_bDebugMessages) {
-        CPrintF(TRANS("%s : Haven't any entity to telport!\n"), m_strName);
+        CPrintF(TRANS("[%s] : Haven't any entity to telport!\n"), m_strName);
       }
 
       return;
@@ -87,7 +94,7 @@ functions:
     // If no destination where teleport then stop.
     if (penDestination == NULL) {
       if (m_bDebugMessages) {
-        CPrintF(TRANS("%s : Haven't destination to telport!\n"), m_strName);
+        CPrintF(TRANS("[%s] : Haven't destination to telport!\n"), m_strName);
       }
 
       return;
@@ -95,26 +102,30 @@ functions:
 
     if (m_bDebugMessages) {
       if (bThis) {
-        CPrintF(TRANS("%s : Teleporting %s to %s location.\n"), m_strName, penEntityToTP->GetName(), penDestination->GetName());
+        CPrintF(TRANS("[%s] : Teleporting %s to %s location.\n"), m_strName, penEntityToTP->GetName(), penDestination->GetName());
       } else {
-        CPrintF(TRANS("%s : Teleporting %s to this teleporter.\n"), m_strName, penEntityToTP->GetName());
+        CPrintF(TRANS("[%s] : Teleporting %s to this teleporter.\n"), m_strName, penEntityToTP->GetName());
       }
     }
 
     CPlacement3D pl = penDestination->GetPlacement();
-    if (m_bSaveOrintation) {
+    
+    // If we need to kepp orientation of victim.
+    if (m_bKeepOrientation) {
       pl.pl_OrientationAngle = penEntityToTP->GetPlacement().pl_OrientationAngle;
     }
 
-    // teleport back
+    // Teleport back.
     penEntityToTP->Teleport(pl, m_bTelefrag);
 
+    // If victim is movable and forcestop enabled then apply it.
     if (m_bForceStop && (penEntityToTP->GetPhysicsFlags()&EPF_MOVABLE) ) {
       ((CMovableEntity*)&*penEntityToTP)->ForceFullStop();
     }
 
-    // spawn teleport effect
-    if (m_bSpawnEffect) {
+    // If spawn effect enabled then spawn it.
+    if (m_bSpawnEffect)
+    {
       ESpawnEffect ese;
       ese.colMuliplier = C_WHITE|CT_OPAQUE;
       ese.betType = BET_TELEPORT;
@@ -130,6 +141,9 @@ functions:
   }
   
 procedures:
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     InitAsEditorModel();
