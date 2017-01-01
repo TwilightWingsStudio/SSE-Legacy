@@ -41,17 +41,25 @@ components:
   2 texture TEXTURE_CAUSEDKEEPER "Models\\Editor\\CausedKeeper.tex",
 
 functions:
+  // --------------------------------------------------------------------------------------
+  // Returns short entity description to show it in SED.
+  // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const {
     return m_strDescription;
   }
 
-  void DoKeep(const ETrigger &eTrigger) {
+  // --------------------------------------------------------------------------------------
+  // Saves penCaused into property if possible.
+  // --------------------------------------------------------------------------------------
+  void DoKeep(const ETrigger &eTrigger)
+  {
     CEntity *penCaused = eTrigger.penCaused;
 
-    if (penCaused == NULL) {
+    if (penCaused == NULL)
+    {
       if (m_bResetOnNull) {
         if (m_bDebugMessages) {
-          CPrintF("%s : Setting target to NULL.\n", m_strName);
+          CPrintF("[%s] : Setting Target to NULL.\n", m_strName);
         }
 
         m_penTarget = NULL; 
@@ -60,6 +68,7 @@ functions:
       return;
     }
   
+    // If class filter exists then apply it.
     if (m_strOnlyClass != "") {
       if (!IsDerivedFromClass(penCaused, m_strOnlyClass)) {
         return;
@@ -67,13 +76,16 @@ functions:
     }
 
     if (m_bDebugMessages) {
-      CPrintF("%s : Setting target to %s.\n", m_strName, penCaused->GetName());
+      CPrintF("[%s] : Setting Target to [#%d][%s].\n", m_strName, penCaused->en_ulID, penCaused->GetName());
     }
 
     m_penTarget = penCaused;
   }
   
 procedures:
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     InitAsEditorModel();
@@ -86,7 +98,8 @@ procedures:
   
     autowait(0.1f);
   
-    wait() {
+    wait()
+    {
       on (EBegin) : { 
         resume;
       }
@@ -115,7 +128,7 @@ procedures:
         }
 
         if (m_bDebugMessages) {
-          CPrintF("%s : Resetting target!\n", m_strName);
+          CPrintF("[%s] : Forced resetting Target to NULL!\n", m_strName);
         }
 
         m_penTarget = NULL;
