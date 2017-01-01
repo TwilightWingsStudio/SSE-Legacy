@@ -275,7 +275,7 @@ procedures:
 
     // damage/explode properties
     m_fDamageWounded = 1E10f;
-    m_fBlowUpAmount = 60.0f;
+    m_fBlowUpAmount = 5.0f;
     m_fBodyParts = 4;
     m_fBlowUpSize = 2.0f;
 
