@@ -20,6 +20,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "EntitiesMP/PlayerWeapons.h"
 %}
 
+enum ESTUsePenCausedAs {
+  0 ESTUP_NONE        "0 None",
+  1 ESTUP_SOURCE      "1 Entity to Teleport",
+  2 ESTUP_DESTINATION "2 Destination Target",
+};
+
 class CSimpleTeleport: CRationalEntity {
 name      "SimpleTeleport";
 thumbnail "Thumbnails\\SimpleTeleport.tbn";
@@ -35,8 +41,7 @@ properties:
    6 CEntityPointer m_penEnityToTP   "Entity To Teleport" 'E',
    7 CEntityPointer m_penDestination "Destination Target" 'T',
 
-  10 BOOL m_bPenCausedAsEntityToTP  "EntityToTP=penCaused" = FALSE,
-  11 BOOL m_bPenCausedAsDestination "Destination=penCaused" = FALSE,
+  10 enum ESTUsePenCausedAs m_eUsePenCausedAs "Use penCaused as ..." = ESTUP_NONE,
    
   25 BOOL m_bForceStop              "Force Stop" 'F' = FALSE,
   26 BOOL m_bKeepOrientation        "Keep Orientation" = FALSE,
@@ -63,30 +68,39 @@ functions:
   void DoTeleportation(const ETrigger &eTrigger)
   {
     CEntity *penEntityToTP = m_penEnityToTP;
+    CEntity *penDestination = m_penDestination;
 
-    if (m_bPenCausedAsEntityToTP && eTrigger.penCaused) {
-      penEntityToTP = eTrigger.penCaused;
+    
+    switch (m_eUsePenCausedAs)
+    {
+      case ESTUP_SOURCE: {
+        if (eTrigger.penCaused) {
+          penEntityToTP = eTrigger.penCaused;
+        }
+      } break;
+      
+      case ESTUP_DESTINATION: {
+        if (eTrigger.penCaused) {
+          penDestination = eTrigger.penCaused;
+        }
+      } break;
+      
+      case ESTUP_NONE: default: break;
     }
 
     // If no any entity to teleport then stop.
     if (penEntityToTP == NULL) {
       if (m_bDebugMessages) {
-        CPrintF(TRANS("[%s] : Haven't any entity to telport!\n"), m_strName);
+        CPrintF(TRANS("[%s] : Haven't any entity to teleport!\n"), m_strName);
       }
 
       return;
-    }
-    
-    CEntity *penDestination = m_penDestination;
-
-    if (m_bPenCausedAsDestination && eTrigger.penCaused) {
-      penDestination = eTrigger.penCaused;
     }
 
     // If no destination where teleport then stop.
     if (penDestination == NULL) {
       if (m_bDebugMessages) {
-        CPrintF(TRANS("[%s] : Haven't destination to telport!\n"), m_strName);
+        CPrintF(TRANS("[%s] : Haven't destination to teleport!\n"), m_strName);
       }
 
       return;
