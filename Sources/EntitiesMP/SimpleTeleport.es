@@ -37,7 +37,6 @@ properties:
 
   10 BOOL m_bPenCausedAsEntityToTP  "EntityToTP=penCaused" = FALSE,
   11 BOOL m_bPenCausedAsDestination "Destination=penCaused" = FALSE,
-  12 BOOL m_bThisAsDestination      "Destination=this" = FALSE,
    
   25 BOOL m_bForceStop              "Force Stop" 'F' = FALSE,
   26 BOOL m_bKeepOrientation        "Keep Orientation" = FALSE,
@@ -84,13 +83,6 @@ functions:
       penDestination = eTrigger.penCaused;
     }
 
-    BOOL bThis = FALSE;
-
-    if (m_bThisAsDestination) {
-      penDestination = this;
-      bThis = TRUE;
-    }
-
     // If no destination where teleport then stop.
     if (penDestination == NULL) {
       if (m_bDebugMessages) {
@@ -101,7 +93,7 @@ functions:
     }
 
     if (m_bDebugMessages) {
-      if (bThis) {
+      if (penDestination == this) {
         CPrintF(TRANS("[%s] : Teleporting %s to %s location.\n"), m_strName, penEntityToTP->GetName(), penDestination->GetName());
       } else {
         CPrintF(TRANS("[%s] : Teleporting %s to this teleporter.\n"), m_strName, penEntityToTP->GetName());
