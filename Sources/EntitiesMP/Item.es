@@ -55,11 +55,13 @@ properties:
  16 BOOL m_bFloating "Floating" 'F' = FALSE,
  
  // [SSE] Items Expansion
- 30 enum EOscillationType m_eotOscillation "Oscillation Type" = OT_DEFAULT,
+ 30 enum EOscillationType m_eotOscillation "Oscillation Anim. Type" = OT_DEFAULT,
  31 BOOL m_bParticles                      "Particles On" = TRUE,
  32 BOOL m_bFlare                          "Flare On" = TRUE,
  //40 COLOR m_colParticles                   "Particles Color" = COLOR(C_WHITE|CT_OPAQUE),
  //41 COLOR m_colFlare                       "Flare Color" = COLOR(C_WHITE|CT_OPAQUE),
+ 
+ //60 FLOAT m_tmLastPicked = -1.0F,
 
 components:
   1 model   MODEL_ITEM      "Models\\Items\\ItemHolder\\ItemHolder.mdl",
@@ -81,16 +83,20 @@ functions:
       pamo->amo_moModelObject.mo_colBlendColor = colMutiply;
     }
 
-    // if never picked
+    // If never picked then don't bother testing.
     if (m_ulPickedMask == 0) {
-      // don't bother testing
       return;
+    }
+    
+    if (m_bRespawn && !m_bDropped && m_fRespawnTime >= 1.0F) {
+      
     }
 
     BOOL bFlare = TRUE;
 
     // if current player has already picked this item
-    if (_ulPlayerRenderingMask&m_ulPickedMask) {
+    if (_ulPlayerRenderingMask&m_ulPickedMask)
+    {
       // if picked items are not rendered
       extern INDEX plr_bRenderPicked;
       if (!plr_bRenderPicked) {
@@ -186,7 +192,8 @@ functions:
 /************************************************************
  *                      INITALIZATION                       *
  ************************************************************/
-  void Initialize(void) {
+  void Initialize(void)
+  {
     InitAsModel();
     SetFlags(GetFlags()|ENF_SEETHROUGH);
 
@@ -206,8 +213,6 @@ functions:
     SetDesiredTranslation(FLOAT3D(0,0,0));  // just to add to movers
   };
 
-
-
 /************************************************************
  *                   SET MODEL AND ATTACHMENT               *
  ************************************************************/
@@ -219,8 +224,10 @@ functions:
     AddAttachmentToModel(this, *GetModelObject(), ITEMHOLDER_ATTACHMENT_ITEM, ulIDModel, ulIDTexture,
                          ulIDReflectionTexture, ulIDSpecularTexture, ulIDBumpTexture);
   };
+
   void AddItemSpecial(INDEX iAttachmentPos, ULONG ulIDModel, ULONG ulIDTexture,
-               ULONG ulIDReflectionTexture, ULONG ulIDSpecularTexture, ULONG ulIDBumpTexture) {
+               ULONG ulIDReflectionTexture, ULONG ulIDSpecularTexture, ULONG ulIDBumpTexture)
+  {
     AddAttachmentToModel(this, *GetModelObject(), iAttachmentPos, ulIDModel, ulIDTexture,
                          ulIDReflectionTexture, ulIDSpecularTexture, ulIDBumpTexture);
   };
@@ -229,7 +236,8 @@ functions:
   // Add attachment to item.
   // --------------------------------------------------------------------------------------
   void AddItemAttachment(INDEX iAttachment, ULONG ulIDModel, ULONG ulIDTexture,
-                         ULONG ulIDReflectionTexture, ULONG ulIDSpecularTexture, ULONG ulIDBumpTexture) {
+                         ULONG ulIDReflectionTexture, ULONG ulIDSpecularTexture, ULONG ulIDBumpTexture)
+  {
     CModelObject &mo = GetModelObject()->GetAttachmentModel(ITEMHOLDER_ATTACHMENT_ITEM)->amo_moModelObject;
     AddAttachmentToModel(this, mo, iAttachment, ulIDModel, ulIDTexture,
                          ulIDReflectionTexture, ulIDSpecularTexture, ulIDBumpTexture);
@@ -247,10 +255,9 @@ functions:
   }
 
   // --------------------------------------------------------------------------------------
-  // Add flare
+  // Add flare attachment.
   // --------------------------------------------------------------------------------------
-  void AddFlare(ULONG ulIDModel, ULONG ulIDTexture, 
-    const FLOAT3D &vPos, const FLOAT3D &vStretch)
+  void AddFlare(ULONG ulIDModel, ULONG ulIDTexture, const FLOAT3D &vPos, const FLOAT3D &vStretch)
   {
     // add flare to items if not respawn
     if (!m_bRespawn && !m_bDropped && m_bFlare)
@@ -266,7 +273,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Stretch item.
   // --------------------------------------------------------------------------------------
-  void StretchItem(const FLOAT3D &vStretch) {
+  void StretchItem(const FLOAT3D &vStretch)
+  {
     CModelObject &mo = GetModelObject()->GetAttachmentModel(ITEMHOLDER_ATTACHMENT_ITEM)->amo_moModelObject;
     mo.StretchModel(vStretch);
     ModelChangeNotify();
@@ -307,7 +315,8 @@ procedures:
 
     wait() {
       on (EBegin) : { resume; }
-      on (EPass epass) : { 
+      on (EPass epass) :
+      {
         if (!IsOfClass(epass.penOther, "Player")) {
           pass;
         }
@@ -319,11 +328,12 @@ procedures:
 
         call ItemCollected(epass); 
       }
+
       on (EEnd) : { stop; }
     }
 
     // wait for sound to end
-    autowait(m_fPickSoundLen+0.5f);
+    autowait(m_fPickSoundLen + 0.5F);
 
     // cease to exist
     Destroy();
@@ -331,7 +341,9 @@ procedures:
     return;
   };
 
-
+  // --------------------------------------------------------------------------------------
+  // Returns bytes of memory used by this object.
+  // --------------------------------------------------------------------------------------
   ItemReceived(EVoid)
   {
     // hide yourself
