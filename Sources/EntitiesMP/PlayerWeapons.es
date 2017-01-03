@@ -182,6 +182,11 @@ enum WeaponType {
 #define LIGHT_ANIM_NONE 5
 
 // Balance
+#define KNIFE_BACKSTAB_MULTIPLIER 4.0F
+
+#define CHAINSAW_BACKSTAB_ENABLED 1
+#define CHAINSAW_BACKSTAB_MULTIPLIER 2.0F // [SSE] Balance Change. Default=1.0F and no backstab.
+
 #define COLT_DAMAGE 20.0F
 #define COLT_DAMAGE_COOP 10.0F
 #define COLT_MAG_SIZE 6
@@ -2026,23 +2031,29 @@ functions:
         }        
       }
     }
+
     // if any model hit
-    if (penClosest!=NULL) {
+    if (penClosest != NULL)
+    {
       // in deathmatches check for backstab
-      if (!(GetSP()->sp_bCooperative) && IsOfClass(penClosest, "Player")) {
+      if (!(GetSP()->sp_bCooperative) && IsOfClass(penClosest, "Player"))
+      {
         FLOAT3D vToTarget = penClosest->GetPlacement().pl_PositionVector - m_penPlayer->GetPlacement().pl_PositionVector;
         FLOAT3D vTargetHeading = FLOAT3D(0.0, 0.0, -1.0f)*penClosest->GetRotationMatrix();
         vToTarget.Normalize(); vTargetHeading.Normalize();
         if (vToTarget%vTargetHeading>0.64279) //CosFast(50.0f)
         {
-          PrintCenterMessage(this, m_penPlayer, TRANS("Backstab!"), 4.0f, MSS_NONE);
+          PrintCenterMessage(this, m_penPlayer, TRANS("Backstab!"), KNIFE_BACKSTAB_MULTIPLIER, MSS_NONE);
           fDamage *= 4.0f;
         }
       }
+
       const FLOAT fDamageMul = GetSeriousDamageMultiplier(m_penPlayer);
       InflictDirectDamage(penClosest, m_penPlayer, DMT_CLOSERANGE, fDamage*fDamageMul, vHit, vDir);
+
       return TRUE;
     }
+
     return FALSE;
   };
 
@@ -2175,8 +2186,24 @@ functions:
         ((CPlayer&)*m_penPlayer).m_tmChainShakeEnd = _pTimer->CurrentTick() + CHAINSAW_UPDATETIME*1.5f;
       }
     }
+
     // if any model hit
-    if (penClosest!=NULL) {
+    if (penClosest != NULL)
+    { 
+      // in deathmatches check for backstab
+      if (CHAINSAW_BACKSTAB_ENABLED && !(GetSP()->sp_bCooperative) && IsOfClass(penClosest, "Player"))
+      {
+        FLOAT3D vToTarget = penClosest->GetPlacement().pl_PositionVector - m_penPlayer->GetPlacement().pl_PositionVector;
+        FLOAT3D vTargetHeading = FLOAT3D(0.0, 0.0, -1.0f)*penClosest->GetRotationMatrix();
+        vToTarget.Normalize(); vTargetHeading.Normalize();
+
+        if (vToTarget%vTargetHeading > 0.64279) //CosFast(50.0f)
+        {
+          PrintCenterMessage(this, m_penPlayer, TRANS("Backsaw!"), CHAINSAW_BACKSTAB_MULTIPLIER, MSS_NONE);
+          fDamage *= 4.0f;
+        }
+      }
+
       InflictDirectDamage(penClosest, m_penPlayer, DMT_CHAINSAW, fDamage, vHit, vDir);
       return TRUE;
     }
@@ -4492,7 +4519,7 @@ procedures:
     // fire first colt - one bullet less in colt
     GetAnimator()->FireAnimation(BODY_ANIM_COLT_FIRERIGHT, 0);
     FireOneBullet(wpn_fFX[WEAPON_DOUBLECOLT], wpn_fFY[WEAPON_DOUBLECOLT], 500.0f,
-      ((GetSP()->sp_bCooperative) ? DOUBLE_COLT_DAMAGE_COOP : DOUBLE_COLT_DAMAGE );
+      ((GetSP()->sp_bCooperative) ? DOUBLE_COLT_DAMAGE_COOP : DOUBLE_COLT_DAMAGE));
 
     if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Colt_fire");}
     
@@ -4531,7 +4558,9 @@ procedures:
     // fire second colt
     GetAnimator()->FireAnimation(BODY_ANIM_COLT_FIRELEFT, 0);
     m_bMirrorFire = TRUE;
-    FireOneBullet(wpn_fFX[WEAPON_DOUBLECOLT], wpn_fFY[WEAPON_DOUBLECOLT], 500.0f, 10.0f);
+    FireOneBullet(wpn_fFX[WEAPON_DOUBLECOLT], wpn_fFY[WEAPON_DOUBLECOLT], 500.0f,
+      ((GetSP()->sp_bCooperative) ? DOUBLE_COLT_DAMAGE_COOP : DOUBLE_COLT_DAMAGE));
+
     if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Colt_fire");}
 
     /*

@@ -70,19 +70,19 @@ enum BoolEType {
 };
 
 enum EventEType {
-  0 EET_START             "00 Start event",              // start event
-  1 EET_STOP              "01 Stop event",               // stop event
-  2 EET_TRIGGER           "02 Trigger event",            // trigger event
-  3 EET_IGNORE            "03 Don't send event",         // don't send event (ignore)
-  4 EET_ACTIVATE          "04 Activate event",           // activate event
-  5 EET_DEACTIVATE        "05 Deactivate event",         // deactivate event
-  6 EET_ENVIRONMENTSTART  "06 Start environment event",  // start environment event
-  7 EET_ENVIRONMENTSTOP   "07 Stop environment event",   // stop environment event
-  8 EET_STARTATTACK       "08 OBSOLETE! - Start attack event",       // start attack enemy
-  9 EET_STOPATTACK        "09 OBSOLETE! - Stop attack event",        // stop attack enemy
- 10 EET_STOPBLINDNESS     "10 Stop blindness event",       // enemy stop being blind
- 11 EET_STOPDEAFNESS      "11 Stop deafness event",        // enemy stop being deaf
- 12 EET_TELEPORTMOVINGBRUSH "12 Teleport moving brush",    // moving brush teleporting event
+  0 EET_START             "Start event [0]",              // start event
+  1 EET_STOP              "Stop event [1]",               // stop event
+  2 EET_TRIGGER           "Trigger event [2]",            // trigger event
+  3 EET_IGNORE            "Don't send event [3]",         // don't send event (ignore)
+  4 EET_ACTIVATE          "Activate event [4]",           // activate event
+  5 EET_DEACTIVATE        "Deactivate event [5]",         // deactivate event
+  6 EET_ENVIRONMENTSTART  "Start environment event [6]",  // start environment event
+  7 EET_ENVIRONMENTSTOP   "Stop environment event [7]",   // stop environment event
+  8 EET_STARTATTACK       "OBSOLETE! - [8] Start attack event",       // start attack enemy
+  9 EET_STOPATTACK        "OBSOLETE! - [9] Stop attack event",        // stop attack enemy
+ 10 EET_STOPBLINDNESS     "Stop blindness event [10]",       // enemy stop being blind
+ 11 EET_STOPDEAFNESS      "Stop deafness event [11]",        // enemy stop being deaf
+ 12 EET_TELEPORTMOVINGBRUSH "Teleport moving brush [12]",    // moving brush teleporting event
 };
 
 
