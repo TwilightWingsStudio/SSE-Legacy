@@ -186,7 +186,8 @@ enum WeaponType {
 #define COLT_DAMAGE_COOP 10.0F
 #define COLT_MAG_SIZE 6
 
-#define DOUBLE_COLT_DAMAGE 10.0F
+#define DOUBLE_COLT_DAMAGE 17.5F      // [SSE] Balance Change. Default=10.0F
+#define DOUBLE_COLT_DAMAGE_COOP 10.0F
 
 #define SINGLE_SHOTGUN_BULLETS 7
 #define SINGLE_SHOTGUN_DAMAGE 10.0F
@@ -4490,7 +4491,9 @@ procedures:
   {
     // fire first colt - one bullet less in colt
     GetAnimator()->FireAnimation(BODY_ANIM_COLT_FIRERIGHT, 0);
-    FireOneBullet(wpn_fFX[WEAPON_DOUBLECOLT], wpn_fFY[WEAPON_DOUBLECOLT], 500.0f, DOUBLE_COLT_DAMAGE);
+    FireOneBullet(wpn_fFX[WEAPON_DOUBLECOLT], wpn_fFY[WEAPON_DOUBLECOLT], 500.0f,
+      ((GetSP()->sp_bCooperative) ? DOUBLE_COLT_DAMAGE_COOP : DOUBLE_COLT_DAMAGE );
+
     if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Colt_fire");}
     
     /*
