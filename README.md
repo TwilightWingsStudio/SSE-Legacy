@@ -1,12 +1,13 @@
-# Serious Sam Evolution
+# [SSE] - Serious Sam Evolution
+##### Don't confuse with damned Revolution!
 ========================
 
-This is the non-official fork of Serious-Engine.
+This is the unofficial fork of Serious Engine 1.
 This fork will be always synchronized with the official repository - https://github.com/Croteam-official/Serious-Engine.
 
-This fork created for extra features which are focused on improving gameplay stability and adding more opportunities for mapping and modding.
-For some reasons these features not added into Official repository.
-Information about features you can find on our wiki - https://github.com/zcaliptium/Serious-Engine/wiki.
+This fork created for extra features which are focused on improving gameplay stability and adding more opportunities for different kinds of content creation - mapping (with set of new Entities and improved existing ones) and modding (with new functionality added to the engine).
+
+For some reasons these features not added into Official repository. But I wish what in some day my project will become superior than Official.
 
 ========================
 Here is Serious Engine v.1.10 source code, including the following projects:
