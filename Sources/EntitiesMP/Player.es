@@ -2741,6 +2741,27 @@ functions:
       UBYTE ubA = int(sin(_pTimer->CurrentTick()*10.0f)*127+128);
       pdp->PutTextCXY( TRANS("Analyzing..."), pixDPWidth*0.5f, pixDPHeight*0.2f, SE_COL_BLUE_NEUTRAL_LT|ubA);
     }
+    
+    // [SSE] Respawn Sign
+    if (!(GetFlags() & ENF_ALIVE) && !GetSP()->sp_bSinglePlayer) { // If player dead and in MP.
+      pdp->SetFont( _pfdDisplayFont);
+      pdp->SetTextScaling( fScale);
+      pdp->SetTextAspect( 1.0f);
+      
+      if (GetSP()->sp_ctCredits == -1) {
+        pdp->PutTextCXY(TRANS("Press FIRE to respawn!"), pixDPWidth*0.5f, pixDPHeight*0.2f, C_WHITE|255);
+      } else {
+        if (GetSP()->sp_ctCreditsLeft != 0) {
+          CTString strTmp;
+          strTmp.PrintF("%s\n\n%d %s", TRANS("Press FIRE to respawn!"), GetSP()->sp_ctCreditsLeft, TRANS("respawn credit(s) left."));
+
+          pdp->PutTextCXY(strTmp, pixDPWidth*0.5f, pixDPHeight*0.2f, C_WHITE|255);
+        } else {
+          pdp->PutTextCXY(TRANS("You can't respawn - out of credits!"), pixDPWidth*0.5f, pixDPHeight*0.2f, C_WHITE|255);
+        }
+      }
+    }
+    // [SSE] Respawn Sign END
   }
 
   // --------------------------------------------------------------------------------------
@@ -4985,8 +5006,9 @@ functions:
             }
           // if no more credits left
           } else {
-            // report that you cannot respawn
-            CPrintF(TRANS("%s rests in peace - out of credits\n"), GetPlayerName());
+            if (_pNetwork->IsPlayerLocal(this)) { // [SSE] Respawn Sign
+              CPrintF(TRANS("%s rests in peace - out of credits\n"), GetPlayerName()); // report that you cannot respawn
+            }
           }
         }
       }
