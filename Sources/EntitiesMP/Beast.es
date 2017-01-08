@@ -36,6 +36,13 @@ enum BeastType {
   #define BEAST_STRETCH 2.0f
   #define BIG_BEAST_STRETCH 12.0f
   #define HUGE_BEAST_STRETCH 30.0f
+  
+  #define BIG_BEAST_CANNONBALL_RESISTANCE 0.3333F
+  #define HUGE_BEAST_CANNONBALL_RESISTANCE 0.5F    // [SSE] Balance Change. Default=0.3333F
+  
+  #define MELEE_DAMAGE_NORMAL 40.0F
+  #define MELEE_DAMAGE_BIG 80.0F
+  #define MELEE_DAMAGE_HUGE 120.0F
 
   // info structure
   static EntityInfo eiBeastHuge = {
@@ -220,9 +227,13 @@ functions:
     }
 
     // Cannonballs inflict less damage then the default.
-    if (m_bcType == BT_BIG && dmtType == DMT_CANNONBALL)
+    if (dmtType == DMT_CANNONBALL)
     {
-      fDamageAmmount *= 0.3333f;
+      if (m_bcType == BT_BIG) {
+        fDamageAmmount *= BIG_BEAST_CANNONBALL_RESISTANCE;
+      } else if (m_bcType == BT_HUGE) {
+        fDamageAmmount *= HUGE_BEAST_CANNONBALL_RESISTANCE;
+      }
     }
 
     // Can't harm own class.
@@ -568,11 +579,11 @@ procedures:
       FLOAT3D vDirection = m_penEnemy->GetPlacement().pl_PositionVector-GetPlacement().pl_PositionVector;
       vDirection.Normalize();
       if (m_bcType == BT_BIG) {
-        InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, 80.0f, FLOAT3D(0, 0, 0), vDirection);
+        InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, MELEE_DAMAGE_BIG, FLOAT3D(0, 0, 0), vDirection);
       } else if (m_bcType == BT_HUGE) {
-        InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, 120.0f, FLOAT3D(0, 0, 0), vDirection);
+        InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, MELEE_DAMAGE_HUGE, FLOAT3D(0, 0, 0), vDirection);
       } else  {
-        InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, 40.0f, FLOAT3D(0, 0, 0), vDirection);
+        InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, MELEE_DAMAGE_NORMAL, FLOAT3D(0, 0, 0), vDirection);
       }
     }
 
