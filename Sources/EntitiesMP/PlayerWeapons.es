@@ -70,7 +70,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   extern const INDEX aiWeaponsRemap[19] = { 0,  1,  10,  2,  3,  4,  5,  6,  7,
                                             8,  9,  11, 13, 12, 14, 15, 16, 17, 18 };
   //
-  extern INDEX cht_bInfiniteAmmo; // [SSe] Cheats Expansion
+  extern INDEX cht_bInfiniteAmmo; // [SSE] Cheats Expansion
 %}
 
 uses "EntitiesMP/Player";

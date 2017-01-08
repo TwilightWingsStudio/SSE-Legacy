@@ -338,11 +338,12 @@ static INDEX cht_bKillAll      = FALSE;
 static INDEX cht_bKillAllAura  = FALSE; // [SSE] Cheats Expansion
 static INDEX cht_bGiveAll      = FALSE;
 static INDEX cht_bOpen         = FALSE;
+static INDEX cht_bAllKeys      = FALSE; // [SSE] Cheats Expansion
 static INDEX cht_bAllMessages  = FALSE;
 static INDEX cht_bRefresh      = FALSE;
-extern INDEX cht_bRevive       = FALSE; // [SSe] Cheats Expansion
+extern INDEX cht_bRevive       = FALSE; // [SSE] Cheats Expansion
 extern INDEX cht_bGod          = FALSE;
-extern INDEX cht_bInfiniteAmmo = FALSE; // [SSe] Cheats Expansion
+extern INDEX cht_bInfiniteAmmo = FALSE; // [SSE] Cheats Expansion
 extern INDEX cht_bFly          = FALSE;
 extern INDEX cht_bGhost        = FALSE;
 extern INDEX cht_bInvisible    = FALSE;
@@ -835,10 +836,11 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("user INDEX cht_bInvisible;", &cht_bInvisible);
   _pShell->DeclareSymbol("user INDEX cht_bGiveAll;",   &cht_bGiveAll);
   _pShell->DeclareSymbol("user INDEX cht_bKillAll;",   &cht_bKillAll);
-  _pShell->DeclareSymbol("user INDEX cht_bKillAllAura;", &cht_bKillAllAura); // [SSe] Cheats Expansion
-  _pShell->DeclareSymbol("user INDEX cht_bRevive;", &cht_bRevive);           // [SSe] Cheats Expansion
-  _pShell->DeclareSymbol("user INDEX cht_bInfiniteAmmo;", &cht_bInfiniteAmmo);           // [SSe] Cheats Expansion
+  _pShell->DeclareSymbol("user INDEX cht_bKillAllAura;", &cht_bKillAllAura);   // [SSE] Cheats Expansion
+  _pShell->DeclareSymbol("user INDEX cht_bRevive;", &cht_bRevive);             // [SSE] Cheats Expansion
+  _pShell->DeclareSymbol("user INDEX cht_bInfiniteAmmo;", &cht_bInfiniteAmmo); // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bOpen;",      &cht_bOpen);
+  _pShell->DeclareSymbol("user INDEX cht_bAllKeys;", &cht_bAllKeys);           // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bAllMessages;", &cht_bAllMessages);
   _pShell->DeclareSymbol("user FLOAT cht_fTranslationMultiplier ;", &cht_fTranslationMultiplier);
   _pShell->DeclareSymbol("user INDEX cht_bRefresh;", &cht_bRefresh);
@@ -5195,6 +5197,11 @@ functions:
     if (cht_bAllMessages) {
       cht_bAllMessages = FALSE;
       CheatAllMessages();
+    }
+    
+    if (cht_bAllKeys) {
+      cht_bAllKeys = FALSE;
+      m_ulKeys = 0xFFFFFFFF;
     }
     
     if (cht_bRefresh) {
