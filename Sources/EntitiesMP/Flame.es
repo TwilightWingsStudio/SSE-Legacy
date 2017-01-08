@@ -15,37 +15,39 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 504
 %{
-#include "StdH.h"
-#define TM_APPLY_DAMAGE_QUANTUM 0.25f
-#define TM_APPLY_WHOLE_DAMAGE 7.5f
-#define DAMAGE_AMMOUNT 30.0f
-#define MIN_DAMAGE_QUANTUM (DAMAGE_AMMOUNT/TM_APPLY_WHOLE_DAMAGE*TM_APPLY_DAMAGE_QUANTUM)
-#define MAX_DAMAGE_QUANTUM (MIN_DAMAGE_QUANTUM*10.0f)
-#define DEATH_BURN_TIME 4.0f
+  #include "StdH.h"
+  #define TM_APPLY_DAMAGE_QUANTUM 0.25f
+  #define TM_APPLY_WHOLE_DAMAGE 7.5f
+  #define DAMAGE_AMMOUNT 30.0f
+  
+  // Values bellow Used only for particles rendering.
+  #define MIN_DAMAGE_QUANTUM (DAMAGE_AMMOUNT/TM_APPLY_WHOLE_DAMAGE*TM_APPLY_DAMAGE_QUANTUM)
+  #define MAX_DAMAGE_QUANTUM (MIN_DAMAGE_QUANTUM*10.0f)
+  #define DEATH_BURN_TIME 4.0f
 
-#include "EntitiesMP/MovingBrush.h"
+  #include "EntitiesMP/MovingBrush.h"
 %}
 
 uses "EntitiesMP/Light";
 
-// input parameter for flame
+// Input parameter for flame.
 event EFlame {
-  CEntityPointer penOwner,        // entity which owns it
-  CEntityPointer penAttach,       // entity on which flame is attached (his parent)
+  CEntityPointer penOwner,  // Entity which owns it.
+  CEntityPointer penAttach, // Entity on which flame is attached (his parent).
 };
 
-// event for stop burning
+// Event for stop burning.
 event EStopFlaming {
   BOOL m_bNow,
 };
 
 %{
-void CFlame_OnPrecache(CDLLEntityClass *pdec, INDEX iUser) 
-{
-  pdec->PrecacheModel(MODEL_FLAME);
-  pdec->PrecacheTexture(TEXTURE_FLAME);
-  pdec->PrecacheSound(SOUND_FLAME);
-}
+  void CFlame_OnPrecache(CDLLEntityClass *pdec, INDEX iUser) 
+  {
+    pdec->PrecacheModel(MODEL_FLAME);
+    pdec->PrecacheTexture(TEXTURE_FLAME);
+    pdec->PrecacheSound(SOUND_FLAME);
+  }
 %}
 
 class CFlame : CMovableModelEntity {
@@ -85,7 +87,6 @@ properties:
 
 {
   CLightSource m_lsLightSource;
-
 }
 
 components:
@@ -97,18 +98,24 @@ components:
  12 sound   SOUND_FLAME         "SoundsMP\\Fire\\Burning.wav",
 
 functions:
-  // add to prediction any entities that this entity depends on
+  // --------------------------------------------------------------------------------------
+  // Add to prediction any entities that this entity depends on
+  // --------------------------------------------------------------------------------------
   void AddDependentsToPrediction(void)
   {
     m_penOwner->AddToPrediction();
   }
-  // postmoving
-  void PostMoving(void) {
+
+  // --------------------------------------------------------------------------------------
+  // Called every tick after processing entity movement.
+  // --------------------------------------------------------------------------------------
+  void PostMoving(void)
+  {
     CMovableModelEntity::PostMoving();
 
-    // if no air
     CContentType &ctDn = GetWorld()->wo_actContentTypes[en_iDnContent];
-    // stop existing
+
+    // If no air then stop existing.
     if (!(ctDn.ct_ulFlags&CTF_BREATHABLE_LUNGS)) {
       EStopFlaming esf;
       esf.m_bNow = TRUE;
@@ -117,26 +124,34 @@ functions:
 
     // never remove from list of movers
     en_ulFlags &= ~ENF_INRENDERING;
+
     // not moving in fact, only moving with its parent
     en_plLastPlacement = en_plPlacement;
   };
 
+  // --------------------------------------------------------------------------------------
   /* Read from stream. */
+  // --------------------------------------------------------------------------------------
   void Read_t( CTStream *istr) // throw char *
   {
     CMovableModelEntity::Read_t(istr);
     SetupLightSource();
   }
 
+  // --------------------------------------------------------------------------------------
+  // Returns TRUE if point inside of polygon.
+  // --------------------------------------------------------------------------------------
   BOOL IsPointInsidePolygon(const FLOAT3D &vPos, CBrushPolygon *pbpo)
   {
     FLOATplane3D &plPlane=pbpo->bpo_pbplPlane->bpl_plAbsolute;
+
     // find major axes of the polygon plane
     INDEX iMajorAxis1, iMajorAxis2;
     GetMajorAxesForPlane(plPlane, iMajorAxis1, iMajorAxis2);
 
     // create an intersector
     CIntersector isIntersector(vPos(iMajorAxis1), vPos(iMajorAxis2));
+
     // for all edges in the polygon
     FOREACHINSTATICARRAY(pbpo->bpo_abpePolygonEdges, CBrushPolygonEdge, itbpePolygonEdge) {
       // get edge vertices (edge direction is irrelevant here!)
@@ -147,11 +162,14 @@ functions:
         vVertex0(iMajorAxis1), vVertex0(iMajorAxis2),
         vVertex1(iMajorAxis1), vVertex1(iMajorAxis2));
     }
+
     // return result of polygon intersection
     return isIntersector.IsIntersecting();
   }
 
+  // --------------------------------------------------------------------------------------
   /* Get static light source information. */
+  // --------------------------------------------------------------------------------------
   CLightSource *GetLightSource(void)
   {
     if (!IsPredictor()) {
@@ -161,39 +179,44 @@ functions:
     }
   }
 
-  // render particles
+  // --------------------------------------------------------------------------------------
+  // Renders particles.
+  // --------------------------------------------------------------------------------------
   void RenderParticles(void)
   {
-    FLOAT fTimeFactor=CalculateRatio(_pTimer->CurrentTick(), m_tmFirstStart, m_tmStart+TM_APPLY_WHOLE_DAMAGE, 0.05f, 0.2f);
-    FLOAT fDeathFactor=1.0f;
-    if( _pTimer->CurrentTick()>m_tmDeathParticlesStart)
-    {
-      fDeathFactor=1.0f-Clamp((_pTimer->CurrentTick()-m_tmDeathParticlesStart)/DEATH_BURN_TIME, 0.0f, 1.0f);
+    FLOAT fTimeFactor = CalculateRatio(_pTimer->CurrentTick(), m_tmFirstStart, m_tmStart+TM_APPLY_WHOLE_DAMAGE, 0.05f, 0.2f);
+    FLOAT fDeathFactor = 1.0f;
+
+    if (_pTimer->CurrentTick() > m_tmDeathParticlesStart) {
+      fDeathFactor = 1.0f-Clamp((_pTimer->CurrentTick() - m_tmDeathParticlesStart)/DEATH_BURN_TIME, 0.0f, 1.0f);
     }
-    CEntity *penParent= GetParent();
-    FLOAT fPower=ClampUp(m_fDamageStep-MIN_DAMAGE_QUANTUM, MAX_DAMAGE_QUANTUM)/MAX_DAMAGE_QUANTUM;
-    if( penParent!= NULL)
+
+    CEntity *penParent = GetParent();
+    FLOAT fPower = ClampUp(m_fDamageStep-MIN_DAMAGE_QUANTUM, MAX_DAMAGE_QUANTUM)/MAX_DAMAGE_QUANTUM;
+
+    if (penParent != NULL)
     {
-      if( (penParent->en_RenderType==CEntity::RT_MODEL || penParent->en_RenderType==CEntity::RT_EDITORMODEL ||
-           penParent->en_RenderType==CEntity::RT_SKAMODEL || penParent->en_RenderType==CEntity::RT_SKAEDITORMODEL) &&
-          (Particle_GetViewer()!=penParent) )
+      if ((penParent->en_RenderType == CEntity::RT_MODEL || penParent->en_RenderType == CEntity::RT_EDITORMODEL ||
+           penParent->en_RenderType == CEntity::RT_SKAMODEL || penParent->en_RenderType == CEntity::RT_SKAEDITORMODEL) &&
+          (Particle_GetViewer() != penParent) )
       {
         Particles_Burning(penParent, fPower, fTimeFactor*fDeathFactor);
-      }
-      else
-      {
+      } else {
         Particles_BrushBurning(this, &m_vPos01, m_ctFlames, m_vPlaneNormal, fPower, fTimeFactor*fDeathFactor);
       }
     }
   }
 
-  // Setup light source
+  // --------------------------------------------------------------------------------------
+  // Setups the light source.
+  // --------------------------------------------------------------------------------------
   void SetupLightSource(void)
   {
     // setup light source
     CLightSource lsNew;
     lsNew.ls_ulFlags = LSF_NONPERSISTENT|LSF_DYNAMIC;
-    if(m_bBurningBrush)
+
+    if (m_bBurningBrush)
     {
       UBYTE ubRndH = UBYTE( 25+(FLOAT(rand())/RAND_MAX-0.5f)*28);
       UBYTE ubRndS = 166;
@@ -202,13 +225,12 @@ functions:
       //lsNew.ls_colColor = 0x3F3F1600;
       lsNew.ls_rFallOff = 4.0f;
       lsNew.ls_rHotSpot = 0.2f;
-    }
-    else
-    {
+    } else {
       lsNew.ls_colColor = 0x8F8F5000;
       lsNew.ls_rFallOff = 6.0f;
       lsNew.ls_rHotSpot = 0.50f;
     }
+
     lsNew.ls_plftLensFlare = NULL;
     lsNew.ls_ubPolygonalMask = 0;
     lsNew.ls_paoLightAnimation = NULL;
@@ -221,17 +243,21 @@ functions:
  *                   P R O C E D U R E S                    *
  ************************************************************/
 procedures:
-  // --->>> MAIN
-  Main(EFlame ef) {
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
+  Main(EFlame ef)
+  {
     // attach to parent (another entity)
-    ASSERT(ef.penOwner!=NULL);
-    ASSERT(ef.penAttach!=NULL);
+    ASSERT(ef.penOwner != NULL);
+    ASSERT(ef.penAttach != NULL);
     m_penOwner = ef.penOwner;
     m_penAttach = ef.penAttach;
 
     m_tmStart = _pTimer->CurrentTick();
     m_tmFirstStart=m_tmStart;
     SetParent(ef.penAttach);
+
     // initialization
     InitAsEditorModel();
     SetPhysicsFlags(EPF_MODEL_FLYING);
@@ -249,13 +275,14 @@ procedures:
     // must always be in movers, to find sector content type
     AddToMovers();
 
-    m_bBurningBrush=FALSE;
-    BOOL bAllowFlame=TRUE;
-    if( !(ef.penAttach->en_RenderType==CEntity::RT_MODEL || ef.penAttach->en_RenderType==CEntity::RT_EDITORMODEL ||
-          ef.penAttach->en_RenderType==CEntity::RT_SKAMODEL || ef.penAttach->en_RenderType==CEntity::RT_SKAEDITORMODEL ))
+    m_bBurningBrush = FALSE;
+    BOOL bAllowFlame = TRUE;
+
+    if (!(ef.penAttach->en_RenderType == CEntity::RT_MODEL || ef.penAttach->en_RenderType == CEntity::RT_EDITORMODEL ||
+          ef.penAttach->en_RenderType == CEntity::RT_SKAMODEL || ef.penAttach->en_RenderType == CEntity::RT_SKAEDITORMODEL ))
     {
       m_bBurningBrush=TRUE;
-      FLOAT3D vPos=GetPlacement().pl_PositionVector;
+      FLOAT3D vPos = GetPlacement().pl_PositionVector;
       FLOATplane3D plPlane;
       FLOAT fDistanceToEdge;
       FindSectorsAroundEntity();
@@ -263,21 +290,22 @@ procedures:
       pbpo=GetNearestPolygon(vPos, plPlane, fDistanceToEdge);
       FLOAT3D vBrushPos = ef.penAttach->GetPlacement().pl_PositionVector;
       FLOATmatrix3D mBrushRotInv = !ef.penAttach->GetRotationMatrix();
-      if( pbpo!=NULL && pbpo->bpo_pbscSector->bsc_pbmBrushMip->bm_pbrBrush->br_penEntity==ef.penAttach)
+
+      if (pbpo != NULL && pbpo->bpo_pbscSector->bsc_pbmBrushMip->bm_pbrBrush->br_penEntity==ef.penAttach)
       {
         plPlane = pbpo->bpo_pbplPlane->bpl_plAbsolute;
         m_vPlaneNormal=(FLOAT3D &)plPlane;
         m_vPlaneNormal.Normalize();
+
         // ------ Calculate plane-paralel normal vectors
         FLOAT3D vU, vV;
         //CPrintF("plPlane %g\n", plPlane(2));
-        if(plPlane(2)<-0.1f)
-        {
-          bAllowFlame=FALSE;
+        if (plPlane(2) < -0.1f) {
+          bAllowFlame = FALSE;
         }
 
         // if the plane is mostly horizontal
-        if (Abs(plPlane(2))>0.5) {
+        if (Abs(plPlane(2)) > 0.5) {
           // use cross product of +x axis and plane normal as +s axis
           vU = FLOAT3D(1.0f, 0.0f, 0.0f)*m_vPlaneNormal;
         // if the plane is mostly vertical
@@ -285,94 +313,108 @@ procedures:
           // use cross product of +y axis and plane normal as +s axis
           vU = FLOAT3D(0.0f, 1.0f, 0.0f)*m_vPlaneNormal;
         }
+
         // make +s axis normalized
         vU.Normalize();
+
         // use cross product of plane normal and +s axis as +t axis
         vV = vU*m_vPlaneNormal;
         vV.Normalize();
 
         // counter of valid flames
-        m_ctFlames=0;
-        for(INDEX iTest=0; iTest<20; iTest++)
+        m_ctFlames = 0;
+        
+        for(INDEX iTest = 0; iTest < 20; iTest++)
         {
           FLOAT fA=FRnd()*360.0f;
           FLOAT fR=FRnd()*2.0f;
-          FLOAT3D vRndV=vV*fR*SinFast(fA);
-          FLOAT3D vRndU=vU*fR*CosFast(fA);
-          FLOAT3D vRndPos=vPos;
-          if( iTest!=0)
-          {
-            vRndPos+=vRndV+vRndU;
+          FLOAT3D vRndV = vV*fR*SinFast(fA);
+          FLOAT3D vRndU = vU*fR*CosFast(fA);
+          FLOAT3D vRndPos = vPos;
+
+          if (iTest != 0) {
+            vRndPos += vRndV+vRndU;
           }
+
           // project point to a plane
           FLOAT3D vProjectedRndPos=plPlane.ProjectPoint(vRndPos);
-          if( IsPointInsidePolygon(vProjectedRndPos, pbpo))
+          if (IsPointInsidePolygon(vProjectedRndPos, pbpo))
           {
-            (&m_vPos01)[ m_ctFlames]=(vProjectedRndPos-vBrushPos)*mBrushRotInv;
+            (&m_vPos01)[m_ctFlames] = (vProjectedRndPos - vBrushPos)*mBrushRotInv;
             m_ctFlames++;
-            if( m_ctFlames==6) { break; };
+            if (m_ctFlames == 6) { break; };
           }
         }
-      }
-      else
-      {
+      } else {
         bAllowFlame=FALSE;
       }
     }
+
     // setup light source
-    if( bAllowFlame)
-    {
+    if (bAllowFlame) {
       SetupLightSource();
     }
 
     m_bLoop = bAllowFlame;
-    while(m_bLoop) {
-      wait(TM_APPLY_DAMAGE_QUANTUM) {
+
+    while (m_bLoop)
+    {
+      wait(TM_APPLY_DAMAGE_QUANTUM)
+      {
         // damage to parent
-        on (EBegin) : {
-          // if parent does not exist anymore
-          if (m_penAttach==NULL || (m_penAttach->GetFlags()&ENF_DELETED)) {
-            // stop existing
+        on (EBegin) :
+        {
+          // if parent does not exist anymore then stop existing.
+          if (m_penAttach == NULL || (m_penAttach->GetFlags()&ENF_DELETED)) {
             m_bLoop = FALSE;
             stop;
           }
+
           // inflict damage to parent
           const FLOAT fDamageMul = GetSeriousDamageMultiplier(m_penOwner);
-          FLOAT fDamageToApply=fDamageMul*(m_fDamageToApply/TM_APPLY_WHOLE_DAMAGE*TM_APPLY_DAMAGE_QUANTUM)*m_fDamageStep;
+          FLOAT fDamageToApply = fDamageMul*(m_fDamageToApply/TM_APPLY_WHOLE_DAMAGE*TM_APPLY_DAMAGE_QUANTUM)*m_fDamageStep;
           m_penAttach->InflictDirectDamage( m_penAttach, m_penOwner, DMT_BURNING, fDamageToApply,
                                             GetPlacement().pl_PositionVector, -en_vGravityDir);
-          m_fAppliedDamage+=fDamageToApply;
+          m_fAppliedDamage += fDamageToApply;
+
           resume;
         }
-        on (EFlame ef) : {
+
+        on (EFlame ef) :
+        {
           m_penOwner = ef.penOwner;
           FLOAT fTimeLeft=m_tmStart+TM_APPLY_WHOLE_DAMAGE-_pTimer->CurrentTick();
           FLOAT fDamageLeft=(fTimeLeft/TM_APPLY_DAMAGE_QUANTUM)*m_fDamageStep;
           m_fDamageToApply=ClampUp(fDamageLeft+DAMAGE_AMMOUNT, 80.0f);
           m_tmStart=_pTimer->CurrentTick();
           m_fDamageStep=m_fDamageToApply/(TM_APPLY_WHOLE_DAMAGE/TM_APPLY_DAMAGE_QUANTUM);
+
           resume;
         };
-        on (EStopFlaming esf) : {
-          if( !esf.m_bNow)
-          {
-            m_tmDeathParticlesStart=_pTimer->CurrentTick();
+
+        on (EStopFlaming esf) :
+        {
+          if (!esf.m_bNow) {
+            m_tmDeathParticlesStart = _pTimer->CurrentTick();
             resume;
-          }
-          else
-          {
+          } else {
             m_bLoop = FALSE;
             stop;
           }
         };
+
         on (EBrushDestroyed) : { 
           m_bLoop = FALSE;
           stop;
         };
-        on (ETimer) : { stop; }
+
+        on (ETimer) : {
+          stop;
+        }
       }
-      if(_pTimer->CurrentTick()>m_tmStart+TM_APPLY_WHOLE_DAMAGE)
-      {
+
+      // If it is time to choke a fire then do it.
+      if (_pTimer->CurrentTick() > m_tmStart + TM_APPLY_WHOLE_DAMAGE) {
         m_bLoop = FALSE;
       }
     }
