@@ -333,18 +333,19 @@ struct PlayerControls {
 static struct PlayerControls pctlCurrent;
 
 // Cheats
-static INDEX cht_iGoToMarker  = -1;
-static INDEX cht_bKillAll     = FALSE;
-static INDEX cht_bKillAllAura = FALSE; // [SSE]
-static INDEX cht_bGiveAll     = FALSE;
-static INDEX cht_bOpen        = FALSE;
-static INDEX cht_bAllMessages = FALSE;
-static INDEX cht_bRefresh     = FALSE;
-extern INDEX cht_bRevive      = FALSE; // [SSe]
-extern INDEX cht_bGod         = FALSE;
-extern INDEX cht_bFly         = FALSE;
-extern INDEX cht_bGhost       = FALSE;
-extern INDEX cht_bInvisible   = FALSE;
+static INDEX cht_iGoToMarker   = -1;
+static INDEX cht_bKillAll      = FALSE;
+static INDEX cht_bKillAllAura  = FALSE; // [SSE] Cheats Expansion
+static INDEX cht_bGiveAll      = FALSE;
+static INDEX cht_bOpen         = FALSE;
+static INDEX cht_bAllMessages  = FALSE;
+static INDEX cht_bRefresh      = FALSE;
+extern INDEX cht_bRevive       = FALSE; // [SSe] Cheats Expansion
+extern INDEX cht_bGod          = FALSE;
+extern INDEX cht_bInfiniteAmmo = FALSE; // [SSe] Cheats Expansion
+extern INDEX cht_bFly          = FALSE;
+extern INDEX cht_bGhost        = FALSE;
+extern INDEX cht_bInvisible    = FALSE;
 extern FLOAT cht_fTranslationMultiplier = 1.0f;
 extern INDEX cht_bEnable     = 0;   
 
@@ -834,8 +835,9 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("user INDEX cht_bInvisible;", &cht_bInvisible);
   _pShell->DeclareSymbol("user INDEX cht_bGiveAll;",   &cht_bGiveAll);
   _pShell->DeclareSymbol("user INDEX cht_bKillAll;",   &cht_bKillAll);
-  _pShell->DeclareSymbol("user INDEX cht_bKillAllAura;", &cht_bKillAllAura);
-  _pShell->DeclareSymbol("user INDEX cht_bRevive;", &cht_bRevive);
+  _pShell->DeclareSymbol("user INDEX cht_bKillAllAura;", &cht_bKillAllAura); // [SSe] Cheats Expansion
+  _pShell->DeclareSymbol("user INDEX cht_bRevive;", &cht_bRevive);           // [SSe] Cheats Expansion
+  _pShell->DeclareSymbol("user INDEX cht_bInfiniteAmmo;", &cht_bInfiniteAmmo);           // [SSe] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bOpen;",      &cht_bOpen);
   _pShell->DeclareSymbol("user INDEX cht_bAllMessages;", &cht_bAllMessages);
   _pShell->DeclareSymbol("user FLOAT cht_fTranslationMultiplier ;", &cht_fTranslationMultiplier);
@@ -5135,7 +5137,7 @@ functions:
   // --------------------------------------------------------------------------------------
   BOOL CheatsEnabled(void)
   {
-    return (GetSP()->sp_ctMaxPlayers==1||GetSP()->sp_bQuickTest) && m_penActionMarker==NULL && !_SE_DEMO;
+    return (GetSP()->sp_ctMaxPlayers == 1 || GetSP()->sp_bQuickTest) && m_penActionMarker == NULL && !_SE_DEMO;
   }
 
   // --------------------------------------------------------------------------------------
@@ -7315,6 +7317,7 @@ procedures:
         if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
           iScore *= ((CPlayerSettingsEntity&)*m_penSettings).m_fScoreReceiveMul;
         }
+        //
 
         m_psLevelStats.ps_iScore += iScore;
         m_psGameStats.ps_iScore += iScore;

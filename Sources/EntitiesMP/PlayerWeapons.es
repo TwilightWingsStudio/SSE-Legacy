@@ -69,7 +69,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
   extern const INDEX aiWeaponsRemap[19] = { 0,  1,  10,  2,  3,  4,  5,  6,  7,
                                             8,  9,  11, 13, 12, 14, 15, 16, 17, 18 };
-
+  //
+  extern INDEX cht_bInfiniteAmmo; // [SSe] Cheats Expansion
 %}
 
 uses "EntitiesMP/Player";
@@ -554,16 +555,25 @@ static FLOAT afMinigunPipe3rdView[3] = { 0.25f, 0.3f, -2.5f};
 #define F_OFFSET_CHG m_aMiniGunLast
 #define F_TEMP m_aMiniGunSpeed
 
-// decrement ammo taking infinite ammo options in account
-void DecAmmo(INDEX &ctAmmo, INDEX iDec = 1)
-{
-  // Do nothing if infinite ammo!
-  if (GetSP()->sp_bInfiniteAmmo) {
-    return;
+  // decrement ammo taking infinite ammo options in account
+  void DecAmmo(INDEX &ctAmmo, INDEX iDec = 1)
+  {
+    // Do nothing if infinite ammo!
+    if (GetSP()->sp_bInfiniteAmmo) {
+      return;
+    } else {
+      // [SSE] Cheats Expansion
+      if (cht_bInfiniteAmmo) {
+        if (GetSP()->sp_ctMaxPlayers == 1 || GetSP()->sp_bQuickTest) {
+          return;
+        } else {
+          cht_bInfiniteAmmo = FALSE; // Disable dat shit!
+        }
+      }
+    }
+    
+    ctAmmo -= iDec;
   }
-  
-  ctAmmo -= iDec;
-}
 %}
 
 class export CPlayerWeapons : CRationalEntity {
