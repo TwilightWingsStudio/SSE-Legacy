@@ -53,6 +53,7 @@ properties:
  20 BOOL  m_bKamikazeAttached = FALSE,
 
 components:
+
   0 class   CLASS_BASE        "Classes\\EnemyFly.ecl",
   1 model   MODEL_WOMAN       "ModelsMP\\Enemies\\Woman\\Woman.mdl",
   2 texture TEXTURE_WOMAN     "Models\\Enemies\\Woman\\Woman.tex",
@@ -72,6 +73,7 @@ components:
  55 sound   SOUND_DEATH     "Models\\Enemies\\Woman\\Sounds\\Death.wav",
 
 functions:
+
   // --------------------------------------------------------------------------------------
   // Precache entity components.
   // --------------------------------------------------------------------------------------
@@ -126,7 +128,7 @@ functions:
   };
 
   // --------------------------------------------------------------------------------------
-  /* Receive damage */
+  // Receive damage.
   // --------------------------------------------------------------------------------------
   void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
     FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection) 
@@ -244,28 +246,34 @@ functions:
     return(GetModelObject()->GetAnimLength(WOMAN_ANIM_GROUNDTOAIR));
   };
 
-  void ChangeCollisionToAir() {
+  void ChangeCollisionToAir()
+  {
     ChangeCollisionBoxIndexWhenPossible(WOMAN_COLLISION_BOX_AIR);
   };
 
-  void ChangeCollisionToGround() {
+  void ChangeCollisionToGround()
+  {
     ChangeCollisionBoxIndexWhenPossible(WOMAN_COLLISION_BOX_GROUND);
   };
 
   // virtual sound functions
-  void IdleSound(void) {
+  void IdleSound(void)
+  {
     PlaySound(m_soSound, SOUND_IDLE, SOF_3D);
   };
 
-  void SightSound(void) {
+  void SightSound(void)
+  {
     PlaySound(m_soSound, SOUND_SIGHT, SOF_3D);
   };
 
-  void WoundSound(void) {
+  void WoundSound(void)
+  {
     PlaySound(m_soSound, SOUND_WOUND, SOF_3D);
   };
 
-  void DeathSound(void) {
+  void DeathSound(void)
+  {
     PlaySound(m_soSound, SOUND_DEATH, SOF_3D);
   };
   
@@ -514,7 +522,7 @@ procedures:
   // --------------------------------------------------------------------------------------
   Main(EVoid)
   {
-    // declare yourself as a model
+    // Declare yourself as a model.
     InitAsModel();
     SetPhysicsFlags(EPF_MODEL_WALKING|EPF_HASLUNGS);
     SetCollisionFlags(ECF_MODEL);
@@ -526,11 +534,11 @@ procedures:
     
     m_sptType = SPT_FEATHER;
 
-    // set your appearance
+    // Set your appearance.
     SetModel(MODEL_WOMAN);
     SetModelMainTexture(TEXTURE_WOMAN);
 
-    // setup moving speed
+    // Setup moving speed.
     m_fWalkSpeed = FRnd() + 1.5f;
     m_aWalkRotateSpeed = FRnd()*10.0f + 25.0f;
     m_fAttackRunSpeed = FRnd()*2.0f + 9.0f;
@@ -538,7 +546,7 @@ procedures:
     m_fCloseRunSpeed = FRnd()*2.0f + 4.0f;
     m_aCloseRotateSpeed = FRnd()*50 + 245.0f;
 
-    // setup attack distances
+    // Setup attack distances.
     m_fAttackDistance = 50.0f;
     m_fCloseDistance = 5.0f;
     m_fStopDistance = 0.0f;
@@ -546,7 +554,7 @@ procedures:
     m_fCloseFireTime = 2.0f;
     m_fIgnoreRange = 200.0f;
 
-    // fly moving properties
+    // Fly moving properties.
     m_fFlyWalkSpeed = FRnd()/2 + 1.0f;
     m_aFlyWalkRotateSpeed = FRnd()*10.0f + 25.0f;
     m_fFlyAttackRunSpeed = FRnd()*2.0f + 10.0f;
@@ -558,7 +566,7 @@ procedures:
     m_fAirToGroundMin = 0.1f;
     m_fAirToGroundMax = 0.1f;
 
-    // attack properties - CAN BE SET
+    // Attack properties - CAN BE SET.
     m_fFlyAttackDistance = 50.0f;
     m_fFlyCloseDistance = 12.5f;
     m_fFlyStopDistance = 0.0f;
@@ -566,7 +574,7 @@ procedures:
     m_fFlyCloseFireTime = 2.0f;
     m_fFlyIgnoreRange = 200.0f;
 
-    // damage/explode properties
+    // Damage/Explode properties.
     m_fBlowUpAmount = 100.0f;
     m_fBodyParts = 4;
     m_fDamageWounded = 20.0f;
@@ -578,7 +586,7 @@ procedures:
 
     autowait(0.05f);
 
-    // continue behavior in base class
+    // Continue behavior in base class.
     jump CEnemyFly::MainLoop();
   };
 };

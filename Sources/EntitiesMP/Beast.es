@@ -67,6 +67,7 @@ properties:
   //3 BOOL m_bBeBoss  "Boss" 'B' = FALSE, // Don not use property with ID 3 in CBeast!
 
 components:
+
   0 class   CLASS_BASE          "Classes\\EnemyBase.ecl",
   1 class   CLASS_PROJECTILE    "Classes\\Projectile.ecl",
   2 class   CLASS_BASIC_EFFECT  "Classes\\BasicEffect.ecl",
@@ -87,6 +88,33 @@ components:
  57 sound   SOUND_ANGER     "Models\\Enemies\\Beast\\Sounds\\Anger.wav",
 
 functions:
+
+  // --------------------------------------------------------------------------------------
+  // Precache entity components.
+  // --------------------------------------------------------------------------------------
+  void Precache(void)
+  {
+    CEnemyBase::Precache();
+    PrecacheSound(SOUND_IDLE );
+    PrecacheSound(SOUND_SIGHT);
+    PrecacheSound(SOUND_WOUND);
+    PrecacheSound(SOUND_ANGER);
+    PrecacheSound(SOUND_FIRE);
+    PrecacheSound(SOUND_KICK);
+
+    PrecacheModel(MODEL_BEAST);
+    PrecacheTexture(TEXTURE_BEAST_NORMAL);
+    PrecacheTexture(TEXTURE_BEAST_BIG);
+
+    if (m_bcType == BT_NORMAL) {
+      PrecacheSound(SOUND_DEATH);
+      PrecacheClass(CLASS_PROJECTILE, PRT_BEAST_PROJECTILE);
+    } else {
+      PrecacheSound(SOUND_DEATHBIG);
+      PrecacheClass(CLASS_PROJECTILE, PRT_BEAST_BIG_PROJECTILE);
+    }
+  };
+
   // --------------------------------------------------------------------------------------
   // Describe how this enemy killed player.
   // --------------------------------------------------------------------------------------
@@ -114,32 +142,8 @@ functions:
       case BT_HUGE: return fnmHuge;
       default: ASSERT(FALSE);
     }
-  };
-
-  // --------------------------------------------------------------------------------------
-  // Precache entity components.
-  // --------------------------------------------------------------------------------------
-  void Precache(void)
-  {
-    CEnemyBase::Precache();
-    PrecacheSound(SOUND_IDLE );
-    PrecacheSound(SOUND_SIGHT);
-    PrecacheSound(SOUND_WOUND);
-    PrecacheSound(SOUND_ANGER);
-    PrecacheSound(SOUND_FIRE);
-    PrecacheSound(SOUND_KICK);
-
-    PrecacheModel(MODEL_BEAST);
-    PrecacheTexture(TEXTURE_BEAST_NORMAL);
-    PrecacheTexture(TEXTURE_BEAST_BIG);
-
-    if (m_bcType == BT_NORMAL) {
-      PrecacheSound(SOUND_DEATH);
-      PrecacheClass(CLASS_PROJECTILE, PRT_BEAST_PROJECTILE);
-    } else {
-      PrecacheSound(SOUND_DEATHBIG);
-      PrecacheClass(CLASS_PROJECTILE, PRT_BEAST_BIG_PROJECTILE);
-    }
+    
+    return fnmNormal;
   };
 
   // --------------------------------------------------------------------------------------
@@ -209,19 +213,19 @@ functions:
   void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
     FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection) 
   {
-    // take less damage from heavy bullets (e.g. sniper)
+    // Take less damage from heavy bullets (e.g. sniper).
     if (dmtType == DMT_BULLET && fDamageAmmount > 100.0f)
     {
       fDamageAmmount *= 0.5f;
     }
 
-    // cannonballs inflict less damage then the default
+    // Cannonballs inflict less damage then the default.
     if (m_bcType == BT_BIG && dmtType == DMT_CANNONBALL)
     {
       fDamageAmmount *= 0.3333f;
     }
 
-    // can't harm own class
+    // Can't harm own class.
     if (!IsOfClass(penInflictor, "Beast")) {
       CEnemyBase::ReceiveDamage(penInflictor, dmtType, fDamageAmmount, vHitPoint, vDirection);
     }
@@ -603,13 +607,13 @@ procedures:
     SetModel(MODEL_BEAST);
     StandingAnim();
 
-    // setup moving speed
+    // Setup moving speed.
     m_fWalkSpeed = FRnd()*2 + 5.0f;
     m_aWalkRotateSpeed = AngleDeg(FRnd()*20.0f + 50.0f);
     m_fCloseRunSpeed = FRnd() + 10.0f;
     m_aCloseRotateSpeed = AngleDeg(FRnd()*100 + 900.0f);
 
-    // setup attack distances
+    // Setup attack distances.
     m_fAttackDistance = 500.0f;
     m_fCloseDistance = 0.0f;
     m_fStopDistance = 0.0f;
@@ -619,7 +623,7 @@ procedures:
     m_fCloseDistance = 7.0f;
     m_tmGiveUp = Max(m_tmGiveUp, 10.0f);
 
-    // damage/explode properties
+    // Damage/Explode properties.
     if (m_bcType == BT_NORMAL)
     {
       m_fAttackRunSpeed = 6.0f;//6
@@ -629,7 +633,7 @@ procedures:
       m_fBlowUpAmount = 10000.0f;
       m_fBodyParts = 4;
       m_fDamageWounded = 250.0f;
-      m_iScore = 5000;//500
+      m_iScore = 5000; // 500
 
       // set stretch factor
       GetModelObject()->StretchModel(FLOAT3D(BEAST_STRETCH, BEAST_STRETCH, BEAST_STRETCH));
@@ -640,16 +644,16 @@ procedures:
     } else if (m_bcType == BT_BIG) {
       m_fAttackRunSpeed = 25.0f;//8
       m_aAttackRotateSpeed = AngleDeg(600.0f);
-      SetHealth(3000.0f);//500
+      SetHealth(3000.0f); // 500
       SetModelMainTexture(TEXTURE_BEAST_BIG);
-      m_fBlowUpAmount = 10000.0f;//500
+      m_fBlowUpAmount = 10000.0f; // 500
       m_fBodyParts = 6;
-      m_fDamageWounded = 650.0f;//500
-      m_iScore = 25000; //1000
+      m_fDamageWounded = 650.0f; // 500
+      m_iScore = 25000; // 1000
       m_fStopDistance = 15;
       m_fCloseDistance = 20;
 
-      // set stretch factor
+      // Set stretch factor.
       GetModelObject()->StretchModel(FLOAT3D(BIG_BEAST_STRETCH, BIG_BEAST_STRETCH, BIG_BEAST_STRETCH));
       ModelChangeNotify();
       m_sptType = SPT_BLOOD;
@@ -658,18 +662,18 @@ procedures:
     } else { // HUGE
       m_fAttackRunSpeed = 35.0f;//8
       m_aAttackRotateSpeed = AngleDeg(600.0f);
-      SetHealth(6000.0f);//500
+      SetHealth(6000.0f); // 500
       SetModelMainTexture(TEXTURE_BEAST_HUGE);
-      m_fBlowUpAmount = 100000.0f;//500
+      m_fBlowUpAmount = 100000.0f; // 500
       m_fBodyParts = 6;
-      m_fDamageWounded = 1650.0f;//500
-      m_iScore = 40000; //1000
+      m_fDamageWounded = 1650.0f; // 500
+      m_iScore = 40000; // 1000
       m_fStopDistance = 75;
       m_fCloseDistance = 80;
       m_fAttackDistance = 1000.0f;
       m_fIgnoreRange = 1200.0f;
 
-      // set stretch factor
+      // Set stretch factor.
       GetModelObject()->StretchModel(FLOAT3D(HUGE_BEAST_STRETCH, HUGE_BEAST_STRETCH, HUGE_BEAST_STRETCH));
       ModelChangeNotify();
       m_sptType = SPT_BLOOD;
@@ -678,7 +682,7 @@ procedures:
     
     m_fMaxHealth = GetHealth();
 
-    // continue behavior in base class
+    // Continue behavior in base class.
     jump CEnemyBase::MainLoop();
   };
 };
