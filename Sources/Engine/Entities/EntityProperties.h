@@ -194,7 +194,7 @@ public:
 
   char *dec_strName;                  // descriptive name of the class
   char *dec_strIconFileName;          // filename of texture or thumbnail
-  INDEX dec_iID;                      // class ID
+  ULONG dec_ulID;                     // class ID
 
   CDLLEntityClass *dec_pdecBase;      // pointer to the base class
 
