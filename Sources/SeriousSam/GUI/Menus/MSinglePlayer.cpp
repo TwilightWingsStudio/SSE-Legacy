@@ -27,7 +27,7 @@ void CSinglePlayerMenu::Initialize_t(void)
   // Initialize title label.
   gm_mgTitle.mg_strText = TRANS("SINGLE PLAYER");
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
+  AddChild(&gm_mgTitle);
 
   // Initialize player label.
   gm_mgPlayerLabel.mg_boxOnScreen = BoxBigRow(-1.0f);
@@ -111,15 +111,15 @@ void CSinglePlayerMenu::Initialize_t(void)
   gm_mgOptions.mg_pActivatedFunction = NULL;
 
   // Add components.
-  gm_lhChildren.AddTail(gm_mgPlayerLabel.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgNewGame.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgCustom.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgQuickLoad.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgLoad.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgTraining.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgTechTest.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgPlayersAndControls.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgOptions.mg_lnNode);
+  AddChild(&gm_mgPlayerLabel);
+  AddChild(&gm_mgNewGame);
+  AddChild(&gm_mgCustom);
+  AddChild(&gm_mgQuickLoad);
+  AddChild(&gm_mgLoad);
+  AddChild(&gm_mgTraining);
+  AddChild(&gm_mgTechTest);
+  AddChild(&gm_mgPlayersAndControls);
+  AddChild(&gm_mgOptions);
 }
 
 void CSinglePlayerMenu::StartMenu(void)
@@ -129,7 +129,7 @@ void CSinglePlayerMenu::StartMenu(void)
 
   if (gm_mgTraining.mg_bEnabled) {
     if (!gm_mgTraining.mg_lnNode.IsLinked()) {
-      gm_lhChildren.AddTail(gm_mgTraining.mg_lnNode);
+      AddChild(&gm_mgTraining);
     }
 
     gm_mgLoad.mg_boxOnScreen = BoxBigRow(3.0f);

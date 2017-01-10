@@ -46,8 +46,8 @@ void CNetworkStartMenu::Initialize_t(void)
   gm_mgSessionName.mg_strTip = TRANS("name the session to start");
   
   // Add components.
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgSessionName.mg_lnNode);
+  AddChild(&gm_mgTitle);
+  AddChild(&gm_mgSessionName);
 
   // Initialize "Game type" trigger.
   TRIGGER_MG(gm_mgGameType, 2,
@@ -71,7 +71,7 @@ void CNetworkStartMenu::Initialize_t(void)
   gm_mgLevel.mg_pmgDown = &gm_mgMaxPlayers;
   gm_mgLevel.mg_strTip = TRANS("choose the level to start");
   gm_mgLevel.mg_pActivatedFunction = NULL;
-  gm_lhChildren.AddTail(gm_mgLevel.mg_lnNode);
+  AddChild(&gm_mgLevel);
 
   // Initialize "Max players" trigger.
   TRIGGER_MG(gm_mgMaxPlayers, 5,
@@ -109,8 +109,8 @@ void CNetworkStartMenu::Initialize_t(void)
   gm_mgStart.mg_pActivatedFunction = NULL;
   
   // Add components.
-  gm_lhChildren.AddTail(gm_mgGameOptions.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgStart.mg_lnNode);
+  AddChild(&gm_mgGameOptions);
+  AddChild(&gm_mgStart);
 }
 
 void CNetworkStartMenu::StartMenu(void)

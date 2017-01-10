@@ -58,8 +58,8 @@ void CNetworkJoinMenu::Initialize_t(void)
   gm_mgOpen.mg_pActivatedFunction = NULL;
   
   // Add components.
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgLAN.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgNET.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgOpen.mg_lnNode);
+  AddChild(&gm_mgTitle);
+  AddChild(&gm_mgLAN);
+  AddChild(&gm_mgNET);
+  AddChild(&gm_mgOpen);
 }

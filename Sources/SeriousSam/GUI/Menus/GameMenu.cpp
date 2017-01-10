@@ -46,6 +46,16 @@ void CGameMenu::Destroy(void)
 {
 }
 
+// --------------------------------------------------------------------------------------
+// Adds component as new child.
+// --------------------------------------------------------------------------------------
+void CGameMenu::AddChild(CMenuGadget *pChild)
+{
+  if (pChild) {
+    gm_lhChildren.AddTail(pChild->mg_lnNode);
+  }
+}
+
 void CGameMenu::FillListItems(void)
 {
   ASSERT(FALSE);  // must be implemented to scroll up/down

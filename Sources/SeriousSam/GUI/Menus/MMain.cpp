@@ -31,7 +31,7 @@ void CMainMenu::Initialize_t(void)
   /*
   gm_mgTitle.mg_strText = "SERIOUS SAM - BETA";  // nothing to see here, kazuya
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
-  gm_lhChildren.AddTail( gm_mgTitle.mg_lnNode);
+  AddChild(&gm_mgTitle);
   */
 
   // Initialize version label.
@@ -125,16 +125,16 @@ void CMainMenu::Initialize_t(void)
   gm_mgQuit.mg_pActivatedFunction = NULL;
 
   // Add components.
-  gm_lhChildren.AddTail(gm_mgVersionLabel.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgModLabel.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgSingle.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgNetwork.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgSplitScreen.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgDemo.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgMods.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgHighScore.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgOptions.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgQuit.mg_lnNode);
+  AddChild(&gm_mgVersionLabel);
+  AddChild(&gm_mgModLabel);
+  AddChild(&gm_mgSingle);
+  AddChild(&gm_mgNetwork);
+  AddChild(&gm_mgSplitScreen);
+  AddChild(&gm_mgDemo);
+  AddChild(&gm_mgMods);
+  AddChild(&gm_mgHighScore);
+  AddChild(&gm_mgOptions);
+  AddChild(&gm_mgQuit);
 }
 
 void CMainMenu::StartMenu(void)

@@ -68,12 +68,12 @@ void CNetworkOpenMenu::Initialize_t(void)
   gm_mgJoin.mg_pActivatedFunction = NULL;
   
   // Add components.
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgAddressLabel.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgAddress.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgPortLabel.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgPort.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgJoin.mg_lnNode);
+  AddChild(&gm_mgTitle);
+  AddChild(&gm_mgAddressLabel);
+  AddChild(&gm_mgAddress);
+  AddChild(&gm_mgPortLabel);
+  AddChild(&gm_mgPort);
+  AddChild(&gm_mgJoin);
 }
 
 void CNetworkOpenMenu::StartMenu(void)

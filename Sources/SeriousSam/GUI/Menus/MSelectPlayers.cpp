@@ -26,7 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   gd.mg_pmgLeft = lf; \
   gd.mg_pmgRight = rt; \
   gd.mg_strText = txt; \
-  gm_lhChildren.AddTail(gd.mg_lnNode);
+  AddChild(&gd);
 
 extern CTString astrNoYes[2];
 extern CTString astrSplitScreenRadioTexts[4];
@@ -41,7 +41,7 @@ void CSelectPlayersMenu::Initialize_t(void)
   // Initialize title label.
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
   gm_mgTitle.mg_strText = TRANS("SELECT PLAYERS");
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
+  AddChild(&gm_mgTitle);
 
   // Initialize "Dedicated" trigger.
   TRIGGER_MG(gm_mgDedicated, 0, gm_mgStart, gm_mgObserver, TRANS("Dedicated:"), astrNoYes);
@@ -81,11 +81,11 @@ void CSelectPlayersMenu::Initialize_t(void)
   gm_mgNotes.mg_strText = "";
 
   // Add components.
-  gm_lhChildren.AddTail(gm_mgPlayer0Change.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgPlayer1Change.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgPlayer2Change.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgPlayer3Change.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgNotes.mg_lnNode);
+  AddChild(&gm_mgPlayer0Change);
+  AddChild(&gm_mgPlayer1Change);
+  AddChild(&gm_mgPlayer2Change);
+  AddChild(&gm_mgPlayer3Change);
+  AddChild(&gm_mgNotes);
 
   /*  // options button
   mgSplitOptions.mg_strText = TRANS("Game options");
@@ -96,7 +96,7 @@ void CSelectPlayersMenu::Initialize_t(void)
   mgSplitOptions.mg_pmgDown = &mgSplitStartStart;
   mgSplitOptions.mg_strTip = TRANS("adjust game rules");
   mgSplitOptions.mg_pActivatedFunction = &StartGameOptionsFromSplitScreen;
-  gm_lhChildren.AddTail( mgSplitOptions.mg_lnNode);*/
+  AddChild(&mgSplitOptions);*/
 
   /*  // start button
   mgSplitStartStart.mg_bfsFontSize = BFS_LARGE;
@@ -104,8 +104,8 @@ void CSelectPlayersMenu::Initialize_t(void)
   mgSplitStartStart.mg_pmgUp = &mgSplitOptions;
   mgSplitStartStart.mg_pmgDown = &mgSplitGameType;
   mgSplitStartStart.mg_strText = TRANS("START");
-  gm_lhChildren.AddTail( mgSplitStartStart.mg_lnNode);
   mgSplitStartStart.mg_pActivatedFunction = &StartSelectPlayersMenuFromSplit;
+  AddChild(&mgSplitStartStart);
   */
 
   ADD_GADGET(gm_mgStart, BoxMediumRow(11), &gm_mgSplitScreenCfg, &gm_mgPlayer0Change, NULL, NULL, TRANS("START"));

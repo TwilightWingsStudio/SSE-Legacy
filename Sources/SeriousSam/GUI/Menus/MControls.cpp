@@ -66,11 +66,11 @@ void CControlsMenu::Initialize_t(void)
   gm_mgSensitivity.mg_strTip = TRANS("sensitivity for all axis in this control set");
   
   // Add components.
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgNameLabel.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgButtons.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgAdvanced.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgSensitivity.mg_lnNode);
+  AddChild(&gm_mgTitle);
+  AddChild(&gm_mgNameLabel);
+  AddChild(&gm_mgButtons);
+  AddChild(&gm_mgAdvanced);
+  AddChild(&gm_mgSensitivity);
 
   TRIGGER_MG(gm_mgInvertTrigger, 5.5, gm_mgSensitivity, gm_mgSmoothTrigger,
     TRANS("INVERT LOOK"), astrNoYes);
@@ -94,7 +94,7 @@ void CControlsMenu::Initialize_t(void)
   gm_mgPredefined.mg_strTip = TRANS("load one of several predefined control settings");
   gm_mgPredefined.mg_pActivatedFunction = NULL;
 
-  gm_lhChildren.AddTail(gm_mgPredefined.mg_lnNode);
+  AddChild(&gm_mgPredefined);
 }
 
 void CControlsMenu::StartMenu(void)

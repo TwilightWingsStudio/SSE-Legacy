@@ -27,7 +27,7 @@ void CCustomizeAxisMenu::Initialize_t(void)
   // Initialize title label.
   gm_mgTitle.mg_strText = TRANS("CUSTOMIZE AXIS");
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
+  AddChild(&gm_mgTitle);
 
   // Initialize "Action" trigger.
   TRIGGER_MG(gm_mgActionTrigger, 0, gm_mgSmoothTrigger, gm_mgMountedTrigger, TRANS("ACTION"), astrNoYes);
@@ -73,8 +73,8 @@ void CCustomizeAxisMenu::Initialize_t(void)
   gm_mgDeadzone.mg_strTip = TRANS("set dead zone for this axis");
 
   // Add components.
-  gm_lhChildren.AddTail(gm_mgSensitivity.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgDeadzone.mg_lnNode);
+  AddChild(&gm_mgSensitivity);
+  AddChild(&gm_mgDeadzone);
 
   TRIGGER_MG(gm_mgInvertTrigger, 5, gm_mgDeadzone, gm_mgRelativeTrigger, TRANS("INVERTED"), astrNoYes);
   gm_mgInvertTrigger.mg_strTip = TRANS("choose whether to invert this axis or not");

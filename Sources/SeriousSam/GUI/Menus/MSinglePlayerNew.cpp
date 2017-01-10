@@ -86,13 +86,13 @@ void CSinglePlayerNewMenu::Initialize_t(void)
   gm_mgMental.mg_pActivatedFunction = NULL;
   
   // Add components.
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgTourist.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgEasy.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgMedium.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgHard.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgSerious.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgMental.mg_lnNode);
+  AddChild(&gm_mgTitle);
+  AddChild(&gm_mgTourist);
+  AddChild(&gm_mgEasy);
+  AddChild(&gm_mgMedium);
+  AddChild(&gm_mgHard);
+  AddChild(&gm_mgSerious);
+  AddChild(&gm_mgMental);
 }
 
 void CSinglePlayerNewMenu::StartMenu(void)

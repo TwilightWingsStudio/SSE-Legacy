@@ -49,10 +49,10 @@ void CConfirmMenu::Initialize_t(void)
   gm_mgConfirmNo.mg_iCenterI = -1;
   gm_mgConfirmNo.mg_bfsFontSize = BFS_LARGE;
   
-  // Add components.
-  gm_lhChildren.AddTail(gm_mgConfirmLabel.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgConfirmYes.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgConfirmNo.mg_lnNode);
+  // Add components.  
+  AddChild(&gm_mgConfirmLabel);
+  AddChild(&gm_mgConfirmYes);
+  AddChild(&gm_mgConfirmNo);
 
   _pConfimedYes = NULL;
   _pConfimedNo = NULL;

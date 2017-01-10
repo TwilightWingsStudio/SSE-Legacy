@@ -29,7 +29,7 @@ void CVideoOptionsMenu::Initialize_t(void)
 {
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
   gm_mgTitle.mg_strText = TRANS("VIDEO");
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
+  AddChild(&gm_mgTitle);
 
   TRIGGER_MG(gm_mgDisplayAPITrigger, 0,
     gm_mgApply, gm_mgDisplayAdaptersTrigger, TRANS("GRAPHICS API"), astrDisplayAPIRadioTexts);
@@ -77,8 +77,8 @@ void CVideoOptionsMenu::Initialize_t(void)
   gm_mgApply.mg_pActivatedFunction = NULL;
 
   // Add components.
-  gm_lhChildren.AddTail(gm_mgVideoRendering.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgApply.mg_lnNode);
+  AddChild(&gm_mgVideoRendering);
+  AddChild(&gm_mgApply);
 }
 
 void CVideoOptionsMenu::StartMenu(void)

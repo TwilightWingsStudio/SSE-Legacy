@@ -30,7 +30,7 @@ void CSplitStartMenu::Initialize_t(void)
   // Initialize title label.
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
   gm_mgTitle.mg_strText = TRANS("START SPLIT SCREEN");
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
+  AddChild(&gm_mgTitle);
 
   // Initialize "Game type" trigger.
   TRIGGER_MG(gm_mgGameType, 0,
@@ -76,9 +76,9 @@ void CSplitStartMenu::Initialize_t(void)
   gm_mgStart.mg_pActivatedFunction = NULL;
   
   // Add components.
-  gm_lhChildren.AddTail(gm_mgLevel.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgOptions.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgStart.mg_lnNode);
+  AddChild(&gm_mgLevel);
+  AddChild(&gm_mgOptions);
+  AddChild(&gm_mgStart);
 }
 
 void CSplitStartMenu::StartMenu(void)

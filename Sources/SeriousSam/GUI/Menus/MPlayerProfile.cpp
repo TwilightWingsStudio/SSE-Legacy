@@ -32,7 +32,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   mg.mg_pActivatedFunction = &PPOnPlayerSelect; \
   mg.mg_strText = #index; \
   mg.mg_strTip = TRANS("select new currently active player"); \
-  gm_lhChildren.AddTail(mg.mg_lnNode);
+  AddChild(&mg);
 
 extern BOOL  _bPlayerMenuFromSinglePlayer;
 extern CTString _strLastPlayerAppearance;
@@ -54,8 +54,8 @@ void CPlayerProfileMenu::Initialize_t(void)
   gm_mgNoLabel.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgNoLabel.mg_iCenterI = -1;
 
-  gm_lhChildren.AddTail(gm_mgProfileTitle.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgNoLabel.mg_lnNode);
+  AddChild(&gm_mgProfileTitle);
+  AddChild(&gm_mgNoLabel);
 
   ADD_SELECT_PLAYER_MG(0, gm_mgNumber[0], gm_mgNumber[7], gm_mgNumber[1], gm_mgNumber[0]);
   ADD_SELECT_PLAYER_MG(1, gm_mgNumber[1], gm_mgNumber[0], gm_mgNumber[2], gm_mgNumber[1]);
@@ -103,10 +103,10 @@ void CPlayerProfileMenu::Initialize_t(void)
   gm_mgTeam.mg_strTip = TRANS("enter team name, if playing in team");
 
   // Add components.
-  gm_lhChildren.AddTail(gm_mgNameLabel.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgNameField.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgTeamLabel.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgTeam.mg_lnNode);
+  AddChild(&gm_mgNameLabel);
+  AddChild(&gm_mgNameField);
+  AddChild(&gm_mgTeamLabel);
+  AddChild(&gm_mgTeam);
 
   TRIGGER_MG(gm_mgCrosshair, 4.0, gm_mgTeam, gm_mgWeaponSelect, TRANS("CROSSHAIR"), astrCrosshair);
   gm_mgCrosshair.mg_bVisual = TRUE;
@@ -176,8 +176,8 @@ void CPlayerProfileMenu::Initialize_t(void)
   gm_mgModel.mg_pActivatedFunction = NULL;
   
   // Add components.
-  gm_lhChildren.AddTail(gm_mgCustomizeControls.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgModel.mg_lnNode);
+  AddChild(&gm_mgCustomizeControls);
+  AddChild(&gm_mgModel);
 }
 
 INDEX CPlayerProfileMenu::ComboFromPlayer(INDEX iPlayer)

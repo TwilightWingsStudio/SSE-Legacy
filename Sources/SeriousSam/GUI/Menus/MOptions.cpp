@@ -84,11 +84,11 @@ void COptionsMenu::Initialize_t(void)
   gm_mgAddonOptions.mg_pActivatedFunction = NULL;
   
   // Add components.
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgVideoOptions.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgAudioOptions.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgPlayerProfileOptions.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgNetworkOptions.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgCustomOptions.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgAddonOptions.mg_lnNode);
+  AddChild(&gm_mgTitle);
+  AddChild(&gm_mgVideoOptions);
+  AddChild(&gm_mgAudioOptions);
+  AddChild(&gm_mgPlayerProfileOptions);
+  AddChild(&gm_mgNetworkOptions);
+  AddChild(&gm_mgCustomOptions);
+  AddChild(&gm_mgAddonOptions);
 }

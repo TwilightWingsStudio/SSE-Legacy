@@ -35,7 +35,14 @@ public:
   INDEX gm_iListWantedItem;   // item you want to focus initially
   INDEX gm_ctListVisible;
   INDEX gm_ctListTotal;
+  
+  // Constructor.
   CGameMenu(void);
+  
+  // Adds component as new child.
+  virtual void AddChild(CMenuGadget *pChild);
+
+  // Working functions...
   void ScrollList(INDEX iDir);
   void KillAllFocuses(void);
   virtual void Initialize_t(void);

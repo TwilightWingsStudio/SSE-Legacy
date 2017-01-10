@@ -934,7 +934,7 @@ extern void FixupBackButton(CGameMenu *pgm)
   mgBack.mg_bfsFontSize = BFS_LARGE;
   mgBack.mg_boxOnScreen = BoxBack();
   mgBack.mg_boxOnScreen = BoxLeftColumn(16.5f);
-  pgm->gm_lhChildren.AddTail( mgBack.mg_lnNode);
+  pgm->AddChild(&mgBack);
 
   mgBack.mg_pmgLeft = 
   mgBack.mg_pmgRight = 

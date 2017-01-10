@@ -55,10 +55,10 @@ void CSplitScreenMenu::Initialize_t(void)
   gm_mgLoad.mg_pActivatedFunction = NULL;
 
   // Add components.
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgStart.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgQuickLoad.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgLoad.mg_lnNode);
+  AddChild(&gm_mgTitle);
+  AddChild(&gm_mgStart);
+  AddChild(&gm_mgQuickLoad);
+  AddChild(&gm_mgLoad);
 }
 
 void CSplitScreenMenu::StartMenu(void)

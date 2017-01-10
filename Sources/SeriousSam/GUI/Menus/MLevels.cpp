@@ -26,7 +26,7 @@ void CLevelsMenu::Initialize_t(void)
 {
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
   gm_mgTitle.mg_strText = TRANS("CHOOSE LEVEL");
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
+  AddChild(&gm_mgTitle);
 
   for (INDEX iLabel = 0; iLabel<LEVELS_ON_SCREEN; iLabel++)
   {
@@ -37,11 +37,12 @@ void CLevelsMenu::Initialize_t(void)
     gm_mgManualLevel[iLabel].mg_pmgDown = &gm_mgManualLevel[iNext];
     gm_mgManualLevel[iLabel].mg_boxOnScreen = BoxMediumRow(iLabel);
     gm_mgManualLevel[iLabel].mg_pActivatedFunction = NULL; // never called!
-    gm_lhChildren.AddTail(gm_mgManualLevel[iLabel].mg_lnNode);
+    AddChild(&gm_mgManualLevel[iLabel]);
   }
 
-  gm_lhChildren.AddTail(gm_mgArrowUp.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgArrowDn.mg_lnNode);
+  AddChild(&gm_mgArrowUp);
+  AddChild(&gm_mgArrowDn);
+  
   gm_mgArrowUp.mg_adDirection = AD_UP;
   gm_mgArrowDn.mg_adDirection = AD_DOWN;
   gm_mgArrowUp.mg_boxOnScreen = BoxArrow(AD_UP);

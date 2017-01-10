@@ -29,7 +29,7 @@ void CAudioOptionsMenu::Initialize_t(void)
   // Initialize title label.
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
   gm_mgTitle.mg_strText = TRANS("AUDIO");
-  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
+  AddChild(&gm_mgTitle);
 
   TRIGGER_MG(gm_mgAudioAutoTrigger, 0,
     gm_mgApply, gm_mgFrequencyTrigger, TRANS("AUTO-ADJUST"), astrNoYes);
@@ -76,9 +76,9 @@ void CAudioOptionsMenu::Initialize_t(void)
   gm_mgApply.mg_pActivatedFunction = NULL;
 
   // Add components.
-  gm_lhChildren.AddTail(gm_mgWaveVolume.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgMPEGVolume.mg_lnNode);
-  gm_lhChildren.AddTail(gm_mgApply.mg_lnNode);
+  AddChild(&gm_mgWaveVolume);
+  AddChild(&gm_mgMPEGVolume);
+  AddChild(&gm_mgApply);
 }
 
 void CAudioOptionsMenu::StartMenu(void)
