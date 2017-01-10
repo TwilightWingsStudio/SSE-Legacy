@@ -25,9 +25,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class CConfirmMenu : public CGameMenu {
 public:
-  CMGButton gm_mgConfirmLabel;
-  CMGButton gm_mgConfirmYes;
-  CMGButton gm_mgConfirmNo;
+  CMGButton *gm_pConfirmLabel;
+  CMGButton *gm_pConfirmYes;
+  CMGButton *gm_pConfirmNo;
 
   void(*_pConfimedYes)(void) = NULL;
   void(*_pConfimedNo)(void) = NULL;

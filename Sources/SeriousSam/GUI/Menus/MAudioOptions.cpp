@@ -27,58 +27,69 @@ extern void RefreshSoundFormat(void);
 void CAudioOptionsMenu::Initialize_t(void)
 {
   // Initialize title label.
-  gm_mgTitle.mg_boxOnScreen = BoxTitle();
-  gm_mgTitle.mg_strText = TRANS("AUDIO");
-  AddChild(&gm_mgTitle);
+  gm_pTitle = new CMGTitle(TRANS("AUDIO"));
+  gm_pTitle->mg_boxOnScreen = BoxTitle();
 
-  TRIGGER_MG(gm_mgAudioAutoTrigger, 0,
-    gm_mgApply, gm_mgFrequencyTrigger, TRANS("AUTO-ADJUST"), astrNoYes);
-  gm_mgAudioAutoTrigger.mg_strTip = TRANS("adjust quality to fit your system");
+  // Initialize "Auto-Adjust" trigger.
+  gm_pAudioAutoTrigger = new CMGTrigger(TRANS("AUTO-ADJUST"));
+  gm_pAudioAutoTrigger->mg_strTip = TRANS("adjust quality to fit your system");
+  gm_pAudioAutoTrigger->mg_pmgUp = gm_pApplyButton;
+  gm_pAudioAutoTrigger->mg_pmgDown = gm_pFrequencyTrigger;
+  gm_pAudioAutoTrigger->mg_boxOnScreen = BoxMediumRow(0);
+  gm_pAudioAutoTrigger->mg_astrTexts = astrNoYes;
+  gm_pAudioAutoTrigger->mg_ctTexts = sizeof(astrNoYes) / sizeof(astrNoYes[0]);
+  gm_pAudioAutoTrigger->mg_strValue = astrNoYes[0];
 
-  TRIGGER_MG(gm_mgFrequencyTrigger, 1,
-    gm_mgAudioAutoTrigger, gm_mgAudioAPITrigger, TRANS("FREQUENCY"), astrFrequencyRadioTexts);
-  gm_mgFrequencyTrigger.mg_strTip = TRANS("select sound quality or turn sound off");
-
-  TRIGGER_MG(gm_mgAudioAPITrigger, 2,
-    gm_mgFrequencyTrigger, gm_mgWaveVolume, TRANS("SOUND SYSTEM"), astrSoundAPIRadioTexts);
-  gm_mgAudioAPITrigger.mg_strTip = TRANS("choose sound system (API) to use");
+  // Initialize "Frequency" trigger.
+  gm_pFrequencyTrigger = new CMGTrigger(TRANS("FREQUENCY"));
+  gm_pFrequencyTrigger->mg_strTip = TRANS("select sound quality or turn sound off");
+  gm_pFrequencyTrigger->mg_pmgUp = gm_pAudioAutoTrigger;
+  gm_pFrequencyTrigger->mg_pmgDown = gm_pAudioAPITrigger;
+  gm_pFrequencyTrigger->mg_boxOnScreen = BoxMediumRow(1);
+  gm_pFrequencyTrigger->mg_astrTexts = astrFrequencyRadioTexts;
+  gm_pFrequencyTrigger->mg_ctTexts = sizeof(astrFrequencyRadioTexts) / sizeof(astrFrequencyRadioTexts[0]);
+  gm_pFrequencyTrigger->mg_strValue = astrFrequencyRadioTexts[0];
   
-  // Reset pointers.
-  gm_mgAudioAutoTrigger.mg_pOnTriggerChange = NULL;
-  gm_mgFrequencyTrigger.mg_pOnTriggerChange = NULL;
-  gm_mgAudioAPITrigger.mg_pOnTriggerChange = NULL;
+  // Initialize "Sound System" trigger.
+  gm_pAudioAPITrigger = new CMGTrigger(TRANS("SOUND SYSTEM"));
+  gm_pAudioAPITrigger->mg_strTip = TRANS("choose sound system (API) to use");
+  gm_pAudioAPITrigger->mg_pmgUp = gm_pFrequencyTrigger;
+  gm_pAudioAPITrigger->mg_pmgDown = gm_pWaveVolume;
+  gm_pAudioAPITrigger->mg_boxOnScreen = BoxMediumRow(2);
+  gm_pAudioAPITrigger->mg_astrTexts = astrSoundAPIRadioTexts;
+  gm_pAudioAPITrigger->mg_ctTexts = sizeof(astrSoundAPIRadioTexts) / sizeof(astrSoundAPIRadioTexts[0]);
+  gm_pAudioAPITrigger->mg_strValue = astrSoundAPIRadioTexts[0];
 
   // Initialize "Sound Effects Volume" slider.
-  gm_mgWaveVolume.mg_boxOnScreen = BoxMediumRow(3);
-  gm_mgWaveVolume.mg_strText = TRANS("SOUND EFFECTS VOLUME");
-  gm_mgWaveVolume.mg_strTip = TRANS("adjust volume of in-game sound effects");
-  gm_mgWaveVolume.mg_pmgUp = &gm_mgAudioAPITrigger;
-  gm_mgWaveVolume.mg_pmgDown = &gm_mgMPEGVolume;
-  gm_mgWaveVolume.mg_pOnSliderChange = NULL;
-  gm_mgWaveVolume.mg_pActivatedFunction = NULL;
+  gm_pWaveVolume = new CMGSlider(TRANS("SOUND EFFECTS VOLUME"));
+  gm_pWaveVolume->mg_boxOnScreen = BoxMediumRow(3);
+  gm_pWaveVolume->mg_strTip = TRANS("adjust volume of in-game sound effects");
+  gm_pWaveVolume->mg_pmgUp = gm_pAudioAPITrigger;
+  gm_pWaveVolume->mg_pmgDown = gm_pMPEGVolume;
 
   // Initialize "Music Volume" slider.
-  gm_mgMPEGVolume.mg_boxOnScreen = BoxMediumRow(4);
-  gm_mgMPEGVolume.mg_strText = TRANS("MUSIC VOLUME");
-  gm_mgMPEGVolume.mg_strTip = TRANS("adjust volume of in-game music");
-  gm_mgMPEGVolume.mg_pmgUp = &gm_mgWaveVolume;
-  gm_mgMPEGVolume.mg_pmgDown = &gm_mgApply;
-  gm_mgMPEGVolume.mg_pOnSliderChange = NULL;
-  gm_mgMPEGVolume.mg_pActivatedFunction = NULL;
+  gm_pMPEGVolume = new CMGSlider(TRANS("MUSIC VOLUME"));
+  gm_pMPEGVolume->mg_boxOnScreen = BoxMediumRow(4);
+  gm_pMPEGVolume->mg_strTip = TRANS("adjust volume of in-game music");
+  gm_pMPEGVolume->mg_pmgUp = gm_pWaveVolume;
+  gm_pMPEGVolume->mg_pmgDown = gm_pApplyButton;
 
   // Initialize "Apply" button.
-  gm_mgApply.mg_bfsFontSize = BFS_LARGE;
-  gm_mgApply.mg_boxOnScreen = BoxBigRow(4);
-  gm_mgApply.mg_strText = TRANS("APPLY");
-  gm_mgApply.mg_strTip = TRANS("activate selected options");
-  gm_mgApply.mg_pmgUp = &gm_mgMPEGVolume;
-  gm_mgApply.mg_pmgDown = &gm_mgAudioAutoTrigger;
-  gm_mgApply.mg_pActivatedFunction = NULL;
+  gm_pApplyButton = new CMGButton(TRANS("APPLY"));
+  gm_pApplyButton->mg_bfsFontSize = BFS_LARGE;
+  gm_pApplyButton->mg_boxOnScreen = BoxBigRow(4);
+  gm_pApplyButton->mg_strTip = TRANS("activate selected options");
+  gm_pApplyButton->mg_pmgUp = gm_pMPEGVolume;
+  gm_pApplyButton->mg_pmgDown = gm_pAudioAutoTrigger;
 
   // Add components.
-  AddChild(&gm_mgWaveVolume);
-  AddChild(&gm_mgMPEGVolume);
-  AddChild(&gm_mgApply);
+  AddChild(gm_pTitle);
+  AddChild(gm_pAudioAutoTrigger);
+  AddChild(gm_pFrequencyTrigger);
+  AddChild(gm_pAudioAPITrigger);
+  AddChild(gm_pWaveVolume);
+  AddChild(gm_pMPEGVolume);
+  AddChild(gm_pApplyButton);
 }
 
 void CAudioOptionsMenu::StartMenu(void)

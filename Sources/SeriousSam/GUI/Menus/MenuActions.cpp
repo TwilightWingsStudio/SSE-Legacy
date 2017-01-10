@@ -116,7 +116,7 @@ static void ExitConfirm(void)
 
   gmCurrent._pConfimedYes = &ExitGame;
   gmCurrent._pConfimedNo = NULL;
-  gmCurrent.gm_mgConfirmLabel.mg_strText = TRANS("ARE YOU SERIOUS?");
+  gmCurrent.gm_pConfirmLabel->mg_strText = TRANS("ARE YOU SERIOUS?");
   gmCurrent.gm_pgmParentMenu = pgmCurrentMenu;
   gmCurrent.BeLarge();
   ChangeToMenu(&gmCurrent);
@@ -136,7 +136,7 @@ static void StopConfirm(void)
 
   gmCurrent._pConfimedYes = &StopCurrentGame;
   gmCurrent._pConfimedNo = NULL;
-  gmCurrent.gm_mgConfirmLabel.mg_strText = TRANS("ARE YOU SERIOUS?");
+  gmCurrent.gm_pConfirmLabel->mg_strText = TRANS("ARE YOU SERIOUS?");
   gmCurrent.gm_pgmParentMenu = pgmCurrentMenu;
   gmCurrent.BeLarge();
   ChangeToMenu(&gmCurrent);
@@ -174,7 +174,7 @@ extern void ModConnectConfirm(void)
   CPrintF(TRANS("Server is running a different MOD (%s).\nYou need to reload to connect.\n"), _fnmModSelected);
   gmCurrent._pConfimedYes = &ModConnect;
   gmCurrent._pConfimedNo = NULL;
-  gmCurrent.gm_mgConfirmLabel.mg_strText = TRANS("CHANGE THE MOD?");
+  gmCurrent.gm_pConfirmLabel->mg_strText = TRANS("CHANGE THE MOD?");
   gmCurrent.gm_pgmParentMenu = pgmCurrentMenu;
   gmCurrent.BeLarge();
   ChangeToMenu(&gmCurrent);
@@ -187,7 +187,7 @@ void SaveConfirm(void)
   extern void OnFileSaveOK(void);
   gmCurrent._pConfimedYes = &OnFileSaveOK;
   gmCurrent._pConfimedNo = NULL;
-  gmCurrent.gm_mgConfirmLabel.mg_strText = TRANS("OVERWRITE?");
+  gmCurrent.gm_pConfirmLabel->mg_strText = TRANS("OVERWRITE?");
   gmCurrent.gm_pgmParentMenu = pgmCurrentMenu;
   gmCurrent.BeLarge();
   ChangeToMenu(&gmCurrent);
@@ -207,7 +207,7 @@ void ModNotInstalled(void)
 
   gmCurrent._pConfimedYes = &ExitAndSpawnExplorer;
   gmCurrent._pConfimedNo = NULL;
-  gmCurrent.gm_mgConfirmLabel.mg_strText.PrintF(
+  gmCurrent.gm_pConfirmLabel->mg_strText.PrintF(
     TRANS("You don't have MOD '%s' installed.\nDo you want to visit its web site?"), (const char*)_fnmModSelected);
   gmCurrent.gm_pgmParentMenu = pgmCurrentMenu;
   gmCurrent.BeSmall();
@@ -220,7 +220,7 @@ extern void ModConfirm(void)
 
   gmCurrent._pConfimedYes = &ModLoadYes;
   gmCurrent._pConfimedNo = NULL;
-  gmCurrent.gm_mgConfirmLabel.mg_strText = TRANS("LOAD THIS MOD?");
+  gmCurrent.gm_pConfirmLabel->mg_strText = TRANS("LOAD THIS MOD?");
   gmCurrent.gm_pgmParentMenu = &_pGUIM->gmLoadSaveMenu;
   gmCurrent.BeLarge();
   ChangeToMenu(&gmCurrent);
@@ -240,7 +240,7 @@ void VideoConfirm(void)
   gmCurrent._pConfimedYes = NULL;
   gmCurrent._pConfimedNo = RevertVideoSettings;
 
-  gmCurrent.gm_mgConfirmLabel.mg_strText = TRANS("KEEP THIS SETTING?");
+  gmCurrent.gm_pConfirmLabel->mg_strText = TRANS("KEEP THIS SETTING?");
   gmCurrent.gm_pgmParentMenu = pgmCurrentMenu;
   gmCurrent.BeLarge();
   ChangeToMenu(&gmCurrent);
@@ -271,8 +271,8 @@ static void ConfirmNo(void)
 void InitActionsForConfirmMenu() {
   CConfirmMenu &gmCurrent = _pGUIM->gmConfirmMenu;
 
-  gmCurrent.gm_mgConfirmYes.mg_pActivatedFunction = &ConfirmYes;
-  gmCurrent.gm_mgConfirmNo.mg_pActivatedFunction = &ConfirmNo;
+  gmCurrent.gm_pConfirmYes->mg_pActivatedFunction = &ConfirmYes;
+  gmCurrent.gm_pConfirmNo->mg_pActivatedFunction = &ConfirmNo;
 }
 
 // ------------------------ CMainMenu implementation
@@ -854,42 +854,42 @@ extern void RefreshSoundFormat(void)
 
   switch (_pSound->GetFormat())
   {
-    case CSoundLibrary::SF_NONE:     {gmCurrent.gm_mgFrequencyTrigger.mg_iSelected = 0; break; }
-    case CSoundLibrary::SF_11025_16: {gmCurrent.gm_mgFrequencyTrigger.mg_iSelected = 1; break; }
-    case CSoundLibrary::SF_22050_16: {gmCurrent.gm_mgFrequencyTrigger.mg_iSelected = 2; break; }
-    case CSoundLibrary::SF_44100_16: {gmCurrent.gm_mgFrequencyTrigger.mg_iSelected = 3; break; }
-    default:                          gmCurrent.gm_mgFrequencyTrigger.mg_iSelected = 0;
+    case CSoundLibrary::SF_NONE:     {gmCurrent.gm_pFrequencyTrigger->mg_iSelected = 0; break; }
+    case CSoundLibrary::SF_11025_16: {gmCurrent.gm_pFrequencyTrigger->mg_iSelected = 1; break; }
+    case CSoundLibrary::SF_22050_16: {gmCurrent.gm_pFrequencyTrigger->mg_iSelected = 2; break; }
+    case CSoundLibrary::SF_44100_16: {gmCurrent.gm_pFrequencyTrigger->mg_iSelected = 3; break; }
+    default:                          gmCurrent.gm_pFrequencyTrigger->mg_iSelected = 0;
   }
 
-  gmCurrent.gm_mgAudioAutoTrigger.mg_iSelected = Clamp(sam_bAutoAdjustAudio, 0, 1);
-  gmCurrent.gm_mgAudioAPITrigger.mg_iSelected = Clamp(_pShell->GetINDEX("snd_iInterface"), 0L, 2L);
+  gmCurrent.gm_pAudioAutoTrigger->mg_iSelected = Clamp(sam_bAutoAdjustAudio, 0, 1);
+  gmCurrent.gm_pAudioAPITrigger->mg_iSelected = Clamp(_pShell->GetINDEX("snd_iInterface"), 0L, 2L);
 
-  gmCurrent.gm_mgWaveVolume.mg_iMinPos = 0;
-  gmCurrent.gm_mgWaveVolume.mg_iMaxPos = VOLUME_STEPS;
-  gmCurrent.gm_mgWaveVolume.mg_iCurPos = (INDEX)(_pShell->GetFLOAT("snd_fSoundVolume")*VOLUME_STEPS + 0.5f);
-  gmCurrent.gm_mgWaveVolume.ApplyCurrentPosition();
+  gmCurrent.gm_pWaveVolume->mg_iMinPos = 0;
+  gmCurrent.gm_pWaveVolume->mg_iMaxPos = VOLUME_STEPS;
+  gmCurrent.gm_pWaveVolume->mg_iCurPos = (INDEX)(_pShell->GetFLOAT("snd_fSoundVolume")*VOLUME_STEPS + 0.5f);
+  gmCurrent.gm_pWaveVolume->ApplyCurrentPosition();
 
-  gmCurrent.gm_mgMPEGVolume.mg_iMinPos = 0;
-  gmCurrent.gm_mgMPEGVolume.mg_iMaxPos = VOLUME_STEPS;
-  gmCurrent.gm_mgMPEGVolume.mg_iCurPos = (INDEX)(_pShell->GetFLOAT("snd_fMusicVolume")*VOLUME_STEPS + 0.5f);
-  gmCurrent.gm_mgMPEGVolume.ApplyCurrentPosition();
+  gmCurrent.gm_pMPEGVolume->mg_iMinPos = 0;
+  gmCurrent.gm_pMPEGVolume->mg_iMaxPos = VOLUME_STEPS;
+  gmCurrent.gm_pMPEGVolume->mg_iCurPos = (INDEX)(_pShell->GetFLOAT("snd_fMusicVolume")*VOLUME_STEPS + 0.5f);
+  gmCurrent.gm_pMPEGVolume->ApplyCurrentPosition();
 
-  gmCurrent.gm_mgAudioAutoTrigger.ApplyCurrentSelection();
-  gmCurrent.gm_mgAudioAPITrigger.ApplyCurrentSelection();
-  gmCurrent.gm_mgFrequencyTrigger.ApplyCurrentSelection();
+  gmCurrent.gm_pAudioAutoTrigger->ApplyCurrentSelection();
+  gmCurrent.gm_pAudioAPITrigger->ApplyCurrentSelection();
+  gmCurrent.gm_pFrequencyTrigger->ApplyCurrentSelection();
 }
 
 static void ApplyAudioOptions(void)
 {
   CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
 
-  sam_bAutoAdjustAudio = gmCurrent.gm_mgAudioAutoTrigger.mg_iSelected;
+  sam_bAutoAdjustAudio = gmCurrent.gm_pAudioAutoTrigger->mg_iSelected;
   if (sam_bAutoAdjustAudio) {
     _pShell->Execute("include \"Scripts\\Addons\\SFX-AutoAdjust.ini\"");
   } else {
-    _pShell->SetINDEX("snd_iInterface", gmCurrent.gm_mgAudioAPITrigger.mg_iSelected);
+    _pShell->SetINDEX("snd_iInterface", gmCurrent.gm_pAudioAPITrigger->mg_iSelected);
 
-    switch (gmCurrent.gm_mgFrequencyTrigger.mg_iSelected)
+    switch (gmCurrent.gm_pFrequencyTrigger->mg_iSelected)
     {
       case 0: {_pSound->SetFormat(CSoundLibrary::SF_NONE); break; }
       case 1: {_pSound->SetFormat(CSoundLibrary::SF_11025_16); break; }
@@ -912,8 +912,8 @@ static void WaveSliderChange(void)
 {
   CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
 
-  gmCurrent.gm_mgWaveVolume.mg_iCurPos -= 5;
-  gmCurrent.gm_mgWaveVolume.ApplyCurrentPosition();
+  gmCurrent.gm_pWaveVolume->mg_iCurPos -= 5;
+  gmCurrent.gm_pWaveVolume->ApplyCurrentPosition();
 }
 
 static void FrequencyTriggerChange(INDEX iDummy)
@@ -921,16 +921,16 @@ static void FrequencyTriggerChange(INDEX iDummy)
   CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
 
   sam_bAutoAdjustAudio = 0;
-  gmCurrent.gm_mgAudioAutoTrigger.mg_iSelected = 0;
-  gmCurrent.gm_mgAudioAutoTrigger.ApplyCurrentSelection();
+  gmCurrent.gm_pAudioAutoTrigger->mg_iSelected = 0;
+  gmCurrent.gm_pAudioAutoTrigger->ApplyCurrentSelection();
 }
 
 static void MPEGSliderChange(void)
 {
   CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
 
-  gmCurrent.gm_mgMPEGVolume.mg_iCurPos -= 5;
-  gmCurrent.gm_mgMPEGVolume.ApplyCurrentPosition();
+  gmCurrent.gm_pMPEGVolume->mg_iCurPos -= 5;
+  gmCurrent.gm_pMPEGVolume->ApplyCurrentPosition();
 }
 
 static void OnMPEGVolumeChange(INDEX iCurPos)
@@ -942,12 +942,12 @@ void InitActionsForAudioOptionsMenu()
 {
   CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
 
-  gmCurrent.gm_mgFrequencyTrigger.mg_pOnTriggerChange = FrequencyTriggerChange;
-  gmCurrent.gm_mgWaveVolume.mg_pOnSliderChange = &OnWaveVolumeChange;
-  gmCurrent.gm_mgWaveVolume.mg_pActivatedFunction = WaveSliderChange;
-  gmCurrent.gm_mgMPEGVolume.mg_pOnSliderChange = &OnMPEGVolumeChange;
-  gmCurrent.gm_mgMPEGVolume.mg_pActivatedFunction = MPEGSliderChange;
-  gmCurrent.gm_mgApply.mg_pActivatedFunction = &ApplyAudioOptions;
+  gmCurrent.gm_pFrequencyTrigger->mg_pOnTriggerChange = FrequencyTriggerChange;
+  gmCurrent.gm_pWaveVolume->mg_pOnSliderChange = &OnWaveVolumeChange;
+  gmCurrent.gm_pWaveVolume->mg_pActivatedFunction = WaveSliderChange;
+  gmCurrent.gm_pMPEGVolume->mg_pOnSliderChange = &OnMPEGVolumeChange;
+  gmCurrent.gm_pMPEGVolume->mg_pActivatedFunction = MPEGSliderChange;
+  gmCurrent.gm_pApplyButton->mg_pActivatedFunction = &ApplyAudioOptions;
 }
 
 // ------------------------ CVarMenu implementation

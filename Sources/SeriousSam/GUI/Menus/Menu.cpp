@@ -234,7 +234,7 @@ BOOL IsMenusInRoot(void)
 // ------------------------ Global menu function implementation
 void InitializeMenus(void)
 {
-  _pGUIM = new CMenuManager();
+  _pGUIM = new CMenuManager;
 
   try {
     // initialize and load corresponding fonts
@@ -262,10 +262,10 @@ void InitializeMenus(void)
     _toPointer.SetData_t( CTFILENAME( "Textures\\General\\Pointer.tex"));
     _toLogoMenuA.SetData_t(  CTFILENAME( "Textures\\Logo\\sam_menulogo256a.tex"));
     _toLogoMenuB.SetData_t(  CTFILENAME( "Textures\\Logo\\sam_menulogo256b.tex"));
-  }
-  catch( char *strError) {
+  } catch( char *strError) {
     FatalError( strError);
   }
+
   // force logo textures to be of maximal size
   ((CTextureData*)_toLogoMenuA.GetData())->Force(TEX_CONSTANT);
   ((CTextureData*)_toLogoMenuB.GetData())->Force(TEX_CONSTANT);
@@ -291,152 +291,150 @@ void InitializeMenus(void)
     InitGameTypes();
 
     // ------------------- Initialize menus
-  _pGUIM->gmConfirmMenu.Initialize_t();
-  _pGUIM->gmConfirmMenu.gm_strName = "Confirm";
-  _pGUIM->gmConfirmMenu.gm_pmgSelectedByDefault = &_pGUIM->gmConfirmMenu.gm_mgConfirmYes;
-  _pGUIM->gmConfirmMenu.gm_pgmParentMenu = NULL;
-  InitActionsForConfirmMenu();
+    _pGUIM->gmConfirmMenu.Initialize_t();
+    _pGUIM->gmConfirmMenu.gm_strName = "Confirm";
+    _pGUIM->gmConfirmMenu.gm_pmgSelectedByDefault = _pGUIM->gmConfirmMenu.gm_pConfirmYes;
+    _pGUIM->gmConfirmMenu.gm_pgmParentMenu = NULL;
+    InitActionsForConfirmMenu();
 
-  _pGUIM->gmMainMenu.Initialize_t();
-  _pGUIM->gmMainMenu.gm_strName = "Main";
-  _pGUIM->gmMainMenu.gm_pmgSelectedByDefault = &_pGUIM->gmMainMenu.gm_mgSingle;
-  _pGUIM->gmMainMenu.gm_pgmParentMenu = NULL;
-  InitActionsForMainMenu();
+    _pGUIM->gmMainMenu.Initialize_t();
+    _pGUIM->gmMainMenu.gm_strName = "Main";
+    _pGUIM->gmMainMenu.gm_pmgSelectedByDefault = &_pGUIM->gmMainMenu.gm_mgSingle;
+    _pGUIM->gmMainMenu.gm_pgmParentMenu = NULL;
+    InitActionsForMainMenu();
 
-  _pGUIM->gmInGameMenu.Initialize_t();
-  _pGUIM->gmInGameMenu.gm_strName = "InGame";
-  _pGUIM->gmInGameMenu.gm_pmgSelectedByDefault = &_pGUIM->gmInGameMenu.gm_mgQuickLoad;
-  _pGUIM->gmInGameMenu.gm_pgmParentMenu = NULL;
-  InitActionsForInGameMenu();
+    _pGUIM->gmInGameMenu.Initialize_t();
+    _pGUIM->gmInGameMenu.gm_strName = "InGame";
+    _pGUIM->gmInGameMenu.gm_pmgSelectedByDefault = &_pGUIM->gmInGameMenu.gm_mgQuickLoad;
+    _pGUIM->gmInGameMenu.gm_pgmParentMenu = NULL;
+    InitActionsForInGameMenu();
 
-  _pGUIM->gmSinglePlayerMenu.Initialize_t();
-  _pGUIM->gmSinglePlayerMenu.gm_strName = "SinglePlayer";
-  _pGUIM->gmSinglePlayerMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSinglePlayerMenu.gm_mgNewGame;
-  _pGUIM->gmSinglePlayerMenu.gm_pgmParentMenu = &_pGUIM->gmMainMenu;
-  InitActionsForSinglePlayerMenu();
+    _pGUIM->gmSinglePlayerMenu.Initialize_t();
+    _pGUIM->gmSinglePlayerMenu.gm_strName = "SinglePlayer";
+    _pGUIM->gmSinglePlayerMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSinglePlayerMenu.gm_mgNewGame;
+    _pGUIM->gmSinglePlayerMenu.gm_pgmParentMenu = &_pGUIM->gmMainMenu;
+    InitActionsForSinglePlayerMenu();
 
-  _pGUIM->gmSinglePlayerNewMenu.Initialize_t();
-  _pGUIM->gmSinglePlayerNewMenu.gm_strName = "SinglePlayerNew";
-  _pGUIM->gmSinglePlayerNewMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSinglePlayerNewMenu.gm_mgMedium;
-  _pGUIM->gmSinglePlayerNewMenu.gm_pgmParentMenu = &_pGUIM->gmSinglePlayerMenu;
-  InitActionsForSinglePlayerNewMenu();
+    _pGUIM->gmSinglePlayerNewMenu.Initialize_t();
+    _pGUIM->gmSinglePlayerNewMenu.gm_strName = "SinglePlayerNew";
+    _pGUIM->gmSinglePlayerNewMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSinglePlayerNewMenu.gm_mgMedium;
+    _pGUIM->gmSinglePlayerNewMenu.gm_pgmParentMenu = &_pGUIM->gmSinglePlayerMenu;
+    InitActionsForSinglePlayerNewMenu();
 
-  _pGUIM->gmDisabledFunction.Initialize_t();
-  _pGUIM->gmDisabledFunction.gm_strName = "DisabledFunction";
-  _pGUIM->gmDisabledFunction.gm_pmgSelectedByDefault = &_pGUIM->gmDisabledFunction.gm_mgButton;
-  _pGUIM->gmDisabledFunction.gm_pgmParentMenu = NULL;
+    _pGUIM->gmDisabledFunction.Initialize_t();
+    _pGUIM->gmDisabledFunction.gm_strName = "DisabledFunction";
+    _pGUIM->gmDisabledFunction.gm_pmgSelectedByDefault = &_pGUIM->gmDisabledFunction.gm_mgButton;
+    _pGUIM->gmDisabledFunction.gm_pgmParentMenu = NULL;
 
-  _pGUIM->gmPlayerProfile.Initialize_t();
-  _pGUIM->gmPlayerProfile.gm_strName = "PlayerProfile";
-  _pGUIM->gmPlayerProfile.gm_pmgSelectedByDefault = &_pGUIM->gmPlayerProfile.gm_mgNameField;
-  InitActionsForPlayerProfileMenu();
+    _pGUIM->gmPlayerProfile.Initialize_t();
+    _pGUIM->gmPlayerProfile.gm_strName = "PlayerProfile";
+    _pGUIM->gmPlayerProfile.gm_pmgSelectedByDefault = &_pGUIM->gmPlayerProfile.gm_mgNameField;
+    InitActionsForPlayerProfileMenu();
 
-  _pGUIM->gmControls.Initialize_t();
-  _pGUIM->gmControls.gm_strName = "Controls";
-  _pGUIM->gmControls.gm_pmgSelectedByDefault = &_pGUIM->gmControls.gm_mgButtons;
-  InitActionsForControlsMenu();
+    _pGUIM->gmControls.Initialize_t();
+    _pGUIM->gmControls.gm_strName = "Controls";
+    _pGUIM->gmControls.gm_pmgSelectedByDefault = &_pGUIM->gmControls.gm_mgButtons;
+    InitActionsForControlsMenu();
 
-    // warning! parent menu has to be set inside button activate function from where
-    // Load/Save menu is called
-  _pGUIM->gmLoadSaveMenu.Initialize_t();
-  _pGUIM->gmLoadSaveMenu.gm_strName = "LoadSave";
-  _pGUIM->gmLoadSaveMenu.gm_pmgSelectedByDefault = &_pGUIM->gmLoadSaveMenu.gm_amgButton[0];
+      // warning! parent menu has to be set inside button activate function from where
+      // Load/Save menu is called
+    _pGUIM->gmLoadSaveMenu.Initialize_t();
+    _pGUIM->gmLoadSaveMenu.gm_strName = "LoadSave";
+    _pGUIM->gmLoadSaveMenu.gm_pmgSelectedByDefault = &_pGUIM->gmLoadSaveMenu.gm_amgButton[0];
 
-  _pGUIM->gmHighScoreMenu.Initialize_t();
-  _pGUIM->gmHighScoreMenu.gm_strName = "HighScore";
-  _pGUIM->gmHighScoreMenu.gm_pmgSelectedByDefault = &mgBack;
+    _pGUIM->gmHighScoreMenu.Initialize_t();
+    _pGUIM->gmHighScoreMenu.gm_strName = "HighScore";
+    _pGUIM->gmHighScoreMenu.gm_pmgSelectedByDefault = &mgBack;
 
-  _pGUIM->gmCustomizeKeyboardMenu.Initialize_t();
-  _pGUIM->gmCustomizeKeyboardMenu.gm_strName = "CustomizeKeyboard";
-  _pGUIM->gmCustomizeKeyboardMenu.gm_pmgSelectedByDefault = &_pGUIM->gmCustomizeKeyboardMenu.gm_mgKey[0];
-  _pGUIM->gmCustomizeKeyboardMenu.gm_pgmParentMenu = &_pGUIM->gmControls;
+    _pGUIM->gmCustomizeKeyboardMenu.Initialize_t();
+    _pGUIM->gmCustomizeKeyboardMenu.gm_strName = "CustomizeKeyboard";
+    _pGUIM->gmCustomizeKeyboardMenu.gm_pmgSelectedByDefault = &_pGUIM->gmCustomizeKeyboardMenu.gm_mgKey[0];
+    _pGUIM->gmCustomizeKeyboardMenu.gm_pgmParentMenu = &_pGUIM->gmControls;
 
-  _pGUIM->gmCustomizeAxisMenu.Initialize_t();
-  _pGUIM->gmCustomizeAxisMenu.gm_strName = "CustomizeAxis";
-  _pGUIM->gmCustomizeAxisMenu.gm_pmgSelectedByDefault = &_pGUIM->gmCustomizeAxisMenu.gm_mgActionTrigger;
-  _pGUIM->gmCustomizeAxisMenu.gm_pgmParentMenu = &_pGUIM->gmControls;
-  InitActionsForCustomizeAxisMenu();
+    _pGUIM->gmCustomizeAxisMenu.Initialize_t();
+    _pGUIM->gmCustomizeAxisMenu.gm_strName = "CustomizeAxis";
+    _pGUIM->gmCustomizeAxisMenu.gm_pmgSelectedByDefault = &_pGUIM->gmCustomizeAxisMenu.gm_mgActionTrigger;
+    _pGUIM->gmCustomizeAxisMenu.gm_pgmParentMenu = &_pGUIM->gmControls;
+    InitActionsForCustomizeAxisMenu();
 
-  _pGUIM->gmOptionsMenu.Initialize_t();
-  _pGUIM->gmOptionsMenu.gm_strName = "Options";
-  _pGUIM->gmOptionsMenu.gm_pmgSelectedByDefault = &_pGUIM->gmOptionsMenu.gm_mgVideoOptions;
-  _pGUIM->gmOptionsMenu.gm_pgmParentMenu = &_pGUIM->gmMainMenu;
-  InitActionsForOptionsMenu();
+    _pGUIM->gmOptionsMenu.Initialize_t();
+    _pGUIM->gmOptionsMenu.gm_strName = "Options";
+    _pGUIM->gmOptionsMenu.gm_pmgSelectedByDefault = &_pGUIM->gmOptionsMenu.gm_mgVideoOptions;
+    _pGUIM->gmOptionsMenu.gm_pgmParentMenu = &_pGUIM->gmMainMenu;
+    InitActionsForOptionsMenu();
 
-  _pGUIM->gmVideoOptionsMenu.Initialize_t();
-  _pGUIM->gmVideoOptionsMenu.gm_strName = "VideoOptions";
-  _pGUIM->gmVideoOptionsMenu.gm_pmgSelectedByDefault = &_pGUIM->gmVideoOptionsMenu.gm_mgDisplayAPITrigger;
-  _pGUIM->gmVideoOptionsMenu.gm_pgmParentMenu = &_pGUIM->gmOptionsMenu;
-  InitActionsForVideoOptionsMenu();
+    _pGUIM->gmVideoOptionsMenu.Initialize_t();
+    _pGUIM->gmVideoOptionsMenu.gm_strName = "VideoOptions";
+    _pGUIM->gmVideoOptionsMenu.gm_pmgSelectedByDefault = &_pGUIM->gmVideoOptionsMenu.gm_mgDisplayAPITrigger;
+    _pGUIM->gmVideoOptionsMenu.gm_pgmParentMenu = &_pGUIM->gmOptionsMenu;
+    InitActionsForVideoOptionsMenu();
 
-  _pGUIM->gmAudioOptionsMenu.Initialize_t();
-  _pGUIM->gmAudioOptionsMenu.gm_strName = "AudioOptions";
-  _pGUIM->gmAudioOptionsMenu.gm_pmgSelectedByDefault = &_pGUIM->gmAudioOptionsMenu.gm_mgFrequencyTrigger;
-  _pGUIM->gmAudioOptionsMenu.gm_pgmParentMenu = &_pGUIM->gmOptionsMenu;
-  InitActionsForAudioOptionsMenu();
+    _pGUIM->gmAudioOptionsMenu.Initialize_t();
+    _pGUIM->gmAudioOptionsMenu.gm_strName = "AudioOptions";
+    _pGUIM->gmAudioOptionsMenu.gm_pmgSelectedByDefault = _pGUIM->gmAudioOptionsMenu.gm_pFrequencyTrigger;
+    _pGUIM->gmAudioOptionsMenu.gm_pgmParentMenu = &_pGUIM->gmOptionsMenu;
+    InitActionsForAudioOptionsMenu();
 
-  _pGUIM->gmLevelsMenu.Initialize_t();
-  _pGUIM->gmLevelsMenu.gm_strName = "Levels";
-  _pGUIM->gmLevelsMenu.gm_pmgSelectedByDefault = &_pGUIM->gmLevelsMenu.gm_mgManualLevel[0];
-  _pGUIM->gmLevelsMenu.gm_pgmParentMenu = &_pGUIM->gmSinglePlayerMenu;
+    _pGUIM->gmLevelsMenu.Initialize_t();
+    _pGUIM->gmLevelsMenu.gm_strName = "Levels";
+    _pGUIM->gmLevelsMenu.gm_pmgSelectedByDefault = &_pGUIM->gmLevelsMenu.gm_mgManualLevel[0];
+    _pGUIM->gmLevelsMenu.gm_pgmParentMenu = &_pGUIM->gmSinglePlayerMenu;
 
-  _pGUIM->gmVarMenu.Initialize_t();
-  _pGUIM->gmVarMenu.gm_strName = "Var";
-  _pGUIM->gmVarMenu.gm_pmgSelectedByDefault = &_pGUIM->gmVarMenu.gm_mgVar[0];
-  _pGUIM->gmVarMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkStartMenu;
-  InitActionsForVarMenu();
+    _pGUIM->gmVarMenu.Initialize_t();
+    _pGUIM->gmVarMenu.gm_strName = "Var";
+    _pGUIM->gmVarMenu.gm_pmgSelectedByDefault = &_pGUIM->gmVarMenu.gm_mgVar[0];
+    _pGUIM->gmVarMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkStartMenu;
+    InitActionsForVarMenu();
 
-  _pGUIM->gmServersMenu.Initialize_t();
-  _pGUIM->gmServersMenu.gm_strName = "Servers";
-  _pGUIM->gmServersMenu.gm_pmgSelectedByDefault = &_pGUIM->gmServersMenu.gm_mgList;
-  _pGUIM->gmServersMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkOpenMenu;
-  InitActionsForServersMenu();
+    _pGUIM->gmServersMenu.Initialize_t();
+    _pGUIM->gmServersMenu.gm_strName = "Servers";
+    _pGUIM->gmServersMenu.gm_pmgSelectedByDefault = &_pGUIM->gmServersMenu.gm_mgList;
+    _pGUIM->gmServersMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkOpenMenu;
+    InitActionsForServersMenu();
 
-  _pGUIM->gmNetworkMenu.Initialize_t();
-  _pGUIM->gmNetworkMenu.gm_strName = "Network";
-  _pGUIM->gmNetworkMenu.gm_pmgSelectedByDefault = &_pGUIM->gmNetworkMenu.gm_mgJoin;
-  _pGUIM->gmNetworkMenu.gm_pgmParentMenu = &_pGUIM->gmMainMenu;
-  InitActionsForNetworkMenu();
+    _pGUIM->gmNetworkMenu.Initialize_t();
+    _pGUIM->gmNetworkMenu.gm_strName = "Network";
+    _pGUIM->gmNetworkMenu.gm_pmgSelectedByDefault = &_pGUIM->gmNetworkMenu.gm_mgJoin;
+    _pGUIM->gmNetworkMenu.gm_pgmParentMenu = &_pGUIM->gmMainMenu;
+    InitActionsForNetworkMenu();
 
-  _pGUIM->gmNetworkStartMenu.Initialize_t();
-  _pGUIM->gmNetworkStartMenu.gm_strName = "NetworkStart";
-  _pGUIM->gmNetworkStartMenu.gm_pmgSelectedByDefault = &_pGUIM->gmNetworkStartMenu.gm_mgStart;
-  _pGUIM->gmNetworkStartMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkMenu;
-  InitActionsForNetworkStartMenu();
+    _pGUIM->gmNetworkStartMenu.Initialize_t();
+    _pGUIM->gmNetworkStartMenu.gm_strName = "NetworkStart";
+    _pGUIM->gmNetworkStartMenu.gm_pmgSelectedByDefault = &_pGUIM->gmNetworkStartMenu.gm_mgStart;
+    _pGUIM->gmNetworkStartMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkMenu;
+    InitActionsForNetworkStartMenu();
 
-  _pGUIM->gmNetworkJoinMenu.Initialize_t();
-  _pGUIM->gmNetworkJoinMenu.gm_strName = "NetworkJoin";
-  _pGUIM->gmNetworkJoinMenu.gm_pmgSelectedByDefault = &_pGUIM->gmNetworkJoinMenu.gm_mgLAN;
-  _pGUIM->gmNetworkJoinMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkMenu;
-  InitActionsForNetworkJoinMenu();
+    _pGUIM->gmNetworkJoinMenu.Initialize_t();
+    _pGUIM->gmNetworkJoinMenu.gm_strName = "NetworkJoin";
+    _pGUIM->gmNetworkJoinMenu.gm_pmgSelectedByDefault = &_pGUIM->gmNetworkJoinMenu.gm_mgLAN;
+    _pGUIM->gmNetworkJoinMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkMenu;
+    InitActionsForNetworkJoinMenu();
 
-  _pGUIM->gmSelectPlayersMenu.gm_bAllowDedicated = FALSE;
-  _pGUIM->gmSelectPlayersMenu.gm_bAllowObserving = FALSE;
-  _pGUIM->gmSelectPlayersMenu.Initialize_t();
-  _pGUIM->gmSelectPlayersMenu.gm_strName = "SelectPlayers";
-  _pGUIM->gmSelectPlayersMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSelectPlayersMenu.gm_mgStart;
-  InitActionsForSelectPlayersMenu();
+    _pGUIM->gmSelectPlayersMenu.gm_bAllowDedicated = FALSE;
+    _pGUIM->gmSelectPlayersMenu.gm_bAllowObserving = FALSE;
+    _pGUIM->gmSelectPlayersMenu.Initialize_t();
+    _pGUIM->gmSelectPlayersMenu.gm_strName = "SelectPlayers";
+    _pGUIM->gmSelectPlayersMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSelectPlayersMenu.gm_mgStart;
+    InitActionsForSelectPlayersMenu();
 
-  _pGUIM->gmNetworkOpenMenu.Initialize_t();
-  _pGUIM->gmNetworkOpenMenu.gm_strName = "NetworkOpen";
-  _pGUIM->gmNetworkOpenMenu.gm_pmgSelectedByDefault = &_pGUIM->gmNetworkOpenMenu.gm_mgJoin;
-  _pGUIM->gmNetworkOpenMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkJoinMenu;
-  InitActionsForNetworkOpenMenu();
+    _pGUIM->gmNetworkOpenMenu.Initialize_t();
+    _pGUIM->gmNetworkOpenMenu.gm_strName = "NetworkOpen";
+    _pGUIM->gmNetworkOpenMenu.gm_pmgSelectedByDefault = &_pGUIM->gmNetworkOpenMenu.gm_mgJoin;
+    _pGUIM->gmNetworkOpenMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkJoinMenu;
+    InitActionsForNetworkOpenMenu();
 
-  _pGUIM->gmSplitScreenMenu.Initialize_t();
-  _pGUIM->gmSplitScreenMenu.gm_strName = "SplitScreen";
-  _pGUIM->gmSplitScreenMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSplitScreenMenu.gm_mgStart;
-  _pGUIM->gmSplitScreenMenu.gm_pgmParentMenu = &_pGUIM->gmMainMenu;
-  InitActionsForSplitScreenMenu();
+    _pGUIM->gmSplitScreenMenu.Initialize_t();
+    _pGUIM->gmSplitScreenMenu.gm_strName = "SplitScreen";
+    _pGUIM->gmSplitScreenMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSplitScreenMenu.gm_mgStart;
+    _pGUIM->gmSplitScreenMenu.gm_pgmParentMenu = &_pGUIM->gmMainMenu;
+    InitActionsForSplitScreenMenu();
 
-  _pGUIM->gmSplitStartMenu.Initialize_t();
-  _pGUIM->gmSplitStartMenu.gm_strName = "SplitStart";
-  _pGUIM->gmSplitStartMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSplitStartMenu.gm_mgStart;
-  _pGUIM->gmSplitStartMenu.gm_pgmParentMenu = &_pGUIM->gmSplitScreenMenu;
-  InitActionsForSplitStartMenu();
-  }
-  catch( char *strError)
-  {
+    _pGUIM->gmSplitStartMenu.Initialize_t();
+    _pGUIM->gmSplitStartMenu.gm_strName = "SplitStart";
+    _pGUIM->gmSplitStartMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSplitStartMenu.gm_mgStart;
+    _pGUIM->gmSplitStartMenu.gm_pgmParentMenu = &_pGUIM->gmSplitScreenMenu;
+    InitActionsForSplitStartMenu();
+  } catch( char *strError) {
     FatalError( strError);
   }
 }

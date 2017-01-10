@@ -46,32 +46,35 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 
 class CMenuManager {
-public:
-  CConfirmMenu gmConfirmMenu;
-  CMainMenu gmMainMenu;
-  CInGameMenu gmInGameMenu;
-  CSinglePlayerMenu gmSinglePlayerMenu;
-  CSinglePlayerNewMenu gmSinglePlayerNewMenu;
-  CDisabledMenu gmDisabledFunction;
-  CLevelsMenu gmLevelsMenu;
-  CVarMenu gmVarMenu;
-  CPlayerProfileMenu gmPlayerProfile;
-  CControlsMenu gmControls;
-  CLoadSaveMenu gmLoadSaveMenu;
-  CHighScoreMenu gmHighScoreMenu;
-  CCustomizeKeyboardMenu gmCustomizeKeyboardMenu;
-  CServersMenu gmServersMenu;
-  CCustomizeAxisMenu gmCustomizeAxisMenu;
-  COptionsMenu gmOptionsMenu;
-  CVideoOptionsMenu gmVideoOptionsMenu;
-  CAudioOptionsMenu gmAudioOptionsMenu;
-  CNetworkMenu gmNetworkMenu;
-  CNetworkJoinMenu gmNetworkJoinMenu;
-  CNetworkStartMenu gmNetworkStartMenu;
-  CNetworkOpenMenu gmNetworkOpenMenu;
-  CSplitScreenMenu gmSplitScreenMenu;
-  CSplitStartMenu gmSplitStartMenu;
-  CSelectPlayersMenu gmSelectPlayersMenu;
+  public:
+    CConfirmMenu gmConfirmMenu;
+    CMainMenu gmMainMenu;
+    CInGameMenu gmInGameMenu;
+    CSinglePlayerMenu gmSinglePlayerMenu;
+    CSinglePlayerNewMenu gmSinglePlayerNewMenu;
+    CDisabledMenu gmDisabledFunction;
+    CLevelsMenu gmLevelsMenu;
+    CVarMenu gmVarMenu;
+    CPlayerProfileMenu gmPlayerProfile;
+    CControlsMenu gmControls;
+    CLoadSaveMenu gmLoadSaveMenu;
+    CHighScoreMenu gmHighScoreMenu;
+    CCustomizeKeyboardMenu gmCustomizeKeyboardMenu;
+    CServersMenu gmServersMenu;
+    CCustomizeAxisMenu gmCustomizeAxisMenu;
+    COptionsMenu gmOptionsMenu;
+    CVideoOptionsMenu gmVideoOptionsMenu;
+    CAudioOptionsMenu gmAudioOptionsMenu;
+    CNetworkMenu gmNetworkMenu;
+    CNetworkJoinMenu gmNetworkJoinMenu;
+    CNetworkStartMenu gmNetworkStartMenu;
+    CNetworkOpenMenu gmNetworkOpenMenu;
+    CSplitScreenMenu gmSplitScreenMenu;
+    CSplitStartMenu gmSplitStartMenu;
+    CSelectPlayersMenu gmSelectPlayersMenu;
+    
+    // Constructor.
+    CMenuManager();
 };
 
 extern CMenuManager *_pGUIM; // TODO: Make singleton!

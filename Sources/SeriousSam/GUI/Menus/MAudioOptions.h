@@ -27,17 +27,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 
 class CAudioOptionsMenu : public CGameMenu {
-public:
-  CMGTitle gm_mgTitle;
-  CMGTrigger gm_mgAudioAutoTrigger;
-  CMGTrigger gm_mgAudioAPITrigger;
-  CMGTrigger gm_mgFrequencyTrigger;
-  CMGSlider gm_mgWaveVolume;
-  CMGSlider gm_mgMPEGVolume;
-  CMGButton gm_mgApply;
+  public:
+    CMGTitle *gm_pTitle;
+    CMGTrigger *gm_pAudioAutoTrigger;
+    CMGTrigger *gm_pAudioAPITrigger;
+    CMGTrigger *gm_pFrequencyTrigger;
+    CMGSlider *gm_pWaveVolume;
+    CMGSlider *gm_pMPEGVolume;
+    CMGButton *gm_pApplyButton;
 
-  void StartMenu(void);
-  void Initialize_t(void);
+    void StartMenu(void);
+    void Initialize_t(void);
 };
 
 #endif  /* include-once check. */

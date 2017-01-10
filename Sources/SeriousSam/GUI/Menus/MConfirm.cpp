@@ -26,33 +26,31 @@ void CConfirmMenu::Initialize_t(void)
   gm_bPopup = TRUE;
 
   // Initialize title label.
-  gm_mgConfirmLabel.mg_strText = "";
-  gm_mgConfirmLabel.mg_boxOnScreen = BoxPopupLabel();
-  gm_mgConfirmLabel.mg_iCenterI = 0;
-  gm_mgConfirmLabel.mg_bfsFontSize = BFS_LARGE;
+  gm_pConfirmLabel = new CMGButton();
+  gm_pConfirmLabel->mg_boxOnScreen = BoxPopupLabel();
+  gm_pConfirmLabel->mg_iCenterI = 0;
+  gm_pConfirmLabel->mg_bfsFontSize = BFS_LARGE;
 
   // Initialize "Yes" button.
-  gm_mgConfirmYes.mg_strText = TRANS("YES");
-  gm_mgConfirmYes.mg_boxOnScreen = BoxPopupYesLarge();
-  gm_mgConfirmYes.mg_pActivatedFunction = NULL;
-  gm_mgConfirmYes.mg_pmgLeft =
-    gm_mgConfirmYes.mg_pmgRight = &gm_mgConfirmNo;
-  gm_mgConfirmYes.mg_iCenterI = 1;
-  gm_mgConfirmYes.mg_bfsFontSize = BFS_LARGE;
+  gm_pConfirmYes = new CMGButton(TRANS("YES"));
+  gm_pConfirmYes->mg_boxOnScreen = BoxPopupYesLarge();
+  gm_pConfirmYes->mg_pActivatedFunction = NULL;
+  gm_pConfirmYes->mg_pmgLeft = gm_pConfirmYes->mg_pmgRight = gm_pConfirmNo;
+  gm_pConfirmYes->mg_iCenterI = 1;
+  gm_pConfirmYes->mg_bfsFontSize = BFS_LARGE;
 
   // Initialize "No" button.
-  gm_mgConfirmNo.mg_strText = TRANS("NO");
-  gm_mgConfirmNo.mg_boxOnScreen = BoxPopupNoLarge();
-  gm_mgConfirmNo.mg_pActivatedFunction = NULL;
-  gm_mgConfirmNo.mg_pmgLeft =
-    gm_mgConfirmNo.mg_pmgRight = &gm_mgConfirmYes;
-  gm_mgConfirmNo.mg_iCenterI = -1;
-  gm_mgConfirmNo.mg_bfsFontSize = BFS_LARGE;
+  gm_pConfirmNo = new CMGButton(TRANS("NO"));
+  gm_pConfirmNo->mg_boxOnScreen = BoxPopupNoLarge();
+  gm_pConfirmNo->mg_pActivatedFunction = NULL;
+  gm_pConfirmNo->mg_pmgLeft = gm_pConfirmNo->mg_pmgRight = gm_pConfirmYes;
+  gm_pConfirmNo->mg_iCenterI = -1;
+  gm_pConfirmNo->mg_bfsFontSize = BFS_LARGE;
   
   // Add components.  
-  AddChild(&gm_mgConfirmLabel);
-  AddChild(&gm_mgConfirmYes);
-  AddChild(&gm_mgConfirmNo);
+  AddChild(gm_pConfirmLabel);
+  AddChild(gm_pConfirmYes);
+  AddChild(gm_pConfirmNo);
 
   _pConfimedYes = NULL;
   _pConfimedNo = NULL;
@@ -60,31 +58,31 @@ void CConfirmMenu::Initialize_t(void)
 
 void CConfirmMenu::BeLarge(void)
 {
-  gm_mgConfirmLabel.mg_bfsFontSize = BFS_LARGE;
-  gm_mgConfirmYes.mg_bfsFontSize = BFS_LARGE;
-  gm_mgConfirmNo.mg_bfsFontSize = BFS_LARGE;
+  gm_pConfirmLabel->mg_bfsFontSize = BFS_LARGE;
+  gm_pConfirmYes->mg_bfsFontSize = BFS_LARGE;
+  gm_pConfirmNo->mg_bfsFontSize = BFS_LARGE;
 
-  gm_mgConfirmLabel.mg_iCenterI = 0;
-  gm_mgConfirmYes.mg_boxOnScreen = BoxPopupYesLarge();
-  gm_mgConfirmNo.mg_boxOnScreen = BoxPopupNoLarge();
+  gm_pConfirmLabel->mg_iCenterI = 0;
+  gm_pConfirmYes->mg_boxOnScreen = BoxPopupYesLarge();
+  gm_pConfirmNo->mg_boxOnScreen = BoxPopupNoLarge();
 }
 
 void CConfirmMenu::BeSmall(void)
 {
-  gm_mgConfirmLabel.mg_bfsFontSize = BFS_MEDIUM;
-  gm_mgConfirmYes.mg_bfsFontSize = BFS_MEDIUM;
-  gm_mgConfirmNo.mg_bfsFontSize = BFS_MEDIUM;
+  gm_pConfirmLabel->mg_bfsFontSize = BFS_MEDIUM;
+  gm_pConfirmYes->mg_bfsFontSize = BFS_MEDIUM;
+  gm_pConfirmNo->mg_bfsFontSize = BFS_MEDIUM;
 
-  gm_mgConfirmLabel.mg_iCenterI = -1;
-  gm_mgConfirmYes.mg_boxOnScreen = BoxPopupYesSmall();
-  gm_mgConfirmNo.mg_boxOnScreen = BoxPopupNoSmall();
+  gm_pConfirmLabel->mg_iCenterI = -1;
+  gm_pConfirmYes->mg_boxOnScreen = BoxPopupYesSmall();
+  gm_pConfirmNo->mg_boxOnScreen = BoxPopupNoSmall();
 }
 
 // return TRUE if handled
 BOOL CConfirmMenu::OnKeyDown(int iVKey)
 {
-  if ((iVKey == VK_ESCAPE || iVKey == VK_RBUTTON) && gm_mgConfirmNo.mg_pActivatedFunction != NULL) {
-    gm_mgConfirmNo.OnActivate();
+  if ((iVKey == VK_ESCAPE || iVKey == VK_RBUTTON) && gm_pConfirmNo->mg_pActivatedFunction != NULL) {
+    gm_pConfirmNo->OnActivate();
     return TRUE;
   }
   return CGameMenu::OnKeyDown(iVKey);
