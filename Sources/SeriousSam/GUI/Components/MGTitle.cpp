@@ -19,7 +19,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <GameMP/LCDDrawing.h>
 #include "MGTitle.h"
 
-
+// --------------------------------------------------------------------------------------
+// Draws component.
+// --------------------------------------------------------------------------------------
 void CMGTitle::Render(CDrawPort *pdp)
 {
   SetFontTitle(pdp);

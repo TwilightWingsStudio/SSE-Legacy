@@ -23,7 +23,9 @@ extern PIX  _pixCursorPosI;
 extern PIX  _pixCursorPosJ;
 extern INDEX sam_bWideScreen;
 
-
+// --------------------------------------------------------------------------------------
+// Constructor.
+// --------------------------------------------------------------------------------------
 CMGSlider::CMGSlider()
 {
   mg_iMinPos = 0;
@@ -33,6 +35,9 @@ CMGSlider::CMGSlider()
   mg_fFactor = 1.0f;
 }
 
+// --------------------------------------------------------------------------------------
+// Called to exclude wrong values. Mostly after loading some data from configs.
+// --------------------------------------------------------------------------------------
 void CMGSlider::ApplyCurrentPosition(void)
 {
   mg_iCurPos = Clamp(mg_iCurPos, mg_iMinPos, mg_iMaxPos);
@@ -44,15 +49,21 @@ void CMGSlider::ApplyCurrentPosition(void)
   }
 }
 
+// --------------------------------------------------------------------------------------
+// Changes core parameters of slider.
+// --------------------------------------------------------------------------------------
 void CMGSlider::ApplyGivenPosition(INDEX iMin, INDEX iMax, INDEX iCur)
 {
   mg_iMinPos = iMin;
   mg_iMaxPos = iMax;
   mg_iCurPos = iCur;
+
   ApplyCurrentPosition();
 }
 
-
+// --------------------------------------------------------------------------------------
+// Called every time when user pressed a button while this component active.
+// --------------------------------------------------------------------------------------
 BOOL CMGSlider::OnKeyDown(int iVKey)
 {
   // if scrolling left
@@ -60,12 +71,14 @@ BOOL CMGSlider::OnKeyDown(int iVKey)
     mg_iCurPos--;
     ApplyCurrentPosition();
     return TRUE;
-    // if scrolling right
+
+  // if scrolling right
   } else if ((iVKey == VK_RETURN || iVKey == VK_RIGHT) && mg_iCurPos<mg_iMaxPos) {
     mg_iCurPos++;
     ApplyCurrentPosition();
     return TRUE;
-    // if lmb pressed
+   
+   // If LMB pressed.
   } else if (iVKey == VK_LBUTTON) {
     // get position of slider box on screen
     PIXaabbox2D boxSlider = GetSliderBox();
@@ -77,12 +90,17 @@ BOOL CMGSlider::OnKeyDown(int iVKey)
       fRatio = Clamp(fRatio, 0.0f, 1.0f);
       mg_iCurPos = fRatio*(mg_iMaxPos - mg_iMinPos) + mg_iMinPos;
       ApplyCurrentPosition();
+
       return TRUE;
     }
   }
+
   return CMenuGadget::OnKeyDown(iVKey);
 }
 
+// --------------------------------------------------------------------------------------
+// Returns a box on screen taken by slider.
+// --------------------------------------------------------------------------------------
 PIXaabbox2D CMGSlider::GetSliderBox(void)
 {
   extern CDrawPort *pdp;
@@ -92,9 +110,13 @@ PIXaabbox2D CMGSlider::GetSliderBox(void)
   PIX pixJSize = box.Size()(2)*0.95f;
   PIX pixISizeR = box.Size()(1)*0.45f;
   if (sam_bWideScreen) pixJSize++;
+
   return PIXaabbox2D(PIX2D(pixIR + 1, pixJ + 1), PIX2D(pixIR + pixISizeR - 2, pixJ + pixJSize - 2));
 }
 
+// --------------------------------------------------------------------------------------
+// Draws component.
+// --------------------------------------------------------------------------------------
 void CMGSlider::Render(CDrawPort *pdp)
 {
   SetFontMedium(pdp);
@@ -108,9 +130,8 @@ void CMGSlider::Render(CDrawPort *pdp)
   PIX pixJSize = box.Size()(2)*0.95f;
   PIX pixISizeR = box.Size()(1)*0.45f;
   if (sam_bWideScreen) pixJSize++;
-
-  // print text left of slider
-  pdp->PutTextR(mg_strText, pixIL, pixJ, col);
+  
+  pdp->PutTextR(mg_strText, pixIL, pixJ, col); // print text label left of slider
 
   // draw box around slider
   LCDDrawBox(0, -1, PIXaabbox2D(PIX2D(pixIR + 1, pixJ), PIX2D(pixIR + pixISizeR - 2, pixJ + pixJSize - 2)),

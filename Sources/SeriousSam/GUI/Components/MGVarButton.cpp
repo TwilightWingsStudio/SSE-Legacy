@@ -37,7 +37,9 @@ BOOL CMGVarButton::IsEnabled(void)
     || mg_pvsVar->vs_bCanChangeInGame);
 }
 
-// return slider position on scren
+// --------------------------------------------------------------------------------------
+// Returns slider position on screen.
+// --------------------------------------------------------------------------------------
 PIXaabbox2D CMGVarButton::GetSliderBox(void)
 {
   extern CDrawPort *pdp;
@@ -50,6 +52,10 @@ PIXaabbox2D CMGVarButton::GetSliderBox(void)
 }
 
 extern BOOL _bVarChanged;
+
+// --------------------------------------------------------------------------------------
+// Called every time when user pressed a button while this component active.
+// --------------------------------------------------------------------------------------
 BOOL CMGVarButton::OnKeyDown(int iVKey)
 {
   if (mg_pvsVar == NULL || mg_pvsVar->vs_bSeparator || !mg_pvsVar->Validate() || !mg_bEnabled) {
@@ -79,42 +85,55 @@ BOOL CMGVarButton::OnKeyDown(int iVKey)
     FlushVarSettings(TRUE);
     void MenuGoToParent(void);
     MenuGoToParent();
+
     return TRUE;
   }
 
-  if (iVKey == VK_LBUTTON || iVKey == VK_RIGHT) {
-    if (mg_pvsVar != NULL) {
+  // If pressed LMB or right arrow button then we should increase value.
+  if (iVKey == VK_LBUTTON || iVKey == VK_RIGHT)
+  {
+    if (mg_pvsVar != NULL)
+    {
       INDEX iOldValue = mg_pvsVar->vs_iValue;
       mg_pvsVar->vs_iValue++;
+
       if (mg_pvsVar->vs_iValue >= mg_pvsVar->vs_ctValues) {
         // wrap non-sliders, clamp sliders
         if (mg_pvsVar->vs_iSlider) mg_pvsVar->vs_iValue = mg_pvsVar->vs_ctValues - 1L;
         else mg_pvsVar->vs_iValue = 0;
       }
+
       if (iOldValue != mg_pvsVar->vs_iValue) {
         _bVarChanged = TRUE;
         mg_pvsVar->vs_bCustom = FALSE;
         mg_pvsVar->Validate();
       }
     }
+
     return TRUE;
   }
 
-  if (iVKey == VK_LEFT || iVKey == VK_RBUTTON) {
-    if (mg_pvsVar != NULL) {
+    // If pressed RMB or left arrow button then we should increase value.
+  if (iVKey == VK_LEFT || iVKey == VK_RBUTTON)
+  {
+    if (mg_pvsVar != NULL)
+    {
       INDEX iOldValue = mg_pvsVar->vs_iValue;
       mg_pvsVar->vs_iValue--;
+
       if (mg_pvsVar->vs_iValue<0) {
         // wrap non-sliders, clamp sliders
         if (mg_pvsVar->vs_iSlider) mg_pvsVar->vs_iValue = 0;
         else mg_pvsVar->vs_iValue = mg_pvsVar->vs_ctValues - 1L;
       }
+
       if (iOldValue != mg_pvsVar->vs_iValue) {
         _bVarChanged = TRUE;
         mg_pvsVar->vs_bCustom = FALSE;
         mg_pvsVar->Validate();
       }
     }
+
     return TRUE;
   }
 
@@ -122,6 +141,9 @@ BOOL CMGVarButton::OnKeyDown(int iVKey)
   return CMenuGadget::OnKeyDown(iVKey);
 }
 
+// --------------------------------------------------------------------------------------
+// Draws component.
+// --------------------------------------------------------------------------------------
 void CMGVarButton::Render(CDrawPort *pdp)
 {
   if (mg_pvsVar == NULL) {
@@ -142,21 +164,27 @@ void CMGVarButton::Render(CDrawPort *pdp)
     COLOR col = LCDGetColor(C_WHITE | 255, "separator");
     CTString strText = mg_pvsVar->vs_strName;
     pdp->PutTextC(strText, pixIC, pixJ, col);
+
   } else if (mg_pvsVar->Validate()) {
     // check whether the variable is disabled
     if (mg_pvsVar->vs_strFilter != "") mg_bEnabled = _pShell->GetINDEX(mg_pvsVar->vs_strFilter);
     COLOR col = GetCurrentColor();
     pdp->PutTextR(mg_pvsVar->vs_strName, pixIL, pixJ, col);
-    // custom is by default
-    CTString strText = TRANS("Custom");
+    
+    CTString strText = TRANS("Custom"); // custom is by default
+
+    // If not custom then...
     if (!mg_pvsVar->vs_bCustom)
-    { // not custom!
+    {
       strText = mg_pvsVar->vs_astrTexts[mg_pvsVar->vs_iValue];
-      // need slider?
-      if (mg_pvsVar->vs_iSlider>0) {
-        // draw box around slider
+
+      // If we need slider then receive it.
+      if (mg_pvsVar->vs_iSlider > 0)
+      {
         PIX pixISize = box.Size()(1)*0.13f;
         PIX pixJSize = box.Size()(2);
+
+        // draw box around slider
         LCDDrawBox(0, -1, PIXaabbox2D(PIX2D(pixIR, pixJ + 1), PIX2D(pixIR + pixISize - 4, pixJ + pixJSize - 6)),
           LCDGetColor(C_GREEN | 255, "slider box"));
 
@@ -171,11 +199,11 @@ void CMGVarButton::Render(CDrawPort *pdp)
           FLOAT fUnitWidth = (FLOAT)(pixISize - 5) / mg_pvsVar->vs_ctValues;
           pdp->Fill(pixIR + 1 + (mg_pvsVar->vs_iValue*fUnitWidth), pixJ + 2, fUnitWidth, pixJSize - 9, col);
         }
-        // move text printout to the right of slider
-        pixIR += box.Size()(1)*0.15f;
+        
+        pixIR += box.Size()(1) * 0.15f; // move text printout to the right of slider
       }
     }
-    // write right text
-    pdp->PutText(strText, pixIR, pixJ, col);
+
+    pdp->PutText(strText, pixIR, pixJ, col); // write right text
   }
 }

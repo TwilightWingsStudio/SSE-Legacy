@@ -29,8 +29,9 @@ void CMGChangePlayer::OnActivate(void)
   IFeel_PlayEffect("Menu_press");
   _iLocalPlayer = mg_iLocalPlayer;
 
-  if (_pGame->gm_aiMenuLocalPlayers[mg_iLocalPlayer] < 0)
+  if (_pGame->gm_aiMenuLocalPlayers[mg_iLocalPlayer] < 0) {
     _pGame->gm_aiMenuLocalPlayers[mg_iLocalPlayer] = 0;
+  }
 
   _pGUIM->gmPlayerProfile.gm_piCurrentPlayer = &_pGame->gm_aiMenuLocalPlayers[mg_iLocalPlayer];
   _pGUIM->gmPlayerProfile.gm_pgmParentMenu = &_pGUIM->gmSelectPlayersMenu;

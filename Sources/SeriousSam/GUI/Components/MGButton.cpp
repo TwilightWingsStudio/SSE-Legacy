@@ -25,7 +25,9 @@ extern CSoundData *_psdPress;
 
 extern CMenuGadget *_pmgLastActivatedGadget;
 
-
+// --------------------------------------------------------------------------------------
+// Constructor.
+// --------------------------------------------------------------------------------------
 CMGButton::CMGButton(void)
 {
 	mg_pActivatedFunction = NULL;
@@ -58,7 +60,9 @@ void CMGButton::OnActivate(void)
 	}
 }
 
-
+// --------------------------------------------------------------------------------------
+// Draws component.
+// --------------------------------------------------------------------------------------
 void CMGButton::Render(CDrawPort *pdp)
 {
 	if (mg_bfsFontSize == BFS_LARGE) {

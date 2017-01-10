@@ -51,7 +51,7 @@ class CMenuGadget
     CMenuGadget(void);
 
     // return TRUE if handled
-    virtual BOOL OnKeyDown(int iVKey);
+    virtual BOOL OnKeyDown(int iVKey); // Called every time when user pressed a button while this component active.
     virtual BOOL OnChar(MSG msg);
 
     virtual void OnActivate(void);
@@ -63,7 +63,7 @@ class CMenuGadget
     virtual void OnMouseOver(PIX pixI, PIX pixJ);
 
     virtual COLOR GetCurrentColor(void);
-    virtual void  Render(CDrawPort *pdp);
+    virtual void  Render(CDrawPort *pdp); // Draws the component.
     virtual BOOL  IsSeparator(void) { return FALSE; };
 };
 

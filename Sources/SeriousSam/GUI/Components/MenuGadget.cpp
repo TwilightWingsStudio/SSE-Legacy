@@ -27,7 +27,9 @@ extern BOOL _bDefiningKey = FALSE;
 extern BOOL _bEditingString = FALSE;
 extern CMenuGadget *_pmgLastActivatedGadget = NULL;
 
-
+// --------------------------------------------------------------------------------------
+// Constructor.
+// --------------------------------------------------------------------------------------
 CMenuGadget::CMenuGadget(void)
 {
   mg_pmgLeft = NULL;
@@ -47,27 +49,25 @@ void CMenuGadget::OnActivate(void)
   NOTHING;
 }
 
-// return TRUE if handled
+// --------------------------------------------------------------------------------------
+// Called every time when user pressed a button while this component active.
+// --------------------------------------------------------------------------------------
 BOOL CMenuGadget::OnKeyDown(int iVKey)
 {
-  // if return pressed
+  // If return pressed...
   if (iVKey == VK_RETURN || iVKey == VK_LBUTTON) {
-    // activate
-    OnActivate();
-    // key is handled
-    return TRUE;
+    OnActivate(); // Activate.
+    return TRUE; // Notice that is handled.
   }
-  // key is not handled
-  return FALSE;
+
+  return FALSE; // Notice that is not handled.
 }
 
 
 BOOL CMenuGadget::OnChar(MSG msg)
 {
-  // key is not handled
-  return FALSE;
+  return FALSE; // Notice that is not handled.
 }
-
 
 void CMenuGadget::OnSetFocus(void)
 {
@@ -120,11 +120,11 @@ COLOR CMenuGadget::GetCurrentColor(void)
       colUnselected = colSelected = LCDGetColor(C_WHITE, "label");
     }
   }
-  // use unselected color
-  COLOR colRet = colUnselected;
-  // if selected
+ 
+  COLOR colRet = colUnselected; // Use unselected color.
+
+  // If selected then oscilate towards selected color.
   if (mg_bFocused) {
-    // oscilate towards selected color
     FLOAT tmNow = _pTimer->GetHighPrecisionTimer().GetSeconds();
     colRet = LerpColor((colUnselected >> 1) & 0x7F7F7F7F, colSelected, sin(tmNow*10.0f)*0.5f + 0.5f);
   }
@@ -132,6 +132,7 @@ COLOR CMenuGadget::GetCurrentColor(void)
   return colRet | CT_OPAQUE;
 }
 
-void CMenuGadget::Render(CDrawPort *pdp)
-{
-}
+// --------------------------------------------------------------------------------------
+// Draws component.
+// --------------------------------------------------------------------------------------
+void CMenuGadget::Render(CDrawPort *pdp) {}

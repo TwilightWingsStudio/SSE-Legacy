@@ -44,6 +44,9 @@ void PrintInBox(CDrawPort *pdp, PIX pixI, PIX pixJ, PIX pixSizeI, CTString str, 
   pdp->PutText(str, pixI, pixJ, col);
 }
 
+// --------------------------------------------------------------------------------------
+// Constructor.
+// --------------------------------------------------------------------------------------
 CMGServerList::CMGServerList()
 {
   mg_iSelected = 0;
@@ -60,6 +63,7 @@ CMGServerList::CMGServerList()
   mg_iSort = 2;
   mg_bSortDown = FALSE;
 }
+
 void CMGServerList::AdjustFirstOnScreen(void)
 {
   INDEX ctSessions = _lhServers.Count();
@@ -146,6 +150,9 @@ void SortAndFilterServers(void)
   _lhServers.Sort(CompareSessions, offsetof(CNetworkSession, ns_lnNode));
 }
 
+// --------------------------------------------------------------------------------------
+// Draws component.
+// --------------------------------------------------------------------------------------
 void CMGServerList::Render(CDrawPort *pdp)
 {
   _iSort = mg_iSort;
@@ -356,6 +363,9 @@ void CMGServerList::OnMouseOver(PIX pixI, PIX pixJ)
   }
 }
 
+// --------------------------------------------------------------------------------------
+// Called every time when user pressed a button while this component active.
+// --------------------------------------------------------------------------------------
 BOOL CMGServerList::OnKeyDown(int iVKey)
 {
   switch (iVKey) {

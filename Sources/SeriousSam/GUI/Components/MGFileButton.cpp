@@ -22,7 +22,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 extern CSoundData *_psdPress;
 
-
+// --------------------------------------------------------------------------------------
+// Constructor.
+// --------------------------------------------------------------------------------------
 CMGFileButton::CMGFileButton(void)
 {
   mg_iState = FBS_NORMAL;
@@ -134,6 +136,9 @@ void CMGFileButton::OnActivate(void)
   }
 }
 
+// --------------------------------------------------------------------------------------
+// Called every time when user pressed a button while this component active.
+// --------------------------------------------------------------------------------------
 BOOL CMGFileButton::OnKeyDown(int iVKey)
 {
   if (mg_iState == FBS_NORMAL) {
@@ -223,13 +228,16 @@ void CMGFileButton::OnStringCanceled(void)
   mg_strText = _strOrgDescription;
 }
 
+// --------------------------------------------------------------------------------------
+// Draws component.
+// --------------------------------------------------------------------------------------
 void CMGFileButton::Render(CDrawPort *pdp)
 {
-  // render original gadget first
-  CMGEdit::Render(pdp);
+  CMGEdit::Render(pdp); // Render original component first.
 
-  // if currently selected
-  if (mg_bFocused && mg_bEnabled) {
+  // If currently selected...
+  if (mg_bFocused && mg_bEnabled)
+  {
     // add info at the bottom if screen
     SetFontMedium(pdp);
 

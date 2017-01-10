@@ -24,7 +24,9 @@ extern CSoundData *_psdPress;
 
 extern BOOL _bDefiningKey;
 
-
+// --------------------------------------------------------------------------------------
+// Constructor.
+// --------------------------------------------------------------------------------------
 CMGKeyDefinition::CMGKeyDefinition(void)
 {
   mg_iState = DOING_NOTHING;
@@ -38,26 +40,29 @@ void CMGKeyDefinition::OnActivate(void)
   mg_iState = RELEASE_RETURN_WAITING;
 }
 
+// --------------------------------------------------------------------------------------
+// Called every time when user pressed a button while this component active.
+// --------------------------------------------------------------------------------------
 BOOL CMGKeyDefinition::OnKeyDown(int iVKey)
 {
-  // if waiting for a key definition
+  // If waiting for a key definition then do nothing.
   if (mg_iState == PRESS_KEY_WAITING) {
-    // do nothing
     return TRUE;
   }
 
-  // if backspace pressed
-  if (iVKey == VK_BACK) {
-    // clear both keys
+  // if backspace pressed then clear both keys
+  if (iVKey == VK_BACK)
+  {
     DefineKey(KID_NONE);
-    // message is processed
-    return TRUE;
+    return TRUE; // Notice that key is handled.
   }
 
   return CMenuGadget::OnKeyDown(iVKey);
 }
 
-// set names for both key bindings
+// --------------------------------------------------------------------------------------
+// Sets names for both key bindings.
+// --------------------------------------------------------------------------------------
 void CMGKeyDefinition::SetBindingNames(BOOL bDefining)
 {
   // find the button
@@ -74,32 +79,29 @@ void CMGKeyDefinition::SetBindingNames(BOOL bDefining)
       CTString strKey1 = _pInput->GetButtonTransName(iKey1);
       CTString strKey2 = _pInput->GetButtonTransName(iKey2);
 
-      // if defining
+      // If defining...
       if (bDefining) {
-        // if only first key is defined
+        // If only first key is defined then put question mark for second key.
         if (bKey1Bound && !bKey2Bound) {
-          // put question mark for second key
           mg_strBinding = strKey1 + TRANS(" or ") + "?";
-        // otherwise
-        } else {
-          // put question mark only
+        } else { // otherwise put question mark only
           mg_strBinding = "?";
         }
-        // if not defining
-      }
-      else {
-        // if second key is defined
+
+      // If not defining
+      } else {
+        // if second key is defined then add both.
         if (bKey2Bound) {
-          // add both
           mg_strBinding = strKey1 + TRANS(" or ") + strKey2;
-        // if second key is undefined
+
+        // if second key is undefined then display only first one.
         } else {
-          // display only first one
           mg_strBinding = strKey1;
         }
       }
       return;
     }
+
     ict++;
   }
 
@@ -122,37 +124,41 @@ void CMGKeyDefinition::DefineKey(INDEX iDik)
 {
   // for each button in controls
   INDEX ict = 0;
-  FOREACHINLIST(CButtonAction, ba_lnNode, _pGame->gm_ctrlControlsExtra.ctrl_lhButtonActions, itba) {
+  FOREACHINLIST(CButtonAction, ba_lnNode, _pGame->gm_ctrlControlsExtra.ctrl_lhButtonActions, itba)
+  {
     CButtonAction &ba = *itba;
-    // if it is this one
-    if (ict == mg_iControlNumber) {
-      // if should clear
+
+    // If it is this one...
+    if (ict == mg_iControlNumber)
+    {
+      // If should clear then unbind both.
       if (iDik == KID_NONE) {
-        // unbind both
         ba.ba_iFirstKey = KID_NONE;
         ba.ba_iSecondKey = KID_NONE;
       }
-      // if first key is unbound, or both keys are bound
-      if (ba.ba_iFirstKey == KID_NONE || ba.ba_iSecondKey != KID_NONE) {
-        // bind first key
+
+      // if first key is unbound, or both keys are bound bind first key and clear second key.
+      if (ba.ba_iFirstKey == KID_NONE || ba.ba_iSecondKey != KID_NONE)
+      {
         ba.ba_iFirstKey = iDik;
-        // clear second key
         ba.ba_iSecondKey = KID_NONE;
-      // if only first key bound
+   
+      // if only first key bound then bind second key.
       } else {
-        // bind second key
         ba.ba_iSecondKey = iDik;
       }
-      // if it is not this one
+
+    // If it is not this one then clear bindings that contain this key.
     } else {
-      // clear bindings that contain this key
       if (ba.ba_iFirstKey == iDik) {
         ba.ba_iFirstKey = KID_NONE;
       }
+
       if (ba.ba_iSecondKey == iDik) {
         ba.ba_iSecondKey = KID_NONE;
       }
     }
+
     ict++;
   }
 
@@ -168,17 +174,18 @@ void CMGKeyDefinition::Think(void)
     _bMouseUsedLast = FALSE;
     _pInput->SetJoyPolling(TRUE);
     _pInput->GetInput(FALSE);
+
     if (_pInput->IsInputEnabled() &&
       !_pInput->GetButtonState(KID_ENTER) &&
       !_pInput->GetButtonState(KID_MOUSE1))
     {
       mg_iState = PRESS_KEY_WAITING;
     }
-  }
-  else if (mg_iState == PRESS_KEY_WAITING)
-  {
+
+  } else if (mg_iState == PRESS_KEY_WAITING) {
     _pInput->SetJoyPolling(TRUE);
     _pInput->GetInput(FALSE);
+
     for (INDEX iDik = 0; iDik<MAX_OVERALL_BUTTONS; iDik++)
     {
       if (_pInput->GetButtonState(iDik))
@@ -208,6 +215,9 @@ void CMGKeyDefinition::Think(void)
   }
 }
 
+// --------------------------------------------------------------------------------------
+// Draws component.
+// --------------------------------------------------------------------------------------
 void CMGKeyDefinition::Render(CDrawPort *pdp)
 {
   SetFontMedium(pdp);

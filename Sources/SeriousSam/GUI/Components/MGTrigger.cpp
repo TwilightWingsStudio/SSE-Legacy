@@ -19,11 +19,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <GameMP/LCDDrawing.h>
 #include "MGTrigger.h"
 
-
-INDEX GetNewLoopValue(int iVKey, INDEX iCurrent, INDEX ctMembers)
+// --------------------------------------------------------------------------------------
+// Returns next or previous variant depends on pressed button.
+// --------------------------------------------------------------------------------------
+static INDEX GetNewLoopValue(int iVKey, INDEX iCurrent, INDEX ctMembers)
 {
   INDEX iPrev = (iCurrent + ctMembers - 1) % ctMembers;
   INDEX iNext = (iCurrent + 1) % ctMembers;
+
   // return and right arrow set new text
   if (iVKey == VK_RETURN || iVKey == VK_LBUTTON || iVKey == VK_RIGHT)
   {
@@ -32,9 +35,13 @@ INDEX GetNewLoopValue(int iVKey, INDEX iCurrent, INDEX ctMembers)
   } else if ((iVKey == VK_BACK || iVKey == VK_RBUTTON) || (iVKey == VK_LEFT)) {
     return iPrev;
   }
+
   return iCurrent;
 }
 
+// --------------------------------------------------------------------------------------
+// Constructor.
+// --------------------------------------------------------------------------------------
 CMGTrigger::CMGTrigger(void)
 {
   mg_pPreTriggerChange = NULL;
@@ -43,12 +50,18 @@ CMGTrigger::CMGTrigger(void)
   mg_bVisual = FALSE;
 }
 
+// --------------------------------------------------------------------------------------
+// Called to exclude wrong variants. Mostly after loading some data from configs.
+// --------------------------------------------------------------------------------------
 void CMGTrigger::ApplyCurrentSelection(void)
 {
   mg_iSelected = Clamp(mg_iSelected, 0L, mg_ctTexts - 1L);
   mg_strValue = mg_astrTexts[mg_iSelected];
 }
 
+// --------------------------------------------------------------------------------------
+// Called if user pressed right button.
+// --------------------------------------------------------------------------------------
 void CMGTrigger::OnSetNextInList(int iVKey)
 {
   if (mg_pPreTriggerChange != NULL) {
@@ -63,6 +76,9 @@ void CMGTrigger::OnSetNextInList(int iVKey)
   }
 }
 
+// --------------------------------------------------------------------------------------
+// Called every time when user pressed a button while this component active.
+// --------------------------------------------------------------------------------------
 BOOL CMGTrigger::OnKeyDown(int iVKey)
 {
   if ((iVKey == VK_RETURN || iVKey == VK_LBUTTON) ||
@@ -74,10 +90,14 @@ BOOL CMGTrigger::OnKeyDown(int iVKey)
     if (mg_bEnabled) OnSetNextInList(iVKey);
     return TRUE;
   }
+
   // key is not handled
   return FALSE;
 }
 
+// --------------------------------------------------------------------------------------
+// Draws component.
+// --------------------------------------------------------------------------------------
 void CMGTrigger::Render(CDrawPort *pdp)
 {
   SetFontMedium(pdp);
@@ -88,8 +108,11 @@ void CMGTrigger::Render(CDrawPort *pdp)
   PIX pixJ = box.Min()(2);
 
   COLOR col = GetCurrentColor();
+  
+  // If not visual or haven't any value.
   if (!mg_bVisual || mg_strValue == "") {
     CTString strValue = mg_strValue;
+
     if (mg_bVisual) {
       strValue = TRANS("none");
     }
@@ -105,18 +128,21 @@ void CMGTrigger::Render(CDrawPort *pdp)
     CTString strLabel = mg_strLabel + ": ";
     pdp->PutText(strLabel, box.Min()(1), pixJ, col);
     CTextureObject to;
+
     try {
       to.SetData_t(mg_strValue);
       CTextureData *ptd = (CTextureData *)to.GetData();
       PIX pixSize = box.Size()(2);
       PIX pixCX = box.Max()(1) - pixSize / 2;
       PIX pixCY = box.Center()(2);
+
       pdp->PutTexture(&to, PIXaabbox2D(
         PIX2D(pixCX - pixSize / 2, pixCY - pixSize / 2),
         PIX2D(pixCX - pixSize / 2 + pixSize, pixCY - pixSize / 2 + pixSize)), C_WHITE | 255);
     } catch (char *strError) {
       CPrintF("%s\n", strError);
     }
+
     to.SetData(NULL);
   }
 }

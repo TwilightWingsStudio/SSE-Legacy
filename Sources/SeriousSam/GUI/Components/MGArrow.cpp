@@ -19,15 +19,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <GameMP/LCDDrawing.h>
 #include "MGArrow.h"
 
-
+// --------------------------------------------------------------------------------------
+// Draws component.
+// --------------------------------------------------------------------------------------
 void CMGArrow::Render(CDrawPort *pdp)
 {
   SetFontMedium(pdp);
 
   PIXaabbox2D box = FloatBoxToPixBox(pdp, mg_boxOnScreen);
   COLOR col = GetCurrentColor();
-
   CTString str;
+
   if (mg_adDirection == AD_NONE) {
     str = "???";
   } else if (mg_adDirection == AD_UP) {
@@ -47,8 +49,7 @@ void CMGArrow::OnActivate(void)
 {
   if (mg_adDirection == AD_UP) {
     pgmCurrentMenu->ScrollList(-3);
-  }
-  else if (mg_adDirection == AD_DOWN) {
+  } else if (mg_adDirection == AD_DOWN) {
     pgmCurrentMenu->ScrollList(+3);
   }
 }

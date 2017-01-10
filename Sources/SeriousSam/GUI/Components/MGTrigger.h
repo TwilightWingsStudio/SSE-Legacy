@@ -28,12 +28,12 @@ class CMGTrigger : public CMenuGadget
 {
   public:
     CTString mg_strLabel;
-    CTString mg_strValue;
-    CTString *mg_astrTexts;
-    INDEX mg_ctTexts;
+    CTString mg_strValue;   // Current text.
+    CTString *mg_astrTexts; // List of variants.
+    INDEX mg_ctTexts;       // Number of variants.
     INDEX mg_iSelected;
     INDEX mg_iCenterI;
-    BOOL mg_bVisual;
+    BOOL mg_bVisual; // Used for togglable textures.
 
     // Constructor.
     CMGTrigger(void);
@@ -42,9 +42,7 @@ class CMGTrigger : public CMenuGadget
     void OnSetNextInList(int iVKey);
     void(*mg_pPreTriggerChange)(INDEX iCurrentlySelected);
     void(*mg_pOnTriggerChange)(INDEX iCurrentlySelected);
-
-    // return TRUE if handled
-    BOOL OnKeyDown(int iVKey);
+    BOOL OnKeyDown(int iVKey); // return TRUE if handled
     void Render(CDrawPort *pdp);
 };
 

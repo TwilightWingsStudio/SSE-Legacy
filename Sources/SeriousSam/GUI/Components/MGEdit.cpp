@@ -23,7 +23,9 @@ extern CSoundData *_psdPress;
 
 extern BOOL _bEditingString;
 
-
+// --------------------------------------------------------------------------------------
+// Constructor.
+// --------------------------------------------------------------------------------------
 CMGEdit::CMGEdit(void)
 {
   mg_pstrToChange = NULL;
@@ -43,6 +45,7 @@ void CMGEdit::OnActivate(void)
   if (!mg_bEnabled) {
     return;
   }
+
   ASSERT(mg_pstrToChange != NULL);
   PlayMenuSound(_psdPress);
   IFeel_PlayEffect("Menu_press");
@@ -80,6 +83,7 @@ static void Key_BackDel(CTString &str, INDEX &iPos, BOOL bShift, BOOL bRight)
       str.DeleteChar(iPos);
     }
   }
+
   if (!bRight && iPos>0) {       // BACKSPACE key
     if (bShift) {
       // delete to start of line
@@ -93,28 +97,31 @@ static void Key_BackDel(CTString &str, INDEX &iPos, BOOL bShift, BOOL bRight)
   }
 }
 
-// key/mouse button pressed
+// --------------------------------------------------------------------------------------
+// Called every time when user pressed a button while this component active.
+// --------------------------------------------------------------------------------------
 BOOL CMGEdit::OnKeyDown(int iVKey)
 {
-  // if not in edit mode
+  // if not in edit mode then behave like normal component.
   if (!mg_bEditing) {
-    // behave like normal gadget
     return CMenuGadget::OnKeyDown(iVKey);
   }
 
   // finish editing?
   BOOL bShift = GetKeyState(VK_SHIFT) & 0x8000;
-  switch (iVKey) {
-  case VK_UP: case VK_DOWN:
-  case VK_RETURN:  case VK_LBUTTON: *mg_pstrToChange = mg_strText;  Clear(); OnStringChanged();  break;
-  case VK_ESCAPE:  case VK_RBUTTON:  mg_strText = *mg_pstrToChange; Clear(); OnStringCanceled(); break;
-  case VK_LEFT:    if (mg_iCursorPos > 0)                  mg_iCursorPos--;  break;
-  case VK_RIGHT:   if (mg_iCursorPos < strlen(mg_strText)) mg_iCursorPos++;  break;
-  case VK_HOME:    mg_iCursorPos = 0;                   break;
-  case VK_END:     mg_iCursorPos = strlen(mg_strText);  break;
-  case VK_BACK:    Key_BackDel(mg_strText, mg_iCursorPos, bShift, FALSE);  break;
-  case VK_DELETE:  Key_BackDel(mg_strText, mg_iCursorPos, bShift, TRUE);   break;
-  default:  break; // ignore all other special keys
+
+  switch (iVKey)
+  {
+    case VK_UP: case VK_DOWN:
+    case VK_RETURN:  case VK_LBUTTON: *mg_pstrToChange = mg_strText;  Clear(); OnStringChanged();  break;
+    case VK_ESCAPE:  case VK_RBUTTON:  mg_strText = *mg_pstrToChange; Clear(); OnStringCanceled(); break;
+    case VK_LEFT:    if (mg_iCursorPos > 0)                  mg_iCursorPos--;  break;
+    case VK_RIGHT:   if (mg_iCursorPos < strlen(mg_strText)) mg_iCursorPos++;  break;
+    case VK_HOME:    mg_iCursorPos = 0;                   break;
+    case VK_END:     mg_iCursorPos = strlen(mg_strText);  break;
+    case VK_BACK:    Key_BackDel(mg_strText, mg_iCursorPos, bShift, FALSE);  break;
+    case VK_DELETE:  Key_BackDel(mg_strText, mg_iCursorPos, bShift, TRUE);   break;
+    default:  break; // ignore all other special keys
   }
 
   // key is handled
@@ -124,24 +131,28 @@ BOOL CMGEdit::OnKeyDown(int iVKey)
 // char typed
 BOOL CMGEdit::OnChar(MSG msg)
 {
-  // if not in edit mode
+  // if not in edit mode then behave like normal gadget.
   if (!mg_bEditing) {
-    // behave like normal gadget
     return CMenuGadget::OnChar(msg);
   }
+
   // only chars are allowed
   const INDEX ctFullLen = mg_strText.Length();
   const INDEX ctNakedLen = mg_strText.LengthNaked();
   mg_iCursorPos = Clamp(mg_iCursorPos, 0L, ctFullLen);
   int iVKey = msg.wParam;
+
   if (isprint(iVKey) && ctNakedLen <= mg_ctMaxStringLen) {
     mg_strText.InsertChar(mg_iCursorPos, (char)iVKey);
     mg_iCursorPos++;
   }
-  // key is handled
-  return TRUE;
+
+  return TRUE; // Notice that key is handled.
 }
 
+// --------------------------------------------------------------------------------------
+// Draws component.
+// --------------------------------------------------------------------------------------
 void CMGEdit::Render(CDrawPort *pdp)
 {
   if (mg_bEditing) {
