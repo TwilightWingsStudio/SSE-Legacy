@@ -35,7 +35,7 @@ CMGButton::CMGButton(void)
 	mg_bfsFontSize = BFS_MEDIUM;
 	mg_iCursorPos = -1;
 	mg_bRectangle = FALSE;
-	mg_bMental = FALSE;
+	mg_bBlinking = FALSE;
 	mg_bEditing = FALSE;
 	mg_bHighlighted = FALSE;
 }
@@ -84,7 +84,7 @@ void CMGButton::Render(CDrawPort *pdp)
 			colRectangle = LCDGetColor(C_WHITE | 0xFF, "hilited rectangle");
 		}
 	}
-	if (mg_bMental) {
+	if (mg_bBlinking) {
 		FLOAT tmIn = 0.2f;
 		FLOAT tmOut = 1.0f;
 		FLOAT tmFade = 0.1f;

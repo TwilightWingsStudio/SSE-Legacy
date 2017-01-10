@@ -34,7 +34,7 @@ class CMGButton : public CMenuGadget
     BOOL  mg_bEditing;
     BOOL  mg_bHighlighted;
     BOOL  mg_bRectangle;
-    BOOL  mg_bMental;
+    BOOL  mg_bBlinking;
     INDEX mg_iTextMode;
     INDEX mg_iCursorPos;
     INDEX mg_iIndex;

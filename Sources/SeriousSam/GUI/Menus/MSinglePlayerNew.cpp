@@ -80,7 +80,7 @@ void CSinglePlayerNewMenu::Initialize_t(void)
   gm_mgMental.mg_pmgUp = &gm_mgSerious;
   gm_mgMental.mg_pmgDown = &gm_mgTourist;
   gm_mgMental.mg_pActivatedFunction = NULL;
-  gm_mgMental.mg_bMental = TRUE;
+  gm_mgMental.mg_bBlinking = TRUE;
 
 
 }
