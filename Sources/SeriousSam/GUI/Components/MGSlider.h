@@ -31,9 +31,12 @@ class CMGSlider : public CMGButton
     INDEX mg_iMinPos;
     INDEX mg_iMaxPos;
     INDEX mg_iCurPos;
-
-    // Constructor.
+    
+    // Default constructor. Constructs component without text.
     CMGSlider();
+    
+    // Constructs component with the text.
+    CMGSlider(const CTString &strText);
 
     void ApplyCurrentPosition(void);
     void ApplyGivenPosition(INDEX iMin, INDEX iMax, INDEX iCur);

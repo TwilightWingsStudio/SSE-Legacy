@@ -27,16 +27,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class CMGTrigger : public CMenuGadget
 {
   public:
-    CTString mg_strLabel;
-    CTString mg_strValue;   // Current text.
+    CTString mg_strLabel;   // Text label.
+    CTString mg_strValue;   // Current selected text.
     CTString *mg_astrTexts; // List of variants.
     INDEX mg_ctTexts;       // Number of variants.
-    INDEX mg_iSelected;
+    INDEX mg_iSelected;     // Selected index.
     INDEX mg_iCenterI;
     BOOL mg_bVisual; // Used for togglable textures.
 
-    // Constructor.
+    // Default constructor. Constructs component without text.
     CMGTrigger(void);
+    
+    // Constructs component with the text.
+    CMGTrigger(const CTString &strText);
 
     void ApplyCurrentSelection(void);
     void OnSetNextInList(int iVKey);

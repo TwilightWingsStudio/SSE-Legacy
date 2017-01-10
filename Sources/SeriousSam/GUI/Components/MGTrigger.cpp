@@ -40,7 +40,7 @@ static INDEX GetNewLoopValue(int iVKey, INDEX iCurrent, INDEX ctMembers)
 }
 
 // --------------------------------------------------------------------------------------
-// Constructor.
+// Default constructor. Constructs component without text.
 // --------------------------------------------------------------------------------------
 CMGTrigger::CMGTrigger(void)
 {
@@ -48,6 +48,21 @@ CMGTrigger::CMGTrigger(void)
   mg_pOnTriggerChange = NULL;
   mg_iCenterI = 0;
   mg_bVisual = FALSE;
+  mg_iSelected = 0;
+}
+
+// --------------------------------------------------------------------------------------
+// Constructs component with the text.
+// --------------------------------------------------------------------------------------
+CMGTrigger::CMGTrigger(const CTString &strText)
+{
+  mg_pPreTriggerChange = NULL;
+  mg_pOnTriggerChange = NULL;
+  mg_iCenterI = 0;
+  mg_bVisual = FALSE;
+  mg_iSelected = 0;
+  
+  mg_strLabel = strText;
 }
 
 // --------------------------------------------------------------------------------------

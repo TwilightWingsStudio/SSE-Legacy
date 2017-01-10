@@ -26,28 +26,45 @@ extern CSoundData *_psdPress;
 extern CMenuGadget *_pmgLastActivatedGadget;
 
 // --------------------------------------------------------------------------------------
-// Constructor.
+// Default constructor. Constructs component without text.
 // --------------------------------------------------------------------------------------
 CMGButton::CMGButton(void)
 {
-	mg_pActivatedFunction = NULL;
-	mg_iIndex = 0;
-	mg_iCenterI = 0;
-	mg_iTextMode = 1;
-	mg_bfsFontSize = BFS_MEDIUM;
-	mg_iCursorPos = -1;
-	mg_bRectangle = FALSE;
-	mg_bBlinking = FALSE;
-	mg_bEditing = FALSE;
-	mg_bHighlighted = FALSE;
+  mg_pActivatedFunction = NULL;
+  mg_iIndex = 0;
+  mg_iCenterI = 0;
+  mg_iTextMode = 1;
+  mg_bfsFontSize = BFS_MEDIUM;
+  mg_iCursorPos = -1;
+  mg_bRectangle = FALSE;
+  mg_bBlinking = FALSE;
+  mg_bEditing = FALSE;
+  mg_bHighlighted = FALSE;
 }
 
+// --------------------------------------------------------------------------------------
+// Constructs component with the text.
+// --------------------------------------------------------------------------------------
+CMGButton::CMGButton(const CTString &strText)
+{
+  mg_pActivatedFunction = NULL;
+  mg_iIndex = 0;
+  mg_iCenterI = 0;
+  mg_iTextMode = 1;
+  mg_bfsFontSize = BFS_MEDIUM;
+  mg_iCursorPos = -1;
+  mg_bRectangle = FALSE;
+  mg_bBlinking = FALSE;
+  mg_bEditing = FALSE;
+  mg_bHighlighted = FALSE;
+  
+  mg_strText = strText;
+}
 
 void CMGButton::SetText(CTString strNew)
 {
 	mg_strText = strNew;
 }
-
 
 void CMGButton::OnActivate(void)
 {

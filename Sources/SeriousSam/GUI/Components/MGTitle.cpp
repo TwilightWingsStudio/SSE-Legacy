@@ -20,6 +20,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "MGTitle.h"
 
 // --------------------------------------------------------------------------------------
+// Default constructor. Constructs component without text.
+// --------------------------------------------------------------------------------------
+CMGTitle::CMGTitle() {}
+
+// --------------------------------------------------------------------------------------
+// Constructs component with the text.
+// --------------------------------------------------------------------------------------
+CMGTitle::CMGTitle(const CTString &strText)
+{
+  mg_strText = strText;
+}
+
+// --------------------------------------------------------------------------------------
 // Draws component.
 // --------------------------------------------------------------------------------------
 void CMGTitle::Render(CDrawPort *pdp)

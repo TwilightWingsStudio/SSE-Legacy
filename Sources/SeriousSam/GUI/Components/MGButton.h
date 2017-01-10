@@ -41,8 +41,11 @@ class CMGButton : public CMenuGadget
 
     void (*mg_pActivatedFunction)(void);
 
-    // Constructor.
+    // Default constructor. Constructs component without text.
     CMGButton(void);
+    
+    // Constructs component with the text.
+    CMGButton(const CTString &strText);
 
     void SetText(CTString strNew);
     void OnActivate(void);

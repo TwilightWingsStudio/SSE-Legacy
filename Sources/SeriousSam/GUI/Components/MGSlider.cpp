@@ -24,7 +24,7 @@ extern PIX  _pixCursorPosJ;
 extern INDEX sam_bWideScreen;
 
 // --------------------------------------------------------------------------------------
-// Constructor.
+// Default constructor. Constructs component without text.
 // --------------------------------------------------------------------------------------
 CMGSlider::CMGSlider()
 {
@@ -33,6 +33,20 @@ CMGSlider::CMGSlider()
   mg_iCurPos = 8;
   mg_pOnSliderChange = NULL;
   mg_fFactor = 1.0f;
+}
+
+// --------------------------------------------------------------------------------------
+// Default constructor. Constructs component with the text.
+// --------------------------------------------------------------------------------------
+CMGSlider::CMGSlider(const CTString &strText)
+{
+  mg_iMinPos = 0;
+  mg_iMaxPos = 16;
+  mg_iCurPos = 8;
+  mg_pOnSliderChange = NULL;
+  mg_fFactor = 1.0f;
+  
+  mg_strText = strText;
 }
 
 // --------------------------------------------------------------------------------------
