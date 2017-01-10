@@ -555,7 +555,7 @@ void MenuUpdateMouseFocus(void)
 
   CMenuGadget *pmgActive = NULL;
   // for all gadgets in menu
-  FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhGadgets, itmg) {
+  FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhChildren, itmg) {
     CMenuGadget &mg = *itmg;
     // if focused
     if( itmg->mg_bFocused) {
@@ -673,7 +673,7 @@ BOOL DoMenu( CDrawPort *pdp)
   {
     _pTimer->SetCurrentTick(_tmMenuLastTickDone);
     // call think for all gadgets in menu
-    FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhGadgets, itmg) {
+    FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhChildren, itmg) {
       itmg->Think();
     }
     _tmMenuLastTickDone+=_pTimer->TickQuantum;
@@ -792,7 +792,7 @@ BOOL DoMenu( CDrawPort *pdp)
     // render parent menu first
     if (pgmCurrentMenu->gm_pgmParentMenu!=NULL) {
       _pGame->MenuPreRenderMenu(pgmCurrentMenu->gm_pgmParentMenu->gm_strName);
-      FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_pgmParentMenu->gm_lhGadgets, itmg) {
+      FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_pgmParentMenu->gm_lhChildren, itmg) {
         if( itmg->mg_bVisible) {
           itmg->Render( &dpMenu);
         }
@@ -824,7 +824,7 @@ BOOL DoMenu( CDrawPort *pdp)
   BOOL bStilInMenus = FALSE;
   _pGame->MenuPreRenderMenu(pgmCurrentMenu->gm_strName);
   // for each menu gadget
-  FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhGadgets, itmg) {
+  FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhChildren, itmg) {
     // if gadget is visible
     if( itmg->mg_bVisible) {
       bStilInMenus = TRUE;
@@ -841,7 +841,7 @@ BOOL DoMenu( CDrawPort *pdp)
   // if mouse was not active last
   if (!_bMouseUsedLast) {
     // find focused gadget
-    FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhGadgets, itmg) {
+    FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhChildren, itmg) {
       CMenuGadget &mg = *itmg;
       // if focused
       if( itmg->mg_bFocused) {
@@ -934,7 +934,7 @@ extern void FixupBackButton(CGameMenu *pgm)
   mgBack.mg_bfsFontSize = BFS_LARGE;
   mgBack.mg_boxOnScreen = BoxBack();
   mgBack.mg_boxOnScreen = BoxLeftColumn(16.5f);
-  pgm->gm_lhGadgets.AddTail( mgBack.mg_lnNode);
+  pgm->gm_lhChildren.AddTail( mgBack.mg_lnNode);
 
   mgBack.mg_pmgLeft = 
   mgBack.mg_pmgRight = 
@@ -955,7 +955,7 @@ void ChangeToMenu( CGameMenu *pgmNewMenu)
     if (!pgmNewMenu->gm_bPopup) {
       pgmCurrentMenu->EndMenu();
     } else {
-      FOREACHINLIST(CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhGadgets, itmg) {
+      FOREACHINLIST(CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhChildren, itmg) {
         itmg->OnKillFocus();
       }
     }

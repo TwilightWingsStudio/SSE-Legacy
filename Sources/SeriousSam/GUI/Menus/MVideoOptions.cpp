@@ -22,13 +22,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 extern void InitVideoOptionsButtons();
 extern void UpdateVideoOptionsButtons(INDEX iSelected);
 
-
+// --------------------------------------------------------------------------------------
+// Intializes video options menu.
+// --------------------------------------------------------------------------------------
 void CVideoOptionsMenu::Initialize_t(void)
 {
-  // intialize video options menu
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
   gm_mgTitle.mg_strText = TRANS("VIDEO");
-  gm_lhGadgets.AddTail(gm_mgTitle.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
 
   TRIGGER_MG(gm_mgDisplayAPITrigger, 0,
     gm_mgApply, gm_mgDisplayAdaptersTrigger, TRANS("GRAPHICS API"), astrDisplayAPIRadioTexts);
@@ -49,6 +50,7 @@ void CVideoOptionsMenu::Initialize_t(void)
     gm_mgFullScreenTrigger, gm_mgVideoRendering, TRANS("BITS PER PIXEL"), astrBitsPerPixelRadioTexts);
   gm_mgBitsPerPixelTrigger.mg_strTip = TRANS("select number of colors used for display");
 
+  // Reset all pointers.
   gm_mgDisplayPrefsTrigger.mg_pOnTriggerChange = NULL;
   gm_mgDisplayAPITrigger.mg_pOnTriggerChange = NULL;
   gm_mgDisplayAdaptersTrigger.mg_pOnTriggerChange = NULL;
@@ -56,23 +58,27 @@ void CVideoOptionsMenu::Initialize_t(void)
   gm_mgResolutionsTrigger.mg_pOnTriggerChange = NULL;
   gm_mgBitsPerPixelTrigger.mg_pOnTriggerChange = NULL;
 
+   // Initialize "Rendering Options" button.
   gm_mgVideoRendering.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgVideoRendering.mg_boxOnScreen = BoxMediumRow(7.0f);
   gm_mgVideoRendering.mg_pmgUp = &gm_mgBitsPerPixelTrigger;
   gm_mgVideoRendering.mg_pmgDown = &gm_mgApply;
   gm_mgVideoRendering.mg_strText = TRANS("RENDERING OPTIONS");
   gm_mgVideoRendering.mg_strTip = TRANS("manually adjust rendering settings");
-  gm_lhGadgets.AddTail(gm_mgVideoRendering.mg_lnNode);
   gm_mgVideoRendering.mg_pActivatedFunction = NULL;
 
+  // Initialize "Apply" button.
   gm_mgApply.mg_bfsFontSize = BFS_LARGE;
   gm_mgApply.mg_boxOnScreen = BoxBigRow(5.5f);
   gm_mgApply.mg_pmgUp = &gm_mgVideoRendering;
   gm_mgApply.mg_pmgDown = &gm_mgDisplayAPITrigger;
   gm_mgApply.mg_strText = TRANS("APPLY");
   gm_mgApply.mg_strTip = TRANS("apply selected options");
-  gm_lhGadgets.AddTail(gm_mgApply.mg_lnNode);
   gm_mgApply.mg_pActivatedFunction = NULL;
+
+  // Add components.
+  gm_lhChildren.AddTail(gm_mgVideoRendering.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgApply.mg_lnNode);
 }
 
 void CVideoOptionsMenu::StartMenu(void)

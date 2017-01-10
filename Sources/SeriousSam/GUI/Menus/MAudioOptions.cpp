@@ -21,13 +21,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 extern void RefreshSoundFormat(void);
 
-
+// --------------------------------------------------------------------------------------
+// Intializes Audio options menu.
+// --------------------------------------------------------------------------------------
 void CAudioOptionsMenu::Initialize_t(void)
 {
-  // intialize Audio options menu
+  // Initialize title label.
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
   gm_mgTitle.mg_strText = TRANS("AUDIO");
-  gm_lhGadgets.AddTail(gm_mgTitle.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
 
   TRIGGER_MG(gm_mgAudioAutoTrigger, 0,
     gm_mgApply, gm_mgFrequencyTrigger, TRANS("AUTO-ADJUST"), astrNoYes);
@@ -36,13 +38,17 @@ void CAudioOptionsMenu::Initialize_t(void)
   TRIGGER_MG(gm_mgFrequencyTrigger, 1,
     gm_mgAudioAutoTrigger, gm_mgAudioAPITrigger, TRANS("FREQUENCY"), astrFrequencyRadioTexts);
   gm_mgFrequencyTrigger.mg_strTip = TRANS("select sound quality or turn sound off");
-  gm_mgFrequencyTrigger.mg_pOnTriggerChange = NULL;
 
   TRIGGER_MG(gm_mgAudioAPITrigger, 2,
     gm_mgFrequencyTrigger, gm_mgWaveVolume, TRANS("SOUND SYSTEM"), astrSoundAPIRadioTexts);
   gm_mgAudioAPITrigger.mg_strTip = TRANS("choose sound system (API) to use");
+  
+  // Reset pointers.
+  gm_mgAudioAutoTrigger.mg_pOnTriggerChange = NULL;
+  gm_mgFrequencyTrigger.mg_pOnTriggerChange = NULL;
   gm_mgAudioAPITrigger.mg_pOnTriggerChange = NULL;
 
+  // Initialize "Sound Effects Volume" slider.
   gm_mgWaveVolume.mg_boxOnScreen = BoxMediumRow(3);
   gm_mgWaveVolume.mg_strText = TRANS("SOUND EFFECTS VOLUME");
   gm_mgWaveVolume.mg_strTip = TRANS("adjust volume of in-game sound effects");
@@ -50,8 +56,8 @@ void CAudioOptionsMenu::Initialize_t(void)
   gm_mgWaveVolume.mg_pmgDown = &gm_mgMPEGVolume;
   gm_mgWaveVolume.mg_pOnSliderChange = NULL;
   gm_mgWaveVolume.mg_pActivatedFunction = NULL;
-  gm_lhGadgets.AddTail(gm_mgWaveVolume.mg_lnNode);
 
+  // Initialize "Music Volume" slider.
   gm_mgMPEGVolume.mg_boxOnScreen = BoxMediumRow(4);
   gm_mgMPEGVolume.mg_strText = TRANS("MUSIC VOLUME");
   gm_mgMPEGVolume.mg_strTip = TRANS("adjust volume of in-game music");
@@ -59,16 +65,20 @@ void CAudioOptionsMenu::Initialize_t(void)
   gm_mgMPEGVolume.mg_pmgDown = &gm_mgApply;
   gm_mgMPEGVolume.mg_pOnSliderChange = NULL;
   gm_mgMPEGVolume.mg_pActivatedFunction = NULL;
-  gm_lhGadgets.AddTail(gm_mgMPEGVolume.mg_lnNode);
 
+  // Initialize "Apply" button.
   gm_mgApply.mg_bfsFontSize = BFS_LARGE;
   gm_mgApply.mg_boxOnScreen = BoxBigRow(4);
   gm_mgApply.mg_strText = TRANS("APPLY");
   gm_mgApply.mg_strTip = TRANS("activate selected options");
-  gm_lhGadgets.AddTail(gm_mgApply.mg_lnNode);
   gm_mgApply.mg_pmgUp = &gm_mgMPEGVolume;
   gm_mgApply.mg_pmgDown = &gm_mgAudioAutoTrigger;
   gm_mgApply.mg_pActivatedFunction = NULL;
+
+  // Add components.
+  gm_lhChildren.AddTail(gm_mgWaveVolume.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgMPEGVolume.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgApply.mg_lnNode);
 }
 
 void CAudioOptionsMenu::StartMenu(void)

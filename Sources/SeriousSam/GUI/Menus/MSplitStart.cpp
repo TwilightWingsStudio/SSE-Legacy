@@ -22,27 +22,29 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 extern void UpdateSplitLevel(INDEX iDummy);
 
-
+// --------------------------------------------------------------------------------------
+// Intializes split screen start menu.
+// --------------------------------------------------------------------------------------
 void CSplitStartMenu::Initialize_t(void)
 {
-  // intialize split screen menu
+  // Initialize title label.
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
   gm_mgTitle.mg_strText = TRANS("START SPLIT SCREEN");
-  gm_lhGadgets.AddTail(gm_mgTitle.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
 
-  // game type trigger
+  // Initialize "Game type" trigger.
   TRIGGER_MG(gm_mgGameType, 0,
     gm_mgStart, gm_mgDifficulty, TRANS("Game type:"), astrGameTypeRadioTexts);
   gm_mgGameType.mg_ctTexts = ctGameTypeRadioTexts;
   gm_mgGameType.mg_strTip = TRANS("choose type of multiplayer game");
   gm_mgGameType.mg_pOnTriggerChange = &UpdateSplitLevel;
 
-  // difficulty trigger
+  // Initialize "Difficulty" trigger.
   TRIGGER_MG(gm_mgDifficulty, 1,
     gm_mgGameType, gm_mgLevel, TRANS("Difficulty:"), astrDifficultyRadioTexts);
   gm_mgDifficulty.mg_strTip = TRANS("choose difficulty level");
 
-  // level name
+  // Initialize level name
   gm_mgLevel.mg_strText = "";
   gm_mgLevel.mg_strLabel = TRANS("Level:");
   gm_mgLevel.mg_boxOnScreen = BoxMediumRow(2);
@@ -51,10 +53,8 @@ void CSplitStartMenu::Initialize_t(void)
   gm_mgLevel.mg_pmgUp = &gm_mgDifficulty;
   gm_mgLevel.mg_pmgDown = &gm_mgOptions;
   gm_mgLevel.mg_strTip = TRANS("choose the level to start");
-  gm_mgLevel.mg_pActivatedFunction = NULL;
-  gm_lhGadgets.AddTail(gm_mgLevel.mg_lnNode);
 
-  // options button
+  // Initialize "Game Options" button
   gm_mgOptions.mg_strText = TRANS("Game options");
   gm_mgOptions.mg_boxOnScreen = BoxMediumRow(3);
   gm_mgOptions.mg_bfsFontSize = BFS_MEDIUM;
@@ -62,17 +62,23 @@ void CSplitStartMenu::Initialize_t(void)
   gm_mgOptions.mg_pmgUp = &gm_mgLevel;
   gm_mgOptions.mg_pmgDown = &gm_mgStart;
   gm_mgOptions.mg_strTip = TRANS("adjust game rules");
-  gm_mgOptions.mg_pActivatedFunction = NULL;
-  gm_lhGadgets.AddTail(gm_mgOptions.mg_lnNode);
 
-  // start button
+  // Initialize "Start" button
   gm_mgStart.mg_bfsFontSize = BFS_LARGE;
   gm_mgStart.mg_boxOnScreen = BoxBigRow(4);
   gm_mgStart.mg_pmgUp = &gm_mgOptions;
   gm_mgStart.mg_pmgDown = &gm_mgGameType;
   gm_mgStart.mg_strText = TRANS("START");
-  gm_lhGadgets.AddTail(gm_mgStart.mg_lnNode);
+
+  // Reset pointers.
+  gm_mgLevel.mg_pActivatedFunction = NULL;
+  gm_mgOptions.mg_pActivatedFunction = NULL;
   gm_mgStart.mg_pActivatedFunction = NULL;
+  
+  // Add components.
+  gm_lhChildren.AddTail(gm_mgLevel.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgOptions.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgStart.mg_lnNode);
 }
 
 void CSplitStartMenu::StartMenu(void)

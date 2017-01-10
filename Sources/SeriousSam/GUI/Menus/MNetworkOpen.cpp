@@ -19,19 +19,21 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "MenuStuff.h"
 #include "MNetworkOpen.h"
 
-
+// --------------------------------------------------------------------------------------
+// Intializes network open menu.
+// --------------------------------------------------------------------------------------
 void CNetworkOpenMenu::Initialize_t(void)
 {
-  // intialize network join menu
+  // Initialize title label.
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
   gm_mgTitle.mg_strText = TRANS("JOIN");
-  gm_lhGadgets.AddTail(gm_mgTitle.mg_lnNode);
 
+  // Initialize "Address" label.
   gm_mgAddressLabel.mg_strText = TRANS("Address:");
   gm_mgAddressLabel.mg_boxOnScreen = BoxMediumLeft(1);
   gm_mgAddressLabel.mg_iCenterI = -1;
-  gm_lhGadgets.AddTail(gm_mgAddressLabel.mg_lnNode);
 
+  // Initialize "Address" edit.
   gm_mgAddress.mg_strText = _pGame->gam_strJoinAddress;
   gm_mgAddress.mg_ctMaxStringLen = 20;
   gm_mgAddress.mg_pstrToChange = &_pGame->gam_strJoinAddress;
@@ -41,13 +43,13 @@ void CNetworkOpenMenu::Initialize_t(void)
   gm_mgAddress.mg_pmgUp = &gm_mgJoin;
   gm_mgAddress.mg_pmgDown = &gm_mgPort;
   gm_mgAddress.mg_strTip = TRANS("specify server address");
-  gm_lhGadgets.AddTail(gm_mgAddress.mg_lnNode);
 
+  // Initialize "Port" label.
   gm_mgPortLabel.mg_strText = TRANS("Port:");
   gm_mgPortLabel.mg_boxOnScreen = BoxMediumLeft(2);
   gm_mgPortLabel.mg_iCenterI = -1;
-  gm_lhGadgets.AddTail(gm_mgPortLabel.mg_lnNode);
 
+  // Initialize "Port" edit.
   gm_mgPort.mg_strText = "";
   gm_mgPort.mg_ctMaxStringLen = 10;
   gm_mgPort.mg_pstrToChange = &gm_strPort;
@@ -57,14 +59,21 @@ void CNetworkOpenMenu::Initialize_t(void)
   gm_mgPort.mg_pmgUp = &gm_mgAddress;
   gm_mgPort.mg_pmgDown = &gm_mgJoin;
   gm_mgPort.mg_strTip = TRANS("specify server address");
-  gm_lhGadgets.AddTail(gm_mgPort.mg_lnNode);
 
+  // Initialize "Join" button.
   gm_mgJoin.mg_boxOnScreen = BoxMediumMiddle(3);
   gm_mgJoin.mg_pmgUp = &gm_mgPort;
   gm_mgJoin.mg_pmgDown = &gm_mgAddress;
   gm_mgJoin.mg_strText = TRANS("Join");
-  gm_lhGadgets.AddTail(gm_mgJoin.mg_lnNode);
   gm_mgJoin.mg_pActivatedFunction = NULL;
+  
+  // Add components.
+  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgAddressLabel.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgAddress.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgPortLabel.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgPort.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgJoin.mg_lnNode);
 }
 
 void CNetworkOpenMenu::StartMenu(void)

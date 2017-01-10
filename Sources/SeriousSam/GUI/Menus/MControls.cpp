@@ -21,48 +21,56 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 extern CTFileName _fnmControlsToCustomize;
 
-
+// --------------------------------------------------------------------------------------
+// Intializes controls menu.
+// --------------------------------------------------------------------------------------
 void CControlsMenu::Initialize_t(void)
 {
-  // intialize player and controls menu
+  // Initialize title label.
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
   gm_mgTitle.mg_strText = TRANS("CONTROLS");
-  gm_lhGadgets.AddTail(gm_mgTitle.mg_lnNode);
 
+  // Initialize player name label.
   gm_mgNameLabel.mg_strText = "";
   gm_mgNameLabel.mg_boxOnScreen = BoxMediumRow(0.0);
   gm_mgNameLabel.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgNameLabel.mg_iCenterI = -1;
   gm_mgNameLabel.mg_bEnabled = FALSE;
   gm_mgNameLabel.mg_bLabel = TRUE;
-  gm_lhGadgets.AddTail(gm_mgNameLabel.mg_lnNode);
 
+  // Initialize "Customize Controls" button.
   gm_mgButtons.mg_strText = TRANS("CUSTOMIZE BUTTONS");
   gm_mgButtons.mg_boxOnScreen = BoxMediumRow(2.0);
   gm_mgButtons.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgButtons.mg_iCenterI = 0;
-  gm_lhGadgets.AddTail(gm_mgButtons.mg_lnNode);
   gm_mgButtons.mg_pmgUp = &gm_mgPredefined;
   gm_mgButtons.mg_pmgDown = &gm_mgAdvanced;
   gm_mgButtons.mg_pActivatedFunction = NULL;
   gm_mgButtons.mg_strTip = TRANS("customize buttons in current controls");
 
+  // Initialize "Advanced Joysrick Setup" button.
   gm_mgAdvanced.mg_strText = TRANS("ADVANCED JOYSTICK SETUP");
   gm_mgAdvanced.mg_iCenterI = 0;
   gm_mgAdvanced.mg_boxOnScreen = BoxMediumRow(3);
   gm_mgAdvanced.mg_bfsFontSize = BFS_MEDIUM;
-  gm_lhGadgets.AddTail(gm_mgAdvanced.mg_lnNode);
   gm_mgAdvanced.mg_pmgUp = &gm_mgButtons;
   gm_mgAdvanced.mg_pmgDown = &gm_mgSensitivity;
   gm_mgAdvanced.mg_pActivatedFunction = NULL;
   gm_mgAdvanced.mg_strTip = TRANS("adjust advanced settings for joystick axis");
 
+  // Initialize "Sensitivity" slider.
   gm_mgSensitivity.mg_boxOnScreen = BoxMediumRow(4.5);
   gm_mgSensitivity.mg_strText = TRANS("SENSITIVITY");
   gm_mgSensitivity.mg_pmgUp = &gm_mgAdvanced;
   gm_mgSensitivity.mg_pmgDown = &gm_mgInvertTrigger;
   gm_mgSensitivity.mg_strTip = TRANS("sensitivity for all axis in this control set");
-  gm_lhGadgets.AddTail(gm_mgSensitivity.mg_lnNode);
+  
+  // Add components.
+  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgNameLabel.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgButtons.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgAdvanced.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgSensitivity.mg_lnNode);
 
   TRIGGER_MG(gm_mgInvertTrigger, 5.5, gm_mgSensitivity, gm_mgSmoothTrigger,
     TRANS("INVERT LOOK"), astrNoYes);
@@ -81,11 +89,12 @@ void CControlsMenu::Initialize_t(void)
   gm_mgPredefined.mg_iCenterI = 0;
   gm_mgPredefined.mg_boxOnScreen = BoxMediumRow(10);
   gm_mgPredefined.mg_bfsFontSize = BFS_MEDIUM;
-  gm_lhGadgets.AddTail(gm_mgPredefined.mg_lnNode);
   gm_mgPredefined.mg_pmgUp = &gm_mgIFeelTrigger;
   gm_mgPredefined.mg_pmgDown = &gm_mgButtons;
-  gm_mgPredefined.mg_pActivatedFunction = NULL;
   gm_mgPredefined.mg_strTip = TRANS("load one of several predefined control settings");
+  gm_mgPredefined.mg_pActivatedFunction = NULL;
+
+  gm_lhChildren.AddTail(gm_mgPredefined.mg_lnNode);
 }
 
 void CControlsMenu::StartMenu(void)

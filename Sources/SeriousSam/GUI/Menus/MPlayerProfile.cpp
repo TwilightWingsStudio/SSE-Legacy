@@ -32,26 +32,30 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   mg.mg_pActivatedFunction = &PPOnPlayerSelect; \
   mg.mg_strText = #index; \
   mg.mg_strTip = TRANS("select new currently active player"); \
-  gm_lhGadgets.AddTail(mg.mg_lnNode);
+  gm_lhChildren.AddTail(mg.mg_lnNode);
 
 extern BOOL  _bPlayerMenuFromSinglePlayer;
 extern CTString _strLastPlayerAppearance;
 extern void PPOnPlayerSelect(void);
 
-
+// --------------------------------------------------------------------------------------
+// Intializes player and controls menu.
+// --------------------------------------------------------------------------------------
 void CPlayerProfileMenu::Initialize_t(void)
 {
-  // intialize player and controls menu
   _bPlayerMenuFromSinglePlayer = FALSE;
+
+  // Initialize title label.
   gm_mgProfileTitle.mg_boxOnScreen = BoxTitle();
   gm_mgProfileTitle.mg_strText = TRANS("PLAYER PROFILE");
-  gm_lhGadgets.AddTail(gm_mgProfileTitle.mg_lnNode);
 
   gm_mgNoLabel.mg_strText = TRANS("PROFILE:");
   gm_mgNoLabel.mg_boxOnScreen = BoxMediumLeft(0.0f);
   gm_mgNoLabel.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgNoLabel.mg_iCenterI = -1;
-  gm_lhGadgets.AddTail(gm_mgNoLabel.mg_lnNode);
+
+  gm_lhChildren.AddTail(gm_mgProfileTitle.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgNoLabel.mg_lnNode);
 
   ADD_SELECT_PLAYER_MG(0, gm_mgNumber[0], gm_mgNumber[7], gm_mgNumber[1], gm_mgNumber[0]);
   ADD_SELECT_PLAYER_MG(1, gm_mgNumber[1], gm_mgNumber[0], gm_mgNumber[2], gm_mgNumber[1]);
@@ -67,9 +71,8 @@ void CPlayerProfileMenu::Initialize_t(void)
   gm_mgNameLabel.mg_boxOnScreen = BoxMediumLeft(1.25f);
   gm_mgNameLabel.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgNameLabel.mg_iCenterI = -1;
-  gm_lhGadgets.AddTail(gm_mgNameLabel.mg_lnNode);
 
-  // setup of player name button is done on start menu
+  // Setup of player name button is done on start menu.
   gm_mgNameField.mg_strText = "<???>";
   gm_mgNameField.mg_ctMaxStringLen = 25;
   gm_mgNameField.mg_boxOnScreen = BoxPlayerEdit(1.25);
@@ -79,13 +82,12 @@ void CPlayerProfileMenu::Initialize_t(void)
   gm_mgNameField.mg_pmgDown = &gm_mgTeam;
   gm_mgNameField.mg_pmgRight = &gm_mgModel;
   gm_mgNameField.mg_strTip = TRANS("rename currently active player");
-  gm_lhGadgets.AddTail(gm_mgNameField.mg_lnNode);
 
+  // Initialize "Team" label.
   gm_mgTeamLabel.mg_strText = TRANS("TEAM:");
   gm_mgTeamLabel.mg_boxOnScreen = BoxMediumLeft(2.25f);
   gm_mgTeamLabel.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgTeamLabel.mg_iCenterI = -1;
-  gm_lhGadgets.AddTail(gm_mgTeamLabel.mg_lnNode);
 
   // setup of player name button is done on start menu
   gm_mgTeam.mg_strText = "<???>";
@@ -99,72 +101,83 @@ void CPlayerProfileMenu::Initialize_t(void)
   gm_mgTeam.mg_pmgRight = &gm_mgModel;
   //gm_mgTeam.mg_strTip = TRANS("teamplay is disabled in this version");
   gm_mgTeam.mg_strTip = TRANS("enter team name, if playing in team");
-  gm_lhGadgets.AddTail(gm_mgTeam.mg_lnNode);
+
+  // Add components.
+  gm_lhChildren.AddTail(gm_mgNameLabel.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgNameField.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgTeamLabel.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgTeam.mg_lnNode);
 
   TRIGGER_MG(gm_mgCrosshair, 4.0, gm_mgTeam, gm_mgWeaponSelect, TRANS("CROSSHAIR"), astrCrosshair);
   gm_mgCrosshair.mg_bVisual = TRUE;
   gm_mgCrosshair.mg_boxOnScreen = BoxPlayerSwitch(5.0f);
   gm_mgCrosshair.mg_iCenterI = -1;
-  gm_mgCrosshair.mg_pOnTriggerChange = NULL;
 
   TRIGGER_MG(gm_mgWeaponSelect, 4.0, gm_mgCrosshair, gm_mgWeaponHide, TRANS("AUTO SELECT WEAPON"), astrWeapon);
   gm_mgWeaponSelect.mg_boxOnScreen = BoxPlayerSwitch(6.0f);
   gm_mgWeaponSelect.mg_iCenterI = -1;
-  gm_mgWeaponSelect.mg_pOnTriggerChange = NULL;
 
   TRIGGER_MG(gm_mgWeaponHide, 4.0, gm_mgWeaponSelect, gm_mg3rdPerson, TRANS("HIDE WEAPON MODEL"), astrNoYes);
   gm_mgWeaponHide.mg_boxOnScreen = BoxPlayerSwitch(7.0f);
   gm_mgWeaponHide.mg_iCenterI = -1;
-  gm_mgWeaponHide.mg_pOnTriggerChange = NULL;
 
   TRIGGER_MG(gm_mg3rdPerson, 4.0, gm_mgWeaponHide, gm_mgQuotes, TRANS("PREFER 3RD PERSON VIEW"), astrNoYes);
   gm_mg3rdPerson.mg_boxOnScreen = BoxPlayerSwitch(8.0f);
   gm_mg3rdPerson.mg_iCenterI = -1;
-  gm_mg3rdPerson.mg_pOnTriggerChange = NULL;
 
   TRIGGER_MG(gm_mgQuotes, 4.0, gm_mg3rdPerson, gm_mgAutoSave, TRANS("VOICE QUOTES"), astrNoYes);
   gm_mgQuotes.mg_boxOnScreen = BoxPlayerSwitch(9.0f);
   gm_mgQuotes.mg_iCenterI = -1;
-  gm_mgQuotes.mg_pOnTriggerChange = NULL;
 
   TRIGGER_MG(gm_mgAutoSave, 4.0, gm_mgQuotes, gm_mgCompDoubleClick, TRANS("AUTO SAVE"), astrNoYes);
   gm_mgAutoSave.mg_boxOnScreen = BoxPlayerSwitch(10.0f);
   gm_mgAutoSave.mg_iCenterI = -1;
-  gm_mgAutoSave.mg_pOnTriggerChange = NULL;
 
   TRIGGER_MG(gm_mgCompDoubleClick, 4.0, gm_mgAutoSave, gm_mgSharpTurning, TRANS("INVOKE COMPUTER"), astrComputerInvoke);
   gm_mgCompDoubleClick.mg_boxOnScreen = BoxPlayerSwitch(11.0f);
   gm_mgCompDoubleClick.mg_iCenterI = -1;
-  gm_mgCompDoubleClick.mg_pOnTriggerChange = NULL;
 
   TRIGGER_MG(gm_mgSharpTurning, 4.0, gm_mgCompDoubleClick, gm_mgViewBobbing, TRANS("SHARP TURNING"), astrNoYes);
   gm_mgSharpTurning.mg_boxOnScreen = BoxPlayerSwitch(12.0f);
   gm_mgSharpTurning.mg_iCenterI = -1;
-  gm_mgSharpTurning.mg_pOnTriggerChange = NULL;
 
   TRIGGER_MG(gm_mgViewBobbing, 4.0, gm_mgSharpTurning, gm_mgCustomizeControls, TRANS("VIEW BOBBING"), astrNoYes);
   gm_mgViewBobbing.mg_boxOnScreen = BoxPlayerSwitch(13.0f);
   gm_mgViewBobbing.mg_iCenterI = -1;
-  gm_mgViewBobbing.mg_pOnTriggerChange = NULL;
 
+  // Initialize "Customize Controls" button.
   gm_mgCustomizeControls.mg_strText = TRANS("CUSTOMIZE CONTROLS");
   gm_mgCustomizeControls.mg_boxOnScreen = BoxMediumLeft(14.5f);
   gm_mgCustomizeControls.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgCustomizeControls.mg_iCenterI = -1;
   gm_mgCustomizeControls.mg_pmgUp = &gm_mgViewBobbing;
-  gm_mgCustomizeControls.mg_pActivatedFunction = NULL;
   gm_mgCustomizeControls.mg_pmgDown = &gm_mgNumber[0];
   gm_mgCustomizeControls.mg_pmgRight = &gm_mgModel;
   gm_mgCustomizeControls.mg_strTip = TRANS("customize controls for this player");
-  gm_lhGadgets.AddTail(gm_mgCustomizeControls.mg_lnNode);
 
+  // Initialize player model preview area.
   gm_mgModel.mg_boxOnScreen = BoxPlayerModel();
   gm_mgModel.mg_pmgLeft = &gm_mgNameField;
-  gm_mgModel.mg_pActivatedFunction = NULL;
   gm_mgModel.mg_pmgDown = &gm_mgNameField;
   gm_mgModel.mg_pmgLeft = &gm_mgNameField;
   gm_mgModel.mg_strTip = TRANS("change model for this player");
-  gm_lhGadgets.AddTail(gm_mgModel.mg_lnNode);
+
+  // Reset pointers.
+  gm_mgCrosshair.mg_pOnTriggerChange = NULL;
+  gm_mgWeaponSelect.mg_pOnTriggerChange = NULL;
+  gm_mgWeaponHide.mg_pOnTriggerChange = NULL;
+  gm_mg3rdPerson.mg_pOnTriggerChange = NULL;
+  gm_mgQuotes.mg_pOnTriggerChange = NULL;
+  gm_mgAutoSave.mg_pOnTriggerChange = NULL;
+  gm_mgCompDoubleClick.mg_pOnTriggerChange = NULL;
+  gm_mgSharpTurning.mg_pOnTriggerChange = NULL;
+  gm_mgViewBobbing.mg_pOnTriggerChange = NULL;
+  gm_mgCustomizeControls.mg_pActivatedFunction = NULL;
+  gm_mgModel.mg_pActivatedFunction = NULL;
+  
+  // Add components.
+  gm_lhChildren.AddTail(gm_mgCustomizeControls.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgModel.mg_lnNode);
 }
 
 INDEX CPlayerProfileMenu::ComboFromPlayer(INDEX iPlayer)

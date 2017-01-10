@@ -26,57 +26,66 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   gd.mg_pmgLeft = lf; \
   gd.mg_pmgRight = rt; \
   gd.mg_strText = txt; \
-  gm_lhGadgets.AddTail(gd.mg_lnNode);
+  gm_lhChildren.AddTail(gd.mg_lnNode);
 
 extern CTString astrNoYes[2];
 extern CTString astrSplitScreenRadioTexts[4];
 extern void SelectPlayersFillMenu(void);
 extern void SelectPlayersApplyMenu(void);
 
+// --------------------------------------------------------------------------------------
+// Intializes players selection menu.
+// --------------------------------------------------------------------------------------
 void CSelectPlayersMenu::Initialize_t(void)
 {
-  // intialize split screen menu
+  // Initialize title label.
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
   gm_mgTitle.mg_strText = TRANS("SELECT PLAYERS");
-  gm_lhGadgets.AddTail(gm_mgTitle.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
 
+  // Initialize "Dedicated" trigger.
   TRIGGER_MG(gm_mgDedicated, 0, gm_mgStart, gm_mgObserver, TRANS("Dedicated:"), astrNoYes);
   gm_mgDedicated.mg_strTip = TRANS("select to start dedicated server");
-  gm_mgDedicated.mg_pOnTriggerChange = NULL;
 
+  // Initialize "Observer" trigger.
   TRIGGER_MG(gm_mgObserver, 1, gm_mgDedicated, gm_mgSplitScreenCfg, TRANS("Observer:"), astrNoYes);
   gm_mgObserver.mg_strTip = TRANS("select to join in for observing, not for playing");
-  gm_mgObserver.mg_pOnTriggerChange = NULL;
 
-  // split screen config trigger
+  // Initialize "Number of players" trigger.
   TRIGGER_MG(gm_mgSplitScreenCfg, 2, gm_mgObserver, gm_mgPlayer0Change, TRANS("Number of players:"), astrSplitScreenRadioTexts);
   gm_mgSplitScreenCfg.mg_strTip = TRANS("choose more than one player to play in split screen");
+  
+  // Reset pointers.
+  gm_mgDedicated.mg_pOnTriggerChange = NULL;
+  gm_mgObserver.mg_pOnTriggerChange = NULL;
   gm_mgSplitScreenCfg.mg_pOnTriggerChange = NULL;
 
+  // Initialize players selection buttons.
   gm_mgPlayer0Change.mg_iCenterI = -1;
   gm_mgPlayer1Change.mg_iCenterI = -1;
   gm_mgPlayer2Change.mg_iCenterI = -1;
   gm_mgPlayer3Change.mg_iCenterI = -1;
+
   gm_mgPlayer0Change.mg_boxOnScreen = BoxMediumMiddle(4);
   gm_mgPlayer1Change.mg_boxOnScreen = BoxMediumMiddle(5);
   gm_mgPlayer2Change.mg_boxOnScreen = BoxMediumMiddle(6);
   gm_mgPlayer3Change.mg_boxOnScreen = BoxMediumMiddle(7);
-  gm_mgPlayer0Change.mg_strTip =
-    gm_mgPlayer1Change.mg_strTip =
-    gm_mgPlayer2Change.mg_strTip =
-    gm_mgPlayer3Change.mg_strTip = TRANS("select profile for this player");
-  gm_lhGadgets.AddTail(gm_mgPlayer0Change.mg_lnNode);
-  gm_lhGadgets.AddTail(gm_mgPlayer1Change.mg_lnNode);
-  gm_lhGadgets.AddTail(gm_mgPlayer2Change.mg_lnNode);
-  gm_lhGadgets.AddTail(gm_mgPlayer3Change.mg_lnNode);
+
+  gm_mgPlayer0Change.mg_strTip = gm_mgPlayer1Change.mg_strTip = gm_mgPlayer2Change.mg_strTip = gm_mgPlayer3Change.mg_strTip = TRANS("select profile for this player");
 
   gm_mgNotes.mg_boxOnScreen = BoxMediumRow(9.0);
   gm_mgNotes.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgNotes.mg_iCenterI = -1;
   gm_mgNotes.mg_bEnabled = FALSE;
   gm_mgNotes.mg_bLabel = TRUE;
-  gm_lhGadgets.AddTail(gm_mgNotes.mg_lnNode);
   gm_mgNotes.mg_strText = "";
+
+  // Add components.
+  gm_lhChildren.AddTail(gm_mgPlayer0Change.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgPlayer1Change.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgPlayer2Change.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgPlayer3Change.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgNotes.mg_lnNode);
 
   /*  // options button
   mgSplitOptions.mg_strText = TRANS("Game options");
@@ -87,7 +96,7 @@ void CSelectPlayersMenu::Initialize_t(void)
   mgSplitOptions.mg_pmgDown = &mgSplitStartStart;
   mgSplitOptions.mg_strTip = TRANS("adjust game rules");
   mgSplitOptions.mg_pActivatedFunction = &StartGameOptionsFromSplitScreen;
-  gm_lhGadgets.AddTail( mgSplitOptions.mg_lnNode);*/
+  gm_lhChildren.AddTail( mgSplitOptions.mg_lnNode);*/
 
   /*  // start button
   mgSplitStartStart.mg_bfsFontSize = BFS_LARGE;
@@ -95,7 +104,7 @@ void CSelectPlayersMenu::Initialize_t(void)
   mgSplitStartStart.mg_pmgUp = &mgSplitOptions;
   mgSplitStartStart.mg_pmgDown = &mgSplitGameType;
   mgSplitStartStart.mg_strText = TRANS("START");
-  gm_lhGadgets.AddTail( mgSplitStartStart.mg_lnNode);
+  gm_lhChildren.AddTail( mgSplitStartStart.mg_lnNode);
   mgSplitStartStart.mg_pActivatedFunction = &StartSelectPlayersMenuFromSplit;
   */
 

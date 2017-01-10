@@ -20,17 +20,20 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "MenuStuff.h"
 #include "MNetworkStart.h"
 
+extern INDEX sam_bMentalActivated;
+
 extern void UpdateNetworkLevel(INDEX iDummy);
 
-
+// --------------------------------------------------------------------------------------
+// Intializes network start menu.
+// --------------------------------------------------------------------------------------
 void CNetworkStartMenu::Initialize_t(void)
 {
-  // title
+  // Initialize title label.
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
   gm_mgTitle.mg_strText = TRANS("START SERVER");
-  gm_lhGadgets.AddTail(gm_mgTitle.mg_lnNode);
 
-  // session name edit box
+  // Initialize "Session name" edit box.
   gm_mgSessionName.mg_strText = _pGame->gam_strSessionName;
   gm_mgSessionName.mg_strLabel = TRANS("Session name:");
   gm_mgSessionName.mg_ctMaxStringLen = 25;
@@ -41,21 +44,24 @@ void CNetworkStartMenu::Initialize_t(void)
   gm_mgSessionName.mg_pmgUp = &gm_mgStart;
   gm_mgSessionName.mg_pmgDown = &gm_mgGameType;
   gm_mgSessionName.mg_strTip = TRANS("name the session to start");
-  gm_lhGadgets.AddTail(gm_mgSessionName.mg_lnNode);
+  
+  // Add components.
+  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgSessionName.mg_lnNode);
 
-  // game type trigger
+  // Initialize "Game type" trigger.
   TRIGGER_MG(gm_mgGameType, 2,
     gm_mgSessionName, gm_mgDifficulty, TRANS("Game type:"), astrGameTypeRadioTexts);
   gm_mgGameType.mg_ctTexts = ctGameTypeRadioTexts;
   gm_mgGameType.mg_strTip = TRANS("choose type of multiplayer game");
   gm_mgGameType.mg_pOnTriggerChange = &UpdateNetworkLevel;
 
-  // difficulty trigger
+  // Initialize "Difficulty" trigger.
   TRIGGER_MG(gm_mgDifficulty, 3,
     gm_mgGameType, gm_mgLevel, TRANS("Difficulty:"), astrDifficultyRadioTexts);
   gm_mgDifficulty.mg_strTip = TRANS("choose difficulty level");
 
-  // level name
+  // Initialize "Level" button.
   gm_mgLevel.mg_strText = "";
   gm_mgLevel.mg_strLabel = TRANS("Level:");
   gm_mgLevel.mg_boxOnScreen = BoxMediumRow(4);
@@ -65,24 +71,24 @@ void CNetworkStartMenu::Initialize_t(void)
   gm_mgLevel.mg_pmgDown = &gm_mgMaxPlayers;
   gm_mgLevel.mg_strTip = TRANS("choose the level to start");
   gm_mgLevel.mg_pActivatedFunction = NULL;
-  gm_lhGadgets.AddTail(gm_mgLevel.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgLevel.mg_lnNode);
 
-  // max players trigger
+  // Initialize "Max players" trigger.
   TRIGGER_MG(gm_mgMaxPlayers, 5,
     gm_mgLevel, gm_mgWaitAllPlayers, TRANS("Max players:"), astrMaxPlayersRadioTexts);
   gm_mgMaxPlayers.mg_strTip = TRANS("choose maximum allowed number of players");
 
-  // wait all players trigger
+  // Initialize "Wait all players" trigger.
   TRIGGER_MG(gm_mgWaitAllPlayers, 6,
     gm_mgMaxPlayers, gm_mgVisible, TRANS("Wait for all players:"), astrNoYes);
   gm_mgWaitAllPlayers.mg_strTip = TRANS("if on, game won't start until all players have joined");
 
-  // server visible trigger
+  // Initialize "Server visible" trigger.
   TRIGGER_MG(gm_mgVisible, 7,
     gm_mgMaxPlayers, gm_mgGameOptions, TRANS("Server visible:"), astrNoYes);
   gm_mgVisible.mg_strTip = TRANS("invisible servers are not listed, cleints have to join manually");
 
-  // options button
+  // Initialize "Game options" button.
   gm_mgGameOptions.mg_strText = TRANS("Game options");
   gm_mgGameOptions.mg_boxOnScreen = BoxMediumRow(8);
   gm_mgGameOptions.mg_bfsFontSize = BFS_MEDIUM;
@@ -90,22 +96,25 @@ void CNetworkStartMenu::Initialize_t(void)
   gm_mgGameOptions.mg_pmgUp = &gm_mgVisible;
   gm_mgGameOptions.mg_pmgDown = &gm_mgStart;
   gm_mgGameOptions.mg_strTip = TRANS("adjust game rules");
-  gm_mgGameOptions.mg_pActivatedFunction = NULL;
-  gm_lhGadgets.AddTail(gm_mgGameOptions.mg_lnNode);
 
-  // start button
+  // Initialize "Start" button.
   gm_mgStart.mg_bfsFontSize = BFS_LARGE;
   gm_mgStart.mg_boxOnScreen = BoxBigRow(7);
   gm_mgStart.mg_pmgUp = &gm_mgGameOptions;
   gm_mgStart.mg_pmgDown = &gm_mgSessionName;
   gm_mgStart.mg_strText = TRANS("START");
-  gm_lhGadgets.AddTail(gm_mgStart.mg_lnNode);
+  
+  // Reset pointers.
+  gm_mgGameOptions.mg_pActivatedFunction = NULL;
   gm_mgStart.mg_pActivatedFunction = NULL;
+  
+  // Add components.
+  gm_lhChildren.AddTail(gm_mgGameOptions.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgStart.mg_lnNode);
 }
 
 void CNetworkStartMenu::StartMenu(void)
 {
-  extern INDEX sam_bMentalActivated;
   gm_mgDifficulty.mg_ctTexts = sam_bMentalActivated ? 6 : 5;
 
   gm_mgGameType.mg_iSelected = Clamp(_pShell->GetINDEX("gam_iStartMode"), 0L, ctGameTypeRadioTexts - 1L);

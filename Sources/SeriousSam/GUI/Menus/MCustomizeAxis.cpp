@@ -19,17 +19,21 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "MenuStuff.h"
 #include "MCustomizeAxis.h"
 
-
+// --------------------------------------------------------------------------------------
+// Intializes axis menu.
+// --------------------------------------------------------------------------------------
 void CCustomizeAxisMenu::Initialize_t(void)
 {
-  // intialize axis menu
+  // Initialize title label.
   gm_mgTitle.mg_strText = TRANS("CUSTOMIZE AXIS");
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
-  gm_lhGadgets.AddTail(gm_mgTitle.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
 
+  // Initialize "Action" trigger.
   TRIGGER_MG(gm_mgActionTrigger, 0, gm_mgSmoothTrigger, gm_mgMountedTrigger, TRANS("ACTION"), astrNoYes);
   gm_mgActionTrigger.mg_strTip = TRANS("choose action to customize");
 
+  // Initialize "Mounted to" trigger.
   TRIGGER_MG(gm_mgMountedTrigger, 2, gm_mgActionTrigger, gm_mgSensitivity, TRANS("MOUNTED TO"), astrNoYes);
   gm_mgMountedTrigger.mg_strTip = TRANS("choose controller axis that will perform the action");
 
@@ -48,29 +52,36 @@ void CCustomizeAxisMenu::Initialize_t(void)
   INDEX ctAxis = _pInput->GetAvailableAxisCount();
   gm_mgMountedTrigger.mg_astrTexts = new CTString[ctAxis];
   gm_mgMountedTrigger.mg_ctTexts = ctAxis;
+
   // for all axis actions that can be mounted
   for (INDEX iAxis = 0; iAxis<ctAxis; iAxis++) {
     gm_mgMountedTrigger.mg_astrTexts[iAxis] = _pInput->GetAxisTransName(iAxis);
   }
 
+  // Initialize "Sensitivity" slider.
   gm_mgSensitivity.mg_boxOnScreen = BoxMediumRow(3);
   gm_mgSensitivity.mg_strText = TRANS("SENSITIVITY");
   gm_mgSensitivity.mg_pmgUp = &gm_mgMountedTrigger;
   gm_mgSensitivity.mg_pmgDown = &gm_mgDeadzone;
-  gm_lhGadgets.AddTail(gm_mgSensitivity.mg_lnNode);
   gm_mgSensitivity.mg_strTip = TRANS("set sensitivity for this axis");
 
+  // Initialize "Dead Zone" slider.
   gm_mgDeadzone.mg_boxOnScreen = BoxMediumRow(4);
   gm_mgDeadzone.mg_strText = TRANS("DEAD ZONE");
   gm_mgDeadzone.mg_pmgUp = &gm_mgSensitivity;
   gm_mgDeadzone.mg_pmgDown = &gm_mgInvertTrigger;
-  gm_lhGadgets.AddTail(gm_mgDeadzone.mg_lnNode);
   gm_mgDeadzone.mg_strTip = TRANS("set dead zone for this axis");
+
+  // Add components.
+  gm_lhChildren.AddTail(gm_mgSensitivity.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgDeadzone.mg_lnNode);
 
   TRIGGER_MG(gm_mgInvertTrigger, 5, gm_mgDeadzone, gm_mgRelativeTrigger, TRANS("INVERTED"), astrNoYes);
   gm_mgInvertTrigger.mg_strTip = TRANS("choose whether to invert this axis or not");
+
   TRIGGER_MG(gm_mgRelativeTrigger, 6, gm_mgInvertTrigger, gm_mgSmoothTrigger, TRANS("RELATIVE"), astrNoYes);
   gm_mgRelativeTrigger.mg_strTip = TRANS("select relative or absolute axis reading");
+
   TRIGGER_MG(gm_mgSmoothTrigger, 7, gm_mgRelativeTrigger, gm_mgActionTrigger, TRANS("SMOOTH"), astrNoYes);
   gm_mgSmoothTrigger.mg_strTip = TRANS("turn this on to filter readings on this axis");
 }

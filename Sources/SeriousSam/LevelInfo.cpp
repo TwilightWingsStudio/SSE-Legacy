@@ -29,6 +29,7 @@ CLevelInfo::CLevelInfo(void)
   li_strName = TRANS("<invalid level>");
   li_ulSpawnFlags = 0x0;
 }
+
 CLevelInfo::CLevelInfo(const CLevelInfo &li)
 {
   li_fnLevel      = li.li_fnLevel;    
@@ -90,6 +91,7 @@ BOOL GetLevelInfo(CLevelInfo &li, const CTFileName &fnm)
     return FALSE;
   }
 }
+
 int qsort_CompareLevels(const void *elem1, const void *elem2 )
 {
   const CLevelInfo &li1 = **(CLevelInfo **)elem1;

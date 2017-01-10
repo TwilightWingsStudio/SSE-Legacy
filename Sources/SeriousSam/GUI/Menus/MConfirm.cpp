@@ -18,18 +18,21 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "MenuPrinting.h"
 #include "MConfirm.h"
 
+// --------------------------------------------------------------------------------------
+// Intializes confirmation menu.
+// --------------------------------------------------------------------------------------
 void CConfirmMenu::Initialize_t(void)
 {
   gm_bPopup = TRUE;
 
+  // Initialize title label.
   gm_mgConfirmLabel.mg_strText = "";
-  gm_lhGadgets.AddTail(gm_mgConfirmLabel.mg_lnNode);
   gm_mgConfirmLabel.mg_boxOnScreen = BoxPopupLabel();
   gm_mgConfirmLabel.mg_iCenterI = 0;
   gm_mgConfirmLabel.mg_bfsFontSize = BFS_LARGE;
 
+  // Initialize "Yes" button.
   gm_mgConfirmYes.mg_strText = TRANS("YES");
-  gm_lhGadgets.AddTail(gm_mgConfirmYes.mg_lnNode);
   gm_mgConfirmYes.mg_boxOnScreen = BoxPopupYesLarge();
   gm_mgConfirmYes.mg_pActivatedFunction = NULL;
   gm_mgConfirmYes.mg_pmgLeft =
@@ -37,14 +40,19 @@ void CConfirmMenu::Initialize_t(void)
   gm_mgConfirmYes.mg_iCenterI = 1;
   gm_mgConfirmYes.mg_bfsFontSize = BFS_LARGE;
 
+  // Initialize "No" button.
   gm_mgConfirmNo.mg_strText = TRANS("NO");
-  gm_lhGadgets.AddTail(gm_mgConfirmNo.mg_lnNode);
   gm_mgConfirmNo.mg_boxOnScreen = BoxPopupNoLarge();
   gm_mgConfirmNo.mg_pActivatedFunction = NULL;
   gm_mgConfirmNo.mg_pmgLeft =
     gm_mgConfirmNo.mg_pmgRight = &gm_mgConfirmYes;
   gm_mgConfirmNo.mg_iCenterI = -1;
   gm_mgConfirmNo.mg_bfsFontSize = BFS_LARGE;
+  
+  // Add components.
+  gm_lhChildren.AddTail(gm_mgConfirmLabel.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgConfirmYes.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgConfirmNo.mg_lnNode);
 
   _pConfimedYes = NULL;
   _pConfimedNo = NULL;

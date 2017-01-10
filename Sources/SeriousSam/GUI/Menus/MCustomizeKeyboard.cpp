@@ -61,7 +61,7 @@ void CCustomizeKeyboardMenu::Initialize_t(void)
   // intialize Audio options menu
   gm_mgTitle.mg_strText = TRANS("CUSTOMIZE BUTTONS");
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
-  gm_lhGadgets.AddTail(gm_mgTitle.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgTitle.mg_lnNode);
 
 #define KL_START 3.0f
 #define KL_STEEP -1.45f
@@ -75,11 +75,11 @@ void CCustomizeKeyboardMenu::Initialize_t(void)
     gm_mgKey[iLabel].mg_pmgUp = &gm_mgKey[iPrev];
     gm_mgKey[iLabel].mg_pmgDown = &gm_mgKey[iNext];
     gm_mgKey[iLabel].mg_bVisible = TRUE;
-    gm_lhGadgets.AddTail(gm_mgKey[iLabel].mg_lnNode);
+    gm_lhChildren.AddTail(gm_mgKey[iLabel].mg_lnNode);
   }
   // arrows just exist
-  gm_lhGadgets.AddTail(gm_mgArrowDn.mg_lnNode);
-  gm_lhGadgets.AddTail(gm_mgArrowUp.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgArrowDn.mg_lnNode);
+  gm_lhChildren.AddTail(gm_mgArrowUp.mg_lnNode);
   gm_mgArrowDn.mg_adDirection = AD_DOWN;
   gm_mgArrowUp.mg_adDirection = AD_UP;
   gm_mgArrowDn.mg_boxOnScreen = BoxArrow(AD_DOWN);

@@ -22,7 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class CGameMenu {
 public:
-  CListHead gm_lhGadgets;
+  CListHead gm_lhChildren;
   CGameMenu *gm_pgmParentMenu;
   BOOL gm_bPopup;
   const char *gm_strName;   // menu name (for mod interface only)
