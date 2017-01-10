@@ -22,12 +22,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "ArrowDir.h"
 #include "MGButton.h"
 
-
-class CMGArrow : public CMGButton {
-public:
-  enum ArrowDir mg_adDirection;
-  void Render(CDrawPort *pdp);
-  void OnActivate(void);
+// --------------------------------------------------------------------------------------
+// Class that provides button used for scrolling lists while pressing it.
+// --------------------------------------------------------------------------------------
+class CMGArrow : public CMGButton
+{
+  public:
+    enum ArrowDir mg_adDirection;
+    void Render(CDrawPort *pdp);
+    void OnActivate(void);
 };
 
 #endif  /* include-once check. */

@@ -21,11 +21,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "MenuGadget.h"
 
+// --------------------------------------------------------------------------------------
+// Class that provides large text label that showed on top of every menu screen.
+// --------------------------------------------------------------------------------------
+class CMGTitle : public CMenuGadget
+{
+  public:
+    CTString mg_strText;
 
-class CMGTitle : public CMenuGadget {
-public:
-  CTString mg_strText;
-  void Render(CDrawPort *pdp);
+    void Render(CDrawPort *pdp);
 };
 
 #endif  /* include-once check. */

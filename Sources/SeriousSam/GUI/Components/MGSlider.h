@@ -21,22 +21,26 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "MGButton.h"
 
+// --------------------------------------------------------------------------------------
+// Class that provides horizontal slider.
+// --------------------------------------------------------------------------------------
+class CMGSlider : public CMGButton
+{
+  public:
+    FLOAT mg_fFactor;
+    INDEX mg_iMinPos;
+    INDEX mg_iMaxPos;
+    INDEX mg_iCurPos;
 
-class CMGSlider : public CMGButton {
-public:
-  FLOAT mg_fFactor;
-  INDEX mg_iMinPos;
-  INDEX mg_iMaxPos;
-  INDEX mg_iCurPos;
+    // Constructor.
+    CMGSlider();
 
-  CMGSlider();
-  void ApplyCurrentPosition(void);
-  void ApplyGivenPosition(INDEX iMin, INDEX iMax, INDEX iCur);
-  // return TRUE if handled
-  virtual BOOL OnKeyDown(int iVKey);
-  void(*mg_pOnSliderChange)(INDEX iCurPos);
-  PIXaabbox2D GetSliderBox(void);
-  void Render(CDrawPort *pdp);
+    void ApplyCurrentPosition(void);
+    void ApplyGivenPosition(INDEX iMin, INDEX iMax, INDEX iCur);
+    virtual BOOL OnKeyDown(int iVKey); // return TRUE if handled
+    void(*mg_pOnSliderChange)(INDEX iCurPos);
+    PIXaabbox2D GetSliderBox(void);
+    void Render(CDrawPort *pdp);
 };
 
 #endif  /* include-once check. */

@@ -21,16 +21,21 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "MGButton.h"
 
+// --------------------------------------------------------------------------------------
+// Class that provides area where rendered some player model. Used for skins preview.
+// --------------------------------------------------------------------------------------
+class CMGModel : public CMGButton
+{
+  public:
+    CModelObject mg_moModel;
+    CModelObject mg_moFloor;
+    CPlacement3D mg_plModel;
+    BOOL mg_fFloorY;
 
-class CMGModel : public CMGButton {
-public:
-  CModelObject mg_moModel;
-  CModelObject mg_moFloor;
-  CPlacement3D mg_plModel;
-  BOOL mg_fFloorY;
+    // Constructor.
+    CMGModel(void);
 
-  CMGModel(void);
-  void Render(CDrawPort *pdp);
+    void Render(CDrawPort *pdp);
 };
 
 #endif  /* include-once check. */

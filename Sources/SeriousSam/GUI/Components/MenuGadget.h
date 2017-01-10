@@ -27,38 +27,44 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #define EMPTYSLOTSTRING TRANS("<save a new one>")
 
+// --------------------------------------------------------------------------------------
+// Class that provides basic GUI component.
+// --------------------------------------------------------------------------------------
+class CMenuGadget
+{
+  public:
+    CListNode mg_lnNode;
+    FLOATaabbox2D mg_boxOnScreen;
+    BOOL mg_bVisible;
+    BOOL mg_bEnabled;
+    BOOL mg_bLabel;
+    BOOL mg_bFocused;
+    INDEX mg_iInList; // for scrollable gadget lists
 
-class CMenuGadget {
-public:
-  CListNode mg_lnNode;
-  FLOATaabbox2D mg_boxOnScreen;
-  BOOL mg_bVisible;
-  BOOL mg_bEnabled;
-  BOOL mg_bLabel;
-  BOOL mg_bFocused;
-  INDEX mg_iInList; // for scrollable gadget lists
+    CTString mg_strTip;
+    CMenuGadget *mg_pmgLeft;
+    CMenuGadget *mg_pmgRight;
+    CMenuGadget *mg_pmgUp;
+    CMenuGadget *mg_pmgDown;
 
-  CTString mg_strTip;
-  CMenuGadget *mg_pmgLeft;
-  CMenuGadget *mg_pmgRight;
-  CMenuGadget *mg_pmgUp;
-  CMenuGadget *mg_pmgDown;
+    // Constructor.
+    CMenuGadget(void);
 
-  CMenuGadget(void);
-  // return TRUE if handled
-  virtual BOOL OnKeyDown(int iVKey);
-  virtual BOOL OnChar(MSG msg);
-  virtual void OnActivate(void);
-  virtual void OnSetFocus(void);
-  virtual void OnKillFocus(void);
-  virtual void Appear(void);
-  virtual void Disappear(void);
-  virtual void Think(void);
-  virtual void OnMouseOver(PIX pixI, PIX pixJ);
+    // return TRUE if handled
+    virtual BOOL OnKeyDown(int iVKey);
+    virtual BOOL OnChar(MSG msg);
 
-  virtual COLOR GetCurrentColor(void);
-  virtual void  Render(CDrawPort *pdp);
-  virtual BOOL  IsSeparator(void) { return FALSE; };
+    virtual void OnActivate(void);
+    virtual void OnSetFocus(void);
+    virtual void OnKillFocus(void);
+    virtual void Appear(void);
+    virtual void Disappear(void);
+    virtual void Think(void);
+    virtual void OnMouseOver(PIX pixI, PIX pixJ);
+
+    virtual COLOR GetCurrentColor(void);
+    virtual void  Render(CDrawPort *pdp);
+    virtual BOOL  IsSeparator(void) { return FALSE; };
 };
 
 enum ButtonFontSize {

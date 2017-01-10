@@ -21,13 +21,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "MGButton.h"
 
+// --------------------------------------------------------------------------------------
+// Class that provides clickable button which is list item in some levels menu.
+// --------------------------------------------------------------------------------------
+class CMGLevelButton : public CMGButton
+{
+  public:
+    CTFileName mg_fnmLevel;
 
-class CMGLevelButton : public CMGButton {
-public:
-  CTFileName mg_fnmLevel;
-
-  void OnActivate(void);
-  void OnSetFocus(void);
+    void OnActivate(void);
+    void OnSetFocus(void);
 };
 
 #endif  /* include-once check. */

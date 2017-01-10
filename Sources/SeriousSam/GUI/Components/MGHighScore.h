@@ -21,10 +21,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "MenuGadget.h"
 
-
-class CMGHighScore : public CMenuGadget {
-public:
-  void Render(CDrawPort *pdp);
+// --------------------------------------------------------------------------------------
+// Class that provides highscore table.
+// --------------------------------------------------------------------------------------
+class CMGHighScore : public CMenuGadget
+{
+  public:
+    void Render(CDrawPort *pdp);
 };
 
 #endif  /* include-once check. */

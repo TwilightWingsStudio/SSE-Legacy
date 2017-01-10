@@ -21,26 +21,31 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "MenuGadget.h"
 
+// --------------------------------------------------------------------------------------
+// Class that provides some label used for listening and remembering keybindings.
+// --------------------------------------------------------------------------------------
+class CMGKeyDefinition : public CMenuGadget
+{
+  public:
+    INDEX mg_iState;
+    INDEX mg_iControlNumber;
 
-class CMGKeyDefinition : public CMenuGadget {
-public:
-  INDEX mg_iState;
-  INDEX mg_iControlNumber;
+    CTString mg_strLabel;
+    CTString mg_strBinding;
 
-  CTString mg_strLabel;
-  CTString mg_strBinding;
+    // Constructor.
+    CMGKeyDefinition(void);
 
-  CMGKeyDefinition(void);
-  void Appear(void);
-  void Disappear(void);
-  void OnActivate(void);
-  // return TRUE if handled
-  BOOL OnKeyDown(int iVKey);
-  void Think(void);
-  // set names for both key bindings
-  void SetBindingNames(BOOL bDefining);
-  void DefineKey(INDEX iDik);
-  void Render(CDrawPort *pdp);
+    void Appear(void);
+    void Disappear(void);
+    void OnActivate(void);
+    // return TRUE if handled
+    BOOL OnKeyDown(int iVKey);
+    void Think(void);
+    // set names for both key bindings
+    void SetBindingNames(BOOL bDefining);
+    void DefineKey(INDEX iDik);
+    void Render(CDrawPort *pdp);
 };
 
 #endif  /* include-once check. */

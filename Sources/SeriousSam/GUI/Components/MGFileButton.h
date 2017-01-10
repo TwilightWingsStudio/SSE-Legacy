@@ -25,33 +25,41 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define FBS_NORMAL    0 // normal active state
 #define FBS_SAVENAME  1 // typing in the save name
 #define FBS_RENAME    2 // renaming existing file
-class CMGFileButton : public CMGEdit {
-public:
-  CMGFileButton(void);
-  CTFileName mg_fnm;
-  CTString mg_strDes;   // entire description goes here
-  CTString mg_strInfo;  // info part of text to print above the gadget tip
-  INDEX mg_iState;
 
-  // refresh current text from description
-  void RefreshText(void);
-  // save description to disk
-  void SaveDescription(void);
-  void SaveYes(void);
-  void DoSave(void);
-  void DoLoad(void);
-  void StartEdit(void);
+// --------------------------------------------------------------------------------------
+// Class that looks like editable text which also can be list item.
+// Provies file loading, saving and renaming functionality.
+// --------------------------------------------------------------------------------------
+class CMGFileButton : public CMGEdit
+{
+  public:
+    CTFileName mg_fnm;
+    CTString mg_strDes;   // entire description goes here
+    CTString mg_strInfo;  // info part of text to print above the gadget tip
+    INDEX mg_iState;
 
-  // return TRUE if handled
-  BOOL OnKeyDown(int iVKey);
-  void OnActivate(void);
-  void OnSetFocus(void);
-  void OnKillFocus(void);
+    // Constructor.
+    CMGFileButton(void);
+    
+    // refresh current text from description
+    void RefreshText(void);
+    // save description to disk
+    void SaveDescription(void);
+    void SaveYes(void);
+    void DoSave(void);
+    void DoLoad(void);
+    void StartEdit(void);
 
-  // overrides from edit gadget
-  void OnStringChanged(void);
-  void OnStringCanceled(void);
-  void Render(CDrawPort *pdp);
+    // return TRUE if handled
+    BOOL OnKeyDown(int iVKey);
+    void OnActivate(void);
+    void OnSetFocus(void);
+    void OnKillFocus(void);
+
+    // overrides from edit gadget
+    void OnStringChanged(void);
+    void OnStringCanceled(void);
+    void Render(CDrawPort *pdp);
 };
 
 #endif  /* include-once check. */

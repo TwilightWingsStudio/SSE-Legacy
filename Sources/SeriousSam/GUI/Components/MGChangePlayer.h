@@ -21,13 +21,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "MGButton.h"
 
+// --------------------------------------------------------------------------------------
+// Class that provides clickable button which is list item in players selection menu
+//   while starting or joining some game session.
+// --------------------------------------------------------------------------------------
+class CMGChangePlayer : public CMGButton
+{
+  public:
+    INDEX mg_iLocalPlayer;
 
-class CMGChangePlayer : public CMGButton {
-public:
-  INDEX mg_iLocalPlayer;
-
-  void SetPlayerText(void);
-  void OnActivate(void);
+    void SetPlayerText(void);
+    void OnActivate(void);
 };
 
 #endif  /* include-once check. */

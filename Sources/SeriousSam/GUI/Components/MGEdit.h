@@ -21,23 +21,28 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "MGButton.h"
 
+// --------------------------------------------------------------------------------------
+// Class that provides field with editable text GUI component.
+// --------------------------------------------------------------------------------------
+class CMGEdit : public CMGButton
+{
+  public:
+    INDEX mg_ctMaxStringLen;
+    CTString *mg_pstrToChange;
 
-class CMGEdit : public CMGButton {
-public:
-  INDEX mg_ctMaxStringLen;
-  CTString *mg_pstrToChange;
+    // Constructor.
+    CMGEdit(void);
 
-  CMGEdit(void);
+    // return TRUE if handled
+    BOOL OnKeyDown(int iVKey);
+    BOOL OnChar(MSG msg);
 
-  // return TRUE if handled
-  BOOL OnKeyDown(int iVKey);
-  BOOL OnChar(MSG msg);
-  void Clear(void);
-  void OnActivate(void);
-  void OnKillFocus(void);
-  void Render(CDrawPort *pdp);
-  virtual void OnStringChanged(void);
-  virtual void OnStringCanceled(void);
+    void Clear(void);
+    void OnActivate(void);
+    void OnKillFocus(void);
+    void Render(CDrawPort *pdp);
+    virtual void OnStringChanged(void);
+    virtual void OnStringCanceled(void);
 };
 
 #endif  /* include-once check. */

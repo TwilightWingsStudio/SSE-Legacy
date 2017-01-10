@@ -21,15 +21,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "MGButton.h"
 
-
-class CMGVarButton : public CMGButton {
-public:
-  class CVarSetting *mg_pvsVar;
-  PIXaabbox2D GetSliderBox(void);
-  BOOL OnKeyDown(int iVKey);
-  void Render(CDrawPort *pdp);
-  BOOL IsSeparator(void);
-  BOOL IsEnabled(void);
+// --------------------------------------------------------------------------------------
+// VarButton - VariantButton
+// Class that provides clickable button that is variant in some list.
+// --------------------------------------------------------------------------------------
+class CMGVarButton : public CMGButton
+{
+  public:
+    class CVarSetting *mg_pvsVar;
+    PIXaabbox2D GetSliderBox(void);
+    BOOL OnKeyDown(int iVKey);
+    void Render(CDrawPort *pdp);
+    BOOL IsSeparator(void);
+    BOOL IsEnabled(void);
 };
 
 #endif  /* include-once check. */
