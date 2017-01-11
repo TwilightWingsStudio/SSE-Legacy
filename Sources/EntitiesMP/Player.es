@@ -3402,8 +3402,13 @@ functions:
     // [SSE] CPlayerSettingsEntity
     CPlayerSettingsEntity *penSettings = NULL;
     if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
-      fDamageAmmount *=  ((CPlayerSettingsEntity&)*m_penSettings).m_fDamageReceiveMul;
       penSettings = (CPlayerSettingsEntity *)&*m_penSettings;
+      
+      fDamageAmmount *= penSettings->m_fDamageReceiveMul;
+      
+      if (penInflictor == this) {
+        fDamageAmmount *= penSettings->m_fSelfDamageMul;
+      }
     }
 
     // ignore zero damages
@@ -3438,21 +3443,35 @@ functions:
       if (m_penCamera != NULL) {
         // if the camera has onbreak
         CEntity *penOnBreak = ((CCamera&)*m_penCamera).m_penOnBreak;
-        if (penOnBreak!=NULL) {
+
+        if (penOnBreak != NULL) {
           // trigger it
           SendToTarget(penOnBreak, EET_TRIGGER, this);
-        // if it doesn't
+        // If it doesn't then just deactivate camera.
         } else {
-          // just deactivate camera
           m_penCamera = NULL; 
         }
       }
     }
 
-    // if the player is doing autoactions
+    // if the player is doing autoactions then ignore all damage
     if (m_penActionMarker != NULL) {
-      // ignore all damage
       return;
+    }
+    
+    // [SSE] CPlayerSettingsEntity
+    if (penSettings && !penSettings->m_bCanDie) {
+      if (en_fHealth <= 0.0F) {
+        return;
+      } else {
+        if (fSubHealth >= en_fHealth) {
+          fSubHealth = ClampUp(fSubHealth, en_fHealth - 1.0F);
+        }
+        
+        if (fSubHealth <= 0) {
+          return;
+        }
+      }
     }
 
     DamageImpact(dmtType, fSubHealth, vHitPoint, vDirection);

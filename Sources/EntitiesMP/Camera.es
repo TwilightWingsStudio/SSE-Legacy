@@ -81,7 +81,7 @@ properties:
  71 enum EventEType m_eetAutoCameraEndEvent "Auto camera end event" = EET_STOP,
  72 FLOAT3D m_vRelTargetOffset = FLOAT3D(0,0,0),
  
- // SSE
+ // [SSE] Camera Expansion
  80 BOOL m_bDisablePlayerControl "Disable Player Control" = TRUE,
 
 components:

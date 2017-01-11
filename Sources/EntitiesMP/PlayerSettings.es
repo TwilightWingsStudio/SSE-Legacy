@@ -69,11 +69,13 @@ properties:
   36 FLOAT m_fSpeedDownMultiplier "Mul Speed Down" = 1.0F,
    
   // Receive / Pickup Multipliers
-  40 FLOAT m_fDamageReceiveMul  "Mul Receive Damage" = 1.0F,
-  41 FLOAT m_fHeathPickUpMul    "Mul Health PickUp" = 1.0F,
-  42 FLOAT m_fArmorPickUpMul    "Mul Armor PickUp" = 1.0F,
+  40 FLOAT m_fDamageReceiveMul  "Mul All Damage" = 1.0F,
+  41 FLOAT m_fSelfDamageMul     "Mul Self Damage" = 1.0F,
+
+  42 FLOAT m_fHeathPickUpMul    "Mul Health PickUp" = 1.0F,
+  43 FLOAT m_fArmorPickUpMul    "Mul Armor PickUp" = 1.0F,
  
-  43 FLOAT m_fScoreReceiveMul   "Mul Receive Score" = 1.0F,
+  44 FLOAT m_fScoreReceiveMul   "Mul Receive Score" = 1.0F,
   
   50 FLOAT m_fArmorAbsorbtionMul "Mul Armor Absorbtion" = 0.66F,
    
@@ -93,6 +95,8 @@ properties:
  
   75 FLOAT m_fTopArmor  "Armor Top" = 100.0F,
   76 FLOAT m_fMaxArmor  "Armor Max" = 200.0F,
+  
+  90 BOOL m_bCanDie     "Can Die" = TRUE,
  
   // Health Regeneration
  120 FLOAT m_fHealthRegenValue  "HP Regen. Val" = 0.0F, 
