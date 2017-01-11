@@ -416,10 +416,13 @@ procedures:
                 }
               } else if (m_bTellCount && m_strTellCountMsg != "") {
                 CTString strRemaining = TranslateConst(m_strTellCountMsg);
-                CTString strReplace;
+                CTString strReplace, strReplace2;
+
                 strReplace.PrintF("%d", m_iCountTmp);
+                strReplace2.PrintF("%d", m_iCount - m_iCountTmp);
 
                 while (strRemaining.ReplaceSubstr("%d", strReplace)) {}
+                while(strRemaining.ReplaceSubstr("%D",strReplace2)) {}
                 PrintCenterMessage(this, m_penCaused, strRemaining, 3.0f, MSS_INFO);
               }
             }
