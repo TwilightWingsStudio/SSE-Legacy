@@ -39,6 +39,8 @@ extern INDEX cht_bFly;
 extern INDEX cht_bGhost;
 extern INDEX cht_bInvisible;
 extern FLOAT cht_fTranslationMultiplier;
+extern INDEX cht_bKillAllAura; // [SSE] Cheats Expansion
+extern INDEX cht_bInfiniteAmmo; // [SSE] Cheats Expansion
 
 // Interface Control
 extern INDEX hud_bShowInfo;
@@ -1495,11 +1497,14 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
     _pDP->SetFont( _pfdConsoleFont);
     _pDP->SetTextScaling( 1.0f);
     const FLOAT fchtTM = cht_fTranslationMultiplier; // for text formatting sake :)
-    if ( fchtTM > 1.0f)  { _pDP->PutTextR( "turbo",     _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
-    if ( cht_bInvisible) { _pDP->PutTextR( "invisible", _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
-    if ( cht_bGhost)     { _pDP->PutTextR( "ghost",     _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
-    if ( cht_bFly)       { _pDP->PutTextR( "fly",       _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
-    if ( cht_bGod)       { _pDP->PutTextR( "god",       _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+
+    if ( fchtTM > 1.0f)     { _pDP->PutTextR( "turbo",     _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+    if ( cht_bGhost)        { _pDP->PutTextR( "ghost",     _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+    if ( cht_bFly)          { _pDP->PutTextR( "fly",       _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+    if ( cht_bGod)          { _pDP->PutTextR( "god",       _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+    if ( cht_bInfiniteAmmo) { _pDP->PutTextR( "noammo",    _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+    if ( cht_bKillAllAura)  { _pDP->PutTextR( "killaura",  _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+    if ( cht_bInvisible)    { _pDP->PutTextR( "invisible", _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
   }
 
   // in the end, remember the current time so it can be used in the next frame

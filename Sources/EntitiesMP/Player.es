@@ -335,7 +335,7 @@ static struct PlayerControls pctlCurrent;
 // Cheats
 static INDEX cht_iGoToMarker   = -1;
 static INDEX cht_bKillAll      = FALSE;
-static INDEX cht_bKillAllAura  = FALSE; // [SSE] Cheats Expansion
+extern INDEX cht_bKillAllAura  = FALSE; // [SSE] Cheats Expansion
 static INDEX cht_bGiveAll      = FALSE;
 static INDEX cht_bOpen         = FALSE;
 static INDEX cht_bAllKeys      = FALSE; // [SSE] Cheats Expansion
