@@ -84,6 +84,8 @@ typedef enum NetworkMessageType {
   MSG_SEQ_PAUSE,         // game was paused/unpaused
   MSG_SEQ_CHARACTERCHANGE, // a player has changed character
   
+  MSG_SEQ_DESTROYENTITY, // [SSE] Netcode Update - instruction for removing entity from the World.
+  
   MSG_S2C_ATTACHPLAYER, // [SSE] Netcode Update - instructions for certain client to take control on specified player.
 
   MSG_GAMESTREAMBLOCKS,         // packet with one or more game stream messages

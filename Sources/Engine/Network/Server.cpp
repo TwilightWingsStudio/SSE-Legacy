@@ -1094,7 +1094,8 @@ void CServer::SendSessionStateData(INDEX iClient)
     // send the stream to the remote session state
     _pNetwork->SendToClientReliable(iClient, strmInfo);
   
-    CPrintF(TRANS("Server: Sent connection data to '%s' (%dk->%dk->%dk)\n"),
+    CPrintF(TRANS("Server: Sent connection data to (%d) '%s' (%dk->%dk->%dk)\n"),
+      iClient,
       (const char*)_cmiComm.Server_GetClientName(iClient), 
       slFullSize/1024, slDeltaSize/1024, slSize/1024);
     if (net_bDumpConnectionInfo) {

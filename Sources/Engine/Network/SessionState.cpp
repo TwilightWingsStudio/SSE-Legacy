@@ -1472,7 +1472,7 @@ void CSessionState::ProcessGameStreamBlock(CNetworkMessage &nmMessage)
     //ses_bAllowRandom = FALSE;
   } break;
   
-    // [SSE] Netcode Update - Swap two active players between.
+  // [SSE] Netcode Update - Swap two active players between.
   case MSG_SEQ_SWAPPLAYERENTITIES:
   {
     _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
@@ -1508,6 +1508,28 @@ void CSessionState::ProcessGameStreamBlock(CNetworkMessage &nmMessage)
     CPlayerEntity *penFirst = pltFirst.plt_penPlayerEntity;
     pltFirst.AttachEntity(pltSecond.plt_penPlayerEntity);
     pltSecond.AttachEntity(penFirst);
+
+    // handle all the sent events
+    ses_bAllowRandom = TRUE;
+    CEntity::HandleSentEvents();
+    ses_bAllowRandom = FALSE;
+  } break;
+  
+  // [SSE] Netcode Update - Destroy entity.
+  case MSG_SEQ_DESTROYENTITY:
+  {
+    _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
+
+    INDEX iEntity;
+    nmMessage >> iEntity;
+
+    CEntity *penEntity = _pNetwork->ga_World.EntityFromID(iEntity);
+
+    if (penEntity == NULL) {
+      break;
+    }
+    
+    penEntity->Destroy();
 
     // handle all the sent events
     ses_bAllowRandom = TRUE;

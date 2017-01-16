@@ -945,6 +945,35 @@ static void SwapPlayersTest(void* pArgs)
   CPrintF("  Swapped!\n");
 }
 
+static void DestroyEntityTest(void *pArgs)
+{
+  INDEX iEntity = NEXTARGUMENT(INDEX);
+  
+  CPrintF("destroyentitytest:\n");
+  if (!_pNetwork->ga_srvServer.srv_bActive) {
+    CPrintF("  <not a server>\n");
+    return;
+  }
+  
+  CEntity *penEntity = _pNetwork->ga_World.EntityFromID(iEntity);
+
+  if (penEntity == NULL) {
+    CPrintF("  <invalid entity>\n");
+    return;
+  }
+  
+  CServer &srvServer = _pNetwork->ga_srvServer;
+  
+  // create message for destroying entity in all sessions
+  CNetworkStreamBlock nsbDestroyEntity(MSG_SEQ_DESTROYENTITY, ++srvServer.srv_iLastProcessedSequence);
+  nsbDestroyEntity<<iEntity;
+
+  // put the message in buffer to be sent to all sessions
+  _pNetwork->ga_srvServer.AddBlockToAllSessions(nsbDestroyEntity);
+  
+  CPrintF("  done! Entity marked for removing!\n");
+}
+
 /*
  * Initialize game management.
  */
@@ -957,6 +986,7 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user void AttachPlayerTest(INDEX, INDEX);", &AttachPlayerTest);
   _pShell->DeclareSymbol("user void DetachPlayerTest(INDEX);", &DetachPlayerTest);
   _pShell->DeclareSymbol("user void SwapPlayersTest(INDEX, INDEX);", &SwapPlayersTest);
+  _pShell->DeclareSymbol("user void DestroyEntityTest(INDEX);", &DestroyEntityTest);
 
   // Add shell symbols.
   _pShell->DeclareSymbol("user INDEX dbg_bBreak;", &dbg_bBreak);
