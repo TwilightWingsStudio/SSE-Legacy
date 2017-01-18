@@ -664,9 +664,15 @@ public:
 
 // check if entity is of given class
 BOOL ENGINE_API IsOfClass(CEntity *pen, const char *pstrClassName);
+BOOL ENGINE_API IsOfClassID(CEntity *pen, ULONG ulID); // [SSE] Extended Class Check
+
 BOOL ENGINE_API IsOfSameClass(CEntity *pen1, CEntity *pen2);
+BOOL ENGINE_API IsOfSameClassID(CEntity *pen1, CEntity *pen2); // [SSE] Extended Class Check
+
 // check if entity is of given class or derived from
 BOOL ENGINE_API IsDerivedFromClass(CEntity *pen, const char *pstrClassName);
+BOOL ENGINE_API IsDerivedFromClassID(CEntity *pen, ULONG ulID); // [SSE] Extended Class Check
+
 
 // all standard smart pointer functions are here as inlines
 inline CEntityPointer::CEntityPointer(void) : ep_pen(NULL) {};

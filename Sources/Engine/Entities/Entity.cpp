@@ -79,15 +79,31 @@ extern INDEX _ctPredictorEntities;
 // check if entity is of given class
 BOOL IsOfClass(CEntity *pen, const char *pstrClassName)
 {
-  if (pen==NULL || pstrClassName==NULL) {
+  if (pen == NULL || pstrClassName == NULL) {
     return FALSE;
   }
-  if (strcmp(pen->GetClass()->ec_pdecDLLClass->dec_strName, pstrClassName)==0) {
+
+  if (strcmp(pen->GetClass()->ec_pdecDLLClass->dec_strName, pstrClassName) == 0) {
     return TRUE;
   } else {
     return FALSE;
   }
 }
+
+// [SSE] Extended Class Check
+BOOL ENGINE_API IsOfClassID(CEntity *pen, ULONG ulID)
+{
+  if (pen == NULL) {
+    return FALSE;
+  }
+  
+  if (pen->GetClass()->ec_pdecDLLClass->dec_ulID == ulID) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
 BOOL IsOfSameClass(CEntity *pen1, CEntity *pen2)
 {
   if (pen1==NULL || pen2==NULL) {
@@ -100,22 +116,61 @@ BOOL IsOfSameClass(CEntity *pen1, CEntity *pen2)
   }
 }
 
+// [SSE] Extended Class Check
+BOOL IsOfSameClassID(CEntity *pen1, CEntity *pen2)
+{
+  if (pen1 == NULL || pen2 == NULL) {
+    return FALSE;
+  }
+
+  if (pen1->GetClass()->ec_pdecDLLClass->dec_ulID == pen2->GetClass()->ec_pdecDLLClass->dec_ulID) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
 // check if entity is of given class or derived from
 BOOL IsDerivedFromClass(CEntity *pen, const char *pstrClassName)
 {
-  if (pen==NULL || pstrClassName==NULL) {
+  if (pen == NULL || pstrClassName == NULL) {
     return FALSE;
   }
+
   // for all classes in hierarchy of the entity
   for(CDLLEntityClass *pdecDLLClass = pen->GetClass()->ec_pdecDLLClass;
-      pdecDLLClass!=NULL;
+      pdecDLLClass != NULL;
       pdecDLLClass = pdecDLLClass->dec_pdecBase) {
-    // if it is the wanted class
-    if (strcmp(pdecDLLClass->dec_strName, pstrClassName)==0) {
-      // it is derived
+
+    // If it is the wanted class then it is derived.
+    if (strcmp(pdecDLLClass->dec_strName, pstrClassName) == 0) {
+      //
       return TRUE;
     }
   }
+
+  // otherwise, it is not derived
+  return FALSE;
+}
+
+// [SSE] Extended Class Check
+BOOL IsDerivedFromClassID(CEntity *pen, ULONG ulID)
+{
+  if (pen == NULL) {
+    return FALSE;
+  }
+
+  // for all classes in hierarchy of the entity
+  for(CDLLEntityClass *pdecDLLClass = pen->GetClass()->ec_pdecDLLClass;
+      pdecDLLClass != NULL;
+      pdecDLLClass = pdecDLLClass->dec_pdecBase) {
+
+    // If it is the wanted class then it is derived.
+    if (pdecDLLClass->dec_ulID == ulID) {
+      return TRUE;
+    }
+  }
+
   // otherwise, it is not derived
   return FALSE;
 }

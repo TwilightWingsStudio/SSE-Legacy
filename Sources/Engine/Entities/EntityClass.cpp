@@ -313,6 +313,8 @@ void CEntityClass::Read_t( CTStream *istr) // throw char *
     CTmpPrecachingNow tpn;
     ObtainComponents_t();
   }
+  
+  ec_pdecDLLClass->dec_ulID = 0; // [SSE] Extended Class Check
 
   // attach the DLL
   ec_pdecDLLClass->dec_OnInitClass();
