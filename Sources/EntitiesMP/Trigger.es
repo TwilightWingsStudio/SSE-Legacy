@@ -358,7 +358,7 @@ procedures:
 
       // re-roots start events as triggers
       on (EStart eStart) : {
-        SendToTargetM(this, EET_TRIGGER, eStart.penCaused);
+        SendToTarget(this, EET_TRIGGER, eStart.penCaused); // [SSE] - Here must be SendToTarget not SendToTargetM!!!
         resume;
       }
 
@@ -366,14 +366,14 @@ procedures:
       on (ETrigger eTrigger) : {
         if (m_fMinTime > 0 && m_tmLastTriggered != 0 && (_pTimer->CurrentTick() - m_fMinTime) < m_tmLastTriggered) {
           if (m_bDebug) {
-            CPrintF(TRANS("%s: received Trigger event, but min Time was not reached\n"), m_strName);
+            CPrintF(TRANS(["[%s] : received Trigger event, but min Time was not reached\n"), m_strName);
           }
           resume;
         }
 
         if (!(m_strCausedOnlyByClass == "" || IsOfClass(eTrigger.penCaused, m_strCausedOnlyByClass))) {
           if (m_bDebug) {
-            CPrintF(TRANS("%s: received Trigger event, but from wrong class\n"),m_strName);
+            CPrintF(TRANS("[%s] : received Trigger event, but from wrong class\n"),m_strName);
           }
           resume;
         }
@@ -382,9 +382,9 @@ procedures:
 
         if (m_bDebug) {
           if (eTrigger.penCaused != NULL) {
-            CPrintF(TRANS("%s triggered through %s\n"), m_strName, eTrigger.penCaused->GetName());
-          }else{
-            CPrintF(TRANS("%s triggered through unknown entity\n"), m_strName);
+            CPrintF(TRANS("[%s] : triggered through %s\n"), m_strName, eTrigger.penCaused->GetName());
+          } else {
+            CPrintF(TRANS("[%s] : triggered through unknown entity\n"), m_strName);
           }
         }
 
