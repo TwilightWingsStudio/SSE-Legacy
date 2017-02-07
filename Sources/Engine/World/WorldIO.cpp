@@ -811,6 +811,16 @@ void CWorld::ReadInfo_t(CTStream *strm, BOOL bMaybeDescription) // throw char *
     if (strm->PeekID_t()==CChunkID("DTRS")) {
       strm->ExpectID_t("DTRS");
     }
+    
+    // [SSE] Rev Import - BEGIN
+    // [ZCaliptium] This code only prevents SED/game crash while trying to load any shitty map made with SSR.
+    if (strm->PeekID_t() == CChunkID("LDRB")) {
+      strm->ExpectID_t("LDRB");
+      ULONG ulShit = 0;
+      (*strm)>>ulShit;
+    }
+    // [SSE] Rev Import - END
+    
     // read the name
     (*strm)>>wo_strName;
     // read the flags
