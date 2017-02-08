@@ -15,36 +15,37 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 322
 %{
-  #include "StdH.h"
-  //#include "Models/Enemies/Elementals/AirMan.h"
-  //#include "Models/Enemies/Elementals/IceMan.h"
-  #include "Models/Enemies/Elementals/StoneMan.h"
-  //#include "Models/Enemies/Elementals/Twister.h"
-  //#include "Models/Enemies/Elementals/WaterMan.h"
-  //#include "Models/Enemies/Elementals/Projectile/IcePyramid.h"
-  #include "Models/Enemies/Elementals/Projectile/LavaStone.h"
+#include "StdH.h"
+//#include "Models/Enemies/Elementals/AirMan.h"
+//#include "Models/Enemies/Elementals/IceMan.h"
+#include "Models/Enemies/Elementals/StoneMan.h"
+//#include "Models/Enemies/Elementals/Twister.h"
+//#include "Models/Enemies/Elementals/WaterMan.h"
+//#include "Models/Enemies/Elementals/Projectile/IcePyramid.h"
+#include "Models/Enemies/Elementals/Projectile/LavaStone.h"
 
-  #include "Models/Enemies/ElementalLava/ElementalLava.h"
-  #include "EntitiesMP/WorldSettingsController.h"
-  #include "EntitiesMP/BackgroundViewer.h"
+#include "Models/Enemies/ElementalLava/ElementalLava.h"
+#include "EntitiesMP/WorldSettingsController.h"
+#include "EntitiesMP/BackgroundViewer.h"
 
-  // lava elemental definitions
-  #define LAVAMAN_SMALL_STRETCH (2.0f*0.75f)
-  #define LAVAMAN_BIG_STRETCH (4.0f*1.25f)
-  #define LAVAMAN_LARGE_STRETCH (16.0f*2.5f)
+// lava elemental definitions
+#define LAVAMAN_SMALL_STRETCH (2.0f*0.75f)
+#define LAVAMAN_BIG_STRETCH (4.0f*1.25f)
+#define LAVAMAN_LARGE_STRETCH (16.0f*2.5f)
 
-  #define LAVAMAN_BOSS_FIRE_RIGHT FLOAT3D(1.01069f, 0.989616f, -1.39743f)
-  #define LAVAMAN_BOSS_FIRE_LEFT FLOAT3D(-0.39656f, 1.08619f, -1.34373f)
-  #define LAVAMAN_FIRE_LEFT FLOAT3D(-0.432948f, 1.51133f, -0.476662f)
+#define LAVAMAN_BOSS_FIRE_RIGHT FLOAT3D(1.01069f, 0.989616f, -1.39743f)
+#define LAVAMAN_BOSS_FIRE_LEFT FLOAT3D(-0.39656f, 1.08619f, -1.34373f)
+#define LAVAMAN_FIRE_LEFT FLOAT3D(-0.432948f, 1.51133f, -0.476662f)
 
-  #define LAVAMAN_FIRE_SMALL  (LAVAMAN_FIRE_LEFT*LAVAMAN_SMALL_STRETCH)
-  #define LAVAMAN_FIRE_BIG    (LAVAMAN_FIRE_LEFT*LAVAMAN_BIG_STRETCH)
-  #define LAVAMAN_FIRE_LARGE_LEFT  (LAVAMAN_BOSS_FIRE_LEFT*LAVAMAN_LARGE_STRETCH)
-  #define LAVAMAN_FIRE_LARGE_RIGHT (LAVAMAN_BOSS_FIRE_RIGHT*LAVAMAN_LARGE_STRETCH)
+#define LAVAMAN_FIRE_SMALL  (LAVAMAN_FIRE_LEFT*LAVAMAN_SMALL_STRETCH)
+#define LAVAMAN_FIRE_BIG    (LAVAMAN_FIRE_LEFT*LAVAMAN_BIG_STRETCH)
+#define LAVAMAN_FIRE_LARGE_LEFT  (LAVAMAN_BOSS_FIRE_LEFT*LAVAMAN_LARGE_STRETCH)
+#define LAVAMAN_FIRE_LARGE_RIGHT (LAVAMAN_BOSS_FIRE_RIGHT*LAVAMAN_LARGE_STRETCH)
 
-  #define LAVAMAN_SPAWN_BIG   (FLOAT3D(0.0171274f, 1.78397f, -0.291414f)*LAVAMAN_BIG_STRETCH)
-  #define LAVAMAN_SPAWN_LARGE (FLOAT3D(0.0171274f, 1.78397f, -0.291414f)*LAVAMAN_LARGE_STRETCH)
-  #define DEATH_BURN_TIME 1.0f
+#define LAVAMAN_SPAWN_BIG   (FLOAT3D(0.0171274f, 1.78397f, -0.291414f)*LAVAMAN_BIG_STRETCH)
+#define LAVAMAN_SPAWN_LARGE (FLOAT3D(0.0171274f, 1.78397f, -0.291414f)*LAVAMAN_LARGE_STRETCH)
+#define DEATH_BURN_TIME 1.0f
+
 %}
 
 uses "EntitiesMP/EnemyBase";
@@ -52,11 +53,11 @@ uses "EntitiesMP/EnemyBase";
 //uses "EntitiesMP/Water";
 
 enum ElementalType {
-  0 ELT_AIR           "0 Air !!!obsolete!!!",        // air elemental
-  1 ELT_ICE           "1 Ice !!!obsolete!!!",        // ice elemental
-  2 ELT_LAVA          "2 Lava",       // lava elemental
-  3 ELT_STONE         "3 Stone !!!obsolete!!!",      // stone elemental
-  4 ELT_WATER         "4 Water !!!obsolete!!!",      // water elemental
+  0 ELT_AIR           "obsolete",        // air elemental
+  1 ELT_ICE           "obsolete",        // ice elemental
+  2 ELT_LAVA          "Lava",       // lava elemental
+  3 ELT_STONE         "obsolete",      // stone elemental
+  4 ELT_WATER         "obsolete",      // water elemental
 };
 
 
@@ -120,13 +121,11 @@ static EntityInfo eiLavaElementalSmall = {
   0.0f, 1.7f*LAVAMAN_SMALL_STRETCH, 0.0f,
   0.0f, LAVAMAN_SMALL_STRETCH, 0.0f,
 };
-
 static EntityInfo eiLavaElementalBig = {
   EIBT_FIRE, 2800.0f,
   0.0f, 1.7f*LAVAMAN_BIG_STRETCH, 0.0f,
   0.0f, LAVAMAN_BIG_STRETCH, 0.0f,
 };
-
 static EntityInfo eiLavaElementalLarge = {
   EIBT_FIRE, 11200.0f,
   0.0f, 1.7f*LAVAMAN_LARGE_STRETCH, 0.0f,
@@ -139,13 +138,11 @@ static EntityInfo eiStoneElementalSmall = {
   0.0f, 1.7f, 0.0f,
   0.0f, 1.0f, 0.0f,
 };
-
 static EntityInfo eiStoneElementalBig = {
   EIBT_ROCK, 4000.0f,
   0.0f, 6.8f, 0.0f,
   0.0f, 4.0f, 0.0f,
 };
-
 static EntityInfo eiStoneElementalLarge = {
   EIBT_ROCK, 16000.0f,
   0.0f, 27.2f, 0.0f,
@@ -158,13 +155,11 @@ static EntityInfo eiWaterElementalSmall = {
   0.0f, 1.7f, 0.0f,
   0.0f, 1.0f, 0.0f,
 };
-
 static EntityInfo eiWaterElementalBig = {
   EIBT_WATER, 2000.0f,
   0.0f, 6.8f, 0.0f,
   0.0f, 4.0f, 0.0f,
 };
-
 static EntityInfo eiWaterElementalLarge = {
   EIBT_WATER, 8000.0f,
   0.0f, 27.2f, 0.0f,
@@ -172,17 +167,17 @@ static EntityInfo eiWaterElementalLarge = {
 };
 
 
-  // obsolete
-  #define EPF_BOX_PLANE_ELEMENTAL (EPF_ORIENTEDBYGRAVITY|EPF_MOVABLE)
-  #define FIRE_ROCKS        FLOAT3D(-0.9f, 1.6f, -1.0f)
-  #define FIRE_ROCKS_BIG    FLOAT3D(-3.6f, 6.4f, -4.0f)
-  #define FIRE_ROCKS_LARGE  FLOAT3D(-14.4f, 25.6f, -16.0f)
-  #define WATER_LEFT          FLOAT3D(-0.75f,  1.3f,  -1.2f)
-  #define WATER_RIGHT         FLOAT3D( 0.75f,  1.3f,  -1.2f)
-  #define WATER_BIG_LEFT      FLOAT3D(-3.0f,   5.2f,  -4.8f)
-  #define WATER_BIG_RIGHT     FLOAT3D( 3.0f,   5.2f,  -4.8f)
-  #define WATER_LARGE_LEFT    FLOAT3D(-12.0f, 20.8f, -19.2f)
-  #define WATER_LARGE_RIGHT   FLOAT3D( 12.0f, 20.8f, -19.2f)
+// obsolete
+#define EPF_BOX_PLANE_ELEMENTAL (EPF_ORIENTEDBYGRAVITY|EPF_MOVABLE)
+#define FIRE_ROCKS        FLOAT3D(-0.9f, 1.6f, -1.0f)
+#define FIRE_ROCKS_BIG    FLOAT3D(-3.6f, 6.4f, -4.0f)
+#define FIRE_ROCKS_LARGE  FLOAT3D(-14.4f, 25.6f, -16.0f)
+#define WATER_LEFT          FLOAT3D(-0.75f,  1.3f,  -1.2f)
+#define WATER_RIGHT         FLOAT3D( 0.75f,  1.3f,  -1.2f)
+#define WATER_BIG_LEFT      FLOAT3D(-3.0f,   5.2f,  -4.8f)
+#define WATER_BIG_RIGHT     FLOAT3D( 3.0f,   5.2f,  -4.8f)
+#define WATER_LARGE_LEFT    FLOAT3D(-12.0f, 20.8f, -19.2f)
+#define WATER_LARGE_RIGHT   FLOAT3D( 12.0f, 20.8f, -19.2f)
 
 %}
 
@@ -294,7 +289,6 @@ functions:
     str.PrintF(TRANS("%s was killed by a Lava Golem"), strPlayerName);
     return str;
   }
-
   virtual const CTFileName &GetComputerMessageName(void) const {
     static DECLARE_CTFILENAME(fnm, "Data\\Messages\\Enemies\\ElementalLava.txt");
     return fnm;
@@ -303,17 +297,15 @@ functions:
   // render burning particles
   void RenderParticles(void)
   {
-    FLOAT fTimeFactor = 1.0f;
-    FLOAT fPower = 0.25f;
-
-    if (m_EesCurrentState == ELS_NORMAL)
+    FLOAT fTimeFactor=1.0f;
+    FLOAT fPower=0.25f;
+    if (m_EesCurrentState==ELS_NORMAL)
     {
-      FLOAT fDeathFactor = 1.0f;
-
-      if (m_fSpiritStartTime != 0.0f) {
-        fDeathFactor = 1.0f - Clamp((_pTimer->CurrentTick()-m_fSpiritStartTime)/DEATH_BURN_TIME, 0.0f, 1.0f);
+      FLOAT fDeathFactor=1.0f;
+      if( m_fSpiritStartTime!=0.0f)
+      {
+        fDeathFactor=1.0f-Clamp((_pTimer->CurrentTick()-m_fSpiritStartTime)/DEATH_BURN_TIME, 0.0f, 1.0f);
       }
-      
       Particles_Burning(this, fPower, fTimeFactor*fDeathFactor);
     }
   }
@@ -322,15 +314,16 @@ functions:
   {
     CEnemyBase::Precache();
 
-    switch (m_EetType)
+    switch(m_EetType)
     {
-      case ELT_LAVA:
+    case ELT_LAVA:
       {
-        if (m_EecChar == ELC_LARGE) {
+        if( m_EecChar == ELC_LARGE)
+        {
           PrecacheClass(CLASS_PROJECTILE, PRT_LAVAMAN_BIG_BOMB);
         }
-
-        if ((m_EecChar == ELC_LARGE) || (m_EecChar == ELC_BIG) ) {
+        if( (m_EecChar == ELC_LARGE) || (m_EecChar == ELC_BIG) )
+        {
           PrecacheClass(CLASS_PROJECTILE, PRT_LAVAMAN_BOMB);
         }
 
@@ -360,28 +353,28 @@ functions:
   void *GetEntityInfo(void) {
     switch (m_EetType) {
       case ELT_AIR:
-        switch (m_EecChar) {
+        switch(m_EecChar) {
           case ELC_LARGE: return &eiAirElementalLarge;
           case ELC_BIG: return &eiAirElementalBig;
           default: { return &eiAirElementalSmall; }
         }
         break;
       case ELT_ICE:
-        switch (m_EecChar) {
+        switch(m_EecChar) {
           case ELC_LARGE: return &eiIceElementalLarge;
           case ELC_BIG: return &eiIceElementalBig;
           default: { return &eiIceElementalSmall; }
         }
         break;
       case ELT_LAVA:
-        switch (m_EecChar) {
+        switch(m_EecChar) {
           case ELC_LARGE: return &eiLavaElementalLarge;
           case ELC_BIG: return &eiLavaElementalBig;
           default: { return &eiLavaElementalSmall; }
         }
         break;
       case ELT_STONE:
-        switch (m_EecChar) {
+        switch(m_EecChar) {
           case ELC_LARGE: return &eiStoneElementalLarge;
           case ELC_BIG: return &eiStoneElementalBig;
           default: { return &eiStoneElementalSmall; }
@@ -389,7 +382,7 @@ functions:
         break;
       //case ELT_WATER:
       default: {
-        switch (m_EecChar) {
+        switch(m_EecChar) {
           case ELC_LARGE: return &eiWaterElementalLarge;
           case ELC_BIG: return &eiWaterElementalBig;
           default: { return &eiWaterElementalSmall; }
@@ -401,21 +394,18 @@ functions:
   BOOL FillEntityStatistics(EntityStats *pes)
   {
     CEnemyBase::FillEntityStatistics(pes);
-
-    switch (m_EetType) {
-      case ELT_WATER : { pes->es_strName+=" Water"; } break;
-      case ELT_AIR   : { pes->es_strName+=" Air"; } break;
-      case ELT_STONE : { pes->es_strName+=" Stone"; } break;
-      case ELT_LAVA  : { pes->es_strName+=" Lava"; } break;
-      case ELT_ICE   : { pes->es_strName+=" Ice"; } break;
+    switch(m_EetType) {
+    case ELT_WATER : { pes->es_strName+=" Water"; } break;
+    case ELT_AIR   : { pes->es_strName+=" Air"; } break;
+    case ELT_STONE : { pes->es_strName+=" Stone"; } break;
+    case ELT_LAVA  : { pes->es_strName+=" Lava"; } break;
+    case ELT_ICE   : { pes->es_strName+=" Ice"; } break;
     }
-
-    switch (m_EecChar) {
-      case ELC_LARGE: pes->es_strName+=" Large"; break;
-      case ELC_BIG:   pes->es_strName+=" Big"; break;
-      case ELC_SMALL: pes->es_strName+=" Small"; break;
+    switch(m_EecChar) {
+    case ELC_LARGE: pes->es_strName+=" Large"; break;
+    case ELC_BIG:   pes->es_strName+=" Big"; break;
+    case ELC_SMALL: pes->es_strName+=" Small"; break;
     }
-
     return TRUE;
   }
 
@@ -424,18 +414,20 @@ functions:
     FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection) 
   {
     // elemental can't harm elemental
-    if (IsOfClass(penInflictor, "Elemental")) {
+    if( IsOfClass(penInflictor, "Elemental")) {
       return;
     }
 
     // boss can't be telefragged
-    if (m_EecChar == ELC_LARGE && dmtType == DMT_TELEPORT) {
+    if( m_EecChar==ELC_LARGE && dmtType==DMT_TELEPORT)
+    {
       return;
     }
 
     // elementals take less damage from heavy bullets (e.g. sniper)
-    if (m_EecChar == ELC_BIG && dmtType == DMT_BULLET && fDamageAmmount > 100.0f) {
-      fDamageAmmount /= 2.5f;
+    if( m_EecChar==ELC_BIG && dmtType==DMT_BULLET && fDamageAmmount>100.0f)
+    {
+      fDamageAmmount/=2.5f;
     }
 
 
@@ -444,7 +436,7 @@ functions:
     //CPrintF( "Character: %s, MaxHlt = %g, Hlt = %g, SpwnDmg = %g, Spawned: %d, Should: %d\n",
     //  strChar, m_fMaxHealth, GetHealth(), m_fSpawnDamage, m_ctSpawned, ctShouldSpawn);
 
-    if (m_bSpawnEnabled && m_bSpawnWhenHarmed && (m_EecChar == ELC_LARGE || m_EecChar == ELC_BIG))
+    if (m_bSpawnEnabled && m_bSpawnWhenHarmed && (m_EecChar==ELC_LARGE || m_EecChar==ELC_BIG))
     {
       INDEX ctShouldSpawn = Clamp( INDEX((m_fMaxHealth-GetHealth())/m_fSpawnDamage), INDEX(0), INDEX(10));
       if(m_ctSpawned<ctShouldSpawn)
@@ -454,7 +446,7 @@ functions:
     }
 
     // if not in normal state can't be harmed
-    if (m_EesCurrentState != ELS_NORMAL) {
+    if (m_EesCurrentState!=ELS_NORMAL) {
       return;
     }
 
@@ -483,7 +475,6 @@ functions:
         default: iAnim = STONEMAN_ANIM_WOUND03; break;
       }*/
     }
-
     StartModelAnim(iAnim, 0);
     return iAnim;
   };
@@ -525,7 +516,6 @@ functions:
 //      StartModelAnim(STONEMAN_ANIM_WALK, AOF_LOOPING|AOF_NORESTART);
     }
   };
-
   void RunningAnim(void)
   {
     if (m_EetType == ELT_LAVA) {
@@ -534,7 +524,6 @@ functions:
 //      StartModelAnim(STONEMAN_ANIM_RUN, AOF_LOOPING|AOF_NORESTART);
     }
   };
-
   void RotatingAnim(void) {
     if (m_EetType == ELT_LAVA) {
       WalkingAnim();
@@ -559,19 +548,17 @@ functions:
   void IdleSound(void) {
     PlaySound(m_soSound, SOUND_LAVA_IDLE, SOF_3D);
   };
-
   void SightSound(void) {
   };
-
   void WoundSound(void) {
     PlaySound(m_soSound, SOUND_LAVA_WOUND, SOF_3D);
   };
-
   void DeathSound(void) {
     PlaySound(m_soSound, SOUND_LAVA_DEATH, SOF_3D);
   };
 
-  BOOL CountAsKill(void) {
+  BOOL CountAsKill(void)
+  {
     return m_bCountAsKill;
   }
 
@@ -580,13 +567,13 @@ functions:
   {
     INDEX ctShouldSpawn = Clamp( INDEX((m_fMaxHealth-GetHealth())/m_fSpawnDamage), INDEX(0), INDEX(10));
     // disable too much spawning
-    if (m_bSpawnOnBlowUp && (m_EecChar==ELC_LARGE || m_EecChar==ELC_BIG) && (GetHealth() <= 0.0f) )
+    if (m_bSpawnOnBlowUp && (m_EecChar==ELC_LARGE || m_EecChar==ELC_BIG) && (GetHealth()<=0.0f) )
     {
-      ctShouldSpawn += 2;
+      ctShouldSpawn+=2;
     }
 
-    ASSERT(m_ctSpawned <= ctShouldSpawn);
-    if(m_ctSpawned >= ctShouldSpawn)
+    ASSERT(m_ctSpawned<=ctShouldSpawn);
+    if(m_ctSpawned>=ctShouldSpawn)
     {
       return;
     }
@@ -603,14 +590,12 @@ functions:
     // create entity
     CEntityPointer pen = GetWorld()->CreateEntity(pl, GetClass());
     ((CElemental&)*pen).m_EetType = m_EetType;
-
     // elemental size
     if (m_EecChar==ELC_LARGE) {
       ((CElemental&)*pen).m_EecChar = ELC_BIG;
     } else {
       ((CElemental&)*pen).m_EecChar = ELC_SMALL;
     }
-
     // start properties
     ((CElemental&)*pen).m_EesStartState = ELS_BOX;
     ((CElemental&)*pen).m_fDensity = m_fDensity;
@@ -619,14 +604,12 @@ functions:
     ((CElemental&)*pen).m_ttTarget = m_ttTarget;
     ((CElemental&)*pen).m_bSpawned = TRUE;
     pen->Initialize(EVoid());
-
     // set moving
-    if (m_EecChar == ELC_LARGE) {
+    if (m_EecChar==ELC_LARGE) {
       ((CElemental&)*pen).LaunchAsFreeProjectile(FLOAT3D(0, 0, -40.0f), this);
     } else {
       ((CElemental&)*pen).LaunchAsFreeProjectile(FLOAT3D(0, 0, -20.0f), this);
     }
-
     ((CElemental&)*pen).SetDesiredRotation(ANGLE3D(0, 0, FRnd()*360-180));
 
     // spawn particle debris explosion
@@ -711,9 +694,7 @@ functions:
   void ShakeItBaby(FLOAT tmShaketime, FLOAT fPower)
   {
     CWorldSettingsController *pwsc = GetWSC(this);
-
-    if (pwsc != NULL)
-    {
+    if (pwsc!=NULL) {
       pwsc->m_tmShakeStarted = tmShaketime;
       pwsc->m_vShakePos = GetPlacement().pl_PositionVector;
       pwsc->m_fShakeFalloff = 450.0f;
@@ -744,23 +725,24 @@ functions:
   }
 
   // hit ground
-  void HitGround(void)
-  {
+  void HitGround(void) {
     FLOAT3D vSource;
-
-    if (m_penEnemy != NULL) {
+    if( m_penEnemy != NULL)
+    {
       vSource = GetPlacement().pl_PositionVector +
       FLOAT3D(m_penEnemy->en_mRotation(1, 2), m_penEnemy->en_mRotation(2, 2), m_penEnemy->en_mRotation(3, 2));
-    } else {
+    }
+    else
+    {
       vSource = GetPlacement().pl_PositionVector;
     }
 
     // damage
-    if (m_EecChar == ELC_LARGE) {
+    if (m_EecChar==ELC_LARGE) {
       InflictRangeDamage(this, DMT_IMPACT, 150.0f, vSource, 7.5f, m_fCloseDistance);
       ShakeItBaby(_pTimer->CurrentTick(), 5.0f);
       SpawnShockwave(10.0f);
-    } else if (m_EecChar == ELC_BIG) {
+    } else if (m_EecChar==ELC_BIG) {
       InflictRangeDamage(this, DMT_IMPACT, 75.0f, vSource, 5.0f, m_fCloseDistance);
       ShakeItBaby(_pTimer->CurrentTick(), 2.0f);
       SpawnShockwave(3.0f);
@@ -816,10 +798,8 @@ functions:
 */
 
   // add attachments
-  void AddAttachments(void)
-  {
-    switch (m_EetType)
-    {
+  void AddAttachments(void) {
+    switch (m_EetType) {
 /*      case ELT_AIR:
         if (GetModelObject()->GetAttachmentModel(AIRMAN_ATTACHMENT_TWISTER)==NULL) {
           AddAttachmentToModel(this, *GetModelObject(), AIRMAN_ATTACHMENT_TWISTER,
@@ -892,7 +872,6 @@ functions:
     FLOAT fEntitySize = box.Size().MaxNorm()/2;
 
     INDEX iCount = 1;
-
     switch (m_EecChar) {
       case ELC_SMALL: iCount = 3; break;
       case ELC_BIG: iCount = 5; break;
@@ -1040,9 +1019,8 @@ procedures:
   LavamanFire(EVoid)
   {
     m_bSpawnEnabled = TRUE;
-
     // shoot projectiles
-    if (m_EecChar == ELC_LARGE)
+    if (m_EecChar==ELC_LARGE)
     {
       CModelObject &mo = *GetModelObject();
       FLOAT tmWait = mo.GetAnimLength( mo.ao_iCurrentAnim )-mo.GetPassedTime();
@@ -1059,8 +1037,9 @@ procedures:
       // set next shoot time
       m_fShootTime = _pTimer->CurrentTick() + m_fAttackFireTime*(1.0f + FRnd()/5.0f);
       return EReturn();
-
-    } else if (m_EecChar == ELC_BIG) {
+    }
+    else if (m_EecChar==ELC_BIG)
+    {
       CModelObject &mo = *GetModelObject();
       FLOAT tmWait = mo.GetAnimLength( mo.ao_iCurrentAnim )-mo.GetPassedTime();
       StartModelAnim(ELEMENTALLAVA_ANIM_ATTACKLEFTHAND, AOF_SMOOTHCHANGE);
@@ -1091,8 +1070,9 @@ procedures:
       eLaunch.fSpeed = fLaunchSpeed;
       penProjectile->Initialize(eLaunch);
       PlaySound(m_soSound, SOUND_LAVA_FIRE, SOF_3D);
-
-    } else if (TRUE) {
+    }
+    else if (TRUE)
+    {
       CModelObject &mo = *GetModelObject();
       FLOAT tmWait = mo.GetAnimLength( mo.ao_iCurrentAnim )-mo.GetPassedTime();
       StartModelAnim(ELEMENTALLAVA_ANIM_ATTACKLEFTHAND, AOF_SMOOTHCHANGE);
@@ -1106,7 +1086,7 @@ procedures:
     StandingAnim();
     autowait(_pTimer->TickQuantum);
 
-    if (m_EecChar != ELC_SMALL) {
+    if (m_EecChar!=ELC_SMALL) {
       MaybeSwitchToAnotherPlayer();
     }
 
@@ -1120,7 +1100,6 @@ procedures:
   {
     StartModelAnim(ELEMENTALLAVA_ANIM_ATTACKLEFTHAND, 0);
     autowait(0.7f);
-
     // throw rocks
     if (m_EecChar==ELC_LARGE) {
       ThrowRocks(PRT_LAVAMAN_STONE);
@@ -1129,14 +1108,11 @@ procedures:
     } else {
       ThrowRocks(PRT_LAVAMAN_STONE);
     }
-
     PlaySound(m_soSound, SOUND_LAVA_FIRE, SOF_3D);
     autowait(0.9f);
-
     // stand a while
     StandingAnim();
     autowait(FRnd()/3+_pTimer->TickQuantum);
-
     return EReturn();
   };
 
@@ -1148,7 +1124,6 @@ procedures:
     PlaySound(m_soFireL, SOUND_LAVA_KICK, SOF_3D);
     StartModelAnim(ELEMENTALLAVA_ANIM_WALKBIG, AOF_SMOOTHCHANGE);
     autocall CMovableModelEntity::WaitUntilScheduledAnimStarts() EReturn;
-
     return EReturn();
   };
 
@@ -1239,17 +1214,17 @@ procedures:
   };
   */
 
+
 /************************************************************
  *                PROCEDURES WHEN HARMED                    *
  ************************************************************/
   // Play wound animation and falling body part
-  BeWounded(EDamage eDamage) : CEnemyBase::BeWounded
-  {
+  BeWounded(EDamage eDamage) : CEnemyBase::BeWounded {
     // spawn additional elemental
-    if (m_bSpawnEnabled) {
+    if( m_bSpawnEnabled)
+    {
       SpawnNewElemental();
     }
-
     jump CEnemyBase::BeWounded(eDamage);
   };
 
@@ -1257,8 +1232,7 @@ procedures:
  *                 CHANGE STATE PROCEDURES                  *
  ************************************************************/
    // box to normal
-  BoxToNormal(EVoid)
-  {
+  BoxToNormal(EVoid) {
     m_EesCurrentState = ELS_NORMAL;
     SetPhysicsFlags(EPF_MODEL_WALKING);
     ChangeCollisionBoxIndexWhenPossible(STONEMAN_COLLISION_BOX_NORMAL);
@@ -1266,7 +1240,6 @@ procedures:
     StartModelAnim(STONEMAN_ANIM_MORPHBOXUP, 0);
     AddAttachments();
     autowait(GetModelObject()->GetAnimLength(STONEMAN_ANIM_MORPHBOXUP));
-
     return EReturn();
   };
 
@@ -1282,43 +1255,38 @@ procedures:
   };*/
 
   // plane to normal
-  PlaneToNormal(EVoid)
-  {
+  PlaneToNormal(EVoid) {
     m_EesCurrentState = ELS_NORMAL;
     SwitchToModel();
     SetPhysicsFlags(EPF_MODEL_WALKING);
     ChangeCollisionBoxIndexWhenPossible(ELEMENTALLAVA_COLLISION_BOX_NORMAL);
     PlaySound(m_soFireL, SOUND_LAVA_GROW, SOF_3D);
-
     INDEX iAnim;
-
     if (m_EetType == ELT_LAVA) {
       iAnim = ELEMENTALLAVA_ANIM_MELTUP;
     } else {
 //      iAnim = STONEMAN_ANIM_MORPHPLANEUP;
     }
-
     StartModelAnim(iAnim, 0);
     AddAttachments();
     autowait(GetModelObject()->GetAnimLength(iAnim));
-
     return EReturn();
   };
 
 /************************************************************
  *                A T T A C K   E N E M Y                   *
  ************************************************************/
-  InitializeAttack(EVoid) : CEnemyBase::InitializeAttack
-  {
+  InitializeAttack(EVoid) : CEnemyBase::InitializeAttack {
     // change state from box to normal
-    if (m_EesCurrentState == ELS_BOX) {
+    if (m_EesCurrentState==ELS_BOX)
+    {
       autocall BoxToNormal() EReturn;
-
+    }
     // change state from plane to normal
-    } else if (m_EesCurrentState == ELS_PLANE) {
+    else if (m_EesCurrentState==ELS_PLANE)
+    {
       autocall PlaneToNormal() EReturn;
     }
-
     jump CEnemyBase::InitializeAttack();
   };
 
@@ -1362,7 +1330,6 @@ procedures:
       m_fFadeTime = 2.0f;
       autowait(m_fFadeTime);
     }
-
     autocall CEnemyBase::Death() EEnd;
     GetModelObject()->mo_toBump.SetData( NULL);
     return EEnd();
@@ -1405,12 +1372,12 @@ procedures:
       m_bSpawned = m_bCountKillInStatistcs;
     }
 
-    if (m_EecChar == ELC_LARGE || m_EecChar == ELC_BIG && m_EetType == ELT_LAVA)
+    if (m_EecChar==ELC_LARGE || m_EecChar==ELC_BIG && m_EetType==ELT_LAVA)
     {
       PlaySound(m_soBackground, SOUND_LAVA_LAVABURN, SOF_3D|SOF_LOOP);
     }
 
-    if (m_EecChar==ELC_LARGE)
+    if( m_EecChar==ELC_LARGE)
     {
       autocall BossAppear() EReturn;
     }
@@ -1420,15 +1387,12 @@ procedures:
 /************************************************************
  *                       M  A  I  N                         *
  ************************************************************/
-  Main(EVoid)
-  {
-    if (m_EetType != ELT_LAVA) {
-      m_EetType = ELT_LAVA;
+  Main(EVoid) {
+    if (m_EetType!=ELT_LAVA) {
+      m_EetType=ELT_LAVA;
     }
-
     // declare yourself as a model
     InitAsModel();
-
     // movable
     if (m_bMovable) {
       SetPhysicsFlags(EPF_MODEL_WALKING);
@@ -1436,7 +1400,6 @@ procedures:
     } else {
       SetPhysicsFlags(EPF_MODEL_IMMATERIAL|EPF_MOVABLE);
     }
-
     // air elemental
     if (m_EetType==ELT_AIR) {
       SetCollisionFlags(ECF_AIR);
@@ -1470,11 +1433,10 @@ procedures:
         SetComponents(this, *GetModelObject(), MODEL_WATER, TEXTURE_WATER, TEXTURE_WATER, TEX_SPEC_STRONG, 0); 
         break;*/
     }
-
     ModelChangeNotify();
 
     // character settings
-    if (m_EecChar == ELC_LARGE)
+    if (m_EecChar==ELC_LARGE)
     {
       // this one is boss!
       m_sptType = SPT_SMALL_LAVA_STONES;
@@ -1498,8 +1460,9 @@ procedures:
       m_fCloseFireTime = 1.0f;
       m_fIgnoreRange = 600.0f;
       m_iScore = 50000;
-
-    } else if (m_EecChar == ELC_BIG) {
+    }
+    else if (m_EecChar==ELC_BIG)
+    {
       m_sptType = SPT_LAVA_STONES;
       SetHealth(800.0f);
       m_fMaxHealth = 800.0f;
@@ -1521,8 +1484,9 @@ procedures:
       m_fIgnoreRange = 400.0f;
       // damage/explode properties
       m_iScore = 2500;
-
-    } else {
+    }
+    else
+    {
       m_sptType = SPT_LAVA_STONES;
       SetHealth(100.0f);
       m_fMaxHealth = 100.0f;
@@ -1561,9 +1525,7 @@ procedures:
     // state and flare attachments
     m_EesCurrentState = m_EesStartState;
     RemoveAttachments();
-
-    switch (m_EesCurrentState)
-    {
+    switch (m_EesCurrentState) {
       case ELS_NORMAL:
         SetPhysicsFlags(EPF_MODEL_WALKING);
         AddAttachments();
@@ -1576,18 +1538,17 @@ procedures:
         SwitchToEditorModel();
         break;
     }
-
     StandingAnim();
 
     // stretch
-    if (m_EecChar == ELC_SMALL) {
+    if (m_EecChar==ELC_SMALL) {
       GetModelObject()->StretchModel(FLOAT3D(LAVAMAN_SMALL_STRETCH, LAVAMAN_SMALL_STRETCH, LAVAMAN_SMALL_STRETCH));
-    } else if (m_EecChar == ELC_LARGE) {
+    }
+    else if (m_EecChar==ELC_LARGE) {
       GetModelObject()->StretchModel(FLOAT3D(LAVAMAN_LARGE_STRETCH, LAVAMAN_LARGE_STRETCH, LAVAMAN_LARGE_STRETCH));
-    } else if (m_EecChar == ELC_BIG) {
+    } else if (m_EecChar==ELC_BIG) {
       GetModelObject()->StretchModel(FLOAT3D(LAVAMAN_BIG_STRETCH, LAVAMAN_BIG_STRETCH, LAVAMAN_BIG_STRETCH));
     }
-
     ModelChangeNotify();
 
     // continue behavior in base class
