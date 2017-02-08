@@ -42,7 +42,7 @@ void DECL_DLL Particles_LavaTrail(CEntity *pen);
 void DECL_DLL Particles_LavaTrail_Prepare(CEntity *pen);
 void DECL_DLL Particles_LavaBombTrail(CEntity *pen, FLOAT fSizeMultiplier);
 void DECL_DLL Particles_LavaBombTrail_Prepare(CEntity *pen);
-void DECL_DLL Particles_RocketTrail(CEntity *pen, FLOAT fStretch);
+void DECL_DLL Particles_RocketTrail(CEntity *pen, FLOAT fStretch, COLOR colMultiply = C_WHITE|CT_OPAQUE);
 void DECL_DLL Particles_RocketTrail_Prepare(CEntity *pen);
 void DECL_DLL Particles_ExplosionDebris1(CEntity *pen, FLOAT tmStart, FLOAT3D vStretch, COLOR colMultiply=C_WHITE|CT_OPAQUE);
 void DECL_DLL Particles_ExplosionDebris2(CEntity *pen, FLOAT tmStart, FLOAT3D vStretch, COLOR colMultiply=C_WHITE|CT_OPAQUE);

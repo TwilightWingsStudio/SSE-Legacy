@@ -1132,7 +1132,8 @@ void Particles_RocketTrail_Prepare(CEntity *pen)
 {
   pen->GetLastPositions(ROCKET_TRAIL_POSITIONS);
 }
-void Particles_RocketTrail(CEntity *pen, FLOAT fStretch)
+
+void Particles_RocketTrail(CEntity *pen, FLOAT fStretch, COLOR colMultiply)
 {
   CLastPositions *plp = pen->GetLastPositions(ROCKET_TRAIL_POSITIONS);
   FLOAT fSeconds = _pTimer->GetLerpedCurrentTick();
@@ -1144,15 +1145,17 @@ void Particles_RocketTrail(CEntity *pen, FLOAT fStretch)
   const FLOAT3D *pvPos2 = &plp->GetPosition(1);
   INDEX iParticle = 0;
   INDEX iParticlesLiving = plp->lp_ctUsed*ROCKET_TRAIL_INTERPOSITIONS;
-  INDEX iPos=2;
-  for( ; iPos<plp->lp_ctUsed; iPos++)
+  INDEX iPos = 2;
+
+  for (; iPos < plp->lp_ctUsed; iPos++)
   {
     pvPos1 = pvPos2;
     pvPos2 = &plp->GetPosition(iPos);
-    if( (*pvPos2 - *pvPos1).Length() == 0.0f)
-    {
+
+    if ((*pvPos2 - *pvPos1).Length() == 0.0f) {
       continue;
     }
+
     for (INDEX iInter=0; iInter<ROCKET_TRAIL_INTERPOSITIONS; iInter++)
     {
       FLOAT fRand = rand()/FLOAT(RAND_MAX);
@@ -1163,28 +1166,39 @@ void Particles_RocketTrail(CEntity *pen, FLOAT fStretch)
       UBYTE ub = 255-(UBYTE)((ULONG)iParticle*255/iParticlesLiving);
       FLOAT fLerpFactor = FLOAT(iPos)/ROCKET_TRAIL_POSITIONS;
       COLOR colColor = LerpColor( C_WHITE, C_BLACK, fLerpFactor);
+      colColor = MulColors(colColor, colMultiply); // [SSE] More Colored Particles
+      
       Particle_RenderSquare( vPos, fSize, fAngle, colColor|ub);
+
       iParticle++;
     }
   }
+
   Particle_Flush();
 
   // now render line
   Particle_PrepareTexture(&_toVerticalGradient, PBT_ADD);
   Particle_SetTexturePart( 512, 512, 0, 0);
   FLOAT3D vOldPos = plp->GetPosition(1);
-  for( iPos=2; iPos<plp->lp_ctUsed; iPos++)
+
+  for( iPos = 2; iPos < plp->lp_ctUsed; iPos++)
   {
     FLOAT3D vPos = plp->GetPosition(iPos);
-    if( (vPos - vOldPos).Length() == 0.0f)
-    {
+
+    if( (vPos - vOldPos).Length() == 0.0f) {
       continue;
     }
+
     UBYTE ub = UBYTE(255-iPos*256/plp->lp_ctUsed);
     FLOAT fSize = iPos*0.01f*fStretch+0.005f;
-    Particle_RenderLine( vPos, vOldPos, fSize, RGBToColor(ub,ub,ub)|ub);
-    vOldPos=vPos;
+    COLOR colLine = RGBToColor( ub, ub, ub);
+    //colLine = MulColors(colLine, colMultiply); // [SSE] More Colored Particles
+    
+    Particle_RenderLine( vPos, vOldPos, fSize, colLine|ub);
+ 
+    vOldPos = vPos;
   }
+
   // all done
   Particle_Flush();
 }
@@ -2035,11 +2049,14 @@ void Particles_WaterfallFoam(CEntity *pen, FLOAT fSizeX, FLOAT fSizeY, FLOAT fSi
     FLOAT3D vPos = vCenter + vX*fX + vY*fY + vZ*fZ;
     FLOAT fFade = CalculateRatio( fT, 0, 1, WATERFALL_FOAM_FADE_IN, WATERFALL_FOAM_FADE_OUT);
     FLOAT fRndRotation = afStarsPositions[iFoam*3][1];
+
     UBYTE ub = NormFloatToByte( fFade);
     COLOR colStar = RGBToColor( ub, ub, ub);
     colStar = MulColors(colStar, colMultiply); // [SSE] Colors for ParticlesHolder
+
     Particle_RenderSquare( vPos, fParticleSize*(1.0f+afStarsPositions[iFoam][1]*0.25f), fRndRotation*300*fT, colStar|0xFF);
   }
+
   // all done
   Particle_Flush();
 }
