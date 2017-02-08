@@ -85,11 +85,13 @@ CTempDC::~CTempDC(void)
 /*
  *   ViewPort functions
  */
-CViewPort::CViewPort( PIX pixWidth, PIX pixHeight, HWND hWnd) :
+CViewPort::CViewPort( PIX pixWidth, PIX pixHeight, HWND hWnd, BOOL bExternalWindow) :
                       vp_Raster( pixWidth, pixHeight, 0)
 {
   vp_hWnd = NULL;
   vp_hWndParent = hWnd;
+  
+  vp_bExternalWindow = bExternalWindow; // [SSE] Better Graphics Wrapper
 
 #ifdef SE1_D3D
   vp_pSwapChain = NULL;
@@ -140,6 +142,12 @@ void CViewPort::OpenCanvas(void)
   // do nothing if not feasable
   if (vp_hWnd != NULL || vp_hWndParent == NULL) return;
 
+  // [SSE] Better Graphics Wrapper
+  if (vp_bExternalWindow) {
+    vp_hWnd = vp_hWndParent;
+    return;
+  }
+  
   // register class
   if (!_bClassRegistered)
   {
@@ -247,8 +255,10 @@ void CViewPort::Resize()
 void CViewPort::ResizeEx(PIX pixNewWidth, PIX pixNewHeight)
 {
   // resize child window
-  ASSERT(vp_hWnd != NULL);
-  SetWindowPos(vp_hWnd, NULL, 0,0, pixNewWidth, pixNewHeight, SWP_NOZORDER|SWP_NOMOVE);
+  if (!vp_bExternalWindow) {
+    ASSERT(vp_hWnd != NULL);
+    SetWindowPos(vp_hWnd, NULL, 0,0, pixNewWidth, pixNewHeight, SWP_NOZORDER|SWP_NOMOVE);
+  }
 
   // resize the raster
   vp_Raster.Resize(pixNewWidth, pixNewHeight);

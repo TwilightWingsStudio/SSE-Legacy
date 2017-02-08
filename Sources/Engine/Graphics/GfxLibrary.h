@@ -271,7 +271,8 @@ public:
   };
 
   // canvas functions
-  void CreateWindowCanvas( void *hWnd, CViewPort **ppvpNew, CDrawPort **ppdpNew);   // Create a new window canvas
+  void CreateWindowCanvas(void *hWnd, CViewPort **ppvpNew, CDrawPort **ppdpNew);   // Create a new window canvas
+  void CreateWindowCanvasEx(void *hWnd, CViewPort **ppvpNew, CDrawPort **ppdpNew, BOOL bExternalWindow); // [SSE] Better Graphics Wrapper
   void DestroyWindowCanvas( CViewPort *pvpOld);                                     // Destroy a window canvas
   void CreateWorkCanvas( PIX pixWidth, PIX pixHeight, CDrawPort **ppdpNew);         // Create a work canvas
   void DestroyWorkCanvas( CDrawPort *pdpOld);                                       // Destroy a work canvas

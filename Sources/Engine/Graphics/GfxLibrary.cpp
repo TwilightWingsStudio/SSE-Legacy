@@ -1521,6 +1521,13 @@ void CGfxLibrary::UnlockDrawPort( CDrawPort *pdpToUnlock)
 /* Create a new window canvas. */
 void CGfxLibrary::CreateWindowCanvas(void *hWnd, CViewPort **ppvpNew, CDrawPort **ppdpNew)
 {
+  CreateWindowCanvasEx(hWnd, ppvpNew, ppdpNew, FALSE);
+}
+
+/* Create a new window canvas extended. */
+// [SSE] Better Graphics Wrapper
+void CGfxLibrary::CreateWindowCanvasEx(void *hWnd, CViewPort **ppvpNew, CDrawPort **ppdpNew, BOOL bExternalWindow)
+{
   RECT rectWindow;	// rectangle for the client area of the window
 
 	// get the dimensions from the window
@@ -1531,7 +1538,7 @@ void CGfxLibrary::CreateWindowCanvas(void *hWnd, CViewPort **ppvpNew, CDrawPort 
   *ppvpNew = NULL;
   *ppdpNew = NULL;
   // create a new viewport
-  if (*ppvpNew = new CViewPort( pixWidth, pixHeight, (HWND)hWnd)) {
+  if (*ppvpNew = new CViewPort(pixWidth, pixHeight, (HWND)hWnd, bExternalWindow)) {
     // and it's drawport
 		*ppdpNew = &(*ppvpNew)->vp_Raster.ra_MainDrawPort;
   } else {

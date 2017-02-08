@@ -51,6 +51,7 @@ public:
 	LPDIRECT3DSURFACE8   vp_pSurfDepth;  // z-buffer for D3D
 #endif // SE1_D3D
   INDEX vp_ctDisplayChanges;    // number of display driver
+  BOOL vp_bExternalWindow; // [SSE] Better Graphics Wrapper
 
   // open/close canvas window
   void OpenCanvas(void);
@@ -58,11 +59,12 @@ public:
 
 // interface
   /* Constructor for given window. */
-  CViewPort(PIX pixWidth, PIX pixHeight, HWND hWnd);
-	/* Destructor. */
+  CViewPort(PIX pixWidth, PIX pixHeight, HWND hWnd, BOOL bExternalWindow);
+
+  /* Destructor. */
   ~CViewPort(void);
 
-	/* Display the back buffer on screen. */
+  /* Display the back buffer on screen. */
   void SwapBuffers(void);
 
   // [SSE] Better Graphics Wrapper
