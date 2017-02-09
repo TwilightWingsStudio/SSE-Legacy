@@ -707,20 +707,67 @@ void CTStream::ReadDictionary_intenal_t(SLONG slOffset)
   strm_dmDictionaryMode = DM_PROCESSING;
 
   ExpectID_t("DICT");  // dictionary
+
   // read number of new filenames
   INDEX ctFileNamesOld = strm_afnmDictionary.Count();
   INDEX ctFileNamesNew;
   *this>>ctFileNamesNew;
+
   // if there are any new filenames
-  if (ctFileNamesNew>0) {
+  if (ctFileNamesNew > 0) {
     // create that much space
     strm_afnmDictionary.Push(ctFileNamesNew);
+
     // for each filename
-    for(INDEX iFileName=ctFileNamesOld; iFileName<ctFileNamesOld+ctFileNamesNew; iFileName++) {
-      // read it
-      *this>>strm_afnmDictionary[iFileName];
+    for (INDEX iFileName=ctFileNamesOld; iFileName<ctFileNamesOld+ctFileNamesNew; iFileName++)
+    {
+      #define SE_SSE_SLASHES_FIXER
+
+      #ifdef SE_SSE_SLASHES_FIXER
+      CTFileName fnmAsset;
+      
+      *this >> fnmAsset; // Read it.
+      strm_afnmDictionary[iFileName] = fnmAsset;
+
+      // [SSE] Rev Import
+      char *pcSrc = fnmAsset.str_String;
+      char *pcDst = strm_afnmDictionary[iFileName].str_String;
+
+      memset(pcDst, 0, strlen(pcDst));
+      
+      // Cycle through all chars...
+      while (*pcSrc != 0)
+      {
+        // Fix all / slashes to \ //
+        if (*pcSrc == '/') {
+          *pcSrc = '\\';
+        }
+        
+        char *pNext = pcSrc + 1; // Get pointer to next char.
+
+        // If we have slash and next char is slash.
+        if (*pcSrc == '\\' && (*pNext == '/' || *pNext == '\\')) {
+          pcSrc++;
+          continue;
+        }
+        
+        // Add plain text.
+        *pcDst = *pcSrc;
+        pcSrc++;
+        pcDst++;
+      }
+      
+      if (strm_afnmDictionary[iFileName].HasPrefix("\\")) {
+        strm_afnmDictionary[iFileName].RemovePrefix("\\");
+      }
+
+      #else
+      *this >> strm_afnmDictionary[iFileName]; // Default Code.
+
+      #endif
     }
   }
+
   ExpectID_t("DEND");  // dictionary end
 
   // remember where end of dictionary is
