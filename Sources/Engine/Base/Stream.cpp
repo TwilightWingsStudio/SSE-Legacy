@@ -39,6 +39,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Templates/Stock_CTextureData.h>
 #include <Engine/Templates/Stock_CModelData.h>
 
+extern BOOL _bWorldEditorApp;
+
 // default size of page used for stream IO operations (4Kb)
 ULONG _ulPageSize = 0;
 // maximum lenght of file that can be saved (default: 128Mb)
@@ -718,6 +720,8 @@ void CTStream::ReadDictionary_intenal_t(SLONG slOffset)
     // create that much space
     strm_afnmDictionary.Push(ctFileNamesNew);
 
+    BOOL bNotInSEDError = FALSE;
+    
     // for each filename
     for (INDEX iFileName=ctFileNamesOld; iFileName<ctFileNamesOld+ctFileNamesNew; iFileName++)
     {
@@ -741,6 +745,10 @@ void CTStream::ReadDictionary_intenal_t(SLONG slOffset)
         // Fix all / slashes to \ //
         if (*pcSrc == '/') {
           *pcSrc = '\\';
+
+          if (!_bWorldEditorApp) {
+            ThrowF_t("ERROR! Wrong slashes '/' used for assets paths written inside of WLD file!\nI can guess this map was made with shitty SSR.\nYou can try to resave the map with editor to fix it.\n");
+          }
         }
         
         char *pNext = pcSrc + 1; // Get pointer to next char.
@@ -748,6 +756,11 @@ void CTStream::ReadDictionary_intenal_t(SLONG slOffset)
         // If we have slash and next char is slash.
         if (*pcSrc == '\\' && (*pNext == '/' || *pNext == '\\')) {
           pcSrc++;
+          
+          if (!_bWorldEditorApp) {
+            ThrowF_t("ERROR! Multiple slashes \\\\ were used for assets paths written inside of WLD file.\nI can guess this map was made with shitty SSR.\nYou can try to resave the map with editor to fix it.\n");
+          }
+          
           continue;
         }
         
