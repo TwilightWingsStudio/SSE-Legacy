@@ -59,14 +59,15 @@ functions:
     // find actual number of players
     INDEX ctActivePlayers = 0;
 
-    {for(INDEX i = 0; i < ctMaxPlayers; i++) {
+    for(INDEX i = 0; i < ctMaxPlayers; i++)
+    {
       // Skip invalid players.
       if (GetPlayerEntity(i) == NULL) {
         continue;
       }
 
       ctActivePlayers++;
-    }}
+    }
     
     //CPrintF("active players %d, ", ctActivePlayers);
 
@@ -441,9 +442,8 @@ functions:
   // --------------------------------------------------------------------------------------
   CEntity* CheckCloserPlayer(CEntity *penCurrentTarget, FLOAT fRange)
   {
-    // if the owner is blind
+    // If the owner is blind then don't even bother checking.
     if ( GetOwner()->m_bBlind) {
-      // don't even bother checking
       return NULL;
     }
 
@@ -457,28 +457,29 @@ functions:
         fRange = fClosestPlayer - 0.1f;
     }
 
-    fClosestPlayer = Min(fClosestPlayer, fRange);  // this is maximum considered range
+    fClosestPlayer = Min(fClosestPlayer, fRange); // This is maximum considered range.
 
     //CEntity *penAllocatedEnemy = FindClosestEB();
     //if (GetOwner()->GetTeam()==0 && penAllocatedEnemy != penCurrentTarget && penAllocatedEnemy != NULL) {
     //  return /*FindClosestEB();*/penAllocatedEnemy;
     //}
 
-    // for all other players
-    for (INDEX iPlayer = 0; iPlayer < GetMaxPlayers(); iPlayer++) {
+    // For all other players.
+    for (INDEX iPlayer = 0; iPlayer < GetMaxPlayers(); iPlayer++)
+    {
       CEntity *penPlayer = GetPlayerEntity(iPlayer);
 
       if (penPlayer == NULL || penPlayer == penCurrentTarget) {
         continue;
       }
 
-      // if player is alive and visible
-      if ((penPlayer->GetFlags()&ENF_ALIVE) && !(penPlayer->GetFlags()&ENF_INVISIBLE)) {
-        // calculate distance to player
+      // If player is alive and visible then calculate distance to player.
+      if ((penPlayer->GetFlags()&ENF_ALIVE) && !(penPlayer->GetFlags()&ENF_INVISIBLE))
+      {
         FLOAT fDistance = (penPlayer->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
-        // if closer than current and you can see him
+
+        // If closer than current and you can see him then update.
         if (fDistance < fClosestPlayer && GetOwner()->SeeEntity(penPlayer, Cos(GetOwner()->m_fViewAngle/2.0f))) {
-          // update
           fClosestPlayer = fDistance;
           penClosestPlayer = penPlayer;
         }
@@ -493,16 +494,16 @@ functions:
   // --------------------------------------------------------------------------------------
   CEntity* CheckAnotherPlayer(CEntity *penCurrentTarget)
   {
-    // if the owner is blind, or no current target
-    if ( GetOwner()->m_bBlind || penCurrentTarget==NULL) {
-      // don't even check
+    // If the owner is blind, or no current target then don't even check.
+    if (GetOwner()->m_bBlind || penCurrentTarget==NULL) {
       return NULL;
     }
 
-    // get allowed distance
     CEntity *penClosestPlayer = NULL;
     FLOAT fCurrentDistance;
     FLOAT fRange;
+
+    // Get allowed distance.
     if (penCurrentTarget != NULL) { 
         fCurrentDistance = (penCurrentTarget->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
         fRange = fCurrentDistance*1.5f; 
@@ -511,26 +512,26 @@ functions:
         fCurrentDistance = fRange/1.5f;
     }
 
-    // find a random offset to start searching
-    INDEX iOffset = GetRandomPlayer();
-
-    // for all other players
+    
+    INDEX iOffset = GetRandomPlayer(); // Find a random offset to start searching.
     INDEX ctPlayers = GetMaxPlayers();
-    for (INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
-      CEntity *penPlayer = GetPlayerEntity((iPlayer+iOffset)%ctPlayers);
+
+    // For all other players.
+    for (INDEX iPlayer = 0; iPlayer < ctPlayers; iPlayer++)
+    {
+      CEntity *penPlayer = GetPlayerEntity((iPlayer + iOffset)%ctPlayers);
+
       if (penPlayer == NULL || penPlayer == penCurrentTarget) {
         continue;
       }
 
-      // if player is alive and visible
-      if ((penPlayer->GetFlags()&ENF_ALIVE) && !(penPlayer->GetFlags()&ENF_INVISIBLE)) {
-        // calculate distance to player
-        FLOAT fDistance = 
-          (penPlayer->GetPlacement().pl_PositionVector-m_penOwner->GetPlacement().pl_PositionVector).Length();
-        // if inside allowed range and visible
-        if (fDistance<fRange && 
-            GetOwner()->SeeEntity(penPlayer, Cos(GetOwner()->m_fViewAngle/2.0f))) {
-          // attack that one
+      // If player is alive and visible then calculate distance to player.
+      if ((penPlayer->GetFlags()&ENF_ALIVE) && !(penPlayer->GetFlags()&ENF_INVISIBLE))
+      {
+        FLOAT fDistance = (penPlayer->GetPlacement().pl_PositionVector - m_penOwner->GetPlacement().pl_PositionVector).Length();
+
+        // if inside allowed range and visible then attack that one.
+        if (fDistance < fRange && GetOwner()->SeeEntity(penPlayer, Cos(GetOwner()->m_fViewAngle/2.0f))) {
           return penPlayer;
         }
       }
@@ -549,34 +550,45 @@ functions:
 
 procedures:
 
-  // watching
-  Active() {
-    // repeat
-    while (TRUE) {
+  // --------------------------------------------------------------------------------------
+  // Watching.
+  // --------------------------------------------------------------------------------------
+  Active()
+  {
+    // Repeat always.
+    while (TRUE)
+    {
       // check all players
       Watch();
+
       // wait for given delay
-      wait(m_tmDelay) {
+      wait(m_tmDelay)
+      {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
-        // stop looking
-        on (EStop) : { jump Inactive(); }
-        // force re-checking if receiving start or teleport
+        on (EStop) : { jump Inactive(); } // Stop looking.
+        
+        // Force re-checking if receiving start or teleport.
         on (EStart) : { stop; }
         on (ETeleport) : { stop; }
       }
     }
   };
 
-  // not watching
-  Inactive(EVoid) {
+  // --------------------------------------------------------------------------------------
+  // Not watching.
+  // --------------------------------------------------------------------------------------
+  Inactive(EVoid)
+  {
     wait() {
       on (EBegin) : { resume; }
       on (EStart) : { jump Active(); }
     }
   };
 
-  // dummy mode
+  // --------------------------------------------------------------------------------------
+  // Dummy mode.
+  // --------------------------------------------------------------------------------------
   Dummy(EVoid)
   {
     // ignores all events forever
@@ -586,21 +598,24 @@ procedures:
     };
   }
 
-  Main(EWatcherInit eInit) {
-    // remember the initial parameters
-    ASSERT(eInit.penOwner!=NULL);
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
+  Main(EWatcherInit eInit)
+  {
+    // Remember the initial parameters.
+    ASSERT(eInit.penOwner != NULL);
     m_penOwner = eInit.penOwner;
 
-    // init as nothing
+    // Init as nothing.
     InitAsVoid();
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
     SetCollisionFlags(ECF_IMMATERIAL);
 
-    // if in flyover game mode
+    // If in flyover game mode then go to dummy mode.
     if (GetSP()->sp_gmGameMode == CSessionProperties::GM_FLYOVER) {
-      // go to dummy mode
       jump Dummy();
-      // NOTE: must not destroy self, because owner has a pointer
+      // NOTE: Must not destroy self, because owner has a pointer!
     }
 
     // generate random number of player to check next 
@@ -610,8 +625,7 @@ procedures:
     // start in disabled state
     autocall Inactive() EEnd;
 
-    // cease to exist
-    Destroy();
+    Destroy(); // Cease to exist.
 
     return;
   };

@@ -69,8 +69,8 @@ properties:
   36 FLOAT m_fSpeedDownMultiplier "Mul Speed Down" = 1.0F,
    
   // Receive / Pickup Multipliers
-  40 FLOAT m_fDamageReceiveMul  "Mul All Damage" = 1.0F,
-  41 FLOAT m_fSelfDamageMul     "Mul Self Damage" = 1.0F,
+  40 FLOAT m_fDamageReceiveMul  "Mul Damage All" = 1.0F,
+  41 FLOAT m_fSelfDamageMul     "Mul Damage Self" = 1.0F,
 
   42 FLOAT m_fHeathPickUpMul    "Mul Health PickUp" = 1.0F,
   43 FLOAT m_fArmorPickUpMul    "Mul Armor PickUp" = 1.0F,

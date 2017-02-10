@@ -1779,14 +1779,13 @@ functions:
   /*
    *  >>>---  ROTATE MINIGUN  ---<<<
    */
-  void RotateMinigun(void) {
+  void RotateMinigun(void)
+  {
     ANGLE aAngle = Lerp(m_aMiniGunLast, m_aMiniGun, _pTimer->GetLerpFactor());
     // rotate minigun barrels
     CAttachmentModelObject *amo = m_moWeapon.GetAttachmentModel(MINIGUN_ATTACHMENT_BARRELS);
     amo->amo_plRelative.pl_OrientationAngle(3) = aAngle;
   };
-
-
 
   /*
    *  >>>---  SUPPORT (COMMON) FUNCTIONS  ---<<<
@@ -1795,7 +1794,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Calc weapon position for 3rd person view.
   // --------------------------------------------------------------------------------------
-  void CalcWeaponPosition3rdPersonView(FLOAT3D vPos, CPlacement3D &plPos, BOOL bResetZ) {
+  void CalcWeaponPosition3rdPersonView(FLOAT3D vPos, CPlacement3D &plPos, BOOL bResetZ) 
+  {
     plPos.pl_OrientationAngle = ANGLE3D(0, 0, 0);
     // weapon handle
     if (!m_bMirrorFire) {
@@ -1829,8 +1829,10 @@ functions:
   // --------------------------------------------------------------------------------------
   // Calc weapon position.
   // --------------------------------------------------------------------------------------
-  void CalcWeaponPosition(FLOAT3D vPos, CPlacement3D &plPos, BOOL bResetZ) {
+  void CalcWeaponPosition(FLOAT3D vPos, CPlacement3D &plPos, BOOL bResetZ)
+  {
     plPos.pl_OrientationAngle = ANGLE3D(0, 0, 0);
+
     // weapon handle
     if (!m_bMirrorFire) {
       plPos.pl_PositionVector = FLOAT3D( wpn_fX[m_iCurrentWeapon], wpn_fY[m_iCurrentWeapon],
@@ -1905,7 +1907,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Calc weapon position.
   // --------------------------------------------------------------------------------------
-  void CalcWeaponPositionImprecise (FLOAT3D vPos, CPlacement3D &plPos, BOOL bResetZ, FLOAT fImprecissionAngle) {
+  void CalcWeaponPositionImprecise (FLOAT3D vPos, CPlacement3D &plPos, BOOL bResetZ, FLOAT fImprecissionAngle)
+  {
     plPos.pl_OrientationAngle = ANGLE3D((FRnd()-0.5f)*fImprecissionAngle, (FRnd()-0.5f)*fImprecissionAngle, 0);
     // weapon handle
     if (!m_bMirrorFire) {
@@ -2227,7 +2230,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Prepare Bullet.
   // --------------------------------------------------------------------------------------
-  void PrepareSniperBullet(FLOAT fX, FLOAT fY, FLOAT fDamage, FLOAT fImprecission) {
+  void PrepareSniperBullet(FLOAT fX, FLOAT fY, FLOAT fDamage, FLOAT fImprecission)
+  {
     // bullet start position
     CalcWeaponPositionImprecise(FLOAT3D(fX, fY, 0), plBullet, TRUE, fImprecission);
     // create bullet
@@ -2243,11 +2247,13 @@ functions:
   // --------------------------------------------------------------------------------------
   // Prepare Bullet.
   // --------------------------------------------------------------------------------------
-  void PrepareBullet(FLOAT fX, FLOAT fY, FLOAT fDamage) {
+  void PrepareBullet(FLOAT fX, FLOAT fY, FLOAT fDamage)
+  {
     // bullet start position
     CalcWeaponPosition(FLOAT3D(fX, fY, 0), plBullet, TRUE);
     // create bullet
     penBullet = CreateEntity(plBullet, CLASS_BULLET);
+
     // init bullet
     EBulletInit eInit;
     eInit.penOwner = m_penPlayer;
@@ -2258,7 +2264,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Fire one bullet.
   // --------------------------------------------------------------------------------------
-  void FireSniperBullet(FLOAT fX, FLOAT fY, FLOAT fRange, FLOAT fDamage, FLOAT fImprecission) {
+  void FireSniperBullet(FLOAT fX, FLOAT fY, FLOAT fRange, FLOAT fDamage, FLOAT fImprecission)
+  {
     PrepareSniperBullet(fX, fY, fDamage, fImprecission);
     ((CBullet&)*penBullet).CalcTarget(fRange);
     ((CBullet&)*penBullet).m_fBulletSize = 0.1f;
@@ -2290,10 +2297,12 @@ functions:
   // --------------------------------------------------------------------------------------
   // Fire one bullet.
   // --------------------------------------------------------------------------------------
-  void FireOneBullet(FLOAT fX, FLOAT fY, FLOAT fRange, FLOAT fDamage) {
+  void FireOneBullet(FLOAT fX, FLOAT fY, FLOAT fRange, FLOAT fDamage)
+  {
     PrepareBullet(fX, fY, fDamage);
     ((CBullet&)*penBullet).CalcTarget(fRange);
     ((CBullet&)*penBullet).m_fBulletSize = 0.1f;
+
     // launch bullet
     ((CBullet&)*penBullet).LaunchBullet(TRUE, FALSE, TRUE);
     ((CBullet&)*penBullet).DestroyBullet();
@@ -2303,7 +2312,8 @@ functions:
   // Fire bullets (x offset is used for double shotgun).
   // --------------------------------------------------------------------------------------
   void FireBullets(FLOAT fX, FLOAT fY, FLOAT fRange, FLOAT fDamage, INDEX iBullets,
-    FLOAT *afPositions, FLOAT fStretch, FLOAT fJitter) {
+    FLOAT *afPositions, FLOAT fStretch, FLOAT fJitter)
+  {
     PrepareBullet(fX, fY, fDamage);
     ((CBullet&)*penBullet).CalcTarget(fRange);
     ((CBullet&)*penBullet).m_fBulletSize = GetSP()->sp_bCooperative ? 0.1f : 0.3f;
@@ -2337,14 +2347,16 @@ functions:
   // --------------------------------------------------------------------------------------
   // Fire grenade.
   // --------------------------------------------------------------------------------------
-  void FireGrenade(INDEX iPower) {
+  void FireGrenade(INDEX iPower)
+  {
     // grenade start position
     CPlacement3D plGrenade;
     CalcWeaponPosition(
-      FLOAT3D(wpn_fFX[WEAPON_GRENADELAUNCHER],wpn_fFY[WEAPON_GRENADELAUNCHER], 0), 
+      FLOAT3D(wpn_fFX[WEAPON_GRENADELAUNCHER], wpn_fFY[WEAPON_GRENADELAUNCHER], 0), 
       plGrenade, TRUE);
     // create grenade
     CEntityPointer penGrenade = CreateEntity(plGrenade, CLASS_PROJECTILE);
+
     // init and launch grenade
     ELaunchProjectile eLaunch;
     eLaunch.penLauncher = m_penPlayer;
@@ -2356,14 +2368,16 @@ functions:
   // --------------------------------------------------------------------------------------
   // Fire rocket.
   // --------------------------------------------------------------------------------------
-  void FireRocket(void) {
+  void FireRocket(void)
+  {
     // rocket start position
     CPlacement3D plRocket;
     CalcWeaponPosition(
-      FLOAT3D(wpn_fFX[WEAPON_ROCKETLAUNCHER],wpn_fFY[WEAPON_ROCKETLAUNCHER], 0), 
+      FLOAT3D(wpn_fFX[WEAPON_ROCKETLAUNCHER], wpn_fFY[WEAPON_ROCKETLAUNCHER], 0), 
       plRocket, TRUE);
     // create rocket
     CEntityPointer penRocket= CreateEntity(plRocket, CLASS_PROJECTILE);
+
     // init and launch rocket
     ELaunchProjectile eLaunch;
     eLaunch.penLauncher = m_penPlayer;
@@ -3078,7 +3092,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Receive ammo.
   // --------------------------------------------------------------------------------------
-  BOOL ReceiveAmmo(const CEntityEvent &ee) {
+  BOOL ReceiveAmmo(const CEntityEvent &ee)
+  {
     ASSERT(ee.ee_slEvent == EVENTCODE_EAmmoItem);
 
     // if infinite ammo is on
@@ -3427,7 +3442,7 @@ functions:
   };
 
   // --------------------------------------------------------------------------------------
-  // Does weapon have ammo?
+  // Check if weapon have ammo.
   // --------------------------------------------------------------------------------------
   BOOL HasAmmo(WeaponType EwtWeapon)
   {
@@ -4676,6 +4691,7 @@ procedures:
     if (m_iColtBullets >= COLT_MAG_SIZE) {
       return EEnd();
     }
+
     m_moWeapon.PlayAnim(COLT_ANIM_RELOAD, 0);
 
     // sound
@@ -5901,10 +5917,11 @@ procedures:
     jump Idle();
   };
 
-  /*
-   *  >>>---   RELOAD WEAPON   ---<<<
-   */
-  Reload() {
+  // --------------------------------------------------------------------------------------
+  //  >>>---   RELOAD WEAPON   ---<<<
+  // --------------------------------------------------------------------------------------
+  Reload()
+  {
     m_bReloadWeapon = FALSE;
 
     // reload
@@ -5920,10 +5937,11 @@ procedures:
   };
 
 
-  /*
-   *  >>>---   KNIFE STAND CHANGE   ---<<<
-   */
-  ChangeKnifeStand(EVoid) {
+  // --------------------------------------------------------------------------------------
+  // >>>---   KNIFE STAND CHANGE   ---<<<
+  // --------------------------------------------------------------------------------------
+  ChangeKnifeStand(EVoid)
+  {
 /*    if (m_iKnifeStand==1) {
       // change from knife stand 1 to stand 3
       m_moWeapon.PlayAnim(KNIFE_ANIM_STAND1TOSTAND3, 0);
@@ -5975,9 +5993,9 @@ procedures:
   };
 */
 
-  /*
-   *  >>>---   BORING WEAPON ANIMATION   ---<<<
-   */
+  // --------------------------------------------------------------------------------------
+  // >>>---   BORING WEAPON ANIMATION   ---<<<
+  // --------------------------------------------------------------------------------------
   BoringWeaponAnimation()
   {
     // select new mode change animation
@@ -6008,32 +6026,37 @@ procedures:
     return EBegin();
   };
 
-  /*
-   *  >>>---   NO WEAPON ACTION   ---<<<
-   */
+  // --------------------------------------------------------------------------------------
+  // >>>---   NO WEAPON ACTION   ---<<<
+  // --------------------------------------------------------------------------------------
   Idle()
   {
-    wait() {
-      on (EBegin) : {
-        // play default anim
+    wait()
+    {
+      on (EBegin) :
+      {
+        // Play default anim.
         PlayDefaultAnim();
 
-        // weapon changed
+        // Weapon changed.
         if (m_bChangeWeapon) {
           jump ChangeWeapon();
         }
-        // fire pressed start firing
+
+        // Fire pressed start firing.
         if (m_bFireWeapon) {
           jump Fire();
         }
-        // reload pressed
+
+        // Reload pressed.
         if (m_bReloadWeapon) {
           jump Reload();
         }
+
         resume;
       }
 
-      // select weapon
+      // Select weapon.
       on (ESelectWeapon eSelect) : {
         // [SSE] Weapons
         if (m_iAvailableWeapons == 0) {
@@ -6050,24 +6073,26 @@ procedures:
         resume;
       }
 
-      // fire pressed
+      // Fire pressed.
       on (EFireWeapon) : {
         jump Fire();
       }
 
-      // reload pressed
+      // Reload pressed.
       on (EReloadWeapon) : {
         jump Reload();
       }
 
-      // boring weapon animation
+      // Boring weapon animation.
       on (EBoringWeapon) : {
         call BoringWeaponAnimation();
       }
     }
   };
 
-  // weapons wait here while player is dead, so that stupid animations wouldn't play
+  // --------------------------------------------------------------------------------------
+  // Weapons wait here while player is dead, so that stupid animations wouldn't play.
+  // --------------------------------------------------------------------------------------
   Stopped()
   {
     // make sure we restore all rockets if we are holding the rocket launcher
@@ -6076,7 +6101,7 @@ procedures:
       if (pmo) { pmo->StretchModel(FLOAT3D(1, 1, 1)); }
     }
 
-    // kill all possible sounds, animations, etc
+    // Kill all possible sounds, animations, etc.
     ResetWeaponMovingOffset();
     CPlayer &pl = (CPlayer&)*m_penPlayer;
     pl.m_soWeapon0.Stop();
@@ -6085,36 +6110,42 @@ procedures:
     pl.m_soWeapon3.Stop();
     PlayLightAnim(LIGHT_ANIM_NONE, 0);
 
-    wait() {
-      // after level change
-      on (EPostLevelChange) : { return EBegin(); };
-      on (EStart) : { return EBegin(); };
+    wait()
+    {
+      // After level change.
+      on (EPostLevelChange) : {
+        return EBegin();
+      };
+
+      on (EStart) : {
+        return EBegin();
+      };
       otherwise() : { resume; };
     }
   }
 
-  /*
-   *  >>>---   M  A  I  N   ---<<<
-   */
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main(EWeaponsInit eInit)
   {
-    // remember the initial parameters
+    // Remember the initial parameters.
     ASSERT(eInit.penOwner != NULL);
     m_penPlayer = eInit.penOwner;
 
-    // declare yourself as a void
+    // Declare yourself as a void.
     InitAsVoid();
     SetFlags(GetFlags()|ENF_CROSSESLEVELS|ENF_NOTIFYLEVELCHANGE);
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
     SetCollisionFlags(ECF_IMMATERIAL);
 
-    // set weapon model for current weapon
+    // Set weapon model for current weapon.
     SetCurrentWeaponModel();
+    
+    PlayDefaultAnim(); // Play default anim.
 
-    // play default anim
-    PlayDefaultAnim();    
-
-    wait() {
+    wait()
+    {
       on (EBegin) : { call Idle(); }
 
       on (ESelectWeapon eSelect) : {
@@ -6137,20 +6168,17 @@ procedures:
       }
 
       on (EFireWeapon) : {
-        // start firing
-        m_bFireWeapon = TRUE;
+        m_bFireWeapon = TRUE; // Start firing.
         resume;
       }
 
       on (EReleaseWeapon) : {
-        // stop firing
-        m_bFireWeapon = FALSE;
+        m_bFireWeapon = FALSE; // Stop firing.
         resume;
       }
 
       on (EReloadWeapon) : {
-        // reload wepon
-        m_bReloadWeapon = TRUE;
+        m_bReloadWeapon = TRUE; // Reload weapon.
         resume;
       }
 
@@ -6159,8 +6187,8 @@ procedures:
       on (EEnd) : { stop; }
     }
 
-    // cease to exist
-    Destroy();
+    Destroy(); // Cease to exist.
+
     return;
   };
 };
