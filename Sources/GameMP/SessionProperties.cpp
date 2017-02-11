@@ -231,7 +231,6 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
 
   sp.sp_bUseExtraEnemies = gam_bUseExtraEnemies;
   
-  sp.sp_bSharedLives = gam_bSharedLives; // [SSE] Personal/Shared Extra Lives
   
   sp.sp_bKeepSeriousDamageOnProjectiles = gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
 
@@ -239,6 +238,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   if (sp.sp_bCooperative) {
     sp.sp_ctCredits     = gam_iCredits;
     sp.sp_ctCreditsLeft = gam_iCredits;
+    sp.sp_bSharedLives = gam_bSharedLives; // [SSE] Personal/Shared Extra Lives
     sp.sp_iScoreLimit = 0;
     sp.sp_iFragLimit  = 0;
     sp.sp_iTimeLimit  = 0;
@@ -248,6 +248,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   } else {
     sp.sp_ctCredits     = -1;
     sp.sp_ctCreditsLeft = -1;
+    sp.sp_bSharedLives = FALSE; // [SSE] Personal/Shared Extra Lives
     sp.sp_iScoreLimit = gam_iScoreLimit;
     sp.sp_iFragLimit  = gam_iFragLimit;
     sp.sp_iTimeLimit  = gam_iTimeLimit;
