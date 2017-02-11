@@ -39,7 +39,7 @@ extern INDEX cht_bFly;
 extern INDEX cht_bGhost;
 extern INDEX cht_bInvisible;
 extern FLOAT cht_fTranslationMultiplier;
-extern INDEX cht_bKillAllAura; // [SSE] Cheats Expansion
+extern INDEX cht_bKillAllAura;  // [SSE] Cheats Expansion
 extern INDEX cht_bInfiniteAmmo; // [SSE] Cheats Expansion
 
 // Interface Control
@@ -53,11 +53,10 @@ extern FLOAT hud_fScaling;
 extern FLOAT hud_tmWeaponsOnScreen;
 extern INDEX hud_bShowMatchInfo;
 
-// [SSE]
+// [SSE] HUD - Tweaks
 extern BOOL hud_bShowEmptyAmmoInList;
 
-// [SSE] Sniper Scope Settings
-
+// [SSE] HUD - Sniper Scope Settings
 extern BOOL hud_bSniperScopeDraw;
 extern BOOL hud_bSniperScopeRenderFromQuarter;
 
@@ -1418,20 +1417,38 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
 
   // prepare and draw score or frags info
   strValue.PrintF( "%d", iScore);
-  fRow = pixTopBound  +fHalfUnit;
-  fCol = pixLeftBound +fHalfUnit;
+  fRow = pixTopBound + fHalfUnit;
+  fCol = pixLeftBound + fHalfUnit;
   fAdv = fAdvUnit+ fChrUnit*fWidthAdj/2 -fHalfUnit;
   HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
   HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
   HUD_DrawText(   fCol+fAdv, fRow, strValue, colScore, 1.0f);
   HUD_DrawIcon(   fCol,      fRow, _toFrags, C_WHITE /*colScore*/, 1.0f, FALSE);
+  
+  // [SSE] HUD - Personal/Shared Extra Lives
+  if ((bSinglePlay || bCooperative) && GetSP()->sp_ctCredits >= 0)
+  {
+    BOOL bSharedLives = GetSP()->sp_bSharedLives; 
+    strValue.PrintF( "%d", bSharedLives ? GetSP()->sp_ctCreditsLeft : _penPlayer->m_iLives);
+    fRow = pixTopBound  + fNextUnit+fHalfUnit;
+    fCol = pixLeftBound + fHalfUnit;
+    fAdv = fAdvUnit+ fChrUnit*fWidthAdj/2 -fHalfUnit;
+
+    HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
+    HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
+    HUD_DrawText(   fCol+fAdv, fRow, strValue,  colMana, 1.0f);
+    HUD_DrawIcon(   fCol,      fRow, _toHealth, C_WHITE /*colMana*/, 1.0f, FALSE);
+  }
+  //
 
   // eventually draw mana info
-  if ( bScoreMatch || bFragMatch) {
+  if (bScoreMatch || bFragMatch)
+  {
     strValue.PrintF( "%d", iMana);
     fRow = pixTopBound  + fNextUnit+fHalfUnit;
     fCol = pixLeftBound + fHalfUnit;
     fAdv = fAdvUnit+ fChrUnit*fWidthAdj/2 -fHalfUnit;
+
     HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
     HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
     HUD_DrawText(   fCol+fAdv, fRow, strValue,  colMana, 1.0f);

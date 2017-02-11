@@ -2756,7 +2756,7 @@ functions:
         
       } else {
         BOOL bSharedLives = GetSP()->sp_bSharedLives; // [SSE] Personal/Shared Extra Lives
-        INDEX iCreditsLeft = (bSharedLives ? GetSP()->sp_ctCreditsLeft : m_iLives) ; 
+        INDEX iCreditsLeft = (bSharedLives ? GetSP()->sp_ctCreditsLeft : m_iLives);
         
         if (iCreditsLeft != 0) {
           CTString strTmp;
