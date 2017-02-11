@@ -50,6 +50,9 @@ extern INDEX gam_bGibs;
 extern INDEX gam_bUseExtraEnemies;
 extern CTString gam_strGameAgentExtras;
 
+extern INDEX gam_bSharedLives;                    // [SSE] Personal/Shared Extra Lives
+extern INDEX gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
+
 
 static void SetGameModeParameters(CSessionProperties &sp)
 {
@@ -162,6 +165,10 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   sp.sp_bRespawnInPlace = FALSE;
   sp.sp_fExtraEnemyStrength          = 0;
   sp.sp_fExtraEnemyStrengthPerPlayer = 0;
+  
+  sp.sp_bSharedLives = FALSE;                   // [SSE] Personal/Shared Extra Lives
+  sp.sp_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
+
 
   sp.sp_iBlood = Clamp( gam_iBlood, 0L, 3L);
   sp.sp_bGibs  = gam_bGibs;
@@ -223,6 +230,10 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_tmSpawnInvulnerability = gam_tmSpawnInvulnerability;
 
   sp.sp_bUseExtraEnemies = gam_bUseExtraEnemies;
+  
+  sp.sp_bSharedLives = gam_bSharedLives; // [SSE] Personal/Shared Extra Lives
+  
+  sp.sp_bKeepSeriousDamageOnProjectiles = gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
 
   // set credits and limits
   if (sp.sp_bCooperative) {
@@ -392,6 +403,7 @@ ULONG GetSpawnFlagsForGameType(INDEX iGameType)
   case CSessionProperties::GM_FRAGMATCH:    return SPF_DEATHMATCH;
   };
 }
+
 ULONG GetSpawnFlagsForGameTypeCfunc(void* pArgs)
 {
   INDEX iGameType = NEXTARGUMENT(INDEX);

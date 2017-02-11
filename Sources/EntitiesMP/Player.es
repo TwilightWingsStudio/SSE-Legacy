@@ -142,17 +142,17 @@ int qsort_CompareMarkerDistance(const void *pv0, const void *pv1)
 {
   MarkerDistance &md0 = *(MarkerDistance*)pv0;
   MarkerDistance &md1 = *(MarkerDistance*)pv1;
-  if (      md0.md_fMinD<md1.md_fMinD) return +1;
-  else if ( md0.md_fMinD>md1.md_fMinD) return -1;
+  if (     md0.md_fMinD<md1.md_fMinD) return +1;
+  else if (md0.md_fMinD>md1.md_fMinD) return -1;
   else                                return  0;
 }
 
 static inline FLOAT IntensityAtDistance( FLOAT fFallOff, FLOAT fHotSpot, FLOAT fDistance)
 {
   // intensity is zero if further than fall-off range
-  if ( fDistance>fFallOff) return 0.0f;
+  if (fDistance>fFallOff) return 0.0f;
   // intensity is maximum if closer than hot-spot range
-  if ( fDistance<fHotSpot) return 1.0f;
+  if (fDistance<fHotSpot) return 1.0f;
   // interpolate if between fall-off and hot-spot range
   return (fFallOff-fDistance)/(fFallOff-fHotSpot);
 }
@@ -1216,6 +1216,9 @@ properties:
  190 INDEX m_iSeriousBombCount = 0,      // ammount of serious bombs player owns
  191 INDEX m_iLastSeriousBombCount = 0,  // ammount of serious bombs player had before firing
  192 FLOAT m_tmSeriousBombFired = -10.0f,  // when the bomb was last fired
+ 
+ // [SSE] Personal/Shared Extra Lives
+ 200 INDEX m_iLives = 0,
 
 {
   ShellLaunchData ShellLaunchData_array;  // array of data describing flying empty shells
@@ -1641,7 +1644,7 @@ functions:
     (*istr)>>ctMsg;
     m_acmiMessages.Clear();
     m_ctUnreadMessages = 0;
-    if ( ctMsg>0) {
+    if (ctMsg>0) {
       m_acmiMessages.Push(ctMsg);
       for(INDEX iMsg=0; iMsg<ctMsg; iMsg++) {
         m_acmiMessages[iMsg].Read_t(*istr);
@@ -1767,7 +1770,7 @@ functions:
   {
 
     // get proper type of stats
-    if ( csType==CST_SHORT) {
+    if (csType==CST_SHORT) {
       GetShortStats(strStats);
     } else {
       ASSERT(csType==CST_DETAIL);
@@ -1979,7 +1982,7 @@ functions:
       strStats+="\n";
       strStats+=AlignString(CTString(0, "^cFFFFFF%s:^r\n%s", TRANS("PLAYING TIME"), TimeToString(GetStatsRealWorldTime())));
       strStats+="\n";
-      if ( m_psGameStats.ps_iScore<=plr_iHiScore) {
+      if (m_psGameStats.ps_iScore<=plr_iHiScore) {
         strStats+=AlignString(CTString(0, "^cFFFFFF%s:^r\n%d", TRANS("HI-SCORE"), plr_iHiScore));
       } else {
         strStats+=TRANS("YOU BEAT THE HI-SCORE!");
@@ -1991,7 +1994,7 @@ functions:
     strStats+=CTString(0, "^cFFFFFF%s^r", TranslateConst(en_pwoWorld->GetName(), 0));
     strStats+="\n";
     if (iCoopType<=1) {
-      if ( m_bEndOfLevel) {
+      if (m_bEndOfLevel) {
         strStats+=AlignString(CTString(0, "  %s:\n%s", TRANS("ESTIMATED TIME"), TimeToString(m_tmEstTime)));
         strStats+="\n";
         strStats+=AlignString(CTString(0, "  %s:\n%d", TRANS("TIME BONUS"), m_iTimeScore));
@@ -2084,13 +2087,13 @@ functions:
   {
     CTString strKey;
     strKey.PrintF("\\player_%d\\%s", iPlayer, (const char*)GetPlayerName());
-	  strOut+=strKey;
+    strOut+=strKey;
     if (GetSP()->sp_bUseFrags) {
       strKey.PrintF("\\frags_%d\\%d", iPlayer, m_psLevelStats.ps_iKills);
-	    strOut+=strKey;
+      strOut+=strKey;
     } else {
       strKey.PrintF("\\frags_%d\\%d", iPlayer, m_psLevelStats.ps_iScore);
-	    strOut+=strKey;
+      strOut+=strKey;
     }
     strKey.PrintF("\\ping_%d\\%d", iPlayer, INDEX(ceil(en_tmPing*1000.0f)));
     strOut+=strKey;
@@ -2236,7 +2239,7 @@ functions:
   // --------------------------------------------------------------------------------------
   BOOL AdjustShadingParameters(FLOAT3D &vLightDirection, COLOR &colLight, COLOR &colAmbient) 
   {
-    if ( cht_bDumpPlayerShading)
+    if (cht_bDumpPlayerShading)
     {
       ANGLE3D a3dHPB;
       DirectionVectorToAngles(-vLightDirection, a3dHPB);
@@ -2481,7 +2484,7 @@ functions:
   void RenderScroll(CDrawPort *pdp)
   {
     CWorldSettingsController *pwsc = GetWSC(this);
-    if ( pwsc!=NULL && pwsc->m_penScrollHolder!=NULL)
+    if (pwsc!=NULL && pwsc->m_penScrollHolder!=NULL)
     {
       CScrollHolder &sch = (CScrollHolder &) *pwsc->m_penScrollHolder;
       sch.Credits_Render(&sch, pdp);
@@ -2492,7 +2495,7 @@ functions:
   void RenderCredits(CDrawPort *pdp)
   {
     CWorldSettingsController *pwsc = GetWSC(this);
-    if ( pwsc!=NULL && pwsc->m_penCreditsHolder!=NULL)
+    if (pwsc!=NULL && pwsc->m_penCreditsHolder!=NULL)
     {
       CCreditsHolder &cch = (CCreditsHolder &) *pwsc->m_penCreditsHolder;
       cch.Credits_Render(&cch, pdp);
@@ -2503,7 +2506,7 @@ functions:
   void RenderTextFX(CDrawPort *pdp)
   {
     CWorldSettingsController *pwsc = GetWSC(this);
-    if ( pwsc!=NULL && pwsc->m_penTextFXHolder!=NULL)
+    if (pwsc!=NULL && pwsc->m_penTextFXHolder!=NULL)
     {
       CTextFXHolder &tfx = (CTextFXHolder &) *pwsc->m_penTextFXHolder;
       tfx.TextFX_Render(&tfx, pdp);
@@ -2514,7 +2517,7 @@ functions:
   void RenderHudPicFX(CDrawPort *pdp)
   {
     CWorldSettingsController *pwsc = GetWSC(this);
-    if ( pwsc!=NULL && pwsc->m_penHudPicFXHolder!=NULL)
+    if (pwsc!=NULL && pwsc->m_penHudPicFXHolder!=NULL)
     {
       CHudPicHolder &hpfx = (CHudPicHolder &) *pwsc->m_penHudPicFXHolder;
       hpfx.HudPic_Render(&hpfx, pdp);
@@ -2589,7 +2592,7 @@ functions:
     plr_fFrontClipDistance = Clamp( plr_fFrontClipDistance, 0.05f, 0.50f);
     FLOAT fFCD = plr_fFrontClipDistance;
     // adjust front clip plane if swimming
-    if ( m_pstState==PST_SWIM && iViewState==PVT_PLAYEREYES) { fFCD *= 0.6666f; }
+    if (m_pstState==PST_SWIM && iViewState==PVT_PLAYEREYES) { fFCD *= 0.6666f; }
     prPerspectiveProjection.FrontClipDistanceL() = fFCD;
     prPerspectiveProjection.AspectRatioL() = 1.0f;
     // set up viewer position
@@ -2750,10 +2753,14 @@ functions:
       
       if (GetSP()->sp_ctCredits == -1) {
         pdp->PutTextCXY(TRANS("Press FIRE to respawn!"), pixDPWidth*0.5f, pixDPHeight*0.2f, C_WHITE|255);
+        
       } else {
-        if (GetSP()->sp_ctCreditsLeft != 0) {
+        BOOL bSharedLives = GetSP()->sp_bSharedLives; // [SSE] Personal/Shared Extra Lives
+        INDEX iCreditsLeft = (bSharedLives ? GetSP()->sp_ctCreditsLeft : m_iLives) ; 
+        
+        if (iCreditsLeft != 0) {
           CTString strTmp;
-          strTmp.PrintF("%s\n\n%d %s", TRANS("Press FIRE to respawn!"), GetSP()->sp_ctCreditsLeft, TRANS("respawn credit(s) left."));
+          strTmp.PrintF("%s\n\n%d %s", TRANS("Press FIRE to respawn!"), iCreditsLeft, bSharedLives ? TRANS("shared respawn credit(s) left.") : TRANS("personal respawn credit(s) left."));
 
           pdp->PutTextCXY(strTmp, pixDPWidth*0.5f, pixDPHeight*0.2f, C_WHITE|255);
         } else {
@@ -3179,9 +3186,9 @@ functions:
     GetBoundingBox(box);
   
     // on plane
-    if ( GetNearestPolygon(vPoint, vPlaneNormal, fDistanceToEdge)) {
+    if (GetNearestPolygon(vPoint, vPlaneNormal, fDistanceToEdge)) {
       // if near to polygon and away from last stain point
-      if ( (vPoint-GetPlacement().pl_PositionVector).Length()<0.5f
+      if ((vPoint-GetPlacement().pl_PositionVector).Length()<0.5f
         && (m_vLastStain-vPoint).Length()>1.0f ) {
         m_vLastStain = vPoint;
         FLOAT fStretch = box.Size().Length();
@@ -3259,7 +3266,7 @@ functions:
 
     FLOAT fMassFactor = 200.0f/((EntityInfo*)GetEntityInfo())->fMass;
     
-    if ( !(en_ulFlags & ENF_ALIVE))
+    if (!(en_ulFlags & ENF_ALIVE))
     {
       fMassFactor /= 3;
     }
@@ -3355,7 +3362,7 @@ functions:
                       FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection)
   {
     // don't harm yourself with knife or with rocket in easy/tourist mode
-    if ( penInflictor == this && (dmtType==DMT_CLOSERANGE || dmtType==DMT_CHAINSAW ||
+    if (penInflictor == this && (dmtType==DMT_CLOSERANGE || dmtType==DMT_CHAINSAW ||
         ((dmtType==DMT_EXPLOSION||dmtType==DMT_CANNONBALL_EXPLOSION||dmtType==DMT_PROJECTILE) &&
           GetSP()->sp_gdGameDifficulty<=CSessionProperties::GD_EASY)) ) {
       return;
@@ -3372,7 +3379,7 @@ functions:
 
     // if invulnerable, nothing can harm you except telefrag or abyss
     const TIME tmDelta = m_tmInvulnerability - _pTimer->CurrentTick();
-    if ( tmDelta>0 && dmtType!=DMT_ABYSS && dmtType!=DMT_TELEPORT) { return; }
+    if (tmDelta>0 && dmtType!=DMT_ABYSS && dmtType!=DMT_TELEPORT) { return; }
 
     // if invunerable after spawning
     FLOAT tmSpawnInvulnerability = GetSP()->sp_tmSpawnInvulnerability;
@@ -3395,7 +3402,7 @@ functions:
 
     // adjust for difficulty
     FLOAT fDifficultyDamage = GetSP()->sp_fDamageStrength;
-    if ( fDifficultyDamage <= 1.0f || penInflictor != this) {
+    if (fDifficultyDamage <= 1.0f || penInflictor != this) {
       fDamageAmmount *= fDifficultyDamage;
     }
 
@@ -3438,7 +3445,7 @@ functions:
     }
 
     // if any damage
-    if ( fSubHealth > 0) { 
+    if (fSubHealth > 0) { 
       // if camera is active
       if (m_penCamera != NULL) {
         // if the camera has onbreak
@@ -3480,14 +3487,14 @@ functions:
     CPlayerEntity::ReceiveDamage( penInflictor, dmtType, fSubHealth, vHitPoint, vDirection);
 
     // red screen and hit translation
-    if ( fDamageAmmount > 1.0f) {
+    if (fDamageAmmount > 1.0f) {
 // !!!! this is obsolete, DamageImpact is used instead!
-      if ( dmtType==DMT_EXPLOSION || dmtType==DMT_PROJECTILE || dmtType==DMT_BULLET
+      if (dmtType==DMT_EXPLOSION || dmtType==DMT_PROJECTILE || dmtType==DMT_BULLET
        || dmtType==DMT_IMPACT    || dmtType==DMT_CANNONBALL || dmtType==DMT_CANNONBALL_EXPLOSION) {
 //        GiveImpulseTranslationAbsolute( vDirection*(fDamageAmmount/7.5f)
 //                                        -en_vGravityDir*(fDamageAmmount/15.0f));
       }
-      if ( GetFlags()&ENF_ALIVE) {
+      if (GetFlags()&ENF_ALIVE) {
         m_fDamageAmmount += fDamageAmmount;
         m_tmWoundedTime   = _pTimer->CurrentTick();
       }
@@ -3508,17 +3515,17 @@ functions:
       PlaySound( m_soLocalAmbientOnce, SOUND_WATERBUBBLES, SOF_3D|SOF_VOLUMETRIC|SOF_LOCAL);
       m_soLocalAmbientOnce.Set3DParameters( 25.0f, 5.0f, 2.0f, Lerp(0.5f, 1.5f, FRnd()) );
       SpawnBubbles( 10+INDEX(FRnd()*10));
-    } else if ( m_fDamageAmmount>1.0f) {
+    } else if (m_fDamageAmmount>1.0f) {
       // if not dead
       if (GetFlags()&ENF_ALIVE) {
         // determine corresponding sound
         INDEX iSound;
         char *strIFeel = NULL;
-        if ( m_fDamageAmmount < 5.0f) {
+        if (m_fDamageAmmount < 5.0f) {
           iSound = GenderSound(SOUND_WOUNDWEAK);
           strIFeel = "WoundWeak";
         }
-        else if ( m_fDamageAmmount < 25.0f) {
+        else if (m_fDamageAmmount < 25.0f) {
           iSound = GenderSound(SOUND_WOUNDMEDIUM);
           strIFeel = "WoundMedium";
         }
@@ -3527,7 +3534,7 @@ functions:
           strIFeel = "WoundStrong";
         }
 
-        if ( m_pstState==PST_DIVE) {
+        if (m_pstState==PST_DIVE) {
           iSound = GenderSound(SOUND_WOUNDWATER);
           strIFeel = "WoundWater";
         }
@@ -3536,7 +3543,7 @@ functions:
         SetRandomMouthPitch( 0.9f, 1.1f);
         // give some pause inbetween screaming
         TIME tmNow = _pTimer->CurrentTick();
-        if ( (tmNow-m_tmScreamTime) > 1.0f) {
+        if ((tmNow-m_tmScreamTime) > 1.0f) {
           m_tmScreamTime = tmNow;
           PlaySound( m_soMouth, iSound, SOF_3D);
           if (_pNetwork->IsPlayerLocal(this)) {IFeel_PlayEffect(strIFeel);}
@@ -3579,12 +3586,12 @@ functions:
     // determine debris texture (color)
     ULONG ulFleshTexture = TEXTURE_FLESH_GREEN;
     ULONG ulFleshModel   = MODEL_FLESH;
-    if ( iBloodType==2) { ulFleshTexture = TEXTURE_FLESH_RED; }
+    if (iBloodType==2) { ulFleshTexture = TEXTURE_FLESH_RED; }
     // spawn debris
     Debris_Begin( EIBT_FLESH, DPT_BLOODTRAIL, BET_BLOODSTAIN, fBlowUpSize, vNormalizedDamage, vBodySpeed, 1.0f, 0.0f);
     for( INDEX iDebris=0; iDebris<4; iDebris++) {
       // flowerpower mode?
-      if ( iBloodType==3) {
+      if (iBloodType==3) {
         switch( IRnd()%5) {
         case 1:  { ulFleshModel = MODEL_FLESH_APPLE;   ulFleshTexture = TEXTURE_FLESH_APPLE;   break; }
         case 2:  { ulFleshModel = MODEL_FLESH_BANANA;  ulFleshTexture = TEXTURE_FLESH_BANANA;  break; }
@@ -3643,7 +3650,7 @@ functions:
   BOOL ReceiveItem(const CEntityEvent &ee)
   {
     // *********** HEALTH ***********
-    if ( ee.ee_slEvent == EVENTCODE_EHealth)
+    if (ee.ee_slEvent == EVENTCODE_EHealth)
     {
       FLOAT fHealth = ((EHealth&)ee).fHealth;
       FLOAT fTopHealth = TopHealth();
@@ -3671,14 +3678,14 @@ functions:
       FLOAT fHealthOld = GetHealth();
       FLOAT fHealthNew = fHealthOld + fHealth;
 
-      if ( ((EHealth&)ee).bOverTopHealth) {
+      if (((EHealth&)ee).bOverTopHealth) {
         fHealthNew = ClampUp( fHealthNew, fMaxHealth);
       } else {
         fHealthNew = ClampUp( fHealthNew, fTopHealth);
       }
 
       // if value can be changed
-      if ( ceil(fHealthNew) > ceil(fHealthOld)) {
+      if (ceil(fHealthNew) > ceil(fHealthOld)) {
         // receive it
         SetHealth(fHealthNew);
         ItemPicked( TRANS("Health"), fHealth);
@@ -3689,7 +3696,7 @@ functions:
     } 
 
     // *********** ARMOR ***********
-    else if ( ee.ee_slEvent == EVENTCODE_EArmor)
+    else if (ee.ee_slEvent == EVENTCODE_EArmor)
     {
       FLOAT fArmor = ((EArmor&)ee).fArmor;
       FLOAT fTopArmor = TopArmor();
@@ -3717,14 +3724,14 @@ functions:
       FLOAT fArmorOld = m_fArmor;
       FLOAT fArmorNew = fArmorOld + fArmor;
 
-      if ( ((EArmor&)ee).bOverTopArmor) {
+      if (((EArmor&)ee).bOverTopArmor) {
         fArmorNew = ClampUp( fArmorNew, fMaxArmor);
       } else {
         fArmorNew = ClampUp( fArmorNew, fTopArmor);
       }
 
       // if value can be changed
-      if ( ceil(fArmorNew) > ceil(fArmorOld)) {
+      if (ceil(fArmorNew) > ceil(fArmorOld)) {
         // receive it
         m_fArmor = fArmorNew;
         ItemPicked( TRANS("Armor"), fArmor);
@@ -3819,7 +3826,7 @@ functions:
     }
 
     // *********** POWERUPS ***********
-    else if ( ee.ee_slEvent == EVENTCODE_EPowerUp) {
+    else if (ee.ee_slEvent == EVENTCODE_EPowerUp) {
       // [SSE] Player Settings Entity
       if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
         if (((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpPUPS) {
@@ -4325,7 +4332,7 @@ functions:
 
     // if less than few seconds elapsed since last damage
     FLOAT tmSinceWounding = _pTimer->CurrentTick() - m_tmWoundedTime;
-    if ( tmSinceWounding<4.0f) {
+    if (tmSinceWounding<4.0f) {
       // decrease damage ammount
       m_fDamageAmmount *= 1.0f - tmSinceWounding/4.0f;
     } else {
@@ -4387,18 +4394,18 @@ functions:
 
     CPlayerActionMarker *ppam = GetActionMarker();
     ASSERT( ppam != NULL);
-    if ( ppam->m_paaAction == PAA_LOGO_FIRE_MINIGUN || ppam->m_paaAction == PAA_LOGO_FIRE_INTROSE)
+    if (ppam->m_paaAction == PAA_LOGO_FIRE_MINIGUN || ppam->m_paaAction == PAA_LOGO_FIRE_INTROSE)
     {
-      if ( m_tmMinigunAutoFireStart != -1)
+      if (m_tmMinigunAutoFireStart != -1)
       {
         FLOAT tmDelta = _pTimer->CurrentTick()-m_tmMinigunAutoFireStart;
         FLOAT aDH=0.0f;
         FLOAT aDP=0.0f;
-        if ( tmDelta>=0.0f && tmDelta<=0.75f)
+        if (tmDelta>=0.0f && tmDelta<=0.75f)
         {
           aDH = 0.0f;
         }
-        else if ( tmDelta>=0.75f)
+        else if (tmDelta>=0.75f)
         {
           FLOAT fDT = tmDelta-0.75f;
           aDH = 1.0f*cos(fDT+PI/2.0f);
@@ -4972,69 +4979,86 @@ functions:
   // --------------------------------------------------------------------------------------
   // Death actions.
   // --------------------------------------------------------------------------------------
-  void DeathActions(const CPlayerAction &paAction) {
+  void DeathActions(const CPlayerAction &paAction)
+  {
     // set heading, pitch and banking from the normal rotation into the camera view rotation
-    if (m_penView!=NULL) {
-      ASSERT(IsPredicted()&&m_penView->IsPredicted()||IsPredictor()&&m_penView->IsPredictor()||!IsPredicted()&&!m_penView->IsPredicted()&&!IsPredictor()&&!m_penView->IsPredictor());
+    if (m_penView != NULL) {
+      ASSERT(IsPredicted() && m_penView->IsPredicted() || IsPredictor() && m_penView->IsPredictor() || !IsPredicted() && !m_penView->IsPredicted() && !IsPredictor() && !m_penView->IsPredictor());
+
       en_plViewpoint.pl_PositionVector = FLOAT3D(0, 1, 0);
+
       en_plViewpoint.pl_OrientationAngle += (ANGLE3D(
         (ANGLE)((FLOAT)paAction.pa_aRotation(1)*_pTimer->TickQuantum),
         (ANGLE)((FLOAT)paAction.pa_aRotation(2)*_pTimer->TickQuantum),
         (ANGLE)((FLOAT)paAction.pa_aRotation(3)*_pTimer->TickQuantum)));
     }
 
-    // if death is finished and fire just released again and this is not a predictor
-    if (m_iMayRespawn==2 && (ulReleasedButtons&PLACT_FIRE) && !IsPredictor()) {
+    // If death is finished and fire just released again and this is not a predictor.
+    if (m_iMayRespawn == 2 && (ulReleasedButtons&PLACT_FIRE) && !IsPredictor())
+    {
       if ((GetSP()->sp_bQuickTest || GetSP()->sp_bSinglePlayer) && cht_bRevive) {
         SendEvent(EEnd());
-      // if singleplayer
-      } else if ( GetSP()->sp_bSinglePlayer) {
-        // load quick savegame
+
+      // If singleplayer then load quick savegame.
+      } else if (GetSP()->sp_bSinglePlayer) {
         _pShell->Execute("gam_bQuickLoad=1;");
-      // if deathmatch or similar
-      } else if ( !GetSP()->sp_bCooperative) {
-        // rebirth
+
+      // If deathmatch or similar then rebirth.
+      } else if (!GetSP()->sp_bCooperative) {
         SendEvent(EEnd());
-      // if cooperative
+
+      // If cooperative.
       } else {
-        // if holding down reload button
+        // If holding down reload button then forbid respawning in-place.
         if (m_ulLastButtons&PLACT_RELOAD) {
-          // forbid respawning in-place
           m_ulFlags &= ~PLF_RESPAWNINPLACE;
         }
-        // if playing on credits
-        if (GetSP()->sp_ctCredits!=0) {
-          // if playing on infinite credits or some credits left
-          if (GetSP()->sp_ctCredits==-1 || GetSP()->sp_ctCreditsLeft!=0) {
-            // decrement credits
-            if (GetSP()->sp_ctCredits!=-1) {
-              ((CSessionProperties*)GetSP())->sp_ctCreditsLeft--;
-            }
 
-            // initiate respawn
-            CPrintF(TRANS("%s is riding the gun again\n"), GetPlayerName());
-            SendEvent(EEnd());
-
-            // report number of credits left
-            if (GetSP()->sp_ctCredits>0) {
-              if (GetSP()->sp_ctCreditsLeft==0) {
-                CPrintF(TRANS("  no more credits left!\n"));
+        // If playing with respawn with limited (> 0) credits or infinite credits (<= -1).
+        if (GetSP()->sp_ctCredits != 0)
+        {
+          BOOL bSharedLives = GetSP()->sp_bSharedLives;
+          
+          // If playing on infinite credits or some credits left
+          if (GetSP()->sp_ctCredits == -1 || (bSharedLives ? GetSP()->sp_ctCreditsLeft : m_iLives) != 0) // [SSE] Personal/Shared Extra Lives
+          {
+            // If credits used then decrement credits.
+            if (GetSP()->sp_ctCredits != -1) {
+              if (bSharedLives) {
+                ((CSessionProperties*)GetSP())->sp_ctCreditsLeft--;
               } else {
-                CPrintF(TRANS("  %d credits left\n"), GetSP()->sp_ctCreditsLeft);
+                m_iLives--; // [SSE] Personal/Shared Extra Lives
               }
             }
-          // if no more credits left
+
+            CPrintF(TRANS("%s is riding the gun again\n"), GetPlayerName());
+            SendEvent(EEnd()); // Initiate respawn.
+
+            // Report number of credits left.
+            if (GetSP()->sp_ctCredits > 0)
+            {
+              INDEX iCreditsLeftAfter = (bSharedLives ? GetSP()->sp_ctCreditsLeft : m_iLives) ; // [SSE] Personal/Shared Extra Lives
+
+              if (iCreditsLeftAfter == 0) {
+                CPrintF(TRANS("  no more credits left!\n"));
+              } else {
+                CPrintF(TRANS("  %d credit(s) left\n"), iCreditsLeftAfter);
+              }
+            }
+
+          // If no more credits left then report that you cannot respawn.
           } else {
             if (_pNetwork->IsPlayerLocal(this)) { // [SSE] Respawn Sign
-              CPrintF(TRANS("%s rests in peace - out of credits\n"), GetPlayerName()); // report that you cannot respawn
+              CPrintF(TRANS("%s rests in peace - out of credits\n"), GetPlayerName());
             }
           }
         }
       }
     }
-    // check fire released once after death
-    if (m_iMayRespawn==1 && !(ulButtonsNow&PLACT_FIRE)) {
-      m_iMayRespawn=2;
+
+    // Check fire released once after death.
+    if (m_iMayRespawn == 1 && !(ulButtonsNow&PLACT_FIRE)) {
+      m_iMayRespawn = 2;
     }
   };
 
@@ -5146,7 +5170,7 @@ functions:
     }
 
     // apply center view
-    if ( ulButtonsNow&PLACT_CENTER_VIEW) {
+    if (ulButtonsNow&PLACT_CENTER_VIEW) {
       // center view with speed of 45 degrees per 1/20 seconds
       paAction.pa_aRotation(2) += Clamp( -en_plViewpoint.pl_OrientationAngle(2)/_pTimer->TickQuantum, -900.0f, +900.0f);
     }
@@ -5368,7 +5392,7 @@ functions:
   void RenderChainsawParticles(BOOL bThird)
   {
     FLOAT fStretch=1.0f;
-    if ( bThird)
+    if (bThird)
     {
       fStretch=0.4f;
     }
@@ -5378,7 +5402,7 @@ functions:
     {
       BulletSprayLaunchData &bsld = m_absldData[iSpray];
       FLOAT fLife=1.25f;
-      if ( tmNow > (bsld.bsld_tmLaunch+fLife)) { continue;}
+      if (tmNow > (bsld.bsld_tmLaunch+fLife)) { continue;}
       Particles_BulletSpray(bsld.bsld_iRndBase, bsld.bsld_vPos, bsld.bsld_vG,
         bsld.bsld_eptType, bsld.bsld_tmLaunch, bsld.bsld_vStretch*fStretch, 1.0f);
     }
@@ -5388,9 +5412,9 @@ functions:
     {
       GoreSprayLaunchData &gsld = m_agsldData[iGore];
       FLOAT fLife=2.0f;
-      if ( tmNow > (gsld.gsld_tmLaunch+fLife)) { continue;}
+      if (tmNow > (gsld.gsld_tmLaunch+fLife)) { continue;}
       FLOAT3D vPos=gsld.gsld_vPos;
-      if ( bThird)
+      if (bThird)
       {
         vPos=gsld.gsld_v3rdPos;
       }
@@ -5413,7 +5437,7 @@ functions:
     // render weapon models if needed
     // do not render weapon if sniping
     BOOL bRenderModels = _pShell->GetINDEX("gfx_bRenderModels");
-    if ( hud_bShowWeapon && bRenderModels && !bSniping) {
+    if (hud_bShowWeapon && bRenderModels && !bSniping) {
       // render weapons only if view is from player eyes
       ((CPlayerWeapons&)*m_penWeapons).RenderWeaponModel(prProjection, pdp, 
        vViewerLightDirection, colViewerLight, colViewerAmbient, bRenderWeapon, iEye);
@@ -5461,7 +5485,7 @@ functions:
 
     if (tmSinceWounding < 4.0f) {
       // decrease damage ammount
-      if ( tmSinceWounding<0.001f) { ulA = (ulA+64)/2; }
+      if (tmSinceWounding<0.001f) { ulA = (ulA+64)/2; }
     }
 
     // add rest of blend ammount
@@ -5490,7 +5514,7 @@ functions:
     pdp->BlendScreen();
 
     // render status info line (if needed)
-    if ( hud_bShowInfo) { 
+    if (hud_bShowInfo) { 
       // get player or its predictor
       BOOL bSnooping = FALSE;
       CPlayer *penHUDPlayer = this;
@@ -5503,7 +5527,7 @@ functions:
       // check if snooping is needed
       CPlayerWeapons *pen = (CPlayerWeapons*)&*penHUDPlayer->m_penWeapons;
       TIME tmDelta = _pTimer->CurrentTick() - pen->m_tmSnoopingStarted;
-      if ( tmDelta<plr_tmSnoopingTime) {
+      if (tmDelta<plr_tmSnoopingTime) {
         ASSERT( pen->m_penTargeting!=NULL);
         penHUDPlayer = (CPlayer*)&*pen->m_penTargeting;
         bSnooping = TRUE;
@@ -5840,7 +5864,7 @@ functions:
       } else if (bAdjustHealth) {
         FLOAT fHealth = GetHealth();
         FLOAT fTopHealth = TopHealth();
-        if ( fHealth < fTopHealth) {
+        if (fHealth < fTopHealth) {
           SetHealth(ClampUp(fHealth+fTopHealth/2.0f, fTopHealth));
         }
       }
@@ -6067,7 +6091,7 @@ functions:
     }
             
     // spirit particles
-    if ( m_tmSpiritStart != 0.0f)
+    if (m_tmSpiritStart != 0.0f)
     {
       Particles_Appearing(this, m_tmSpiritStart);
     }
@@ -6598,7 +6622,7 @@ procedures:
     ULONG ulFlags = AOF_LOOPING|AOF_NORESTART;
 
     INDEX iAnim = GetModelObject()->GetAnim();
-    if ( iAnim!=PLAYER_ANIM_STAND)
+    if (iAnim!=PLAYER_ANIM_STAND)
     {
       ulFlags |= AOF_SMOOTHCHANGE;
     }
@@ -6632,7 +6656,7 @@ procedures:
     ULONG ulFlags = AOF_LOOPING|AOF_NORESTART;
 
     INDEX iAnim = GetModelObject()->GetAnim();
-    if ( iAnim!=PLAYER_ANIM_STAND)
+    if (iAnim!=PLAYER_ANIM_STAND)
     {
       ulFlags |= AOF_SMOOTHCHANGE;
     }
@@ -6873,10 +6897,10 @@ procedures:
     // put it at marker
     Teleport(GetActionMarker()->GetPlacement());
     // make it rotate in spawnpose
-    SetPhysicsFlags(GetPhysicsFlags() & ~(EPF_TRANSLATEDBYGRAVITY|EPF_ORIENTEDBYGRAVITY));
-    m_ulFlags|=PLF_AUTOMOVEMENTS;
-    SetDesiredRotation(ANGLE3D(60,0,0));
-    SetDesiredTranslation(ANGLE3D(0,20.0f,0));
+    SetPhysicsFlags(GetPhysicsFlags() & ~(EPF_TRANSLATEDBYGRAVITY | EPF_ORIENTEDBYGRAVITY));
+    m_ulFlags |= PLF_AUTOMOVEMENTS;
+    SetDesiredRotation(ANGLE3D(60, 0, 0));
+    SetDesiredTranslation(ANGLE3D(0, 20.0f, 0));
     StartModelAnim(PLAYER_ANIM_SPAWNPOSE, AOF_LOOPING);
     CModelObject &moBody = GetModelObject()->GetAttachmentModel(PLAYER_ATTACHMENT_TORSO)->amo_moModelObject;
     moBody.PlayAnim(BODY_ANIM_SPAWNPOSE, AOF_LOOPING);
@@ -6884,6 +6908,7 @@ procedures:
     autowait(8.0f);
     // switch to model
     SwitchToEditorModel();
+
     // return to auto-action loop
     return EReturn();
   }
@@ -6917,7 +6942,7 @@ procedures:
     CWorldSettingsController *pwsc = NULL;
     // obtain bcg viewer
     CBackgroundViewer *penBcgViewer = (CBackgroundViewer *) GetWorld()->GetBackgroundViewer();
-    if ( penBcgViewer != NULL)
+    if (penBcgViewer != NULL)
     {
       pwsc = (CWorldSettingsController *) &*penBcgViewer->m_penWorldSettingsController;
       pwsc->m_tmShakeStarted = _pTimer->CurrentTick();
@@ -7157,7 +7182,7 @@ procedures:
         jump TheEnd();
       } else if (GetActionMarker()->m_paaAction==PAA_NOGRAVITY) {
         SetPhysicsFlags(GetPhysicsFlags() & ~(EPF_TRANSLATEDBYGRAVITY|EPF_ORIENTEDBYGRAVITY));
-        if ( GetActionMarker()->GetParent() != NULL)
+        if (GetActionMarker()->GetParent() != NULL)
         {
           SetParent(GetActionMarker()->GetParent());
         }
@@ -7246,6 +7271,10 @@ procedures:
     // set initial vars
     en_tmMaxHoldBreath = 60.0f;
     en_fDensity = 1000.0f;    // same density as water - to be able to dive freely
+    
+    if (!GetSP()->sp_bSharedLives && GetSP()->sp_ctCredits > 0) {
+      m_iLives = GetSP()->sp_ctCredits;
+    }
 
     ModelChangeNotify();
 

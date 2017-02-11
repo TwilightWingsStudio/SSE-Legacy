@@ -81,6 +81,10 @@ public:
   ULONG sp_ulLevelsMask;    // mask of visited levels so far
 
   BOOL  sp_bUseExtraEnemies;  // spawn extra multiplayer enemies
+  
+  BOOL sp_bSharedLives; // [SSE] Personal/Shared Extra Lives
+  
+  BOOL sp_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
 };
 
 // NOTE: never instantiate CSessionProperties, as its size is not fixed to the size defined in engine
