@@ -121,6 +121,8 @@ static CTextureObject _toArmorSmall;
 static CTextureObject _toArmorMedium;
 static CTextureObject _toArmorLarge;
 
+static CTextureObject _toExtraLive; // [SSE]
+
 // ammo textures
 static CTextureObject _toAShells;
 static CTextureObject _toABullets;
@@ -1437,7 +1439,7 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
     HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
     HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
     HUD_DrawText(   fCol+fAdv, fRow, strValue,  colMana, 1.0f);
-    HUD_DrawIcon(   fCol,      fRow, _toHealth, C_WHITE /*colMana*/, 1.0f, FALSE);
+    HUD_DrawIcon(   fCol,      fRow, _toExtraLive, C_WHITE /*colMana*/, 1.0f, FALSE);
   }
   //
 
@@ -1554,6 +1556,8 @@ extern void InitHUD(void)
     _toArmorSmall.SetData_t(  CTFILENAME("TexturesMP\\Interface\\ArSmall.tex"));
     _toArmorMedium.SetData_t(   CTFILENAME("TexturesMP\\Interface\\ArMedium.tex"));
     _toArmorLarge.SetData_t(   CTFILENAME("TexturesMP\\Interface\\ArStrong.tex"));
+    
+    _toExtraLive.SetData_t(  CTFILENAME("TexturesMP\\Interface\\IExtraLive.tex")); // [SSE]
 
     // initialize ammo textures
     _toAShells.SetData_t(        CTFILENAME("TexturesMP\\Interface\\AmShells.tex"));
@@ -1609,6 +1613,8 @@ extern void InitHUD(void)
     ((CTextureData*)_toArmorSmall.GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)_toArmorMedium.GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)_toArmorLarge.GetData())->Force(TEX_CONSTANT);
+    
+    ((CTextureData*)_toExtraLive.GetData())->Force(TEX_CONSTANT); // [SSE]
 
     ((CTextureData*)_toAShells       .GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)_toABullets      .GetData())->Force(TEX_CONSTANT);

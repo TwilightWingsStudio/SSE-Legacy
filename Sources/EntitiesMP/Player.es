@@ -3836,31 +3836,37 @@ functions:
 
       const FLOAT tmNow = _pTimer->CurrentTick();
 
-      switch( ((EPowerUp&)ee).puitType) {
-      case PUIT_INVISIB :  m_tmInvisibility    = tmNow + m_tmInvisibilityMax;
-        ItemPicked(TRANS("^cABE3FFInvisibility"), 0);
-        return TRUE;
-      case PUIT_INVULNER:  m_tmInvulnerability = tmNow + m_tmInvulnerabilityMax;
-        ItemPicked(TRANS("^c00B440Invulnerability"), 0);
-        return TRUE;
-      case PUIT_DAMAGE  :  m_tmSeriousDamage   = tmNow + m_tmSeriousDamageMax;
-        ItemPicked(TRANS("^cFF0000Serious Damage!"), 0);
-        return TRUE;
-      case PUIT_SPEED   :  m_tmSeriousSpeed    = tmNow + m_tmSeriousSpeedMax;
-        ItemPicked(TRANS("^cFF9400Serious Speed"), 0);
-        return TRUE;
-      case PUIT_BOMB    :
-        m_iSeriousBombCount++;
-        ItemPicked(TRANS("^cFF0000Serious Bomb!"), 0);
-        //ItemPicked(TRANS("^cFF0000S^cFFFF00e^cFF0000r^cFFFF00i^cFF0000o^cFFFF00u^cFF0000s ^cFF0000B^cFFFF00o^cFF0000m^cFFFF00b!"), 0);
-        // send computer message
-        if (GetSP()->sp_bCooperative) {
-          EComputerMessage eMsg;
-          eMsg.fnmMessage = CTFILENAME("DataMP\\Messages\\Weapons\\seriousbomb.txt");
-          this->SendEvent(eMsg);
+      switch (((EPowerUp&)ee).puitType)
+      {
+        case PUIT_INVISIB :  m_tmInvisibility    = tmNow + m_tmInvisibilityMax;
+          ItemPicked(TRANS("^cABE3FFInvisibility"), 0);
+          return TRUE;
+
+        case PUIT_INVULNER:  m_tmInvulnerability = tmNow + m_tmInvulnerabilityMax;
+          ItemPicked(TRANS("^c00B440Invulnerability"), 0);
+          return TRUE;
+
+        case PUIT_DAMAGE  :  m_tmSeriousDamage   = tmNow + m_tmSeriousDamageMax;
+          ItemPicked(TRANS("^cFF0000Serious Damage!"), 0);
+          return TRUE;
+
+        case PUIT_SPEED   :  m_tmSeriousSpeed    = tmNow + m_tmSeriousSpeedMax;
+          ItemPicked(TRANS("^cFF9400Serious Speed"), 0);
+          return TRUE;
+
+        case PUIT_BOMB    :
+          m_iSeriousBombCount++;
+          ItemPicked(TRANS("^cFF0000Serious Bomb!"), 0);
+          //ItemPicked(TRANS("^cFF0000S^cFFFF00e^cFF0000r^cFFFF00i^cFF0000o^cFFFF00u^cFF0000s ^cFF0000B^cFFFF00o^cFF0000m^cFFFF00b!"), 0);
+          // send computer message
+          if (GetSP()->sp_bCooperative) {
+            EComputerMessage eMsg;
+            eMsg.fnmMessage = CTFILENAME("DataMP\\Messages\\Weapons\\seriousbomb.txt");
+            this->SendEvent(eMsg);
+          }
+
+          return TRUE;              
         }
-        return TRUE;              
-      }
     }
 
     // nothing picked
