@@ -2053,7 +2053,7 @@ functions:
     if (penClosest != NULL)
     {
       // in deathmatches check for backstab
-      if (!(GetSP()->sp_bCooperative) && IsOfClass(penClosest, "Player"))
+      if (!(GetSP()->sp_bCooperative) && (IsOfClass(penClosest, "Player") || IsOfClass(penClosest, "Santa")))
       {
         FLOAT3D vToTarget = penClosest->GetPlacement().pl_PositionVector - m_penPlayer->GetPlacement().pl_PositionVector;
         FLOAT3D vTargetHeading = FLOAT3D(0.0, 0.0, -1.0f)*penClosest->GetRotationMatrix();
@@ -2208,7 +2208,7 @@ functions:
     if (penClosest != NULL)
     { 
       // in deathmatches check for backstab
-      if (CHAINSAW_BACKSTAB_ENABLED && !(GetSP()->sp_bCooperative) && IsOfClass(penClosest, "Player"))
+      if (CHAINSAW_BACKSTAB_ENABLED && !(GetSP()->sp_bCooperative) && (IsOfClass(penClosest, "Player") || IsOfClass(penClosest, "Santa")))
       {
         FLOAT3D vToTarget = penClosest->GetPlacement().pl_PositionVector - m_penPlayer->GetPlacement().pl_PositionVector;
         FLOAT3D vTargetHeading = FLOAT3D(0.0, 0.0, -1.0f)*penClosest->GetRotationMatrix();
