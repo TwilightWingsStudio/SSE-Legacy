@@ -1914,6 +1914,8 @@ functions:
     m_penAnimator->AddToPrediction();
     m_penView->AddToPrediction();
     m_pen3rdPersonView->AddToPrediction();
+
+    m_penSpectatorCamera->AddToPrediction(); // [SSE] Spectator Camera
   }
 
   // --------------------------------------------------------------------------------------
@@ -2744,7 +2746,6 @@ functions:
 
     INDEX iViewState = m_iViewState;
     
-   
     if (bCamera)
     {
       // [SSE] Spectator Camera
@@ -2782,7 +2783,12 @@ functions:
     ApplyShaking(plViewer);
 
     colBlend = 0;
-    if (iViewState == PVT_SCENECAMERA) {
+    
+    // [SSE] Spectator Camera
+    if (iViewState == PVT_SPECTATORCAMERA) {
+      prPerspectiveProjection.FOVL() = plr_fFOV;
+
+    } else if (iViewState == PVT_SCENECAMERA) {
       CCamera *pcm = (CCamera*)&*m_penCamera;
       prPerspectiveProjection.FOVL() = 
         Lerp(pcm->m_fLastFOV, pcm->m_fFOV, _pTimer->GetLerpFactor());
@@ -2793,6 +2799,7 @@ functions:
       } else {
         colBlend = pcm->m_colFade0;
       }
+
     } else {
       prPerspectiveProjection.FOVL() = aFOV;
     }
@@ -2801,13 +2808,16 @@ functions:
       FLOAT2D(0.0f, 0.0f),
       FLOAT2D((FLOAT)pdp->GetWidth(), (FLOAT)pdp->GetHeight())
     );
+
     // determine front clip plane
     plr_fFrontClipDistance = Clamp( plr_fFrontClipDistance, 0.05f, 0.50f);
     FLOAT fFCD = plr_fFrontClipDistance;
+
     // adjust front clip plane if swimming
     if (m_pstState==PST_SWIM && iViewState==PVT_PLAYEREYES) { fFCD *= 0.6666f; }
     prPerspectiveProjection.FrontClipDistanceL() = fFCD;
     prPerspectiveProjection.AspectRatioL() = 1.0f;
+
     // set up viewer position
     apr = prPerspectiveProjection;
     apr->ViewerPlacementL() = plViewer;
@@ -3090,6 +3100,7 @@ functions:
         ListenFromEntity(penViewer, plViewer);
       }
     }
+
     Stereo_SetBuffer(STEREO_BOTH);
 
     RenderScroll(pdpCamera);
@@ -3180,7 +3191,6 @@ functions:
       }
     }
     
-    
     // [SSE] Spectator Camera
     if (IsSpectatorCameraActive())
     {
@@ -3210,6 +3220,7 @@ functions:
         cmp_ppenDHPlayer = this;
       }
     }
+
     // all done - lock back the original drawport
     pdp->Lock();
   };

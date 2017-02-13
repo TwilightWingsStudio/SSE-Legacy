@@ -30,6 +30,14 @@ components:
   2 texture TEXTURE_MARKER "Models\\Editor\\Vector.tex",
 
 functions:
+  // render particles
+  void RenderParticles(void)
+  {
+    if (Particle_GetViewer()==this) {
+      Particles_ViewerLocal(this);
+    }
+  }
+
   void Toggle()
   {
     m_bActive = !m_bActive;
