@@ -604,6 +604,9 @@
     <ClCompile Include="Randomizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SpectatorCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1662,6 +1665,12 @@
     <ClInclude Include="Randomizer_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SpectatorCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SpectatorCamera_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2593,6 +2602,9 @@
     </CustomBuild>
     <CustomBuild Include="Randomizer.es">
       <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SpectatorCamera.es">
+      <Filter>Class Files\Players</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

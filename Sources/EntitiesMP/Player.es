@@ -57,6 +57,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "EntitiesMP/CreditsHolder.h"
 #include "EntitiesMP/HudPicHolder.h"
 
+#include "EntitiesMP/SpectatorCamera.h"
+
 extern void JumpFromBouncer(CEntity *penToBounce, CEntity *penBouncer);
 // from game
 #define GRV_SHOWEXTRAS  (1L<<0)   // add extra stuff like console, weapon, pause
@@ -72,6 +74,7 @@ enum PlayerViewType {
   1 PVT_PLAYERAUTOVIEW  "",
   2 PVT_SCENECAMERA     "",
   3 PVT_3RDPERSONVIEW   "",
+  4 PVT_SPECTATORCAMERA "",
 };
 
 enum PlayerState {
@@ -348,10 +351,12 @@ extern INDEX cht_bFly          = FALSE;
 extern INDEX cht_bGhost        = FALSE;
 extern INDEX cht_bInvisible    = FALSE;
 extern FLOAT cht_fTranslationMultiplier = 1.0f;
-extern INDEX cht_bEnable     = 0;   
+extern INDEX cht_bEnable       = 0;
+
+extern INDEX cht_bSpectator    = FALSE; // [SSE] Spectator Camera
 
 // Interface Control
-static INDEX hud_bShowAll	    = TRUE; // used internaly in menu/console
+static INDEX hud_bShowAll     = TRUE; // used internaly in menu/console
 extern INDEX hud_bShowWeapon  = TRUE;
 extern INDEX hud_bShowMessages = TRUE;
 extern INDEX hud_bShowInfo    = TRUE;
@@ -579,21 +584,68 @@ DECL_DLL void ctl_ComposeActionPacket(INDEX iPlayer/*const CPlayerCharacter &pc*
       break;
     }
   }
-  // set button pressed flags
-  if (pctlCurrent.bWeaponNext) paAction.pa_ulButtons |= PLACT_WEAPON_NEXT;
-  if (pctlCurrent.bWeaponPrev) paAction.pa_ulButtons |= PLACT_WEAPON_PREV;
-  if (pctlCurrent.bWeaponFlip) paAction.pa_ulButtons |= PLACT_WEAPON_FLIP;
-  if (pctlCurrent.bFire)       paAction.pa_ulButtons |= PLACT_FIRE;
-  if (pctlCurrent.bReload)     paAction.pa_ulButtons |= PLACT_RELOAD;
-  if (pctlCurrent.bUse)        paAction.pa_ulButtons |= PLACT_USE|PLACT_USE_HELD|PLACT_SNIPER_USE;
-  if (pctlCurrent.bComputer)      paAction.pa_ulButtons |= PLACT_COMPUTER;
-  if (pctlCurrent.b3rdPersonView) paAction.pa_ulButtons |= PLACT_3RD_PERSON_VIEW;
-  if (pctlCurrent.bCenterView)    paAction.pa_ulButtons |= PLACT_CENTER_VIEW;
-  // is 'use' being held?
-  if (pctlCurrent.bUseOrComputer) paAction.pa_ulButtons |= PLACT_USE_HELD|PLACT_SNIPER_USE;
-  if (pctlCurrent.bSniperZoomIn)  paAction.pa_ulButtons |= PLACT_SNIPER_ZOOMIN;
-  if (pctlCurrent.bSniperZoomOut) paAction.pa_ulButtons |= PLACT_SNIPER_ZOOMOUT;
-  if (pctlCurrent.bFireBomb)      paAction.pa_ulButtons |= PLACT_FIREBOMB;
+  
+  // [SSE] Spectator Camera
+  if (penThis->IsSpectatorCameraActive() && !((CSpectatorCamera*)&*penThis->m_penSpectatorCamera)->m_bPlayerControl)
+  {
+    // Forward
+    if (pctlCurrent.bMoveForward) {
+      paAction.pa_ulButtons |= PLACT_WEAPON_FLIP;
+    }
+
+    // Backward
+    if (pctlCurrent.bMoveBackward) {
+      paAction.pa_ulButtons |= PLACT_RELOAD;
+    }
+
+    // Left
+    if (pctlCurrent.bMoveLeft) {
+      paAction.pa_ulButtons |= PLACT_WEAPON_PREV;
+    }
+
+    // Right
+    if (pctlCurrent.bMoveRight) {
+      paAction.pa_ulButtons |= PLACT_WEAPON_NEXT;
+    }
+    
+    // Up
+    if (pctlCurrent.bMoveUp) {
+      paAction.pa_ulButtons |= PLACT_CENTER_VIEW;
+    }
+    
+    // Down
+    if (pctlCurrent.bMoveDown) {
+      paAction.pa_ulButtons |= PLACT_COMPUTER;
+    }
+
+    // Acceleration
+    if (pctlCurrent.bFire) {
+      paAction.pa_ulButtons |= PLACT_FIRE;
+    }
+
+    // view
+    if (pctlCurrent.b3rdPersonView) {
+      paAction.pa_ulButtons |= PLACT_3RD_PERSON_VIEW;
+    }
+
+  // Default Controls
+  } else {
+    // set button pressed flags
+    if (pctlCurrent.bWeaponNext) paAction.pa_ulButtons |= PLACT_WEAPON_NEXT;
+    if (pctlCurrent.bWeaponPrev) paAction.pa_ulButtons |= PLACT_WEAPON_PREV;
+    if (pctlCurrent.bWeaponFlip) paAction.pa_ulButtons |= PLACT_WEAPON_FLIP;
+    if (pctlCurrent.bFire)       paAction.pa_ulButtons |= PLACT_FIRE;
+    if (pctlCurrent.bReload)     paAction.pa_ulButtons |= PLACT_RELOAD;
+    if (pctlCurrent.bUse)        paAction.pa_ulButtons |= PLACT_USE|PLACT_USE_HELD|PLACT_SNIPER_USE;
+    if (pctlCurrent.bComputer)      paAction.pa_ulButtons |= PLACT_COMPUTER;
+    if (pctlCurrent.b3rdPersonView) paAction.pa_ulButtons |= PLACT_3RD_PERSON_VIEW;
+    if (pctlCurrent.bCenterView)    paAction.pa_ulButtons |= PLACT_CENTER_VIEW;
+    // is 'use' being held?
+    if (pctlCurrent.bUseOrComputer) paAction.pa_ulButtons |= PLACT_USE_HELD|PLACT_SNIPER_USE;
+    if (pctlCurrent.bSniperZoomIn)  paAction.pa_ulButtons |= PLACT_SNIPER_ZOOMIN;
+    if (pctlCurrent.bSniperZoomOut) paAction.pa_ulButtons |= PLACT_SNIPER_ZOOMOUT;
+    if (pctlCurrent.bFireBomb)      paAction.pa_ulButtons |= PLACT_FIREBOMB;
+  }
 
   // if userorcomp just pressed
   if (pctlCurrent.bUseOrComputer && !pctlCurrent.bUseOrComputerLast) {
@@ -840,6 +892,7 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("user INDEX cht_bRevive;", &cht_bRevive);             // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bInfiniteAmmo;", &cht_bInfiniteAmmo); // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bOpen;",      &cht_bOpen);
+  _pShell->DeclareSymbol("user INDEX cht_bSpectator;",      &cht_bSpectator);  // [SSE] Spectator Camera
   _pShell->DeclareSymbol("user INDEX cht_bAllKeys;", &cht_bAllKeys);           // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bAllMessages;", &cht_bAllMessages);
   _pShell->DeclareSymbol("user FLOAT cht_fTranslationMultiplier ;", &cht_fTranslationMultiplier);
@@ -1078,6 +1131,7 @@ properties:
   6 FLOAT m_fMaxHealth = 1,                 // default health supply player can have
   7 INDEX m_ulFlags = 0,                      // various flags
   
+ 10 CEntityPointer m_penSpectatorCamera,      // [SSE] Spectator Camera
  15 CEntityPointer m_penSettings,             // [SSE] Player Settings Entity
  16 CEntityPointer m_penWeapons,              // player weapons
  17 CEntityPointer m_penAnimator,             // player animator
@@ -1263,6 +1317,8 @@ components:
   4 class   CLASS_BASIC_EFFECT    "Classes\\BasicEffect.ecl",
   5 class   CLASS_BLOOD_SPRAY     "Classes\\BloodSpray.ecl", 
   6 class   CLASS_SERIOUSBOMB     "Classes\\SeriousBomb.ecl",
+  
+ 10 class   CLASS_SPECTATOR_CAMERA "Classes\\SpectatorCamera.ecl",
 
 // gender specific sounds - make sure that offset is exactly 100 
  50 sound SOUND_WATER_ENTER     "Sounds\\Player\\WaterEnter.wav",
@@ -1462,6 +1518,152 @@ functions:
     //CheatAllMessagesDir("Data\\Messages\\weapons\\", CMF_READ);
     //CheatAllMessagesDir("Data\\Messages\\enemies\\", CMF_READ);
     // ... or not
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Spectator Camera
+  // --------------------------------------------------------------------------------------
+  void SpectatorControl()
+  {
+    CSpectatorCamera *pen = (CSpectatorCamera*)&*m_penSpectatorCamera;
+    
+    // Use.
+    if (ulNewButtons & PLACT_USE) {
+      pen->TogglePlayerControl();
+      pen->StopCamera();
+    }
+    
+    // Forward.
+    if (ulNewButtons & PLACT_WEAPON_FLIP) {
+      pen->m_bButtonUp = TRUE;
+    }
+
+    // Backward.
+    if (ulNewButtons & PLACT_RELOAD) {
+      pen->m_bButtonDown = TRUE;
+    }
+
+    // Left.
+    if (ulNewButtons & PLACT_WEAPON_PREV) {
+      pen->m_bButtonLeft = TRUE;
+    }
+
+    // Right.
+    if (ulNewButtons & PLACT_WEAPON_NEXT) {
+      pen->m_bButtonRight = TRUE;
+    }
+    
+    // Up.
+    if (ulNewButtons & PLACT_CENTER_VIEW) {
+      pen->m_bButtonMUp = TRUE;
+    }
+    
+    // Down.
+    if (ulNewButtons & PLACT_COMPUTER) {
+      pen->m_bButtonMDown = TRUE;
+    }
+    
+    // Speed Up.
+    if (ulNewButtons & PLACT_FIRE) {
+      pen->m_bButtonFire = TRUE;
+    }
+    
+    // Released.
+    if (ulReleasedButtons & PLACT_WEAPON_FLIP) {
+      pen->m_bButtonUp = FALSE;
+    }
+
+    if (ulReleasedButtons & PLACT_RELOAD) {
+      pen->m_bButtonDown = FALSE;
+    }
+
+    if (ulReleasedButtons & PLACT_WEAPON_PREV) {
+      pen->m_bButtonLeft = FALSE;
+    }
+
+    if (ulReleasedButtons & PLACT_WEAPON_NEXT) {
+      pen->m_bButtonRight = FALSE;
+    }
+    
+    // Stop Move Up.
+    if (ulReleasedButtons & PLACT_CENTER_VIEW) {
+      pen->m_bButtonMUp = FALSE;
+    }
+    
+    // Stop Move Down.
+    if (ulReleasedButtons & PLACT_COMPUTER) {
+      pen->m_bButtonMDown = FALSE;
+    }
+
+    // Stop Acceleration.
+    if (ulReleasedButtons & PLACT_FIRE) {
+      pen->m_bButtonFire = FALSE;
+    }
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Spectator Camera
+  // Returns TRUE if spectator camera is active.
+  // --------------------------------------------------------------------------------------
+  BOOL IsSpectatorCameraActive()
+  {
+    // TODO: Put assert.
+    
+    if (m_penSpectatorCamera == NULL) {
+      return FALSE;
+    }
+    
+    if (((CSpectatorCamera*)&*m_penSpectatorCamera)->m_bActive) {
+      return TRUE;
+    }
+    
+    return FALSE;
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Spectator Camera
+  // Enables / Disables spectator camera.
+  // --------------------------------------------------------------------------------------
+  void ToggleSpectatorCamera()
+  {
+    ((CSpectatorCamera*)&*m_penSpectatorCamera)->Toggle();
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Spectator Camera
+  // Starts spectator camera from player position.
+  // --------------------------------------------------------------------------------------
+  void StartSpectatorCameraFromOwner()
+  {
+    if (m_penSpectatorCamera == NULL) {
+      return;
+    }
+    
+    CPlacement3D pl = CPlacement3D(GetPlacement().pl_PositionVector + FLOAT3D(0, 1.5f, -1) * GetRotationMatrix(), GetPlacement().pl_OrientationAngle);
+    m_penSpectatorCamera->SetPlacement(pl);
+    
+    ((CSpectatorCamera*)&*m_penSpectatorCamera)->Toggle();
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Spectator Camera
+  // Creates and initializes spectator camera.
+  // --------------------------------------------------------------------------------------
+  void CreateSpectatorCamera(void)
+  {
+      if (IsPredictor()) { // laggg
+          return;
+      }
+
+      CPlacement3D pl = CPlacement3D(GetPlacement().pl_PositionVector + FLOAT3D(0, 1.5f, -1) * GetRotationMatrix(), GetPlacement().pl_OrientationAngle);
+      CEntityPointer penCamera = CreateEntity(pl, CLASS_SPECTATOR_CAMERA);
+      CSpectatorCamera *pen = (CSpectatorCamera*)&*penCamera;
+      
+      pen->m_penOwner = this;
+      
+      pen->Initialize();
+
+      m_penSpectatorCamera = pen;
   }
 
   // --------------------------------------------------------------------------------------
@@ -2542,10 +2744,21 @@ functions:
 
     INDEX iViewState = m_iViewState;
     
-    if (m_penCamera!=NULL && bCamera) {
-      iViewState = PVT_SCENECAMERA;
-      plViewer = m_penCamera->GetLerpedPlacement();
-      penViewer = m_penCamera;
+   
+    if (bCamera)
+    {
+      // [SSE] Spectator Camera
+      if (IsSpectatorCameraActive()) {
+        iViewState = PVT_SPECTATORCAMERA;
+        plViewer = m_penSpectatorCamera->GetLerpedPlacement();
+        penViewer = m_penSpectatorCamera;
+
+      // If possible then render view from [Camera] entity.
+      } else if (m_penCamera != NULL) {
+        iViewState = PVT_SCENECAMERA;
+        plViewer = m_penCamera->GetLerpedPlacement();
+        penViewer = m_penCamera;
+      }
     }
 
     // init projection parameters
@@ -2770,6 +2983,71 @@ functions:
     }
     // [SSE] Respawn Sign END
   }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Spectator Camera
+  // Render view from spectator camera.
+  // --------------------------------------------------------------------------------------
+  void RenderSpectatorCameraView(CDrawPort *pdp)
+  {
+    CDrawPort dpCamera;
+    CDrawPort *pdpCamera = pdp;
+
+    pdp->Unlock();
+    pdpCamera->Lock();
+
+    CAnyProjection3D apr;
+    CEntity *penViewer;
+    CPlacement3D plViewer;
+    COLOR colBlend;
+
+    // for each eye
+    for (INDEX iEye=STEREO_LEFT; iEye<=(Stereo_IsEnabled()?STEREO_RIGHT:STEREO_LEFT); iEye++)
+    {
+      // setup view settings
+      SetupView(pdpCamera, apr, penViewer, plViewer, colBlend, TRUE);
+
+      // setup stereo rendering
+      Stereo_SetBuffer(iEye);
+      Stereo_AdjustProjection(*apr, iEye, 1);
+
+      // render the view
+      ASSERT(IsValidFloat(plViewer.pl_OrientationAngle(1))&&IsValidFloat(plViewer.pl_OrientationAngle(2))&&IsValidFloat(plViewer.pl_OrientationAngle(3)));
+      _ulPlayerRenderingMask = 1<<GetMyPlayerIndex();
+      RenderView(*en_pwoWorld, *penViewer, apr, *pdpCamera);
+      _ulPlayerRenderingMask = 0;
+
+      // listen from there if needed
+      if (iEye == STEREO_LEFT) {
+        ListenFromEntity(penViewer, plViewer);
+      }
+    }
+
+    Stereo_SetBuffer(STEREO_BOTH);
+
+    // add world glaring
+    {
+      COLOR colGlare = GetWorldGlaring();
+      UBYTE ubR, ubG, ubB, ubA;
+      ColorToRGBA(colGlare, ubR, ubG, ubB, ubA);
+      if (ubA!=0) {
+        pdpCamera->dp_ulBlendingRA += ULONG(ubR)*ULONG(ubA);
+        pdpCamera->dp_ulBlendingGA += ULONG(ubG)*ULONG(ubA);
+        pdpCamera->dp_ulBlendingBA += ULONG(ubB)*ULONG(ubA);
+        pdpCamera->dp_ulBlendingA  += ULONG(ubA);
+      }
+      // do all queued screen blendings
+      pdpCamera->BlendScreen();
+    }
+
+    pdpCamera->Unlock();
+    pdp->Lock();
+
+    // camera fading
+    if ((colBlend&CT_AMASK)!=0) {
+      pdp->Fill(colBlend);
+    }
+  }
 
   // --------------------------------------------------------------------------------------
   // Render view from camera.
@@ -2892,7 +3170,7 @@ functions:
       m_penActionMarker==NULL;
 
     // if dualhead, or no camera active
-    if (bDualHead||m_penCamera==NULL) {
+    if (bDualHead || (m_penCamera == NULL && !IsSpectatorCameraActive())) {
       // make left player view
       CDrawPort dpView(pdp, TRUE);
       if (dpView.Lock()) {
@@ -2901,16 +3179,29 @@ functions:
         dpView.Unlock();
       }
     }
+    
+    
+    // [SSE] Spectator Camera
+    if (IsSpectatorCameraActive())
+    {
+      CDrawPort dpView(pdp, TRUE);
 
+      if (dpView.Lock()) {
+        // draw it, listen if not dualhead
+        RenderSpectatorCameraView(&dpView);
+        dpView.Unlock();
+      }
+    
     // if camera active
-    if (m_penCamera!=NULL) {
+    } else if (m_penCamera != NULL) {
       // make left or right camera view
-      CDrawPort dpView(pdp, m_penActionMarker!=NULL);
+      CDrawPort dpView(pdp, m_penActionMarker != NULL);
       if (dpView.Lock()) {
         // draw it, listen if not dualhead
         RenderCameraView(&dpView, !bDualHead);
         dpView.Unlock();
       }
+
     // if camera is not active
     } else {
       // if dualhead
@@ -4186,20 +4477,33 @@ functions:
       }
     }
     
-    // if alive
-    if (GetFlags() & ENF_ALIVE) {
-      // if not in auto-action mode
-      if (m_penActionMarker==NULL) {
-        // apply actions
-        AliveActions(paAction);
-      // if in auto-action mode
-      } else {
-        // do automatic actions
-        AutoActions(paAction);
-      }
-    // if not alive rotate camera view and rebirth on fire
+    // [SSE] Spectator Camera
+    if (IsSpectatorCameraActive() && !((CSpectatorCamera*)&*m_penSpectatorCamera)->m_bPlayerControl) {
+      ((CSpectatorCamera*)&*m_penSpectatorCamera)->Rotation(paAction.pa_aRotation);
+      
+      SpectatorControl();
     } else {
-      DeathActions(paAction);
+      if (IsSpectatorCameraActive() && ((CSpectatorCamera*)&*m_penSpectatorCamera)->m_bPlayerControl) {
+        if (ulNewButtons & PLACT_USE) {
+          ((CSpectatorCamera*)&*m_penSpectatorCamera)->TogglePlayerControl();
+        }
+      }
+      
+      // if alive
+      if (GetFlags() & ENF_ALIVE) {
+        // if not in auto-action mode
+        if (m_penActionMarker==NULL) {
+          // apply actions
+          AliveActions(paAction);
+        // if in auto-action mode
+        } else {
+          // do automatic actions
+          AutoActions(paAction);
+        }
+      // if not alive rotate camera view and rebirth on fire
+      } else {
+        DeathActions(paAction);
+      }
     }
 
     if (Abs(_pTimer->CurrentTick()-m_tmAnalyseEnd)<_pTimer->TickQuantum*2) {
@@ -5249,6 +5553,17 @@ functions:
     if (cht_bGiveAll) {
       cht_bGiveAll = FALSE;
       ((CPlayerWeapons&)*m_penWeapons).CheatGiveAll();
+    }
+    
+    // [SSE] Spectator Camera
+    if (cht_bSpectator) {
+      cht_bSpectator = FALSE;
+
+      if (IsSpectatorCameraActive()) {
+        ToggleSpectatorCamera();
+      } else {
+        StartSpectatorCameraFromOwner();
+      }
     }
 
     if (cht_bKillAll) {
@@ -7295,6 +7610,8 @@ procedures:
     EAnimatorInit eInitAnimator;
     eInitAnimator.penPlayer = this;
     m_penAnimator->Initialize(eInitAnimator);
+    
+    CreateSpectatorCamera(); // [SSE] Spectator Camera
 
     // set sound default parameters
     m_soMouth.Set3DParameters(50.0f, 10.0f, 1.0f, 1.0f);
@@ -7481,6 +7798,10 @@ procedures:
     // cease to exist
     m_penWeapons->Destroy();
     m_penAnimator->Destroy();
+    
+    if (m_penSpectatorCamera != NULL) {
+      m_penSpectatorCamera->Destroy();
+    }
 
     if (m_penView != NULL) {
       m_penView->Destroy();
