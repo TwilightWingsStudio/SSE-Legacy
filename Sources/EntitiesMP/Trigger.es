@@ -366,7 +366,7 @@ procedures:
       on (ETrigger eTrigger) : {
         if (m_fMinTime > 0 && m_tmLastTriggered != 0 && (_pTimer->CurrentTick() - m_fMinTime) < m_tmLastTriggered) {
           if (m_bDebug) {
-            CPrintF(TRANS(["[%s] : received Trigger event, but min Time was not reached\n"), m_strName);
+            CPrintF(TRANS("[%s] : received Trigger event, but min Time was not reached\n"), m_strName);
           }
           resume;
         }
