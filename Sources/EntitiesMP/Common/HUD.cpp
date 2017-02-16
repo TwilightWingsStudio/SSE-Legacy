@@ -163,6 +163,8 @@ static CTextureObject _toSniperArrow;
 static CTextureObject _toSniperEye;
 static CTextureObject _toSniperLed;
 
+static BOOL _bHUDAssetsLoaded = FALSE; // [SSE] HUD No Crash If No Assets
+
 // all info about color transitions
 struct ColorTransitionTable {
   COLOR ctt_colFine;      // color for values over 1.0
@@ -207,6 +209,7 @@ static struct AmmoInfo _aaiAmmo[8] = {
   { &_toAIronBall,      &_awiWeapons[14], NULL,             0, 0, 0, -9, FALSE }, //  6
   { &_toASniperBullets, &_awiWeapons[13], NULL,             0, 0, 0, -9, FALSE }, //  7
 };
+
 static const INDEX aiAmmoRemap[8] = { 0, 1, 2, 3, 4, 7, 5, 6 };
 
 struct WeaponInfo _awiWeapons[18] = {
@@ -897,6 +900,8 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
 {
   // no player - no info, sorry
   if (penPlayerCurrent == NULL || (penPlayerCurrent->GetFlags()&ENF_DELETED)) return;
+  
+  if (!_bHUDAssetsLoaded) return;
 
   // if snooping and owner player ins NULL, return
   if (bSnooping && penPlayerOwner == NULL) return;
@@ -1438,7 +1443,7 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
 
     HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
     HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
-    HUD_DrawText(   fCol+fAdv, fRow, strValue,  colMana, 1.0f);
+    HUD_DrawText(   fCol+fAdv, fRow, strValue,  C_lGRAY, 1.0f);
     HUD_DrawIcon(   fCol,      fRow, _toExtraLive, C_WHITE /*colMana*/, 1.0f, FALSE);
   }
   //
@@ -1537,7 +1542,8 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
 extern void InitHUD(void)
 {
   CPrintF("Loading HUD assets...\n");
-  // try to
+
+  // Try to load all stuff.
   try {
     // initialize and load HUD numbers font
     DECLARE_CTFILENAME( fnFont, "Fonts\\Numbers3.fnt");
@@ -1652,9 +1658,97 @@ extern void InitHUD(void)
     ((CTextureData*)_toSniperLed.GetData())->Force(TEX_CONSTANT);
 
   } catch( char *strError) {
-    FatalError( strError);
+    CPrintF("  failed! %s\n", strError);
+    _bHUDAssetsLoaded = FALSE;
+    return;
+  }
+  
+  _bHUDAssetsLoaded = TRUE;
+
+  CPrintF("  done.\n");
+}
+
+static void ReloadTextureData_t(CTextureObject *tobj)
+{
+  if (tobj == NULL) {
+    return;
   }
 
+  if (tobj->GetData() == NULL) {
+    return;
+  }
+
+  CTextureData *ptd = (CTextureData*)tobj->GetData();
+  ptd->Reload();
+  ptd->td_tpLocal.Clear();
+}
+
+extern void HUD_ReloadSS(void* pArgs)
+{
+  if (!_bHUDAssetsLoaded) {
+    InitHUD();
+  }
+  
+  CPrintF("Refreshing HUD assets...\n");
+  
+  if (_bHUDAssetsLoaded)
+  {
+    try {
+      ReloadTextureData_t(&_toHealth);
+      ReloadTextureData_t(&_toOxygen);
+      ReloadTextureData_t(&_toFrags);
+      ReloadTextureData_t(&_toDeaths);
+      ReloadTextureData_t(&_toScore);
+      ReloadTextureData_t(&_toHiScore);
+      ReloadTextureData_t(&_toMessage);
+      ReloadTextureData_t(&_toMana);
+      ReloadTextureData_t(&_toArmorSmall);
+      ReloadTextureData_t(&_toArmorMedium);
+      ReloadTextureData_t(&_toArmorLarge);
+
+      ReloadTextureData_t(&_toExtraLive);
+
+      ReloadTextureData_t(&_toAShells);
+      ReloadTextureData_t(&_toABullets);
+      ReloadTextureData_t(&_toARockets);
+      ReloadTextureData_t(&_toAGrenades);
+      ReloadTextureData_t(&_toANapalm);
+      ReloadTextureData_t(&_toAElectricity);
+      ReloadTextureData_t(&_toAIronBall);
+      ReloadTextureData_t(&_toASniperBullets);
+      ReloadTextureData_t(&_toASeriousBomb);
+
+      ReloadTextureData_t(&_toWKnife);
+      ReloadTextureData_t(&_toWColt);
+      ReloadTextureData_t(&_toWSingleShotgun);
+      ReloadTextureData_t(&_toWDoubleShotgun);
+      ReloadTextureData_t(&_toWTommygun);
+      ReloadTextureData_t(&_toWRocketLauncher);
+      ReloadTextureData_t(&_toWGrenadeLauncher);
+      ReloadTextureData_t(&_toWChainsaw);
+      ReloadTextureData_t(&_toWLaser);
+      ReloadTextureData_t(&_toWIronCannon);
+      ReloadTextureData_t(&_toWSniper);
+      ReloadTextureData_t(&_toWMinigun);
+      ReloadTextureData_t(&_toWFlamer);
+
+      ReloadTextureData_t(&_atoPowerups[0]);
+      ReloadTextureData_t(&_atoPowerups[1]);
+      ReloadTextureData_t(&_atoPowerups[2]);
+      ReloadTextureData_t(&_atoPowerups[3]);
+      ReloadTextureData_t(&_toTile);
+      ReloadTextureData_t(&_toSniperMask);
+      ReloadTextureData_t(&_toSniperWheel);
+      ReloadTextureData_t(&_toSniperArrow);
+      ReloadTextureData_t(&_toSniperEye);
+      ReloadTextureData_t(&_toSniperLed);
+    } catch( char *strError) {
+      CPrintF("  failed! %s\n", strError);
+      _bHUDAssetsLoaded = FALSE;
+      return;
+    }
+  }
+  
   CPrintF("  done.\n");
 }
 

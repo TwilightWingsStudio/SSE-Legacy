@@ -387,6 +387,8 @@ extern FLOAT hud_fSniperScopeZoomTextOpacity = 0.7F;
 extern FLOAT hud_fSniperScopeZoomIconOpacity = 0.6F;
 
 extern BOOL hud_bSniperScopeWheelColoring = TRUE;
+
+extern void HUD_ReloadSS(void* pArgs);
 // [SSE] END
 
 extern FLOAT plr_fBreathingStrength = 0.0f;
@@ -866,6 +868,7 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeZoomTextOpacity;",  &hud_fSniperScopeZoomTextOpacity);
   _pShell->DeclareSymbol("persistent user FLOAT hud_fSniperScopeZoomIconOpacity;",  &hud_fSniperScopeZoomIconOpacity);
   _pShell->DeclareSymbol("persistent user INDEX hud_bSniperScopeWheelColoring;",  &hud_bSniperScopeWheelColoring);
+  _pShell->DeclareSymbol("user void hud_Reload(void);",  &HUD_ReloadSS);
   //
   
   _pShell->DeclareSymbol("INDEX cht_bKillFinalBoss;",  &cht_bKillFinalBoss);
