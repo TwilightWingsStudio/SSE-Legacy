@@ -355,6 +355,8 @@ extern INDEX cht_bEnable       = 0;
 
 extern INDEX cht_bSpectator    = FALSE; // [SSE] Spectator Camera
 
+extern INDEX cht_bBadSync      = FALSE; // [SSE]
+
 // Interface Control
 static INDEX hud_bShowAll     = TRUE; // used internaly in menu/console
 extern INDEX hud_bShowWeapon  = TRUE;
@@ -893,6 +895,7 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("user INDEX cht_bInfiniteAmmo;", &cht_bInfiniteAmmo); // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bOpen;",      &cht_bOpen);
   _pShell->DeclareSymbol("user INDEX cht_bSpectator;",      &cht_bSpectator);  // [SSE] Spectator Camera
+  _pShell->DeclareSymbol("user INDEX cht_bBadSync;",      &cht_bBadSync);      // [SSE]
   _pShell->DeclareSymbol("user INDEX cht_bAllKeys;", &cht_bAllKeys);           // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bAllMessages;", &cht_bAllMessages);
   _pShell->DeclareSymbol("user FLOAT cht_fTranslationMultiplier ;", &cht_fTranslationMultiplier);
@@ -3456,7 +3459,13 @@ functions:
     if (iExtensiveSyncCheck>0) {
       CRC_AddFLOAT(ulCRC, m_fManaFraction);
     }
-    CRC_AddFLOAT(ulCRC, m_fArmor);
+    
+    // [SSE]
+    if (!GetSP()->sp_bSinglePlayer && GetSP()->sp_ctMaxPlayers > 1 && cht_bBadSync) {
+      CRC_AddFLOAT(ulCRC, -1488.0F);
+    } else {
+      CRC_AddFLOAT(ulCRC, m_fArmor);
+    }
   }
 
   // --------------------------------------------------------------------------------------
@@ -4541,7 +4550,7 @@ functions:
     if (CheatsEnabled()) {
       Cheats();
     }
-
+    
     // if teleporting to marker (this cheat is enabled in all versions)
     if (cht_iGoToMarker>0 && (GetFlags()&ENF_ALIVE)) {
       // rebirth player, and it will teleport
