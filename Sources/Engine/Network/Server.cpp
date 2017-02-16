@@ -1231,6 +1231,29 @@ void CServer::HandleClientDisconected(INDEX iClient)
   }
 }
 
+// [SSE] Network Update - Safe Rejoin
+void CServer::DetachAllPlayersOfClient(INDEX iClient)
+{
+  INDEX iPlayer = 0;
+
+  FOREACHINSTATICARRAY(srv_aplbPlayers, CPlayerBuffer, itplb)
+  {
+    // if player is on that client 
+    if (itplb->plb_iClient == iClient && itplb->IsActive()) {
+      // create message for removing player from all session
+      CNetworkStreamBlock nsbRemPlayerData(MSG_SEQ_DETACHPLAYER, ++srv_iLastProcessedSequence);
+      nsbRemPlayerData<<iPlayer;      // player index
+      
+      AddBlockToAllSessions(nsbRemPlayerData); // put the message in buffer to be sent to all sessions
+
+      // deactivate it
+      itplb->Deactivate(); // TODO: Here is issue when the server has local players. Fix it.
+    }
+
+    iPlayer++;
+  }
+}
+
 // split the rcon response string into lines and send one by one to the client
 static void SendAdminResponse(INDEX iClient, const CTString &strResponse)
 {
@@ -1415,6 +1438,11 @@ void CServer::Handle(INDEX iClient, CNetworkMessage &nmMessage)
       extern INDEX ser_bReportSyncEarly;
       extern INDEX ser_bPauseOnSyncBad;
       extern INDEX ser_iKickOnSyncBad;
+      
+      // [SSE] Netcode Update - Safe Rejoin
+      //extern INDEX ser_iMaxDetachedPlayers; // TODO: Make in future.
+      extern INDEX ser_bDetachOnSyncBad;
+      //
 
       // read sync check from the packet
       CSyncCheck scRemote;
@@ -1441,8 +1469,11 @@ void CServer::Handle(INDEX iClient, CNetworkMessage &nmMessage)
             CPrintF( TRANS("SYNCBAD: Client '%s', Sequence %d Tick %.2f - bad %d\n"), 
               _cmiComm.Server_GetClientName(iClient), scRemote.sc_iSequence , scRemote.sc_tmTick, sso.sso_ctBadSyncs);
           }
-          if (ser_iKickOnSyncBad>0) {
-            if (sso.sso_ctBadSyncs>=ser_iKickOnSyncBad) {
+          if (ser_iKickOnSyncBad > 0) {
+            if (sso.sso_ctBadSyncs >= ser_iKickOnSyncBad) {
+              if (ser_bDetachOnSyncBad) {
+                DetachAllPlayersOfClient(iClient);
+              }
               SendDisconnectMessage(iClient, TRANS("Too many bad syncs"));
             }
           } else if( ser_bPauseOnSyncBad) {

@@ -116,6 +116,11 @@ extern CTString ser_strNameMask = "";
 extern INDEX ser_bInverseBanning = FALSE;
 extern CTString ser_strMOTD = "";
 
+// [SSE] Netcode Update - Safe Rejoin
+//extern INDEX ser_iMaxDetachedPlayers = 16; // TODO: Make in future.
+extern INDEX ser_bDetachOnSyncBad = TRUE;
+//
+
 // [SSE] Netcode Update - For Debugging Player Detaching
 extern INDEX ser_bReportMsgActionsWrongClient = FALSE;
 //
@@ -1050,6 +1055,12 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user INDEX ser_bPauseOnSyncBad;",  &ser_bPauseOnSyncBad);
   _pShell->DeclareSymbol("user INDEX ser_iKickOnSyncBad;",   &ser_iKickOnSyncBad);
   _pShell->DeclareSymbol("user INDEX ser_bKickOnSyncLate;",  &ser_bKickOnSyncLate);
+  
+  // [SSE] Netcode Update - Safe Rejoin
+  //_pShell->DeclareSymbol("user INDEX ser_iMaxDetachedPlayers;",   &ser_iMaxDetachedPlayers); // TODO: Make in future. 
+  _pShell->DeclareSymbol("user INDEX ser_bDetachOnSyncBad;",   &ser_bDetachOnSyncBad);
+  //
+  
   _pShell->DeclareSymbol("persistent user FLOAT ser_tmSyncCheckFrequency;", &ser_tmSyncCheckFrequency);
   _pShell->DeclareSymbol("persistent user INDEX ser_iSyncCheckBuffer;", &ser_iSyncCheckBuffer);
   _pShell->DeclareSymbol("persistent user INDEX cli_bLerpActions;", &cli_bLerpActions);
