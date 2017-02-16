@@ -24,13 +24,17 @@ properties:
   19 BOOL m_bButtonMUp = FALSE,
   20 BOOL m_bButtonMDown = FALSE,
   21 BOOL m_bButtonFire = FALSE,
+  
+  30 ANGLE3D m_a3dRotationAngle = ANGLE3D(0, 0, 0),
 
 components:
   1 model MODEL_MARKER "Models\\Editor\\Axis.mdl",
   2 texture TEXTURE_MARKER "Models\\Editor\\Vector.tex",
 
 functions:
-  // render particles
+  // --------------------------------------------------------------------------------------
+  // Render particles.
+  // --------------------------------------------------------------------------------------
   void RenderParticles(void)
   {
     if (Particle_GetViewer()==this) {
@@ -38,34 +42,50 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
+  // Toggles what camera is active.
+  // --------------------------------------------------------------------------------------
   void Toggle()
   {
     m_bActive = !m_bActive;
   }
   
+  // --------------------------------------------------------------------------------------
+  // Toggles player control.
+  // --------------------------------------------------------------------------------------
   void TogglePlayerControl()
   {
     m_bPlayerControl = !m_bPlayerControl;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Called before PreMoving() so we don't need to use PreMoving()
+  // --------------------------------------------------------------------------------------
   void Rotation(ANGLE3D a3dRotation)
   {
     if (!m_bActive) {
       return;
     }
 
-    //a3dRotation *= 10;
-    SetDesiredRotation(a3dRotation);
-    
-    if (GetPlacement().pl_OrientationAngle(3) != 0) {
-      ANGLE3D a3dOrientation = ANGLE3D(GetPlacement().pl_OrientationAngle(1), GetPlacement().pl_OrientationAngle(2), 0);
-      SetPlacement(CPlacement3D(GetPlacement().pl_PositionVector, a3dOrientation));
-    }
+    a3dRotation *= _pTimer->TickQuantum;
+
+    m_a3dRotationAngle = GetPlacement().pl_OrientationAngle;
+    m_a3dRotationAngle(1) += a3dRotation(1);
+    m_a3dRotationAngle(2) = Clamp(m_a3dRotationAngle(2) + a3dRotation(2), -90.0F, 90.0F);
+
+    en_plLastPlacement = en_plPlacement; // Store last placement.
   }
 
-  void Moving(void)
+  // --------------------------------------------------------------------------------------
+  // Called every time after processing movement.
+  // --------------------------------------------------------------------------------------
+  void PostMoving()
   {
-    FLOAT fSpeed = 25;
+    if (m_penOwner == NULL) {
+      return;
+    }
+    
+    FLOAT fSpeed = 1;
     
     FLOAT3D vSpeed = FLOAT3D(0, 0, 0);
     
@@ -98,14 +118,20 @@ functions:
       vSpeed(3) = 0;
     }
     
-    SetDesiredTranslation(vSpeed);
+    SetPlacement(CPlacement3D(GetPlacement().pl_PositionVector + vSpeed * GetRotationMatrix(), m_a3dRotationAngle));
   }
 
+  // --------------------------------------------------------------------------------------
+  // Reduces lagging.
+  // --------------------------------------------------------------------------------------
   void AddDependentsToPrediction(void)
   {
     m_penOwner->AddToPrediction();
   }
 
+  // --------------------------------------------------------------------------------------
+  // Forces full stop and resets all buttons.
+  // --------------------------------------------------------------------------------------
   void StopCamera(void)
   {
     // stop all buttons
@@ -124,11 +150,16 @@ functions:
   }
 
 procedures:
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main(EVoid)
   {
     if (m_penOwner == NULL) {
       Destroy();
     }
+    
+    m_a3dRotationAngle = GetPlacement().pl_OrientationAngle;
 
     SetPredictable(TRUE);
     InitAsEditorModel();
@@ -140,16 +171,15 @@ procedures:
     SetModel(MODEL_MARKER);
     SetModelMainTexture(TEXTURE_MARKER);
     
-    autowait(0.05f);
+    autowait(_pTimer->TickQuantum);
     
     while (TRUE)
     {
       if (m_penOwner == NULL) {
         return;
       }
-      
-      Moving();
-      autowait(0.05f);
+
+      autowait(_pTimer->TickQuantum);
     }
     
     Destroy();
