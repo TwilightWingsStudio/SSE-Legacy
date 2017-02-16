@@ -181,6 +181,8 @@ extern INDEX net_iMaxLocalPlayersPerClient = 4;
 
 extern INDEX ent_bReportSpawnInWall = FALSE;
 
+extern INDEX ent_bReportClassLoad = FALSE; // [SSE] Extended Class Check
+
 extern FLOAT cmd_tmTick = 0.0f;
 extern CTString cmd_cmdOnTick = "";
 extern CTString cmd_strChatSender = "";
@@ -1042,6 +1044,8 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user INDEX net_ctChatMessages;", &net_ctChatMessages);
 
   _pShell->DeclareSymbol("persistent user INDEX ent_bReportSpawnInWall;", &ent_bReportSpawnInWall);
+  
+  _pShell->DeclareSymbol("persistent user INDEX ent_bReportClassLoad;", &ent_bReportClassLoad); // [SSE] Extended Class Check
 
   _pShell->DeclareSymbol("user INDEX ser_bReportSyncOK;",    &ser_bReportSyncOK);
   _pShell->DeclareSymbol("user INDEX ser_bReportSyncBad;",   &ser_bReportSyncBad);
@@ -1056,10 +1060,10 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user INDEX ser_iKickOnSyncBad;",   &ser_iKickOnSyncBad);
   _pShell->DeclareSymbol("user INDEX ser_bKickOnSyncLate;",  &ser_bKickOnSyncLate);
   
-  // [SSE] Netcode Update - Safe Rejoin
+  // [SSE] Netcode Update - Safe Rejoin BEGIN
   //_pShell->DeclareSymbol("user INDEX ser_iMaxDetachedPlayers;",   &ser_iMaxDetachedPlayers); // TODO: Make in future. 
   _pShell->DeclareSymbol("user INDEX ser_bDetachOnSyncBad;",   &ser_bDetachOnSyncBad);
-  //
+  // [SSE] Netcode Update - Safe Rejoin END
   
   _pShell->DeclareSymbol("persistent user FLOAT ser_tmSyncCheckFrequency;", &ser_tmSyncCheckFrequency);
   _pShell->DeclareSymbol("persistent user INDEX ser_iSyncCheckBuffer;", &ser_iSyncCheckBuffer);

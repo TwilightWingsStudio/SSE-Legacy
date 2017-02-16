@@ -31,6 +31,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <Engine/Templates/Stock_CEntityClass.h>
 
+
+extern INDEX ent_bReportClassLoad; // [SSE] Extended Class Check
+
 /////////////////////////////////////////////////////////////////////
 // CEntityClass
 
@@ -321,6 +324,10 @@ void CEntityClass::Read_t( CTStream *istr) // throw char *
 
   // check that the class properties have been properly declared
   CheckClassProperties();
+
+  if (ent_bReportClassLoad) {
+    CPrintF("  Loaded Class: %d [%s]\n", ec_pdecDLLClass->dec_ulID, strClassName);
+  }
 }
 
 /*
