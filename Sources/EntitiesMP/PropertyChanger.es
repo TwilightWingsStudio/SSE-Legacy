@@ -25,10 +25,8 @@ enum EOperation {
   2  EO_SUBSTRACT "-",
   3  EO_MULTIPLY "*",
   4  EO_DIVIDE "/",
-  /*
-  5  EO_INCLUDEBIT "| (index only)",
-  6  EO_EXCLUDEBIT "~ (index only)",
-  */
+  5  EO_INCLUDEBIT "|= 1 << X (index only)",
+  6  EO_EXCLUDEBIT "&= ~(1 << X) (index only)",
 };
 
 class CPropertyChanger: CEntity {
@@ -355,6 +353,8 @@ functions:
           }
         }
 
+        BOOL bErrorOccured = FALSE;
+
         if (m_eOperation == EO_SET) {
           *iValue = *iNew;
         } else if (m_eOperation == EO_ADD) {
@@ -363,36 +363,89 @@ functions:
           *iValue -= *iNew;
         } else if (m_eOperation == EO_MULTIPLY) {
           *iValue *= *iNew;
-        } else if (m_eOperation == EO_DIVIDE && m_iValue != 0) {
+        } else if (m_eOperation == EO_DIVIDE && *iNew != 0) {
           *iValue /= *iNew;
+
+        // BITWISE | and ~
+        } else if (m_eOperation == EO_INCLUDEBIT || m_eOperation == EO_EXCLUDEBIT) {
+          if ((*iNew) >= 0 && (*iNew) < 32) {
+            if (m_eOperation == EO_INCLUDEBIT) {
+              *iValue |= 1 << (*iNew);
+            } else {
+              *iValue &= ~(1 << (*iNew));
+            }
+          } else {
+            if (m_bDebugMessages) {
+              CPrintF(TRANS("%s : Error! Out of bounds while using bitwise operation.\n  Bounds: [0..31]\nValue: %d\n"), m_strName, m_iValue);
+              bErrorOccured = TRUE;
+            }
+          }
+
         } else {
           if (m_bDebugMessages) {
-            CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
+            CPrintF(TRANS("%s : Error! DO NOT DIVIDE THROUGH 0!\n"), m_strName);
+            bErrorOccured = TRUE;
           }
         }
 
-        if (m_bDebugMessages) {
-          CPrintF(TRANS("%s : Target Entity Property: %s.%s is currently (INDEX)%d\n"), m_strName, ((CEntity&)*m_penTarget).GetName(), m_strTargetProperty, iOld);
+        // If debug messages enabled and no errors then printout some text into console.
+        if (m_bDebugMessages && !bErrorOccured)
+        {
+          CPrintF(TRANS("[PC] %s : Target Entity Property: [%s].[%s] is currently (INDEX)%d\n"), m_strName, ((CEntity&)*m_penTarget).GetName(), m_strTargetProperty, iOld);
           if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_INDEX) {
-            CPrintF(TRANS("%s : Source Entity Property: %s.%s is currently (INDEX)%d\n"), m_strName, ((CEntity&)*m_penSource).GetName(), m_strSourceProperty, *iNew);
+            CPrintF(TRANS("[PC] %s : Source Entity Property: [%s].[%s] is currently (INDEX)%d\n"), m_strName, ((CEntity&)*m_penSource).GetName(), m_strSourceProperty, *iNew);
           } else {
-            CPrintF(TRANS("%s: Source Value: (INDEX)%d\n"), m_strName, m_iValue);
+            CPrintF(TRANS("[PC] %s : Source Value: (INDEX)%d\n"), m_strName, m_iValue);
           }
 
           if (m_eOperation == EO_SET) {
-            CPrintF(TRANS("%s : %s=(INDEX)%d\n") ,m_strName, m_strTargetProperty,*iValue);
+            CPrintF(TRANS("  Expression : [%s] = (INDEX)%d\n"), m_strName, m_strTargetProperty, *iValue);
           } else if (m_eOperation == EO_ADD) {
-            CPrintF(TRANS("%s : %s=(INDEX)%d+(INDEX)%d="), m_strName, m_strTargetProperty, ((CEntity&)*m_penTarget).GetName(), *iNew);
-            CPrintF(TRANS("%d\n"),*iValue);
+            CPrintF(TRANS("  Expression : [%s] = (INDEX)%d + (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+            CPrintF(TRANS("  Result = %d\n"), *iValue);
           } else if (m_eOperation == EO_SUBSTRACT) {
-            CPrintF(TRANS("%s : %s=(INDEX)%d-(INDEX)%d="), m_strName, m_strTargetProperty, ((CEntity&)*m_penTarget).GetName(), *iNew);
-            CPrintF(TRANS("%d\n"),*iValue);
+            CPrintF(TRANS("  Expression : [%s] = (INDEX)%d - (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+            CPrintF(TRANS("  Result = %d\n"), *iValue);
           } else if (m_eOperation == EO_MULTIPLY) {
-            CPrintF(TRANS("%s : %s=(INDEX)%d*(INDEX)%d="), m_strName, m_strTargetProperty, ((CEntity&)*m_penTarget).GetName(), *iNew);
-            CPrintF(TRANS("%d\n"),*iValue);
-          } else if (m_eOperation == EO_DIVIDE && m_iValue != 0) {
-            CPrintF(TRANS("%s : %s=(INDEX)%d/(INDEX)%d="), m_strName, m_strTargetProperty, ((CEntity&)*m_penTarget).GetName(), *iNew);
-            CPrintF(TRANS("%d\n"),*iValue);
+            CPrintF(TRANS("  Expression : [%s] = (INDEX)%d * (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+            CPrintF(TRANS("  Result = %d\n"), *iValue);
+          } else if (m_eOperation == EO_DIVIDE) {
+            CPrintF(TRANS("  Expression : [%s] = (INDEX)%d / (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+            CPrintF(TRANS("  Result = %d\n"), *iValue);
+          } else if (m_eOperation == EO_INCLUDEBIT || m_eOperation == EO_EXCLUDEBIT) {
+            if (m_eOperation == EO_INCLUDEBIT) {
+              CPrintF(TRANS("  Expression : [%s] = (INDEX)%d | (1 << %d)\n"), m_strTargetProperty, iOld, *iNew);
+            } else {
+              CPrintF(TRANS("  Expression : [%s] = (INDEX)%d &~ (1 << %d)\n"), m_strTargetProperty, iOld, *iNew);
+            }
+            
+            CTString strBinaryOld ("");
+            CTString strBinary ("");
+
+            for(int i = 0; i < 31; i++)
+            {
+              if ((iOld&(1 << i)) >= 1) {
+                strBinaryOld = "1" + strBinaryOld;
+              } else {
+                strBinaryOld = "0" + strBinaryOld;
+              }
+            }
+            
+            INDEX iKurwa = *iValue;
+
+            for(int i = 0; i < 31; i++)
+            {
+              if (((iKurwa)&(1 << i)) >= 1) {
+                strBinary = "1" + strBinary;
+              } else {
+                strBinary = "0" + strBinary;
+              }
+            }
+
+            CPrintF("  [BIN] Old = %s\n", strBinaryOld);
+            CPrintF("  [BIN] New = %s\n", strBinary);
+            CPrintF("  [DEC] Old = %d\n", iOld);
+            CPrintF("  [DEC] New = %d\n", *iValue);
           }
         }
 
