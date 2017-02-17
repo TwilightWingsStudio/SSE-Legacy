@@ -48,6 +48,10 @@ functions:
   void Toggle()
   {
     m_bActive = !m_bActive;
+    
+    if (m_bActive) {
+      m_a3dRotationAngle = GetPlacement().pl_OrientationAngle;
+    }
   }
   
   // --------------------------------------------------------------------------------------
