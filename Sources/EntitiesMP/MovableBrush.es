@@ -38,16 +38,18 @@ properties:
    9 BOOL m_bZoning         "Zoning"               = FALSE,
   10 BOOL m_bDynamicShadows "Dynamic Shadows"      = FALSE,
   11 BOOL m_bRelative       "Relative Translation" = TRUE,
+  
+  15 CEntityPointer m_penSwitch "Switch",  // for switch relaying
 
-  12 FLOAT m_fbTransX = 0.0f,
-  13 FLOAT m_fbTransY = 0.0f,
-  14 FLOAT m_fbTransZ = 0.0f,
-  15 FLOAT m_fbRotH   = 0.0f,
-  16 FLOAT m_fbRotP   = 0.0f,
-  17 FLOAT m_fbRotB   = 0.0f,
+  22 FLOAT m_fbTransX = 0.0f,
+  23 FLOAT m_fbTransY = 0.0f,
+  24 FLOAT m_fbTransZ = 0.0f,
+  25 FLOAT m_fbRotH   = 0.0f,
+  26 FLOAT m_fbRotP   = 0.0f,
+  27 FLOAT m_fbRotB   = 0.0f,
 
-  18 FLOAT m_fAcceleration "Acceleration" = 1000,
-  19 FLOAT m_fDeceleration "Deceleration" = 1000,
+  28 FLOAT m_fAcceleration "Acceleration" = 1000,
+  29 FLOAT m_fDeceleration "Deceleration" = 1000,
   
   65 FLOAT m_fHealth       "Health" 'H' = -1.0f,
 

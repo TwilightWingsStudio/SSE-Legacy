@@ -57,6 +57,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "EntitiesMP/CreditsHolder.h"
 #include "EntitiesMP/HudPicHolder.h"
 
+#include "EntitiesMP/MovableBrush.h"
+#include "EntitiesMP/MovableModel.h"
 #include "EntitiesMP/SpectatorCamera.h"
 
 extern void JumpFromBouncer(CEntity *penToBounce, CEntity *penBouncer);
@@ -2989,11 +2991,11 @@ functions:
         
         if (iCreditsLeft != 0) {
           CTString strTmp;
-          strTmp.PrintF("%s\n\n%d %s", TRANS("Press FIRE to respawn!"), iCreditsLeft, bSharedLives ? TRANS("shared respawn credit(s) left.") : TRANS("personal respawn credit(s) left."));
+          strTmp.PrintF("%s\n\n%d %s", TRANS("Press FIRE to respawn!"), iCreditsLeft, bSharedLives ? TRANS("shared live(s) left.") : TRANS("personal live(s) left."));
 
           pdp->PutTextCXY(strTmp, pixDPWidth*0.5f, pixDPHeight*0.2f, C_WHITE|255);
         } else {
-          pdp->PutTextCXY(TRANS("You can't respawn - out of credits!"), pixDPWidth*0.5f, pixDPHeight*0.2f, C_WHITE|255);
+          pdp->PutTextCXY(TRANS("You can't respawn - out of lives!"), pixDPWidth*0.5f, pixDPHeight*0.2f, C_WHITE|255);
         }
       }
     }
@@ -4255,8 +4257,20 @@ functions:
       if (((CMovingBrush&)*pen).m_penSwitch != NULL) {
         pen = ((CMovingBrush&)*pen).m_penSwitch;
       }
-    }
+    
+    // [SSE] Interaction Through SSE Movables - BEGIN
+    } else if (IsOfClass(pen, "Movable Model")) {
+      if (((CMovableModel&)*pen).m_penSwitch != NULL) {
+        pen = ((CMovableModel&)*pen).m_penSwitch;
+      }
 
+    } else if (IsOfClass(pen, "Movable Brush")) {
+      if (((CMovableBrush&)*pen).m_penSwitch != NULL) {
+        pen = ((CMovableBrush&)*pen).m_penSwitch;
+      }
+    }
+    // [SSE] Interaction Through SSE Movables - END
+      
     // if switch
     if (IsOfClass( pen, "Switch")) {
       CSwitch &enSwitch = (CSwitch&)*pen;

@@ -160,6 +160,8 @@ properties:
  141 FLOAT m_fAddedTransX = 0.0F,
  142 FLOAT m_fAddedTransY = 0.0F,
  143 FLOAT m_fAddedTransZ = 0.0F,
+ 
+ 150 CEntityPointer m_penSwitch "Switch",  // for switch relaying
 
   {
     CTFileName m_fnOldModel;  // used for remembering last selected model (not saved at all)
