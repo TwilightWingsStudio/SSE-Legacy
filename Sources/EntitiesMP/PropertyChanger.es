@@ -25,7 +25,10 @@ enum EOperation {
   2  EO_SUBSTRACT "-",
   3  EO_MULTIPLY "*",
   4  EO_DIVIDE "/",
-  // TODO: Add ~ and | operations.
+  /*
+  5  EO_INCLUDEBIT "| (index only)",
+  6  EO_EXCLUDEBIT "~ (index only)",
+  */
 };
 
 class CPropertyChanger: CEntity {
@@ -39,7 +42,7 @@ properties:
    3 CTString m_strDescription                   = "Property Changer",
 
    5 BOOL m_bActive            "Active"          = TRUE,
-   6 BOOL m_bDebug             "Debug Messages"  = FALSE,
+   6 BOOL m_bDebugMessages             "Debug Messages"  = FALSE,
    
    // Different data types start here.
   10 CTString   m_strValue     "Value String"    = "",
@@ -159,7 +162,7 @@ functions:
     }
 
     if (bError) {
-      if (m_bDebug) {
+      if (m_bDebugMessages) {
         CPrintF(TRANS("%s : Don't try to receive speeds from non-moving entities!\n"), m_strName);
       }
 
@@ -206,7 +209,7 @@ functions:
 
     // If invalid property.
     if (pTargetProperty == NULL && m_eSourcePT == ECT_ENTITY) { 
-      if (m_bDebug) {
+      if (m_bDebugMessages) {
         CPrintF(TRANS("%s : Property with name '%s' not found!\n"), m_strName, m_strTargetProperty);
       }
 
@@ -255,37 +258,37 @@ functions:
         }
 
         if (m_eOperation == EO_SET) {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF("%s : Setting target float to value=%f.\n", GetName(), *fNew);
           }
 
           *fValue = *fNew;
         } else if (m_eOperation == EO_ADD) {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF("%s : Adding target float to value=%f.\n", GetName(), *fNew);
           }
 
           *fValue += *fNew;
         } else if (m_eOperation == EO_SUBSTRACT) {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF("%s : Substracting target float from value=%f.\n", GetName(), *fNew);
           }
 
           *fValue -= *fNew;
         } else if (m_eOperation == EO_MULTIPLY) {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF("%s : Multiplying target float with value=%f.\n", GetName(), *fNew);
           }
 
           *fValue *= *fNew;
         } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF("%s : Diving target float with value=%f.\n", GetName(), *fNew);
           }
 
           *fValue /= *fNew;
         } else {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
@@ -307,7 +310,7 @@ functions:
 
         *penPointer = *penNew;
 
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CTString strName1 = "NULL";
           CTString strName2 = "NULL";
 
@@ -363,12 +366,12 @@ functions:
         } else if (m_eOperation == EO_DIVIDE && m_iValue != 0) {
           *iValue /= *iNew;
         } else {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
 
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF(TRANS("%s : Target Entity Property: %s.%s is currently (INDEX)%d\n"), m_strName, ((CEntity&)*m_penTarget).GetName(), m_strTargetProperty, iOld);
           if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_INDEX) {
             CPrintF(TRANS("%s : Source Entity Property: %s.%s is currently (INDEX)%d\n"), m_strName, ((CEntity&)*m_penSource).GetName(), m_strSourceProperty, *iNew);
@@ -463,7 +466,7 @@ functions:
         } else if (m_eOperation == EO_DIVIDE && m_rValue != 0) {
           *rValue /= *rNew;
         } else {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
@@ -513,7 +516,7 @@ functions:
         } else if (m_eOperation == EO_DIVIDE && m_anValue!=0) {
           *anValue /= *anNew;
         } else {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
@@ -568,7 +571,7 @@ functions:
         }
       }
 
-      if (m_bDebug) {
+      if (m_bDebugMessages) {
         CPrintF("%s : Modifing target PosX with value=%f.\n", GetName(), *fNew);
       }
 
@@ -583,7 +586,7 @@ functions:
       } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
         *fValue /= *fNew;
       } else {
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
         }
       }
@@ -617,7 +620,7 @@ functions:
         }
       }
 
-      if (m_bDebug) {
+      if (m_bDebugMessages) {
         CPrintF("%s : Modifing target PosY with value=%f.\n", GetName(), *fNew);
       }
 
@@ -632,7 +635,7 @@ functions:
       } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
         *fValue /= *fNew;
       } else {
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
         }
       }
@@ -666,7 +669,7 @@ functions:
         }
       }
 
-      if (m_bDebug) {
+      if (m_bDebugMessages) {
         CPrintF("%s : Modifing target PosZ with value=%f.\n", GetName(), *fNew);
       }
 
@@ -681,7 +684,7 @@ functions:
       } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
         *fValue /= *fNew;
       } else {
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
         }
       }
@@ -715,7 +718,7 @@ functions:
         }
       }
 
-      if (m_bDebug) {
+      if (m_bDebugMessages) {
         CPrintF("%s : Modifing target RotH with value=%f.\n", GetName(), *fNew);
       }
 
@@ -730,7 +733,7 @@ functions:
       } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
         *fValue /= *fNew;
       } else {
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
         }
       }
@@ -764,7 +767,7 @@ functions:
         }
       }
 
-      if (m_bDebug) {
+      if (m_bDebugMessages) {
         CPrintF("%s : Modifing target RotP with value=%f.\n", GetName(), *fNew);
       }
 
@@ -779,7 +782,7 @@ functions:
       } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
         *fValue /= *fNew;
       } else {
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
         }
       }
@@ -813,7 +816,7 @@ functions:
         }
       }
 
-      if (m_bDebug) {
+      if (m_bDebugMessages) {
         CPrintF("%s : Modifing target RotB with value=%f.\n", GetName(), *fNew);
       }
 
@@ -828,7 +831,7 @@ functions:
       } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
         *fValue /= *fNew;
       } else {
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
         }
       }
@@ -862,7 +865,7 @@ functions:
         }
       }
 
-      if (m_bDebug) {
+      if (m_bDebugMessages) {
         CPrintF("%s : Modifing target Health with value=%f.\n", GetName(), *fNew);
       }
 
@@ -877,7 +880,7 @@ functions:
       } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
         ((CLiveEntity&)*m_penTarget).SetHealth(fValue / *fNew);
       } else {
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
         }
       }
@@ -911,7 +914,7 @@ functions:
           }
         }
 
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF("%s : Modifing target SpeedX with value=%f.\n", GetName(), *fNew);
         }
 
@@ -926,7 +929,7 @@ functions:
         } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
           *fValue /= *fNew;
         } else {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
@@ -962,7 +965,7 @@ functions:
           }
         }
 
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF("%s : Modifing target SpeedY with value=%f.\n", GetName(), *fNew);
         }
 
@@ -977,7 +980,7 @@ functions:
         } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
           *fValue /= *fNew;
         } else {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
@@ -1013,7 +1016,7 @@ functions:
           }
         }
 
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF("%s : Modifing target SpeedZ with value=%f.\n", GetName(), *fNew);
         }
 
@@ -1028,7 +1031,7 @@ functions:
         } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
           *fValue /= *fNew;
         } else {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
@@ -1064,7 +1067,7 @@ functions:
           }
         }
 
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF("%s : Modifing target SpeedXRel with value=%f.\n", GetName(), *fNew);
         }
 
@@ -1079,7 +1082,7 @@ functions:
         } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
           *fValue /= *fNew;
         } else {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
@@ -1115,7 +1118,7 @@ functions:
           }
         }
 
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF("%s : Modifing target SpeedYRel with value=%f.\n", GetName(), *fNew);
         }
 
@@ -1130,7 +1133,7 @@ functions:
         } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
           *fValue /= *fNew;
         } else {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
@@ -1166,7 +1169,7 @@ functions:
           }
         }
 
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           CPrintF("%s : Modifing target SpeedZRel with value=%f.\n", GetName(), *fNew);
         }
     
@@ -1181,7 +1184,7 @@ functions:
         } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
           *fValue /= *fNew;
         } else {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
           }
         }
