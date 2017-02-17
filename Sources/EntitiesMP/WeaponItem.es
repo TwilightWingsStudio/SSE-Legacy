@@ -268,7 +268,7 @@ functions:
       case WIT_CANNON:           Particles_Atomic(this, 1.5F, 1.5F, PT_STAR07, 12);  break;
     }
     */
-    Particles_Atomic(this, 1.5F, m_eotOscillation == 1 ? 0.75F : 1.5F, PT_STAR07, 12);
+    Particles_Atomic(this, m_fStretch * 1.5F, (m_eotOscillation == 1 ? 0.75F : 1.5F) * m_fStretch, PT_STAR07, 12);
   }
 
   // --------------------------------------------------------------------------------------

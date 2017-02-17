@@ -89,8 +89,10 @@ functions:
   // --------------------------------------------------------------------------------------
   // No comments.
   // --------------------------------------------------------------------------------------
-  void Precache(void) {
-    switch (m_EhitType) {
+  void Precache(void)
+  {
+    switch (m_EhitType)
+    {
       case HIT_PILL:   PrecacheSound(SOUND_PILL  ); break;
       case HIT_SMALL:  PrecacheSound(SOUND_SMALL ); break;                                      
       case HIT_MEDIUM: PrecacheSound(SOUND_MEDIUM); break;
@@ -110,7 +112,8 @@ functions:
     pes->es_fValue = m_fValue;
     pes->es_iScore = 0;//m_iScore;
     
-    switch (m_EhitType) {
+    switch (m_EhitType)
+    {
       case HIT_PILL:  pes->es_strName+=" pill";   break;
       case HIT_SMALL: pes->es_strName+=" small";  break;
       case HIT_MEDIUM:pes->es_strName+=" medium"; break;
@@ -137,21 +140,22 @@ functions:
     
     BOOL bOnGround = m_eotOscillation == 1;
 
-    switch (m_EhitType) {
+    switch (m_EhitType)
+    {
       case HIT_PILL:
-        Particles_Stardust(this, 0.9F*0.75F, bOnGround ? 0.375F : 0.70F*0.75F, PT_STAR08, 32);
+        Particles_Stardust(this, 0.9F * 0.75F * m_fStretch, (bOnGround ? 0.375F : 0.70F*0.75F) * m_fStretch, PT_STAR08, 32);
         break;
       case HIT_SMALL:
-        Particles_Stardust(this, 1.0F*0.75F, bOnGround ? 0.375F : 0.75F*0.75F, PT_STAR08, 128);
+        Particles_Stardust(this, 1.0F * 0.75F * m_fStretch, (bOnGround ? 0.375F : 0.75F*0.75F) * m_fStretch, PT_STAR08, 128);
         break;
       case HIT_MEDIUM:
-        Particles_Stardust(this, 1.0F*0.75F, bOnGround ? 0.375F : 0.75F*0.75F, PT_STAR08, 128);
+        Particles_Stardust(this, 1.0F * 0.75F * m_fStretch, (bOnGround ? 0.375F : 0.75F*0.75F) * m_fStretch, PT_STAR08, 128);
         break;
       case HIT_LARGE:
-        Particles_Stardust(this, 2.0F*0.75F, bOnGround ? 0.75F : 1.0F*0.75F, PT_STAR08, 192);
+        Particles_Stardust(this, 2.0F * 0.75F * m_fStretch, (bOnGround ? 0.75F : 1.0F*0.75F) * m_fStretch, PT_STAR08, 192);
         break;
       case HIT_SUPER:
-        Particles_Stardust(this, 2.3F*0.75F, bOnGround ? 0.8625F : 1.5F*0.75F, PT_STAR08, 320);
+        Particles_Stardust(this, 2.3F * 0.75F * m_fStretch, (bOnGround ? 0.8625F : 1.5F*0.75F) * m_fStretch, PT_STAR08, 320);
         break;
     }
   }

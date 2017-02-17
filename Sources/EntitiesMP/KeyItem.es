@@ -181,10 +181,10 @@ functions:
       case KIT_BOOKOFWISDOM    :
       case KIT_CRYSTALSKULL    :   
       case KIT_HOLYGRAIL       :
-        Particles_Stardust(this, 1.0F, bOnGround ? 0.25F : 0.5F, PT_STAR08, 64);
+        Particles_Stardust(this, 1.0F * m_fStretch, (bOnGround ? 0.25F : 0.5F) * m_fStretch, PT_STAR08, 64);
         break;
       case KIT_JAGUARGOLDDUMMY :
-        Particles_Stardust(this, 2.0F, bOnGround ? 0.5F : 2.0F, PT_STAR08, 64);
+        Particles_Stardust(this, 2.0F * m_fStretch, (bOnGround ? 0.5F : 2.0F) * m_fStretch, PT_STAR08, 64);
         break;
       case KIT_CROSSWOODEN     :
       case KIT_CROSSMETAL      :   
@@ -199,7 +199,7 @@ functions:
       case KIT_STATUEHEAD03    :
       case KIT_KINGSTATUE      :
       default:
-        Particles_Stardust(this, 1.5F, bOnGround? 0.75F : 1.1f, PT_STAR08, 64);
+        Particles_Stardust(this, 1.5F * m_fStretch, (bOnGround? 0.75F : 1.1f) * m_fStretch, PT_STAR08, 64);
         break;    
     }
   }

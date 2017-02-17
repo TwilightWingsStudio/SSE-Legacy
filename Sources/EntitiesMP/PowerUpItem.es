@@ -143,19 +143,19 @@ functions:
     switch( m_puitType)
     {
       case PUIT_INVISIB:
-        Particles_Stardust( this, 2.0F*0.75F, bOnGround ? 0.75F : 1.00F*0.75F, PT_STAR08, 320);
+        Particles_Stardust( this, 2.0F * 0.75F * m_fStretch, (bOnGround ? 0.75F : 1.00F * 0.75F) * m_fStretch, PT_STAR08, 320);
         break;
       case PUIT_INVULNER:
-        Particles_Stardust( this, 2.0F*0.75F, bOnGround ? 0.75F : 1.00F*0.75F, PT_STAR08, 192);
+        Particles_Stardust( this, 2.0F * 0.75F * m_fStretch, (bOnGround ? 0.75F : 1.00F * 0.75F) * m_fStretch, PT_STAR08, 192);
         break;
       case PUIT_DAMAGE:
-        Particles_Stardust( this, 1.0F*0.75F, bOnGround ? 0.375F : 0.75F*0.75F, PT_STAR08, 128);
+        Particles_Stardust( this, 1.0F * 0.75F * m_fStretch, (bOnGround ? 0.375F : 0.75F * 0.75F) * m_fStretch, PT_STAR08, 128);
         break;
       case PUIT_SPEED:
-        Particles_Stardust( this, 1.0F*0.75F, bOnGround ? 0.375F : 0.75F*0.75F, PT_STAR08, 128);
+        Particles_Stardust( this, 1.0F * 0.75F * m_fStretch, (bOnGround ? 0.375F : 0.75F * 0.75F) * m_fStretch, PT_STAR08, 128);
         break;
       case PUIT_BOMB:
-        Particles_Atomic(this, 2.0F*0.75F, bOnGround ? 0.75F : 2.0F*0.95F, PT_STAR05, 12);
+        Particles_Atomic(this, 2.0F * 0.75F * m_fStretch, (bOnGround ? 0.75F : 2.0F * 0.95F) * m_fStretch, PT_STAR05, 12);
         break;
     }
   }
@@ -227,7 +227,7 @@ procedures:
   {
     ASSERT(epass.penOther != NULL);
  
-    // Don't pick up more bombs then you can carry.
+    // Don't pick up more bombs than you can carry.
     if (m_puitType == PUIT_BOMB)
     {
       if (IsOfClass(epass.penOther, "Player"))

@@ -146,25 +146,31 @@ functions:
     
     BOOL bOnGround = m_eotOscillation == 1;
 
-    switch (m_EaitType) {
-      case ARIT_SHARD:
-        Particles_Emanate(this, 0.75F*0.75F, bOnGround ? 0.3F : 0.75F*0.75F, PT_STAR04, 8, 7.0F);
-        break;
-      case ARIT_SMALL:
-        Particles_Emanate(this, 1.0F*0.75F, bOnGround ? 0.375F : 1.0F*0.75F, PT_STAR04, 32, 7.0F);
-        break;
-      case ARIT_MEDIUM:
-        Particles_Emanate(this, 1.5F*0.75F, bOnGround ? 0.5625F : 1.5F*0.75F, PT_STAR04, 64, 7.0F);
-        break;
-      case ARIT_STRONG:                              
-        Particles_Emanate(this, 2.0F*0.75F, bOnGround ? 0.75F : 1.25F*0.75F, PT_STAR04, 96, 7.0F);
-        break;
-      case ARIT_SUPER:
-        Particles_Emanate(this, 2.5F*0.75F, bOnGround ? 0.9375F : 1.5F*0.75F, PT_STAR04, 128, 7.0F);
-        break;
-      case ARIT_HELM:
-        Particles_Emanate(this, 0.875F*0.75F, bOnGround ? 0.335F : 0.875F*0.75F, PT_STAR04, 16, 7.0F);
-        break;
+    switch (m_EaitType)
+    {
+      case ARIT_SHARD: {
+        Particles_Emanate(this, 0.75F * 0.75F * m_fStretch, (bOnGround ? 0.3F : 0.75F*0.75F) * m_fStretch, PT_STAR04, 8, 7.0F);
+      } break;
+
+      case ARIT_SMALL:{
+        Particles_Emanate(this, 1.0F * 0.75F * m_fStretch, (bOnGround ? 0.375F : 1.0F*0.75F) * m_fStretch, PT_STAR04, 32, 7.0F);
+      } break;
+
+      case ARIT_MEDIUM: {
+        Particles_Emanate(this, 1.5F * 0.75F * m_fStretch, (bOnGround ? 0.5625F : 1.5F*0.75F) * m_fStretch, PT_STAR04, 64, 7.0F);
+      } break;
+
+      case ARIT_STRONG: {
+        Particles_Emanate(this, 2.0F * 0.75F * m_fStretch, (bOnGround ? 0.75F : 1.25F*0.75F) * m_fStretch, PT_STAR04, 96, 7.0F);
+      } break;
+
+      case ARIT_SUPER: {
+        Particles_Emanate(this, 2.5F * 0.75F * m_fStretch, (bOnGround ? 0.9375F : 1.5F*0.75F) * m_fStretch, PT_STAR04, 128, 7.0F);
+      } break;
+
+      case ARIT_HELM: {
+        Particles_Emanate(this, 0.875F * 0.75F * m_fStretch, (bOnGround ? 0.335F : 0.875F*0.75F) * m_fStretch, PT_STAR04, 16, 7.0F);
+      } break;
     }
   }
 

@@ -98,7 +98,7 @@ functions:
       return;
     }
 
-    Particles_Spiral(this, 3.0F*0.5F, m_eotOscillation == 1 ? 0.75F : 2.5F*0.5F, PT_STAR04, 10);
+    Particles_Spiral(this, 3.0F * 0.5F * m_fStretch, (m_eotOscillation == 1 ? 0.75F : 2.5F*0.5F) * m_fStretch, PT_STAR04, 10);
   }
 
   // --------------------------------------------------------------------------------------

@@ -156,39 +156,40 @@ functions:
     
     BOOL bOnGround = m_eotOscillation == 1;
 
-    switch (m_EaitType) {
+    switch (m_EaitType)
+    {
       case AIT_SHELLS:
-        Particles_Spiral(this, 1.0F*0.75F, bOnGround ? 0.375F : 1.0F*0.75F, PT_STAR04, 4); //
+        Particles_Spiral(this, 1.0F * 0.75F * m_fStretch, (bOnGround ? 0.375F : 1.0F*0.75F) * m_fStretch, PT_STAR04, 4); //
         break;
       case AIT_BULLETS:
-        Particles_Spiral(this, 1.5F*0.75F, bOnGround ? 0.5625F : 1.0F*0.75F, PT_STAR04, 6); //
+        Particles_Spiral(this, 1.5F * 0.75F * m_fStretch, (bOnGround ? 0.5625F : 1.0F*0.75F) * m_fStretch, PT_STAR04, 6); //
         break;
       case AIT_ROCKETS:
-        Particles_Spiral(this, 1.5F*0.75F, bOnGround ? 0.5625F : 1.25F*0.75F, PT_STAR04, 6); //
+        Particles_Spiral(this, 1.5F * 0.75F * m_fStretch, (bOnGround ? 0.5625F : 1.25F*0.75F) * m_fStretch, PT_STAR04, 6); //
         break;
       case AIT_GRENADES:
-        Particles_Spiral(this, 2.0F*0.75F, bOnGround ? 0.75F : 1.25F*0.75F, PT_STAR04, 6); //
+        Particles_Spiral(this, 2.0F * 0.75F * m_fStretch, (bOnGround ? 0.75F : 1.25F*0.75F) * m_fStretch, PT_STAR04, 6); //
         break;
       case AIT_ELECTRICITY:
-        Particles_Spiral(this, 1.5F*0.75F, bOnGround ? 0.5625F : 1.125F*0.75F, PT_STAR04, 6); //
+        Particles_Spiral(this, 1.5F * 0.75F * m_fStretch, (bOnGround ? 0.5625F : 1.125F*0.75F) * m_fStretch, PT_STAR04, 6); //
         break;
       case AIT_NUKEBALL:
-        Particles_Spiral(this, 1.25F*0.75F, bOnGround ? 0.475F : 1.0F*0.75F, PT_STAR04, 4);
+        Particles_Spiral(this, 1.25F * 0.75F * m_fStretch, (bOnGround ? 0.475F : 1.0F*0.75F) * m_fStretch, PT_STAR04, 4);
         break;
       case AIT_IRONBALLS:
-        Particles_Spiral(this, 2.0F*0.75F, bOnGround ? 0.75F : 1.25F*0.75F, PT_STAR04, 8); //
+        Particles_Spiral(this, 2.0F * 0.75F * m_fStretch, (bOnGround ? 0.75F : 1.25F*0.75F) * m_fStretch, PT_STAR04, 8); //
         break;
       case AIT_BACKPACK:
-        Particles_Spiral(this, 3.0F*0.5F, bOnGround ? 0.75F : 2.5F*0.5F, PT_STAR04, 10); //
+        Particles_Spiral(this, 3.0F * 0.5F * m_fStretch, (bOnGround ? 0.75F : 2.5F*0.5F) * m_fStretch, PT_STAR04, 10); //
         break;
        case AIT_SERIOUSPACK:
-        Particles_Spiral(this, 3.0F*0.5F, bOnGround ? 0.75F : 2.5F*0.5F, PT_STAR04, 10); //
+        Particles_Spiral(this, 3.0F * 0.5F * m_fStretch, (bOnGround ? 0.75F : 2.5F*0.5F) * m_fStretch, PT_STAR04, 10); //
         break;
        case AIT_NAPALM:
-        Particles_Spiral(this, 3.0F*0.5F, bOnGround ? 0.75F : 2.5F*0.5F, PT_STAR04, 10); //
+        Particles_Spiral(this, 3.0F * 0.5F * m_fStretch, (bOnGround ? 0.75F : 2.5F*0.5F) * m_fStretch, PT_STAR04, 10); //
         break;
        case AIT_SNIPERBULLETS:
-        Particles_Spiral(this, 1.5F*0.75F, bOnGround ? 0.5625F : 1.25F*0.75F, PT_STAR04, 6); //
+        Particles_Spiral(this, 1.5F * 0.75F * m_fStretch, (bOnGround ? 0.5625F : 1.25F*0.75F) * m_fStretch, PT_STAR04, 6); //
         break;
     }
   }

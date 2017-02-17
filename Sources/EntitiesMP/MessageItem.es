@@ -83,7 +83,7 @@ functions:
       return;
     }
 
-    Particles_Stardust(this, 0.9F, m_eotOscillation == 1 ? 0.5F : 0.70F, PT_STAR08, 32);
+    Particles_Stardust(this, 0.9F * m_fStretch, (m_eotOscillation == 1 ? 0.5F : 0.7F) * m_fStretch, PT_STAR08, 32);
   }
 
   // --------------------------------------------------------------------------------------
