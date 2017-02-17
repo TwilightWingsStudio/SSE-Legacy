@@ -25,8 +25,9 @@ enum EOperation {
   2  EO_SUBSTRACT "-",
   3  EO_MULTIPLY "*",
   4  EO_DIVIDE "/",
-  5  EO_INCLUDEBIT "|= 1 << X (index only)",
-  6  EO_EXCLUDEBIT "&= ~(1 << X) (index only)",
+  5  EO_REMAINDER "% (will be made later)", // TODO: Write code for it later.
+  6  EO_INCLUDEBIT "|= 1 << X (index only)",
+  7  EO_EXCLUDEBIT "&= ~(1 << X) (index only)",
 };
 
 class CPropertyChanger: CEntity {
@@ -357,12 +358,16 @@ functions:
 
         if (m_eOperation == EO_SET) {
           *iValue = *iNew;
+
         } else if (m_eOperation == EO_ADD) {
           *iValue += *iNew;
+
         } else if (m_eOperation == EO_SUBSTRACT) {
           *iValue -= *iNew;
+
         } else if (m_eOperation == EO_MULTIPLY) {
           *iValue *= *iNew;
+
         } else if (m_eOperation == EO_DIVIDE && *iNew != 0) {
           *iValue /= *iNew;
 
