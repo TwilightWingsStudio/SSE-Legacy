@@ -20,14 +20,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 enum EOperation {
-  0  EO_SET  "=",
-  1  EO_ADD  "+",
-  2  EO_SUBSTRACT "-",
-  3  EO_MULTIPLY "*",
-  4  EO_DIVIDE "/",
-  5  EO_REMAINDER "% (will be made later)", // TODO: Write code for it later.
-  6  EO_INCLUDEBIT "|= 1 << X (index only)",
-  7  EO_EXCLUDEBIT "&= ~(1 << X) (index only)",
+  0  EO_SET        "=",
+  1  EO_ADD        "+",
+  2  EO_SUBSTRACT  "-",
+  3  EO_MULTIPLY   "*",
+  4  EO_DIVIDE     "/",
+  5  EO_REMAINDER  "% (REMAINDER index only)", // TODO: Write code for it later.
+  6  EO_BITAND     "& (AND index only)",
+  7  EO_BITOR      "| (OR index only)",
+  8  EO_XOR        "^ (XOR index only)",
+  9  EO_INCLUDEBIT "|= 1 << X (index only)",
+ 10  EO_EXCLUDEBIT "&= ~(1 << X) (index only)",
 };
 
 class CPropertyChanger: CEntity {
@@ -41,7 +44,7 @@ properties:
    3 CTString m_strDescription                   = "Property Changer",
 
    5 BOOL m_bActive            "Active"          = TRUE,
-   6 BOOL m_bDebugMessages             "Debug Messages"  = FALSE,
+   6 BOOL m_bDebugMessages     "Debug Messages"  = FALSE,
    
    // Different data types start here.
   10 CTString   m_strValue     "Value String"    = "",
@@ -79,11 +82,34 @@ functions:
   // --------------------------------------------------------------------------------------
   // Returns short description to show it in the SED.
   // --------------------------------------------------------------------------------------
-  const CTString &GetDescription(void) const{
+  const CTString &GetDescription(void) const
+  {
+    ((CTString&)m_strDescription).PrintF("-><none>");
+
+    if (m_penTarget != NULL) {
+      ((CTString&)m_strDescription).PrintF("->%s", m_penTarget->GetName());
+    }
+    
     return m_strDescription;
   }
+
+  // --------------------------------------------------------------------------------------
+  // Returns a string.
+  // --------------------------------------------------------------------------------------
+  void GetBinaryStringFromIndex(CTString &strValue, INDEX iValue)
+  {
+    for(int i = 0; i <= 31; i++)
+    {
+      if ((iValue&(1 << i)) >= 1) {
+        strValue = "1" + strValue;
+      } else {
+        strValue = "0" + strValue;
+      }
+    }
+  }
   
-  FLOAT GetFSource() {
+  FLOAT GetFSource()
+  {
     // Position and orientation.
     if (m_eSourcePT == ECT_POSX) {
       return m_penSource->GetPlacement().pl_PositionVector(1);
@@ -370,6 +396,18 @@ functions:
 
         } else if (m_eOperation == EO_DIVIDE && *iNew != 0) {
           *iValue /= *iNew;
+          
+        } else if (m_eOperation == EO_REMAINDER && *iNew != 0) {
+          *iValue %= *iNew;
+          
+        } else if (m_eOperation == EO_BITAND) {
+          *iValue &= *iNew;
+
+        } else if (m_eOperation == EO_BITOR) {
+          *iValue |= *iNew;
+          
+        } else if (m_eOperation == EO_XOR) {
+          *iValue ^= *iNew;
 
         // BITWISE | and ~
         } else if (m_eOperation == EO_INCLUDEBIT || m_eOperation == EO_EXCLUDEBIT) {
@@ -405,52 +443,58 @@ functions:
 
           if (m_eOperation == EO_SET) {
             CPrintF(TRANS("  Expression : [%s] = (INDEX)%d\n"), m_strName, m_strTargetProperty, *iValue);
+
           } else if (m_eOperation == EO_ADD) {
             CPrintF(TRANS("  Expression : [%s] = (INDEX)%d + (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
             CPrintF(TRANS("  Result = %d\n"), *iValue);
+
           } else if (m_eOperation == EO_SUBSTRACT) {
             CPrintF(TRANS("  Expression : [%s] = (INDEX)%d - (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
             CPrintF(TRANS("  Result = %d\n"), *iValue);
+
           } else if (m_eOperation == EO_MULTIPLY) {
             CPrintF(TRANS("  Expression : [%s] = (INDEX)%d * (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
             CPrintF(TRANS("  Result = %d\n"), *iValue);
+
           } else if (m_eOperation == EO_DIVIDE) {
             CPrintF(TRANS("  Expression : [%s] = (INDEX)%d / (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
             CPrintF(TRANS("  Result = %d\n"), *iValue);
-          } else if (m_eOperation == EO_INCLUDEBIT || m_eOperation == EO_EXCLUDEBIT) {
+
+          } else if (m_eOperation == EO_REMAINDER) {
+            CPrintF(TRANS("  Expression : [%s] = (INDEX)%d %% (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+            CPrintF(TRANS("  Result = %d\n"), *iValue);
+
+          } else if (m_eOperation == EO_INCLUDEBIT || m_eOperation == EO_EXCLUDEBIT || m_eOperation == EO_BITAND || m_eOperation == EO_BITOR || m_eOperation == EO_XOR) {
+
+            CTString strBinaryOld("");
+            CTString strBinaryNew("");
+            CTString strBinaryResult("");
+
+            GetBinaryStringFromIndex(strBinaryOld, iOld);
+            GetBinaryStringFromIndex(strBinaryResult, *iValue);
+            
+            INDEX iNewNew = *iNew;
+            
             if (m_eOperation == EO_INCLUDEBIT) {
               CPrintF(TRANS("  Expression : [%s] = (INDEX)%d | (1 << %d)\n"), m_strTargetProperty, iOld, *iNew);
-            } else {
+              iNewNew = 1 << *iNew;
+            } else if (m_eOperation == EO_EXCLUDEBIT) {
               CPrintF(TRANS("  Expression : [%s] = (INDEX)%d &~ (1 << %d)\n"), m_strTargetProperty, iOld, *iNew);
-            }
-            
-            CTString strBinaryOld ("");
-            CTString strBinary ("");
-
-            for(int i = 0; i < 31; i++)
-            {
-              if ((iOld&(1 << i)) >= 1) {
-                strBinaryOld = "1" + strBinaryOld;
-              } else {
-                strBinaryOld = "0" + strBinaryOld;
-              }
-            }
-            
-            INDEX iKurwa = *iValue;
-
-            for(int i = 0; i < 31; i++)
-            {
-              if (((iKurwa)&(1 << i)) >= 1) {
-                strBinary = "1" + strBinary;
-              } else {
-                strBinary = "0" + strBinary;
-              }
+              iNewNew = 1 << *iNew;
+            } else if (m_eOperation == EO_BITOR) {
+              CPrintF(TRANS("  Expression : [%s] = (INDEX)%d | (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+            } else if (m_eOperation == EO_BITAND) {
+              CPrintF(TRANS("  Expression : [%s] = (INDEX)%d & (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+            } else {
+              CPrintF(TRANS("  Expression : [%s] = (INDEX)%d XOR (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
             }
 
-            CPrintF("  [BIN] Old = %s\n", strBinaryOld);
-            CPrintF("  [BIN] New = %s\n", strBinary);
-            CPrintF("  [DEC] Old = %d\n", iOld);
-            CPrintF("  [DEC] New = %d\n", *iValue);
+            GetBinaryStringFromIndex(strBinaryNew, iNewNew);
+
+            CPrintF("  OLD = |%s| = %d\n", strBinaryOld, iOld);
+            CPrintF("  MOD = |%s| = %d\n", strBinaryNew, *iNew);
+            CPrintF("        |--------------------------------|\n");
+            CPrintF("  OUT = |%s| = %d\n", strBinaryResult, *iValue);
           }
         }
 
