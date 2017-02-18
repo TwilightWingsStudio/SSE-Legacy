@@ -25,7 +25,12 @@ enum ECondition{
    3 EC_SMALLER      "3 <",
    4 EC_SMALLER_SAME "4 <=",
    5 EC_LARGER_SAME  "5 >=",
+   
    // TODO: Add & and !& opeation
+   /*
+   6 EC_BITWISEINC   "6 &",
+   7 EC_BITWISEEXC   "7 !&",
+   */
 };
 
 enum EConType{
@@ -414,6 +419,7 @@ functions:
           if (penPointer == penPointer2) {
             bResult = TRUE;
           }
+
         } else if (m_eCondition == EC_DIFFERENT) {
           if (m_bDebug) {
             CPrintF("  Condition = [!=] (different)\n");
@@ -426,19 +432,42 @@ functions:
 
       // String
       } else if (bs1) {
+        // If we have second string then compare them between.
         if (bs2) {
+          if (m_bDebug)
+          {
+            CPrintF("[%s] : Comparing two strings...\n", m_strName);
+          }
+          
+          // ===
           if (m_eCondition == EC_SAME) {
+            if (m_bDebug) {
+              CPrintF("  Condition = [==] (same)\n");
+            }
+            
             if (strValue == strValue2) {
               bResult = TRUE;
             }
-          }
-          if (m_eCondition == EC_DIFFERENT) {
+
+          // !=
+          } else if (m_eCondition == EC_DIFFERENT) {
+            if (m_bDebug) {
+              CPrintF("  Condition = [!=] (different)\n");
+            }
+            
             if (strValue != strValue2) {
               bResult = TRUE;
             }
           }
+          
+        // If we have only one string then check if it isn't empty.
         } else {
           if (strValue != "") {
+          if (m_bDebug)
+          {
+            CPrintF("[%s] : Checking if string is not empty...\n", m_strName);
+          }
+            
             bResult = TRUE;
           }
         }
