@@ -36,9 +36,7 @@ static EntityInfo eiGuffy = {
 
 //#define FIRE_DEATH_LEFT   FLOAT3D( 0.0f, 7.0f, -2.0f)
 //#define FIRE_DEATH_RIGHT  FLOAT3D(3.75f, 4.2f, -2.5f)
-
 %}
-
 
 class CGuffy : CEnemyBase {
 name      "Guffy";
@@ -86,6 +84,7 @@ functions:
     static DECLARE_CTFILENAME(fnmSoldier,  "DataMP\\Messages\\Enemies\\Guffy.txt");
     return fnmSoldier;
   }
+
   /*// overridable function to get range for switching to another player
   FLOAT GetThreatDistance(void)
   {
@@ -100,7 +99,8 @@ functions:
     return CEnemyBase::ForcesCannonballToExplode();
   }*/
 
-  void Precache(void) {
+  void Precache(void)
+  {
     CEnemyBase::Precache();
     
     // guffy
@@ -145,21 +145,24 @@ functions:
     }
   };
 
-
   // virtual anim functions
   void StandingAnim(void) {
     StartModelAnim(GUFFY_ANIM_IDLE, AOF_LOOPING|AOF_NORESTART);
   };
+
   /*void StandingAnimFight(void)
   {
     StartModelAnim(GUFFY_ANIM_FIRE, AOF_LOOPING|AOF_NORESTART);
   }*/
+
   void RunningAnim(void) {
     StartModelAnim(GUFFY_ANIM_RUN, AOF_LOOPING|AOF_NORESTART);
   };
+
   void WalkingAnim(void) {
     RunningAnim();
   };
+
   void RotatingAnim(void) {
     StartModelAnim(GUFFY_ANIM_RUN, AOF_LOOPING|AOF_NORESTART);
   };
@@ -168,18 +171,22 @@ functions:
   void IdleSound(void) {
     PlaySound(m_soSound, SOUND_IDLE, SOF_3D);
   };
+
   void SightSound(void) {
     PlaySound(m_soSound, SOUND_SIGHT, SOF_3D);
   };
+
   void WoundSound(void) {
     PlaySound(m_soSound, SOUND_WOUND, SOF_3D);
   };
+
   void DeathSound(void) {
     PlaySound(m_soSound, SOUND_DEATH, SOF_3D);
   };
 
   // fire rocket
-  void FireRocket(FLOAT3D &vPos) {
+  void FireRocket(FLOAT3D &vPos)
+  {
     CPlacement3D plRocket;
     plRocket.pl_PositionVector = vPos;
     plRocket.pl_OrientationAngle = ANGLE3D(0, -5.0f-FRnd()*10.0f, 0);
@@ -201,7 +208,8 @@ functions:
   };
 
   // damage anim
-  INDEX AnimForDamage(FLOAT fDamage) {
+  INDEX AnimForDamage(FLOAT fDamage)
+  {
     INDEX iAnim;
     iAnim = GUFFY_ANIM_WOUND;
     StartModelAnim(iAnim, 0);
@@ -209,11 +217,13 @@ functions:
   };
   
   // death
-  INDEX AnimForDeath(void) {
+  INDEX AnimForDeath(void)
+  {
     INDEX iAnim;
     FLOAT3D vFront;
     GetHeadingDirection(0, vFront);
     FLOAT fDamageDir = m_vDamage%vFront;
+
     if (fDamageDir<0) {
       iAnim = GUFFY_ANIM_DEATHBACKWARD;
     } else {
@@ -225,16 +235,16 @@ functions:
   };
 
   // death
-  FLOAT WaitForDust(FLOAT3D &vStretch) {
+  FLOAT WaitForDust(FLOAT3D &vStretch)
+  {
     vStretch=FLOAT3D(1,1,2)*1.5f;
-    if(GetModelObject()->GetAnim()==GUFFY_ANIM_DEATHBACKWARD)
-    {
+
+    if (GetModelObject()->GetAnim() == GUFFY_ANIM_DEATHBACKWARD) {
       return 0.48f;
-    }
-    else if(GetModelObject()->GetAnim()==GUFFY_ANIM_DEATHFORWARD)
-    {
+    } else if (GetModelObject()->GetAnim()==GUFFY_ANIM_DEATHFORWARD) {
       return 1.0f;
-   }
+    }
+
     return -1.0f;
   };
 
@@ -242,8 +252,8 @@ procedures:
 /************************************************************
  *                A T T A C K   E N E M Y                   *
  ************************************************************/
-  Fire(EVoid) : CEnemyBase::Fire {
-    
+  Fire(EVoid) : CEnemyBase::Fire
+  {
     StartModelAnim(GUFFY_ANIM_FIRE, AOF_LOOPING);
     
     // wait for animation to bring the left hand into firing position
@@ -255,17 +265,20 @@ procedures:
     fLookRight = fLookRight * m;
     BOOL bEnemyRight = fLookRight % (m_penEnemy->GetPlacement().pl_PositionVector - GetPlacement().pl_PositionVector);
 
-    if (bEnemyRight>=0) {  // enemy is to the right of guffy
-      ShootProjectile(PRT_GUFFY_PROJECTILE, FIRE_LEFT_ARM*m_fSize*m_fStretchMultiplier, ANGLE3D(0, 0, 0));
+    FLOAT fSMul = ClampDn(m_fStretchMultiplier, 0.2F); // [SSE] Better Enemy Stretching
+    
+    if (bEnemyRight >= 0) {  // enemy is to the right of guffy
+      ShootProjectile(PRT_GUFFY_PROJECTILE, FIRE_LEFT_ARM*m_fSize * fSMul, ANGLE3D(0, 0, 0));
       PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
       
-      ShootProjectile(PRT_GUFFY_PROJECTILE, FIRE_RIGHT_ARM*m_fSize*m_fStretchMultiplier, ANGLE3D(-9, 0, 0)*m_fStretchMultiplier);
+      ShootProjectile(PRT_GUFFY_PROJECTILE, FIRE_RIGHT_ARM*m_fSize * fSMul, ANGLE3D(-9, 0, 0) * fSMul);
       PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
+
     } else { // enemy is to the left of guffy
-      ShootProjectile(PRT_GUFFY_PROJECTILE, FIRE_LEFT_ARM*m_fSize*m_fStretchMultiplier, ANGLE3D(9, 0, 0)*m_fStretchMultiplier);
+      ShootProjectile(PRT_GUFFY_PROJECTILE, FIRE_LEFT_ARM*m_fSize * fSMul, ANGLE3D(9, 0, 0) * fSMul);
       PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
       
-      ShootProjectile(PRT_GUFFY_PROJECTILE, FIRE_RIGHT_ARM*m_fSize*m_fStretchMultiplier, ANGLE3D(0, 0, 0));
+      ShootProjectile(PRT_GUFFY_PROJECTILE, FIRE_RIGHT_ARM*m_fSize * fSMul, ANGLE3D(0, 0, 0));
       PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
     }
     
@@ -286,7 +299,8 @@ procedures:
 /************************************************************
  *                    D  E  A  T  H                         *
  ************************************************************/
-  /*Death(EVoid) : CEnemyBase::Death {
+  /*Death(EVoid) : CEnemyBase::Death
+  {
     // stop moving
     StopMoving();
     DeathSound();     // death sound
@@ -305,10 +319,11 @@ procedures:
     return EEnd();
   };*/
 
-/************************************************************
- *                       M  A  I  N                         *
- ************************************************************/
-  Main(EVoid) {
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
+  Main(EVoid)
+  {
     // declare yourself as a model
     InitAsModel();
     SetPhysicsFlags(EPF_MODEL_WALKING);
@@ -332,7 +347,7 @@ procedures:
     m_iScore = 3000;
     //m_fThreatDistance = 15;
     
-    if (m_fStepHeight==-1) {
+    if (m_fStepHeight == -1) {
       m_fStepHeight = 4.0f;
     }
 
