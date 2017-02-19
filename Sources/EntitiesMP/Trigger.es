@@ -244,7 +244,11 @@ functions:
     }
 
     if (m_strConsoleCmd != "") {
-      _pShell->Execute(m_strConsoleCmd);
+      if (m_strConsoleCmd.HasPrefix("net_") || m_strConsoleCmd.HasPrefix("ser_") || m_strConsoleCmd.HasPrefix("gam_") || m_strConsoleCmd.HasPrefix("cli_") || m_strConsoleCmd.HasPrefix("tex_") || m_strConsoleCmd.HasPrefix("Quit();")) {
+        CPrintF("%s : Trigger tried to use not allowed shell command!\n", m_strName);
+      } else {
+        _pShell->Execute(m_strConsoleCmd);
+      }
     }
 
     // if max trig count is used for counting
