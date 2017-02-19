@@ -65,6 +65,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "EntitiesMP/MovingBrush.h"
   #include "EntitiesMP/MessageHolder.h"
   #include "EntitiesMP/EnemyBase.h"
+  
+  // [SSE]
+  #include "EntitiesMP/MovableBrush.h"
+  #include "EntitiesMP/MovableModel.h"
+
   extern INDEX hud_bShowWeapon;
 
   extern const INDEX aiWeaponsRemap[19] = { 0,  1,  10,  2,  3,  4,  5,  6,  7,
@@ -1253,9 +1258,13 @@ functions:
 
     // set some targeting properties (snooping and such...)
     TIME tmNow = _pTimer->CurrentTick();
-    if (m_penRayHit!=NULL)
+
+    if (m_penRayHit != NULL)
     {
       CEntity *pen = m_penRayHit;
+
+      BOOL bExCheck = TRUE;
+      
       // if alive 
       if (pen->GetFlags()&ENF_ALIVE)
       {
@@ -1263,48 +1272,67 @@ functions:
         CheckTargetPrediction(pen);
 
         // if player
-        if (IsOfClass( pen, "Player")) {
+        if (IsOfClass( pen, "Player"))
+        {
           // rememer when targeting begun  
-          if (m_tmTargetingStarted==0) {
+          if (m_tmTargetingStarted == 0) {
             m_penTargeting = pen;
             m_tmTargetingStarted = tmNow;
           }
+
           // keep player name, mana and health for eventual printout or coloring
           m_fEnemyHealth = ((CPlayer*)pen)->GetHealth() / ((CPlayer*)pen)->m_fMaxHealth;
           m_strLastTarget.PrintF( "%s", ((CPlayer*)pen)->GetPlayerName());
+
           if (GetSP()->sp_gmGameMode==CSessionProperties::GM_SCOREMATCH) {
             // add mana to player name
             CTString strMana="";
             strMana.PrintF( " (%d)", ((CPlayer*)pen)->m_iMana);
             m_strLastTarget += strMana;
           }
-          if (hud_bShowPlayerName) { m_tmLastTarget = tmNow+1.5f; }
-        }
+
+          if (hud_bShowPlayerName) {
+            m_tmLastTarget = tmNow + 1.5f;
+          }
+
+          bExCheck = FALSE;
+
         // not targeting player
-        else {
-          // reset targeting
-          m_tmTargetingStarted = 0; 
+        } else {
+          m_tmTargetingStarted = 0;  // reset targeting
         }
+
         // keep enemy health for eventual crosshair coloring
         if (IsDerivedFromClass( pen, "Enemy Base")) {
           m_fEnemyHealth = ((CEnemyBase*)pen)->GetHealth() / ((CEnemyBase*)pen)->m_fMaxHealth;
+          bExCheck = FALSE;
         }
+
          // cannot snoop while firing
         if (m_bFireWeapon) { m_tmTargetingStarted = 0; }
       }
-      // if not alive
-      else
+
+      if (bExCheck)
       {
         // not targeting player
         m_tmTargetingStarted = 0; 
 
         // check switch/messageholder relaying by moving brush
-        if (IsOfClass( pen, "Moving Brush") && ((CMovingBrush&)*pen).m_penSwitch!=NULL) {
+        if (IsOfClass(pen, "Moving Brush") && ((CMovingBrush&)*pen).m_penSwitch != NULL) {
           pen = ((CMovingBrush&)*pen).m_penSwitch;
+          
+        // [SSE] Interaction Through SSE Movables - BEGIN
+        } else if (IsOfClass(pen, "Movable Brush") && ((CMovableBrush&)*pen).m_penSwitch != NULL) {
+          pen = ((CMovableBrush&)*pen).m_penSwitch;
+          
+        } else if (IsOfClass(pen, "Movable Model") && ((CMovableModel&)*pen).m_penSwitch != NULL) {
+          pen = ((CMovableModel&)*pen).m_penSwitch;
         }
+        // [SSE] Interaction Through SSE Movables - END
 
-        // if switch
-        if (IsOfClass( pen, "Switch")) {
+        // If switch is under ray.
+        if (IsOfClass(pen, "Switch"))
+        {
           CSwitch &enSwitch = (CSwitch&)*pen;
 
           // if switch near enough and is useable
@@ -1315,7 +1343,8 @@ functions:
             } else {
               m_strLastTarget = TRANS("Use");
             }
-            m_tmLastTarget = tmNow+0.5f;
+
+            m_tmLastTarget = tmNow + 0.5f;
           }
         }
 
@@ -1331,14 +1360,14 @@ functions:
             if (!pl.HasMessage(fnmMessage)) {
               // show analyse message
               m_strLastTarget = TRANS("Analyze");
-              m_tmLastTarget  = tmNow+0.5f;
+              m_tmLastTarget  = tmNow + 0.5f;
             }
           }
         }
       }
-    }
+
     // if didn't hit anything
-    else {
+    } else {
       // not targeting player
       m_tmTargetingStarted = 0; 
       // remember position ahead
