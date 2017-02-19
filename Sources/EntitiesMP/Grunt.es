@@ -93,7 +93,8 @@ functions:
   }
 
   /* Entity info */
-  void *GetEntityInfo(void) {
+  void *GetEntityInfo(void)
+  {
     if (m_gtType==GT_SOLDIER) {
       return &eiGruntSoldier;
     } else if (m_gtType==GT_COMMANDER) {
@@ -104,13 +105,15 @@ functions:
     }
   };
 
-  virtual const CTFileName &GetComputerMessageName(void) const {
+  virtual const CTFileName &GetComputerMessageName(void) const
+  {
     static DECLARE_CTFILENAME(fnmSoldier,     "DataMP\\Messages\\Enemies\\GruntSoldier.txt");
     static DECLARE_CTFILENAME(fnmCommander,   "DataMP\\Messages\\Enemies\\GruntCommander.txt");
+
     switch(m_gtType) {
-    default: ASSERT(FALSE);
-    case GT_SOLDIER:  return fnmSoldier;
-    case GT_COMMANDER: return fnmCommander;
+      default: ASSERT(FALSE);
+      case GT_SOLDIER:  return fnmSoldier;
+      case GT_COMMANDER: return fnmCommander;
     }
   };
 
@@ -139,22 +142,25 @@ functions:
   };
 
   // damage anim
-  INDEX AnimForDamage(FLOAT fDamage) {
+  INDEX AnimForDamage(FLOAT fDamage)
+  {
     INDEX iAnim;
     iAnim = GRUNT_ANIM_WOUND01;
     StartModelAnim(iAnim, 0);
+
     return iAnim;
   };
 
   // death
-  INDEX AnimForDeath(void) {
+  INDEX AnimForDeath(void)
+  {
     INDEX iAnim;
     FLOAT3D vFront;
 
     GetHeadingDirection(0, vFront);
     FLOAT fDamageDir = m_vDamage%vFront;
 
-    if (fDamageDir<0) {
+    if (fDamageDir < 0) {
       iAnim = GRUNT_ANIM_DEATHBACKWARD;
     } else {
       iAnim = GRUNT_ANIM_DEATHFORWARD;
@@ -164,13 +170,15 @@ functions:
     return iAnim;
   };
 
-  FLOAT WaitForDust(FLOAT3D &vStretch) {
-    vStretch=FLOAT3D(1,1,2);
-    if (GetModelObject()->GetAnim()==GRUNT_ANIM_DEATHBACKWARD) {
+  FLOAT WaitForDust(FLOAT3D &vStretch)
+  {
+    vStretch=FLOAT3D(1, 1, 2);
+    if (GetModelObject()->GetAnim() == GRUNT_ANIM_DEATHBACKWARD) {
       return 0.5f;
-    } else if(GetModelObject()->GetAnim()==GRUNT_ANIM_DEATHFORWARD) {
+    } else if(GetModelObject()->GetAnim() == GRUNT_ANIM_DEATHFORWARD) {
       return 1.0f;
     }
+
     return -1.0f;
   };
 
@@ -183,16 +191,20 @@ functions:
   void StandingAnim(void) {
     StartModelAnim(GRUNT_ANIM_IDLE, AOF_LOOPING|AOF_NORESTART);
   };
+
   /*void StandingAnimFight(void)
   {
     StartModelAnim(HEADMAN_ANIM_IDLE_FIGHT, AOF_LOOPING|AOF_NORESTART);
   }*/
+
   void RunningAnim(void) {
     StartModelAnim(GRUNT_ANIM_RUN, AOF_LOOPING|AOF_NORESTART);
-  };
-    void WalkingAnim(void) {
+  }
+ 
+  void WalkingAnim(void) {
     RunningAnim();
   };
+
   void RotatingAnim(void) {
     RunningAnim();
   };
@@ -201,12 +213,15 @@ functions:
   void IdleSound(void) {
     PlaySound(m_soSound, SOUND_IDLE, SOF_3D);
   };
+
   void SightSound(void) {
     PlaySound(m_soSound, SOUND_SIGHT, SOF_3D);
   };
+
   void WoundSound(void) {
     PlaySound(m_soSound, SOUND_WOUND, SOF_3D);
   };
+
   void DeathSound(void) {
     PlaySound(m_soSound, SOUND_DEATH, SOF_3D);
   };
@@ -223,7 +238,8 @@ procedures:
 /************************************************************
  *                A T T A C K   E N E M Y                   *
  ************************************************************/
-  Fire(EVoid) : CEnemyBase::Fire {
+  Fire(EVoid) : CEnemyBase::Fire
+  {
     // soldier
     if (m_gtType == GT_SOLDIER) {
       autocall SoldierAttack() EEnd;
@@ -231,24 +247,28 @@ procedures:
     } else if (m_gtType == GT_COMMANDER) {
       autocall CommanderAttack() EEnd;
     // should never get here
-    } else{
+    } else {
       ASSERT(FALSE);
     }
+
     return EReturn();
   };
     
+  // --------------------------------------------------------------------------------------
   // Soldier attack
-  SoldierAttack(EVoid) {
+  // --------------------------------------------------------------------------------------
+  SoldierAttack(EVoid)
+  {
     StandingAnimFight();
     autowait(0.2f + FRnd()*0.25f);
 
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
-    ShootProjectile(PRT_GRUNT_PROJECTILE_SOL, FIREPOS_SOLDIER*m_fStretchMultiplier, ANGLE3D(0, 0, 0));
+    ShootProjectile(PRT_GRUNT_PROJECTILE_SOL, FIREPOS_SOLDIER * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(0, 0, 0)); // [SSE] Better Enemy Stretching
     PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
 
     autowait(0.15f + FRnd()*0.1f);
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
-    ShootProjectile(PRT_GRUNT_PROJECTILE_SOL, FIREPOS_SOLDIER*m_fStretchMultiplier, ANGLE3D(0, 0, 0));
+    ShootProjectile(PRT_GRUNT_PROJECTILE_SOL, FIREPOS_SOLDIER * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(0, 0, 0)); // [SSE] Better Enemy Stretching
     PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
     
 
@@ -256,8 +276,11 @@ procedures:
     return EEnd();
   };
 
+  // --------------------------------------------------------------------------------------
   // Commander attack (predicted firing on moving player)
-  CommanderAttack(EVoid) {
+  // --------------------------------------------------------------------------------------
+  CommanderAttack(EVoid)
+  {
     StandingAnimFight();
     autowait(0.2f + FRnd()*0.25f);
 
@@ -270,37 +293,38 @@ procedures:
     ShootPredictedProjectile(PRT_GRUNT_LASER, vPredictedEnemyPosition, FLOAT3D(0.0f, 1.0f, 0.0f), ANGLE3D(0, 0, 0));*/
 
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
-    ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN*m_fStretchMultiplier, ANGLE3D(-20, 0, 0));
+    ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(-20, 0, 0)); // [SSE] Better Enemy Stretching
     PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
 
     autowait(0.035f);
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
-    ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN*m_fStretchMultiplier, ANGLE3D(-10, 0, 0));
+    ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(-10, 0, 0)); // [SSE] Better Enemy Stretching
     PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
 
     autowait(0.035f);
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
-    ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN*m_fStretchMultiplier, ANGLE3D(0, 0, 0));
+    ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(0, 0, 0)); // [SSE] Better Enemy Stretching
     PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
 
     autowait(0.035f);
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
-    ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN*m_fStretchMultiplier, ANGLE3D(10, 0, 0));
+    ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(10, 0, 0)); // [SSE] Better Enemy Stretching
     PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
 
     autowait(0.035f);
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
-    ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN*m_fStretchMultiplier, ANGLE3D(20, 0, 0));
+    ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(20, 0, 0)); // [SSE] Better Enemy Stretching
     PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
 
     autowait(FRnd()*0.5f);
     return EEnd();
   };
 
-/************************************************************
- *                       M  A  I  N                         *
- ************************************************************/
-  Main(EVoid) {
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
+  Main(EVoid)
+  {
     // declare yourself as a model
     InitAsModel();
     SetPhysicsFlags(EPF_MODEL_WALKING|EPF_HASLUNGS);
@@ -312,7 +336,9 @@ procedures:
 
     // set your appearance
     SetModel(MODEL_GRUNT);
-    switch (m_gtType) {
+
+    switch (m_gtType)
+    {
       case GT_SOLDIER:
         // set your texture
         SetModelMainTexture(TEXTURE_SOLDIER);
