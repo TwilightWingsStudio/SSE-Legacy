@@ -660,6 +660,7 @@ public:
   virtual BOOL IsInteractionProvider(void);
   virtual BOOL IsInteractionRelay(void);
   virtual CEntity* GetInteractionProvider(void);
+  virtual const CTString& GetInteractionHint(void) const;
 
   /* Model change notify */
   void ModelChangeNotify(void);

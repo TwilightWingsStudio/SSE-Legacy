@@ -3336,6 +3336,12 @@ CEntity* CEntity::GetInteractionProvider(void)
   return NULL;
 }
 
+const CTString &CEntity::GetInteractionHint() const
+{
+  static const CTString strDummyName("");
+  return strDummyName;
+}
+
 /////////////////////////////////////////////////////////////////////
 // Overrides from CSerial
 
