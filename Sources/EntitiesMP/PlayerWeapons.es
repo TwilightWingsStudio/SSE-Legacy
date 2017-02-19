@@ -1258,115 +1258,111 @@ functions:
 
     // set some targeting properties (snooping and such...)
     TIME tmNow = _pTimer->CurrentTick();
-
+    
     if (m_penRayHit != NULL)
     {
       CEntity *pen = m_penRayHit;
 
-      BOOL bExCheck = TRUE;
+      // If target is interaction relay then get its interaction provider.
+      if (pen->IsInteractionRelay())
+      {
+        pen = pen->GetInteractionProvider();
+      }
       
-      // if alive 
-      if (pen->GetFlags()&ENF_ALIVE)
+      // If exists target which is interaction provider then printout some stuff.
+      if (pen != NULL && pen->IsInteractionProvider())
       {
-        // check the target for time prediction updating
-        CheckTargetPrediction(pen);
-
-        // if player
-        if (IsOfClass( pen, "Player"))
+        BOOL bExCheck = TRUE;
+        
+        // if alive 
+        if (pen->GetFlags()&ENF_ALIVE)
         {
-          // rememer when targeting begun  
-          if (m_tmTargetingStarted == 0) {
-            m_penTargeting = pen;
-            m_tmTargetingStarted = tmNow;
-          }
+          // check the target for time prediction updating
+          CheckTargetPrediction(pen);
 
-          // keep player name, mana and health for eventual printout or coloring
-          m_fEnemyHealth = ((CPlayer*)pen)->GetHealth() / ((CPlayer*)pen)->m_fMaxHealth;
-          m_strLastTarget.PrintF( "%s", ((CPlayer*)pen)->GetPlayerName());
-
-          if (GetSP()->sp_gmGameMode==CSessionProperties::GM_SCOREMATCH) {
-            // add mana to player name
-            CTString strMana="";
-            strMana.PrintF( " (%d)", ((CPlayer*)pen)->m_iMana);
-            m_strLastTarget += strMana;
-          }
-
-          if (hud_bShowPlayerName) {
-            m_tmLastTarget = tmNow + 1.5f;
-          }
-
-          bExCheck = FALSE;
-
-        // not targeting player
-        } else {
-          m_tmTargetingStarted = 0;  // reset targeting
-        }
-
-        // keep enemy health for eventual crosshair coloring
-        if (IsDerivedFromClass( pen, "Enemy Base")) {
-          m_fEnemyHealth = ((CEnemyBase*)pen)->GetHealth() / ((CEnemyBase*)pen)->m_fMaxHealth;
-          bExCheck = FALSE;
-        }
-
-         // cannot snoop while firing
-        if (m_bFireWeapon) { m_tmTargetingStarted = 0; }
-      }
-
-      if (bExCheck)
-      {
-        // not targeting player
-        m_tmTargetingStarted = 0; 
-
-        // check switch/messageholder relaying by moving brush
-        if (IsOfClass(pen, "Moving Brush") && ((CMovingBrush&)*pen).m_penSwitch != NULL) {
-          pen = ((CMovingBrush&)*pen).m_penSwitch;
-          
-        // [SSE] Interaction Through SSE Movables - BEGIN
-        } else if (IsOfClass(pen, "Movable Brush") && ((CMovableBrush&)*pen).m_penSwitch != NULL) {
-          pen = ((CMovableBrush&)*pen).m_penSwitch;
-          
-        } else if (IsOfClass(pen, "Movable Model") && ((CMovableModel&)*pen).m_penSwitch != NULL) {
-          pen = ((CMovableModel&)*pen).m_penSwitch;
-        }
-        // [SSE] Interaction Through SSE Movables - END
-
-        // If switch is under ray.
-        if (IsOfClass(pen, "Switch"))
-        {
-          CSwitch &enSwitch = (CSwitch&)*pen;
-
-          // if switch near enough and is useable
-          if ((m_fRayHitDistance < enSwitch.m_fUseRange) && enSwitch.m_bUseable) {
-            // show switch message
-            if (enSwitch.m_strMessage != "") {
-              m_strLastTarget = enSwitch.m_strMessage;
-            } else {
-              m_strLastTarget = TRANS("Use");
+          // if player
+          if (IsOfClass( pen, "Player"))
+          {
+            // rememer when targeting begun  
+            if (m_tmTargetingStarted == 0) {
+              m_penTargeting = pen;
+              m_tmTargetingStarted = tmNow;
             }
 
-            m_tmLastTarget = tmNow + 0.5f;
+            // keep player name, mana and health for eventual printout or coloring
+            m_fEnemyHealth = ((CPlayer*)pen)->GetHealth() / ((CPlayer*)pen)->m_fMaxHealth;
+            m_strLastTarget.PrintF( "%s", ((CPlayer*)pen)->GetPlayerName());
+
+            if (GetSP()->sp_gmGameMode==CSessionProperties::GM_SCOREMATCH) {
+              // add mana to player name
+              CTString strMana="";
+              strMana.PrintF( " (%d)", ((CPlayer*)pen)->m_iMana);
+              m_strLastTarget += strMana;
+            }
+
+            if (hud_bShowPlayerName) {
+              m_tmLastTarget = tmNow + 1.5f;
+            }
+
+            bExCheck = FALSE;
+
+          // not targeting player
+          } else {
+            m_tmTargetingStarted = 0;  // reset targeting
           }
+
+          // keep enemy health for eventual crosshair coloring
+          if (IsDerivedFromClass( pen, "Enemy Base")) {
+            m_fEnemyHealth = ((CEnemyBase*)pen)->GetHealth() / ((CEnemyBase*)pen)->m_fMaxHealth;
+            bExCheck = FALSE;
+          }
+
+           // cannot snoop while firing
+          if (m_bFireWeapon) { m_tmTargetingStarted = 0; }
         }
 
-        // if analyzable
-        if (IsOfClass( pen, "MessageHolder")) {
-          CMessageHolder &enMsgHolder = (CMessageHolder&)*pen;
+        if (bExCheck)
+        {
+          // not targeting player
+          m_tmTargetingStarted = 0;
 
-          // if messageholder near enough and is useable
-          if (m_fRayHitDistance < enMsgHolder.m_fDistance && enMsgHolder.m_bActive) {
-            const CTFileName &fnmMessage = enMsgHolder.m_fnmMessage;
-            // if player doesn't have that message it database
-            CPlayer &pl = (CPlayer&)*m_penPlayer;
-            if (!pl.HasMessage(fnmMessage)) {
-              // show analyse message
-              m_strLastTarget = TRANS("Analyze");
-              m_tmLastTarget  = tmNow + 0.5f;
+          // If switch is under ray.
+          if (IsOfClass(pen, "Switch"))
+          {
+            CSwitch &enSwitch = (CSwitch&)*pen;
+
+            // if switch near enough and is useable
+            if ((m_fRayHitDistance < enSwitch.m_fUseRange) && enSwitch.m_bUseable) {
+              // show switch message
+              if (enSwitch.m_strMessage != "") {
+                m_strLastTarget = enSwitch.m_strMessage;
+              } else {
+                m_strLastTarget = TRANS("Use");
+              }
+
+              m_tmLastTarget = tmNow + 0.5f;
+            }
+          }
+
+          // if analyzable
+          if (IsOfClass( pen, "MessageHolder")) {
+            CMessageHolder &enMsgHolder = (CMessageHolder&)*pen;
+
+            // if messageholder near enough and is useable
+            if (m_fRayHitDistance < enMsgHolder.m_fDistance && enMsgHolder.m_bActive) {
+              const CTFileName &fnmMessage = enMsgHolder.m_fnmMessage;
+              // if player doesn't have that message it database
+              CPlayer &pl = (CPlayer&)*m_penPlayer;
+              if (!pl.HasMessage(fnmMessage)) {
+                // show analyse message
+                m_strLastTarget = TRANS("Analyze");
+                m_tmLastTarget  = tmNow + 0.5f;
+              }
             }
           }
         }
       }
 
-    // if didn't hit anything
     } else {
       // not targeting player
       m_tmTargetingStarted = 0; 
@@ -1376,6 +1372,8 @@ functions:
       m_vRayHit = crRay.cr_vOrigin+vDir*50.0f;
     }
 
+
+    
     // determine snooping time
     TIME tmDelta = tmNow - m_tmTargetingStarted; 
     if (m_tmTargetingStarted>0 && plr_tmSnoopingDelay>0 && tmDelta>plr_tmSnoopingDelay) {
