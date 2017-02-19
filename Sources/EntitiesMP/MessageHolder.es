@@ -37,6 +37,16 @@ components:
   2 texture TEXTURE_MARKER   "Models\\Editor\\MessageHolder.tex"
 
 functions:
+
+  // --------------------------------------------------------------------------------------
+  // [SSE] Interaction API
+  // Return true if this entity can act act like interaction provider.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsInteractionProvider()
+  {
+    return TRUE;
+  }
+
   const CTString &GetDescription(void) const {
     ((CTString&)m_strDescription).PrintF("%s", m_fnmMessage.FileName());
     return m_strDescription;

@@ -171,6 +171,25 @@ components:
   1 class   CLASS_BLOOD_SPRAY     "Classes\\BloodSpray.ecl",
 
 functions:
+
+  // --------------------------------------------------------------------------------------
+  // [SSE] Interaction API
+  // Return true if this entity can act act like interaction relay.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsInteractionRelay()
+  {
+    return TRUE;
+  }
+
+  // --------------------------------------------------------------------------------------
+  // [SSE] Interaction API
+  // Return pointer to interaction provider if needed.
+  // --------------------------------------------------------------------------------------
+  virtual CEntity *GetInteractionProvider()
+  {
+    return m_penSwitch;
+  }
+
   /* Fill in entity statistics - for AI purposes only */
   BOOL FillEntityStatistics(EntityStats *pes)
   {

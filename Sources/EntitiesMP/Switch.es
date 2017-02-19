@@ -60,7 +60,17 @@ properties:
 components:
 
 
-functions:                                        
+functions:
+
+  // --------------------------------------------------------------------------------------
+  // [SSE] Interaction API
+  // Return true if this entity can act act like interaction provider.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsInteractionProvider(void)
+  {
+    return TRUE;
+  }
+
   // --------------------------------------------------------------------------------------
   // Returns anim data for given animation property - returns NULL for none.
   // --------------------------------------------------------------------------------------
