@@ -4310,6 +4310,20 @@ functions:
           return TRUE;
         }
       }
+
+    // If CPlayer...
+    } else if (IsOfClass(pen, "Player")) { // [SSE] Player Revive In Coop
+      // If coop and personal lives.
+      if (GetSP()->sp_bCooperative && !GetSP()->sp_bSharedLives)
+      {
+        CPlayer *penTarget = (CPlayer*)pen;
+        
+        if (!(penTarget->GetFlags()&ENF_ALIVE) && penTarget->m_iLives <= 0 && m_iLives > 0) {
+          CPrintF(TRANS("%s was revived by\n"), penTarget->GetPlayerName(), GetPlayerName());
+          penTarget->SendEvent(EEnd());
+          m_iLives--;
+        }
+      }
     }
 
     return FALSE;

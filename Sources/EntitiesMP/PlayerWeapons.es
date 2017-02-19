@@ -1287,7 +1287,7 @@ functions:
           // if player
           if (IsOfClass( pen, "Player"))
           {
-            // rememer when targeting begun  
+            // rememer when targeting begun
             if (m_tmTargetingStarted == 0) {
               m_penTargeting = pen;
               m_tmTargetingStarted = tmNow;
@@ -1317,12 +1317,25 @@ functions:
 
            // cannot snoop while firing
           if (m_bFireWeapon) { m_tmTargetingStarted = 0; }
+        } else {
+          // [SSE] Player Revive In Coop
+          if (GetSP()->sp_bCooperative && !GetSP()->sp_bSharedLives && IsOfClass(pen, "Player"))
+          {
+            CPlayer &pl = (CPlayer&)*m_penPlayer;
+            CPlayer *penTargetPlayer = (CPlayer*)pen;
+            
+            if (penTargetPlayer->m_iLives <= 0 && pl.m_iLives > 0) {
+              m_strLastTarget.PrintF(TRANS("Revive for 1 EL: %s"), penTargetPlayer->GetPlayerName());
+              m_tmLastTarget = tmNow + 1.5f;
+            }
+          }
+          
+          m_tmTargetingStarted = 0; // not targeting player
         }
 
         if (bExCheck)
         {
-          // not targeting player
-          m_tmTargetingStarted = 0;
+          m_tmTargetingStarted = 0; // not targeting player
 
           // If switch is under ray.
           if (IsOfClass(pen, "Switch"))
