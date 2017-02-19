@@ -57,8 +57,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "EntitiesMP/CreditsHolder.h"
 #include "EntitiesMP/HudPicHolder.h"
 
-#include "EntitiesMP/MovableBrush.h"
-#include "EntitiesMP/MovableModel.h"
+#include "EntitiesMP/SimpleSwitch.h"
 #include "EntitiesMP/SpectatorCamera.h"
 
 extern void JumpFromBouncer(CEntity *penToBounce, CEntity *penBouncer);
@@ -4263,37 +4262,52 @@ functions:
     }
 
     // If target is interaction relay then get its interaction provider.
-    if (pen->IsInteractionRelay())
-    {
+    if (pen->IsInteractionRelay()) {
       pen = pen->GetInteractionProvider();
     }
 
-    if (pen != NULL && pen->IsInteractionProvider())
-    {
-      // if switch
-      if (IsOfClass( pen, "Switch")) {
-        CSwitch &enSwitch = (CSwitch&)*pen;
+    if (pen == NULL) {
+      return FALSE;
+    }
 
-        // if switch near enough and is useable
-        if (fRayHitDistance < enSwitch.m_fUseRange && enSwitch.m_bUseable) {
-          // send it a trigger event
-          SendToTarget(pen, EET_TRIGGER, this);
-          return TRUE;
-        }
+    if (!pen->IsInteractionProvider()) {
+      return FALSE;
+    }
+
+    // If CSwitch...
+    if (IsOfClass( pen, "Switch"))
+    {
+      CSwitch &enSwitch = (CSwitch&)*pen;
+
+      // if switch near enough and is useable
+      if (fRayHitDistance < enSwitch.m_fUseRange && enSwitch.m_bUseable) {
+        // send it a trigger event
+        SendToTarget(pen, EET_TRIGGER, this);
+        return TRUE;
       }
 
-      // if analyzable messageholder
-      if (IsOfClass( pen, "MessageHolder")) {
-        CMessageHolder &enMsgHolder = (CMessageHolder&)*pen;
+    // If CSimpleSwitch...
+    } else if (IsOfClass(pen, "SimpleSwitch")) {
+      CSimpleSwitch &enSwitch = (CSimpleSwitch&)*pen;
 
-        if (fRayHitDistance < enMsgHolder.m_fDistance && enMsgHolder.m_bActive) {
-          const CTFileName &fnmMessage = enMsgHolder.m_fnmMessage;
-          // if player doesn't have that message in database
-          if (!HasMessage(fnmMessage)) {
-            // add the message
-            ReceiveComputerMessage(fnmMessage, CMF_ANALYZE);
-            return TRUE;
-          }
+      // if switch near enough and is useable
+      if (fRayHitDistance < enSwitch.m_fUseRange && enSwitch.m_bActive) {
+        // send it a trigger event
+        SendToTarget(pen, EET_TRIGGER, this);
+        return TRUE;
+      }
+
+    // if analyzable messageholder
+    } else if (IsOfClass( pen, "MessageHolder")) {
+      CMessageHolder &enMsgHolder = (CMessageHolder&)*pen;
+
+      if (fRayHitDistance < enMsgHolder.m_fDistance && enMsgHolder.m_bActive) {
+        const CTFileName &fnmMessage = enMsgHolder.m_fnmMessage;
+        // if player doesn't have that message in database
+        if (!HasMessage(fnmMessage)) {
+          // add the message
+          ReceiveComputerMessage(fnmMessage, CMF_ANALYZE);
+          return TRUE;
         }
       }
     }

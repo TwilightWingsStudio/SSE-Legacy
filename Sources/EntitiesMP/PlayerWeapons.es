@@ -67,8 +67,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "EntitiesMP/EnemyBase.h"
   
   // [SSE]
-  #include "EntitiesMP/MovableBrush.h"
-  #include "EntitiesMP/MovableModel.h"
+  #include "EntitiesMP/SimpleSwitch.h"
 
   extern INDEX hud_bShowWeapon;
 
@@ -1263,6 +1262,11 @@ functions:
     {
       CEntity *pen = m_penRayHit;
 
+      // keep enemy health for eventual crosshair coloring
+      if (IsDerivedFromClass( pen, "Enemy Base")) {
+        m_fEnemyHealth = ((CEnemyBase*)pen)->GetHealth() / ((CEnemyBase*)pen)->m_fMaxHealth;
+      }
+
       // If target is interaction relay then get its interaction provider.
       if (pen->IsInteractionRelay())
       {
@@ -1311,12 +1315,6 @@ functions:
             m_tmTargetingStarted = 0;  // reset targeting
           }
 
-          // keep enemy health for eventual crosshair coloring
-          if (IsDerivedFromClass( pen, "Enemy Base")) {
-            m_fEnemyHealth = ((CEnemyBase*)pen)->GetHealth() / ((CEnemyBase*)pen)->m_fMaxHealth;
-            bExCheck = FALSE;
-          }
-
            // cannot snoop while firing
           if (m_bFireWeapon) { m_tmTargetingStarted = 0; }
         }
@@ -1332,7 +1330,8 @@ functions:
             CSwitch &enSwitch = (CSwitch&)*pen;
 
             // if switch near enough and is useable
-            if ((m_fRayHitDistance < enSwitch.m_fUseRange) && enSwitch.m_bUseable) {
+            if ((m_fRayHitDistance < enSwitch.m_fUseRange) && enSwitch.m_bUseable)
+            {
               // show switch message
               if (enSwitch.m_strMessage != "") {
                 m_strLastTarget = enSwitch.m_strMessage;
@@ -1342,10 +1341,25 @@ functions:
 
               m_tmLastTarget = tmNow + 0.5f;
             }
-          }
+
+          } else if (IsOfClass(pen, "SimpleSwitch")) {
+            CSimpleSwitch &enSwitch = (CSimpleSwitch&)*pen;
+
+            // if switch near enough and is useable
+            if ((m_fRayHitDistance < enSwitch.m_fUseRange) && enSwitch.m_bActive)
+            {
+              // show switch message
+              if (enSwitch.m_strMessage != "") {
+                m_strLastTarget = enSwitch.m_strMessage;
+              } else {
+                m_strLastTarget = TRANS("Use");
+              }
+
+              m_tmLastTarget = tmNow + 0.5f;
+            }
 
           // if analyzable
-          if (IsOfClass( pen, "MessageHolder")) {
+          } else if (IsOfClass( pen, "MessageHolder")) {
             CMessageHolder &enMsgHolder = (CMessageHolder&)*pen;
 
             // if messageholder near enough and is useable

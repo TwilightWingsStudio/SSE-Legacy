@@ -607,6 +607,9 @@
     <ClCompile Include="SpectatorCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleSwitch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1671,6 +1674,12 @@
     <ClInclude Include="SpectatorCamera_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SimpleSwitch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleSwitch_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2605,6 +2614,9 @@
     </CustomBuild>
     <CustomBuild Include="SpectatorCamera.es">
       <Filter>Class Files\Players</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SimpleSwitch.es">
+      <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

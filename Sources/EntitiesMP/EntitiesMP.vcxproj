@@ -198,6 +198,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="RangeDamager.cpp" />
     <ClCompile Include="RayCaster.cpp" />
     <ClCompile Include="Sequencer.cpp" />
+    <ClCompile Include="SimpleSwitch.cpp" />
     <ClCompile Include="SimpleTeleport.cpp" />
     <ClCompile Include="SpectatorCamera.cpp" />
     <ClCompile Include="StdH\StdH.cpp">
@@ -450,6 +451,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="RayCaster_tables.h" />
     <ClInclude Include="Sequencer.h" />
     <ClInclude Include="Sequencer_tables.h" />
+    <ClInclude Include="SimpleSwitch.h" />
+    <ClInclude Include="SimpleSwitch_tables.h" />
     <ClInclude Include="SimpleTeleport.h" />
     <ClInclude Include="SimpleTeleport_tables.h" />
     <ClInclude Include="SpectatorCamera.h" />
@@ -2981,6 +2984,19 @@ ecc EntitiesMP/%(Filename).es </Command>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="SpectatorCamera.es">
+      <FileType>Document</FileType>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="SimpleSwitch.es">
       <FileType>Document</FileType>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
