@@ -4319,7 +4319,7 @@ functions:
         CPlayer *penTarget = (CPlayer*)pen;
         
         if (!(penTarget->GetFlags()&ENF_ALIVE) && penTarget->m_iLives <= 0 && m_iLives > 0) {
-          CPrintF(TRANS("%s was revived by\n"), penTarget->GetPlayerName(), GetPlayerName());
+          CPrintF(TRANS("%s was revived by %s\n"), penTarget->GetPlayerName(), GetPlayerName());
           penTarget->SendEvent(EEnd());
           m_iLives--;
         }
