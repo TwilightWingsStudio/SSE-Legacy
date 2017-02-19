@@ -3319,6 +3319,24 @@ BOOL CEntity::FillEntityStatistics(struct EntityStats *pes)
 }
 
 /////////////////////////////////////////////////////////////////////
+// [SSE] Interaction API
+
+BOOL CEntity::IsInteractionProvider(void)
+{
+  return FALSE;
+}
+
+BOOL CEntity::IsInteractionRelay(void)
+{
+  return FALSE;
+}
+
+CEntity* CEntity::GetInteractionProvider(void)
+{
+  return NULL;
+}
+
+/////////////////////////////////////////////////////////////////////
 // Overrides from CSerial
 
 /*

@@ -656,6 +656,11 @@ public:
   /* Fill in entity statistics - for AI purposes only */
   virtual BOOL FillEntityStatistics(struct EntityStats *pes);
 
+  // [SSE] Interaction API
+  virtual BOOL IsInteractionProvider(void);
+  virtual BOOL IsInteractionRelay(void);
+  virtual CEntity* GetInteractionProvider(void);
+
   /* Model change notify */
   void ModelChangeNotify(void);
   /* Terrain change notify */ 
