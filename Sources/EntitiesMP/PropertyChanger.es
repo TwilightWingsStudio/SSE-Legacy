@@ -117,7 +117,7 @@ functions:
     } else if (m_eSourcePT == ECT_POSY) {
       return m_penSource->GetPlacement().pl_PositionVector(2);
 
-    } else if (m_eSourcePT == ECT_POSX) {
+    } else if (m_eSourcePT == ECT_POSZ) {
       return m_penSource->GetPlacement().pl_PositionVector(3);
 
     } else if (m_eSourcePT == ECT_ROTH) {
