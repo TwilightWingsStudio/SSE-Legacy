@@ -610,6 +610,9 @@
     <ClCompile Include="SimpleSwitch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PropertiesCloner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1680,6 +1683,12 @@
     <ClInclude Include="SimpleSwitch_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PropertiesCloner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertiesCloner_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2616,6 +2625,9 @@
       <Filter>Class Files\Players</Filter>
     </CustomBuild>
     <CustomBuild Include="SimpleSwitch.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="PropertiesCloner.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>
