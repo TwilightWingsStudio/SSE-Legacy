@@ -214,6 +214,13 @@ enum WeaponType {
 #define SNIPER_DAMAGE_SNIPING 90.0F
 #define SNIPER_DAMAGE_SNIPING_COOP 300.0F
 
+// [SSE] Anim Wait Constants
+#define SINGLESHOTGUN_ANIM_FIRE_LENGTH 0.6F      // 1.1 - 0.5
+#define SINGLESHOTGUN_ANIM_FIREFAST_LENGTH 0.45F // 0.825 - 0.375
+
+#define DOUBLESHOTGUN_ANIM_FIRE_LENGTH 1.5F      // 1.75 - 0.25
+#define DOUBLESHOTGUN_ANIM_FIREFAST_LENGTH 0.9F  // 1.05 - 0.15
+
 // mana for ammo adjustment (multiplier)
 #define MANA_AMMO (0.1f)
 
@@ -3598,7 +3605,7 @@ functions:
     }
 
     m_moWeapon.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim
-    return m_moWeapon.GetAnimLength(iAnim);
+    return m_moWeapon.GetAnimLength(iAnim); // TODO: Huyna
   };
 
   // --------------------------------------------------------------------------------------
@@ -3614,7 +3621,7 @@ functions:
     }
 
     m_moWeapon.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim
-    return m_moWeapon.GetAnimLength(iAnim);
+    return m_moWeapon.GetAnimLength(iAnim); // TODO: Huyna
   };
 
   // --------------------------------------------------------------------------------------
@@ -3631,10 +3638,10 @@ functions:
 
     if (IRnd()&1) {
       m_moWeapon.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim for one colt
-      return m_moWeapon.GetAnimLength(iAnim);
+      return m_moWeapon.GetAnimLength(iAnim); // TODO: Huyna
     } else {
       m_moWeaponSecond.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim for one colt
-      return m_moWeaponSecond.GetAnimLength(iAnim);
+      return m_moWeaponSecond.GetAnimLength(iAnim); // TODO: Huyna
     }
   };
 
@@ -3652,7 +3659,7 @@ functions:
 
     m_moWeapon.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim
 
-    return m_moWeapon.GetAnimLength(iAnim);
+    return m_moWeapon.GetAnimLength(iAnim); // TODO: Huyna
   };
 
   // --------------------------------------------------------------------------------------
@@ -3670,7 +3677,7 @@ functions:
 
     m_moWeapon.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim
 
-    return m_moWeapon.GetAnimLength(iAnim);
+    return m_moWeapon.GetAnimLength(iAnim); // TODO: Huyna
   };
 
   // --------------------------------------------------------------------------------------
@@ -3687,7 +3694,7 @@ functions:
 
     m_moWeapon.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim
 
-    return m_moWeapon.GetAnimLength(iAnim);
+    return m_moWeapon.GetAnimLength(iAnim); // TODO: Huyna
   };
 
   // --------------------------------------------------------------------------------------
@@ -3699,7 +3706,7 @@ functions:
     iAnim = SNIPER_ANIM_WAIT01;
     m_moWeapon.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim
 
-    return m_moWeapon.GetAnimLength(iAnim);
+    return m_moWeapon.GetAnimLength(iAnim); // TODO: Huyna
   };
 
   // --------------------------------------------------------------------------------------
@@ -3717,7 +3724,7 @@ functions:
 
     m_moWeapon.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim
 
-    return m_moWeapon.GetAnimLength(iAnim);
+    return m_moWeapon.GetAnimLength(iAnim); // TODO: Huyna
   };
 
   // --------------------------------------------------------------------------------------
@@ -3727,7 +3734,7 @@ functions:
   {
     m_moWeapon.PlayAnim(ROCKETLAUNCHER_ANIM_WAIT2, AOF_SMOOTHCHANGE); // play boring anim
 
-    return m_moWeapon.GetAnimLength(ROCKETLAUNCHER_ANIM_WAIT2);
+    return m_moWeapon.GetAnimLength(ROCKETLAUNCHER_ANIM_WAIT2); // TODO: Huyna
   };
 
   // --------------------------------------------------------------------------------------
@@ -3737,7 +3744,7 @@ functions:
   {
     m_moWeapon.PlayAnim(GRENADELAUNCHER_ANIM_WAIT2, AOF_SMOOTHCHANGE); // play boring anim
 
-    return m_moWeapon.GetAnimLength(GRENADELAUNCHER_ANIM_WAIT2);
+    return m_moWeapon.GetAnimLength(GRENADELAUNCHER_ANIM_WAIT2); // TODO: Huyna
   };
 
 /*
@@ -3789,7 +3796,7 @@ functions:
 
     m_moWeapon.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim
 
-    return m_moWeapon.GetAnimLength(iAnim);
+    return m_moWeapon.GetAnimLength(iAnim); // TODO: Huyna
   };
   
   // --------------------------------------------------------------------------------------
@@ -3807,7 +3814,7 @@ functions:
 
     m_moWeapon.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim
 
-    return m_moWeapon.GetAnimLength(iAnim);
+    return m_moWeapon.GetAnimLength(iAnim); // TODO: Huyna
   };
 
   // --------------------------------------------------------------------------------------
@@ -3819,7 +3826,7 @@ functions:
     iAnim = LASER_ANIM_WAIT02;
     m_moWeapon.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim
 
-    return m_moWeapon.GetAnimLength(iAnim);
+    return m_moWeapon.GetAnimLength(iAnim); // TODO: Huyna
   };
 
   /*
@@ -3850,7 +3857,7 @@ functions:
 
     m_moWeapon.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim
 
-    return m_moWeapon.GetAnimLength(iAnim);
+    return m_moWeapon.GetAnimLength(iAnim); // TODO: Huyna
   };
 
   // --------------------------------------------------------------------------------------
@@ -4266,7 +4273,7 @@ procedures:
 
     // --->>>  DOUBLE COLT -> COLT SPECIFIC  <<<---
     if (m_iCurrentWeapon==WEAPON_DOUBLECOLT && m_iWantedWeapon==WEAPON_COLT) {
-      autowait(m_moWeapon.GetAnimLength(m_iAnim));
+      autowait(m_moWeapon.GetAnimLength(m_iAnim)); // TODO: Huyna
       return EEnd();
     }
 
@@ -4288,7 +4295,7 @@ procedures:
     }
 
     m_moWeapon.PlayAnim(m_iAnim, 0);
-    autowait(m_moWeapon.GetAnimLength(m_iAnim));
+    autowait(m_moWeapon.GetAnimLength(m_iAnim)); // TODO: Huyna
     return EEnd();
   };
 
@@ -4386,7 +4393,7 @@ procedures:
 
     // --->>>  COLT -> COLT DOUBLE SPECIFIC  <<<---
     if (m_iPreviousWeapon == WEAPON_COLT && m_iCurrentWeapon == WEAPON_DOUBLECOLT) {
-      autowait(m_moWeapon.GetAnimLength(m_iAnim));
+      autowait(m_moWeapon.GetAnimLength(m_iAnim)); // TODO: Huyna
       // mark that weapon change has ended
       m_tmWeaponChangeRequired -= hud_tmWeaponsOnScreen/2;
       return EEnd();
@@ -4406,7 +4413,7 @@ procedures:
     */
 
     m_moWeapon.PlayAnim(m_iAnim, 0);
-    autowait(m_moWeapon.GetAnimLength(m_iAnim));
+    autowait(m_moWeapon.GetAnimLength(m_iAnim)); // TODO: Huyna
 
 /*
     if (m_iCurrentWeapon == WEAPON_NUKECANNON)
@@ -4576,8 +4583,8 @@ procedures:
       autowait(m_fAnimWaitTime/2);
     }
 
-    if (m_moWeapon.GetAnimLength(m_iAnim)-m_fAnimWaitTime>=_pTimer->TickQuantum) {
-      autowait(m_moWeapon.GetAnimLength(m_iAnim)-m_fAnimWaitTime);
+    if (m_moWeapon.GetAnimLength(m_iAnim)-m_fAnimWaitTime>=_pTimer->TickQuantum) { // TODO: Huyna
+      autowait(m_moWeapon.GetAnimLength(m_iAnim)-m_fAnimWaitTime); // TODO: Huyna
     }
 
     return EEnd();
@@ -4626,7 +4633,7 @@ procedures:
     }
 
     m_moWeapon.PlayAnim(iAnim, 0);
-    autowait(m_moWeapon.GetAnimLength(iAnim)-0.05f);
+    autowait(m_moWeapon.GetAnimLength(iAnim)-0.05f); // TODO: Huyna
     m_moWeapon.PlayAnim(COLT_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART);
 
     // no more bullets in colt -> reload
@@ -4650,7 +4657,7 @@ procedures:
 
     m_moWeapon.PlayAnim(COLT_ANIM_RELOAD, 0);
     if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Colt_reload");}
-    autowait(m_moWeapon.GetAnimLength(COLT_ANIM_RELOAD));
+    autowait(m_moWeapon.GetAnimLength(COLT_ANIM_RELOAD)); // TODO: Huyna
     m_iColtBullets = 6;
 
     return EEnd();
@@ -4696,7 +4703,7 @@ procedures:
     }
 
     m_moWeapon.PlayAnim(m_iAnim, 0);                  // play first colt anim
-    autowait(m_moWeapon.GetAnimLength(m_iAnim)/2);    // wait half of the anim
+    autowait(m_moWeapon.GetAnimLength(m_iAnim)/2);    // wait half of the anim  // TODO: Huyna
 
     // fire second colt
     GetAnimator()->FireAnimation(BODY_ANIM_COLT_FIRELEFT, 0);
@@ -4729,7 +4736,7 @@ procedures:
     PlaySound(pl.m_soWeapon1, SOUND_COLT_FIRE, SOF_3D|SOF_VOLUMETRIC);
 
     m_moWeaponSecond.PlayAnim(m_iAnim, 0);
-    autowait(m_moWeapon.GetAnimLength(m_iAnim)/2);    // wait half of the anim
+    autowait(m_moWeapon.GetAnimLength(m_iAnim)/2);    // wait half of the anim  // TODO: Huyna
 
     // no more bullets in colt -> reload
     if (m_iColtBullets == 0) {
@@ -4753,7 +4760,7 @@ procedures:
     PlaySound(pl.m_soWeapon2, SOUND_COLT_RELOAD, SOF_3D|SOF_VOLUMETRIC);
 
     // wait half of reload time
-    autowait(m_moWeapon.GetAnimLength(COLT_ANIM_RELOAD)/2);
+    autowait(m_moWeapon.GetAnimLength(COLT_ANIM_RELOAD)/2); // TODO: Huyna
 
     m_moWeaponSecond.PlayAnim(COLT_ANIM_RELOAD, 0);
 
@@ -4763,7 +4770,7 @@ procedures:
     if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Colt_reload");}
 
     // wait second halt minus half shortest fire animation
-    autowait(m_moWeapon.GetAnimLength(COLT_ANIM_RELOAD)-0.25f);
+    autowait(m_moWeapon.GetAnimLength(COLT_ANIM_RELOAD)-0.25f);  // TODO: Huyna
 
     m_iColtBullets = COLT_MAG_SIZE;
 
@@ -4859,9 +4866,14 @@ procedures:
     }
 
     /* drop shell */
-      autowait(m_moWeapon.GetAnimLength(
-        (GetSP()->sp_bCooperative ? SINGLESHOTGUN_ANIM_FIRE1:SINGLESHOTGUN_ANIM_FIRE1FAST) ) -
-        (GetSP()->sp_bCooperative ? 0.5f : 0.375f) );
+    /*
+    autowait(m_moWeapon.GetAnimLength(
+      (GetSP()->sp_bCooperative ? SINGLESHOTGUN_ANIM_FIRE1 : SINGLESHOTGUN_ANIM_FIRE1FAST) ) -
+      (GetSP()->sp_bCooperative ? 0.5f : 0.375f) );
+    */
+
+    // [SSE] Anim Wait Constants
+    autowait(GetSP()->sp_bCooperative ? SINGLESHOTGUN_ANIM_FIRE_LENGTH : SINGLESHOTGUN_ANIM_FIREFAST_LENGTH);
 
     // no ammo -> change weapon
     if (m_iShells <= 0) {
@@ -4957,9 +4969,13 @@ procedures:
       PlaySound(pl.m_soWeapon1, SOUND_DOUBLESHOTGUN_RELOAD, SOF_3D|SOF_VOLUMETRIC);
     }
 
+    /*
     autowait( m_moWeapon.GetAnimLength(
       (GetSP()->sp_bCooperative ? DOUBLESHOTGUN_ANIM_FIRE : DOUBLESHOTGUN_ANIM_FIREFAST)) -
-      (GetSP()->sp_bCooperative ? 0.25f : 0.15f) );
+      (GetSP()->sp_bCooperative ? 0.25f : 0.15f) );*/
+
+    // [SSE] Anim Wait Constants
+    autowait(GetSP()->sp_bCooperative ? DOUBLESHOTGUN_ANIM_FIRE_LENGTH : DOUBLESHOTGUN_ANIM_FIREFAST_LENGTH);
 
     // no ammo -> change weapon
     if (m_iShells <= 1) {
@@ -5444,8 +5460,9 @@ procedures:
     CModelObject *pmo = &(m_moWeapon.GetAttachmentModel(ROCKETLAUNCHER_ATTACHMENT_ROCKET1)->amo_moModelObject);
     pmo->StretchModel(FLOAT3D(0, 0, 0));
 
-    autowait(m_moWeapon.GetAnimLength(ROCKETLAUNCHER_ANIM_FIRE)-0.05f);
-
+    //autowait(m_moWeapon.GetAnimLength(ROCKETLAUNCHER_ANIM_FIRE)-0.05f);
+    autowait(0.615F); // [SSE] Anim Wait Constants
+    
     CModelObject *pmo = &(m_moWeapon.GetAttachmentModel(ROCKETLAUNCHER_ATTACHMENT_ROCKET1)->amo_moModelObject);
     pmo->StretchModel(FLOAT3D(1, 1, 1));
 
@@ -5612,7 +5629,7 @@ procedures:
     m_tmFlamerStop = 1e9;
     
     m_moWeapon.PlayAnim(FLAMER_ANIM_FIRESTART, 0);
-    autowait(m_moWeapon.GetAnimLength(FLAMER_ANIM_FIRESTART));
+    autowait(m_moWeapon.GetAnimLength(FLAMER_ANIM_FIRESTART)); // TODO: Huyna
 
     // play fire sound
     CPlayer &pl = (CPlayer&)*m_penPlayer;
@@ -5664,7 +5681,7 @@ procedures:
     }
 
     m_moWeapon.PlayAnim(FLAMER_ANIM_FIREEND, 0);
-    autowait(m_moWeapon.GetAnimLength(FLAMER_ANIM_FIREEND));
+    autowait(m_moWeapon.GetAnimLength(FLAMER_ANIM_FIREEND)); // TODO: Huyna
 
     if (m_iNapalm <= 0) {
       // select new weapon
@@ -5686,7 +5703,7 @@ procedures:
   
     // bring the chainsaw down to cutting height (fire position)
     m_moWeapon.PlayAnim(CHAINSAW_ANIM_WAIT2FIRE, 0);
-    autowait(m_moWeapon.GetAnimLength(CHAINSAW_ANIM_WAIT2FIRE)-0.05f);
+    autowait(m_moWeapon.GetAnimLength(CHAINSAW_ANIM_WAIT2FIRE)-0.05f); // TODO: Huyna
 
     CPlayerAnimator &pa=*GetAnimator();
     pa.FireAnimation(BODY_ANIM_MINIGUN_FIRELONG, 0);
@@ -5733,7 +5750,7 @@ procedures:
     pl.m_soWeaponAmbient.Set3DParameters(30.0f, 3.0f, 1.0f, 1.0f);        
     
     m_moWeapon.PlayAnim(CHAINSAW_ANIM_FIRE2WAIT, 0);
-    autowait(m_moWeapon.GetAnimLength(CHAINSAW_ANIM_FIRE2WAIT));
+    autowait(m_moWeapon.GetAnimLength(CHAINSAW_ANIM_FIRE2WAIT)); // TODO: Huyna
 
     // stop teeth rotation
     CModelObject *pmo1 = &(m_moWeapon.GetAttachmentModel(CHAINSAW_ATTACHMENT_BLADE)->amo_moModelObject);
@@ -5752,7 +5769,7 @@ procedures:
   {
     // bring it back to idle position
     m_moWeapon.PlayAnim(CHAINSAW_ANIM_FIRE2WAIT, 0);
-    autowait(m_moWeapon.GetAnimLength(CHAINSAW_ANIM_FIRE2WAIT));
+    autowait(m_moWeapon.GetAnimLength(CHAINSAW_ANIM_FIRE2WAIT)); // TODO: Huyna
     jump Idle();
   }
 
@@ -5948,8 +5965,8 @@ procedures:
 
     TM_START = _pTimer->CurrentTick();
     m_fWeaponDrawPowerOld = m_fWeaponDrawPower;
-    while (m_fWeaponDrawPower > 0.0f ||
-      ((_pTimer->CurrentTick()-TM_START) < m_moWeapon.GetAnimLength(CANNON_ANIM_FIRE)) )
+
+    while (m_fWeaponDrawPower > 0.0f || ((_pTimer->CurrentTick() - TM_START) < 1.2F) ) // [SSE] Anim Wait Constants // m_moWeapon.GetAnimLength(CANNON_ANIM_FIRE)
     {
       autowait(_pTimer->TickQuantum);
       m_fWeaponDrawPowerOld = m_fWeaponDrawPower;
