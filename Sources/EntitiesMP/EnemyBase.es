@@ -3170,17 +3170,24 @@ procedures:
     }
 
     // if the anim is not yet finished
-    if (!IsAnimFinished()) {
-      // wait the rest of time till the anim end
-      wait(GetCurrentAnimLength() - GetPassedTime()) {
-        on (EBegin) : { resume; }
-        on (ETimer) : { stop; }
-        // if timer expired
-        on (EReminder) : {
-          // stop moving
-          StopMoving();
-          resume;
+    if (!IsAnimFinished())
+    {
+      if (GetPassedTime() < 15.0F) // [SSE] Charge Hit Restriction
+      {
+        // wait the rest of time till the anim end
+        wait(GetCurrentAnimLength() - GetPassedTime())
+        {
+          on (EBegin) : { resume; }
+          on (ETimer) : { stop; }
+          // if timer expired
+          on (EReminder) : {
+            // stop moving
+            StopMoving();
+            resume;
+          }
         }
+      } else {
+        StopMoving();
       }
     }
 
