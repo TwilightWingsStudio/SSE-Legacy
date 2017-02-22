@@ -491,6 +491,8 @@ procedures:
     m_fBodyParts = 4;
     m_fDamageWounded = 80.0f;
     m_iScore = 1000;
+    
+    m_tmMaxChargeHitLength = 1.3F;
 
     if (m_fStepHeight == -1) {
       m_fStepHeight = 4.0f;

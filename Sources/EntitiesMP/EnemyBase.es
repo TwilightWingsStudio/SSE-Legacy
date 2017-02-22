@@ -186,6 +186,8 @@ properties:
 181 BOOL  m_bResizeAttachments "Stretch attachments" = FALSE, // for small enemies with big guns
 
 // [SSE]
+185 FLOAT m_tmChargeHitStarted = 0.0F,
+186 FLOAT m_tmMaxChargeHitLength = 5.0F,
 190 INDEX m_iLastReminderValue = 0,
 
 200 BOOL m_bCountEnemyInStatistics "Count As Enemy (statistics)" = TRUE,
@@ -3136,9 +3138,11 @@ procedures:
   // --------------------------------------------------------------------------------------
   ChargeHitEnemy(EVoid) 
   {
+    m_tmChargeHitStarted = _pTimer->CurrentTick(); // Remember startup time.
+
     // wait for length of hit animation
     // TODO: Make it better!
-    wait(ClampUp(GetAnimLength(m_iChargeHitAnimation), 15.0F)) // [SSE] Charge Hit Restriction
+    wait(ClampUp(GetAnimLength(m_iChargeHitAnimation), m_tmMaxChargeHitLength)) // [SSE] Charge Hit Restriction
     {
       on (EBegin) : { resume; }
       on (ETimer) : { stop; }
@@ -3151,7 +3155,8 @@ procedures:
         resume;
       }
       // if you touch some entity
-      on (ETouch etouch) : {
+      on (ETouch etouch) :
+      {
         // if it is alive and in front
         if ((etouch.penOther->GetFlags()&ENF_ALIVE) && IsInPlaneFrustum(etouch.penOther, CosFast(60.0f))) {
           // get your direction
@@ -3170,24 +3175,21 @@ procedures:
     }
 
     // if the anim is not yet finished
-    if (!IsAnimFinished())
+    if (!IsAnimFinished()) 
     {
-      if (GetPassedTime() < 15.0F) // [SSE] Charge Hit Restriction
+      FLOAT tmDelta = _pTimer->CurrentTick() - m_tmChargeHitStarted;
+  
+      // wait the rest of time till the anim end
+      wait(tmDelta <= m_tmMaxChargeHitLength ? ClampUp(GetCurrentAnimLength(), m_tmMaxChargeHitLength) - tmDelta : _pTimer->TickQuantum) // [SSE] Charge Hit Restriction
       {
-        // wait the rest of time till the anim end
-        wait(GetCurrentAnimLength() - GetPassedTime())
-        {
-          on (EBegin) : { resume; }
-          on (ETimer) : { stop; }
-          // if timer expired
-          on (EReminder) : {
-            // stop moving
-            StopMoving();
-            resume;
-          }
+        on (EBegin) : { resume; }
+        on (ETimer) : { stop; }
+        // if timer expired
+        on (EReminder) : {
+          // stop moving
+          StopMoving();
+          resume;
         }
-      } else {
-        StopMoving();
       }
     }
 

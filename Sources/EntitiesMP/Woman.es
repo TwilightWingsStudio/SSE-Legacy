@@ -573,6 +573,8 @@ procedures:
     m_fFlyAttackFireTime = 3.0f;
     m_fFlyCloseFireTime = 2.0f;
     m_fFlyIgnoreRange = 200.0f;
+    
+    m_tmMaxChargeHitLength = 0.9F;
 
     // Damage/Explode properties.
     m_fBlowUpAmount = 100.0f;
