@@ -185,7 +185,7 @@ properties:
 
 181 BOOL  m_bResizeAttachments "Stretch attachments" = FALSE, // for small enemies with big guns
 
-// SSE
+// [SSE]
 190 INDEX m_iLastReminderValue = 0,
 
 200 BOOL m_bCountEnemyInStatistics "Count As Enemy (statistics)" = TRUE,
@@ -3137,7 +3137,9 @@ procedures:
   ChargeHitEnemy(EVoid) 
   {
     // wait for length of hit animation
-    wait(GetAnimLength(m_iChargeHitAnimation)) {
+    // TODO: Make it better!
+    wait(ClampUp(GetAnimLength(m_iChargeHitAnimation), 15.0F)) // [SSE] Charge Hit Restriction
+    {
       on (EBegin) : { resume; }
       on (ETimer) : { stop; }
       // ignore damages
@@ -3166,6 +3168,7 @@ procedures:
         pass;
       }
     }
+
     // if the anim is not yet finished
     if (!IsAnimFinished()) {
       // wait the rest of time till the anim end
