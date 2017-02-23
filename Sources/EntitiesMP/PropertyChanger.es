@@ -25,7 +25,7 @@ enum EOperation {
   2  EO_SUBSTRACT  "-",
   3  EO_MULTIPLY   "*",
   4  EO_DIVIDE     "/",
-  5  EO_REMAINDER  "% (REMAINDER index only)", // TODO: Write code for it later.
+  5  EO_REMAINDER  "% (REMAINDER)", // TODO: Write code for it later.
   6  EO_BITAND     "& (AND index only)",
   7  EO_BITOR      "| (OR index only)",
   8  EO_XOR        "^ (XOR index only)",
@@ -235,7 +235,7 @@ functions:
     // If invalid property.
     if (pTargetProperty == NULL && m_eSourcePT == ECT_ENTITY) { 
       if (m_bDebugMessages) {
-        CPrintF(TRANS("%s : Property with name '%s' not found!\n"), m_strName, m_strTargetProperty);
+        CPrintF(TRANS("[PC] %s : Property with name '%s' not found!\n"), m_strName, m_strTargetProperty);
       }
 
       return;
@@ -281,40 +281,63 @@ functions:
             *fNew = *((FLOAT*)&fSrc);
           }
         }
+        
+        BOOL bErrorOccured = FALSE;
 
         if (m_eOperation == EO_SET) {
-          if (m_bDebugMessages) {
-            CPrintF("%s : Setting target float to value=%f.\n", GetName(), *fNew);
-          }
-
           *fValue = *fNew;
+
         } else if (m_eOperation == EO_ADD) {
-          if (m_bDebugMessages) {
-            CPrintF("%s : Adding target float to value=%f.\n", GetName(), *fNew);
-          }
-
           *fValue += *fNew;
+
         } else if (m_eOperation == EO_SUBSTRACT) {
-          if (m_bDebugMessages) {
-            CPrintF("%s : Substracting target float from value=%f.\n", GetName(), *fNew);
-          }
-
           *fValue -= *fNew;
+
         } else if (m_eOperation == EO_MULTIPLY) {
-          if (m_bDebugMessages) {
-            CPrintF("%s : Multiplying target float with value=%f.\n", GetName(), *fNew);
-          }
-
           *fValue *= *fNew;
-        } else if (m_eOperation == EO_DIVIDE && m_fValue != 0) {
-          if (m_bDebugMessages) {
-            CPrintF("%s : Diving target float with value=%f.\n", GetName(), *fNew);
+
+        } else if (m_eOperation == EO_DIVIDE && (*fNew != 0.0F)) {
+          *fValue /= *fNew;
+          
+        } else if (m_eOperation == EO_REMAINDER && (*fNew != 0.0F)) {
+          *fValue =  fmod(*fValue, *fNew);
+
+        } else {
+          bErrorOccured = TRUE;
+        }
+        
+        if (m_bDebugMessages && !bErrorOccured)
+        {
+          CPrintF(TRANS("[PC] %s : Target Entity Property: [%s].[%s] is currently (FLOAT)%f\n"), m_strName, ((CEntity&)*m_penTarget).GetName(), m_strTargetProperty, fOld);
+          if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_INDEX) {
+            CPrintF(TRANS("[PC] %s : Source Entity Property: [%s].[%s] is currently (FLOAT)%f\n"), m_strName, ((CEntity&)*m_penSource).GetName(), m_strSourceProperty, *fNew);
+          } else {
+            CPrintF(TRANS("[PC] %s : Source Value: (FLOAT)%F\n"), m_strName, m_fValue);
           }
 
-          *fValue /= *fNew;
-        } else {
-          if (m_bDebugMessages) {
-            CPrintF(TRANS("%s : DO NOT DIVIDE THROUGH 0!\n"), m_strName);
+          if (m_eOperation == EO_SET) {
+            CPrintF(TRANS("  Expression : [%s] = (FLOAT)%f\n"), m_strTargetProperty, *fNew);
+            CPrintF(TRANS("  Result = %f\n"), *fValue);
+
+          } else if (m_eOperation == EO_ADD) {
+            CPrintF(TRANS("  Expression : [%s] = (FLOAT)%f + (FLOAT)%f\n"), m_strTargetProperty, fOld, *fNew);
+            CPrintF(TRANS("  Result = %f\n"), *fValue);
+
+          } else if (m_eOperation == EO_SUBSTRACT) {
+            CPrintF(TRANS("  Expression : [%s] = (FLOAT)%f - (FLOAT)%f\n"), m_strTargetProperty, fOld, *fNew);
+            CPrintF(TRANS("  Result = %f\n"), *fValue);
+
+          } else if (m_eOperation == EO_MULTIPLY) {
+            CPrintF(TRANS("  Expression : [%s] = (FLOAT)%f * (FLOAT)%f\n"), m_strTargetProperty, fOld, *fNew);
+            CPrintF(TRANS("  Result = %f\n"), *fValue);
+
+          } else if (m_eOperation == EO_DIVIDE) {
+            CPrintF(TRANS("  Expression : [%s] = (FLOAT)%f / (FLOAT)%f\n"), m_strTargetProperty, fOld, *fNew);
+            CPrintF(TRANS("  Result = %f\n"), *fValue);
+
+          } else if (m_eOperation == EO_REMAINDER) {
+            CPrintF(TRANS("  Expression : [%s] = (FLOAT)%f FMOD(%%) (FLOAT)%f\n"), m_strTargetProperty, fOld, *fNew);
+            CPrintF(TRANS("  Result = %f\n"), *fValue);
           }
         }
           
@@ -419,14 +442,14 @@ functions:
             }
           } else {
             if (m_bDebugMessages) {
-              CPrintF(TRANS("%s : Error! Out of bounds while using bitwise operation.\n  Bounds: [0..31]\nValue: %d\n"), m_strName, m_iValue);
+              CPrintF(TRANS("[PC] %s : Error! Out of bounds while using bitwise operation.\n  Bounds: [0..31]\nValue: %d\n"), m_strName, m_iValue);
               bErrorOccured = TRUE;
             }
           }
 
         } else {
           if (m_bDebugMessages) {
-            CPrintF(TRANS("%s : Error! DO NOT DIVIDE THROUGH 0!\n"), m_strName);
+            CPrintF(TRANS("[PC] %s : Error! DO NOT DIVIDE THROUGH 0!\n"), m_strName);
             bErrorOccured = TRUE;
           }
         }
@@ -442,7 +465,8 @@ functions:
           }
 
           if (m_eOperation == EO_SET) {
-            CPrintF(TRANS("  Expression : [%s] = (INDEX)%d\n"), m_strName, m_strTargetProperty, *iValue);
+            CPrintF(TRANS("  Expression : [%s] = (INDEX)%d\n"), m_strTargetProperty, *iNew);
+            CPrintF(TRANS("  Result = %d\n"), *iValue);
 
           } else if (m_eOperation == EO_ADD) {
             CPrintF(TRANS("  Expression : [%s] = (INDEX)%d + (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
