@@ -83,6 +83,7 @@ properties:
  
  // [SSE] Camera Expansion
  80 BOOL m_bDisablePlayerControl "Disable Player Control" = TRUE,
+ 81 BOOL m_bHideHUD "Hide HUD" = TRUE,
 
 components:
 

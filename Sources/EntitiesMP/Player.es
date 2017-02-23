@@ -3117,6 +3117,15 @@ functions:
       if (bListen && iEye==STEREO_LEFT) {
         ListenFromEntity(penViewer, plViewer);
       }
+      
+      if (hud_bShowAll && m_penCamera != NULL && !((CCamera&)*m_penCamera).m_bHideHUD) {
+        // let the player entity render its interface
+        CPlacement3D plLight(_vViewerLightDirection, ANGLE3D(0,0,0));
+        plLight.AbsoluteToRelative(plViewer);
+        RenderHUD( *(CPerspectiveProjection3D *)(CProjection3D *)apr, pdp, 
+          plLight.pl_PositionVector, _colViewerLight, _colViewerAmbient, 
+          penViewer==this && (GetFlags()&ENF_ALIVE), iEye);
+      }
     }
 
     Stereo_SetBuffer(STEREO_BOTH);
@@ -5847,17 +5856,24 @@ functions:
 
     // render crosshair if sniper zoom not active
     CPlacement3D plView;
+  
     if (m_iViewState == PVT_PLAYEREYES) {
       // player view
       plView = en_plViewpoint;
       plView.RelativeToAbsolute(GetPlacement());
+      
     } else if (m_iViewState == PVT_3RDPERSONVIEW) {
       // camera view
       plView = ((CPlayerView&)*m_pen3rdPersonView).GetPlacement();
     }
+    
+    if (m_penCamera != NULL) {
+      plView = m_penCamera->GetLerpedPlacement();
+    }
 
     // Sniper rifle has it's own scope!
-    if (!bSniping) {
+    if (!bSniping)
+    {
       ((CPlayerWeapons&)*m_penWeapons).RenderCrosshair(prProjection, pdp, plView);
       // [SSE] Second Crosshair
       if (hud_bSecondCrosshair && ((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon == WEAPON_DOUBLECOLT) {
