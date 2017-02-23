@@ -19,6 +19,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "EntitiesMP/BackgroundViewer.h"
 #include "EntitiesMP/WorldSettingsController.h"
 #include "EntitiesMP/EnemyBase.h"
+
+#define SERIOUSBOMB_PLAYERKILLDISTANCE 100.0F
+#define SERIOUSBOMB_SAFEDISTANCE 5.0F
 %}
 
 // event for initialisation
@@ -53,11 +56,16 @@ components:
 
 
 functions:
-  
+
+  // --------------------------------------------------------------------------------------
+  // Makes earthquake effect.
+  // --------------------------------------------------------------------------------------
   void ShakeItBaby(FLOAT tmShaketime, FLOAT fPower, FLOAT fFade, BOOL bFadeIn)
   {
     CWorldSettingsController *pwsc = GetWSC(this);
-    if (pwsc!=NULL) {
+
+    if (pwsc != NULL)
+    {
       pwsc->m_tmShakeStarted = tmShaketime;
       pwsc->m_vShakePos = GetPlacement().pl_PositionVector;
       pwsc->m_fShakeFalloff = 450.0f;
@@ -74,42 +82,89 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
+  // Makes white glare effect.
+  // --------------------------------------------------------------------------------------
   void Glare(FLOAT fStart, FLOAT fEnd, FLOAT fFinR, FLOAT fFoutR)
   {
     CWorldSettingsController *pwsc = GetWSC(this);
-    if (pwsc!=NULL)
+
+    if (pwsc != NULL)
     {
       pwsc->m_colGlade=C_WHITE;
-      pwsc->m_tmGlaringStarted = _pTimer->CurrentTick()+fStart;
-      pwsc->m_tmGlaringEnded = pwsc->m_tmGlaringStarted+fEnd;
+      pwsc->m_tmGlaringStarted = _pTimer->CurrentTick() + fStart;
+      pwsc->m_tmGlaringEnded = pwsc->m_tmGlaringStarted + fEnd;
       pwsc->m_fGlaringFadeInRatio = fFinR;
       pwsc->m_fGlaringFadeOutRatio = fFoutR;
     }
   }
-    
 
-  void ExplodeBomb( void )
+  // --------------------------------------------------------------------------------------
+  // Kills everybody who can be killed.
+  // --------------------------------------------------------------------------------------
+  void ExplodeBomb(void)
   {
     // for each entity in the world
-    {FOREACHINDYNAMICCONTAINER(this->GetWorld()->wo_cenEntities, CEntity, iten) {
+    FOREACHINDYNAMICCONTAINER(this->GetWorld()->wo_cenEntities, CEntity, iten)
+    {
       CEntity *pen = iten;
-      if (IsDerivedFromClass(pen, "Enemy Base")) {
+
+      if (IsDerivedFromClass(pen, "Enemy Base"))
+      {
         CEnemyBase *penEnemy = (CEnemyBase *)pen;
-        if (penEnemy->m_bBoss==TRUE || DistanceTo(this, penEnemy)>250.0f) {
+
+        if (penEnemy->m_bBoss == TRUE || DistanceTo(this, penEnemy) > 250.0f) {
           continue;
         }
-        this->InflictDirectDamage(pen, this, DMT_EXPLOSION, penEnemy->GetHealth()+100.0f, pen->GetPlacement().pl_PositionVector, FLOAT3D(0,1,0));
+
+        this->InflictDirectDamage(pen, this, DMT_EXPLOSION, penEnemy->GetHealth()+100.0f, pen->GetPlacement().pl_PositionVector, FLOAT3D(0, 1, 0));
       }
-    }}
+    }
+
+    // [SSE] Better Serious Bomb
+    if ((GetSP()->sp_bCooperative && GetSP()->sp_bFriendlyFire) || !GetSP()->sp_bCooperative)
+    {
+      INDEX ctMaxPlayers = GetMaxPlayers();
+      CEntity *penPlayer;
+
+      // Cycle through all active players...
+      for (INDEX i = 0; i < ctMaxPlayers; i++)
+      {
+        penPlayer = GetPlayerEntity(i);
+
+        // If player is invalid then skip him.
+        if (penPlayer == NULL) {
+          continue;
+        }
+        
+        // If player is owner then don't touch him. (NOTE: We have distance check but this one is for safety.)
+        if (penPlayer == m_penOwner) {
+          continue;
+        }
+        
+        FLOAT fDistance = DistanceTo(this, penPlayer);
+        
+        // If player in wrong place then don't kill him.
+        if (fDistance < SERIOUSBOMB_SAFEDISTANCE || fDistance > SERIOUSBOMB_PLAYERKILLDISTANCE) {
+          continue;
+        }
+        
+        // Process the magic. :D
+        this->InflictDirectDamage(penPlayer, this, DMT_EXPLOSION, 999999.0F, penPlayer->GetPlacement().pl_PositionVector, FLOAT3D(0, 1, 0));
+      }
+    }
   }
   
 procedures:
-  
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main(ESeriousBomb esb)
   {
     InitAsVoid();
 
-    if (esb.penOwner) {
+    if (esb.penOwner)
+    {
       m_penOwner = esb.penOwner;
       
       m_soBlow.Set3DParameters(500.0f, 250.0f, 3.0f, 1.0f);
@@ -129,9 +184,9 @@ procedures:
       ExplodeBomb();
       autowait(0.25f);
       ExplodeBomb();
-      autowait(1.75f);   
-
+      autowait(1.75f);
     }
+
     Destroy();
     return;
   };
