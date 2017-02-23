@@ -373,6 +373,7 @@ extern FLOAT hud_tmLatencySnapshot = 1.0f;
 extern INDEX hud_bShowMatchInfo = TRUE;
 
 // [SSE] HUD
+extern BOOL hud_bSecondCrosshair = FALSE;
 extern BOOL hud_bRedScreenOnDamage = TRUE;
 extern BOOL hud_bShowEmptyAmmoInList = TRUE;
 
@@ -855,6 +856,7 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("persistent user FLOAT plr_fBreathingStrength;", &plr_fBreathingStrength);
   
   // [SSE] HUD
+  _pShell->DeclareSymbol("persistent user INDEX hud_bSecondCrosshair;",  &hud_bSecondCrosshair);
   _pShell->DeclareSymbol("persistent user INDEX hud_bRedScreenOnDamage;",  &hud_bRedScreenOnDamage);
   _pShell->DeclareSymbol("persistent user INDEX hud_bShowEmptyAmmoInList;",  &hud_bShowEmptyAmmoInList);
   
@@ -5857,6 +5859,10 @@ functions:
     // Sniper rifle has it's own scope!
     if (!bSniping) {
       ((CPlayerWeapons&)*m_penWeapons).RenderCrosshair(prProjection, pdp, plView);
+      // [SSE] Second Crosshair
+      if (hud_bSecondCrosshair && ((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon == WEAPON_DOUBLECOLT) {
+        ((CPlayerWeapons&)*m_penWeapons).RenderCrosshair2(prProjection, pdp, plView);
+      }
     }
 
     // get your prediction tail

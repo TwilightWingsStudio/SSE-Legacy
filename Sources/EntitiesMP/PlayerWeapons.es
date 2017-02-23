@@ -628,6 +628,11 @@ properties:
  35 FLOAT3D m_vBulletSource = FLOAT3D(0,0,0), // bullet launch position remembered here
  36 FLOAT3D m_vBulletTarget = FLOAT3D(0,0,0), // bullet hit (if hit) position remembered here
 
+ // [SSE] Second Crosshair
+ 37 FLOAT3D m_vRayHit2     = FLOAT3D(0,0,0), // coordinates where second ray hit
+ 38 FLOAT3D m_vRayHitLast2 = FLOAT3D(0,0,0), // for second ray lerping
+ 39 FLOAT m_fRayHitDistance2 = 100.0f,   // distance from hit point
+
  // ammo for all weapons
  40 INDEX m_iBullets        = 0,
  41 INDEX m_iMaxBullets     = MAX_BULLETS,
@@ -1248,19 +1253,40 @@ functions:
     if (GetPlayer()->m_iViewState == PVT_3RDPERSONVIEW) {
       fFX = fFY = 0;
     }
+
     CalcWeaponPosition(FLOAT3D(fFX, fFY, 0), plCrosshair, FALSE);
+ 
     // cast ray
     CCastRay crRay( m_penPlayer, plCrosshair);
     crRay.cr_bHitTranslucentPortals = FALSE;
     crRay.cr_bPhysical = FALSE;
     crRay.cr_ttHitModels = CCastRay::TT_COLLISIONBOX;
     GetWorld()->CastRay(crRay);
+
     // store required cast ray results
     m_vRayHitLast = m_vRayHit;  // for lerping purposes
     m_vRayHit   = crRay.cr_vHit;
     m_penRayHit = crRay.cr_penHit;
     m_fRayHitDistance = crRay.cr_fHitDistance;
     m_fEnemyHealth = 0.0f;
+
+    // [SSE] Second Crosshair
+    if (m_iCurrentWeapon == WEAPON_DOUBLECOLT)
+    {
+      m_bMirrorFire = TRUE;
+      CalcWeaponPosition(FLOAT3D(fFX, fFY, 0), plCrosshair, FALSE);
+      m_bMirrorFire = FALSE;
+      
+      CCastRay crRay2( m_penPlayer, plCrosshair);
+      crRay2.cr_bHitTranslucentPortals = FALSE;
+      crRay2.cr_bPhysical = FALSE;
+      crRay2.cr_ttHitModels = CCastRay::TT_COLLISIONBOX;
+      GetWorld()->CastRay(crRay2);
+      
+      m_vRayHitLast2 = m_vRayHit2;
+      m_vRayHit2   = crRay2.cr_vHit;
+      m_fRayHitDistance2 = crRay2.cr_fHitDistance;
+    }
 
     // set some targeting properties (snooping and such...)
     TIME tmNow = _pTimer->CurrentTick();
@@ -1547,6 +1573,107 @@ functions:
         strCoords.PrintF( "%.0f,%.0f,%.0f", vRayHit(1), vRayHit(2), vRayHit(3));
         pdp->PutTextC( strCoords, slDPWidth*0.5f, slDPHeight*0.10f, C_WHITE|CT_OPAQUE);
       }
+    }
+  };
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Second Crosshair
+  // --------------------------------------------------------------------------------------
+  void RenderCrosshair2( CProjection3D &prProjection, CDrawPort *pdp, CPlacement3D &plViewSource)
+  {
+    INDEX iCrossHair = GetPlayer()->GetSettings()->ps_iCrossHairType+1;
+
+    // adjust crosshair type
+    if (iCrossHair<=0) {
+      iCrossHair  = 0;
+      _iLastCrosshairType = 0;
+    }
+
+    // create new crosshair texture (if needed)
+    if (_iLastCrosshairType != iCrossHair) {
+      _iLastCrosshairType = iCrossHair;
+      CTString fnCrosshair;
+      fnCrosshair.PrintF( "Textures\\Interface\\Crosshairs\\Crosshair%d.tex", iCrossHair);
+      try {
+        // load new crosshair texture
+        _toCrosshair.SetData_t( fnCrosshair);
+      } catch( char *strError) { 
+        // didn't make it! - reset crosshair
+        CPrintF( strError);
+        iCrossHair = 0;
+        return;
+      }
+    }
+    COLOR colCrosshair = C_WHITE;
+    TIME  tmNow = _pTimer->CurrentTick();
+
+    // if hit anything
+    FLOAT3D vOnScreen;
+    FLOAT   fDistance = m_fRayHitDistance2;
+    //const FLOAT3D vRayHit = Lerp( m_vRayHitLast, m_vRayHit, _pTimer->GetLerpFactor());
+    const FLOAT3D vRayHit = m_vRayHit2;  // lerping doesn't seem to work ???
+
+    // if hit anything
+    if (m_penRayHit != NULL) {
+      CEntity *pen = m_penRayHit;
+      // do screen projection
+      prProjection.ViewerPlacementL() = plViewSource;
+      prProjection.ObjectPlacementL() = CPlacement3D( FLOAT3D(0.0f, 0.0f, 0.0f), ANGLE3D( 0, 0, 0));
+      prProjection.Prepare();
+      prProjection.ProjectCoordinate( vRayHit, vOnScreen);
+
+      // if required, show enemy health thru crosshair color
+      if (hud_bCrosshairColoring && m_fEnemyHealth > 0) {
+        if (m_fEnemyHealth < 0.25f) {
+          colCrosshair = C_RED;
+        } else if (m_fEnemyHealth < 0.50f) {
+          colCrosshair = C_ORANGE;
+        } else if (m_fEnemyHealth < 0.75f) {
+          colCrosshair = C_YELLOW;
+        } else {
+          colCrosshair = C_GREEN;
+        }
+      }
+    // if didn't hit anything
+    } else {
+      // far away in screen center
+      vOnScreen(1) = (FLOAT)pdp->GetWidth()  *0.5f;
+      vOnScreen(2) = (FLOAT)pdp->GetHeight() *0.5f;
+      fDistance    = 100.0f;
+    }
+
+    // if croshair should be of fixed position
+    if (hud_bCrosshairFixed || GetPlayer()->m_iViewState == PVT_3RDPERSONVIEW) {
+      // reset it to screen center
+      vOnScreen(1) = (FLOAT)pdp->GetWidth()  *0.5f;
+      vOnScreen(2) = (FLOAT)pdp->GetHeight() *0.5f;
+      //fDistance    = 100.0f;
+    }
+    
+    // clamp console variables
+    hud_fCrosshairScale   = Clamp( hud_fCrosshairScale,   0.1f, 2.0f);
+    hud_fCrosshairRatio   = Clamp( hud_fCrosshairRatio,   0.1f, 1.0f);
+    hud_fCrosshairOpacity = Clamp( hud_fCrosshairOpacity, 0.1f, 1.0f);
+    const ULONG ulAlpha = NormFloatToByte( hud_fCrosshairOpacity);
+
+    // draw crosshair if needed
+    if (iCrossHair>0) {
+      // determine crosshair size
+      const FLOAT fMinD =   1.0f;
+      const FLOAT fMaxD = 100.0f;
+      fDistance = Clamp( fDistance, fMinD, fMaxD);
+      const FLOAT fRatio   = (fDistance-fMinD) / (fMaxD-fMinD);
+      const FLOAT fMaxSize = (FLOAT)pdp->GetWidth() / 640.0f;
+      const FLOAT fMinSize = fMaxSize * hud_fCrosshairRatio;
+      const FLOAT fSize    = 16 * Lerp( fMaxSize, fMinSize, fRatio) * hud_fCrosshairScale;
+      // draw crosshair
+      const FLOAT fI0 = + (PIX)vOnScreen(1) - fSize;
+      const FLOAT fI1 = + (PIX)vOnScreen(1) + fSize;
+      const FLOAT fJ0 = - (PIX)vOnScreen(2) - fSize +pdp->GetHeight();
+      const FLOAT fJ1 = - (PIX)vOnScreen(2) + fSize +pdp->GetHeight();
+      pdp->InitTexture( &_toCrosshair);
+      pdp->AddTexture( fI0, fJ0, fI1, fJ1, colCrosshair|ulAlpha);
+      pdp->FlushRenderingQueue();
     }
   };
 
@@ -4703,7 +4830,7 @@ procedures:
     }
 
     m_moWeapon.PlayAnim(m_iAnim, 0);                  // play first colt anim
-    autowait(m_moWeapon.GetAnimLength(m_iAnim)/2);    // wait half of the anim  // TODO: Huyna
+    autowait(m_moWeapon.GetAnimLength(m_iAnim) / 2);    // wait half of the anim  // TODO: Huyna
 
     // fire second colt
     GetAnimator()->FireAnimation(BODY_ANIM_COLT_FIRELEFT, 0);
@@ -4736,7 +4863,7 @@ procedures:
     PlaySound(pl.m_soWeapon1, SOUND_COLT_FIRE, SOF_3D|SOF_VOLUMETRIC);
 
     m_moWeaponSecond.PlayAnim(m_iAnim, 0);
-    autowait(m_moWeapon.GetAnimLength(m_iAnim)/2);    // wait half of the anim  // TODO: Huyna
+    autowait(m_moWeapon.GetAnimLength(m_iAnim) / 2);    // wait half of the anim  // TODO: Huyna
 
     // no more bullets in colt -> reload
     if (m_iColtBullets == 0) {
