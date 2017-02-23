@@ -356,7 +356,8 @@ extern INDEX cht_bEnable       = 0;
 
 extern INDEX cht_bSpectator    = FALSE; // [SSE] Spectator Camera
 
-extern INDEX cht_bBadSync      = FALSE; // [SSE]
+extern INDEX cht_bBadSync      = FALSE; // [SSE] Cheats Expansion
+extern INDEX cht_bSuicide      = FALSE; // [SSE] Cheats Expansion
 
 // Interface Control
 static INDEX hud_bShowAll     = TRUE; // used internaly in menu/console
@@ -897,6 +898,7 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("user INDEX cht_bGiveAll;",   &cht_bGiveAll);
   _pShell->DeclareSymbol("user INDEX cht_bKillAll;",   &cht_bKillAll);
   _pShell->DeclareSymbol("user INDEX cht_bKillAllAura;", &cht_bKillAllAura);   // [SSE] Cheats Expansion
+  _pShell->DeclareSymbol("user INDEX cht_bSuicide;", &cht_bSuicide);           // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bRevive;", &cht_bRevive);             // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bInfiniteAmmo;", &cht_bInfiniteAmmo); // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bOpen;",      &cht_bOpen);
@@ -5641,9 +5643,17 @@ functions:
     }
 
     // cheat
-    if (cht_bGiveAll) {
+    if (cht_bGiveAll)
+    {
       cht_bGiveAll = FALSE;
       ((CPlayerWeapons&)*m_penWeapons).CheatGiveAll();
+    }
+    
+    // [SSE] Cheats Expansion
+    if (cht_bSuicide)
+    {
+      cht_bSuicide = FALSE;
+      InflictDirectDamage(this, this, DMT_EXPLOSION, 999999.0F, GetPlacement().pl_PositionVector, FLOAT3D(0, 1, 0));
     }
     
     // [SSE] Spectator Camera
