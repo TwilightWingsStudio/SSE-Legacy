@@ -7455,8 +7455,14 @@ procedures:
   // --------------------------------------------------------------------------------------
   DoAutoActions(EVoid)
   {
-    // don't look up/down
-    en_plViewpoint.pl_OrientationAngle = ANGLE3D(0,0,0);
+    if (m_penActionMarker != NULL && IsOfClass(m_penActionMarker, "PlayerActionMarker")) {
+      if (GetActionMarker()->m_bResetViewAngle) {
+        en_plViewpoint.pl_OrientationAngle = ANGLE3D(0, 0, 0); // don't look up/down
+      }
+    } else {
+      en_plViewpoint.pl_OrientationAngle = ANGLE3D(0, 0, 0); // don't look up/down
+    }
+
     // disable playeranimator animating
     CPlayerAnimator &plan = (CPlayerAnimator&)*m_penAnimator;
     plan.m_bDisableAnimating = TRUE;
@@ -7633,6 +7639,17 @@ procedures:
       } else if (GetActionMarker()->m_paaAction == PAA_TURNONGRAVITY) {
         SetPhysicsFlags(GetPhysicsFlags()|EPF_TRANSLATEDBYGRAVITY|EPF_ORIENTEDBYGRAVITY);
         SetParent(NULL);
+      
+      // [SSE] New Actions
+      } else if (GetActionMarker()->m_paaAction == PAA_TAKEALLWEAPONS) {
+        GetPlayerWeapons()->InitializeWeapons(0, 0xFFFFFFFF, 0, 0, FALSE);
+
+      } else if (GetActionMarker()->m_paaAction == PAA_TAKEALLAMMO) {
+        GetPlayerWeapons()->InitializeWeapons(0, 0, 0xFFFFFFFF, 0, FALSE);
+        
+      } else if (GetActionMarker()->m_paaAction == PAA_TAKEALLAMMOANDWEAPONS) {
+        GetPlayerWeapons()->InitializeWeapons(0, 0xFFFFFFFF, 0xFFFFFFFF, 0, FALSE);
+      //
 
       } else if (TRUE) {
         ASSERT(FALSE);

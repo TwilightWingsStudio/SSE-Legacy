@@ -50,6 +50,11 @@ enum PlayerAutoAction {
  26 PAA_LOGO_FIRE_INTROSE "SE Logo Fire",       // for SE intro
  27 PAA_INTROSE_SELECT_WEAPON "SE Logo draw weapon",
  28 PAA_STOPANDWAIT       "StopAndWait",      // stop immediately and wait
+
+ // [SSE] New Actions
+ 29 PAA_TAKEALLWEAPONS        "TakeAllWeapons",
+ 30 PAA_TAKEALLAMMO           "TakeAllAmmo",
+ 31 PAA_TAKEALLAMMOANDWEAPONS "TakeAllAmmoAndWeapons",
 };
 
 class CPlayerActionMarker: CMarker {
@@ -63,6 +68,9 @@ properties:
   4 CEntityPointer m_penTrigger "Trigger" 'G',  // triggered when player gets here
   5 FLOAT m_fSpeed "Speed" 'S' = 1.0f,    // how fast to run towards marker
   6 CEntityPointer m_penItem "Item to pick" 'I',
+ 
+  // [SSE]
+ 10 BOOL m_bResetViewAngle "Reset View Angle" = TRUE,
 
 components:
   1 model   MODEL_MARKER     "Models\\Editor\\PlayerActionMarker.mdl",
