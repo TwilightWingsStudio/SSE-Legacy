@@ -32,6 +32,20 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define TOP_ARMOR  100
 #define TOP_HEALTH 100
 
+enum EHUDHorAnchorType
+{
+  EHHAT_LEFT = 0,
+  EHHAT_CENTER = 1,
+  EHHAT_RIGHT = 2,
+};
+
+enum EHUDVerAnchorType
+{
+  EHVAT_TOP = 0,
+  EHVAT_MID = 1,
+  EHVAT_BOT = 2,
+};
+
 // Cheats
 extern INDEX cht_bEnable;
 extern INDEX cht_bGod;
@@ -122,6 +136,8 @@ static CTextureObject _toArmorMedium;
 static CTextureObject _toArmorLarge;
 
 static CTextureObject _toExtraLive; // [SSE]
+
+static CTextureObject _toTestIken; // [SSE]
 
 // ammo textures
 static CTextureObject _toAShells;
@@ -891,6 +907,207 @@ static void HUD_DrawEntityStack()
 #endif
 //<<<<<<< DEBUG FUNCTIONS >>>>>>>
 
+static void HUD_DrawAnchoredRectEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, COLOR colRect)
+{
+  FLOAT fOriginX = fPosX;
+  FLOAT fOriginY = fPosY;
+  
+  FLOAT fModSizeX = fSizeX;
+  FLOAT fModSizeY = fSizeY;
+  
+  switch (ehPos)
+  {
+    default: {
+      fOriginX = fOriginX;
+    } break;
+
+    case EHHAT_CENTER: {
+      fOriginX = _pixDPWidth / 2.0F + fOriginX - fSizeX;
+    } break;
+
+    case EHHAT_RIGHT: {
+      fOriginX = _pixDPWidth - fOriginX - fSizeX;
+    } break;
+  }
+
+  switch (evPos)
+  {
+    default: {
+      fOriginY = fOriginY;
+    } break;
+
+    case EHVAT_MID: {
+      fOriginY = _pixDPHeight / 2.0F + fOriginY - fSizeY;
+    } break;
+
+    case EHVAT_BOT: {
+      fOriginY = _pixDPHeight - fOriginY - fSizeY;
+    } break;
+  }
+  
+  _pDP->Fill(fOriginX, fOriginY, fModSizeX, fModSizeY, colRect|_ulAlphaHUD);
+}
+
+static void HUD_DrawAnchoredRect(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, COLOR colRect)
+{
+  FLOAT fMul;
+  
+  if (_pixDPWidth > _pixDPHeight) {
+    fMul = _pixDPHeight / 480.0F;
+  } else {
+    fMul = _pixDPWidth / 640.0F;
+  }
+
+  fPosX *= fMul;
+  fPosY *= fMul;
+  fSizeX *= fMul;
+  fSizeY *= fMul;
+  
+  HUD_DrawAnchoredRectEx(fPosX, fPosY, fSizeX, fSizeY, ehPos, evPos, colRect);
+}
+
+static void HUD_DrawAnchroredIconEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, CTextureObject &toIcon, COLOR colDefault, FLOAT fNormValue, BOOL bBlink)
+{
+  // Determine color
+  COLOR col = colDefault;
+  if (col == NONE) col = GetCurrentColor( fNormValue);
+
+  // determine blinking state
+  if (bBlink && fNormValue<=(_cttHUD.ctt_fLowMedium/2)) {
+    // activate blinking only if value is <= half the low edge
+    INDEX iCurrentTime = (INDEX)(_tmNow*4);
+    if (iCurrentTime&1) col = C_vdGRAY;
+  }
+  
+  FLOAT fOriginX = fPosX;
+  FLOAT fOriginY = fPosY;
+  
+  
+  const FLOAT fHalfSizeI = fSizeX * 0.5F;
+  const FLOAT fHalfSizeJ = fSizeY * 0.5F;
+  
+  switch (ehPos)
+  {
+    default: {
+      fOriginX = fOriginX + fHalfSizeI;
+    } break;
+
+    case EHHAT_CENTER: {
+      fOriginX = _pixDPWidth / 2.0F + fOriginX;
+    } break;
+
+    case EHHAT_RIGHT: {
+      fOriginX = _pixDPWidth - fOriginX - fHalfSizeI;
+    } break;
+  }
+
+  switch (evPos)
+  {
+    default: {
+      fOriginY = fOriginY + fHalfSizeJ;
+    } break;
+
+    case EHVAT_MID: {
+      fOriginY = _pixDPHeight / 2.0F + fOriginY;
+    } break;
+
+    case EHVAT_BOT: {
+      fOriginY = _pixDPHeight - fOriginY - fHalfSizeJ;
+    } break;
+  }
+
+  // done
+  _pDP->InitTexture( &toIcon);
+  _pDP->AddTexture( fOriginX - fHalfSizeI, fOriginY - fHalfSizeI, fOriginX + fHalfSizeI, fOriginY + fHalfSizeJ, col|_ulAlphaHUD);
+  _pDP->FlushRenderingQueue();
+}
+
+static void HUD_DrawAnchroredIcon(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, CTextureObject &toIcon, COLOR colDefault, FLOAT fNormValue, BOOL bBlink)
+{
+  FLOAT fMul;
+  
+  if (_pixDPWidth > _pixDPHeight) {
+    fMul = _pixDPHeight / 480.0F;
+  } else {
+    fMul = _pixDPWidth / 640.0F;
+  }
+
+  fPosX *= fMul;
+  fPosY *= fMul;
+  fSizeX *= fMul;
+  fSizeY *= fMul;
+  
+  HUD_DrawAnchroredIconEx(fPosX, fPosY, fSizeX, fSizeY, ehPos, evPos, toIcon, colDefault, fNormValue, bBlink);
+}
+
+static void HUD_DrawAnchoredTextEx( FLOAT fPosX, FLOAT fPosY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, const CTString &strText, COLOR colDefault, FLOAT fNormValue)
+{
+  if (_pDP->dp_FontData == NULL) return; // TODO: Maybe make assert.
+  
+  // determine color
+  COLOR col = colDefault;
+  if (col == NONE) {
+    col = GetCurrentColor( fNormValue);
+  }
+
+  FLOAT fOriginX = fPosX;
+  FLOAT fOriginY = fPosY;
+  
+  FLOAT fTextScale = _fResolutionScaling * _fCustomScaling;
+  
+  FLOAT fCharHeight = _pfdDisplayFont->GetHeight() * fTextScale;
+
+  _pDP->SetTextScaling(fTextScale);
+  
+  switch (ehPos)
+  {
+    default: {
+      fOriginX = fOriginX + _pDP->GetTextWidth(strText) / 2;
+    } break;
+
+    case EHHAT_CENTER: {
+      fOriginX = _pixDPWidth / 2.0F + fOriginX;
+    } break;
+
+    case EHHAT_RIGHT: {
+      fOriginX = _pixDPWidth - fOriginX - _pDP->GetTextWidth(strText) / 2.0F;
+    } break;
+  }
+
+  switch (evPos)
+  {
+    default: {
+      fOriginY = fOriginY + fCharHeight / 2.0F;
+    } break;
+
+    case EHVAT_MID: {
+      fOriginY = _pixDPHeight / 2.0F + fOriginY;
+    } break;
+
+    case EHVAT_BOT: {
+      fOriginY = _pixDPHeight - fOriginY - fCharHeight / 2.0F;
+    } break;
+  }
+
+  // done
+  _pDP->PutTextCXY( strText, fOriginX, fOriginY, col|_ulAlphaHUD);
+}
+
+static void HUD_DrawAnchoredText( FLOAT fPosX, FLOAT fPosY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, const CTString &strText, COLOR colDefault, FLOAT fNormValue)
+{
+  FLOAT fMul;
+  
+  if (_pixDPWidth > _pixDPHeight) {
+    fMul = _pixDPHeight / 480.0F;
+  } else {
+    fMul = _pixDPWidth / 640.0F;
+  }
+
+  fPosX *= fMul;
+  fPosY *= fMul;
+  
+  HUD_DrawAnchoredTextEx(fPosX, fPosY, ehPos, evPos, strText, colDefault, fNormValue);
+}
 
 // --------------------------------------------------------------------------------------
 // main
@@ -898,13 +1115,15 @@ static void HUD_DrawEntityStack()
 // render interface (frontend) to drawport
 // (units are in pixels for 640x480 resolution - for other res HUD will be scalled automatically)
 // --------------------------------------------------------------------------------------
+//#define INC_TEST_IKEN
+//#define NEW_HUD
+#ifdef NEW_HUD
 extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner)
 {
   // no player - no info, sorry
   if (penPlayerCurrent == NULL || (penPlayerCurrent->GetFlags()&ENF_DELETED)) return;
   
   if (!_bHUDAssetsLoaded) return;
-  
 
   // if snooping and owner player ins NULL, return
   if (bSnooping && penPlayerOwner == NULL) return;
@@ -937,6 +1156,85 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
   COLOR colTop = SE_COL_ORANGE_LIGHT;
   COLOR colMid = LerpColor(colTop, C_RED, 0.5f);
 
+  /*
+  HUD_DrawAnchoredRect(16, 16, 32, 32, EHHAT_LEFT, EHVAT_TOP, C_RED|255);
+  HUD_DrawAnchoredRect(16, 16, 32, 32, EHHAT_LEFT, EHVAT_MID, C_RED|255);
+  HUD_DrawAnchoredRect(16, 16, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_RED|255);
+  
+  HUD_DrawAnchoredRect(16, 16, 32, 32, EHHAT_CENTER, EHVAT_TOP, C_RED|255);
+  HUD_DrawAnchoredRect(16, 16, 32, 32, EHHAT_CENTER, EHVAT_MID, C_RED|255);
+  HUD_DrawAnchoredRect(16, 16, 32, 32, EHHAT_CENTER, EHVAT_BOT, C_RED|255);
+  
+  HUD_DrawAnchoredRect(16, 16, 32, 32, EHHAT_RIGHT, EHVAT_TOP, C_RED|255);
+  HUD_DrawAnchoredRect(16, 16, 32, 32, EHHAT_RIGHT, EHVAT_BOT, C_RED|255);
+  HUD_DrawAnchoredRect(16, 16, 32, 32, EHHAT_RIGHT, EHVAT_MID, C_RED|255);
+  */
+  HUD_DrawAnchroredIcon(16, 16, 32, 32, EHHAT_LEFT,   EHVAT_TOP, _toTestIken, C_WHITE|64, 1.0F, FALSE);
+  HUD_DrawAnchroredIcon(16, 16, 32, 32, EHHAT_LEFT,   EHVAT_MID, _toTestIken, C_WHITE|64, 1.0F, FALSE);
+  HUD_DrawAnchroredIcon(16, 16, 32, 32, EHHAT_LEFT,   EHVAT_BOT, _toTestIken, C_WHITE|64, 1.0F, FALSE);
+  HUD_DrawAnchroredIcon( 0, 16, 32, 32, EHHAT_CENTER, EHVAT_TOP, _toTestIken, C_WHITE|64, 1.0F, FALSE);
+  HUD_DrawAnchroredIcon( 0,  0, 32, 32, EHHAT_CENTER, EHVAT_MID, _toTestIken, C_WHITE|64, 1.0F, FALSE);
+  HUD_DrawAnchroredIcon( 0, 16, 32, 32, EHHAT_CENTER, EHVAT_BOT, _toTestIken, C_WHITE|64, 1.0F, FALSE);
+  HUD_DrawAnchroredIcon(16, 16, 32, 32, EHHAT_RIGHT,  EHVAT_TOP, _toTestIken, C_WHITE|64, 1.0F, FALSE);
+  HUD_DrawAnchroredIcon(16, 16, 32, 32, EHHAT_RIGHT,  EHVAT_BOT, _toTestIken, C_WHITE|64, 1.0F, FALSE);
+  HUD_DrawAnchroredIcon(16, 16, 32, 32, EHHAT_RIGHT,  EHVAT_MID, _toTestIken, C_WHITE|64, 1.0F, FALSE);
+  
+  CTString strGovno;
+  strGovno.PrintF("[]");
+  
+  _pfdDisplayFont->SetVariableWidth();
+  _pDP->SetFont( _pfdDisplayFont);  
+
+  HUD_DrawAnchoredText(16, 16, EHHAT_LEFT,   EHVAT_TOP, strGovno, C_GREEN|255, 1.0F);
+  HUD_DrawAnchoredText(16, 16, EHHAT_LEFT,   EHVAT_MID, strGovno, C_GREEN|255, 1.0F);
+  HUD_DrawAnchoredText(16, 16, EHHAT_LEFT,   EHVAT_BOT, strGovno, C_GREEN|255, 1.0F);
+  HUD_DrawAnchoredText( 0, 16,   EHHAT_CENTER, EHVAT_TOP, strGovno, C_GREEN|255, 1.0F);
+  HUD_DrawAnchoredText( 0, 0,   EHHAT_CENTER, EHVAT_MID, strGovno, C_GREEN|255, 1.0F);
+  HUD_DrawAnchoredText( 0, 16,   EHHAT_CENTER, EHVAT_BOT, strGovno, C_GREEN|255, 1.0F);
+  HUD_DrawAnchoredText(16, 16, EHHAT_RIGHT,  EHVAT_TOP, strGovno, C_GREEN|255, 1.0F);
+  HUD_DrawAnchoredText(16, 16, EHHAT_RIGHT,  EHVAT_BOT, strGovno, C_GREEN|255, 1.0F);
+  HUD_DrawAnchoredText(16, 16, EHHAT_RIGHT,  EHVAT_MID, strGovno, C_GREEN|255, 1.0F);
+}
+
+#else
+void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner)
+{
+  // no player - no info, sorry
+  if (penPlayerCurrent == NULL || (penPlayerCurrent->GetFlags()&ENF_DELETED)) return;
+  
+  if (!_bHUDAssetsLoaded) return;
+
+  // if snooping and owner player ins NULL, return
+  if (bSnooping && penPlayerOwner == NULL) return;
+
+  // find last values in case of predictor
+  CPlayer *penLast = (CPlayer*)penPlayerCurrent;
+  if (penPlayerCurrent->IsPredictor()) penLast = (CPlayer*)(((CPlayer*)penPlayerCurrent)->GetPredicted());
+  ASSERT(penLast != NULL);
+  if (penLast == NULL) return; // !!!! just in case
+
+  // cache local variables
+  hud_fOpacity = Clamp( hud_fOpacity, 0.1f, 1.0f);
+  hud_fScaling = Clamp( hud_fScaling, 0.5f, 1.2f);
+  
+  _penPlayer  = penPlayerCurrent;
+  _penWeapons = (CPlayerWeapons*)&*_penPlayer->m_penWeapons;
+  _pDP        = pdpCurrent;
+  _pixDPWidth   = _pDP->GetWidth();
+  _pixDPHeight  = _pDP->GetHeight();
+
+  _fCustomScaling     = hud_fScaling;
+  _fResolutionScaling = (FLOAT)_pixDPWidth / 640.0f;
+  _colHUD     = 0x4C80BB00;
+  _colHUDText = SE_COL_ORANGE_LIGHT;
+  _ulAlphaHUD = NormFloatToByte(hud_fOpacity);
+  _tmNow = _pTimer->CurrentTick();
+
+  // determine hud colorization;
+  COLOR colMax = SE_COL_BLUEGREEN_LT;
+  COLOR colTop = SE_COL_ORANGE_LIGHT;
+  COLOR colMid = LerpColor(colTop, C_RED, 0.5f);
+  
   // adjust borders color in case of spying mode
   COLOR colBorder = _colHUD;
 
@@ -1345,9 +1643,14 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
         const FLOAT fCharWidth = (PIX)((_pfdDisplayFont->GetWidth()-2) *fTextScale);
         if (bCooperative) {
           _pDP->PutTextR( strName+":", _pixDPWidth-8*fCharWidth, fCharHeight*i+fOneUnit*2, colScore |_ulAlphaHUD);
-          _pDP->PutText(  "/",         _pixDPWidth-4*fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD  |_ulAlphaHUD);
-          _pDP->PutTextC( strHealth,   _pixDPWidth-6*fCharWidth, fCharHeight*i+fOneUnit*2, colHealth|_ulAlphaHUD);
-          _pDP->PutTextC( strArmor,    _pixDPWidth-2*fCharWidth, fCharHeight*i+fOneUnit*2, colArmor |_ulAlphaHUD);
+          
+          if (penPlayer->GetFlags()&ENF_ALIVE) {
+            _pDP->PutText(  "/",         _pixDPWidth-4*fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD  |_ulAlphaHUD);
+            _pDP->PutTextC( strHealth,   _pixDPWidth-6*fCharWidth, fCharHeight*i+fOneUnit*2, colHealth|_ulAlphaHUD);
+            _pDP->PutTextC( strArmor,    _pixDPWidth-2*fCharWidth, fCharHeight*i+fOneUnit*2, colArmor |_ulAlphaHUD);
+          } else {
+            _pDP->PutTextC(  TRANS("DEAD"), _pixDPWidth-4*fCharWidth, fCharHeight*i+fOneUnit*2, C_RED|_ulAlphaHUD); // [SSE] No Stupid Zeros If Player Dead
+          }
         } else if (bScoreMatch) {
           _pDP->PutTextR( strName+":", _pixDPWidth-12*fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD |_ulAlphaHUD);
           _pDP->PutText(  "/",         _pixDPWidth- 5*fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD |_ulAlphaHUD);
@@ -1547,6 +1850,7 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
   _tmLast = _tmNow;
 
 }
+#endif
 
 // --------------------------------------------------------------------------------------
 // Initialize all that's needed for drawing the HUD.
@@ -1619,6 +1923,10 @@ extern void InitHUD(void)
     // initialize tile texture
     _toTile.SetData_t( CTFILENAME("Textures\\Interface\\Tile.tex"));
 
+    #ifdef INC_TEST_IKEN
+    _toTestIken.SetData_t( CTFILENAME("TestIken.tex"));
+    #endif
+    
     // set all textures as constant
     ((CTextureData*)_toHealth .GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)_toOxygen .GetData())->Force(TEX_CONSTANT);
@@ -1633,6 +1941,10 @@ extern void InitHUD(void)
     ((CTextureData*)_toArmorLarge.GetData())->Force(TEX_CONSTANT);
     
     ((CTextureData*)_toExtraLive.GetData())->Force(TEX_CONSTANT); // [SSE]
+
+    #ifdef INC_TEST_IKEN
+    ((CTextureData*)_toTestIken.GetData())->Force(TEX_CONSTANT); // [SSE]
+    #endif
 
     ((CTextureData*)_toAShells       .GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)_toABullets      .GetData())->Force(TEX_CONSTANT);
