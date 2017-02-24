@@ -7649,11 +7649,38 @@ procedures:
         
       } else if (GetActionMarker()->m_paaAction == PAA_TAKEALLAMMOANDWEAPONS) {
         GetPlayerWeapons()->InitializeWeapons(0, 0xFFFFFFFF, 0xFFFFFFFF, 0, FALSE);
+
+      } else if (GetActionMarker()->m_paaAction == PAA_HIDEWEAPONINSTANTLY) {
+        ((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon = WEAPON_NONE;
+        ((CPlayerWeapons&)*m_penWeapons).m_iWantedWeapon = WEAPON_NONE;
+        m_soWeaponAmbient.Stop();
+
+        CPlayerAnimator &plan = (CPlayerAnimator&)*m_penAnimator;
+        plan.RemoveWeapon();
+        plan.SetWeapon();
+        
+      } else if (GetActionMarker()->m_paaAction == PAA_HIDEANDLOCKWEAPONSINST) {
+        ((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon = WEAPON_NONE;
+        ((CPlayerWeapons&)*m_penWeapons).m_iWantedWeapon = WEAPON_NONE;
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EStop());;
+        m_soWeaponAmbient.Stop();
+
+        CPlayerAnimator &plan = (CPlayerAnimator&)*m_penAnimator;
+        plan.RemoveWeapon();
+        plan.SetWeapon();
+      
+      } else if (GetActionMarker()->m_paaAction == PAA_LOCKWEAPONS) {
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EReleaseWeapon());
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EStop());
+        
+      } else if (GetActionMarker()->m_paaAction == PAA_UNLOCKWEAPONS) {
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EStart());
       //
 
       } else if (TRUE) {
         ASSERT(FALSE);
       }
+      
 
       // if marker points to a trigger
       if (GetActionMarker()->m_penTrigger!=NULL &&

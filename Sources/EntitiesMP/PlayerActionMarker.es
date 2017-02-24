@@ -52,9 +52,14 @@ enum PlayerAutoAction {
  28 PAA_STOPANDWAIT       "StopAndWait",      // stop immediately and wait
 
  // [SSE] New Actions
- 29 PAA_TAKEALLWEAPONS        "TakeAllWeapons",
- 30 PAA_TAKEALLAMMO           "TakeAllAmmo",
- 31 PAA_TAKEALLAMMOANDWEAPONS "TakeAllAmmoAndWeapons",
+ 29 PAA_TAKEALLWEAPONS        "StealAllWeapons",
+ 30 PAA_TAKEALLAMMO           "StealAllAmmo",
+ 31 PAA_TAKEALLAMMOANDWEAPONS "StealAllAmmoAndWeapons",
+ 
+ 32 PAA_HIDEWEAPONINSTANTLY    "HideWeaponInstantly",
+ 33 PAA_HIDEANDLOCKWEAPONSINST "HideAndLockWeapons",
+ 34 PAA_LOCKWEAPONS            "LockWeapons",
+ 35 PAA_UNLOCKWEAPONS          "UnlockWeapons",
 };
 
 class CPlayerActionMarker: CMarker {
