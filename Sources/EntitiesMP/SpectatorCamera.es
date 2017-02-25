@@ -5,7 +5,7 @@
 
 class CSpectatorCamera : CMovableModelEntity {
 name "Spectator Camera";
-thumbnail "XPLUS\\By_VITEK\\Thumbnails\\DontUse.tbn";
+thumbnail "";
 features "HasName", "IsTargetable", "CanBePredictable";
 
 properties:
