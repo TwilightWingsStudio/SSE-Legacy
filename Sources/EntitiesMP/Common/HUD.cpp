@@ -1609,9 +1609,11 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     if (bCooperative) eKey = (SortKeys)Clamp( (INDEX)eKey, 0L, 3L);
     if (eKey==PSK_HEALTH && (bScoreMatch || bFragMatch)) { eKey = PSK_NAME; }; // prevent health snooping in deathmatch
     INDEX iPlayers = SetAllPlayersStats(eKey);
+
     // loop thru players
     for (INDEX i=0; i<iPlayers; i++)
-    { // get player name and mana
+    {
+      // get player name and mana
       CPlayer *penPlayer = _apenPlayers[i];
       const CTString strName = penPlayer->GetPlayerName();
       const INDEX iScore  = penPlayer->m_psGameStats.ps_iScore;
@@ -1620,13 +1622,32 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
       const INDEX iDeaths = penPlayer->m_psGameStats.ps_iDeaths;
       const INDEX iHealth = ClampDn( (INDEX)ceil( penPlayer->GetHealth()), 0L);
       const INDEX iArmor  = ClampDn( (INDEX)ceil( penPlayer->m_fArmor),    0L);
+
       CTString strScore, strMana, strFrags, strDeaths, strHealth, strArmor;
       strScore.PrintF(  "%d", iScore);
       strMana.PrintF(   "%d", iMana);
       strFrags.PrintF(  "%d", iFrags);
       strDeaths.PrintF( "%d", iDeaths);
-      strHealth.PrintF( "%d", iHealth);
       strArmor.PrintF(  "%d", iArmor);
+      
+      // [SSE]
+      if (iArmor >= 10000) {
+        strArmor.PrintF( "%.1fk", iArmor / 1000.0F);
+      } else if (iArmor >= 1000) {
+        strArmor.PrintF( "%.2fk", iArmor / 1000.0F);
+      } else {
+        strArmor.PrintF( "%d", iArmor);
+      }
+
+      if (iHealth >= 10000) {
+        strHealth.PrintF( "%.1fk", iHealth / 1000.0F);
+      } else if (iHealth >= 1000) {
+        strHealth.PrintF( "%.2fk", iHealth / 1000.0F);
+      } else {
+        strHealth.PrintF( "%d", iHealth);
+      }
+      //
+
       // detemine corresponding colors
       colHealth = C_mlRED;
       colMana = colScore = colFrags = colDeaths = colArmor = C_lGRAY;
@@ -1634,11 +1655,13 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
       if (iScore  > _penPlayer->m_psGameStats.ps_iScore)      { bMaxScore  = FALSE; colScore  = C_WHITE; }
       if (iFrags  > _penPlayer->m_psGameStats.ps_iKills)      { bMaxFrags  = FALSE; colFrags  = C_WHITE; }
       if (iDeaths > _penPlayer->m_psGameStats.ps_iDeaths)     { bMaxDeaths = FALSE; colDeaths = C_WHITE; }
-      if (penPlayer==_penPlayer) colScore = colMana = colFrags = colDeaths = _colHUD; // current player
-      if (iHealth>25) colHealth = _colHUD;
-      if (iArmor >25) colArmor  = _colHUD;
+      if (penPlayer == _penPlayer) colScore = colMana = colFrags = colDeaths = _colHUD; // current player
+      if (iHealth > 25) colHealth = _colHUD;
+      if (iArmor  > 25) colArmor  = _colHUD;
+
       // eventually print it out
-      if (hud_iShowPlayers==1 || hud_iShowPlayers==-1 && !bSinglePlay) {
+      if (hud_iShowPlayers==1 || hud_iShowPlayers==-1 && !bSinglePlay)
+      {
         // printout location and info aren't the same for deathmatch and coop play
         const FLOAT fCharWidth = (PIX)((_pfdDisplayFont->GetWidth()-2) *fTextScale);
         if (bCooperative) {
@@ -1666,6 +1689,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
       // calculate summ of scores (for coop mode)
       iScoreSum += iScore;
     }
+
     // draw remaining time if time based death- or scorematch
     if ((bScoreMatch || bFragMatch) && hud_bShowMatchInfo) {
       CTString strLimitsInfo="";
