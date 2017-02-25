@@ -253,7 +253,9 @@ functions:
 
         return;
       } else {
-        CPrintF(TRANS("[PC] %s : Target property ID = %d\n"), m_strName, iTargetPropID);
+        if (m_bDebugMessages) {
+          CPrintF(TRANS("[PC] %s : Target property ID = %d\n"), m_strName, iTargetPropID);
+        }
       }
       
       for (CDLLEntityClass *pdecDLLClass = m_penTarget->en_pecClass->ec_pdecDLLClass; pdecDLLClass != NULL; pdecDLLClass = pdecDLLClass->dec_pdecBase)
