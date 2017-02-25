@@ -321,7 +321,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
   pdec->PrecacheSound(SOUND_FISTS_LONG            );
   pdec->PrecacheSound(SOUND_FISTS_LOW            );
   
-  if (ulAvailable&(1<<(WEAPON_KNIFE-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_KNIFE - 2)) ) {
     pdec->PrecacheModel(MODEL_KNIFE                 );
     pdec->PrecacheModel(MODEL_KNIFEITEM             );
     pdec->PrecacheTexture(TEXTURE_KNIFEITEM         );
@@ -331,7 +331,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
     pdec->PrecacheSound(SOUND_KNIFE_LOW             );
   }
 
-  if (ulAvailable&(1<<(WEAPON_COLT-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_COLT - 2)) ) {
     pdec->PrecacheModel(MODEL_COLT                  );
     pdec->PrecacheModel(MODEL_COLTCOCK              );
     pdec->PrecacheModel(MODEL_COLTMAIN              );
@@ -343,7 +343,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
     pdec->PrecacheSound(SOUND_COLT_RELOAD           );
   }
 
-  if (ulAvailable&(1<<(WEAPON_SINGLESHOTGUN-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_SINGLESHOTGUN - 2)) ) {
     pdec->PrecacheModel(MODEL_SINGLESHOTGUN     );    
     pdec->PrecacheModel(MODEL_SS_SLIDER         );    
     pdec->PrecacheModel(MODEL_SS_HANDLE         );    
@@ -353,7 +353,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
     pdec->PrecacheSound(SOUND_SINGLESHOTGUN_FIRE);    
   }
 
-  if (ulAvailable&(1<<(WEAPON_DOUBLESHOTGUN-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_DOUBLESHOTGUN - 2)) ) {
     pdec->PrecacheModel(MODEL_DOUBLESHOTGUN        ); 
     pdec->PrecacheModel(MODEL_DS_HANDLE            ); 
     pdec->PrecacheModel(MODEL_DS_BARRELS           ); 
@@ -368,7 +368,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
     pdec->PrecacheSound(SOUND_DOUBLESHOTGUN_RELOAD ); 
   }
 
-  if (ulAvailable&(1<<(WEAPON_TOMMYGUN-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_TOMMYGUN - 2)) ) {
     pdec->PrecacheModel(MODEL_TOMMYGUN              );
     pdec->PrecacheModel(MODEL_TG_BODY               );
     pdec->PrecacheModel(MODEL_TG_SLIDER             );
@@ -376,14 +376,14 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
     pdec->PrecacheSound(SOUND_TOMMYGUN_FIRE         );
   }
 
-  if (ulAvailable&(1<<(WEAPON_SNIPER-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_SNIPER - 2)) ) {
     pdec->PrecacheModel(MODEL_SNIPER          ); 
     pdec->PrecacheModel(MODEL_SNIPER_BODY     ); 
     pdec->PrecacheTexture(TEXTURE_SNIPER_BODY );   
     pdec->PrecacheSound(SOUND_SNIPER_FIRE     ); 
   }
 
-  if (ulAvailable&(1<<(WEAPON_MINIGUN-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_MINIGUN - 2)) ) {
     pdec->PrecacheModel(MODEL_MINIGUN          );     
     pdec->PrecacheModel(MODEL_MG_BARRELS       );     
     pdec->PrecacheModel(MODEL_MG_BODY          );     
@@ -397,7 +397,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
     pdec->PrecacheSound(SOUND_MINIGUN_CLICK    );     
   }
                                          
-  if (ulAvailable&(1<<(WEAPON_ROCKETLAUNCHER-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_ROCKETLAUNCHER - 2)) ) {
     pdec->PrecacheModel(MODEL_ROCKETLAUNCHER     );   
     pdec->PrecacheModel(MODEL_RL_BODY            );   
     pdec->PrecacheModel(MODEL_RL_ROTATINGPART    );   
@@ -408,7 +408,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
     pdec->PrecacheClass(CLASS_PROJECTILE, PRT_ROCKET);
   }                                        
 
-  if (ulAvailable&(1<<(WEAPON_GRENADELAUNCHER-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_GRENADELAUNCHER - 2)) ) {
     pdec->PrecacheModel(MODEL_GRENADELAUNCHER       ); 
     pdec->PrecacheModel(MODEL_GL_BODY               ); 
     pdec->PrecacheModel(MODEL_GL_MOVINGPART         ); 
@@ -420,7 +420,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
   }
 
 /*
-  if (ulAvailable&(1<<(WEAPON_PIPEBOMB-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_PIPEBOMB- 2)) ) {
     pdec->PrecacheModel(MODEL_PIPEBOMB_STICK        );
     pdec->PrecacheModel(MODEL_PIPEBOMB_HAND         );
     pdec->PrecacheModel(MODEL_PB_BUTTON             );
@@ -435,7 +435,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
     pdec->PrecacheClass(CLASS_PIPEBOMB);
   }
 */
-  if (ulAvailable&(1<<(WEAPON_CHAINSAW-1))) {
+  if (ulAvailable&(1 << (WEAPON_CHAINSAW - 2))) {
     pdec->PrecacheModel(MODEL_CHAINSAW     );
     pdec->PrecacheModel(MODEL_CS_BODY      );
     pdec->PrecacheModel(MODEL_CS_BLADE     );
@@ -451,7 +451,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
     pdec->PrecacheSound(SOUND_CS_IDLE      );
   }
 
-  if (ulAvailable&(1<<(WEAPON_FLAMER-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_FLAMER - 2)) ) {
     pdec->PrecacheModel(MODEL_FLAMER      );
     pdec->PrecacheModel(MODEL_FL_BODY     );
     pdec->PrecacheModel(MODEL_FL_RESERVOIR);
@@ -466,7 +466,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
   }
 
 
-  if (ulAvailable&(1<<(WEAPON_LASER-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_LASER - 2)) ) {
     pdec->PrecacheModel(MODEL_LASER     );
     pdec->PrecacheModel(MODEL_LS_BODY   );
     pdec->PrecacheModel(MODEL_LS_BARREL );
@@ -476,7 +476,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
     pdec->PrecacheClass(CLASS_PROJECTILE, PRT_LASER_RAY);
   }
 /*
-  if (ulAvailable&(1<<(WEAPON_GHOSTBUSTER-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_GHOSTBUSTER - 2)) ) {
     pdec->PrecacheModel(MODEL_GHOSTBUSTER     );
     pdec->PrecacheModel(MODEL_GB_BODY         );
     pdec->PrecacheModel(MODEL_GB_ROTATOR      );
@@ -490,7 +490,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
     pdec->PrecacheClass(CLASS_GHOSTBUSTERRAY);
   }
   */
-  if (ulAvailable&(1<<(WEAPON_IRONCANNON-1)) /*||
+  if (ulAvailable&(1 << (WEAPON_IRONCANNON - 2)) /*||
        ulAvailable&(1<<(WEAPON_NUKECANNON-1))*/ ) {
     pdec->PrecacheModel(MODEL_CANNON    );
     pdec->PrecacheModel(MODEL_CN_BODY   );
