@@ -297,8 +297,42 @@ functions:
     CEntityProperty *pSourceProperty = NULL;
 
     // If we have source entity and source procperty type is entity property. Then receive its property!
-    if (m_penSource != NULL && m_eSourcePT == ECT_ENTITY) {
-      pSourceProperty = m_penSource->PropertyForName(m_strSourceProperty);
+    if (m_penSource != NULL)
+    {
+      if (m_eSourcePT == ECT_PROPBYID) {
+        INDEX iSourcePropID = atoi(m_strSourceProperty);
+        
+        if (iSourcePropID <= 0)
+        {
+          if (m_bDebugMessages) {
+            CPrintF(TRANS("[PC] %s : '%s' is not a valid number for source property ID!\n"), m_strName, m_strSourceProperty);
+          }
+
+          return;
+        } else {
+          if (m_bDebugMessages) {
+            CPrintF(TRANS("[PC] %s : Source property ID = %d\n"), m_strName, iSourcePropID);
+          }
+        }
+        
+        for (CDLLEntityClass *pdecDLLClass = m_penSource->en_pecClass->ec_pdecDLLClass; pdecDLLClass != NULL; pdecDLLClass = pdecDLLClass->dec_pdecBase)
+        {
+          for (INDEX iProperty = 0; iProperty < pdecDLLClass->dec_ctProperties; iProperty++)
+          {
+            // if it has that same identifier
+            if (pdecDLLClass->dec_aepProperties[iProperty].ep_ulID == iSourcePropID) {
+              pSourceProperty = &pdecDLLClass->dec_aepProperties[iProperty];
+              break;
+            }
+          }
+          
+          if (pSourceProperty != NULL) {
+            break;
+          }
+        }
+      } else if (m_eSourcePT == ECT_ENTITY) {
+        pSourceProperty = m_penSource->PropertyForName(m_strSourceProperty);
+      }
     }
 
     if (m_eTargetPT == ECT_ENTITY || m_eTargetPT == ECT_PROPBYID) {
