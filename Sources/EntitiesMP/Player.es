@@ -4448,11 +4448,11 @@ functions:
     if (!(m_ulFlags&PLF_INITIALIZED)) { return; }
 //    CPrintF("---APPLY: %g\n", paOriginal.pa_aRotation(1));
     
-    // if was not connected
+    // if was not connected then set connected state
     if (m_ulFlags&PLF_NOTCONNECTED) {
-      // set connected state
       SetConnected();
     }
+
     // mark that the player is connected
     m_ulFlags |= PLF_APPLIEDACTION;
 
@@ -4470,6 +4470,7 @@ functions:
       aDeltaRotation *= fRotationDamping;
       aDeltaViewRotation *= fRotationDamping;
     }
+
     //FLOAT3D vDeltaTranslation  = paAction.pa_vTranslation -m_vLastTranslation;
     m_aLastRotation     = paAction.pa_aRotation;
     m_aLastViewRotation = paAction.pa_aViewRotation;
@@ -4487,6 +4488,7 @@ functions:
     if (IsPredictor()) {
       penMe = penMe->GetPredicted();
     }
+
     SetPredictable(!_pNetwork->IsPlayerLocal(penMe));
 
     // check for end of game
@@ -7675,6 +7677,15 @@ procedures:
         
       } else if (GetActionMarker()->m_paaAction == PAA_UNLOCKWEAPONS) {
         ((CPlayerWeapons&)*m_penWeapons).SendEvent(EStart());
+        
+      } else if (GetActionMarker()->m_paaAction == PAA_RESETCAMERAHEADING) {
+        en_plViewpoint.pl_OrientationAngle(1) = 0.0F;
+
+      } else if (GetActionMarker()->m_paaAction == PAA_RESETCAMERAPITCH) {
+        en_plViewpoint.pl_OrientationAngle(2) = 0.0F;
+        
+      } else if (GetActionMarker()->m_paaAction == PAA_RESETCAMERABANKING) {
+        en_plViewpoint.pl_OrientationAngle(3) = 0.0F;
       //
 
       } else if (TRUE) {

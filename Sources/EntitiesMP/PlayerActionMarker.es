@@ -60,6 +60,10 @@ enum PlayerAutoAction {
  33 PAA_HIDEANDLOCKWEAPONSINST "HideAndLockWeapons",
  34 PAA_LOCKWEAPONS            "LockWeapons",
  35 PAA_UNLOCKWEAPONS          "UnlockWeapons",
+ 
+ 36 PAA_RESETCAMERAHEADING     "ResetCameraHeading",
+ 37 PAA_RESETCAMERAPITCH       "ResetCameraPitch",
+ 38 PAA_RESETCAMERABANKING     "ResetCameraBanking",
 };
 
 class CPlayerActionMarker: CMarker {
