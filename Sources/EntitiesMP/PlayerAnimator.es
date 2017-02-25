@@ -1367,6 +1367,8 @@ functions:
     {
       case WEAPON_NONE:
         break;
+      case WEAPON_FISTS:
+        break;
       case WEAPON_KNIFE:
         pmoModel->RemoveAttachmentModel(BODY_ATTACHMENT_KNIFE);
         break;
@@ -1423,6 +1425,7 @@ functions:
       default:
         ASSERT(FALSE);
     }
+
     // sync apperances
     SyncWeapon();
   }
