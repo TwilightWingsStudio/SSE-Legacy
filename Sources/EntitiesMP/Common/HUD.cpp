@@ -1416,7 +1416,6 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
       i = aiAmmoRemap[ii];
       
       AmmoInfo &ai = _aaiAmmo[i];
-      ASSERT( ai.ai_iAmmoAmmount >= 0);
       
       // if no ammo and hasn't got that weapon - just skip this ammo // [SSE] Or if you don't want to see empty ammo types.
       if (ai.ai_iAmmoAmmount <= 0 && (!ai.ai_bHasWeapon || !hud_bShowEmptyAmmoInList)) continue;
