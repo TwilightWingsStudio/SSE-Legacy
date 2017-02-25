@@ -491,7 +491,7 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
   }
   */
   if (ulAvailable&(1 << (WEAPON_IRONCANNON - 2)) /*||
-       ulAvailable&(1<<(WEAPON_NUKECANNON-1))*/ ) {
+       ulAvailable&(1 << (WEAPON_NUKECANNON-2))*/ ) {
     pdec->PrecacheModel(MODEL_CANNON    );
     pdec->PrecacheModel(MODEL_CN_BODY   );
 //    pdec->PrecacheModel(MODEL_CN_NUKEBOX);
@@ -2826,7 +2826,7 @@ functions:
     // For each new weapon.
     for (INDEX iWeapon = WEAPON_KNIFE; iWeapon < WEAPON_LAST; iWeapon++)
     {
-      if (ulNewWeapons & (1<<(iWeapon-1)) ) {
+      if (ulNewWeapons & (1<<(iWeapon-2)) ) {
         // Add default amount of ammo.
         AddDefaultAmmoForWeapon(iWeapon, fMaxAmmoRatio);
       }
@@ -3195,7 +3195,7 @@ functions:
 /*
     if (Ewi.iWeapon == WEAPON_IRONCANNON)
     {
-      m_iAvailableWeapons |= 1<<(WEAPON_NUKECANNON-1);
+      m_iAvailableWeapons |= 1 << (WEAPON_NUKECANNON - 2);
       m_iAvailableWeapons &= ~WEAPONS_DISABLEDMASK;
     }
     */
@@ -3735,6 +3735,7 @@ functions:
 
       case WEAPON_FISTS: // [SSE] Fists Weapon
         break;
+
       case WEAPON_KNIFE:
         switch (m_iKnifeStand) {
           case 1: m_moWeapon.PlayAnim(KNIFE_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART|AOF_SMOOTHCHANGE); break;
@@ -3742,22 +3743,31 @@ functions:
           default: ASSERTALWAYS("Unknown knife stand.");
         }
         break;
+
       case WEAPON_DOUBLECOLT:
         m_moWeaponSecond.PlayAnim(COLT_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART|AOF_SMOOTHCHANGE);
+
       case WEAPON_COLT:
         m_moWeapon.PlayAnim(COLT_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART|AOF_SMOOTHCHANGE); break;
+
       case WEAPON_SINGLESHOTGUN:
         m_moWeapon.PlayAnim(SINGLESHOTGUN_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART|AOF_SMOOTHCHANGE); break;
+
       case WEAPON_DOUBLESHOTGUN:
         m_moWeapon.PlayAnim(DOUBLESHOTGUN_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART|AOF_SMOOTHCHANGE); break;
+
       case WEAPON_TOMMYGUN:
         m_moWeapon.PlayAnim(TOMMYGUN_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART|AOF_SMOOTHCHANGE); break;
+
       case WEAPON_SNIPER:
         m_moWeapon.PlayAnim(SNIPER_ANIM_WAIT01, AOF_LOOPING|AOF_NORESTART|AOF_SMOOTHCHANGE); break;
+
       case WEAPON_MINIGUN:
         m_moWeapon.PlayAnim(MINIGUN_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART|AOF_SMOOTHCHANGE); break;
+
       case WEAPON_ROCKETLAUNCHER:
         m_moWeapon.PlayAnim(ROCKETLAUNCHER_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART|AOF_SMOOTHCHANGE); break;
+
       case WEAPON_GRENADELAUNCHER:
         m_moWeapon.PlayAnim(GRENADELAUNCHER_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART|AOF_SMOOTHCHANGE); break;
 /*
@@ -3770,8 +3780,10 @@ functions:
         }*/
       case WEAPON_FLAMER:
         m_moWeapon.PlayAnim(FLAMER_ANIM_WAIT01, AOF_LOOPING|AOF_NORESTART|AOF_SMOOTHCHANGE); break;
+
       case WEAPON_CHAINSAW:
         m_moWeapon.PlayAnim(CHAINSAW_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART|AOF_SMOOTHCHANGE); break;
+
       case WEAPON_LASER:
         m_moWeapon.PlayAnim(LASER_ANIM_WAIT01, AOF_LOOPING|AOF_NORESTART|AOF_SMOOTHCHANGE); break;
 /*
@@ -3881,8 +3893,8 @@ functions:
   // --------------------------------------------------------------------------------------
   FLOAT DoubleShotgunBoring(void)
   {
-    
     INDEX iAnim;
+
     switch (IRnd()%3) {
       case 0: iAnim = DOUBLESHOTGUN_ANIM_WAIT2; break;
       case 1: iAnim = DOUBLESHOTGUN_ANIM_WAIT3; break;
@@ -4328,12 +4340,12 @@ functions:
         }
       }
     }
-    if (m_fSniperFOV<90.0f) { 
+    if (m_fSniperFOV < 90.0f) { 
       m_bSniping = TRUE;
-    }
-    else {
+    } else {
       m_bSniping = FALSE;
     }
+
     return m_bSniping;
   };
 
@@ -4722,7 +4734,8 @@ procedures:
       {
         on (EBegin) : {
           // fire one shot
-          switch (m_iCurrentWeapon) {
+          switch (m_iCurrentWeapon)
+          {
             case WEAPON_NONE: call FireNone(); break;
             case WEAPON_FISTS: call SwingFist(); break;
             case WEAPON_KNIFE: call SwingKnife(); break;
@@ -4738,8 +4751,10 @@ procedures:
 
             default: ASSERTALWAYS("Unknown weapon.");
           }
+
           resume;
         }
+
         on (EEnd) : {
           stop;
         }
@@ -4747,7 +4762,8 @@ procedures:
     }
 
     // stop weapon firing animation for continuous firing
-    switch (m_iCurrentWeapon) {
+    switch (m_iCurrentWeapon)
+    {
       case WEAPON_TOMMYGUN: { jump TommyGunStop(); break; }
       case WEAPON_MINIGUN: { jump MiniGunSpinDown(); break; }
       case WEAPON_FLAMER: { jump FlamerStop(); break; }
@@ -4755,7 +4771,8 @@ procedures:
       case WEAPON_LASER: { 
         GetAnimator()->FireAnimationOff();
         jump Idle();
-                         }
+      }
+
       default: { jump Idle(); }
     }
   };
@@ -4839,8 +4856,10 @@ procedures:
     GetAnimator()->FireAnimation(BODY_ANIM_KNIFE_ATTACK, 0);
     // sound
     CPlayer &pl = (CPlayer&)*m_penPlayer;
+
     // depending on stand choose random attack
-    switch (m_iKnifeStand) {
+    switch (m_iKnifeStand)
+    {
       case 1:
         iSwing = IRnd()%2;
         switch (iSwing) {
@@ -4868,7 +4887,9 @@ procedures:
         }
         break;
     }
+
     m_moWeapon.PlayAnim(m_iAnim, 0);
+
     if (CutWithKnife(0, 0, 3.0f, 2.0f, 0.5f, ((GetSP()->sp_bCooperative) ? 100.0f : 50.0f))) {
       autowait(m_fAnimWaitTime);
     } else if (TRUE) {
@@ -6487,6 +6508,7 @@ procedures:
       on (EStart) : {
         return EBegin();
       };
+
       otherwise() : { resume; };
     }
   }
