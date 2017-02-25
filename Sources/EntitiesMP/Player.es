@@ -7644,18 +7644,30 @@ procedures:
       
       // [SSE] New Actions
       } else if (GetActionMarker()->m_paaAction == PAA_TAKEALLWEAPONS) {
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EReleaseWeapon());
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EStop());;
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EStart());;
         GetPlayerWeapons()->InitializeWeapons(0, 0xFFFFFFFF, 0, 0, FALSE);
 
       } else if (GetActionMarker()->m_paaAction == PAA_TAKEALLAMMO) {
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EReleaseWeapon());
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EStop());;
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EStart());;
         GetPlayerWeapons()->InitializeWeapons(0, 0, 0xFFFFFFFF, 0, FALSE);
         
       } else if (GetActionMarker()->m_paaAction == PAA_TAKEALLAMMOANDWEAPONS) {
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EReleaseWeapon());
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EStop());;
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EStart());;
         GetPlayerWeapons()->InitializeWeapons(0, 0xFFFFFFFF, 0xFFFFFFFF, 0, FALSE);
 
       } else if (GetActionMarker()->m_paaAction == PAA_HIDEWEAPONINSTANTLY) {
         ((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon = WEAPON_NONE;
         ((CPlayerWeapons&)*m_penWeapons).m_iWantedWeapon = WEAPON_NONE;
-        m_soWeaponAmbient.Stop();
+
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EReleaseWeapon());
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EStop());;
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EStart());;
 
         CPlayerAnimator &plan = (CPlayerAnimator&)*m_penAnimator;
         plan.RemoveWeapon();
@@ -7664,6 +7676,7 @@ procedures:
       } else if (GetActionMarker()->m_paaAction == PAA_HIDEANDLOCKWEAPONSINST) {
         ((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon = WEAPON_NONE;
         ((CPlayerWeapons&)*m_penWeapons).m_iWantedWeapon = WEAPON_NONE;
+        ((CPlayerWeapons&)*m_penWeapons).SendEvent(EReleaseWeapon());
         ((CPlayerWeapons&)*m_penWeapons).SendEvent(EStop());;
         m_soWeaponAmbient.Stop();
 
