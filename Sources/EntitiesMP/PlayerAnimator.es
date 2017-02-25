@@ -112,12 +112,12 @@ void CPlayerAnimator_Precache(ULONG ulAvailable)
   CPlayerWeaponsEffects_Precache();
 
   // precache weapons player has
-  if ( ulAvailable&(1<<(WEAPON_KNIFE-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_KNIFE - 2)) ) {
     pdec->PrecacheModel(MODEL_KNIFE                 );
     pdec->PrecacheTexture(TEXTURE_KNIFE);
   }
 
-  if ( ulAvailable&(1<<(WEAPON_COLT-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_COLT - 2)) ) {
     pdec->PrecacheModel(MODEL_COLT                  );
     pdec->PrecacheModel(MODEL_COLTCOCK              );
     pdec->PrecacheModel(MODEL_COLTMAIN              );
@@ -127,7 +127,7 @@ void CPlayerAnimator_Precache(ULONG ulAvailable)
     pdec->PrecacheTexture(TEXTURE_COLTBULLETS       );  
   }
 
-  if ( ulAvailable&(1<<(WEAPON_SINGLESHOTGUN-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_SINGLESHOTGUN - 2)) ) {
     pdec->PrecacheModel(MODEL_SINGLESHOTGUN     );    
     pdec->PrecacheModel(MODEL_SS_SLIDER         );    
     pdec->PrecacheModel(MODEL_SS_HANDLE         );    
@@ -136,7 +136,7 @@ void CPlayerAnimator_Precache(ULONG ulAvailable)
     pdec->PrecacheTexture(TEXTURE_SS_BARRELS);      
   }
 
-  if ( ulAvailable&(1<<(WEAPON_DOUBLESHOTGUN-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_DOUBLESHOTGUN - 2)) ) {
     pdec->PrecacheModel(MODEL_DOUBLESHOTGUN        ); 
     pdec->PrecacheModel(MODEL_DS_HANDLE            ); 
     pdec->PrecacheModel(MODEL_DS_BARRELS           ); 
@@ -146,20 +146,20 @@ void CPlayerAnimator_Precache(ULONG ulAvailable)
     pdec->PrecacheTexture(TEXTURE_DS_SWITCH        );   
   }
 
-  if ( ulAvailable&(1<<(WEAPON_TOMMYGUN-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_TOMMYGUN - 2)) ) {
     pdec->PrecacheModel(MODEL_TOMMYGUN              );
     pdec->PrecacheModel(MODEL_TG_BODY               );
     pdec->PrecacheModel(MODEL_TG_SLIDER             );
     pdec->PrecacheTexture(TEXTURE_TG_BODY           );  
   }
 
-  if ( ulAvailable&(1<<(WEAPON_SNIPER-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_SNIPER - 2)) ) {
     pdec->PrecacheModel(MODEL_SNIPER          ); 
     pdec->PrecacheModel(MODEL_SNIPER_BODY     ); 
     pdec->PrecacheTexture(TEXTURE_SNIPER_BODY );   
   }
 
-  if ( ulAvailable&(1<<(WEAPON_MINIGUN-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_MINIGUN - 2)) ) {
     pdec->PrecacheModel(MODEL_MINIGUN          );     
     pdec->PrecacheModel(MODEL_MG_BARRELS       );     
     pdec->PrecacheModel(MODEL_MG_BODY          );     
@@ -168,7 +168,7 @@ void CPlayerAnimator_Precache(ULONG ulAvailable)
     pdec->PrecacheTexture(TEXTURE_MG_BARRELS   );       
   }
                                          
-  if ( ulAvailable&(1<<(WEAPON_ROCKETLAUNCHER-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_ROCKETLAUNCHER - 2)) ) {
     pdec->PrecacheModel(MODEL_ROCKETLAUNCHER   );
     pdec->PrecacheModel(MODEL_RL_BODY          );
     pdec->PrecacheModel(MODEL_RL_ROTATINGPART  );
@@ -178,7 +178,7 @@ void CPlayerAnimator_Precache(ULONG ulAvailable)
     pdec->PrecacheTexture(TEXTURE_RL_ROTATINGPART);
   }                                        
 
-  if ( ulAvailable&(1<<(WEAPON_GRENADELAUNCHER-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_GRENADELAUNCHER - 2)) ) {
     pdec->PrecacheModel(MODEL_GRENADELAUNCHER       ); 
     pdec->PrecacheModel(MODEL_GL_BODY               ); 
     pdec->PrecacheModel(MODEL_GL_MOVINGPART         ); 
@@ -188,7 +188,7 @@ void CPlayerAnimator_Precache(ULONG ulAvailable)
   }
 
 /*
-  if ( ulAvailable&(1<<(WEAPON_PIPEBOMB-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_PIPEBOMB-1)) ) {
     pdec->PrecacheModel(MODEL_PIPEBOMB_STICK        );
     pdec->PrecacheModel(MODEL_PB_BUTTON             );
     pdec->PrecacheModel(MODEL_PB_SHIELD             );
@@ -198,7 +198,7 @@ void CPlayerAnimator_Precache(ULONG ulAvailable)
     pdec->PrecacheTexture(TEXTURE_PB_BOMB           );  
   }
 */
-  if ( ulAvailable&(1<<(WEAPON_FLAMER-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_FLAMER - 2)) ) {
     pdec->PrecacheModel(MODEL_FLAMER      );
     pdec->PrecacheModel(MODEL_FL_BODY     );
     pdec->PrecacheModel(MODEL_FL_RESERVOIR);
@@ -207,7 +207,7 @@ void CPlayerAnimator_Precache(ULONG ulAvailable)
     pdec->PrecacheTexture(TEXTURE_FL_FLAME);  
   }
   
-  if ( ulAvailable&(1<<(WEAPON_CHAINSAW-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_CHAINSAW - 2)) ) {
     pdec->PrecacheModel(MODEL_CHAINSAW      );
     pdec->PrecacheModel(MODEL_CS_BODY       );
     pdec->PrecacheModel(MODEL_CS_BLADE      );
@@ -217,7 +217,7 @@ void CPlayerAnimator_Precache(ULONG ulAvailable)
     pdec->PrecacheTexture(TEXTURE_CS_TEETH  );  
   }
 
-  if ( ulAvailable&(1<<(WEAPON_LASER-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_LASER - 2)) ) {
     pdec->PrecacheModel(MODEL_LASER     );
     pdec->PrecacheModel(MODEL_LS_BODY   );
     pdec->PrecacheModel(MODEL_LS_BARREL );
@@ -225,7 +225,7 @@ void CPlayerAnimator_Precache(ULONG ulAvailable)
     pdec->PrecacheTexture(TEXTURE_LS_BARREL);  
   }
 /*
-  if ( ulAvailable&(1<<(WEAPON_GHOSTBUSTER-1)) ) {
+  if (ulAvailable&(1 << (WEAPON_GHOSTBUSTER - 2)) ) {
     pdec->PrecacheModel(MODEL_GHOSTBUSTER     );
     pdec->PrecacheModel(MODEL_GB_BODY         );
     pdec->PrecacheModel(MODEL_GB_ROTATOR      );
@@ -237,8 +237,8 @@ void CPlayerAnimator_Precache(ULONG ulAvailable)
     pdec->PrecacheTexture(TEXTURE_GB_FLARE    );  
   }
 */
-  if ( ulAvailable&(1<<(WEAPON_IRONCANNON-1)) /*||
-       ulAvailable&(1<<(WEAPON_NUKECANNON-1)) */) {
+  if (ulAvailable&(1 << (WEAPON_IRONCANNON - 2)) /*||
+       ulAvailable&(1<<(WEAPON_NUKECANNON - 2)) */) {
     pdec->PrecacheModel(MODEL_CANNON    );
     pdec->PrecacheModel(MODEL_CN_BODY   );
 //    pdec->PrecacheModel(MODEL_CN_NUKEBOX);
@@ -565,14 +565,18 @@ functions:
   }
 
   // set weapon
-  void SetWeapon(void) {
+  void SetWeapon(void)
+  {
     INDEX iWeapon = ((CPlayerWeapons&)*(((CPlayer&)*m_penPlayer).m_penWeapons)).m_iCurrentWeapon;
     m_iWeaponLast = iWeapon;
     CPlayer &pl = (CPlayer&)*m_penPlayer;
     pmoModel = &(pl.GetModelObject()->GetAttachmentModel(PLAYER_ATTACHMENT_TORSO)->amo_moModelObject);
-    switch (iWeapon) {
+    switch (iWeapon)
+    {
     // *********** NONE ***********
       case WEAPON_NONE: break;
+      
+      case WEAPON_FISTS: break; // [SSE] Fists Weapon
 
     // *********** KNIFE ***********
       case WEAPON_KNIFE:
@@ -1264,13 +1268,14 @@ functions:
   };
 
   // fire/attack
-  void FireAnimation(INDEX iAnim, ULONG ulFlags) {
+  void FireAnimation(INDEX iAnim, ULONG ulFlags)
+  {
     if (m_bSwim) {
       INDEX iWeapon = ((CPlayerWeapons&)*(((CPlayer&)*m_penPlayer).m_penWeapons)).m_iCurrentWeapon;
       switch (iWeapon) {
         case WEAPON_NONE:
           break;
-        case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: //case WEAPON_PIPEBOMB:
+        case WEAPON_FISTS: case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: //case WEAPON_PIPEBOMB:
           iAnim += BODY_ANIM_COLT_SWIM_STAND-BODY_ANIM_COLT_STAND;
           break;
         case WEAPON_SINGLESHOTGUN: case WEAPON_DOUBLESHOTGUN: case WEAPON_TOMMYGUN:
@@ -1292,6 +1297,7 @@ functions:
     }
     m_bAttacking = TRUE;
   };
+
   void FireAnimationOff(void) {
     m_bAttacking = FALSE;
   };
@@ -1302,11 +1308,12 @@ functions:
  *                  CHANGE BODY ANIMATION                   *
  ************************************************************/
   // body animation template
-  void BodyAnimationTemplate(INDEX iNone, INDEX iColt, INDEX iShotgun, INDEX iMinigun, ULONG ulFlags) {
+  void BodyAnimationTemplate(INDEX iNone, INDEX iColt, INDEX iShotgun, INDEX iMinigun, ULONG ulFlags)
+  {
     INDEX iWeapon = ((CPlayerWeapons&)*(((CPlayer&)*m_penPlayer).m_penWeapons)).m_iCurrentWeapon;
     switch (iWeapon) {
       case WEAPON_NONE: //SetBodyAnimation(iNone, ulFlags); break;
-      case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: // case WEAPON_PIPEBOMB:
+      case WEAPON_FISTS: case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: // case WEAPON_PIPEBOMB:
         if (m_bSwim) { iColt += BODY_ANIM_COLT_SWIM_STAND-BODY_ANIM_COLT_STAND; }
         SetBodyAnimation(iColt, ulFlags);
         break;
@@ -1355,8 +1362,11 @@ functions:
   {
     CPlayer &pl = (CPlayer&)*m_penPlayer;
     pmoModel = &(pl.GetModelObject()->GetAttachmentModel(PLAYER_ATTACHMENT_TORSO)->amo_moModelObject);
-    switch (m_iWeaponLast) {
+
+    switch (m_iWeaponLast)
+    {
       case WEAPON_NONE:
+        break;
       case WEAPON_KNIFE:
         pmoModel->RemoveAttachmentModel(BODY_ATTACHMENT_KNIFE);
         break;
