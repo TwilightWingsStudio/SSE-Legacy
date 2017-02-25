@@ -71,8 +71,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
   extern INDEX hud_bShowWeapon;
 
-  extern const INDEX aiWeaponsRemap[19] = { 0,  1,  10,  2,  3,  4,  5,  6,  7,
-                                            8,  9,  11, 13, 12, 14, 15, 16, 17, 18 };
+  extern const INDEX aiWeaponsRemap[19] = { 0,  1,  2, 11,  3,  4,  5,  6,  7,  8,
+                                            9, 10, 12, 14, 13, 15, 16, 17, 18 };
   //
   extern INDEX cht_bInfiniteAmmo; // [SSE] Cheats Expansion
 %}
@@ -118,26 +118,27 @@ event EWeaponChanged {};
 // weapons (do not change order! - needed by HUD.cpp)
 enum WeaponType {
   0 WEAPON_NONE               "", // don't consider this in WEAPONS_ALLAVAILABLEMASK
-  1 WEAPON_KNIFE              "",
-  2 WEAPON_COLT               "",
-  3 WEAPON_DOUBLECOLT         "",
-  4 WEAPON_SINGLESHOTGUN      "",
-  5 WEAPON_DOUBLESHOTGUN      "",
-  6 WEAPON_TOMMYGUN           "",
-  7 WEAPON_MINIGUN            "",
-  8 WEAPON_ROCKETLAUNCHER     "",
-  9 WEAPON_GRENADELAUNCHER    "",
- 10 WEAPON_CHAINSAW           "",
- 11 WEAPON_FLAMER             "",
- 12 WEAPON_LASER              "",
- 13 WEAPON_SNIPER             "",
- 14 WEAPON_IRONCANNON         "",
- 15 WEAPON_LAST               "",
+  1 WEAPON_FISTS              "",
+  2 WEAPON_KNIFE              "",
+  3 WEAPON_COLT               "",
+  4 WEAPON_DOUBLECOLT         "",
+  5 WEAPON_SINGLESHOTGUN      "",
+  6 WEAPON_DOUBLESHOTGUN      "",
+  7 WEAPON_TOMMYGUN           "",
+  8 WEAPON_MINIGUN            "",
+  9 WEAPON_ROCKETLAUNCHER     "",
+ 10 WEAPON_GRENADELAUNCHER    "",
+ 11 WEAPON_CHAINSAW           "",
+ 12 WEAPON_FLAMER             "",
+ 13 WEAPON_LASER              "",
+ 14 WEAPON_SNIPER             "",
+ 15 WEAPON_IRONCANNON         "",
+ 16 WEAPON_LAST               "",
 }; // see 'WEAPONS_ALLAVAILABLEMASK' -> (11111111111111 == 0x3FFF)
 
 %{
 // AVAILABLE WEAPON MASK
-#define WEAPONS_ALLAVAILABLEMASK 0x3FFF
+#define WEAPONS_ALLAVAILABLEMASK 0x3FFF // 0x3FFF
 
 /*
 #if BUILD_TEST
@@ -314,7 +315,12 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
   pdec->PrecacheClass(CLASS_BULLET);
   pdec->PrecacheSound(SOUND_SILENCE);
 
-  // precache other weapons if available
+  pdec->PrecacheModel(MODEL_FISTS                 );
+  pdec->PrecacheSound(SOUND_FISTS_BACK            );
+  pdec->PrecacheSound(SOUND_FISTS_HIGH            );
+  pdec->PrecacheSound(SOUND_FISTS_LONG            );
+  pdec->PrecacheSound(SOUND_FISTS_LOW            );
+  
   if (ulAvailable&(1<<(WEAPON_KNIFE-1)) ) {
     pdec->PrecacheModel(MODEL_KNIFE                 );
     pdec->PrecacheModel(MODEL_KNIFEITEM             );
@@ -897,6 +903,12 @@ components:
 251 texture TEXTURE_FLARE01             "Models\\Effects\\Weapons\\Flare01\\Flare.tex",
 
 280 sound   SOUND_SILENCE               "Sounds\\Misc\\Silence.wav",
+
+302 model   MODEL_FISTS                 "Models\\Weapons\\Fists\\Fists.mdl",
+303 sound   SOUND_FISTS_BACK            "Models\\Weapons\\Fists\\Sounds\\Back.wav",
+304 sound   SOUND_FISTS_HIGH            "Models\\Weapons\\Fists\\Sounds\\High.wav",
+305 sound   SOUND_FISTS_LONG            "Models\\Weapons\\Fists\\Sounds\\Long.wav",
+306 sound   SOUND_FISTS_LOW             "Models\\Weapons\\Fists\\Sounds\\Low.wav",
 
 
 functions:
@@ -1814,9 +1826,17 @@ functions:
   void SetCurrentWeaponModel(void)
   {
     // WARNING !!! ---> Order of attachment must be the same with order in RenderWeaponModel()
-    switch (m_iCurrentWeapon) {
+    switch (m_iCurrentWeapon)
+    {
       case WEAPON_NONE:
         break;
+
+      // [SSE] Fists Weapon
+      case WEAPON_FISTS: 
+        SetComponents(this, m_moWeapon, MODEL_FISTS, TEXTURE_HAND, 0, 0, 0);
+        m_moWeapon.PlayAnim(KNIFE_ANIM_WAIT1, 0); // TODO: Redone it.
+        break;
+
       // knife
       case WEAPON_KNIFE:
         SetComponents(this, m_moWeapon, MODEL_KNIFE, TEXTURE_HAND, 0, 0, 0);
@@ -2804,7 +2824,8 @@ functions:
     ULONG ulNewWeapons = m_iAvailableWeapons&~ulOldWeapons;
 
     // For each new weapon.
-    for (INDEX iWeapon = WEAPON_KNIFE; iWeapon < WEAPON_LAST; iWeapon++) {
+    for (INDEX iWeapon = WEAPON_KNIFE; iWeapon < WEAPON_LAST; iWeapon++)
+    {
       if (ulNewWeapons & (1<<(iWeapon-1)) ) {
         // Add default amount of ammo.
         AddDefaultAmmoForWeapon(iWeapon, fMaxAmmoRatio);
@@ -2847,7 +2868,7 @@ functions:
 
     // [SSE] If haven't any weapons - select dummy weapon.
     if (m_iAvailableWeapons == 0) {
-      m_iWantedWeapon = WEAPON_NONE;
+      m_iWantedWeapon = WEAPON_FISTS; // m_iWantedWeapon = WEAPON_NONE;
     // If have some weapons - select the best weapon.
     } else {
       SelectNewWeapon();
@@ -2901,6 +2922,7 @@ functions:
   {
     switch (m_iCurrentWeapon)
     {
+      case WEAPON_FISTS:           return 0;
       case WEAPON_KNIFE:           return 0;
       case WEAPON_COLT:            return 6;
       case WEAPON_DOUBLECOLT:      return 6;
@@ -2933,7 +2955,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Cheat give all.
   // --------------------------------------------------------------------------------------
-  void CheatGiveAll(void) {
+  void CheatGiveAll(void)
+  {
     // all weapons
     m_iAvailableWeapons = WEAPONS_ALLAVAILABLEMASK;
     // m_iAvailableWeapons &= ~WEAPONS_DISABLEDMASK;
@@ -3095,10 +3118,12 @@ functions:
   {
     WeaponItemType wit = WIT_COLT;
 
-    switch (m_iCurrentWeapon) {
+    switch (m_iCurrentWeapon)
+    {
       default:
         ASSERT(FALSE);
-      case WEAPON_NONE: return;
+      case WEAPON_NONE: return; // Void can't be dropped!
+      case WEAPON_FISTS: return; // [SSE] Fists Weapon
 
       case WEAPON_KNIFE: wit = WIT_KNIFE; break;
       case WEAPON_COLT:
@@ -3159,12 +3184,12 @@ functions:
     }
 
     // add weapon
-    if (Ewi.iWeapon == WEAPON_COLT && (m_iAvailableWeapons&(1<<(WEAPON_COLT-1)))) {
+    if (Ewi.iWeapon == WEAPON_COLT && HasWeapon(WEAPON_COLT)) {
       Ewi.iWeapon = WEAPON_DOUBLECOLT;
     }
 
     ULONG ulOldWeapons = m_iAvailableWeapons;
-    m_iAvailableWeapons |= 1<<(Ewi.iWeapon-1);
+    m_iAvailableWeapons |= 1 << (Ewi.iWeapon - 2);
 //    m_iAvailableWeapons &= ~WEAPONS_DISABLEDMASK;
 
 /*
@@ -3469,7 +3494,14 @@ functions:
   {
     switch (iWeapon)
     {
-      case 1: return WEAPON_CHAINSAW;
+      case 1: {
+        if (HasWeapon(WEAPON_CHAINSAW)) {
+          return WEAPON_CHAINSAW;
+        }
+        
+        return WEAPON_KNIFE;
+      } break;
+
       case 2: return WEAPON_DOUBLECOLT;
       case 3: return WEAPON_DOUBLESHOTGUN;
       case 4: return WEAPON_MINIGUN;
@@ -3489,7 +3521,7 @@ functions:
   {
     switch (EwtSelectedWeapon)
     {
-      case WEAPON_KNIFE: case WEAPON_CHAINSAW: return 1;
+      case WEAPON_FISTS: case WEAPON_KNIFE: case WEAPON_CHAINSAW: return 1;
       case WEAPON_COLT: case WEAPON_DOUBLECOLT: return 2;
       case WEAPON_SINGLESHOTGUN: case WEAPON_DOUBLESHOTGUN: return 3;
       case WEAPON_TOMMYGUN: case WEAPON_MINIGUN: return 4;
@@ -3509,8 +3541,23 @@ functions:
   {
     switch (EwtWeapon)
     {
-      case WEAPON_KNIFE: return WEAPON_CHAINSAW;
-      case WEAPON_CHAINSAW: return WEAPON_KNIFE;
+      case WEAPON_FISTS: {
+        if (HasWeapon(WEAPON_KNIFE)) {
+          return WEAPON_KNIFE;
+        }
+        
+        return WEAPON_CHAINSAW;
+      } 
+
+      case WEAPON_KNIFE: {
+        if (HasWeapon(WEAPON_CHAINSAW)) {
+          return WEAPON_CHAINSAW;
+        }
+        
+        return WEAPON_FISTS;
+      }
+
+      case WEAPON_CHAINSAW: return WEAPON_FISTS;
       case WEAPON_COLT: return WEAPON_DOUBLECOLT;
       case WEAPON_DOUBLECOLT: return WEAPON_COLT;
       case WEAPON_SINGLESHOTGUN: return WEAPON_DOUBLESHOTGUN;
@@ -3534,7 +3581,7 @@ functions:
   BOOL WeaponSelectOk(WeaponType wtToTry)
   {
     // if player has weapon and has enough ammo
-    if (((1<<(INDEX(wtToTry)-1))&m_iAvailableWeapons) && HasAmmo(wtToTry)) {
+    if (HasWeapon(wtToTry) && HasAmmo(wtToTry)) {
       // if different weapon
       if (wtToTry != m_iCurrentWeapon) {
         // initiate change
@@ -3631,6 +3678,22 @@ functions:
         ASSERT(FALSE);
     }
   };
+  
+  // --------------------------------------------------------------------------------------
+  // Check if has weapon.
+  // --------------------------------------------------------------------------------------
+  BOOL HasWeapon(WeaponType EwtWeapon)
+  {
+    if (EwtWeapon < WEAPON_KNIFE) {
+      return TRUE; // We always have WEAPON_NONE and WEAPON_FISTS.
+    }
+    
+    if (m_iAvailableWeapons&(1 << (EwtWeapon - 2))) {
+      return TRUE;
+    }
+    
+    return FALSE;
+  }
 
   // --------------------------------------------------------------------------------------
   // Check if weapon have ammo.
@@ -3639,7 +3702,8 @@ functions:
   {
     switch (EwtWeapon)
     {
-      case WEAPON_NONE : return TRUE; // Dummy weapon has infinite ammo.
+      case WEAPON_NONE :  return TRUE; // Dummy weapon has infinite ammo.
+      case WEAPON_FISTS : return TRUE; // [SSE] Fists Weapon
       case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: return TRUE; // Knife / Colt / Double Colt have infinite ammo.
       case WEAPON_CHAINSAW:        return TRUE; // Chainsaw have infinite ammo.
 
@@ -3667,6 +3731,9 @@ functions:
     switch (m_iCurrentWeapon)
     {
       case WEAPON_NONE:
+        break;
+
+      case WEAPON_FISTS: // [SSE] Fists Weapon
         break;
       case WEAPON_KNIFE:
         switch (m_iKnifeStand) {
@@ -3722,6 +3789,23 @@ functions:
   /*
    *  >>>---   WEAPON BORING   ---<<<
    */
+   
+  // --------------------------------------------------------------------------------------
+  // Plays fists boring animation.
+  // --------------------------------------------------------------------------------------
+  FLOAT FistsBoring(void)
+  {
+    INDEX iAnim;
+
+    switch (m_iKnifeStand) {
+      case 1: iAnim = KNIFE_ANIM_WAIT1; break;
+      case 3: iAnim = KNIFE_ANIM_WAIT1; break;
+    }
+
+    m_moWeapon.PlayAnim(iAnim, AOF_SMOOTHCHANGE); // play boring anim
+    return m_moWeapon.GetAnimLength(iAnim); // TODO: Huyna
+  };
+   
   // --------------------------------------------------------------------------------------
   // Plays knife boring animation.
   // --------------------------------------------------------------------------------------
@@ -4069,7 +4153,7 @@ functions:
       if (wt==wtOrg) {
         break;
       }
-      if (( ((1<<(wt-1))&m_iAvailableWeapons) && HasAmmo(wt)) ) {
+      if ( HasWeapon(wt) && HasAmmo(wt) ) {
         return wt;
       }
     }
@@ -4079,17 +4163,24 @@ functions:
   
   WeaponType FindWeaponInDirection(INDEX iDir)
   {
+    // [SSE] Weapons
+    if (m_iAvailableWeapons == 0) {
+      return m_iWantedWeapon = WEAPON_FISTS;
+    }
+    
     INDEX wtOrg = FindRemapedPos(m_iWantedWeapon);
     INDEX wti = wtOrg;
-    FOREVER {
+
+    FOREVER
+    {
       (INDEX&)wti += iDir;
 
       if (wti < 1) {
         wti = WEAPON_IRONCANNON;
       }
 
-      if (wti > 14) {
-        wti = WEAPON_KNIFE;
+      if (wti > 15) {//14) { [SSE] Fists Weapon
+        wti = WEAPON_FISTS;
       }
 
       if (wti == wtOrg) {
@@ -4098,7 +4189,7 @@ functions:
 
       WeaponType wt = (WeaponType) aiWeaponsRemap[wti];
 
-      if (( ((1<<(wt-1))&m_iAvailableWeapons) && HasAmmo(wt)) ) {
+      if (HasWeapon(wt) && HasAmmo(wt)) {
         return wt;
       }
     }
@@ -4152,14 +4243,15 @@ functions:
         EwtTemp = GetStrongerWeapon(iSelect);
 
         // if weapon don't exist or don't have ammo flip it
-        if (!((1<<(EwtTemp-1))&m_iAvailableWeapons) || !HasAmmo(EwtTemp)) {
+        if (!HasWeapon(EwtTemp) || !HasAmmo(EwtTemp)) {
           EwtTemp = GetAltWeapon(EwtTemp);
         }
       }
     }
+    
+    // [SSE] Fists Weapon
+    BOOL bChange = HasWeapon(EwtTemp) && HasAmmo(EwtTemp); // wanted weapon exist and has ammo
 
-    // wanted weapon exist and has ammo
-    BOOL bChange = ( ((1<<(EwtTemp-1))&m_iAvailableWeapons) && HasAmmo(EwtTemp));
     if (bChange) {
       m_iWantedWeapon = EwtTemp;
       m_bChangeWeapon = TRUE;
@@ -4324,6 +4416,11 @@ procedures:
     {
       case WEAPON_NONE:
         break;
+        
+      case WEAPON_FISTS: // [SSE] Fists Weapon
+        m_iAnim = KNIFE_ANIM_PULLOUT;
+        break;
+        
       // knife have different stands
       case WEAPON_KNIFE: 
         if (m_iKnifeStand==1) {
@@ -4439,10 +4536,14 @@ procedures:
     SetCurrentWeaponModel();
 
     // start current weapon bring up animation
-    switch (m_iCurrentWeapon) {
+    switch (m_iCurrentWeapon)
+    {
       case WEAPON_KNIFE: 
         m_iAnim = KNIFE_ANIM_PULL;
         m_iKnifeStand = 1;
+        break;
+      case WEAPON_FISTS: // [SSE] Fists Weapon
+        m_iAnim = KNIFE_ANIM_PULL; // TODO: Remake it
         break;
       case WEAPON_COLT: case WEAPON_DOUBLECOLT:
         m_iAnim = COLT_ANIM_ACTIVATE;
@@ -4623,6 +4724,7 @@ procedures:
           // fire one shot
           switch (m_iCurrentWeapon) {
             case WEAPON_NONE: call FireNone(); break;
+            case WEAPON_FISTS: call SwingFist(); break;
             case WEAPON_KNIFE: call SwingKnife(); break;
             case WEAPON_COLT: call FireColt(); break;
             case WEAPON_DOUBLECOLT: call FireDoubleColt(); break;
@@ -4662,6 +4764,68 @@ procedures:
   FireNone()
   {
     m_bFireWeapon = m_bHasAmmo = FALSE;
+
+    return EEnd();
+  };
+  
+    
+  // ***************** SWING KNIFE *****************
+  SwingFist()
+  {
+    INDEX iSwing;
+
+    // animator swing
+    GetAnimator()->FireAnimation(BODY_ANIM_KNIFE_ATTACK, 0);
+    // sound
+    CPlayer &pl = (CPlayer&)*m_penPlayer;
+    // depending on stand choose random attack
+    switch (m_iKnifeStand)
+    {
+      case 1:
+        iSwing = IRnd()%2;
+
+        switch (iSwing)
+        {
+          case 0: m_iAnim = KNIFE_ANIM_ATTACK01; m_fAnimWaitTime = 0.25f;
+            PlaySound(pl.m_soWeapon0, SOUND_FISTS_BACK, SOF_3D|SOF_VOLUMETRIC);
+            if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Knife_back");}
+            break;
+          case 1: m_iAnim = KNIFE_ANIM_ATTACK02; m_fAnimWaitTime = 0.35f;
+            PlaySound(pl.m_soWeapon1, SOUND_FISTS_BACK, SOF_3D|SOF_VOLUMETRIC);
+            if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Knife_back");}
+            break;
+        }
+        break;
+      case 3:
+        iSwing = IRnd()%2;
+
+        switch (iSwing)
+        {
+          case 0: m_iAnim = KNIFE_ANIM_ATTACK01; m_fAnimWaitTime = 0.50f;
+            PlaySound(pl.m_soWeapon1, SOUND_FISTS_BACK, SOF_3D|SOF_VOLUMETRIC);
+            if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Knife_back");}
+            break;
+          case 1: m_iAnim = KNIFE_ANIM_ATTACK02; m_fAnimWaitTime = 0.50f;
+            PlaySound(pl.m_soWeapon3, SOUND_FISTS_BACK, SOF_3D|SOF_VOLUMETRIC);
+            if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Knife_back");}
+            break;
+        }
+        break;
+    }
+
+    m_moWeapon.PlayAnim(m_iAnim, 0);
+
+    if (CutWithKnife(0, 0, 3.0f, 2.0f, 0.5f, ((GetSP()->sp_bCooperative) ? 100.0f : 50.0f))) {
+      autowait(m_fAnimWaitTime);
+    } else if (TRUE) {
+      autowait(m_fAnimWaitTime/2);
+      CutWithKnife(0, 0, 3.0f, 2.0f, 0.5f, ((GetSP()->sp_bCooperative) ? 100.0f : 50.0f));
+      autowait(m_fAnimWaitTime/2);
+    }
+
+    if (m_moWeapon.GetAnimLength(m_iAnim)-m_fAnimWaitTime>=_pTimer->TickQuantum) { // TODO: Huyna
+      autowait(m_moWeapon.GetAnimLength(m_iAnim)-m_fAnimWaitTime); // TODO: Huyna
+    }
 
     return EEnd();
   };
@@ -6204,6 +6368,7 @@ procedures:
 
     switch (m_iCurrentWeapon)
     {
+      case WEAPON_FISTS: fWait = FistsBoring(); break;
       case WEAPON_KNIFE: fWait = KnifeBoring(); break;
       case WEAPON_COLT: fWait = ColtBoring(); break;
       case WEAPON_DOUBLECOLT: fWait = DoubleColtBoring(); break;
@@ -6260,9 +6425,10 @@ procedures:
       // Select weapon.
       on (ESelectWeapon eSelect) : {
         // [SSE] Weapons
-        if (m_iAvailableWeapons == 0) {
+        // Removed Because Of Fists
+        /*if (m_iAvailableWeapons == 0) {
           resume;
-        }
+        }*/
 
         // try to change weapon
         SelectWeaponChange(eSelect.iWeapon);
@@ -6351,9 +6517,11 @@ procedures:
 
       on (ESelectWeapon eSelect) : {
         // [SSE] Weapons
+        // Removed Because Of Fists
+        /*
         if (m_iAvailableWeapons == 0) {
           resume;
-        }
+        }*/
 
         // try to change weapon
         SelectWeaponChange(eSelect.iWeapon);

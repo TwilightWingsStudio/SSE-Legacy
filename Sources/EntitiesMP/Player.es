@@ -4950,7 +4950,7 @@ functions:
     if (!GetSP()->sp_bCooperative) {
       // enable faster moving if holding knife in DM
       INDEX iCurrentWeapon = ((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon;
-      if (iCurrentWeapon == WEAPON_NONE || iCurrentWeapon == WEAPON_KNIFE) {
+      if (iCurrentWeapon == WEAPON_NONE || iCurrentWeapon == WEAPON_FISTS || iCurrentWeapon == WEAPON_KNIFE) {
         vTranslation *= 1.3f;
       }
 

@@ -151,6 +151,7 @@ static CTextureObject _toASniperBullets;
 static CTextureObject _toASeriousBomb;
 
 // weapon textures
+static CTextureObject _toWFists; // [SSE] Fists Weapon
 static CTextureObject _toWKnife;
 static CTextureObject _toWColt;
 static CTextureObject _toWSingleShotgun;
@@ -216,38 +217,38 @@ struct WeaponInfo {
 
 extern struct WeaponInfo _awiWeapons[18];
 static struct AmmoInfo _aaiAmmo[8] = {
-  { &_toAShells,        &_awiWeapons[4],  &_awiWeapons[5],  0, 0, 0, -9, FALSE }, //  0
-  { &_toABullets,       &_awiWeapons[6],  &_awiWeapons[7],  0, 0, 0, -9, FALSE }, //  1
-  { &_toARockets,       &_awiWeapons[8],  NULL,             0, 0, 0, -9, FALSE }, //  2
-  { &_toAGrenades,      &_awiWeapons[9],  NULL,             0, 0, 0, -9, FALSE }, //  3
-  { &_toANapalm,        &_awiWeapons[11], NULL,             0, 0, 0, -9, FALSE }, //  4
-  { &_toAElectricity,   &_awiWeapons[12], NULL,             0, 0, 0, -9, FALSE }, //  5
-  { &_toAIronBall,      &_awiWeapons[14], NULL,             0, 0, 0, -9, FALSE }, //  6
-  { &_toASniperBullets, &_awiWeapons[13], NULL,             0, 0, 0, -9, FALSE }, //  7
+  { &_toAShells,        &_awiWeapons[5],  &_awiWeapons[6],  0, 0, 0, -9, FALSE }, //  0
+  { &_toABullets,       &_awiWeapons[7],  &_awiWeapons[8],  0, 0, 0, -9, FALSE }, //  1
+  { &_toARockets,       &_awiWeapons[9],  NULL,             0, 0, 0, -9, FALSE }, //  2
+  { &_toAGrenades,      &_awiWeapons[10],  NULL,             0, 0, 0, -9, FALSE }, //  3
+  { &_toANapalm,        &_awiWeapons[12], NULL,             0, 0, 0, -9, FALSE }, //  4
+  { &_toAElectricity,   &_awiWeapons[13], NULL,             0, 0, 0, -9, FALSE }, //  5
+  { &_toAIronBall,      &_awiWeapons[15], NULL,             0, 0, 0, -9, FALSE }, //  6
+  { &_toASniperBullets, &_awiWeapons[14], NULL,             0, 0, 0, -9, FALSE }, //  7
 };
 
 static const INDEX aiAmmoRemap[8] = { 0, 1, 2, 3, 4, 7, 5, 6 };
 
 struct WeaponInfo _awiWeapons[18] = {
   { WEAPON_NONE,            NULL,                 NULL,         FALSE },   //  0
-  { WEAPON_KNIFE,           &_toWKnife,           NULL,         FALSE },   //  1
-  { WEAPON_COLT,            &_toWColt,            NULL,         FALSE },   //  2
-  { WEAPON_DOUBLECOLT,      &_toWColt,            NULL,         FALSE },   //  3
-  { WEAPON_SINGLESHOTGUN,   &_toWSingleShotgun,   &_aaiAmmo[0], FALSE },   //  4
-  { WEAPON_DOUBLESHOTGUN,   &_toWDoubleShotgun,   &_aaiAmmo[0], FALSE },   //  5
-  { WEAPON_TOMMYGUN,        &_toWTommygun,        &_aaiAmmo[1], FALSE },   //  6
-  { WEAPON_MINIGUN,         &_toWMinigun,         &_aaiAmmo[1], FALSE },   //  7
-  { WEAPON_ROCKETLAUNCHER,  &_toWRocketLauncher,  &_aaiAmmo[2], FALSE },   //  8
-  { WEAPON_GRENADELAUNCHER, &_toWGrenadeLauncher, &_aaiAmmo[3], FALSE },   //  9
-  { WEAPON_CHAINSAW,        &_toWChainsaw,        NULL,         FALSE },   // 10
-  { WEAPON_FLAMER,          &_toWFlamer,          &_aaiAmmo[4], FALSE },   // 11
-  { WEAPON_LASER,           &_toWLaser,           &_aaiAmmo[5], FALSE },   // 12
-  { WEAPON_SNIPER,          &_toWSniper,          &_aaiAmmo[7], FALSE },   // 13
-  { WEAPON_IRONCANNON,      &_toWIronCannon,      &_aaiAmmo[6], FALSE },   // 14
+  { WEAPON_FISTS,           &_toWFists,           NULL,         FALSE },   //  1
+  { WEAPON_KNIFE,           &_toWKnife,           NULL,         FALSE },   //  2
+  { WEAPON_COLT,            &_toWColt,            NULL,         FALSE },   //  3
+  { WEAPON_DOUBLECOLT,      &_toWColt,            NULL,         FALSE },   //  4
+  { WEAPON_SINGLESHOTGUN,   &_toWSingleShotgun,   &_aaiAmmo[0], FALSE },   //  5
+  { WEAPON_DOUBLESHOTGUN,   &_toWDoubleShotgun,   &_aaiAmmo[0], FALSE },   //  6
+  { WEAPON_TOMMYGUN,        &_toWTommygun,        &_aaiAmmo[1], FALSE },   //  7
+  { WEAPON_MINIGUN,         &_toWMinigun,         &_aaiAmmo[1], FALSE },   //  8
+  { WEAPON_ROCKETLAUNCHER,  &_toWRocketLauncher,  &_aaiAmmo[2], FALSE },   //  9
+  { WEAPON_GRENADELAUNCHER, &_toWGrenadeLauncher, &_aaiAmmo[3], FALSE },   // 10
+  { WEAPON_CHAINSAW,        &_toWChainsaw,        NULL,         FALSE },   // 11
+  { WEAPON_FLAMER,          &_toWFlamer,          &_aaiAmmo[4], FALSE },   // 12
+  { WEAPON_LASER,           &_toWLaser,           &_aaiAmmo[5], FALSE },   // 13
+  { WEAPON_SNIPER,          &_toWSniper,          &_aaiAmmo[7], FALSE },   // 14
+  { WEAPON_IRONCANNON,      &_toWIronCannon,      &_aaiAmmo[6], FALSE },   // 15
 //{ WEAPON_PIPEBOMB,        &_toWPipeBomb,        &_aaiAmmo[3], FALSE },   // 15
 //{ WEAPON_GHOSTBUSTER,     &_toWGhostBuster,     &_aaiAmmo[5], FALSE },   // 16
 //{ WEAPON_NUKECANNON,      &_toWNukeCannon,      &_aaiAmmo[7], FALSE },   // 17
-  { WEAPON_NONE,            NULL,                 NULL,         FALSE },   // 15
   { WEAPON_NONE,            NULL,                 NULL,         FALSE },   // 16
   { WEAPON_NONE,            NULL,                 NULL,         FALSE },   // 17
 };
@@ -851,7 +852,7 @@ static void FillWeaponAmmoTables(void)
     }
 
     // regular weapons
-    _awiWeapons[i].wi_bHasWeapon = (iAvailableWeapons&(1<<(_awiWeapons[i].wi_wtWeapon-1)));
+    _awiWeapons[i].wi_bHasWeapon = _penWeapons->HasWeapon(_awiWeapons[i].wi_wtWeapon);
 
     if (_awiWeapons[i].wi_paiAmmo != NULL) {
       _awiWeapons[i].wi_paiAmmo->ai_bHasWeapon |= _awiWeapons[i].wi_bHasWeapon;
@@ -1628,7 +1629,6 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
       strMana.PrintF(   "%d", iMana);
       strFrags.PrintF(  "%d", iFrags);
       strDeaths.PrintF( "%d", iDeaths);
-      strArmor.PrintF(  "%d", iArmor);
       
       // [SSE]
       if (iArmor >= 10000) {
@@ -1917,6 +1917,7 @@ extern void InitHUD(void)
     _toASeriousBomb.SetData_t(   CTFILENAME("TexturesMP\\Interface\\AmSeriousBomb.tex"));
 
     // initialize weapon textures
+    _toWFists.SetData_t(           CTFILENAME("TexturesMP\\Interface\\WFists.tex")); // [SSE] Fists Weapon
     _toWKnife.SetData_t(           CTFILENAME("TexturesMP\\Interface\\WKnife.tex"));
     _toWColt.SetData_t(            CTFILENAME("TexturesMP\\Interface\\WColt.tex"));
     _toWSingleShotgun.SetData_t(   CTFILENAME("TexturesMP\\Interface\\WSingleShotgun.tex"));
@@ -1980,6 +1981,7 @@ extern void InitHUD(void)
     ((CTextureData*)_toASniperBullets.GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)_toASeriousBomb  .GetData())->Force(TEX_CONSTANT);
 
+    ((CTextureData*)_toWFists          .GetData())->Force(TEX_CONSTANT); // [SSE] Fists Weapon
     ((CTextureData*)_toWKnife          .GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)_toWColt           .GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)_toWSingleShotgun  .GetData())->Force(TEX_CONSTANT);
@@ -2066,6 +2068,7 @@ extern void HUD_ReloadSS(void* pArgs)
       ReloadTextureData_t(&_toASniperBullets);
       ReloadTextureData_t(&_toASeriousBomb);
 
+      ReloadTextureData_t(&_toWFists); // [SSE] Fists Weapon
       ReloadTextureData_t(&_toWKnife);
       ReloadTextureData_t(&_toWColt);
       ReloadTextureData_t(&_toWSingleShotgun);
