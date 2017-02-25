@@ -25,7 +25,7 @@ enum EOperation {
   2  EO_SUBSTRACT  "-",
   3  EO_MULTIPLY   "*",
   4  EO_DIVIDE     "/",
-  5  EO_REMAINDER  "% (REMAINDER)", // TODO: Write code for it later.
+  5  EO_REMAINDER  "% (MOD / FMOD)", // TODO: Write code for it later.
   6  EO_BITAND     "& (AND index only)",
   7  EO_BITOR      "| (OR index only)",
   8  EO_XOR        "^ (XOR index only)",
@@ -228,16 +228,67 @@ functions:
     if (m_penTarget == NULL) {
       return;
     }
+    
+    if (m_strTargetProperty.Length() == 0)
+    {
+      if (m_bDebugMessages) {
+        CPrintF(TRANS("[PC] %s : Property name is empty!\n"), m_strName);
+      }
+
+      return;
+    }
 
     // Get the target property.
-    CEntityProperty *pTargetProperty = m_penTarget->PropertyForName(m_strTargetProperty);
+    CEntityProperty *pTargetProperty = NULL;
+
+    if (m_eTargetPT == ECT_PROPBYID)
+    {
+      INDEX iTargetPropID = atoi(m_strTargetProperty);
+      
+      if (iTargetPropID <= 0)
+      {
+        if (m_bDebugMessages) {
+          CPrintF(TRANS("[PC] %s : '%s' is not a valid number for property ID!\n"), m_strName, m_strTargetProperty);
+        }
+
+        return;
+      } else {
+        CPrintF(TRANS("[PC] %s : Target property ID = %d\n"), m_strName, iTargetPropID);
+      }
+      
+      for (CDLLEntityClass *pdecDLLClass = m_penTarget->en_pecClass->ec_pdecDLLClass; pdecDLLClass != NULL; pdecDLLClass = pdecDLLClass->dec_pdecBase)
+      {
+        for (INDEX iProperty = 0; iProperty < pdecDLLClass->dec_ctProperties; iProperty++)
+        {
+          // if it has that same identifier
+          if (pdecDLLClass->dec_aepProperties[iProperty].ep_ulID == iTargetPropID) {
+            pTargetProperty = &pdecDLLClass->dec_aepProperties[iProperty];
+            break;
+          }
+        }
+        
+        if (pTargetProperty != NULL) {
+          break;
+        }
+      }
+      
+    } else {
+      pTargetProperty = m_penTarget->PropertyForName(m_strTargetProperty);
+    }
+    
 
     // If invalid property.
-    if (pTargetProperty == NULL && m_eSourcePT == ECT_ENTITY) { 
+    if (pTargetProperty == NULL && m_eTargetPT == ECT_ENTITY) { 
       if (m_bDebugMessages) {
         CPrintF(TRANS("[PC] %s : Property with name '%s' not found!\n"), m_strName, m_strTargetProperty);
       }
 
+      return;
+    } else if (pTargetProperty == NULL && m_eTargetPT == ECT_PROPBYID) {
+      if (m_bDebugMessages) {
+        CPrintF(TRANS("[PC] %s : Property with id '%s' not found!\n"), m_strName, m_strTargetProperty);
+      }
+      
       return;
     }
 
@@ -248,7 +299,7 @@ functions:
       pSourceProperty = m_penSource->PropertyForName(m_strSourceProperty);
     }
 
-    if (m_eTargetPT == ECT_ENTITY) {
+    if (m_eTargetPT == ECT_ENTITY || m_eTargetPT == ECT_PROPBYID) {
       SLONG offset = pTargetProperty->ep_slOffset; 
       CEntityProperty::PropertyType eptType = pTargetProperty->ep_eptType;
 
