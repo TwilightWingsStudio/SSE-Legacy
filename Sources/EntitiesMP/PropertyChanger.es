@@ -228,8 +228,11 @@ functions:
     if (m_penTarget == NULL) {
       return;
     }
+
+    // Get the target property.
+    CEntityProperty *pTargetProperty = NULL;
     
-    if (m_strTargetProperty.Length() == 0)
+    if ((m_eTargetPT == ECT_ENTITY || m_eTargetPT == ECT_PROPBYID) && m_strTargetProperty.Length() == 0)
     {
       if (m_bDebugMessages) {
         CPrintF(TRANS("[PC] %s : Property name is empty!\n"), m_strName);
@@ -237,9 +240,7 @@ functions:
 
       return;
     }
-
-    // Get the target property.
-    CEntityProperty *pTargetProperty = NULL;
+    
 
     if (m_eTargetPT == ECT_PROPBYID)
     {
