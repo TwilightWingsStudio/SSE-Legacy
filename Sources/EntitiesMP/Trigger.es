@@ -104,9 +104,6 @@ properties:
  112 FLOAT m_fRandDelayFactor   "Random delay factor"    = 0.5F,
  113 FLOAT m_fWaitInternal = 1.0f,
 
- 120 CTString m_strConsoleMsg   "Console Message" = "",
- 121 CTString m_strConsoleCmd   "Console Command" = "",
-
  122 BOOL m_bDestroyOnMaxTriggs "Destroy on Max Triggs" = TRUE,
 
  125 CTString m_strTellCountMsg "Count tell message" = "%d more to go...",
@@ -146,8 +143,6 @@ functions:
     slUsedMemory += m_strCausedOnlyByClass.Length();
     slUsedMemory += m_strRangeClass.Length();
     slUsedMemory += m_strRangeName.Length();
-    slUsedMemory += m_strConsoleMsg.Length();
-    slUsedMemory += m_strConsoleCmd.Length();
     slUsedMemory += m_strTellCountMsg.Length();
     return slUsedMemory;
   }
@@ -236,18 +231,6 @@ functions:
         PrintCenterMessage(this, m_penCaused,
           strCookedMessage,
           m_fMessageTime, m_mssMessageSound);
-      }
-    }
-
-    if (m_strConsoleMsg != "") {
-      CPrintF(TRANS("%s\n"), m_strConsoleMsg);
-    }
-
-    if (m_strConsoleCmd != "") {
-      if (m_strConsoleCmd.HasPrefix("net_") || m_strConsoleCmd.HasPrefix("ser_") || m_strConsoleCmd.HasPrefix("gam_") || m_strConsoleCmd.HasPrefix("cli_") || m_strConsoleCmd.HasPrefix("tex_") || m_strConsoleCmd.HasPrefix("Quit();")) {
-        CPrintF("%s : Trigger tried to use not allowed shell command!\n", m_strName);
-      } else {
-        _pShell->Execute(m_strConsoleCmd);
       }
     }
 
