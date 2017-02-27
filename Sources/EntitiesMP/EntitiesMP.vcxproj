@@ -197,6 +197,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="PropertyChanger.cpp" />
     <ClCompile Include="Randomizer.cpp" />
     <ClCompile Include="RangeDamager.cpp" />
+    <ClCompile Include="RangeEventer.cpp" />
     <ClCompile Include="RayCaster.cpp" />
     <ClCompile Include="Sequencer.cpp" />
     <ClCompile Include="ShellExecutor.cpp" />
@@ -451,6 +452,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="Randomizer_tables.h" />
     <ClInclude Include="RangeDamager.h" />
     <ClInclude Include="RangeDamager_tables.h" />
+    <ClInclude Include="RangeEventer.h" />
+    <ClInclude Include="RangeEventer_tables.h" />
     <ClInclude Include="RayCaster.h" />
     <ClInclude Include="RayCaster_tables.h" />
     <ClInclude Include="Sequencer.h" />
@@ -3034,6 +3037,19 @@ ecc EntitiesMP/%(Filename).es </Command>
 ecc EntitiesMP/%(Filename).es </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="RangeEventer.es">
+      <FileType>Document</FileType>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
