@@ -747,6 +747,8 @@ public:
   
   // [SSE] Extended Engine API
   virtual FLOAT GetArmor(void) const { return 0.0F; };
+  virtual FLOAT GetShields(void) const { return 0.0F; };
+  virtual INDEX GetLevel(void) const { return 0; };
 
   // apply some damage to the entity (see event EDamage for more info)
   virtual void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
