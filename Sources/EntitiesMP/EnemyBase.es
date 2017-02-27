@@ -197,6 +197,7 @@ properties:
 214 BOOL m_bRunningToFriend = FALSE,
 
 220 CEntityPointer m_penFactionHolder "Faction Holder",
+221 CEntityPointer m_penSwitch        "TEMP Switch",
 
 240 FLOAT m_fSpeedMultiplier "Speed Multiplier" = 1.0f,
 
@@ -268,6 +269,24 @@ functions:
     }
 
     return (CEnemyFactionHolder*)&*m_penFactionHolder;
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Interaction API
+  // Return true if this entity can act act like interaction relay.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsInteractionRelay()
+  {
+    return TRUE;
+  }
+
+  // --------------------------------------------------------------------------------------
+  // [SSE] Interaction API
+  // Return pointer to interaction provider if needed.
+  // --------------------------------------------------------------------------------------
+  virtual CEntity *GetInteractionProvider()
+  {
+    return m_penSwitch;
   }
 
   // --------------------------------------------------------------------------------------
