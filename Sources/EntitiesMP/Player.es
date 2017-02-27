@@ -1440,6 +1440,15 @@ functions:
   }
 
   // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Returns current armor value.
+  // --------------------------------------------------------------------------------------
+  virtual FLOAT GetArmor(void)
+  {
+    return m_fArmor;
+  }
+
+  // --------------------------------------------------------------------------------------
   INDEX GenderSound(INDEX iSound)
   {
     return iSound+m_iGender*GENDEROFFSET;
@@ -6573,15 +6582,15 @@ functions:
   // --------------------------------------------------------------------------------------
   void CheckDeathForRespawnInPlace(EDeath eDeath)
   {
-    // if respawning in place is not allowed
+    // if respawning in place is not allowed then skip further checks
     if (!GetSP()->sp_bRespawnInPlace) {
-      // skip further checks
       return;
     }
-    // if killed by a player or enemy
+
     CEntity *penKiller = eDeath.eLastDamage.penInflictor;
+
+    // if killed by a player or enemy then mark for respawning in place
     if (IsOfClass(penKiller, "Player") || IsDerivedFromClass(penKiller, "Enemy Base")) {
-      // mark for respawning in place
       m_ulFlags |= PLF_RESPAWNINPLACE;
       m_vDied = GetPlacement().pl_PositionVector;
       m_aDied = GetPlacement().pl_OrientationAngle;

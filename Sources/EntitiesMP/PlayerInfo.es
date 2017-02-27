@@ -37,7 +37,8 @@ properties:
   10 CEntityPointer m_penIOTarget  "IO Player Target", // used both for input and output, m_penCurrentTarget used to compare for change
   11 CEntityPointer m_penCurrentTarget,
   
-  15 BOOL m_bPerTickCheck "Per Tick Check" = FALSE,
+  //14 FLOAT m_fUpdateInterval   "Update Interval" 'W' = 0.1f,
+  15 BOOL m_bPerTickCheck      "Per Tick Check" = FALSE,
   16 BOOL m_bStaticPlayerIndex "Disable Player ID Output" = FALSE,
   
   // info comes now
@@ -89,7 +90,7 @@ functions:
     CPlayer &penPlayer = (CPlayer&)*m_penCurrentTarget;
 
     m_fHealth = penPlayer.GetHealth();
-    m_fArmor = penPlayer.m_fArmor;
+    m_fArmor = penPlayer.GetArmor();
     m_strPlayerName = penPlayer.GetName();
     m_bDead = !(penPlayer.GetFlags()&ENF_ALIVE);
 
@@ -106,6 +107,9 @@ functions:
 
     // For safety.
     if (penWeapons == NULL) {
+      if (m_bDebugMessages) {
+        CPrintF("  Weapons are unavailable!\n", m_fArmor);
+      }
       return;
     }
 
@@ -123,7 +127,8 @@ functions:
     // If player index changed since last time.
     if (m_bStaticPlayerIndex || m_iCurrentPlayerIndex != m_iIOPlayerIndex) {
       // If valid input player index.
-      if ((m_iIOPlayerIndex > -1) && (m_iIOPlayerIndex < 16)) {
+      if ((m_iIOPlayerIndex > -1) && (m_iIOPlayerIndex < 16))
+      {
         // Update index.
         m_iCurrentPlayerIndex = m_iIOPlayerIndex;
 
@@ -176,8 +181,10 @@ procedures:
   
     autowait(0.1f);
   
-    while (TRUE) {
-      wait(_pTimer->TickQuantum) {
+    while (TRUE)
+    {
+      wait(_pTimer->TickQuantum)
+      {
         on (EBegin) : { 
           if (m_bPerTickCheck) {
             UpdateInfo();
