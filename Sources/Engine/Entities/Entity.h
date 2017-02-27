@@ -744,6 +744,10 @@ public:
 
   /* Get health of the entity. */
   FLOAT GetHealth(void) const { return en_fHealth; };
+  
+  // [SSE] Extended Engine API
+  virtual FLOAT GetArmor(void) const { return 0.0F; };
+
   // apply some damage to the entity (see event EDamage for more info)
   virtual void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
     FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection);
