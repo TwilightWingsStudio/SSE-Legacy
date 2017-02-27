@@ -4795,53 +4795,38 @@ procedures:
     GetAnimator()->FireAnimation(BODY_ANIM_KNIFE_ATTACK, 0);
     // sound
     CPlayer &pl = (CPlayer&)*m_penPlayer;
-    // depending on stand choose random attack
-    switch (m_iKnifeStand)
+    
+    iSwing = IRnd()%2;
+
+    switch (iSwing)
     {
-      case 1:
-        iSwing = IRnd()%2;
+      case 0: {
+        m_iAnim = KNIFE_ANIM_ATTACK01;
+        m_fAnimWaitTime = 0.15f;
+        PlaySound(pl.m_soWeapon0, SOUND_FISTS_BACK, SOF_3D|SOF_VOLUMETRIC);
+        //if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Knife_back");}
+      } break;
 
-        switch (iSwing)
-        {
-          case 0: m_iAnim = KNIFE_ANIM_ATTACK01; m_fAnimWaitTime = 0.25f;
-            PlaySound(pl.m_soWeapon0, SOUND_FISTS_BACK, SOF_3D|SOF_VOLUMETRIC);
-            if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Knife_back");}
-            break;
-          case 1: m_iAnim = KNIFE_ANIM_ATTACK02; m_fAnimWaitTime = 0.35f;
-            PlaySound(pl.m_soWeapon1, SOUND_FISTS_BACK, SOF_3D|SOF_VOLUMETRIC);
-            if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Knife_back");}
-            break;
-        }
-        break;
-      case 3:
-        iSwing = IRnd()%2;
-
-        switch (iSwing)
-        {
-          case 0: m_iAnim = KNIFE_ANIM_ATTACK01; m_fAnimWaitTime = 0.50f;
-            PlaySound(pl.m_soWeapon1, SOUND_FISTS_BACK, SOF_3D|SOF_VOLUMETRIC);
-            if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Knife_back");}
-            break;
-          case 1: m_iAnim = KNIFE_ANIM_ATTACK02; m_fAnimWaitTime = 0.50f;
-            PlaySound(pl.m_soWeapon3, SOUND_FISTS_BACK, SOF_3D|SOF_VOLUMETRIC);
-            if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Knife_back");}
-            break;
-        }
-        break;
+      case 1: {
+        m_iAnim = KNIFE_ANIM_ATTACK02;
+        m_fAnimWaitTime = 0.15f;
+        PlaySound(pl.m_soWeapon1, SOUND_FISTS_BACK, SOF_3D|SOF_VOLUMETRIC);
+        //if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Knife_back");}
+      } break;
     }
 
     m_moWeapon.PlayAnim(m_iAnim, 0);
 
-    if (CutWithKnife(0, 0, 3.0f, 2.0f, 0.5f, ((GetSP()->sp_bCooperative) ? 100.0f : 50.0f))) {
+    if (CutWithKnife(0, 0, 2.25f, 2.0f, 0.5f, ((GetSP()->sp_bCooperative) ? 60.0f : 40.5f))) {
       autowait(m_fAnimWaitTime);
     } else if (TRUE) {
       autowait(m_fAnimWaitTime/2);
-      CutWithKnife(0, 0, 3.0f, 2.0f, 0.5f, ((GetSP()->sp_bCooperative) ? 100.0f : 50.0f));
+      CutWithKnife(0, 0, 2.25f, 2.0f, 0.5f, ((GetSP()->sp_bCooperative) ? 60.0f : 40.5f));
       autowait(m_fAnimWaitTime/2);
     }
 
-    if (m_moWeapon.GetAnimLength(m_iAnim)-m_fAnimWaitTime>=_pTimer->TickQuantum) { // TODO: Huyna
-      autowait(m_moWeapon.GetAnimLength(m_iAnim)-m_fAnimWaitTime); // TODO: Huyna
+    if (m_moWeapon.GetAnimLength(m_iAnim) - m_fAnimWaitTime >= _pTimer->TickQuantum) { // TODO: Huyna
+      autowait(m_moWeapon.GetAnimLength(m_iAnim) - m_fAnimWaitTime); // TODO: Huyna
     }
 
     return EEnd();
@@ -6488,6 +6473,12 @@ procedures:
       CModelObject *pmo = &(m_moWeapon.GetAttachmentModel(ROCKETLAUNCHER_ATTACHMENT_ROCKET1)->amo_moModelObject);
       if (pmo) { pmo->StretchModel(FLOAT3D(1, 1, 1)); }
     }
+    
+    /*if (m_iCurrentWeapon == WEAPON_FLAMER) {
+      m_tmFlamerStop = _pTimer->CurrentTick();
+      ((CProjectile&)*m_penFlame).m_penParticles = NULL;
+      m_penFlame = NULL;
+    }*/
 
     // Kill all possible sounds, animations, etc.
     ResetWeaponMovingOffset();
