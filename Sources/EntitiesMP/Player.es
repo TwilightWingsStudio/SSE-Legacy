@@ -4733,6 +4733,17 @@ functions:
       ButtonsActions(paAction);
     }
 
+    // TODO: [ZCaliptium] Remove this shit!
+    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive)
+    {
+      CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
+
+      if (enSettings.m_bLockCameraPitch) {
+        paAction.pa_aViewRotation(2) = 0.0F;
+        paAction.pa_aRotation(2) = 0.0F;
+      }
+    }
+
     // do the actions
     ActiveActions(paAction);
 

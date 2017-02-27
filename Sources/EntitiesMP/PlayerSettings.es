@@ -115,6 +115,8 @@ properties:
  135 enum EPSAPRegenValueType m_etrvtArmorRegenValType "AP Regen. Val Type" = PSART_ARMOR_POINTS,
  136 enum EPSAPRegenValueType m_etrvtArmorRegenMinType "AP Regen. Min Type" = PSART_ARMOR_POINTS,
  137 enum EPSAPRegenValueType m_etrvtArmorRegenMaxType "AP Regen. Max Type" = PSART_ARMOR_POINTS,
+ 
+ 150 BOOL m_bLockCameraPitch "TEMP Lock Cam Pitch" = FALSE,
 
 // --------------------------------------------------------------------------------------
 // C O M P O N E N T S
