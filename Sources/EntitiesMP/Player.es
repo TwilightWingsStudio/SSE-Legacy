@@ -1284,6 +1284,7 @@ properties:
  
  // [SSE] Personal/Shared Extra Lives
  200 INDEX m_iLives = 0,
+ 201 INDEX m_iMoney = 0,
 
 {
   ShellLaunchData ShellLaunchData_array;  // array of data describing flying empty shells
@@ -1447,7 +1448,16 @@ functions:
   {
     return m_fArmor;
   }
-
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Network Update - Entity RPC.
+  // Receives direct command from server. Desync-safe.
+  // --------------------------------------------------------------------------------------
+  virtual void ReceiveRPC(CNetworkMessage &nmMessage)
+  {
+    CPrintF("PLID %d received direct RPC!\n", GetMyPlayerIndex());
+  };
+  
   // --------------------------------------------------------------------------------------
   INDEX GenderSound(INDEX iSound)
   {
