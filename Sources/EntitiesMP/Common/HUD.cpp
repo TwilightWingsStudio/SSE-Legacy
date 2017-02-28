@@ -1320,10 +1320,12 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
   ptoWantedWeapon  = _awiWeapons[iWantedWeapon].wi_ptoWeapon;
 
   AmmoInfo *paiCurrent = _awiWeapons[iCurrentWeapon].wi_paiAmmo;
-  if (paiCurrent!=NULL) ptoCurrentAmmo = paiCurrent->ai_ptoAmmo;
+  if (paiCurrent != NULL) ptoCurrentAmmo = paiCurrent->ai_ptoAmmo;
+  
+  BOOL bAnyColt = iCurrentWeapon == WEAPON_COLT || iCurrentWeapon == WEAPON_DOUBLECOLT;
 
   // draw complete weapon info if knife isn't current weapon
-  if (ptoCurrentAmmo!=NULL && !GetSP()->sp_bInfiniteAmmo) {
+  if (bAnyColt || (ptoCurrentAmmo != NULL && !GetSP()->sp_bInfiniteAmmo)) {
     // determine ammo quantities
     FLOAT fMaxValue = _penWeapons->GetMaxAmmo();
     fValue = _penWeapons->GetAmmo();
@@ -1331,6 +1333,12 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     strValue.PrintF( "%d", (SLONG)ceil(fValue));
     PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.30f, 0.15f, FALSE);
     BOOL bDrawAmmoIcon = _fCustomScaling<=1.0f;
+    
+    // [SSE] Colt Bullets
+    if (bAnyColt) {
+      bDrawAmmoIcon = FALSE;
+    }
+
     // draw ammo, value and weapon
     fRow = pixBottomBound-fHalfUnit;
     fCol = 175 + fHalfUnit;
@@ -1338,16 +1346,19 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     HUD_DrawBorder( fCol+fMoverX, fRow+fMoverY, fOneUnit, fOneUnit, colBorder);
     fCol += fAdvUnit+fChrUnit*3/2 -fHalfUnit;
     HUD_DrawBorder( fCol, fRow, fChrUnit*3, fOneUnit, colBorder);
+
     if (bDrawAmmoIcon) {
       fCol += fAdvUnit+fChrUnit*3/2 -fHalfUnit;
       HUD_DrawBorder( fCol, fRow, fOneUnit, fOneUnit, colBorder);
       HUD_DrawIcon( fCol, fRow, *ptoCurrentAmmo, C_WHITE /*_colHUD*/, fNormValue, TRUE);
       fCol -= fAdvUnit+fChrUnit*3/2 -fHalfUnit;
     }
+
     HUD_DrawText( fCol, fRow, strValue, NONE, fNormValue);
     fCol -= fAdvUnit+fChrUnit*3/2 -fHalfUnit;
     HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, *ptoCurrentWeapon, C_WHITE /*_colHUD*/, fNormValue, !bDrawAmmoIcon);
-  } else if (ptoCurrentWeapon!=NULL) {
+
+  } else if (ptoCurrentWeapon != NULL) {
     // draw only knife or colt icons (ammo is irrelevant)
     fRow = pixBottomBound-fHalfUnit;
     fCol = 205 + fHalfUnit;
