@@ -819,6 +819,29 @@ CNetworkLibrary::~CNetworkLibrary(void)
   delete &ga_srvServer;
 }
 
+static void BroadcastS2STest(void *pArgs)
+{
+  if (!_pNetwork->ga_srvServer.srv_bActive) {
+    CPrintF("  <not a server>\n");
+    return;
+  }
+  
+  CTString strServerName = *NEXTARGUMENT(CTString*);
+  INDEX iPort = NEXTARGUMENT(INDEX);
+  CTString strMessage = *NEXTARGUMENT(CTString*);
+  
+  ULONG ulServerAddress = StringToAddress(strServerName);
+
+  // If message not empty then try to send it.
+  if (strMessage.Length() != 0)
+  {
+    CNetworkMessage nm(MSG_EXTRA);
+    nm << CTString(0, "s2s %s\n", strMessage);
+
+    _pNetwork->SendBroadcast(nm, ulServerAddress, iPort);
+  }
+}
+
 static void AttachPlayerTest(void* pArgs)
 {
   INDEX iClient = NEXTARGUMENT(INDEX);
@@ -1013,6 +1036,9 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user void ListPlayers(void);", &ListPlayers);
   
   // [SSE] Testing
+  extern void LUAJitTest(void *pArgs);
+  _pShell->DeclareSymbol("user void LUAJitTest(void);", &LUAJitTest);
+  _pShell->DeclareSymbol("user void BroadcastS2STest(CTString, INDEX, CTString);", &BroadcastS2STest);
   _pShell->DeclareSymbol("user void DumpPlayerSources(void);", &DumpPlayerSources);
   _pShell->DeclareSymbol("user void DumpPlayerTargets(void);", &DumpPlayerTargets);
 
@@ -2256,27 +2282,32 @@ void CNetworkLibrary::MainLoop(void)
       ULONG ulFrom;
       UWORD uwPort;
       BOOL bHasMsg = ReceiveBroadcast(nmReceived, ulFrom, uwPort);
-      // if there are no more messages
+      // if there are no more messages then finish.
+
       if (!bHasMsg) {
-        // finish
         break;
       }
 
-      // if this message is not valid rcon message
-      if (nmReceived.GetType()!=MSG_EXTRA) {
-        // skip it
+      // If this message is not valid rcon message then skip it.
+      if (nmReceived.GetType() != MSG_EXTRA) {
         continue;
       }
+
       // get the string from the message
       CTString strMsg;
       nmReceived>>strMsg;
 
-      // if this is server
-      if (IsServer()) {
-        // accept requests
+      if (strMsg.RemovePrefix("s2s ")) {
+        CPrintF("[S2S][%s:%d] %s", AddressToString(ulFrom), uwPort, strMsg);
+      }
+      
+      // If this is server then accept requests.
+      if (IsServer())
+      {
         if (!strMsg.RemovePrefix("rcmd ")) {
           continue;
         }
+
         ULONG ulCode;
         char strPass[80];
         char strCmd[256];
