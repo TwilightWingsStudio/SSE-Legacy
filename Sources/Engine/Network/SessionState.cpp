@@ -1536,6 +1536,31 @@ void CSessionState::ProcessGameStreamBlock(CNetworkMessage &nmMessage)
     CEntity::HandleSentEvents();
     ses_bAllowRandom = FALSE;
   } break;
+  
+  // [SSE] Netcode Update - Entity RPC.
+  case MSG_SEQ_ENTITYRPC:
+  {
+    _pNetwork->AddNetGraphValue(NGET_NONACTION, 1.0f); // non-action sequence
+
+    INDEX iEntity;
+    nmMessage >> iEntity;
+
+    CEntity *penEntity = _pNetwork->ga_World.EntityFromID(iEntity);
+
+    if (penEntity == NULL) {
+      break;
+    }
+    
+    // delete all predictors
+    _pNetwork->ga_World.DeletePredictors();
+    
+    penEntity->ReceiveRPC(nmMessage);
+
+    // handle all the sent events
+    ses_bAllowRandom = TRUE;
+    CEntity::HandleSentEvents();
+    ses_bAllowRandom = FALSE;
+  } break;
 
   // if changing character
   case MSG_SEQ_CHARACTERCHANGE:

@@ -86,6 +86,8 @@ typedef enum NetworkMessageType {
   
   MSG_SEQ_DESTROYENTITY, // [SSE] Netcode Update - instruction for removing entity from the World.
   
+  MSG_SEQ_ENTITYRPC,    // [SSE] Netcode Update - instruction for calling special hook in entity.
+  
   MSG_S2C_ATTACHPLAYER, // [SSE] Netcode Update - instructions for certain client to take control on specified player.
 
   MSG_GAMESTREAMBLOCKS,         // packet with one or more game stream messages
