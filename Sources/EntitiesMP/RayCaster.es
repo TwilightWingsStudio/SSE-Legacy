@@ -48,7 +48,7 @@ properties:
      // Here is variables for data output.
   20 CEntityPointer m_penHit "Hit Target",
   21 FLOAT3D m_vPos  "Hit Pos"           = FLOAT3D(0.0F, 0.0F, 0.0F),
-  22 FLOAT m_fBack   "Hit Distance" = 0.0F,
+  22 FLOAT m_fBack   "Distance from Hit" = 0.0F,
 
 components:
    1 model   MODEL_RAYCASTER     "Models\\Editor\\RayCaster.mdl",
