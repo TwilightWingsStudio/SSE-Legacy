@@ -1142,6 +1142,7 @@ properties:
   6 FLOAT m_fMaxHealth = 1,                 // default health supply player can have
   7 INDEX m_ulFlags = 0,                      // various flags
   
+  9 CEntityPointer m_penCurrentInteractable,
  10 CEntityPointer m_penSpectatorCamera,      // [SSE] Spectator Camera
  15 CEntityPointer m_penSettings,             // [SSE] Player Settings Entity
  16 CEntityPointer m_penWeapons,              // player weapons
@@ -1447,6 +1448,15 @@ functions:
   virtual FLOAT GetArmor(void)
   {
     return m_fArmor;
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Returns minimal distance to able interact with object.
+  // --------------------------------------------------------------------------------------
+  virtual FLOAT GetInteractionDistance(void) const
+  {
+    return 2.0F;
   }
   
   // --------------------------------------------------------------------------------------

@@ -70,6 +70,15 @@ functions:
   {
     return TRUE;
   }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Returns minimal distance to able interact with object.
+  // --------------------------------------------------------------------------------------
+  virtual FLOAT GetInteractionDistance(void) const
+  {
+    return m_fUseRange;
+  }
 
   // --------------------------------------------------------------------------------------
   // Returns anim data for given animation property - returns NULL for none.

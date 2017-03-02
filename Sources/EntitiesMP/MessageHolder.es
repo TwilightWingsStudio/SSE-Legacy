@@ -46,6 +46,15 @@ functions:
   {
     return TRUE;
   }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Returns minimal distance to able interact with object.
+  // --------------------------------------------------------------------------------------
+  virtual FLOAT GetInteractionDistance(void) const
+  {
+    return m_fDistance;
+  }
 
   const CTString &GetDescription(void) const {
     ((CTString&)m_strDescription).PrintF("%s", m_fnmMessage.FileName());
