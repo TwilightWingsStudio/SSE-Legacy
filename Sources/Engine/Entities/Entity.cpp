@@ -3342,6 +3342,11 @@ const CTString &CEntity::GetInteractionHint() const
   return strDummyName;
 }
 
+FLOAT CEntity::GetInteractionDistance(void) const
+{
+  return 0.0F;
+}
+
 /////////////////////////////////////////////////////////////////////
 // Overrides from CSerial
 

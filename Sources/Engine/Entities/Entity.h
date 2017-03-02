@@ -661,6 +661,7 @@ public:
   virtual BOOL IsInteractionRelay(void);
   virtual CEntity* GetInteractionProvider(void);
   virtual const CTString& GetInteractionHint(void) const;
+  virtual FLOAT GetInteractionDistance(void) const;
   
   // [SSE] Network Update
   virtual void ReceiveRPC(CNetworkMessage &nmMessage) {};
