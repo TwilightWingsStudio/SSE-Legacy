@@ -663,6 +663,17 @@ public:
   virtual const CTString& GetInteractionHint(void) const;
   virtual FLOAT GetInteractionDistance(void) const;
   
+  // [SSE]
+  inline BOOL IsAlive(void) const
+  {
+    return en_ulFlags&ENF_ALIVE;
+  }
+
+  inline BOOL IsDead(void) const
+  {
+    return !(en_ulFlags&ENF_ALIVE);
+  }
+  
   // [SSE] Network Update
   virtual void ReceiveRPC(CNetworkMessage &nmMessage) {};
 
