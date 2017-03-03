@@ -1252,6 +1252,128 @@ functions:
       }
     }
   }
+  
+  // --------------------------------------------------------------------------------------
+  // Updates information about entity under crosshair.
+  // --------------------------------------------------------------------------------------
+  void UpdateInteractionInfo(CEntity *pen)
+  {
+    if (pen == NULL) return; // TODO: Maybe put ASSERT here.
+
+    TIME tmNow = _pTimer->CurrentTick();
+
+    // If target is alive... 
+    if (pen->IsAlive())
+    {
+      // check the target for time prediction updating
+      CheckTargetPrediction(pen);
+
+      // if player
+      if (IsOfClass( pen, "Player"))
+      {
+        // rememer when targeting begun
+        if (m_tmTargetingStarted == 0) {
+          m_penTargeting = pen;
+          m_tmTargetingStarted = tmNow;
+        }
+
+        // keep player name, mana and health for eventual printout or coloring
+        m_fEnemyHealth = ((CPlayer*)pen)->GetHealth() / ((CPlayer*)pen)->m_fMaxHealth;
+        m_strLastTarget.PrintF( "%s", ((CPlayer*)pen)->GetPlayerName());
+
+        if (GetSP()->sp_gmGameMode==CSessionProperties::GM_SCOREMATCH) {
+          // add mana to player name
+          CTString strMana="";
+          strMana.PrintF( " (%d)", ((CPlayer*)pen)->m_iMana);
+          m_strLastTarget += strMana;
+        }
+
+        if (hud_bShowPlayerName) {
+          m_tmLastTarget = tmNow + 1.5f;
+        }
+        
+        // cannot snoop while firing
+        if (m_bFireWeapon) { m_tmTargetingStarted = 0; }
+
+        return;
+      }
+    }
+
+    m_tmTargetingStarted = 0; // not targeting player
+    
+    // If distance to object doesn't fit the distance then we can't interact with it.
+    if (m_fRayHitDistance >= pen->GetInteractionDistance()) {
+      return;
+    }
+
+    // [SSE] Player Revive In Coop
+    if (GetSP()->sp_bCooperative && !GetSP()->sp_bSharedLives && IsOfClass(pen, "Player") && pen->IsDead())
+    {
+      CPlayer &pl = (CPlayer&)*m_penPlayer;
+      CPlayer *penTargetPlayer = (CPlayer*)pen;
+      
+      if (penTargetPlayer->m_iLives <= 0 && pl.m_iLives > 0) {
+        m_strLastTarget.PrintF(TRANS("Revive for 1 EL: %s"), penTargetPlayer->GetPlayerName());
+        m_tmLastTarget = tmNow + 1.5f;
+      }
+      
+      return;
+    }
+
+    // If switch is under ray.
+    if (IsOfClass(pen, "Switch"))
+    {
+      CSwitch &enSwitch = (CSwitch&)*pen;
+
+      // if switch near enough and is useable
+      if (enSwitch.m_bUseable)
+      {
+        // show switch message
+        if (pen->GetInteractionHint() != "") {
+          m_strLastTarget = pen->GetInteractionHint();
+        } else {
+          m_strLastTarget = TRANS("Use");
+        }
+
+        m_tmLastTarget = tmNow + 0.5f;
+      }
+
+    } else if (IsOfClass(pen, "SimpleSwitch")) {
+      CSimpleSwitch &enSwitch = (CSimpleSwitch&)*pen;
+
+      // if switch near enough and is useable
+      if (enSwitch.m_bActive)
+      {
+        // show switch message
+        if (pen->GetInteractionHint() != "") {
+          m_strLastTarget = pen->GetInteractionHint();
+        } else {
+          m_strLastTarget = TRANS("Use");
+        }
+
+        m_tmLastTarget = tmNow + 0.5f;
+      }
+
+    // if analyzable
+    } else if (IsOfClass( pen, "MessageHolder")) {
+      CMessageHolder &enMsgHolder = (CMessageHolder&)*pen;
+
+      // if messageholder near enough and is useable
+      if (enMsgHolder.m_bActive)
+      {
+        const CTFileName &fnmMessage = enMsgHolder.m_fnmMessage;
+
+        // if player doesn't have that message it database
+        CPlayer &pl = (CPlayer&)*m_penPlayer;
+        if (!pl.HasMessage(fnmMessage))
+        {
+          // show analyse message
+          m_strLastTarget = TRANS("Analyze");
+          m_tmLastTarget  = tmNow + 0.5f;
+        }
+      }
+    }
+  }
 
   // --------------------------------------------------------------------------------------
   // Cast a ray from weapon.
@@ -1321,118 +1443,7 @@ functions:
       // If exists target which is interaction provider then printout some stuff.
       if (pen != NULL && pen->IsInteractionProvider())
       {
-        BOOL bExCheck = TRUE;
-        
-        // if alive 
-        if (pen->GetFlags()&ENF_ALIVE)
-        {
-          // check the target for time prediction updating
-          CheckTargetPrediction(pen);
-
-          // if player
-          if (IsOfClass( pen, "Player"))
-          {
-            // rememer when targeting begun
-            if (m_tmTargetingStarted == 0) {
-              m_penTargeting = pen;
-              m_tmTargetingStarted = tmNow;
-            }
-
-            // keep player name, mana and health for eventual printout or coloring
-            m_fEnemyHealth = ((CPlayer*)pen)->GetHealth() / ((CPlayer*)pen)->m_fMaxHealth;
-            m_strLastTarget.PrintF( "%s", ((CPlayer*)pen)->GetPlayerName());
-
-            if (GetSP()->sp_gmGameMode==CSessionProperties::GM_SCOREMATCH) {
-              // add mana to player name
-              CTString strMana="";
-              strMana.PrintF( " (%d)", ((CPlayer*)pen)->m_iMana);
-              m_strLastTarget += strMana;
-            }
-
-            if (hud_bShowPlayerName) {
-              m_tmLastTarget = tmNow + 1.5f;
-            }
-
-            bExCheck = FALSE;
-
-          // not targeting player
-          } else {
-            m_tmTargetingStarted = 0;  // reset targeting
-          }
-
-           // cannot snoop while firing
-          if (m_bFireWeapon) { m_tmTargetingStarted = 0; }
-        } else {
-          // [SSE] Player Revive In Coop
-          if (GetSP()->sp_bCooperative && !GetSP()->sp_bSharedLives && IsOfClass(pen, "Player"))
-          {
-            CPlayer &pl = (CPlayer&)*m_penPlayer;
-            CPlayer *penTargetPlayer = (CPlayer*)pen;
-            
-            if (penTargetPlayer->m_iLives <= 0 && pl.m_iLives > 0) {
-              m_strLastTarget.PrintF(TRANS("Revive for 1 EL: %s"), penTargetPlayer->GetPlayerName());
-              m_tmLastTarget = tmNow + 1.5f;
-            }
-          }
-          
-          m_tmTargetingStarted = 0; // not targeting player
-        }
-
-        if (bExCheck)
-        {
-          m_tmTargetingStarted = 0; // not targeting player
-
-          // If switch is under ray.
-          if (IsOfClass(pen, "Switch"))
-          {
-            CSwitch &enSwitch = (CSwitch&)*pen;
-
-            // if switch near enough and is useable
-            if ((m_fRayHitDistance < enSwitch.m_fUseRange) && enSwitch.m_bUseable)
-            {
-              // show switch message
-              if (enSwitch.m_strMessage != "") {
-                m_strLastTarget = enSwitch.m_strMessage;
-              } else {
-                m_strLastTarget = TRANS("Use");
-              }
-
-              m_tmLastTarget = tmNow + 0.5f;
-            }
-
-          } else if (IsOfClass(pen, "SimpleSwitch")) {
-            CSimpleSwitch &enSwitch = (CSimpleSwitch&)*pen;
-
-            // if switch near enough and is useable
-            if ((m_fRayHitDistance < enSwitch.m_fUseRange) && enSwitch.m_bActive)
-            {
-              // show switch message
-              if (enSwitch.m_strMessage != "") {
-                m_strLastTarget = enSwitch.m_strMessage;
-              } else {
-                m_strLastTarget = TRANS("Use");
-              }
-
-              m_tmLastTarget = tmNow + 0.5f;
-            }
-
-          // if analyzable
-          } else if (IsOfClass( pen, "MessageHolder")) {
-            CMessageHolder &enMsgHolder = (CMessageHolder&)*pen;
-
-            // if messageholder near enough and is useable
-            if (m_fRayHitDistance < enMsgHolder.m_fDistance && enMsgHolder.m_bActive) {
-              const CTFileName &fnmMessage = enMsgHolder.m_fnmMessage;
-              // if player doesn't have that message it database
-              CPlayer &pl = (CPlayer&)*m_penPlayer;
-              if (!pl.HasMessage(fnmMessage)) {
-                // show analyse message
-                m_strLastTarget = TRANS("Analyze");
-                m_tmLastTarget  = tmNow + 0.5f;
-              }
-            }
-          }
-        }
+        UpdateInteractionInfo(pen);
       }
 
     } else {
@@ -1443,8 +1454,6 @@ functions:
       vDir.Normalize();
       m_vRayHit = crRay.cr_vOrigin+vDir*50.0f;
     }
-
-
     
     // determine snooping time
     TIME tmDelta = tmNow - m_tmTargetingStarted; 
