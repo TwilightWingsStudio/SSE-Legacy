@@ -72,12 +72,21 @@ functions:
   }
   
   // --------------------------------------------------------------------------------------
-  // [SSE] Extended Engine API
+  // [SSE] Interaction API
   // Returns minimal distance to able interact with object.
   // --------------------------------------------------------------------------------------
   virtual FLOAT GetInteractionDistance(void) const
   {
     return m_fUseRange;
+  }
+
+  // --------------------------------------------------------------------------------------
+  // [SSE] Interaction API
+  // Returns hint showed when you point the object.
+  // --------------------------------------------------------------------------------------
+  virtual const CTString& GetInteractionHint(void) const
+  {
+    return m_strMessage;
   }
 
   // --------------------------------------------------------------------------------------
