@@ -4322,6 +4322,11 @@ functions:
     if (!pen->IsInteractionProvider()) {
       return FALSE;
     }
+    
+    // If distance to object doesn't fit the distance then we can't interact with it.
+    if (fRayHitDistance >= pen->GetInteractionDistance()) {
+      return FALSE;
+    }
 
     // If CSwitch...
     if (IsOfClass( pen, "Switch"))
@@ -4329,7 +4334,7 @@ functions:
       CSwitch &enSwitch = (CSwitch&)*pen;
 
       // if switch near enough and is useable
-      if (fRayHitDistance < enSwitch.m_fUseRange && enSwitch.m_bUseable) {
+      if (enSwitch.m_bUseable) {
         // send it a trigger event
         SendToTarget(pen, EET_TRIGGER, this);
         return TRUE;
@@ -4340,7 +4345,7 @@ functions:
       CSimpleSwitch &enSwitch = (CSimpleSwitch&)*pen;
 
       // if switch near enough and is useable
-      if (fRayHitDistance < enSwitch.m_fUseRange && enSwitch.m_bActive) {
+      if (enSwitch.m_bActive) {
         // send it a trigger event
         SendToTarget(pen, EET_TRIGGER, this);
         return TRUE;
@@ -4350,7 +4355,7 @@ functions:
     } else if (IsOfClass( pen, "MessageHolder")) {
       CMessageHolder &enMsgHolder = (CMessageHolder&)*pen;
 
-      if (fRayHitDistance < enMsgHolder.m_fDistance && enMsgHolder.m_bActive) {
+      if (enMsgHolder.m_bActive) {
         const CTFileName &fnmMessage = enMsgHolder.m_fnmMessage;
         // if player doesn't have that message in database
         if (!HasMessage(fnmMessage)) {
