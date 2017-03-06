@@ -80,6 +80,8 @@ Running
 
 This version of the engine comes with a set of resources (`\SE1_10.GRO`) that allow you to freely use the engine without any additional resources required. However if you want to open or modify levels from Serious Sam Classic: The First Encounter or The Second Encounter (including most user-made levels), you will have to copy the game's resources (.GRO files) into the engine folder. You can buy the original games on Steam, as a part of a bundle with Serious Sam Revolution ( http://store.steampowered.com/app/227780 )
 
+WARNING: If you will try to run original The First Encounter levels or custom maps made for TFE then you need to resave them in the Serious Editor 1.07/1.10 or you will have not working scripts on levels.
+
 When running a selected project, make sure its project settings on Debugging is set to the right command:
 * For debug:
     $(SolutionDir)..\Bin\Debug\$(TargetName).exe`
