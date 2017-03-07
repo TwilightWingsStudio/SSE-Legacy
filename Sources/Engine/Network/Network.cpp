@@ -116,6 +116,8 @@ extern CTString ser_strNameMask = "";
 extern INDEX ser_bInverseBanning = FALSE;
 extern CTString ser_strMOTD = "";
 
+extern INDEX ser_bBetterRandom = FALSE; // [SSE] Netcode Update - Better Random
+
 // [SSE] Netcode Update - Safe Rejoin
 //extern INDEX ser_iMaxDetachedPlayers = 16; // TODO: Make in future.
 extern INDEX ser_bDetachOnSyncBad = TRUE;
@@ -1004,6 +1006,35 @@ static void DestroyEntityTest(void *pArgs)
   CPrintF("  done! Entity marked for removing!\n");
 }
 
+static void EntityRPCTest(void *pArgs)
+{
+  INDEX iEntity = NEXTARGUMENT(INDEX);
+  
+  CPrintF("entityrpctest:\n");
+  if (!_pNetwork->ga_srvServer.srv_bActive) {
+    CPrintF("  <not a server>\n");
+    return;
+  }
+  
+  CEntity *penEntity = _pNetwork->ga_World.EntityFromID(iEntity);
+
+  if (penEntity == NULL) {
+    CPrintF("  <invalid entity>\n");
+    return;
+  }
+  
+  CServer &srvServer = _pNetwork->ga_srvServer;
+  
+  // create message for destroying entity in all sessions
+  CNetworkStreamBlock nsbEntityRPC(MSG_SEQ_ENTITYRPC, ++srvServer.srv_iLastProcessedSequence);
+  nsbEntityRPC<<iEntity;
+
+  // put the message in buffer to be sent to all sessions
+  _pNetwork->ga_srvServer.AddBlockToAllSessions(nsbEntityRPC);
+  
+  CPrintF("  done! RPC sent!\n");
+}
+
 /*
  * Initialize game management.
  */
@@ -1017,6 +1048,8 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user void DetachPlayerTest(INDEX);", &DetachPlayerTest);
   _pShell->DeclareSymbol("user void SwapPlayersTest(INDEX, INDEX);", &SwapPlayersTest);
   _pShell->DeclareSymbol("user void DestroyEntityTest(INDEX);", &DestroyEntityTest);
+
+  _pShell->DeclareSymbol("user void EntityRPCTest(INDEX);", &EntityRPCTest);
 
   // Add shell symbols.
   _pShell->DeclareSymbol("user INDEX dbg_bBreak;", &dbg_bBreak);
@@ -1143,6 +1176,8 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("persistent user CTString ser_strNameMask;", &ser_strNameMask);
   _pShell->DeclareSymbol("persistent user INDEX ser_bInverseBanning;", &ser_bInverseBanning);
   _pShell->DeclareSymbol("persistent user CTString ser_strMOTD;", &ser_strMOTD);
+
+  _pShell->DeclareSymbol("persistent user INDEX ser_bBetterRandom;", &ser_bBetterRandom);
 
   _pShell->DeclareSymbol("persistent user INDEX cli_bAutoAdjustSettings;",   &cli_bAutoAdjustSettings);
   _pShell->DeclareSymbol("persistent user FLOAT cli_tmAutoAdjustThreshold;", &cli_tmAutoAdjustThreshold);
@@ -1291,6 +1326,30 @@ void CNetworkLibrary::AutoAdjustSettings(void)
 }
 */
 
+// [SSE] Network Update - Better Random
+static void BetterRandom()
+{
+  CSessionState &ses = _pNetwork->ga_sesSessionState;
+  
+  BOOL bOldAllow = ses.ses_bAllowRandom;
+  ses.ses_bAllowRandom = TRUE;
+  ses.ses_ulRandomSeed = 0x87654321; // random must start at a number different than zero!
+
+  INDEX iV = 32;
+
+  srand(time(NULL));
+  
+  iV = 8 + rand() % 33;
+  CPrintF("Random IV %d\n", iV);
+  
+  // run rnd a few times to make it go random
+  for(INDEX i=0; i < iV; i++) {
+    ses.Rnd();
+  }
+
+  ses.ses_bAllowRandom = bOldAllow;
+}
+
 /*
  * Start a peer-to-peer game session.
  *
@@ -1321,6 +1380,11 @@ void CNetworkLibrary::StartPeerToPeer_t(const CTString &strSessionName,
 
     // make default state data for creating deltas
     MakeDefaultState(fnmWorld, ulSpawnFlags, pvSessionProperties);
+    
+    // [SSE] Network Update - Better Random
+    if (ser_bBetterRandom) {
+      BetterRandom();
+    }
   } else {
     CPrintF( TRANS("  network is off\n"));
   }

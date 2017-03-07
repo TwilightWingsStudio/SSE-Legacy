@@ -1021,6 +1021,7 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
     strmInfo<<_pNetwork->ga_World.wo_fnmFileName;
     strmInfo<<_pNetwork->ga_sesSessionState.ses_ulSpawnFlags;
     strmInfo.Write_t(_pNetwork->ga_aubDefaultProperties, NET_MAXSESSIONPROPERTIES);
+
     SLONG slSize = strmInfo.GetStreamSize();
 
     // send the stream to the remote session state

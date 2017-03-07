@@ -83,10 +83,12 @@ void CSessionState::ResetRND(void)
   ses_bAllowRandom = TRUE;
   // random must start at a number different than zero!
   ses_ulRandomSeed = 0x87654321;
+
   // run rnd a few times to make it go random
-  for(INDEX i=0; i<32; i++) {
+  for(INDEX i=0; i < 32; i++) {
     Rnd();
   }
+
   ses_bAllowRandom = bOldAllow;
 }
 
@@ -349,10 +351,13 @@ void CSessionState::Start_AtClient_t(INDEX ctLocalPlayers)     // throw char *
     // get info for creating default state
     CTFileName fnmWorld;
     strmMessage>>fnmWorld;
+
     ULONG ulSpawnFlags;
     strmMessage>>ulSpawnFlags;
+
     UBYTE aubProperties[NET_MAXSESSIONPROPERTIES];
     strmMessage.Read_t(aubProperties, NET_MAXSESSIONPROPERTIES);
+ 
     // create default state
     NET_MakeDefaultState_t(fnmWorld, ulSpawnFlags, aubProperties, *pstrmState);
     pstrmState->SetPos_t(0);
@@ -370,9 +375,11 @@ void CSessionState::Start_AtClient_t(INDEX ctLocalPlayers)     // throw char *
     // wait for server's response
     CTMemoryStream strmMessage;
     WaitStream_t(strmMessage, "data", MSG_REP_STATEDELTA);
+    CPrintF(TRANS("Received DIFF stream\n"));
     // decompress saved session state
     CTMemoryStream strmDelta;
     CzlibCompressor comp;
+    CPrintF(TRANS("Unpacking DIFF stream\n"));
     comp.UnpackStream_t(strmMessage, strmDelta);
     CTMemoryStream strmNew;
     DIFF_Undiff_t(pstrmState, &strmDelta, &strmNew);
