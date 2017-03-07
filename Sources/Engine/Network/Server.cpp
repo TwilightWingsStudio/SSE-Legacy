@@ -49,6 +49,8 @@ extern INDEX ser_bInverseBanning;
 extern BOOL MatchesBanMask(const CTString &strString, const CTString &strMask);
 extern CClientInterface cm_aciClients[SERVER_CLIENTS];
 
+extern INDEX ser_iMaxAllowedChatPerSec;
+
 CSessionSocket::CSessionSocket(void)
 {
   sso_bActive = FALSE;
@@ -59,7 +61,10 @@ CSessionSocket::CSessionSocket(void)
   sso_ctBadSyncs = 0;
   sso_tvLastMessageSent.Clear();
   sso_tvLastPingSent.Clear();
+  
+  sso_ctLastSecChat = 0; // [SSE] Server Essentials - Chat Anti-DDOS
 }
+
 CSessionSocket::~CSessionSocket(void)
 {
   sso_bActive = FALSE;
@@ -69,7 +74,10 @@ CSessionSocket::~CSessionSocket(void)
   sso_ctBadSyncs = 0;
   sso_tvLastMessageSent.Clear();
   sso_tvLastPingSent.Clear();
+  
+  sso_ctLastSecChat = 0; // [SSE] Server Essentials - Chat Anti-DDOS
 }
+
 void CSessionSocket::Clear(void)
 {
   sso_bActive = FALSE;
@@ -84,6 +92,8 @@ void CSessionSocket::Clear(void)
   sso_iDisconnectedState = 0;
   sso_ctBadSyncs = 0;
   sso_sspParams.Clear();
+  
+  sso_ctLastSecChat = 0; // [SSE] Server Essentials - Chat Anti-DDOS
 }
 
 void CSessionSocket::Activate(void)
@@ -105,6 +115,8 @@ void CSessionSocket::Activate(void)
   sso_ctBadSyncs = 0;
   sso_sspParams.Clear();
 //  sso_nsBuffer.Clear();
+
+  sso_ctLastSecChat = 0; // [SSE] Server Essentials - Chat Anti-DDOS
 }
 
 void CSessionSocket::Deactivate(void)
@@ -117,7 +129,10 @@ void CSessionSocket::Deactivate(void)
   sso_bActive = FALSE;
   sso_nsBuffer.Clear();
   sso_sspParams.Clear();
+  
+  sso_ctLastSecChat = 0; // [SSE] Server Essentials - Chat Anti-DDOS
 }
+
 BOOL CSessionSocket::IsActive(void)
 {
   return sso_bActive;
@@ -711,6 +726,28 @@ ULONG CServer::MaskOfPlayersOnClient(INDEX iClient)
  */
 void CServer::ServerLoop(void)
 {
+  // [SSE] Server Essentials - Chat Anti-DDOS BEGIN
+  static CTimerValue _tvLastSecCheck(-1.0F);
+  
+  CTimerValue tvNow = _pTimer->GetHighPrecisionTimer();
+  
+  if ((tvNow - _tvLastSecCheck).GetSeconds() >= 1.0F)
+  {
+    _tvLastSecCheck = tvNow;
+
+    for(INDEX iSession=0; iSession<srv_assoSessions.Count(); iSession++)
+    {
+      CSessionSocket &sso = srv_assoSessions[iSession];
+
+      if (!sso.IsActive()) {
+        continue;
+      }
+      
+      sso.sso_ctLastSecChat = 0;
+    }
+  }
+  // [SSE] Server Essentials - Chat Anti-DDOS END
+  
   // if not started
   if (!srv_bActive) {
     ASSERTALWAYS("Running server loop for before starting server!");
@@ -1136,9 +1173,8 @@ void CServer::HandleAll()
 
 void CServer::HandleAllForAClient(INDEX iClient)
 {
-  // if the client is not connected
+  // if the client is not connected skip it
   if (!_cmiComm.Server_IsClientUsed(iClient)) {
-    // skip it
     return;
   }
 
@@ -1178,9 +1214,8 @@ void CServer::HandleAllForAClient(INDEX iClient)
       // process it
       Handle(iClient, nmReceived);
 
-    // if there are no more messages
+    // if there are no more messages then skip to receiving unreliable
     } else {
-      // skip to receiving unreliable
       break;
     }
   }
@@ -1196,13 +1231,12 @@ void CServer::HandleAllForAClient(INDEX iClient)
 
   // repeat
   FOREVER {
-    // if there is some unreliable message
+    // if there is some unreliable message then process it
     if (_pNetwork->ReceiveFromClient(iClient, nmReceived)) {
-      // process it
       Handle(iClient, nmReceived);
-    // if there are no more messages
+
+    // if there are no more messages then finish with this client
     } else {
-      // finish with this client
       break;
     }
   }
@@ -1550,8 +1584,31 @@ void CServer::Handle(INDEX iClient, CNetworkMessage &nmMessage)
     CSessionSocket &sso = srv_assoSessions[iClient];
     nmMessage>>sso.sso_sspParams;
   } break;
+
   // if a chat message was sent
-  case MSG_CHAT_IN: {
+  case MSG_CHAT_IN:
+  {
+    // [SSE] Server Essentials - Chat Anti-DDOS BEGIN
+    CSessionSocket &sso = srv_assoSessions[iClient];
+    
+    if (!sso.IsActive()) {
+      break;
+    }
+
+    sso.sso_ctLastSecChat += 1;
+    
+    if (sso.sso_ctLastSecChat > ser_iMaxAllowedChatPerSec)
+    {
+      if (iClient > 0 && sso.sso_iDisconnectedState < 2) {
+        extern BOOL _bDedicatedServer;
+        CPrintF("%s[SrvE] : Client #%d has been kicked for chat DDOS attempt!\n", _bDedicatedServer ? "" : "^cFF0000", iClient);
+        sso.sso_iDisconnectedState = 2; // Force Disconnect
+      }
+
+      break;
+    }
+    // [SSE] Server Essentials - Chat Anti-DDOS END
+    
     // get it
     ULONG ulFrom, ulTo;
     CTString strMessage;

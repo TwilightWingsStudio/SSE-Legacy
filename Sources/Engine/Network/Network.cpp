@@ -116,7 +116,8 @@ extern CTString ser_strNameMask = "";
 extern INDEX ser_bInverseBanning = FALSE;
 extern CTString ser_strMOTD = "";
 
-extern INDEX ser_bBetterRandom = FALSE; // [SSE] Netcode Update - Better Random
+extern INDEX ser_bBetterRandom = FALSE;      // [SSE] Netcode Update - Better Random
+extern INDEX ser_iMaxAllowedChatPerSec = 15; // [SSE] Server Essentials - Chat Anti-DDOS
 
 // [SSE] Netcode Update - Safe Rejoin
 //extern INDEX ser_iMaxDetachedPlayers = 16; // TODO: Make in future.
@@ -1177,7 +1178,8 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("persistent user INDEX ser_bInverseBanning;", &ser_bInverseBanning);
   _pShell->DeclareSymbol("persistent user CTString ser_strMOTD;", &ser_strMOTD);
 
-  _pShell->DeclareSymbol("persistent user INDEX ser_bBetterRandom;", &ser_bBetterRandom);
+  _pShell->DeclareSymbol("persistent user INDEX ser_bBetterRandom;", &ser_bBetterRandom); // [SSE] Netcode Update - Better Random
+  _pShell->DeclareSymbol("persistent user INDEX ser_iMaxAllowedChatPerSec;", &ser_iMaxAllowedChatPerSec); // [SSE] Server Essentials - Chat Anti-DDOS
 
   _pShell->DeclareSymbol("persistent user INDEX cli_bAutoAdjustSettings;",   &cli_bAutoAdjustSettings);
   _pShell->DeclareSymbol("persistent user FLOAT cli_tmAutoAdjustThreshold;", &cli_tmAutoAdjustThreshold);
