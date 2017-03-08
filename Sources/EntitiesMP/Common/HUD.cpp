@@ -32,6 +32,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define TOP_ARMOR  100
 #define TOP_HEALTH 100
 
+static CListHead _lhAllHUDTextures;
+
+class CHUDTextureEntry
+{
+  public:
+    CListNode he_lnNode;
+    CTFileName he_fnTexture;
+    CTextureObject *he_ptoTexture;
+};
+
 enum EHUDHorAnchorType
 {
   EHHAT_LEFT = 0,
@@ -122,6 +132,11 @@ static CFontData _fdNumbersFont;
 // array for pointers of all players
 extern CPlayer *_apenPlayers[NET_MAXGAMEPLAYERS] = {0};
 
+// [SSE] Default Texture
+static CImageInfo _iiDefault; 
+static CTextureData *_tdDefault = NULL;
+//
+
 // status bar textures
 static CTextureObject _toHealth;
 static CTextureObject _toOxygen;
@@ -180,7 +195,7 @@ static CTextureObject _toSniperArrow;
 static CTextureObject _toSniperEye;
 static CTextureObject _toSniperLed;
 
-static BOOL _bHUDAssetsLoaded = FALSE; // [SSE] HUD No Crash If No Assets
+static BOOL _bHUDFontsLoaded = FALSE; // [SSE] HUD No Crash If No Assets
 
 // all info about color transitions
 struct ColorTransitionTable {
@@ -470,6 +485,9 @@ extern INDEX SetAllPlayersStats( INDEX iSortKey)
 // --------------------------------------------------------------------------------------
 static void HUD_DrawBorder( FLOAT fCenterX, FLOAT fCenterY, FLOAT fSizeX, FLOAT fSizeY, COLOR colTiles)
 {
+  if (_toTile.GetData() == NULL) return;
+  if (_toTile.GetData()->ad_Anims == NULL) return;
+  
   // determine location
   const FLOAT fCenterI  = fCenterX * _pixDPWidth  / 640.0f;
   const FLOAT fCenterJ  = fCenterY * _pixDPHeight / (480.0f * _pDP->dp_fWideAdjustment);
@@ -514,6 +532,9 @@ static void HUD_DrawBorder( FLOAT fCenterX, FLOAT fCenterY, FLOAT fSizeX, FLOAT 
 static void HUD_DrawIcon( FLOAT fCenterX, FLOAT fCenterY, CTextureObject &toIcon,
                           COLOR colDefault, FLOAT fNormValue, BOOL bBlink)
 {
+  if (toIcon.GetData() == NULL) return;
+  if (toIcon.GetData()->ad_Anims == NULL) return;
+  
   // determine color
   COLOR col = colDefault;
   if (col==NONE) col = GetCurrentColor( fNormValue);
@@ -605,6 +626,9 @@ static void HUD_DrawBar( FLOAT fCenterX, FLOAT fCenterY, PIX pixSizeX, PIX pixSi
 // --------------------------------------------------------------------------------------
 static void DrawRotatedQuad( class CTextureObject *_pTO, FLOAT fX, FLOAT fY, FLOAT fSize, ANGLE aAngle, COLOR col)
 {
+  if (_pTO->GetData() == NULL) return;
+  if (_pTO->GetData()->ad_Anims == NULL) return;
+  
   FLOAT fSinA = Sin(aAngle);
   FLOAT fCosA = Cos(aAngle);
   FLOAT fSinPCos = fCosA*fSize+fSinA*fSize;
@@ -626,6 +650,9 @@ static void DrawRotatedQuad( class CTextureObject *_pTO, FLOAT fX, FLOAT fY, FLO
 // --------------------------------------------------------------------------------------
 static void DrawAspectCorrectTextureCentered( class CTextureObject *_pTO, FLOAT fX, FLOAT fY, FLOAT fWidth, COLOR col)
 {
+  if (_pTO->GetData() == NULL) return;
+  if (_pTO->GetData()->ad_Anims == NULL) return;
+  
   CTextureData *ptd = (CTextureData*)_pTO->GetData();
   FLOAT fTexSizeI = ptd->GetPixWidth();
   FLOAT fTexSizeJ = ptd->GetPixHeight();
@@ -641,6 +668,9 @@ static void DrawAspectCorrectTextureCentered( class CTextureObject *_pTO, FLOAT 
 // --------------------------------------------------------------------------------------
 static void HUD_DrawSniperMask( void )
 {
+  if (_toSniperMask.GetData() == NULL) return;
+  if (_toSniperMask.GetData()->ad_Anims == NULL) return;
+  
   // determine location
   const FLOAT fSizeI = _pixDPWidth;
   const FLOAT fSizeJ = _pixDPHeight;
@@ -969,6 +999,9 @@ static void HUD_DrawAnchoredRect(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT f
 
 static void HUD_DrawAnchroredIconEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, CTextureObject &toIcon, COLOR colDefault, FLOAT fNormValue, BOOL bBlink)
 {
+  if (toIcon.GetData() == NULL) return;
+  if (toIcon.GetData()->ad_Anims == NULL) return;
+  
   // Determine color
   COLOR col = colDefault;
   if (col == NONE) col = GetCurrentColor( fNormValue);
@@ -1025,6 +1058,9 @@ static void HUD_DrawAnchroredIconEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOA
 
 static void HUD_DrawAnchroredIcon(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, CTextureObject &toIcon, COLOR colDefault, FLOAT fNormValue, BOOL bBlink)
 {
+  if (toIcon.GetData() == NULL) return;
+  if (toIcon.GetData()->ad_Anims == NULL) return;
+  
   FLOAT fMul;
   
   if (_pixDPWidth > _pixDPHeight) {
@@ -1124,7 +1160,7 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
   // no player - no info, sorry
   if (penPlayerCurrent == NULL || (penPlayerCurrent->GetFlags()&ENF_DELETED)) return;
   
-  if (!_bHUDAssetsLoaded) return;
+  if (!_bHUDFontsLoaded) return;
 
   // if snooping and owner player ins NULL, return
   if (bSnooping && penPlayerOwner == NULL) return;
@@ -1203,7 +1239,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
   // no player - no info, sorry
   if (penPlayerCurrent == NULL || (penPlayerCurrent->GetFlags()&ENF_DELETED)) return;
   
-  if (!_bHUDAssetsLoaded) return;
+  if (!_bHUDFontsLoaded) return;
 
   // if snooping and owner player ins NULL, return
   if (bSnooping && penPlayerOwner == NULL) return;
@@ -1886,144 +1922,190 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
 }
 #endif
 
+
+static void InitDefaultTexture()
+{
+  /*
+  if (_tdDefault == NULL)
+  {
+    PIX pixDefaultWidth = 128;
+    PIX pixDefaultHeight = 128;
+    INDEX ctDefaultBPP = 24;
+    
+    _iiDefault.ii_Width = pixDefaultWidth;
+    _iiDefault.ii_Height = pixDefaultHeight;
+    _iiDefault.ii_BitsPerPixel = 24;
+    
+    _iiDefault.ii_Picture = (UBYTE*)AllocMemory( pixDefaultWidth * pixDefaultHeight * ctDefaultBPP);
+    
+    for (INDEX j = 0; j < pixDefaultHeight * ctDefaultBPP/8; j++)
+    {
+      for (INDEX i = 0; i < pixDefaultWidth * ctDefaultBPP/8; i++)
+      {
+        _iiDefault.ii_Picture[j * pixDefaultWidth + i] = 0xFF;
+        
+        
+        if (i < pixDefaultWidth / 2) {
+          CPrintF("WHITE\n");
+        } else {
+          CPrintF("BLACK\n");
+          _iiDefault.ii_Picture[j * pixDefaultWidth + i] = 0x00;
+        }
+      }
+    }
+    
+    _tdDefault = new CTextureData();
+    _tdDefault->Create_t( &_iiDefault, 128, MAX_MEX_LOG2, FALSE);
+  }*/
+}
+
+
+static void HUD_RegisterTexture(CTextureObject *pto, const CTFileName &fnmTexture)
+{
+  CHUDTextureEntry *pte = new CHUDTextureEntry();
+  pte->he_fnTexture = fnmTexture;
+  pte->he_ptoTexture = pto;
+  
+  _lhAllHUDTextures.AddTail(pte->he_lnNode);
+}
+
+static void HUD_LoadTextures()
+{
+  FOREACHINLIST(CHUDTextureEntry, he_lnNode, _lhAllHUDTextures, itthe)
+  {
+    CHUDTextureEntry &hte = *itthe;
+    
+    if (hte.he_ptoTexture == NULL) {
+      FatalError("HUD : Was added CHUDTextureEntry with he_ptoTexture == NULL!");
+      break;
+    }
+    
+    try {
+      hte.he_ptoTexture->SetData_t(hte.he_fnTexture);
+    } catch( char *strError) {
+      CPrintF("  %s\n", strError);
+      hte.he_ptoTexture->SetData(NULL);
+    }
+  }
+}
+
+static void HUD_ForceTextures()
+{
+  FOREACHINLIST(CHUDTextureEntry, he_lnNode, _lhAllHUDTextures, itthe)
+  {
+    CHUDTextureEntry &hte = *itthe;
+    
+    if (hte.he_ptoTexture == NULL) {
+      FatalError("HUD : Was added CHUDTextureEntry with he_ptoTexture == NULL!");
+      break;
+    }
+    
+    if (hte.he_ptoTexture->GetData() == NULL) {
+      continue;
+    }
+    
+    ((CTextureData*)hte.he_ptoTexture->GetData())->Force(TEX_CONSTANT);
+  }
+}
+
+static BOOL _bTexturesRegistered = FALSE;
+
+static void HUD_RegisterTextures()
+{
+  if (_bTexturesRegistered) {
+    return;
+  }
+  
+  // initialize tile texture
+  HUD_RegisterTexture(&_toTile, CTFILENAME("Textures\\Interface\\Tile.tex"));
+  
+  HUD_RegisterTexture(&_toHealth,  CTFILENAME("TexturesMP\\Interface\\HSuper.tex"));
+  HUD_RegisterTexture(&_toOxygen,  CTFILENAME("TexturesMP\\Interface\\Oxygen-2.tex"));
+  HUD_RegisterTexture(&_toFrags,   CTFILENAME("TexturesMP\\Interface\\IBead.tex"));
+  HUD_RegisterTexture(&_toDeaths,  CTFILENAME("TexturesMP\\Interface\\ISkull.tex"));
+  HUD_RegisterTexture(&_toScore,   CTFILENAME("TexturesMP\\Interface\\IScore.tex"));
+  HUD_RegisterTexture(&_toHiScore, CTFILENAME("TexturesMP\\Interface\\IHiScore.tex"));
+  HUD_RegisterTexture(&_toMessage, CTFILENAME("TexturesMP\\Interface\\IMessage.tex"));
+  HUD_RegisterTexture(&_toMana,    CTFILENAME("TexturesMP\\Interface\\IValue.tex"));
+
+  HUD_RegisterTexture(&_toArmorSmall,  CTFILENAME("TexturesMP\\Interface\\ArSmall.tex"));
+  HUD_RegisterTexture(&_toArmorMedium, CTFILENAME("TexturesMP\\Interface\\ArMedium.tex"));
+  HUD_RegisterTexture(&_toArmorLarge,  CTFILENAME("TexturesMP\\Interface\\ArStrong.tex"));
+  
+  HUD_RegisterTexture(&_toExtraLive,  CTFILENAME("TexturesMP\\Interface\\IExtraLive.tex"));
+
+  // initialize ammo textures
+  HUD_RegisterTexture(&_toAShells,        CTFILENAME("TexturesMP\\Interface\\AmShells.tex"));
+  HUD_RegisterTexture(&_toABullets,       CTFILENAME("TexturesMP\\Interface\\AmBullets.tex"));
+  HUD_RegisterTexture(&_toARockets,       CTFILENAME("TexturesMP\\Interface\\AmRockets.tex"));
+  HUD_RegisterTexture(&_toAGrenades,      CTFILENAME("TexturesMP\\Interface\\AmGrenades.tex"));
+  HUD_RegisterTexture(&_toANapalm,        CTFILENAME("TexturesMP\\Interface\\AmFuelReservoir.tex"));
+  HUD_RegisterTexture(&_toAElectricity,   CTFILENAME("TexturesMP\\Interface\\AmElectricity.tex"));
+  HUD_RegisterTexture(&_toAIronBall,      CTFILENAME("TexturesMP\\Interface\\AmCannonBall.tex"));
+  HUD_RegisterTexture(&_toASniperBullets, CTFILENAME("TexturesMP\\Interface\\AmSniperBullets.tex"));
+  HUD_RegisterTexture(&_toASeriousBomb,   CTFILENAME("TexturesMP\\Interface\\AmSeriousBomb.tex"));
+
+  // initialize weapon textures
+  HUD_RegisterTexture(&_toWFists,           CTFILENAME("TexturesMP\\Interface\\WFists.tex")); // [SSE] Fists Weapon
+  HUD_RegisterTexture(&_toWKnife,           CTFILENAME("TexturesMP\\Interface\\WKnife.tex"));
+  HUD_RegisterTexture(&_toWColt,            CTFILENAME("TexturesMP\\Interface\\WColt.tex"));
+  HUD_RegisterTexture(&_toWSingleShotgun,   CTFILENAME("TexturesMP\\Interface\\WSingleShotgun.tex"));
+  HUD_RegisterTexture(&_toWDoubleShotgun,   CTFILENAME("TexturesMP\\Interface\\WDoubleShotgun.tex"));
+  HUD_RegisterTexture(&_toWTommygun,        CTFILENAME("TexturesMP\\Interface\\WTommygun.tex"));
+  HUD_RegisterTexture(&_toWMinigun,         CTFILENAME("TexturesMP\\Interface\\WMinigun.tex"));
+  HUD_RegisterTexture(&_toWRocketLauncher,  CTFILENAME("TexturesMP\\Interface\\WRocketLauncher.tex"));
+  HUD_RegisterTexture(&_toWGrenadeLauncher, CTFILENAME("TexturesMP\\Interface\\WGrenadeLauncher.tex"));
+  HUD_RegisterTexture(&_toWLaser,           CTFILENAME("TexturesMP\\Interface\\WLaser.tex"));
+  HUD_RegisterTexture(&_toWIronCannon,      CTFILENAME("TexturesMP\\Interface\\WCannon.tex"));
+  HUD_RegisterTexture(&_toWChainsaw,        CTFILENAME("TexturesMP\\Interface\\WChainsaw.tex"));
+  HUD_RegisterTexture(&_toWSniper,          CTFILENAME("TexturesMP\\Interface\\WSniper.tex"));
+  HUD_RegisterTexture(&_toWFlamer,          CTFILENAME("TexturesMP\\Interface\\WFlamer.tex"));
+
+  // initialize powerup textures (DO NOT CHANGE ORDER!)
+  HUD_RegisterTexture(&_atoPowerups[0],    CTFILENAME("TexturesMP\\Interface\\PInvisibility.tex"));
+  HUD_RegisterTexture(&_atoPowerups[1],    CTFILENAME("TexturesMP\\Interface\\PInvulnerability.tex"));
+  HUD_RegisterTexture(&_atoPowerups[2],    CTFILENAME("TexturesMP\\Interface\\PSeriousDamage.tex"));
+  HUD_RegisterTexture(&_atoPowerups[3],    CTFILENAME("TexturesMP\\Interface\\PSeriousSpeed.tex"));
+
+  // initialize sniper mask texture
+  HUD_RegisterTexture(&_toSniperMask,   CTFILENAME("TexturesMP\\Interface\\SniperMask.tex"));
+  HUD_RegisterTexture(&_toSniperWheel,  CTFILENAME("TexturesMP\\Interface\\SniperWheel.tex"));
+  HUD_RegisterTexture(&_toSniperArrow,  CTFILENAME("TexturesMP\\Interface\\SniperArrow.tex"));
+  HUD_RegisterTexture(&_toSniperEye,    CTFILENAME("TexturesMP\\Interface\\SniperEye.tex"));
+  HUD_RegisterTexture(&_toSniperLed,    CTFILENAME("TexturesMP\\Interface\\SniperLed.tex"));
+  
+  _bTexturesRegistered = TRUE;
+}
+
 // --------------------------------------------------------------------------------------
 // Initialize all that's needed for drawing the HUD.
 // --------------------------------------------------------------------------------------
 extern void InitHUD(void)
 {
+  InitDefaultTexture();
+  
   CPrintF("Loading HUD assets...\n");
 
   // Try to load all stuff.
-  try {
-    // initialize and load HUD numbers font
-    DECLARE_CTFILENAME( fnFont, "Fonts\\Numbers3.fnt");
-    _fdNumbersFont.Load_t( fnFont);
-    //_fdNumbersFont.SetCharSpacing(0);
-
-    // initialize status bar textures
-    _toHealth.SetData_t(  CTFILENAME("TexturesMP\\Interface\\HSuper.tex"));
-    _toOxygen.SetData_t(  CTFILENAME("TexturesMP\\Interface\\Oxygen-2.tex"));
-    _toFrags.SetData_t(   CTFILENAME("TexturesMP\\Interface\\IBead.tex"));
-    _toDeaths.SetData_t(  CTFILENAME("TexturesMP\\Interface\\ISkull.tex"));
-    _toScore.SetData_t(   CTFILENAME("TexturesMP\\Interface\\IScore.tex"));
-    _toHiScore.SetData_t( CTFILENAME("TexturesMP\\Interface\\IHiScore.tex"));
-    _toMessage.SetData_t( CTFILENAME("TexturesMP\\Interface\\IMessage.tex"));
-    _toMana.SetData_t(    CTFILENAME("TexturesMP\\Interface\\IValue.tex"));
-    _toArmorSmall.SetData_t(  CTFILENAME("TexturesMP\\Interface\\ArSmall.tex"));
-    _toArmorMedium.SetData_t(   CTFILENAME("TexturesMP\\Interface\\ArMedium.tex"));
-    _toArmorLarge.SetData_t(   CTFILENAME("TexturesMP\\Interface\\ArStrong.tex"));
-    
-    _toExtraLive.SetData_t(  CTFILENAME("TexturesMP\\Interface\\IExtraLive.tex")); // [SSE]
-
-    // initialize ammo textures
-    _toAShells.SetData_t(        CTFILENAME("TexturesMP\\Interface\\AmShells.tex"));
-    _toABullets.SetData_t(       CTFILENAME("TexturesMP\\Interface\\AmBullets.tex"));
-    _toARockets.SetData_t(       CTFILENAME("TexturesMP\\Interface\\AmRockets.tex"));
-    _toAGrenades.SetData_t(      CTFILENAME("TexturesMP\\Interface\\AmGrenades.tex"));
-    _toANapalm.SetData_t(        CTFILENAME("TexturesMP\\Interface\\AmFuelReservoir.tex"));
-    _toAElectricity.SetData_t(   CTFILENAME("TexturesMP\\Interface\\AmElectricity.tex"));
-    _toAIronBall.SetData_t(      CTFILENAME("TexturesMP\\Interface\\AmCannonBall.tex"));
-    _toASniperBullets.SetData_t( CTFILENAME("TexturesMP\\Interface\\AmSniperBullets.tex"));
-    _toASeriousBomb.SetData_t(   CTFILENAME("TexturesMP\\Interface\\AmSeriousBomb.tex"));
-
-    // initialize weapon textures
-    _toWFists.SetData_t(           CTFILENAME("TexturesMP\\Interface\\WFists.tex")); // [SSE] Fists Weapon
-    _toWKnife.SetData_t(           CTFILENAME("TexturesMP\\Interface\\WKnife.tex"));
-    _toWColt.SetData_t(            CTFILENAME("TexturesMP\\Interface\\WColt.tex"));
-    _toWSingleShotgun.SetData_t(   CTFILENAME("TexturesMP\\Interface\\WSingleShotgun.tex"));
-    _toWDoubleShotgun.SetData_t(   CTFILENAME("TexturesMP\\Interface\\WDoubleShotgun.tex"));
-    _toWTommygun.SetData_t(        CTFILENAME("TexturesMP\\Interface\\WTommygun.tex"));
-    _toWMinigun.SetData_t(         CTFILENAME("TexturesMP\\Interface\\WMinigun.tex"));
-    _toWRocketLauncher.SetData_t(  CTFILENAME("TexturesMP\\Interface\\WRocketLauncher.tex"));
-    _toWGrenadeLauncher.SetData_t( CTFILENAME("TexturesMP\\Interface\\WGrenadeLauncher.tex"));
-    _toWLaser.SetData_t(           CTFILENAME("TexturesMP\\Interface\\WLaser.tex"));
-    _toWIronCannon.SetData_t(      CTFILENAME("TexturesMP\\Interface\\WCannon.tex"));
-    _toWChainsaw.SetData_t(        CTFILENAME("TexturesMP\\Interface\\WChainsaw.tex"));
-    _toWSniper.SetData_t(          CTFILENAME("TexturesMP\\Interface\\WSniper.tex"));
-    _toWFlamer.SetData_t(          CTFILENAME("TexturesMP\\Interface\\WFlamer.tex"));
-
-    // initialize powerup textures (DO NOT CHANGE ORDER!)
-    _atoPowerups[0].SetData_t( CTFILENAME("TexturesMP\\Interface\\PInvisibility.tex"));
-    _atoPowerups[1].SetData_t( CTFILENAME("TexturesMP\\Interface\\PInvulnerability.tex"));
-    _atoPowerups[2].SetData_t( CTFILENAME("TexturesMP\\Interface\\PSeriousDamage.tex"));
-    _atoPowerups[3].SetData_t( CTFILENAME("TexturesMP\\Interface\\PSeriousSpeed.tex"));
-
-    // initialize sniper mask texture
-    _toSniperMask.SetData_t(       CTFILENAME("TexturesMP\\Interface\\SniperMask.tex"));
-    _toSniperWheel.SetData_t(      CTFILENAME("TexturesMP\\Interface\\SniperWheel.tex"));
-    _toSniperArrow.SetData_t(      CTFILENAME("TexturesMP\\Interface\\SniperArrow.tex"));
-    _toSniperEye.SetData_t(        CTFILENAME("TexturesMP\\Interface\\SniperEye.tex"));
-    _toSniperLed.SetData_t(        CTFILENAME("TexturesMP\\Interface\\SniperLed.tex"));
-
-    // initialize tile texture
-    _toTile.SetData_t( CTFILENAME("Textures\\Interface\\Tile.tex"));
-
-    #ifdef INC_TEST_IKEN
-    _toTestIken.SetData_t( CTFILENAME("TestIken.tex"));
-    #endif
-    
-    // set all textures as constant
-    ((CTextureData*)_toHealth .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toOxygen .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toFrags  .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toDeaths .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toScore  .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toHiScore.GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toMessage.GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toMana   .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toArmorSmall.GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toArmorMedium.GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toArmorLarge.GetData())->Force(TEX_CONSTANT);
-    
-    ((CTextureData*)_toExtraLive.GetData())->Force(TEX_CONSTANT); // [SSE]
-
-    #ifdef INC_TEST_IKEN
-    ((CTextureData*)_toTestIken.GetData())->Force(TEX_CONSTANT); // [SSE]
-    #endif
-
-    ((CTextureData*)_toAShells       .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toABullets      .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toARockets      .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toAGrenades     .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toANapalm       .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toAElectricity  .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toAIronBall     .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toASniperBullets.GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toASeriousBomb  .GetData())->Force(TEX_CONSTANT);
-
-    ((CTextureData*)_toWFists          .GetData())->Force(TEX_CONSTANT); // [SSE] Fists Weapon
-    ((CTextureData*)_toWKnife          .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toWColt           .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toWSingleShotgun  .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toWDoubleShotgun  .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toWTommygun       .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toWRocketLauncher .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toWGrenadeLauncher.GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toWChainsaw       .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toWLaser          .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toWIronCannon     .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toWSniper         .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toWMinigun        .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toWFlamer         .GetData())->Force(TEX_CONSTANT);
-
-    ((CTextureData*)_atoPowerups[0].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_atoPowerups[1].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_atoPowerups[2].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_atoPowerups[3].GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toTile      .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toSniperMask.GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toSniperWheel.GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toSniperArrow.GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toSniperEye.GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toSniperLed.GetData())->Force(TEX_CONSTANT);
-
-  } catch( char *strError) {
-    CPrintF("  failed! %s\n", strError);
-    _bHUDAssetsLoaded = FALSE;
-    return;
+  if (!_bHUDFontsLoaded)
+  {
+    try {
+      // initialize and load HUD numbers font
+      DECLARE_CTFILENAME( fnFont, "Fonts\\Numbers3.fnt");
+      _fdNumbersFont.Load_t( fnFont);
+      //_fdNumbersFont.SetCharSpacing(0);
+    } catch( char *strError) {
+      CPrintF("  failed! %s\n", strError);
+      _bHUDFontsLoaded = FALSE;
+      return;
+    }
   }
-  
-  _bHUDAssetsLoaded = TRUE;
+
+  _bHUDFontsLoaded = TRUE;
+
+  HUD_RegisterTextures();
+  HUD_LoadTextures();
+  HUD_ForceTextures();
 
   CPrintF("  done.\n");
 }
@@ -2045,72 +2127,20 @@ static void ReloadTextureData_t(CTextureObject *tobj)
 
 extern void HUD_ReloadSS(void* pArgs)
 {
-  if (!_bHUDAssetsLoaded) {
-    InitHUD();
-  }
+  InitHUD();
   
   CPrintF("Refreshing HUD assets...\n");
   
-  if (_bHUDAssetsLoaded)
+  FOREACHINLIST(CHUDTextureEntry, he_lnNode, _lhAllHUDTextures, ithte)
   {
+    CHUDTextureEntry &hte = *ithte;
+    
     try {
-      ReloadTextureData_t(&_toHealth);
-      ReloadTextureData_t(&_toOxygen);
-      ReloadTextureData_t(&_toFrags);
-      ReloadTextureData_t(&_toDeaths);
-      ReloadTextureData_t(&_toScore);
-      ReloadTextureData_t(&_toHiScore);
-      ReloadTextureData_t(&_toMessage);
-      ReloadTextureData_t(&_toMana);
-      ReloadTextureData_t(&_toArmorSmall);
-      ReloadTextureData_t(&_toArmorMedium);
-      ReloadTextureData_t(&_toArmorLarge);
-
-      ReloadTextureData_t(&_toExtraLive);
-
-      ReloadTextureData_t(&_toAShells);
-      ReloadTextureData_t(&_toABullets);
-      ReloadTextureData_t(&_toARockets);
-      ReloadTextureData_t(&_toAGrenades);
-      ReloadTextureData_t(&_toANapalm);
-      ReloadTextureData_t(&_toAElectricity);
-      ReloadTextureData_t(&_toAIronBall);
-      ReloadTextureData_t(&_toASniperBullets);
-      ReloadTextureData_t(&_toASeriousBomb);
-
-      ReloadTextureData_t(&_toWFists); // [SSE] Fists Weapon
-      ReloadTextureData_t(&_toWKnife);
-      ReloadTextureData_t(&_toWColt);
-      ReloadTextureData_t(&_toWSingleShotgun);
-      ReloadTextureData_t(&_toWDoubleShotgun);
-      ReloadTextureData_t(&_toWTommygun);
-      ReloadTextureData_t(&_toWRocketLauncher);
-      ReloadTextureData_t(&_toWGrenadeLauncher);
-      ReloadTextureData_t(&_toWChainsaw);
-      ReloadTextureData_t(&_toWLaser);
-      ReloadTextureData_t(&_toWIronCannon);
-      ReloadTextureData_t(&_toWSniper);
-      ReloadTextureData_t(&_toWMinigun);
-      ReloadTextureData_t(&_toWFlamer);
-
-      ReloadTextureData_t(&_atoPowerups[0]);
-      ReloadTextureData_t(&_atoPowerups[1]);
-      ReloadTextureData_t(&_atoPowerups[2]);
-      ReloadTextureData_t(&_atoPowerups[3]);
-      ReloadTextureData_t(&_toTile);
-      ReloadTextureData_t(&_toSniperMask);
-      ReloadTextureData_t(&_toSniperWheel);
-      ReloadTextureData_t(&_toSniperArrow);
-      ReloadTextureData_t(&_toSniperEye);
-      ReloadTextureData_t(&_toSniperLed);
+      ReloadTextureData_t(hte.he_ptoTexture);
     } catch( char *strError) {
-      CPrintF("  failed! %s\n", strError);
-      _bHUDAssetsLoaded = FALSE;
-      return;
+      CPrintF("  Reload Failed: %s\n", strError);
     }
   }
-  
-  CPrintF("  done.\n");
 }
 
 // --------------------------------------------------------------------------------------
