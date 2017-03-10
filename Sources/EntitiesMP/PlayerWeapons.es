@@ -1073,7 +1073,17 @@ functions:
         plWeaponMirror.pl_OrientationAngle(1) = -plWeaponMirror.pl_OrientationAngle(1);
         plWeaponMirror.pl_OrientationAngle(3) = -plWeaponMirror.pl_OrientationAngle(3);
       }
-      ((CPerspectiveProjection3D &)prMirror).FOVL() = AngleDeg(wpn_fFOV[iWeaponData]);
+
+      FLOAT fFOVMul = 1.0F;
+      
+      // [SSE] Shitty Widescreen Fix
+      if (pdp->GetWidth() > pdp->GetHeight()) {
+        fFOVMul = (FLOAT(pdp->GetWidth()) / pdp->GetHeight()) / 1.33F;
+        fFOVMul = Clamp(fFOVMul, 1.0F, 1.75F);
+      }
+      
+      ((CPerspectiveProjection3D &)prMirror).FOVL() = AngleDeg(wpn_fFOV[iWeaponData]) * fFOVMul;
+
       CAnyProjection3D apr;
       apr = prMirror;
       Stereo_AdjustProjection(*apr, iEye, 0.1f);
@@ -1105,7 +1115,16 @@ functions:
     prProjection.FrontClipDistanceL() = wpn_fClip[iWeaponData];
     prProjection.DepthBufferNearL() = 0.0f;
     prProjection.DepthBufferFarL() = 0.1f;
-    ((CPerspectiveProjection3D &)prProjection).FOVL() = AngleDeg(wpn_fFOV[iWeaponData]);
+
+    FLOAT fFOVMul = 1.0F;
+    
+    // [SSE] Shitty Widescreen Fix
+    if (pdp->GetWidth() > pdp->GetHeight()) {
+      fFOVMul = (FLOAT(pdp->GetWidth()) / pdp->GetHeight()) / 1.33F;
+      fFOVMul = Clamp(fFOVMul, 1.0F, 1.75F);
+    }
+    
+    ((CPerspectiveProjection3D &)prProjection).FOVL() = AngleDeg(wpn_fFOV[iWeaponData]) * fFOVMul;
 
     CAnyProjection3D apr;
     apr = prProjection;
@@ -1258,7 +1277,9 @@ functions:
   // --------------------------------------------------------------------------------------
   void UpdateInteractionInfo(CEntity *pen)
   {
-    if (pen == NULL) return; // TODO: Maybe put ASSERT here.
+    if (pen == NULL) { // TODO: Maybe put ASSERT here.
+      return;
+    }
 
     TIME tmNow = _pTimer->CurrentTick();
 
