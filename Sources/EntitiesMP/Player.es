@@ -57,6 +57,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "EntitiesMP/CreditsHolder.h"
 #include "EntitiesMP/HudPicHolder.h"
 
+#include "EntitiesMP/ProgressiveSwitch.h"
 #include "EntitiesMP/SimpleSwitch.h"
 #include "EntitiesMP/SpectatorCamera.h"
 
@@ -95,7 +96,6 @@ event ECameraStart {
 event ECameraStop {
   CEntityPointer penCamera,   // the camera
 };
-
 
 // sent when needs to rebirth
 event ERebirth {
@@ -1149,8 +1149,8 @@ properties:
  17 CEntityPointer m_penAnimator,             // player animator
  18 CEntityPointer m_penView,                 // player view
  19 CEntityPointer m_pen3rdPersonView,        // player 3rd person view
- 20 INDEX m_iViewState=PVT_PLAYEREYES,        // view state
- 21 INDEX m_iLastViewState=PVT_PLAYEREYES,    // last view state
+ 20 INDEX m_iViewState = PVT_PLAYEREYES,        // view state
+ 21 INDEX m_iLastViewState = PVT_PLAYEREYES,    // last view state
 
  26 CAnimObject m_aoLightAnimation,           // light animation object
  27 FLOAT m_fDamageAmmount = 0.0f,            // how much was last wound
@@ -1466,6 +1466,27 @@ functions:
   virtual void ReceiveRPC(CNetworkMessage &nmMessage)
   {
     CPrintF("PLID %d received direct RPC!\n", GetMyPlayerIndex());
+  };
+  
+  // --------------------------------------------------------------------------------------
+  void StartInteractionWith(CEntity *pen)
+  {
+    m_penCurrentInteractable = pen;
+    
+    EStartInteraction eStartInteraction;
+    eStartInteraction.penPlayer = this;
+    
+    pen->SendEvent(eStartInteraction);
+  };
+  
+  // --------------------------------------------------------------------------------------
+  void StopInteraction()
+  {
+    EStopInteraction eStopInteraction;
+    eStopInteraction.penPlayer = this;
+    m_penCurrentInteractable->SendEvent(eStopInteraction);
+
+    m_penCurrentInteractable = NULL; // Reset the pointer.
   };
   
   // --------------------------------------------------------------------------------------
@@ -1933,10 +1954,12 @@ functions:
     }
   };
 
-  // called by other entities to set time prediction parameter
+  // --------------------------------------------------------------------------------------
+  // Called by other entities to set time prediction parameter.
+  // --------------------------------------------------------------------------------------
   void SetPredictionTime(TIME tmAdvance)   // give time interval in advance to set
   {
-    m_tmPredict = _pTimer->CurrentTick()+tmAdvance;
+    m_tmPredict = _pTimer->CurrentTick() + tmAdvance;
   }
 
   // --------------------------------------------------------------------------------------
@@ -2992,8 +3015,30 @@ functions:
     PIX pixDPHeight = pdp->GetHeight();
     FLOAT fScale = (FLOAT)pixDPWidth/640.0f;
 
+    // [SSE] ProgressiveSwitch
+    if (m_penCurrentInteractable != NULL) {
+      pdp->SetFont( _pfdDisplayFont);
+      pdp->SetTextScaling( fScale);
+      pdp->SetTextAspect( 1.0f);
+      
+      CTString strMessage;
+
+      if (m_penCurrentInteractable->IsDead() && IsOfClass(m_penCurrentInteractable, "Player")) {
+        strMessage.PrintF("REVIVING PLAYER");
+
+      } else {
+        strMessage.PrintF("INTERACTING");
+
+        if (IsOfClass(m_penCurrentInteractable, "ProgressiveSwitch")) {
+          CProgressiveSwitch &enSwitch = (CProgressiveSwitch&)*m_penCurrentInteractable;
+          
+          strMessage.PrintF("%s %.2f / %.2f", strMessage, enSwitch.m_fProgress, enSwitch.m_fMaxProgress);
+        }
+      }
+      pdp->PutTextCXY(strMessage, pixDPWidth*0.5f, pixDPHeight*0.85f, C_WHITE|0xDD);
+      
     // print center message
-    if (_pTimer->CurrentTick()<m_tmCenterMessageEnd) {
+    } if (_pTimer->CurrentTick()<m_tmCenterMessageEnd) {
       pdp->SetFont( _pfdDisplayFont);
       pdp->SetTextScaling( fScale);
       pdp->SetTextAspect( 1.0f);
@@ -4333,21 +4378,33 @@ functions:
     {
       CSwitch &enSwitch = (CSwitch&)*pen;
 
-      // if switch near enough and is useable
+      // If switch near enough and is useable then send it a trigger event.
       if (enSwitch.m_bUseable) {
-        // send it a trigger event
         SendToTarget(pen, EET_TRIGGER, this);
         return TRUE;
       }
 
-    // If CSimpleSwitch...
+    // [SSE] SimpleSwitch
     } else if (IsOfClass(pen, "SimpleSwitch")) {
       CSimpleSwitch &enSwitch = (CSimpleSwitch&)*pen;
 
-      // if switch near enough and is useable
+      // If switch near enough and is useable then send it a trigger event.
       if (enSwitch.m_bActive) {
-        // send it a trigger event
         SendToTarget(pen, EET_TRIGGER, this);
+        return TRUE;
+      }
+      
+    // [SSE] ProgressiveSwitch
+    } else if (IsOfClass(pen, "ProgressiveSwitch")) {
+      CProgressiveSwitch &enSwitch = (CProgressiveSwitch&)*pen;
+      
+      if (m_penCurrentInteractable == pen) {
+        return TRUE;
+      }
+
+      // If switch near enough and is useable then send it a trigger event.
+      if (enSwitch.m_bActive) {
+        StartInteractionWith(pen);
         return TRUE;
       }
 
@@ -4401,8 +4458,7 @@ functions:
      
       // penWeapon->m_iWantedWeapon==WEAPON_SNIPER) =>
       // make sure that weapon transition is not in progress
-      if (penWeapon->m_iCurrentWeapon==WEAPON_SNIPER && 
-          penWeapon->m_iWantedWeapon==WEAPON_SNIPER) {
+      if (penWeapon->m_iCurrentWeapon==WEAPON_SNIPER && penWeapon->m_iWantedWeapon==WEAPON_SNIPER) {
         if (m_ulFlags&PLF_ISZOOMING) {
           m_ulFlags&=~PLF_ISZOOMING;
           penWeapon->m_bSniping = FALSE;
@@ -4612,15 +4668,15 @@ functions:
       
       // if alive
       if (GetFlags() & ENF_ALIVE) {
-        // if not in auto-action mode
-        if (m_penActionMarker==NULL) {
-          // apply actions
+        // If not in auto-action mode then apply actions.
+        if (m_penActionMarker == NULL) {
           AliveActions(paAction);
-        // if in auto-action mode
+
+        // If in auto-action mode then do automatic actions.
         } else {
-          // do automatic actions
           AutoActions(paAction);
         }
+
       // if not alive rotate camera view and rebirth on fire
       } else {
         DeathActions(paAction);
@@ -4632,11 +4688,13 @@ functions:
       m_bPendingMessage = TRUE;
       m_tmMessagePlay = 0;
     }
+
     if (m_bPendingMessage && !IsFuss()) {
       m_bPendingMessage = FALSE;
       m_tmMessagePlay = _pTimer->CurrentTick()+1.0f;
       m_tmAnimateInbox = _pTimer->CurrentTick();
     }
+
     if (Abs(_pTimer->CurrentTick()-m_tmMessagePlay)<_pTimer->TickQuantum*2) {
       m_bPendingMessage = FALSE;
       m_tmAnalyseEnd = 0;
@@ -4671,12 +4729,12 @@ functions:
   // --------------------------------------------------------------------------------------
   void Disconnect(void)
   {
-    // remember name
-    m_strName = GetPlayerName();
+    m_strName = GetPlayerName(); // remember name
+
     // clear the character, so we don't get re-connected to same entity
     en_pcCharacter = CPlayerCharacter();
-    // make main loop exit
-    SendEvent(EDisconnected());
+    
+    SendEvent(EDisconnected()); // make main loop exit
   };
 
   // --------------------------------------------------------------------------------------
@@ -5577,8 +5635,6 @@ functions:
       }
     }
     
-    
-
     // if use is pressed
     if (ulNewButtons&PLACT_USE) {
       if (((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon==WEAPON_SNIPER) {
@@ -5601,7 +5657,19 @@ functions:
 
     // if use is released
     if (ulReleasedButtons&PLACT_USE_HELD) {
-      bUseButtonHeld = FALSE;  
+      bUseButtonHeld = FALSE;
+      
+      // [SSE] ProgressiveSwitch
+      if (m_penCurrentInteractable != NULL) {
+        StopInteraction();
+      }
+    }
+    
+    // [SSE] ProgressiveSwitch
+    if (m_penCurrentInteractable != NULL && bUseButtonHeld) { // NOTE: Maybe can cause TMBS.
+      EInteractionTick eInteractionTick;
+      eInteractionTick.penPlayer = this;
+      m_penCurrentInteractable->SendEvent(eInteractionTick);
     }
 
     // if sniper zoomin is pressed
@@ -6716,6 +6784,11 @@ procedures:
   {
     // stop firing when dead
     ((CPlayerWeapons&)*m_penWeapons).SendEvent(EReleaseWeapon());
+    
+    // [SSE] ProgressiveSwitch
+    if (m_penCurrentInteractable != NULL) {
+      StopInteraction();
+    }
 
     // [SSE] Player Settings Entity
     if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bUntilDeath) {
@@ -7868,7 +7941,8 @@ procedures:
     }
     PlayLightAnim(LIGHT_ANIM_NONE, 0);
 
-    wait() {
+    wait()
+    {
       on (EBegin) : { call FirstInit(); }
       on (ERebirth) : { call Rebirth(); }
       on (EDeath eDeath) : { call Death(eDeath); }
@@ -7897,6 +7971,16 @@ procedures:
         } else {
           PlaySound(m_soMouth, GenderSound(SOUND_INHALE2), SOF_3D);
         }
+        resume;
+      }
+      
+      // [SSE] ProgressiveSwitch
+      on (EInteractionComplete eInteractionComplete) : {
+        
+        if (m_penCurrentInteractable == eInteractionComplete.penInteractable) {
+          m_penCurrentInteractable = NULL;
+        }
+        
         resume;
       }
 
@@ -7988,11 +8072,12 @@ procedures:
         ASSERT(FALSE);
         resume;
       }
-      // if player is disconnected
+
+      // if player is disconnected then exit the loop
       on (EDisconnected) : {
-        // exit the loop
         stop;
       }
+
       // support for jumping using bouncers
       on (ETouch eTouch) : {
         if (IsOfClass(eTouch.penOther, "Bouncer")) {

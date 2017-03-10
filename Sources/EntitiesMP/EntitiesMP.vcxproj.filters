@@ -619,6 +619,9 @@
     <ClCompile Include="RangeEventer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ProgressiveSwitch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1707,6 +1710,12 @@
     <ClInclude Include="RangeEventer_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ProgressiveSwitch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgressiveSwitch_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2652,6 +2661,9 @@
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
     <CustomBuild Include="RangeEventer.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ProgressiveSwitch.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>

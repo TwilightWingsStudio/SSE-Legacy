@@ -193,6 +193,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="PlayerInfo.cpp" />
     <ClCompile Include="PlayerParenter.cpp" />
     <ClCompile Include="PlayerSettings.cpp" />
+    <ClCompile Include="ProgressiveSwitch.cpp" />
     <ClCompile Include="PropertiesCloner.cpp" />
     <ClCompile Include="PropertyChanger.cpp" />
     <ClCompile Include="Randomizer.cpp" />
@@ -444,6 +445,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="PlayerParenter_tables.h" />
     <ClInclude Include="PlayerSettings.h" />
     <ClInclude Include="PlayerSettings_tables.h" />
+    <ClInclude Include="ProgressiveSwitch.h" />
+    <ClInclude Include="ProgressiveSwitch_tables.h" />
     <ClInclude Include="PropertiesCloner.h" />
     <ClInclude Include="PropertiesCloner_tables.h" />
     <ClInclude Include="PropertyChanger.h" />
@@ -3024,6 +3027,10 @@ ecc EntitiesMP/%(Filename).es </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
 ecc EntitiesMP/%(Filename).es </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -3046,6 +3053,19 @@ ecc EntitiesMP/%(Filename).es </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="ProgressiveSwitch.es">
+      <FileType>Document</FileType>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
 ecc EntitiesMP/%(Filename).es </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)

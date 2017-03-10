@@ -68,6 +68,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   
   // [SSE]
   #include "EntitiesMP/SimpleSwitch.h"
+  #include "EntitiesMP/ProgressiveSwitch.h"
 
   extern INDEX hud_bShowWeapon;
 
@@ -1073,7 +1074,7 @@ functions:
         plWeaponMirror.pl_OrientationAngle(1) = -plWeaponMirror.pl_OrientationAngle(1);
         plWeaponMirror.pl_OrientationAngle(3) = -plWeaponMirror.pl_OrientationAngle(3);
       }
-
+      
       FLOAT fFOVMul = 1.0F;
       
       // [SSE] Shitty Widescreen Fix
@@ -1083,7 +1084,6 @@ functions:
       }
       
       ((CPerspectiveProjection3D &)prMirror).FOVL() = AngleDeg(wpn_fFOV[iWeaponData]) * fFOVMul;
-
       CAnyProjection3D apr;
       apr = prMirror;
       Stereo_AdjustProjection(*apr, iEye, 0.1f);
@@ -1115,7 +1115,7 @@ functions:
     prProjection.FrontClipDistanceL() = wpn_fClip[iWeaponData];
     prProjection.DepthBufferNearL() = 0.0f;
     prProjection.DepthBufferFarL() = 0.1f;
-
+    
     FLOAT fFOVMul = 1.0F;
     
     // [SSE] Shitty Widescreen Fix
@@ -1123,7 +1123,7 @@ functions:
       fFOVMul = (FLOAT(pdp->GetWidth()) / pdp->GetHeight()) / 1.33F;
       fFOVMul = Clamp(fFOVMul, 1.0F, 1.75F);
     }
-    
+
     ((CPerspectiveProjection3D &)prProjection).FOVL() = AngleDeg(wpn_fFOV[iWeaponData]) * fFOVMul;
 
     CAnyProjection3D apr;
@@ -1277,8 +1277,8 @@ functions:
   // --------------------------------------------------------------------------------------
   void UpdateInteractionInfo(CEntity *pen)
   {
-    if (pen == NULL) { // TODO: Maybe put ASSERT here.
-      return;
+    if (pen == NULL) {
+      return; // TODO: Maybe put ASSERT here.
     }
 
     TIME tmNow = _pTimer->CurrentTick();
@@ -1361,6 +1361,22 @@ functions:
 
     } else if (IsOfClass(pen, "SimpleSwitch")) {
       CSimpleSwitch &enSwitch = (CSimpleSwitch&)*pen;
+
+      // if switch near enough and is useable
+      if (enSwitch.m_bActive)
+      {
+        // show switch message
+        if (pen->GetInteractionHint() != "") {
+          m_strLastTarget = pen->GetInteractionHint();
+        } else {
+          m_strLastTarget = TRANS("Use");
+        }
+
+        m_tmLastTarget = tmNow + 0.5f;
+      }
+      
+    } else if (IsOfClass(pen, "ProgressiveSwitch")) {
+      CProgressiveSwitch &enSwitch = (CProgressiveSwitch&)*pen;
 
       // if switch near enough and is useable
       if (enSwitch.m_bActive)
