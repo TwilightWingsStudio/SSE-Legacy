@@ -2315,8 +2315,8 @@ functions:
         vToTarget.Normalize(); vTargetHeading.Normalize();
         if (vToTarget%vTargetHeading>0.64279) //CosFast(50.0f)
         {
-          PrintCenterMessage(this, m_penPlayer, TRANS("Backstab!"), KNIFE_BACKSTAB_MULTIPLIER, MSS_NONE);
-          fDamage *= 4.0f;
+          PrintCenterMessage(this, m_penPlayer, TRANS("Backstab!"), 3.0F, MSS_NONE);
+          fDamage *= KNIFE_BACKSTAB_MULTIPLIER;
         }
       }
 
@@ -2471,14 +2471,17 @@ functions:
 
         if (vToTarget%vTargetHeading > 0.64279) //CosFast(50.0f)
         {
-          PrintCenterMessage(this, m_penPlayer, TRANS("Backsaw!"), CHAINSAW_BACKSTAB_MULTIPLIER, MSS_NONE);
-          fDamage *= 4.0f;
+          PrintCenterMessage(this, m_penPlayer, TRANS("Backsaw!"), 3.0F, MSS_NONE);
+          fDamage *= CHAINSAW_BACKSTAB_MULTIPLIER;
         }
       }
 
-      InflictDirectDamage(penClosest, m_penPlayer, DMT_CHAINSAW, fDamage, vHit, vDir);
+      const FLOAT fDamageMul = GetSeriousDamageMultiplier(m_penPlayer);
+      InflictDirectDamage(penClosest, m_penPlayer, DMT_CLOSERANGE, fDamage*fDamageMul, vHit, vDir);
+
       return TRUE;
     }
+
     return FALSE;
   };
 
