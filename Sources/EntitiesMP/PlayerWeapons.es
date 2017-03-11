@@ -2477,7 +2477,7 @@ functions:
       }
 
       const FLOAT fDamageMul = GetSeriousDamageMultiplier(m_penPlayer);
-      InflictDirectDamage(penClosest, m_penPlayer, DMT_CLOSERANGE, fDamage*fDamageMul, vHit, vDir);
+      InflictDirectDamage(penClosest, m_penPlayer, DMT_CLOSERANGE, fDamage * fDamageMul, vHit, vDir);
 
       return TRUE;
     }
@@ -3656,6 +3656,7 @@ functions:
     switch (m_iCurrentWeapon)
     {
       case WEAPON_NONE:
+      case WEAPON_FISTS:
       case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: 
       case WEAPON_SINGLESHOTGUN: case WEAPON_DOUBLESHOTGUN:
       case WEAPON_TOMMYGUN: case WEAPON_MINIGUN: case WEAPON_SNIPER:
