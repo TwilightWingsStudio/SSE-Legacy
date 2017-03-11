@@ -1631,7 +1631,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
   const BOOL bCooperative =  GetSP()->sp_bCooperative && !bSinglePlay;
   const BOOL bScoreMatch  = !GetSP()->sp_bCooperative && !GetSP()->sp_bUseFrags;
   const BOOL bFragMatch   = !GetSP()->sp_bCooperative &&  GetSP()->sp_bUseFrags;
-  COLOR colMana, colFrags, colDeaths, colHealth, colArmor;
+  COLOR colMana, colFrags, colDeaths, colHealth, colArmor, colPing;
   COLOR colScore  = _colHUD;
   INDEX iScoreSum = 0;
 
@@ -1669,8 +1669,9 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
       const INDEX iDeaths = penPlayer->m_psGameStats.ps_iDeaths;
       const INDEX iHealth = ClampDn( (INDEX)ceil( penPlayer->GetHealth()), 0L);
       const INDEX iArmor  = ClampDn( (INDEX)ceil( penPlayer->m_fArmor),    0L);
+      const INDEX iPing = ceil(penPlayer->en_tmPing*1000.0f);
 
-      CTString strScore, strMana, strFrags, strDeaths, strHealth, strArmor;
+      CTString strScore, strMana, strFrags, strDeaths, strHealth, strArmor, strPing;
       strScore.PrintF(  "%d", iScore);
       strMana.PrintF(   "%d", iMana);
       strFrags.PrintF(  "%d", iFrags);
@@ -1693,6 +1694,27 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
         strHealth.PrintF( "%d", iHealth);
       }
       //
+      
+			if ( iPing > 300 ) {
+				colPing = C_RED;
+        strPing.PrintF("^f9/^r^c808080///");
+
+      } else if (iPing > 200) {
+				colPing = C_RED;
+        strPing.PrintF("/^c808080///");
+        
+      } else if (iPing > 140) {
+				colPing = C_ORANGE;
+        strPing.PrintF("//^c808080//");
+
+			} else if ( iPing > 80 ) {
+				colPing = C_YELLOW;
+        strPing.PrintF("///^c808080/");
+
+			} else {
+        strPing.PrintF("////");
+				colPing = C_GREEN;
+			}
 
       // detemine corresponding colors
       colHealth = C_mlRED;
@@ -1710,28 +1732,36 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
       {
         // printout location and info aren't the same for deathmatch and coop play
         const FLOAT fCharWidth = (PIX)((_pfdDisplayFont->GetWidth()-2) *fTextScale);
+
         if (bCooperative) {
-          _pDP->PutTextR( strName+":", _pixDPWidth-8*fCharWidth, fCharHeight*i+fOneUnit*2, colScore |_ulAlphaHUD);
+          _pDP->PutTextR( strName+":", _pixDPWidth - 12 *fCharWidth, fCharHeight*i+fOneUnit*2, colScore |_ulAlphaHUD);
           
           if (penPlayer->GetFlags()&ENF_ALIVE) {
-            _pDP->PutText(  "/",         _pixDPWidth-4*fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD  |_ulAlphaHUD);
-            _pDP->PutTextC( strHealth,   _pixDPWidth-6*fCharWidth, fCharHeight*i+fOneUnit*2, colHealth|_ulAlphaHUD);
-            _pDP->PutTextC( strArmor,    _pixDPWidth-2*fCharWidth, fCharHeight*i+fOneUnit*2, colArmor |_ulAlphaHUD);
+            _pDP->PutText(  "/",         _pixDPWidth-8*fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD  |_ulAlphaHUD);
+            _pDP->PutTextC( strHealth,   _pixDPWidth-10*fCharWidth, fCharHeight*i+fOneUnit*2, colHealth|_ulAlphaHUD);
+            _pDP->PutTextC( strArmor,    _pixDPWidth-6*fCharWidth, fCharHeight*i+fOneUnit*2, colArmor |_ulAlphaHUD);
           } else {
-            _pDP->PutTextC(  TRANS("DEAD"), _pixDPWidth-4*fCharWidth, fCharHeight*i+fOneUnit*2, C_RED|_ulAlphaHUD); // [SSE] No Stupid Zeros If Player Dead
+            _pDP->PutTextC(  TRANS("DEAD"), _pixDPWidth-8*fCharWidth, fCharHeight*i+fOneUnit*2, C_RED|_ulAlphaHUD); // [SSE] No Stupid Zeros If Player Dead
           }
+          
+          _pDP->PutTextC( strPing,     _pixDPWidth- 2 * fCharWidth, fCharHeight * i + fOneUnit * 2, colPing|_ulAlphaHUD);
+
         } else if (bScoreMatch) {
-          _pDP->PutTextR( strName+":", _pixDPWidth-12*fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD |_ulAlphaHUD);
-          _pDP->PutText(  "/",         _pixDPWidth- 5*fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD |_ulAlphaHUD);
-          _pDP->PutTextC( strScore,    _pixDPWidth- 8*fCharWidth, fCharHeight*i+fOneUnit*2, colScore|_ulAlphaHUD);
-          _pDP->PutTextC( strMana,     _pixDPWidth- 2*fCharWidth, fCharHeight*i+fOneUnit*2, colMana |_ulAlphaHUD);
+          _pDP->PutTextR( strName+":", _pixDPWidth - 14 * fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD |_ulAlphaHUD);
+          _pDP->PutText(  "/",         _pixDPWidth- 9 * fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD |_ulAlphaHUD);
+          _pDP->PutTextC( strScore,    _pixDPWidth- 12 * fCharWidth, fCharHeight*i+fOneUnit*2, colScore|_ulAlphaHUD);
+          _pDP->PutTextC( strMana,     _pixDPWidth- 6 * fCharWidth, fCharHeight*i+fOneUnit*2, colMana |_ulAlphaHUD);
+          _pDP->PutTextC( strPing,     _pixDPWidth- 2 * fCharWidth, fCharHeight * i + fOneUnit * 2, colPing|_ulAlphaHUD);
+
         } else { // fragmatch!
-          _pDP->PutTextR( strName+":", _pixDPWidth-8*fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD  |_ulAlphaHUD);
-          _pDP->PutText(  "/",         _pixDPWidth-4*fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD  |_ulAlphaHUD);
-          _pDP->PutTextC( strFrags,    _pixDPWidth-6*fCharWidth, fCharHeight*i+fOneUnit*2, colFrags |_ulAlphaHUD);
-          _pDP->PutTextC( strDeaths,   _pixDPWidth-2*fCharWidth, fCharHeight*i+fOneUnit*2, colDeaths|_ulAlphaHUD);
+          _pDP->PutTextR( strName+":", _pixDPWidth-12 * fCharWidth, fCharHeight * i + fOneUnit * 2, _colHUD  |_ulAlphaHUD);
+          _pDP->PutText(  "/",         _pixDPWidth-8 * fCharWidth, fCharHeight * i + fOneUnit * 2, _colHUD  |_ulAlphaHUD);
+          _pDP->PutTextC( strFrags,    _pixDPWidth-10 * fCharWidth, fCharHeight * i + fOneUnit * 2, colFrags |_ulAlphaHUD);
+          _pDP->PutTextC( strDeaths,   _pixDPWidth-6 * fCharWidth, fCharHeight * i + fOneUnit * 2, colDeaths|_ulAlphaHUD);
+          _pDP->PutTextC( strPing,      _pixDPWidth-2 * fCharWidth, fCharHeight * i + fOneUnit * 2, colPing|_ulAlphaHUD);
         }
       }
+
       // calculate summ of scores (for coop mode)
       iScoreSum += iScore;
     }
