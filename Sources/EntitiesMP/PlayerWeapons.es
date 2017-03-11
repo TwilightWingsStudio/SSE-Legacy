@@ -1478,9 +1478,10 @@ functions:
       }
       
       // If exists target which is interaction provider then printout some stuff.
-      if (pen != NULL && pen->IsInteractionProvider())
-      {
+      if (pen != NULL && pen->IsInteractionProvider()) {
         UpdateInteractionInfo(pen);
+      } else {
+        m_tmTargetingStarted = 0;
       }
 
     } else {
