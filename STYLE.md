@@ -18,37 +18,53 @@ Follow our coding standards are absolutely essential to having your pull request
 ```C
 // WRONG
 
-if(){
+if(a > b){
   // Your code here.
 }
 
-if() {
+// WRONG
+
+if(a > b) {
   // Your code here.
 }
 
-if (){
+// WRONG
+
+if (a > b){
   // Your code here.
 }
+
+// WRONG
 
 while(true) {
   // Your code here.
 }
 
+// WRONG
+
 while (true){
   // Your code here.
 }
+
+// WRONG
 
 while(true){
   // Your code here.
 }
 
+// WRONG
+
 for(int i = 0; i < 10; i++){
   // Your code here.
 }
 
+// WRONG
+
 for(int i = 0; i < 10; i++) {
   // Your code here.
 }
+
+// WRONG
 
 for (int i = 0; i < 10; i++){
   // Your code here.
@@ -56,13 +72,17 @@ for (int i = 0; i < 10; i++){
 
 // RIGHT
 
-if () {
+if (a > b) {
   // Your code here.
 }
+
+// RIGHT
 
 while (true) {
   // Your code here.
 }
+
+// RIGHT
 
 for (int i = 0; i < 10; i++) {
   // Your code here.
