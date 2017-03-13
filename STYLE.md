@@ -11,6 +11,65 @@ Follow our coding standards are absolutely essential to having your pull request
 - Avoid doing large commits. I preferred have single commit for a tiny fix/addition rather than bundled up commits.
 - Always make sure all files contain the GNU GPL-2.0 license at the top of the every file containing buildable source code.
 
+### Coding standarts - Operators
+- ALWAYS should be space between operator keyword and round braces!
+- ALWAYS should be space between operator round braces and block braces.
+
+```C
+// WRONG
+
+if(){
+  // Your code here.
+}
+
+if() {
+  // Your code here.
+}
+
+if (){
+  // Your code here.
+}
+
+while(true) {
+  // Your code here.
+}
+
+while (true){
+  // Your code here.
+}
+
+while(true){
+  // Your code here.
+}
+
+for(int i = 0; i < 10; i++){
+  // Your code here.
+}
+
+for(int i = 0; i < 10; i++) {
+  // Your code here.
+}
+
+for (int i = 0; i < 10; i++){
+  // Your code here.
+}
+
+// RIGHT
+
+if () {
+  // Your code here.
+}
+
+while (true) {
+  // Your code here.
+}
+
+for (int i = 0; i < 10; i++) {
+  // Your code here.
+}
+
+```
+
 ### Coding standarts - Methods and Functions
 - Method body braces should ALWAYS be on separate line!
 
