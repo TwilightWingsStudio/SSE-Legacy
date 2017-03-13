@@ -812,7 +812,7 @@ procedures:
         SetPhysicsFlags(GetPhysicsFlags()&~EPF_TRANSLATEDBYGRAVITY);
       }
 
-      if (m_bActive) {
+      if (m_bActive && m_bColliding) {
         SetCollisionFlags(ECF_MODEL);
       } else {
         SetCollisionFlags(ECF_IMMATERIAL);
