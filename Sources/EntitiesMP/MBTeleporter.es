@@ -38,8 +38,10 @@ components:
    1 model   MODEL_MBTELEPORTER   "Models\\Editor\\MovingBrushTeleporter.mdl",
    2 texture TEXTURE_MBTELEPORTER "Models\\Editor\\MovingBrushTeleporter.tex",
 
-functions:                                        
-  // returns bytes of memory used by this object
+functions:  
+  // --------------------------------------------------------------------------------------                                      
+  // Returns bytes of memory used by this object.
+  // --------------------------------------------------------------------------------------
   SLONG GetUsedMemory(void)
   {
     // initial
@@ -52,7 +54,12 @@ functions:
   }
 
 procedures:
-  Reset() {
+
+  // --------------------------------------------------------------------------------------
+  // All business sits here logic.
+  // --------------------------------------------------------------------------------------
+  Reset()
+  {
     if (!m_penMB || !m_penMarker || (!IsOfClass(m_penMB, "Movable Brush") && !IsOfClass(m_penMB, "Moving Brush") && !IsOfClass(m_penMB, "MovingBrush") && !IsOfClass(m_penMB,"Movable Model")) || !IsOfClass(m_penMarker, "Moving Brush Marker")) {
       WarningMessage("MB Teleporter: No Targets selected or Targets of wrong class.");
       return EReturn();
@@ -107,7 +114,11 @@ procedures:
     return;
   }
 
-  Main() {
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
+  Main()
+  {
     InitAsEditorModel();
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
     SetCollisionFlags(ECF_IMMATERIAL);
@@ -119,8 +130,10 @@ procedures:
     // spawn in world editor
     autowait(0.1F);
 
-    while (TRUE) {
-      wait(_pTimer->TickQuantum) {
+    while (TRUE)
+    {
+      wait(_pTimer->TickQuantum)
+      {
         on (EBegin) : {
           resume;
         }
