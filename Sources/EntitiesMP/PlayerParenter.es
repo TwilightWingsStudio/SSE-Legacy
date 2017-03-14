@@ -40,8 +40,8 @@ properties:
   11 FLOAT m_fRotY  "Pitch Offset"   = 0.0F,
   12 FLOAT m_fRotZ  "Banking Offset" = 0.0F,
   
-  13 BOOL m_bPlayer          "Parent Player to Entity" = FALSE,
-  
+  13 BOOL m_bParentPlayerToEntity  "Parent Player to Entity" = FALSE,
+
 components:
   1 model   MODEL_MARKER     "Models\\Editor\\PlayerParenter.mdl",
   2 texture TEXTURE_MARKER   "Models\\Editor\\PlayerParenter.tex"
@@ -49,6 +49,9 @@ components:
 functions:
 
 procedures:
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     // declare yourself as a brush
@@ -58,14 +61,20 @@ procedures:
     SetModel(MODEL_MARKER);
     SetModelMainTexture(TEXTURE_MARKER);
 
-    while (TRUE) {
+    while (TRUE)
+    {
       wait() {
         on (EBegin) : {
           resume;
         }
         
-        on (EStart eStart) : {
-          if (!m_bPlayer) {
+        on (EStart eStart) :
+        {
+          if (eStart.penCaused == NULL) {
+            resume;
+          }
+          
+          if (!m_bParentPlayerToEntity) {
             //remove all parented stuff from player
             {FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten) {
               CEntity *pen = iten;
@@ -80,9 +89,12 @@ procedures:
               eStart.penCaused->SetParent(NULL);
             }
           }
+
           resume;
         }
-        on (ETrigger eTrigger) : {
+
+        on (ETrigger eTrigger) :
+        {
           if (!m_penTarget) { resume;}
 
           CEntityPointer pen = m_penTarget;
@@ -90,7 +102,7 @@ procedures:
           CPlacement3D plWanted = pen->GetPlacement();
           CPlacement3D plPlayer = penCaused->GetPlacement();
     
-          if (m_bPlayer) {
+          if (m_bParentPlayerToEntity) {
             CPlacement3D plTmp = plWanted;
             plWanted = plPlayer;
             plPlayer = plTmp;
@@ -112,7 +124,7 @@ procedures:
               plWanted.pl_PositionVector(2) += m_fTransY;
               plWanted.pl_PositionVector(3) += m_fTransZ;
             } else {
-              CPlacement3D plOffset = CPlacement3D(FLOAT3D(m_fTransX,m_fTransY,m_fTransZ),ANGLE3D(0, 0, 0));
+              CPlacement3D plOffset = CPlacement3D(FLOAT3D(m_fTransX, m_fTransY,m_fTransZ), ANGLE3D(0, 0, 0));
               CPlacement3D plRotation = CPlacement3D(FLOAT3D(0.0F, 0.0F, 0.0F), plPlayer.pl_OrientationAngle);
               plOffset.RelativeToAbsolute(plRotation);
               plWanted.pl_PositionVector += plOffset.pl_PositionVector;
@@ -129,10 +141,11 @@ procedures:
           
           resume;
         }
+
         on (ETimer) : { stop; }
       }
-      
     }
+
     return;
   }
 };
