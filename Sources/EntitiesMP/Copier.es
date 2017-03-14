@@ -33,9 +33,11 @@ properties:
   4 BOOL m_bSpawnEffect "Spawn Effect" 'X' = TRUE,
   5 BOOL m_bTelefrag "Telefrag" 'F' = TRUE,
   
-  // SSE
+  // [SSE]
   6 RANGE m_fInnerCircle        "Circle inner" 'V' = 0.0f,    // inner circle for creation
   7 RANGE m_fOuterCircle        "Circle outer" 'B' = 0.0f,    // outer circle for creation
+  
+ 10 CEntityPointer m_penLastCopy "Last Copy",
 
 components:
 
@@ -72,6 +74,8 @@ functions:
 
     CEntity *pen = GetWorld()->CopyEntityInWorld( *m_penTarget,
       CPlacement3D(FLOAT3D(-32000.0f+FRnd()*200.0f, -32000.0f+FRnd()*200.0f, 0), ANGLE3D(0, 0, 0)) );
+      
+    m_penLastCopy = pen;
 
     // teleport back
     CPlacement3D pl = GetPlacement();
