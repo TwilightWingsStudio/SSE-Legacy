@@ -12,7 +12,7 @@ Following our coding standards is absolutely essential to have your pull request
 - Always make sure all files contain the GNU GPL-2.0 license at the beginning of every file containing buildable source code.
 
 ### Coding standarts - Operators
-- ALWAYS should be space between operator keyword and round braces!
+- ALWAYS should be space between operator keyword and round brackets!
 - ALWAYS should be space between operator round braces and block braces.
 
 ```C
@@ -108,8 +108,8 @@ void SomeFunc()
 }
 ```
 
-### Coding standarts - Class Members
-- Everytning under the public/private/protected sections should be ALWAYS moved a bit to the right.
+### Coding standarts - Access Modifiers
+- Everytning under the access modifiers (public/protected/private/) sections should be ALWAYS moved a bit to the right.
 
 ```C
 // WRONG
@@ -180,18 +180,14 @@ void SomeFunc()
 }
 ```
 
-### Coding standarts - switch members (cases) ALWAYS must have tabs.
-- NEVER write switch-case construction without having tabs for every case block.
+### Coding standarts - switch statement.
+- NEVER write switch statement without having tabs for every section.
 ```C
 // WRONG
 
 switch (iSomeVar)
 {
 case 0: {
-  ...
-} break;
-
-case 1: {
   ...
 } break;
 
@@ -210,7 +206,36 @@ switch (iSomeVar)
     ...
   } break;
 
-  case 1: {
+  case 3: {
+    ...
+  } break;
+
+  default: break;    
+}
+```
+
+- If you have colon and brace at the same line then ALWAYS put space between them!
+```C
+// WRONG
+
+switch (iSomeVar)
+{
+  case 0:{
+    ...
+  } break;
+
+  case 3:{
+    ...
+  } break;
+
+  default: break;    
+}
+
+// RIGHT
+
+switch (iSomeVar)
+{
+  case 0: {
     ...
   } break;
 
