@@ -145,6 +145,15 @@ components:
 // --------------------------------------------------------------------------------------
 functions:
   // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Returns TRUE if main entity logic is active.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsActive(void) const
+  {
+    return m_bActive;
+  }
+
+  // --------------------------------------------------------------------------------------
   // Returns short entity description to show it in SED.
   // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const
@@ -251,13 +260,23 @@ functions:
     }
 
     // on EActivate
-    if (ee.ee_slEvent == EVENTCODE_EActivate) {
+    if (ee.ee_slEvent == EVENTCODE_EActivate)
+    {
+      if (m_bDebugMessages) {
+        CPrintF("[PS] %s : Activated!\n", GetName());
+      }
+
       m_bActive = TRUE;
       return CEntity::HandleEvent(ee); 
     }
 
     // on EDeactivate
-    if (ee.ee_slEvent == EVENTCODE_EDeactivate) {
+    if (ee.ee_slEvent == EVENTCODE_EDeactivate)
+    {
+      if (m_bDebugMessages) {
+        CPrintF("[PS] %s : Deactivated!\n", GetName());
+      }
+      
       m_bActive = FALSE;
       return CEntity::HandleEvent(ee); 
     }

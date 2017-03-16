@@ -3374,7 +3374,7 @@ functions:
   void ProcessRegen(void)
   {
     // [SSE] Player Settings Entity
-    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive)
+    if (m_penSettings && m_penSettings->IsActive())
     {
       CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
       
@@ -3827,7 +3827,7 @@ functions:
 
     // [SSE] Player Settings Entity
     CPlayerSettingsEntity *penSettings = NULL;
-    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+    if (m_penSettings && m_penSettings->IsActive()) {
       penSettings = (CPlayerSettingsEntity *)&*m_penSettings;
       
       fDamageAmmount *= penSettings->m_fDamageReceiveMul;
@@ -4075,7 +4075,7 @@ functions:
       FLOAT fMaxHealth = MaxHealth();
 
       // [SSE] Player Settings Entity
-      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+      if (m_penSettings && m_penSettings->IsActive()) {
         CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
 
         if (!enSettings.m_bCanPickUpHealth) {
@@ -4121,7 +4121,7 @@ functions:
       FLOAT fMaxArmor = MaxArmor();
 
       // [SSE] Player Settings Entity
-      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+      if (m_penSettings && m_penSettings->IsActive()) {
         CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
 
         if (!enSettings.m_bCanPickUpArmor) {
@@ -4170,7 +4170,7 @@ functions:
     // *********** WEAPON ***********
     else if (ee.ee_slEvent == EVENTCODE_EWeaponItem) {
       // [SSE] Player Settings Entity
-      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+      if (m_penSettings && m_penSettings->IsActive()) {
         if (!((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpWeapons) {
           return FALSE;
         }
@@ -4182,7 +4182,7 @@ functions:
     // *********** AMMO ***********
     else if (ee.ee_slEvent == EVENTCODE_EAmmoItem) {
       // [SSE] Player Settings Entity
-      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+      if (m_penSettings && m_penSettings->IsActive()) {
         if (!((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpAmmo) {
           return FALSE;
         }
@@ -4194,7 +4194,7 @@ functions:
     // *********** AMMO PACK ***********
     else if (ee.ee_slEvent == EVENTCODE_EAmmoPackItem) {
       // [SSE] Player Settings Entity
-      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+      if (m_penSettings && m_penSettings->IsActive()) {
         if (!((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpAmmo) {
           return FALSE;
         }
@@ -4211,7 +4211,7 @@ functions:
       }
 
       // [SSE] Player Settings Entity
-      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+      if (m_penSettings && m_penSettings->IsActive()) {
         if (((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpKeys) {
           return FALSE;
         }
@@ -4246,7 +4246,7 @@ functions:
     // *********** POWERUPS ***********
     else if (ee.ee_slEvent == EVENTCODE_EPowerUp) {
       // [SSE] Player Settings Entity
-      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+      if (m_penSettings && m_penSettings->IsActive()) {
         if (((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpPUPS) {
           return FALSE;
         }
@@ -4595,7 +4595,7 @@ functions:
     BOOL bLikeWalking = Abs(paAction.pa_vTranslation(3)) < plr_fSpeedForward/1.99f && Abs(paAction.pa_vTranslation(1)) < plr_fSpeedSide/1.99f;
 
     // [SSE] Player Settings Entity
-    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+    if (m_penSettings && m_penSettings->IsActive()) {
       CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
 
       if (bLikeWalking) {
@@ -4817,7 +4817,7 @@ functions:
     }
 
     // TODO: [ZCaliptium] Remove this shit!
-    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive)
+    if (m_penSettings && m_penSettings->IsActive())
     {
       CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
 
@@ -5073,7 +5073,7 @@ functions:
     FLOAT fDensitySwim = 500.0F;
 
     // [SSE] Player Settings Entity
-    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+    if (m_penSettings && m_penSettings->IsActive()) {
       CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
 
       vTranslation *= enSettings.m_fSpeedAllMultiplier;
@@ -6385,7 +6385,7 @@ functions:
       m_ulFlags &= ~PLF_RESPAWNINPLACE;
       
       // [SSE] Player Settings Entity
-      if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+      if (m_penSettings && m_penSettings->IsActive()) {
         SetHealth(((CPlayerSettingsEntity&)*m_penSettings).m_fTopHealth);
       } else {
         SetHealth(TopHealth()); // set default params
@@ -6955,7 +6955,7 @@ procedures:
     SetCollisionFlags(ECF_CORPSE);
 
     // [SSE] Player Settings Entity
-    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+    if (m_penSettings && m_penSettings->IsActive()) {
       en_fDensity = ((CPlayerSettingsEntity&)*m_penSettings).m_fDensityDead; // set density from player settings entity
     } else {
       en_fDensity = 400.0f; // set density to float out of water
@@ -8034,7 +8034,7 @@ procedures:
         INDEX iScore = eScore.iPoints;
 
         // [SSE] Player Settings Entity
-        if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bActive) {
+        if (m_penSettings && m_penSettings->IsActive()) {
           iScore *= ((CPlayerSettingsEntity&)*m_penSettings).m_fScoreReceiveMul;
         }
         //
