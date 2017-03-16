@@ -663,7 +663,7 @@ public:
   virtual const CTString& GetInteractionHint(void) const;
   virtual FLOAT GetInteractionDistance(void) const;
   
-  // [SSE]
+  // [SSE] Extended Engine API
   inline BOOL IsAlive(void) const
   {
     return en_ulFlags&ENF_ALIVE;
@@ -676,6 +676,9 @@ public:
   
   // [SSE] Network Update
   virtual void ReceiveRPC(CNetworkMessage &nmMessage) {};
+  
+  // [SSE] Extended Engine API
+  virtual BOOL IsActive(void) const { return TRUE; }
 
   /* Model change notify */
   void ModelChangeNotify(void);
