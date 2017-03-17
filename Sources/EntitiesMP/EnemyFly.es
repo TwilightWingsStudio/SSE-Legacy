@@ -443,7 +443,8 @@ procedures:
 /************************************************************
  *                    D  E  A  T  H                         *
  ************************************************************/
-  Death(EVoid) : CEnemyBase::Death {
+  Death(EVoid) : CEnemyBase::Death
+  {
     // clear fly flag
     SetPhysicsFlags((GetPhysicsFlags() & ~EPF_MODEL_FLYING) | EPF_MODEL_WALKING);
     ChangeCollisionToGround();

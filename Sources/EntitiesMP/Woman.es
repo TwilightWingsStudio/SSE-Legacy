@@ -423,7 +423,7 @@ procedures:
   // --------------------------------------------------------------------------------------
   // The death sequence.
   // --------------------------------------------------------------------------------------
-  Death(EVoid) : CEnemyFly::Death
+  Death(EVoid) : CEnemyBase::Death
   {
     DropKamikaze();
     jump CEnemyFly::Death();
