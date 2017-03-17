@@ -17,9 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %{
   #include "StdH.h"
   #include "EntitiesMP/Bullet.h"
-  
-  #define SL_PITCH_MIN (0.01F)
-  #define SL_PITCH_MAX (100.0F)
+  #include "EntitiesMP/SoundHolder.h"
 %}
 
 enum EBSUsePenCausedAs {
@@ -51,15 +49,8 @@ properties:
   20 FLOAT m_fWait      "Min Fire Delay" = 0.1F,
   21 FLOAT m_tmFired = 0.0F,
   
-  50 CTFileName m_fnSound  "Sound File" = CTString(""),
+  50 CEntityPointer m_penSoundFire  "Sound Fire",
   51 CSoundObject m_soFire,
-  
-  52 RANGE m_rFallOffRange "Sound Fall-off" 'F'   = 100.0F,
-  53 RANGE m_rHotSpotRange "Sound Hot-spot" 'H'   = 50.0F,
-  54 FLOAT m_fSoundVolume  "Sound Volume"   'V'   = 1.0F,
-  55 FLOAT m_fSoundPitch   "Sound Pitch"          = 1.0F,
-  56 BOOL m_bSurround      "Sound Surround" 'R'   = FALSE,
-  57 BOOL m_bVolumetric    "Sound Volumetric" 'O' = TRUE,
 
   {
     CAutoPrecacheSound m_aps;
@@ -79,19 +70,12 @@ functions:
   void Precache(void)
   {
     PrecacheClass(CLASS_BULLET);
-
-    m_aps.Precache(m_fnSound);
   }
 
   // --------------------------------------------------------------------------------------
   // Apply mirror and stretch to the entity.
   // --------------------------------------------------------------------------------------
-  void MirrorAndStretch(FLOAT fStretch, BOOL bMirrorX)
-  {
-    // Stretch its ranges.
-    m_rFallOffRange *= fStretch;
-    m_rHotSpotRange *= fStretch;
-  }
+  void MirrorAndStretch(FLOAT fStretch, BOOL bMirrorX) {}
   
   // --------------------------------------------------------------------------------------
   // Fires the bullet in given direction with given properties.
@@ -140,13 +124,12 @@ functions:
   {
     ShootBullet(eTrigger, pl);
 
-    // Play shooting sound.
-    if (m_fSoundVolume > 0.0F && m_fnSound != "") {
-      INDEX iPlayType = SOF_3D;
-      if (m_bSurround) { iPlayType |= SOF_SURROUND; }
-      if (m_bVolumetric) { iPlayType |= SOF_VOLUMETRIC; } 
-      m_soFire.Set3DParameters(FLOAT(m_rFallOffRange), FLOAT(m_rHotSpotRange), m_fSoundVolume, m_fSoundPitch);
-      PlaySound(m_soFire, m_fnSound, iPlayType);
+    // If we have SoundHolder selected then shooting sound.
+    if (m_penSoundFire != NULL)
+    {
+      CSoundHolder &sh = (CSoundHolder&)*m_penSoundFire;
+      m_soFire.Set3DParameters(FLOAT(sh.m_rFallOffRange), FLOAT(sh.m_rHotSpotRange), sh.m_fVolume, sh.m_fPitch);
+      PlaySound(m_soFire, sh.m_fnSound, sh.m_iPlayType);
     }
   }
 procedures:
@@ -159,17 +142,11 @@ procedures:
   // --------------------------------------------------------------------------------------
   Main(EVoid)
   {
-    // Validate range.
-    if (m_rHotSpotRange < 0.0f) { m_rHotSpotRange = 0.0f; }
-    if (m_rFallOffRange < m_rHotSpotRange) { m_rFallOffRange = m_rHotSpotRange; }
-  
-    // Validate volume.
-    if (m_fSoundVolume < FLOAT(SL_VOLUME_MIN)) { m_fSoundVolume = FLOAT(SL_VOLUME_MIN); }
-    if (m_fSoundVolume > FLOAT(SL_VOLUME_MAX)) { m_fSoundVolume = FLOAT(SL_VOLUME_MAX); }
-
-    // Validate pitch.
-    if (m_fSoundPitch < FLOAT(SL_PITCH_MIN)) { m_fSoundPitch = FLOAT(SL_PITCH_MIN); }
-    if (m_fSoundPitch > FLOAT(SL_PITCH_MAX)) { m_fSoundPitch = FLOAT(SL_PITCH_MAX); }
+    // Validate Sound
+    if (m_penSoundFire != NULL && !IsDerivedFromClass(m_penSoundFire, "SoundHolder")) {
+      m_penSoundFire = NULL;
+      WarningMessage("Only SoundHolder can be selected as ""Sound Fire"" for BulletShooter!");
+    }
 
     InitAsEditorModel();
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
