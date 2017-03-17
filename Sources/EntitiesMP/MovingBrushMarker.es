@@ -78,6 +78,24 @@ procedures:
 
   Main()
   {
+    // [SSE] Retart Protection
+    if (m_penSoundFollow != NULL && !IsDerivedFromClass(m_penSoundFollow, "SoundHolder")) {
+      m_penSoundFollow = NULL;
+      WarningMessage("Only SoundHolder can be selected as Follow sound for MovingBrushMarker!");
+    }
+    
+    // [SSE] Retart Protection
+    if (m_penSoundStart != NULL && !IsDerivedFromClass(m_penSoundStart, "SoundHolder")) {
+      m_penSoundStart = NULL;
+      WarningMessage("Only SoundHolder can be selected as Start sound for MovingBrushMarker!");
+    }
+    
+    // [SSE] Retart Protection
+    if (m_penSoundStop != NULL && !IsDerivedFromClass(m_penSoundStop, "SoundHolder")) {
+      m_penSoundStop = NULL;
+      WarningMessage("Only SoundHolder can be selected as Stop sound for MovingBrushMarker!");
+    }
+    
     InitAsEditorModel();
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
     SetCollisionFlags(ECF_IMMATERIAL);
