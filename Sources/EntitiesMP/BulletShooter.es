@@ -22,6 +22,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #define SL_PITCH_MAX (100.0F)
 %}
 
+enum EBSUsePenCausedAs {
+  0 EBSUP_NONE        "0 None",
+  1 EBSUP_INFLICTOR   "1 Inflictor",
+  2 EBSUP_DESTINATION "2 Target",
+};
+
 class CBulletShooter : CRationalEntity {
 name      "BulletShooter";
 thumbnail "Thumbnails\\BulletShooter.tbn";
@@ -37,7 +43,10 @@ properties:
    9 FLOAT m_fRange        "Bullet Range"  = 200.0F,
   10 BOOL  m_bBulletTrail  "Bullet Trail"  = FALSE,
   
-  15 CEntityPointer m_penIgnore "Ignore Entity",
+  15 CEntityPointer m_penInflictor "Inflictor",
+  16 CEntityPointer m_penTarget    "Target",
+
+  17 enum EBSUsePenCausedAs m_eUsePenCausedAs "Use penCaused as ..." = EBSUP_NONE,
 
   20 FLOAT m_fWait      "Min Fire Delay" = 0.1F,
   21 FLOAT m_tmFired = 0.0F,
@@ -87,14 +96,24 @@ functions:
   // --------------------------------------------------------------------------------------
   // Fires the bullet in given direction with given properties.
   // --------------------------------------------------------------------------------------
-  void ShootBullet(const CPlacement3D &pl)
+  void ShootBullet(const ETrigger &eTrigger, const CPlacement3D &pl)
   {
+    CEntity *penInflictor = m_penInflictor;
+    CEntity *penTarget = m_penTarget;
+    
     CEntityPointer penBullet = CreateEntity(pl, CLASS_BULLET);
 
     // Initialize the bullet.
     EBulletInit eInit;
-    if(m_penIgnore) {
-      eInit.penOwner = m_penIgnore;
+    
+    if (m_eUsePenCausedAs == EBSUP_INFLICTOR) {
+      penInflictor = eTrigger.penCaused;
+    } else if (m_eUsePenCausedAs == EBSUP_DESTINATION) {
+      penTarget = eTrigger.penCaused;
+    }
+
+    if (penInflictor) {
+      eInit.penOwner = penInflictor;
     } else {
       eInit.penOwner = this;
     }
@@ -102,7 +121,12 @@ functions:
     eInit.fDamage = m_fBulletDamage;
     penBullet->Initialize(eInit);
 
-    ((CBullet&)*penBullet).CalcTarget(m_fRange);
+    if (penTarget) {
+      ((CBullet&)*penBullet).CalcTarget(penTarget, m_fRange);      
+    } else {
+      ((CBullet&)*penBullet).CalcTarget(m_fRange);
+    }
+
     ((CBullet&)*penBullet).m_fBulletSize = m_fBulletSize;
     ((CBullet&)*penBullet).CalcJitterTarget(m_fJitter);
     ((CBullet&)*penBullet).LaunchBullet(TRUE, m_bBulletTrail, TRUE);
@@ -112,9 +136,9 @@ functions:
   // --------------------------------------------------------------------------------------
   // Calls firing method and plays sound if any sound selected.
   // --------------------------------------------------------------------------------------
-  void Shoot(const CPlacement3D &pl)
+  void Shoot(const ETrigger &eTrigger, const CPlacement3D &pl)
   {
-    ShootBullet(pl);
+    ShootBullet(eTrigger, pl);
 
     // Play shooting sound.
     if (m_fSoundVolume > 0.0F && m_fnSound != "") {
@@ -168,7 +192,7 @@ procedures:
       {
         if (m_bActive && m_tmFired + m_fWait < _pTimer->CurrentTick()) {
           m_tmFired = _pTimer->CurrentTick();
-          Shoot(GetPlacement());
+          Shoot(eTrigger, GetPlacement());
         }
     
         resume;
