@@ -87,7 +87,7 @@ properties:
   40 FLOAT m_fDamageReceiveMul  "Mul Damage All" = 1.0F,
   41 FLOAT m_fSelfDamageMul     "Mul Damage Self" = 1.0F,
 
-  42 FLOAT m_fHeathPickUpMul    "Mul Health PickUp" = 1.0F,
+  42 FLOAT m_fHealthPickUpMul    "Mul Health PickUp" = 1.0F,
   43 FLOAT m_fArmorPickUpMul    "Mul Armor PickUp" = 1.0F,
  
   44 FLOAT m_fScoreReceiveMul   "Mul Receive Score" = 1.0F,

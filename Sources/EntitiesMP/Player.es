@@ -4063,10 +4063,17 @@ functions:
   };
 
   // --------------------------------------------------------------------------------------
-  /* Receive item */
+  // Receive item
   // --------------------------------------------------------------------------------------
   BOOL ReceiveItem(const CEntityEvent &ee)
   {
+    // [SSE] Player Settings Entity
+    CPlayerSettingsEntity *penPlayerSettings = NULL;
+
+    if (m_penSettings && m_penSettings->IsActive()) {
+      penPlayerSettings = static_cast<CPlayerSettingsEntity*>(&*m_penSettings);
+    }
+
     // *********** HEALTH ***********
     if (ee.ee_slEvent == EVENTCODE_EHealth)
     {
@@ -4075,16 +4082,16 @@ functions:
       FLOAT fMaxHealth = MaxHealth();
 
       // [SSE] Player Settings Entity
-      if (m_penSettings && m_penSettings->IsActive()) {
-        CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
-
-        if (!enSettings.m_bCanPickUpHealth) {
+      if (penPlayerSettings)
+      {
+        // If health pickup not allowed then don't do it!
+        if (!penPlayerSettings->m_bCanPickUpHealth) {
           return FALSE;
         }
 
-        fHealth *= enSettings.m_fHeathPickUpMul;
-        fTopHealth = enSettings.m_fTopHealth;
-        fMaxHealth = enSettings.m_fMaxHealth;
+        fHealth *= penPlayerSettings->m_fHealthPickUpMul;
+        fTopHealth = penPlayerSettings->m_fTopHealth;
+        fMaxHealth = penPlayerSettings->m_fMaxHealth;
       }
 
       // If item won't give any health then pickup it always.
@@ -4121,16 +4128,16 @@ functions:
       FLOAT fMaxArmor = MaxArmor();
 
       // [SSE] Player Settings Entity
-      if (m_penSettings && m_penSettings->IsActive()) {
-        CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
-
-        if (!enSettings.m_bCanPickUpArmor) {
+      if (penPlayerSettings)
+      {
+        // If armor pickup not allowed then don't do it!
+        if (!penPlayerSettings->m_bCanPickUpArmor) {
           return FALSE;
         }
 
-        fArmor *= enSettings.m_fArmorPickUpMul;
-        fTopArmor = enSettings.m_fTopArmor;
-        fMaxArmor = enSettings.m_fMaxArmor;
+        fArmor *= penPlayerSettings->m_fArmorPickUpMul;
+        fTopArmor = penPlayerSettings->m_fTopArmor;
+        fMaxArmor = penPlayerSettings->m_fMaxArmor;
       }
 
       // If item won't give any armor then pickup it always.
@@ -4168,34 +4175,38 @@ functions:
     }
 
     // *********** WEAPON ***********
-    else if (ee.ee_slEvent == EVENTCODE_EWeaponItem) {
+    else if (ee.ee_slEvent == EVENTCODE_EWeaponItem)
+    {
       // [SSE] Player Settings Entity
-      if (m_penSettings && m_penSettings->IsActive()) {
-        if (!((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpWeapons) {
+      if (penPlayerSettings)
+      {
+        if (!penPlayerSettings->m_bCanPickUpWeapons) {
           return FALSE;
         }
       }
 
       return ((CPlayerWeapons&)*m_penWeapons).ReceiveWeapon(ee);
     }
-
     // *********** AMMO ***********
-    else if (ee.ee_slEvent == EVENTCODE_EAmmoItem) {
+    else if (ee.ee_slEvent == EVENTCODE_EAmmoItem)
+    {
       // [SSE] Player Settings Entity
-      if (m_penSettings && m_penSettings->IsActive()) {
-        if (!((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpAmmo) {
+      if (penPlayerSettings)
+      {
+        if (!penPlayerSettings->m_bCanPickUpAmmo) {
           return FALSE;
         }
       }
 
       return ((CPlayerWeapons&)*m_penWeapons).ReceiveAmmo(ee);
     }
-
     // *********** AMMO PACK ***********
-    else if (ee.ee_slEvent == EVENTCODE_EAmmoPackItem) {
+    else if (ee.ee_slEvent == EVENTCODE_EAmmoPackItem)
+    {
       // [SSE] Player Settings Entity
-      if (m_penSettings && m_penSettings->IsActive()) {
-        if (!((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpAmmo) {
+      if (penPlayerSettings)
+      {
+        if (!penPlayerSettings->m_bCanPickUpAmmo) {
           return FALSE;
         }
       }
@@ -4211,8 +4222,9 @@ functions:
       }
 
       // [SSE] Player Settings Entity
-      if (m_penSettings && m_penSettings->IsActive()) {
-        if (((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpKeys) {
+      if (penPlayerSettings)
+      {
+        if (!penPlayerSettings->m_bCanPickUpKeys) {
           return FALSE;
         }
       }
@@ -4244,10 +4256,12 @@ functions:
     }
 
     // *********** POWERUPS ***********
-    else if (ee.ee_slEvent == EVENTCODE_EPowerUp) {
+    else if (ee.ee_slEvent == EVENTCODE_EPowerUp)
+    {
       // [SSE] Player Settings Entity
-      if (m_penSettings && m_penSettings->IsActive()) {
-        if (((CPlayerSettingsEntity&)*m_penSettings).m_bCanPickUpPUPS) {
+      if (penPlayerSettings)
+      {
+        if (!penPlayerSettings->m_bCanPickUpPUPS) {
           return FALSE;
         }
       }
