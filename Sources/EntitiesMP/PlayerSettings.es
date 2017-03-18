@@ -158,6 +158,22 @@ functions:
   // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const
   {
+    if (m_bUntilDeath) {
+      ((CTString&)m_strDescription).PrintF("[UD]");
+    } else {
+      ((CTString&)m_strDescription).PrintF("[Always]");
+    }
+    
+    if (m_epstType == EPST_TARGETTED) {
+      ((CTString&)m_strDescription).PrintF("%s-> Target", m_strDescription);
+      
+    } else if (m_epstType == EPST_PENCAUSED) {
+      ((CTString&)m_strDescription).PrintF("%s-> penCaused", m_strDescription);
+
+    } else {
+      ((CTString&)m_strDescription).PrintF("%s-> AllPlayers", m_strDescription);
+      
+    }
     return m_strDescription;
   }
 
