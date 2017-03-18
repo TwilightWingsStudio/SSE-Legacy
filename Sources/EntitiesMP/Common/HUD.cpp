@@ -531,7 +531,7 @@ static void HUD_DrawBorder( FLOAT fCenterX, FLOAT fCenterY, FLOAT fSizeX, FLOAT 
 // Draw icon texture (if color = NONE, use colortransitions structure).
 // --------------------------------------------------------------------------------------
 static void HUD_DrawIcon( FLOAT fCenterX, FLOAT fCenterY, CTextureObject &toIcon,
-                          COLOR colDefault, FLOAT fNormValue, BOOL bBlink)
+                          COLOR colDefault, FLOAT fNormValue, BOOL bBlink, PIX pixWidth = -1, PIX pixHeight = -1)
 {
   if (toIcon.GetData() == NULL) return;
   if (toIcon.GetData()->ad_Anims == NULL) return;
@@ -552,6 +552,15 @@ static void HUD_DrawIcon( FLOAT fCenterX, FLOAT fCenterY, CTextureObject &toIcon
 
   // determine dimensions
   CTextureData *ptd = (CTextureData*)toIcon.GetData();
+  
+  if (pixWidth <= 0) {
+    pixWidth = ptd->GetPixWidth();
+  }
+  
+  if (pixHeight <= 0) {
+    pixHeight = ptd->GetPixHeight();
+  }
+  
   const FLOAT fHalfSizeI = _fResolutionScaling*_fCustomScaling * ptd->GetPixWidth()  * 0.5f;
   const FLOAT fHalfSizeJ = _fResolutionScaling*_fCustomScaling * ptd->GetPixHeight() * 0.5f;
 
@@ -1323,7 +1332,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
   HUD_DrawBorder( fCol, fRow, fChrUnit*3, fOneUnit, colBorder);
   HUD_DrawText( fCol, fRow, strValue, colDefault, fNormValue);
   fCol -= fAdvUnit+fChrUnit*3/2 -fHalfUnit;
-  HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _toHealth, C_WHITE /*_colHUD*/, fNormValue, TRUE);
+  HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _toHealth, C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
 
   // prepare and draw armor info (eventually)
   fValue = _penPlayer->m_fArmor;
@@ -1340,11 +1349,11 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     HUD_DrawText( fCol, fRow, strValue, NONE, fNormValue);
     fCol -= fAdvUnit+fChrUnit*3/2 -fHalfUnit;
     if (fValue<=50.5f) {
-      HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _toArmorSmall, C_WHITE /*_colHUD*/, fNormValue, FALSE);
+      HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _toArmorSmall, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
     } else if (fValue<=100.5f) {
-      HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _toArmorMedium, C_WHITE /*_colHUD*/, fNormValue, FALSE);
+      HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _toArmorMedium, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
     } else {
-      HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _toArmorLarge, C_WHITE /*_colHUD*/, fNormValue, FALSE);
+      HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _toArmorLarge, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
     }
   }
 
@@ -1388,22 +1397,21 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     {
       fCol += fAdvUnit+fChrUnit*3/2 -fHalfUnit;
       HUD_DrawBorder( fCol, fRow, fOneUnit, fOneUnit, colBorder);
-      HUD_DrawIcon( fCol, fRow, *ptoCurrentAmmo, C_WHITE /*_colHUD*/, fNormValue, TRUE);
+      HUD_DrawIcon( fCol, fRow, *ptoCurrentAmmo, C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
       fCol -= fAdvUnit+fChrUnit*3/2 -fHalfUnit;
     }
 
     HUD_DrawText( fCol, fRow, strValue, NONE, fNormValue);
     fCol -= fAdvUnit+fChrUnit*3/2 -fHalfUnit;
-    HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, *ptoCurrentWeapon, C_WHITE /*_colHUD*/, fNormValue, !bDrawAmmoIcon);
+    HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, *ptoCurrentWeapon, C_WHITE /*_colHUD*/, fNormValue, !bDrawAmmoIcon, 32, 32);
 
   } else if (ptoCurrentWeapon != NULL) {
     // draw only knife or colt icons (ammo is irrelevant)
     fRow = pixBottomBound-fHalfUnit;
     fCol = 205 + fHalfUnit;
     HUD_DrawBorder( fCol, fRow, fOneUnit, fOneUnit, colBorder);
-    HUD_DrawIcon(   fCol, fRow, *ptoCurrentWeapon, C_WHITE /*_colHUD*/, fNormValue, FALSE);
+    HUD_DrawIcon(   fCol, fRow, *ptoCurrentWeapon, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
   }
-
 
   // display all ammo infos
   INDEX i;
@@ -1451,7 +1459,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     }
 
     HUD_DrawBorder( fCol,         fRow, fOneUnitS, fOneUnitS, colBombBorder);
-    HUD_DrawIcon(   fCol,         fRow, _toASeriousBomb, colBombIcon, fNormValue, FALSE);
+    HUD_DrawIcon(   fCol,         fRow, _toASeriousBomb, colBombIcon, fNormValue, FALSE, 32);
     HUD_DrawBar(    fCol+fBarPos, fRow, fOneUnitS/5, fOneUnitS-2, BO_DOWN, colBombBar, fNormValue);
     // make space for serious bomb
     fCol -= fAdvUnitS;
@@ -1477,7 +1485,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
       fNormValue = (FLOAT)ai.ai_iAmmoAmmount / ai.ai_iMaxAmmoAmmount;
       colBar = AddShaker( 4, ai.ai_iAmmoAmmount, ai.ai_iLastAmmoAmmount, ai.ai_tmAmmoChanged, fMoverX, fMoverY);
       HUD_DrawBorder( fCol,         fRow+fMoverY, fOneUnitS, fOneUnitS, colBorder);
-      HUD_DrawIcon(   fCol,         fRow+fMoverY, *_aaiAmmo[i].ai_ptoAmmo, colIcon, fNormValue, FALSE);
+      HUD_DrawIcon(   fCol,         fRow+fMoverY, *_aaiAmmo[i].ai_ptoAmmo, colIcon, fNormValue, FALSE, 32, 32);
       HUD_DrawBar(    fCol+fBarPos, fRow+fMoverY, fOneUnitS/5, fOneUnitS-2, BO_DOWN, colBar, fNormValue);
       // advance to next position
       fCol -= fAdvUnitS;
@@ -1499,7 +1507,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     fNormValue = tmDelta / ptmPowerupsMax[i];
     // draw icon and a little bar
     HUD_DrawBorder( fCol,         fRow, fOneUnitS, fOneUnitS, colBorder);
-    HUD_DrawIcon(   fCol,         fRow, _atoPowerups[i], C_WHITE /*_colHUD*/, fNormValue, TRUE);
+    HUD_DrawIcon(   fCol,         fRow, _atoPowerups[i], C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
     HUD_DrawBar(    fCol+fBarPos, fRow, fOneUnitS/5, fOneUnitS-2, BO_DOWN, NONE, fNormValue);
     // play sound if icon is flashing
     if (fNormValue<=(_cttHUD.ctt_fLowMedium/2)) {
@@ -1545,11 +1553,11 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
       // no ammo
       if (_awiWeapons[i].wi_paiAmmo!=NULL && _awiWeapons[i].wi_paiAmmo->ai_iAmmoAmmount==0) {
         HUD_DrawBorder( fCol, fRow, fOneUnit, fOneUnit, 0x22334400);
-        HUD_DrawIcon(   fCol, fRow, *_awiWeapons[i].wi_ptoWeapon, 0x22334400, 1.0f, FALSE);
+        HUD_DrawIcon(   fCol, fRow, *_awiWeapons[i].wi_ptoWeapon, 0x22334400, 1.0f, FALSE, 32, 32);
       // yes ammo
       } else {
         HUD_DrawBorder( fCol, fRow, fOneUnit, fOneUnit, colBorder);
-        HUD_DrawIcon(   fCol, fRow, *_awiWeapons[i].wi_ptoWeapon, colIcon, 1.0f, FALSE);
+        HUD_DrawIcon(   fCol, fRow, *_awiWeapons[i].wi_ptoWeapon, colIcon, 1.0f, FALSE, 32, 32);
       }
       // advance to next position
       fCol += fAdvUnit;
@@ -1587,7 +1595,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
       HUD_DrawBorder( fCol,      fRow, fOneUnit,         fOneUnit, colBorder);
       HUD_DrawBorder( fCol+fAdv, fRow, fOneUnit*4,       fOneUnit, colBorder);
       HUD_DrawBar(    fCol+fAdv, fRow, fOneUnit*4*0.975, fOneUnit*0.9375, BO_LEFT, NONE, fNormValue);
-      HUD_DrawIcon(   fCol,      fRow, _toOxygen, C_WHITE /*_colHUD*/, fNormValue, TRUE);
+      HUD_DrawIcon(   fCol,      fRow, _toOxygen, C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
       bOxygenOnScreen = TRUE;
     }
   }
@@ -1622,7 +1630,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
       HUD_DrawBorder( fCol,      fRow, fOneUnit,          fOneUnit, colBorder);
       HUD_DrawBorder( fCol+fAdv, fRow, fOneUnit*16,       fOneUnit, colBorder);
       HUD_DrawBar(    fCol+fAdv, fRow, fOneUnit*16*0.995, fOneUnit*0.9375, BO_LEFT, NONE, fNormValue);
-      HUD_DrawIcon(   fCol,      fRow, _toHealth, C_WHITE /*_colHUD*/, fNormValue, FALSE);
+      HUD_DrawIcon(   fCol,      fRow, _toHealth, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
     }
   }
 
@@ -1847,7 +1855,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
   HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
   HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
   HUD_DrawText(   fCol+fAdv, fRow, strValue, colScore, 1.0f);
-  HUD_DrawIcon(   fCol,      fRow, _toFrags, C_WHITE /*colScore*/, 1.0f, FALSE);
+  HUD_DrawIcon(   fCol,      fRow, _toFrags, C_WHITE /*colScore*/, 1.0f, FALSE, 32, 32);
   
   // [SSE] HUD - Personal/Shared Extra Lives
   if ((bSinglePlay || bCooperative) && GetSP()->sp_ctCredits >= 0)
@@ -1861,7 +1869,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
     HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
     HUD_DrawText(   fCol+fAdv, fRow, strValue,  C_lGRAY, 1.0f);
-    HUD_DrawIcon(   fCol,      fRow, _toExtraLive, C_WHITE /*colMana*/, 1.0f, FALSE);
+    HUD_DrawIcon(   fCol,      fRow, _toExtraLive, C_WHITE /*colMana*/, 1.0f, FALSE, 32, 32);
   }
   //
 
@@ -1876,7 +1884,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
     HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
     HUD_DrawText(   fCol+fAdv, fRow, strValue,  colMana, 1.0f);
-    HUD_DrawIcon(   fCol,      fRow, _toDeaths, C_WHITE /*colMana*/, 1.0f, FALSE);
+    HUD_DrawIcon(   fCol,      fRow, _toDeaths, C_WHITE /*colMana*/, 1.0f, FALSE, 32, 32);
   }
 
   // if single player or cooperative mode
@@ -1891,7 +1899,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     HUD_DrawBorder( fCol,      fRow, fOneUnit,   fOneUnit, colBorder);
     HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*8, fOneUnit, colBorder);
     HUD_DrawText(   fCol+fAdv, fRow, strValue, NONE, bBeating ? 0.0f : 1.0f);
-    HUD_DrawIcon(   fCol,      fRow, _toHiScore, C_WHITE /*_colHUD*/, 1.0f, FALSE);
+    HUD_DrawIcon(   fCol,      fRow, _toHiScore, C_WHITE /*_colHUD*/, 1.0f, FALSE, 32, 32);
 
     // prepare and draw unread messages
     if (hud_bShowMessages && _penPlayer->m_ctUnreadMessages > 0) {
@@ -1920,7 +1928,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
       HUD_DrawBorder( fCol,      fRow, fOneUnit,   fOneUnit, col);
       HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*4, fOneUnit, col);
       HUD_DrawText(   fCol+fAdv, fRow, strValue,   col, 1.0f);
-      HUD_DrawIcon(   fCol,      fRow, _toMessage, C_WHITE /*col*/, 0.0f, TRUE);
+      HUD_DrawIcon(   fCol,      fRow, _toMessage, C_WHITE /*col*/, 0.0f, TRUE, 32 ,32);
     }
   }
 
