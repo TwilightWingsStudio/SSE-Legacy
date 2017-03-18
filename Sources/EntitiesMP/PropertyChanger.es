@@ -33,6 +33,60 @@ enum EOperation {
  10  EO_EXCLUDEBIT "&= ~(1 << X) (index only)",
 };
 
+%{
+static CTString GetNameForEPT(CEntityProperty::PropertyType eptType)
+{
+  switch (eptType)
+  {
+    case CEntityProperty::EPT_PARENT:           return "CEntityPointer";
+    case CEntityProperty::EPT_SPAWNFLAGS:       return "SPAWNFLAGS";
+    case CEntityProperty::EPT_ENUM:             return "ENUM";
+    case CEntityProperty::EPT_BOOL:             return "BOOL";
+    case CEntityProperty::EPT_FLOAT:            return "FLOAT";
+    case CEntityProperty::EPT_COLOR:            return "COLOR";
+    case CEntityProperty::EPT_STRING:           return "CTString";
+    case CEntityProperty::EPT_RANGE:            return "RANGE";
+    case CEntityProperty::EPT_ENTITYPTR:        return "CEntityPointer";
+    case CEntityProperty::EPT_FILENAME:         return "CTFileName";
+    case CEntityProperty::EPT_INDEX:            return "INDEX";
+    case CEntityProperty::EPT_ANIMATION:        return "ANIMATION";
+    case CEntityProperty::EPT_ILLUMINATIONTYPE: return "ILLUMINATION";
+    case CEntityProperty::EPT_FLOATAABBOX3D:    return "FLOATAABBox3D";
+    case CEntityProperty::EPT_ANGLE:            return "ANGLE";
+    case CEntityProperty::EPT_FLOAT3D:          return "FLOAT3D";
+    case CEntityProperty::EPT_ANGLE3D:          return "ANGLE3D";
+    case CEntityProperty::EPT_FLOATplane3D:     return "FLOATplane3D";
+    case CEntityProperty::EPT_MODELOBJECT:      return "CModelObject";
+    case CEntityProperty::EPT_PLACEMENT3D:      return "CPlacement3D";
+    case CEntityProperty::EPT_ANIMOBJECT:       return "CAnimObject";
+    case CEntityProperty::EPT_FILENAMENODEP:    return "CTFileName";
+    case CEntityProperty::EPT_SOUNDOBJECT:      return "CSoundObject";
+    case CEntityProperty::EPT_STRINGTRANS:      return "CTString";
+    case CEntityProperty::EPT_FLOATQUAT3D:      return "FLOAtquat3D";
+    case CEntityProperty::EPT_FLOATMATRIX3D:    return "FLOATmatrix3D";
+    case CEntityProperty::EPT_FLAGS:            return "FLAGS";
+    case CEntityProperty::EPT_MODELINSTANCE:    return "CModelInstance";
+
+    default: return "UNKNOWN";
+  }
+}
+
+static inline BOOL IsIndexEPT(CEntityProperty::PropertyType eptProperty)
+{
+  switch (eptProperty)
+  {
+    case CEntityProperty::EPT_INDEX: return TRUE;
+    case CEntityProperty::EPT_ENUM: return TRUE;
+    case CEntityProperty::EPT_FLAGS: return TRUE;
+    case CEntityProperty::EPT_ANIMATION: return TRUE;
+    case CEntityProperty::EPT_ILLUMINATIONTYPE: return TRUE;
+    case CEntityProperty::EPT_COLOR: return TRUE;
+  }
+  
+  return FALSE;
+}
+%}
+
 class CPropertyChanger: CEntity {
 name      "PropertyChanger";
 thumbnail "Thumbnails\\PropertyChanger.tbn";
@@ -108,9 +162,9 @@ functions:
     }
   }
   
-  FLOAT GetFSource()
+  FLOAT GeNonEPFloatSource()
   {
-    // Position and orientation.
+    // Position and orientation BEGIN.
     if (m_eSourcePT == ECT_POSX) {
       return m_penSource->GetPlacement().pl_PositionVector(1);
 
@@ -129,6 +183,7 @@ functions:
     } else if (m_eSourcePT == ECT_ROTB) {
       return m_penSource->GetPlacement().pl_OrientationAngle(3);
     }
+    // Position and Orientation END.
 
     BOOL bIsMovableEntity = IsDerivedFromClass(m_penSource, "MovableEntity");
     BOOL bError = FALSE;
@@ -231,16 +286,16 @@ functions:
 
     // Get the target property.
     CEntityProperty *pTargetProperty = NULL;
+    BOOL bTargetIsProperty = m_eTargetPT == ECT_ENTITY || m_eTargetPT == ECT_PROPBYID;
 
-    if ((m_eTargetPT == ECT_ENTITY || m_eTargetPT == ECT_PROPBYID) && m_strTargetProperty.Length() == 0)
+    if (bTargetIsProperty && m_strTargetProperty.Length() == 0)
     {
       if (m_bDebugMessages) {
-        CPrintF(TRANS("[PC] %s : Property name is empty!\n"), m_strName);
+        CPrintF(TRANS("[PC] %s : [Target Property Name] is empty!\n"), m_strName);
       }
 
       return;
     }
-    
 
     if (m_eTargetPT == ECT_PROPBYID)
     {
@@ -283,18 +338,24 @@ functions:
     // If invalid property.
     if (pTargetProperty == NULL && m_eTargetPT == ECT_ENTITY) { 
       if (m_bDebugMessages) {
-        CPrintF(TRANS("[PC] %s : Property with name '%s' not found!\n"), m_strName, m_strTargetProperty);
+        CPrintF(TRANS("[PC] %s : Error! Property with name '%s' not found!\n"), m_strName, m_strTargetProperty);
       }
 
       return;
+
     } else if (pTargetProperty == NULL && m_eTargetPT == ECT_PROPBYID) {
       if (m_bDebugMessages) {
-        CPrintF(TRANS("[PC] %s : Property with id '%s' not found!\n"), m_strName, m_strTargetProperty);
+        CPrintF(TRANS("[PC] %s : Error! Property with ID '%s' not found!\n"), m_strName, m_strTargetProperty);
       }
       
       return;
     }
 
+    if (m_bDebugMessages && pTargetProperty)
+    {
+      CPrintF(TRANS("[PC] %s : Target Entity Property Type is %s\n"), m_strName, GetNameForEPT(pTargetProperty->ep_eptType));
+    }
+      
     CEntityProperty *pSourceProperty = NULL;
     BOOL bSourceIsProperty = m_eSourcePT == ECT_ENTITY || m_eSourcePT == ECT_PROPBYID;
 
@@ -336,8 +397,13 @@ functions:
         pSourceProperty = m_penSource->PropertyForName(m_strSourceProperty);
       }
     }
+    
+    if (m_bDebugMessages && pSourceProperty)
+    {
+      CPrintF(TRANS("[PC] %s : Source Entity Property Type is %s\n"), m_strName, GetNameForEPT(pSourceProperty->ep_eptType));
+    }
 
-    if (m_eTargetPT == ECT_ENTITY || m_eTargetPT == ECT_PROPBYID) {
+    if (bTargetIsProperty) {
       SLONG offset = pTargetProperty->ep_slOffset; 
       CEntityProperty::PropertyType eptType = pTargetProperty->ep_eptType;
 
@@ -359,14 +425,14 @@ functions:
               if (eptSourceType == CEntityProperty::EPT_FLOAT) {
                 SLONG offset1 = pSourceProperty->ep_slOffset; 
                 fNew = ((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-              } else if (eptSourceType == CEntityProperty::EPT_INDEX) {
+              } else if (eptSourceType == CEntityProperty::EPT_INDEX || eptSourceType == CEntityProperty::EPT_ENUM) {
                 SLONG offset1 = pSourceProperty->ep_slOffset;
                 *fNew = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
               }
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
-            FLOAT fSrc = GetFSource();
+            FLOAT fSrc = GeNonEPFloatSource();
             *fNew = *((FLOAT*)&fSrc);
           }
         }
@@ -398,8 +464,18 @@ functions:
         if (m_bDebugMessages && !bErrorOccured)
         {
           CPrintF(TRANS("[PC] %s : Target Entity Property: [%s].[%s] is currently (FLOAT)%f\n"), m_strName, ((CEntity&)*m_penTarget).GetName(), m_strTargetProperty, fOld);
-          if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_INDEX) {
-            CPrintF(TRANS("[PC] %s : Source Entity Property: [%s].[%s] is currently (FLOAT)%f\n"), m_strName, ((CEntity&)*m_penSource).GetName(), m_strSourceProperty, *fNew);
+
+          
+          if (m_penSource != NULL && pSourceProperty != NULL) {
+            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+            
+            if (eptSourceType == CEntityProperty::EPT_FLOAT || eptSourceType == CEntityProperty::EPT_INDEX || eptSourceType == CEntityProperty::EPT_ENUM) {
+              CPrintF(TRANS("[PC] %s : Source Entity Property: [%s].[%s] is currently (FLOAT)%f\n"), m_strName, ((CEntity&)*m_penSource).GetName(), m_strSourceProperty, *fNew);
+            } else {
+              CPrintF(TRANS("[PC] %s : Source Entity Property: [%s].[%s] have incompatable type!\n"), m_strName, ((CEntity&)*m_penSource).GetName(), m_strSourceProperty);
+              CPrintF(TRANS("[PC] %s : Using [Value Float] Instead: (FLOAT)%F\n"), m_strName, m_fValue);
+            }
+
           } else {
             CPrintF(TRANS("[PC] %s : Source Value: (FLOAT)%F\n"), m_strName, m_fValue);
           }
@@ -463,13 +539,14 @@ functions:
         }
 
       // INDEX
-      } else if (eptType == CEntityProperty::EPT_INDEX) {
+      } else if (IsIndexEPT(eptType)) {
         INDEX *iValue = ((INDEX *)(((UBYTE *)(CEntity*)&*m_penTarget) + offset)); 
         INDEX iOld = *iValue;
         INDEX *iNew = &m_iValue;
 
         // If we have source target.
-        if (m_penSource != NULL) {
+        if (m_penSource != NULL)
+        {
           // If property is entity property.
           if (bSourceIsProperty) {
             // If entity property exists.
@@ -477,17 +554,19 @@ functions:
               CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
               
               // Here is support for both INDEX and FLOAT.
-              if (eptSourceType == CEntityProperty::EPT_INDEX) {
+              if (IsIndexEPT(eptSourceType)) {
                 SLONG offset1 = pSourceProperty->ep_slOffset; 
                 iNew = ((INDEX *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
+
               } else if (eptSourceType == CEntityProperty::EPT_FLOAT) {
                 SLONG offset1 = pSourceProperty->ep_slOffset;
                 *iNew = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1));
               }
             }
+
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
-            FLOAT fSrc = GetFSource();
+            FLOAT fSrc = GeNonEPFloatSource();
             *iNew = *((FLOAT *)&fSrc);
           }
         }
@@ -546,11 +625,23 @@ functions:
         // If debug messages enabled and no errors then printout some text into console.
         if (m_bDebugMessages && !bErrorOccured)
         {
-          CPrintF(TRANS("[PC] %s : Target Entity Property: [%s].[%s] is currently (INDEX)%d\n"), m_strName, ((CEntity&)*m_penTarget).GetName(), m_strTargetProperty, iOld);
-          if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_INDEX) {
-            CPrintF(TRANS("[PC] %s : Source Entity Property: [%s].[%s] is currently (INDEX)%d\n"), m_strName, ((CEntity&)*m_penSource).GetName(), m_strSourceProperty, *iNew);
+          CPrintF(TRANS("[PC] %s : Target Entity Property: [%s].[%s] is currently (%s)%d\n"), m_strName, ((CEntity&)*m_penTarget).GetName(), m_strTargetProperty, GetNameForEPT(pSourceProperty->ep_eptType), iOld);
+
+          if (m_penSource != NULL && pSourceProperty != NULL) {
+            CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
+
+            if (IsIndexEPT(eptSourceType)) {
+              CPrintF(TRANS("[PC] %s : Source Entity Property: [%s].[%s] is currently (%s)%d\n"), m_strName, ((CEntity&)*m_penSource).GetName(), m_strSourceProperty, GetNameForEPT(eptSourceType), *iNew);
+            
+            } else if (eptSourceType == CEntityProperty::EPT_FLOAT) {
+              CPrintF(TRANS("[PC] %s : Source Entity Property: [%s].[%s] is currently (INDEX)%d\n"), m_strName, ((CEntity&)*m_penSource).GetName(), m_strSourceProperty, *iNew);
+
+            } else  {
+              CPrintF(TRANS("[PC] %s : Source Entity Property: [%s].[%s] have incompatable type!\n"), m_strName, ((CEntity&)*m_penSource).GetName(), m_strSourceProperty);
+              CPrintF(TRANS("[PC] %s : Using [Source Value] Instead: (INDEX)%d\n"), m_strName, m_iValue);
+            }
           } else {
-            CPrintF(TRANS("[PC] %s : Source Value: (INDEX)%d\n"), m_strName, m_iValue);
+            CPrintF(TRANS("  Source Value = (INDEX)%d\n"), m_strName, m_iValue);
           }
 
           if (m_eOperation == EO_SET) {
@@ -558,23 +649,23 @@ functions:
             CPrintF(TRANS("  Result = %d\n"), *iValue);
 
           } else if (m_eOperation == EO_ADD) {
-            CPrintF(TRANS("  Expression : [%s] = (INDEX)%d + (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+            CPrintF(TRANS("  Expression : [%s] = (%s)%d + (INDEX)%d\n"), m_strTargetProperty, GetNameForEPT(eptType), iOld, *iNew);
             CPrintF(TRANS("  Result = %d\n"), *iValue);
 
           } else if (m_eOperation == EO_SUBSTRACT) {
-            CPrintF(TRANS("  Expression : [%s] = (INDEX)%d - (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+            CPrintF(TRANS("  Expression : [%s] = (%s)%d - (INDEX)%d\n"), m_strTargetProperty, GetNameForEPT(eptType), iOld, *iNew);
             CPrintF(TRANS("  Result = %d\n"), *iValue);
 
           } else if (m_eOperation == EO_MULTIPLY) {
-            CPrintF(TRANS("  Expression : [%s] = (INDEX)%d * (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+            CPrintF(TRANS("  Expression : [%s] = (%s)%d * (INDEX)%d\n"), m_strTargetProperty, GetNameForEPT(eptType), iOld, *iNew);
             CPrintF(TRANS("  Result = %d\n"), *iValue);
 
           } else if (m_eOperation == EO_DIVIDE) {
-            CPrintF(TRANS("  Expression : [%s] = (INDEX)%d / (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+            CPrintF(TRANS("  Expression : [%s] = (%s)%d / (INDEX)%d\n"), m_strTargetProperty, GetNameForEPT(eptType), iOld, *iNew);
             CPrintF(TRANS("  Result = %d\n"), *iValue);
 
           } else if (m_eOperation == EO_REMAINDER) {
-            CPrintF(TRANS("  Expression : [%s] = (INDEX)%d %% (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+            CPrintF(TRANS("  Expression : [%s] = (%s)%d %% (INDEX)%d\n"), m_strTargetProperty, GetNameForEPT(eptType), iOld, *iNew);
             CPrintF(TRANS("  Result = %d\n"), *iValue);
 
           } else if (m_eOperation == EO_INCLUDEBIT || m_eOperation == EO_EXCLUDEBIT || m_eOperation == EO_BITAND || m_eOperation == EO_BITOR || m_eOperation == EO_XOR) {
@@ -587,19 +678,23 @@ functions:
             GetBinaryStringFromIndex(strBinaryResult, *iValue);
             
             INDEX iNewNew = *iNew;
-            
+
             if (m_eOperation == EO_INCLUDEBIT) {
-              CPrintF(TRANS("  Expression : [%s] = (INDEX)%d | (1 << %d)\n"), m_strTargetProperty, iOld, *iNew);
+              CPrintF(TRANS("  Expression : [%s] = (%s)%d | (1 << %d)\n"), m_strTargetProperty, GetNameForEPT(eptType), iOld, *iNew);
               iNewNew = 1 << *iNew;
+
             } else if (m_eOperation == EO_EXCLUDEBIT) {
-              CPrintF(TRANS("  Expression : [%s] = (INDEX)%d &~ (1 << %d)\n"), m_strTargetProperty, iOld, *iNew);
+              CPrintF(TRANS("  Expression : [%s] = (%s)%d &~ (1 << %d)\n"), m_strTargetProperty, GetNameForEPT(eptType), iOld, *iNew);
               iNewNew = 1 << *iNew;
+
             } else if (m_eOperation == EO_BITOR) {
-              CPrintF(TRANS("  Expression : [%s] = (INDEX)%d | (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+              CPrintF(TRANS("  Expression : [%s] = (%s)%d | (INDEX)%d\n"), m_strTargetProperty, GetNameForEPT(eptType), iOld, *iNew);
+
             } else if (m_eOperation == EO_BITAND) {
-              CPrintF(TRANS("  Expression : [%s] = (INDEX)%d & (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+              CPrintF(TRANS("  Expression : [%s] = (%s)%d & (INDEX)%d\n"), m_strTargetProperty, GetNameForEPT(eptType), iOld, *iNew);
+
             } else {
-              CPrintF(TRANS("  Expression : [%s] = (INDEX)%d XOR (INDEX)%d\n"), m_strTargetProperty, iOld, *iNew);
+              CPrintF(TRANS("  Expression : [%s] = (%s)%d XOR (INDEX)%d\n"), m_strTargetProperty, GetNameForEPT(eptType), iOld, *iNew);
             }
 
             GetBinaryStringFromIndex(strBinaryNew, iNewNew);
@@ -626,18 +721,6 @@ functions:
         } else {
           *bValue = *bNew;
         }
-
-      // COLOR
-      } else if (eptType == CEntityProperty::EPT_COLOR) {
-        COLOR *cValue = ((COLOR *)(((UBYTE *)(CEntity*)&*m_penTarget) + offset)); 
-        COLOR *cNew = &m_cValue;
-
-        if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_COLOR) {
-          SLONG offset1 = pSourceProperty->ep_slOffset; 
-          cNew=((COLOR *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-        }
-
-        *cValue= *cNew;
 
       // CTString
       } else if (eptType == CEntityProperty::EPT_STRING) {
@@ -699,18 +782,6 @@ functions:
 
         *fnValue = *fnNew;
 
-      // Animation
-      } else if (eptType == CEntityProperty::   EPT_ANIMATION) {
-        ANIMATION *aValue = ((ANIMATION *)(((UBYTE *)(CEntity*)&*m_penTarget)+offset)); 
-        ANIMATION *aNew = &m_aValue;
-
-        if (m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_ANIMATION) {
-          SLONG offset1 = pSourceProperty->ep_slOffset; 
-          aNew = ((ANIMATION *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
-        }
-
-        *aValue = *aNew;
-
       // ANGLE
       } else if (eptType == CEntityProperty::EPT_ANGLE) {
         ANGLE *anValue = ((ANGLE *)(((UBYTE *)(CEntity*)&*m_penTarget) + offset)); 
@@ -756,6 +827,10 @@ functions:
         } else {
           *an3dValue = *anNew;
         }
+      } else {
+        if (m_bDebugMessages) {
+          CPrintF("[PC] %s : Unknown target property type!\n", m_strName);
+        }
       }
 
     } else if (m_eTargetPT == ECT_POSX) {
@@ -782,7 +857,7 @@ functions:
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
-          FLOAT fSrc = GetFSource();
+          FLOAT fSrc = GeNonEPFloatSource();
           fNew = &fSrc;
         }
       }
@@ -831,7 +906,7 @@ functions:
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
-          FLOAT fSrc = GetFSource();
+          FLOAT fSrc = GeNonEPFloatSource();
           fNew = &fSrc;
         }
       }
@@ -880,7 +955,7 @@ functions:
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
-          FLOAT fSrc = GetFSource();
+          FLOAT fSrc = GeNonEPFloatSource();
           fNew = &fSrc;
         }
       }
@@ -929,7 +1004,7 @@ functions:
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
-          FLOAT fSrc = GetFSource();
+          FLOAT fSrc = GeNonEPFloatSource();
           fNew = &fSrc;
         }
       }
@@ -978,7 +1053,7 @@ functions:
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
-          FLOAT fSrc = GetFSource();
+          FLOAT fSrc = GeNonEPFloatSource();
           fNew = &fSrc;
         }
       }
@@ -1027,7 +1102,7 @@ functions:
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
-          FLOAT fSrc = GetFSource();
+          FLOAT fSrc = GeNonEPFloatSource();
           fNew = &fSrc;
         }
       }
@@ -1076,7 +1151,7 @@ functions:
           }
         // If source type isn't classname.
         } else if (m_eSourcePT != ECT_TYPE) {
-          FLOAT fSrc = GetFSource();
+          FLOAT fSrc = GeNonEPFloatSource();
           fNew = &fSrc;
         }
       }
@@ -1125,7 +1200,7 @@ functions:
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
-            FLOAT fSrc = GetFSource();
+            FLOAT fSrc = GeNonEPFloatSource();
             fNew = &fSrc;
           }
         }
@@ -1176,7 +1251,7 @@ functions:
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
-            FLOAT fSrc = GetFSource();
+            FLOAT fSrc = GeNonEPFloatSource();
             fNew = &fSrc;
           }
         }
@@ -1227,7 +1302,7 @@ functions:
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
-            FLOAT fSrc = GetFSource();
+            FLOAT fSrc = GeNonEPFloatSource();
             fNew = &fSrc;
           }
         }
@@ -1278,7 +1353,7 @@ functions:
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
-            FLOAT fSrc = GetFSource();
+            FLOAT fSrc = GeNonEPFloatSource();
             fNew = &fSrc;
           }
         }
@@ -1329,7 +1404,7 @@ functions:
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
-            FLOAT fSrc = GetFSource();
+            FLOAT fSrc = GeNonEPFloatSource();
             fNew = &fSrc;
           }
         }
@@ -1380,7 +1455,7 @@ functions:
             }
           // If source type isn't classname.
           } else if (m_eSourcePT != ECT_TYPE) {
-            FLOAT fSrc = GetFSource();
+            FLOAT fSrc = GeNonEPFloatSource();
             fNew = &fSrc;
           }
         }
@@ -1435,6 +1510,11 @@ procedures:
   // --------------------------------------------------------------------------------------
   Main()
   {
+    if (m_eTargetPT == ECT_TYPE) {
+      m_eTargetPT = ECT_ENTITY;
+      WarningMessage("[Target Property Type] can't be ""Entity Class""!\nIt is impossible to change entity class!");
+    } 
+    
     InitAsEditorModel();
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
     SetCollisionFlags(ECF_IMMATERIAL);
