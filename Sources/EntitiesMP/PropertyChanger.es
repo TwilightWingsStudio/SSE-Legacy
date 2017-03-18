@@ -197,7 +197,7 @@ functions:
     if (m_eSourcePT == ECT_HEALTH) {
       return ((CLiveEntity&)*m_penSource).GetHealth();
     } else {
-      CPrintF("%s : Shit happened with FSource! Tell to DEV!", GetName());
+      CPrintF("%s : Shit happened with FSource! Tell to DEV!\n", GetName());
       return 0.0F;
     }
   }
@@ -231,7 +231,7 @@ functions:
 
     // Get the target property.
     CEntityProperty *pTargetProperty = NULL;
-    
+
     if ((m_eTargetPT == ECT_ENTITY || m_eTargetPT == ECT_PROPBYID) && m_strTargetProperty.Length() == 0)
     {
       if (m_bDebugMessages) {
@@ -296,6 +296,7 @@ functions:
     }
 
     CEntityProperty *pSourceProperty = NULL;
+    BOOL bSourceIsProperty = m_eSourcePT == ECT_ENTITY || m_eSourcePT == ECT_PROPBYID;
 
     // If we have source entity and source procperty type is entity property. Then receive its property!
     if (m_penSource != NULL)
@@ -349,7 +350,7 @@ functions:
         // If we have source target.
         if (m_penSource != NULL) {
           // If property is entity property.
-          if (m_eSourcePT == ECT_ENTITY) {
+          if (bSourceIsProperty) {
             // If entity property exists.
             if (pSourceProperty != NULL) {
               CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -435,7 +436,7 @@ functions:
         CEntityPointer penOld = *penPointer;
         CEntityPointer *penNew = &m_penValue;
         
-        if (m_eSourcePT == ECT_ENTITY && m_penSource != NULL && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_ENTITYPTR) {
+        if (m_penSource != NULL && bSourceIsProperty && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_ENTITYPTR) {
           SLONG offset1 = pSourceProperty->ep_slOffset; 
           penNew = ((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
         }
@@ -470,7 +471,7 @@ functions:
         // If we have source target.
         if (m_penSource != NULL) {
           // If property is entity property.
-          if (m_eSourcePT == ECT_ENTITY) {
+          if (bSourceIsProperty) {
             // If entity property exists.
             if (pSourceProperty != NULL) {
               CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -643,8 +644,9 @@ functions:
         CTString *strValue = ((CTString *)(((UBYTE *)(CEntity*)&*m_penTarget) + offset)); 
         CTString *strNew = &m_strValue;
         
-        if (m_penSource != NULL) {
-          if (m_eSourcePT == ECT_ENTITY && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_STRING) {
+        if (m_penSource != NULL)
+        {
+          if (bSourceIsProperty && pSourceProperty != NULL && pSourceProperty->ep_eptType == CEntityProperty::EPT_STRING) {
             SLONG offset1 = pSourceProperty->ep_slOffset; 
             strNew = ((CTString *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
           } else if (m_eSourcePT == ECT_TYPE) {
@@ -764,7 +766,7 @@ functions:
       // If we have source target.
       if (m_penSource != NULL) {
         // If property is entity property.
-        if (m_eSourcePT == ECT_ENTITY) {
+        if (bSourceIsProperty) {
           // If entity property exists.
           if (pSourceProperty != NULL) {
             CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -813,7 +815,7 @@ functions:
       // If we have source target.
       if (m_penSource != NULL) {
         // If property is entity property.
-        if (m_eSourcePT == ECT_ENTITY) {
+        if (bSourceIsProperty) {
           // If entity property exists.
           if (pSourceProperty != NULL) {
             CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -862,7 +864,7 @@ functions:
       // If we have source target.
       if (m_penSource != NULL) {
         // If property is entity property.
-        if (m_eSourcePT == ECT_ENTITY) {
+        if (bSourceIsProperty) {
           // If entity property exists.
           if (pSourceProperty != NULL) {
             CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -911,7 +913,7 @@ functions:
       // If we have source target.
       if (m_penSource != NULL) {
         // If property is entity property.
-        if (m_eSourcePT == ECT_ENTITY) {
+        if (bSourceIsProperty) {
           // If entity property exists.
           if (pSourceProperty != NULL) {
             CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -960,7 +962,7 @@ functions:
       // If we have source target.
       if (m_penSource != NULL) {
         // If property is entity property.
-        if (m_eSourcePT == ECT_ENTITY) {
+        if (bSourceIsProperty) {
           // If entity property exists.
           if (pSourceProperty != NULL) {
             CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -1009,7 +1011,7 @@ functions:
       // If we have source target.
       if (m_penSource != NULL) {
         // If property is entity property.
-        if (m_eSourcePT == ECT_ENTITY) {
+        if (bSourceIsProperty) {
           // If entity property exists.
           if (pSourceProperty != NULL) {
             CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -1058,7 +1060,7 @@ functions:
       // If we have source target.
       if (m_penSource != NULL) {
         // If property is entity property.
-        if (m_eSourcePT == ECT_ENTITY) {
+        if (bSourceIsProperty) {
           // If entity property exists.
           if (pSourceProperty != NULL) {
             CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -1107,7 +1109,7 @@ functions:
         // If we have source target.
         if (m_penSource != NULL) {
           // If property is entity property.
-          if (m_eSourcePT == ECT_ENTITY) {
+          if (bSourceIsProperty) {
             // If entity property exists.
             if (pSourceProperty != NULL) {
               CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -1158,7 +1160,7 @@ functions:
         // If we have source target.
         if (m_penSource != NULL) {
           // If property is entity property.
-          if (m_eSourcePT == ECT_ENTITY) {
+          if (bSourceIsProperty) {
             // If entity property exists.
             if (pSourceProperty != NULL) {
               CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -1209,7 +1211,7 @@ functions:
         // If we have source target.
         if (m_penSource != NULL) {
           // If property is entity property.
-          if (m_eSourcePT == ECT_ENTITY) {
+          if (bSourceIsProperty) {
             // If entity property exists.
             if (pSourceProperty != NULL) {
               CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -1260,7 +1262,7 @@ functions:
         // If we have source target.
         if (m_penSource != NULL) {
           // If property is entity property.
-          if (m_eSourcePT == ECT_ENTITY) {
+          if (bSourceIsProperty) {
             // If entity property exists.
             if (pSourceProperty != NULL) {
               CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -1311,7 +1313,7 @@ functions:
         // If we have source target.
         if (m_penSource != NULL) {
           // If property is entity property.
-          if (m_eSourcePT == ECT_ENTITY) {
+          if (bSourceIsProperty) {
             // If entity property exists.
             if (pSourceProperty != NULL) {
               CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -1362,7 +1364,7 @@ functions:
         // If we have source target.
         if (m_penSource != NULL) {
           // If property is entity property.
-          if (m_eSourcePT == ECT_ENTITY) {
+          if (bSourceIsProperty) {
             // If entity property exists.
             if (pSourceProperty != NULL) {
               CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
