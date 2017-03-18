@@ -155,6 +155,7 @@ static CTextureObject _toExtraLive; // [SSE]
 static CTextureObject _toTestIken; // [SSE]
 
 // ammo textures
+static CTextureObject _toAColt;
 static CTextureObject _toAShells;
 static CTextureObject _toABullets;
 static CTextureObject _toARockets;
@@ -1369,10 +1370,10 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     strValue.PrintF( "%d", (SLONG)ceil(fValue));
     PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.30f, 0.15f, FALSE);
     BOOL bDrawAmmoIcon = _fCustomScaling<=1.0f;
-    
+
     // [SSE] Colt Bullets
     if (bAnyColt) {
-      bDrawAmmoIcon = FALSE;
+      ptoCurrentAmmo = &_toAColt;
     }
 
     // draw ammo, value and weapon
@@ -1383,7 +1384,8 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     fCol += fAdvUnit+fChrUnit*3/2 -fHalfUnit;
     HUD_DrawBorder( fCol, fRow, fChrUnit*3, fOneUnit, colBorder);
 
-    if (bDrawAmmoIcon) {
+    if (bDrawAmmoIcon)
+    {
       fCol += fAdvUnit+fChrUnit*3/2 -fHalfUnit;
       HUD_DrawBorder( fCol, fRow, fOneUnit, fOneUnit, colBorder);
       HUD_DrawIcon( fCol, fRow, *ptoCurrentAmmo, C_WHITE /*_colHUD*/, fNormValue, TRUE);
@@ -2065,6 +2067,7 @@ static void HUD_RegisterTextures()
   HUD_RegisterTexture(&_toExtraLive,  CTFILENAME("TexturesMP\\Interface\\IExtraLive.tex"));
 
   // initialize ammo textures
+  HUD_RegisterTexture(&_toAColt,          CTFILENAME("TexturesMP\\Interface\\AmColt.tex"));
   HUD_RegisterTexture(&_toAShells,        CTFILENAME("TexturesMP\\Interface\\AmShells.tex"));
   HUD_RegisterTexture(&_toABullets,       CTFILENAME("TexturesMP\\Interface\\AmBullets.tex"));
   HUD_RegisterTexture(&_toARockets,       CTFILENAME("TexturesMP\\Interface\\AmRockets.tex"));
