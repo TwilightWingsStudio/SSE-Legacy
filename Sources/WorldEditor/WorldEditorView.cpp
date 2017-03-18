@@ -2078,8 +2078,14 @@ void CWorldEditorView::MarkClosestVtxAndEdgeOnPrimitiveBase(CPoint point)
       m_iDragVertice = iVtx;
     }
   }
-  // when we found closest vertice, remember its current position
-  m_vStartDragVertice = theApp.m_vfpCurrent.vfp_avVerticesOnBaseOfPrimitive[ m_iDragVertice];
+
+  // [SSE] SED Assert Fix
+  if (m_iDragVertice != -1)
+  {
+    // when we found closest vertice, remember its current position
+    m_vStartDragVertice = theApp.m_vfpCurrent.vfp_avVerticesOnBaseOfPrimitive[m_iDragVertice];
+  }
+
   if( m_iDragEdge != -1)
   {
     INDEX iEdgeEnd = (m_iDragEdge+1)%vtxCt;
@@ -2923,7 +2929,10 @@ void CWorldEditorView::InvokeSelectLayerCombo(void)
   CCustomComboWnd *pCombo=new CCustomComboWnd;
   CTerrain *ptrTerrain=crRayHit.cr_penHit->GetTerrain();
   if(ptrTerrain==NULL) return;
-  INDEX ctLayers=ptrTerrain->tr_atlLayers.Count();
+  
+  extern INDEX InsertItemMacro(CCustomComboWnd *pCC, CTString strText, INDEX iIcon = -1, INDEX iValue = -1, COLOR col = 0);
+  InsertItemMacro( pCombo, "------------------------------------", -1, -1, C_BLACK|OPAQUE);
+    /*INDEX ctLayers=ptrTerrain->tr_atlLayers.Count();
   for(INDEX iLayer=ctLayers-1; iLayer>=0; iLayer--)
   {
     CTString strLayerName;
@@ -2936,8 +2945,9 @@ void CWorldEditorView::InvokeSelectLayerCombo(void)
     }
     if(ubPower==255) break;
   }
+  */
   GetCursorPos( &pt);
-  pCombo->Initialize(NULL, SelectLayerCommand, pt.x-8, pt.y-8, TRUE);
+  pCombo->Initialize(NULL, SelectLayerCommand, pt.x-8, pt.y-8/*, TRUE*/);
 }
 
 void CWorldEditorView::OnRButtonDown(UINT nFlags, CPoint point)
@@ -8067,7 +8077,8 @@ void CWorldEditorView::GetToolTipText( char *pToolTipText)
     pdecDLLClass = penEntity->GetClass()->ec_pdecDLLClass;
     pchrCursor += sprintf(pchrCursor, "Class: %-24.24s\n", pdecDLLClass->dec_strName);
     INDEX ctLetters = strlen("Class: ")+strlen(pdecDLLClass->dec_strName);
-    memset(pchrCursor, '�', ctLetters);
+    pchrCursor += sprintf(pchrCursor, "ID: [%lu]\n", penEntity->en_ulID); // [SSE] Entity ID Display
+    memset(pchrCursor, '-', ctLetters);
     pchrCursor+=ctLetters;
     *pchrCursor = '\n';
     pchrCursor++;
@@ -8163,7 +8174,7 @@ void CWorldEditorView::GetToolTipText( char *pToolTipText)
       "No of edges:", ctEdges,
       "No of vertices:", ctVertices,
       "No of planes:", ctPlanes);
-    pchrCursor += sprintf(pchrCursor, "%s\n", "������������������������������");
+    pchrCursor += sprintf(pchrCursor, "%s\n", "------------------------------------------------------------");
 
     if( !bCountSelection)
     {
@@ -8182,7 +8193,7 @@ void CWorldEditorView::GetToolTipText( char *pToolTipText)
             pchrCursor += sprintf(pchrCursor, "%-24s %g m\n", strTmp, fMipSwitchDistance);
             iMip++;
           }
-          pchrCursor += sprintf(pchrCursor, "%s\n", "������������������������������");
+          pchrCursor += sprintf(pchrCursor, "%s\n", "------------------------------------------------------------");
         }
       }
     }
@@ -8471,11 +8482,13 @@ else {\
             break;
           }
         }
-        INDEX ctLetters = sprintf(pchrCursor, "%-24.24s %.64s \n", epProperty.ep_strName, strValue);
+
+        INDEX ctLetters = sprintf(pchrCursor, "[%lu] %-24.24s %.64s \n", epProperty.ep_ulID, epProperty.ep_strName, strValue); // [SSE] Property ID Display
         if( ctLetters > iLongestLineLetters) iLongestLineLetters = ctLetters;
         pchrCursor += ctLetters;
       }
     }
+
     if( iLongestLineLetters>2)
     {
       iLongestLineLetters-=2;
