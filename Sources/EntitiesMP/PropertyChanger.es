@@ -625,7 +625,7 @@ functions:
         // If debug messages enabled and no errors then printout some text into console.
         if (m_bDebugMessages && !bErrorOccured)
         {
-          CPrintF(TRANS("[PC] %s : Target Entity Property: [%s].[%s] is currently (%s)%d\n"), m_strName, ((CEntity&)*m_penTarget).GetName(), m_strTargetProperty, GetNameForEPT(pSourceProperty->ep_eptType), iOld);
+          CPrintF(TRANS("[PC] %s : Target Entity Property: [%s].[%s] is currently (%s)%d\n"), m_strName, ((CEntity&)*m_penTarget).GetName(), m_strTargetProperty, GetNameForEPT(eptType), iOld);
 
           if (m_penSource != NULL && pSourceProperty != NULL) {
             CEntityProperty::PropertyType eptSourceType = pSourceProperty->ep_eptType;
@@ -641,7 +641,7 @@ functions:
               CPrintF(TRANS("[PC] %s : Using [Source Value] Instead: (INDEX)%d\n"), m_strName, m_iValue);
             }
           } else {
-            CPrintF(TRANS("  Source Value = (INDEX)%d\n"), m_strName, m_iValue);
+            CPrintF(TRANS("  Source Value = (INDEX)%d\n"), m_iValue);
           }
 
           if (m_eOperation == EO_SET) {
