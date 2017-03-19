@@ -561,8 +561,8 @@ static void HUD_DrawIcon( FLOAT fCenterX, FLOAT fCenterY, CTextureObject &toIcon
     pixHeight = ptd->GetPixHeight();
   }
   
-  const FLOAT fHalfSizeI = _fResolutionScaling*_fCustomScaling * ptd->GetPixWidth()  * 0.5f;
-  const FLOAT fHalfSizeJ = _fResolutionScaling*_fCustomScaling * ptd->GetPixHeight() * 0.5f;
+  const FLOAT fHalfSizeI = _fResolutionScaling*_fCustomScaling * pixWidth  * 0.5f;
+  const FLOAT fHalfSizeJ = _fResolutionScaling*_fCustomScaling * pixHeight * 0.5f;
 
   // done
   _pDP->InitTexture( &toIcon);
