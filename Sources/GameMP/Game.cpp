@@ -122,7 +122,11 @@ extern INDEX gam_bGibs  = TRUE;
 
 extern INDEX gam_bUseExtraEnemies = TRUE;
 
-extern INDEX gam_bSharedLives = TRUE;                    // [SSE] Personal/Shared Extra Lives
+// [SSE] Extra Lives System
+extern INDEX gam_bSharedLives = TRUE;
+extern INDEX gam_iScoreForExtraLive = 100000;
+//
+
 extern INDEX gam_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
 
 static INDEX hud_iEnableStats = 1;
@@ -967,7 +971,10 @@ void CGame::InitInternal( void)
 
   _pShell->DeclareSymbol("persistent user INDEX gam_bUseExtraEnemies;",  &gam_bUseExtraEnemies);
 
-  _pShell->DeclareSymbol("persistent user INDEX gam_bSharedLives;", &gam_bSharedLives); // [SSE] Personal/Shared Extra Lives
+  // [SSE] Extra Lives System
+  _pShell->DeclareSymbol("persistent user INDEX gam_bSharedLives;", &gam_bSharedLives);
+  _pShell->DeclareSymbol("persistent user INDEX gam_iScoreForExtraLive;", &gam_iScoreForExtraLive); 
+  //
   _pShell->DeclareSymbol("persistent user INDEX gam_bKeepSeriousDamageOnProjectiles;",  &gam_bKeepSeriousDamageOnProjectiles); // [SSE] Better Serious Damage
 
   _pShell->DeclareSymbol("user INDEX gam_bQuickLoad;", &gam_bQuickLoad);

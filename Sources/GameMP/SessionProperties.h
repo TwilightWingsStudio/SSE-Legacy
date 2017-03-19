@@ -82,7 +82,11 @@ public:
 
   BOOL  sp_bUseExtraEnemies;  // spawn extra multiplayer enemies
   
-  BOOL sp_bSharedLives; // [SSE] Personal/Shared Extra Lives
+  // [SSE] Extra Lives System
+  BOOL sp_bSharedLives;
+  INDEX sp_iScoreForExtraLive;
+  INDEX sp_iScoreForExtraLiveAccum;
+  //
   
   BOOL sp_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
 };

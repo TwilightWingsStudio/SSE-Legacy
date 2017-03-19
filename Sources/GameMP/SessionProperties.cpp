@@ -50,7 +50,11 @@ extern INDEX gam_bGibs;
 extern INDEX gam_bUseExtraEnemies;
 extern CTString gam_strGameAgentExtras;
 
-extern INDEX gam_bSharedLives;                    // [SSE] Personal/Shared Extra Lives
+// [SSE] Extra Lives System
+extern INDEX gam_bSharedLives;
+extern INDEX gam_iScoreForExtraLive;
+//
+
 extern INDEX gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
 
 
@@ -166,9 +170,13 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   sp.sp_fExtraEnemyStrength          = 0;
   sp.sp_fExtraEnemyStrengthPerPlayer = 0;
   
-  sp.sp_bSharedLives = FALSE;                   // [SSE] Personal/Shared Extra Lives
+  // [SSE] Extra Lives System
+  sp.sp_bSharedLives = FALSE;
+  sp.sp_iScoreForExtraLive = 0;
+  sp.sp_iScoreForExtraLiveAccum = 0;
+  //
+  
   sp.sp_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
-
 
   sp.sp_iBlood = Clamp( gam_iBlood, 0L, 3L);
   sp.sp_bGibs  = gam_bGibs;
@@ -230,15 +238,20 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_tmSpawnInvulnerability = gam_tmSpawnInvulnerability;
 
   sp.sp_bUseExtraEnemies = gam_bUseExtraEnemies;
-  
-  
+
   sp.sp_bKeepSeriousDamageOnProjectiles = gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
 
   // set credits and limits
   if (sp.sp_bCooperative) {
     sp.sp_ctCredits     = gam_iCredits;
     sp.sp_ctCreditsLeft = gam_iCredits;
-    sp.sp_bSharedLives = gam_bSharedLives; // [SSE] Personal/Shared Extra Lives
+
+    // [SSE] Extra Lives System
+    sp.sp_bSharedLives = gam_bSharedLives;
+    sp.sp_iScoreForExtraLive = gam_iScoreForExtraLive;
+    sp.sp_iScoreForExtraLiveAccum = 0;
+    //
+    
     sp.sp_iScoreLimit = 0;
     sp.sp_iFragLimit  = 0;
     sp.sp_iTimeLimit  = 0;
@@ -248,13 +261,20 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   } else {
     sp.sp_ctCredits     = -1;
     sp.sp_ctCreditsLeft = -1;
-    sp.sp_bSharedLives = FALSE; // [SSE] Personal/Shared Extra Lives
+
+    // [SSE] Extra Lives System
+    sp.sp_bSharedLives = FALSE;
+    sp.sp_iScoreForExtraLive = 0;
+    sp.sp_iScoreForExtraLiveAccum = 0;
+    //
+
     sp.sp_iScoreLimit = gam_iScoreLimit;
     sp.sp_iFragLimit  = gam_iFragLimit;
     sp.sp_iTimeLimit  = gam_iTimeLimit;
     sp.sp_bWeaponsStay = FALSE;
     sp.sp_bAmmoStays = FALSE;
     sp.sp_bHealthArmorStays = FALSE;
+
     if (sp.sp_bUseFrags) {
       sp.sp_iScoreLimit = 0;
     } else {
