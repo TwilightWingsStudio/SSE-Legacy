@@ -8046,7 +8046,8 @@ procedures:
         call DoAutoActions();
       }
 
-      on (EReceiveScore eScore) : {
+      on (EReceiveScore eScore) :
+      {
         INDEX iScore = eScore.iPoints;
 
         // [SSE] Player Settings Entity
@@ -8056,13 +8057,14 @@ procedures:
         //
         
         // [SSE] Extra Lives System
+        // NOTE: Only non-predicted because we have here SessionProperties editing!
         if (!IsPredictor() && GetSP()->sp_ctCredits >= 0 && GetSP()->sp_iScoreForExtraLive > 0)
         {
           if (GetSP()->sp_bSharedLives) {
             ((CSessionProperties*)GetSP())->sp_iScoreForExtraLiveAccum += iScore;
             
-            if (GetSP()->sp_iScoreForExtraLiveAccum >= GetSP()->sp_iScoreForExtraLive) {
-              CPrintF("GET EL\n");
+            if (GetSP()->sp_iScoreForExtraLiveAccum >= GetSP()->sp_iScoreForExtraLive)
+            {
               INDEX iLives = GetSP()->sp_iScoreForExtraLiveAccum / GetSP()->sp_iScoreForExtraLive;
 
               ((CSessionProperties*)GetSP())->sp_ctCreditsLeft += iLives;
@@ -8071,8 +8073,8 @@ procedures:
           } else {
             m_iScoreAccumulated += iScore;
 
-            if (m_iScoreAccumulated >= GetSP()->sp_iScoreForExtraLive) {
-              CPrintF("GET EL\n");
+            if (m_iScoreAccumulated >= GetSP()->sp_iScoreForExtraLive)
+            {
               INDEX iLives = m_iScoreAccumulated / GetSP()->sp_iScoreForExtraLive;
             
               m_iLives += iLives;
