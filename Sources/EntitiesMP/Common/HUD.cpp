@@ -2076,7 +2076,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
   HUD_DrawText(   fCol+fAdv, fRow, strValue, colScore, 1.0f);
   HUD_DrawIcon(   fCol,      fRow, _toFrags, C_WHITE /*colScore*/, 1.0f, FALSE, 32, 32);
   
-  // [SSE] HUD - Personal/Shared Extra Lives
+  // [SSE] Extra Lives System
   if ((bSinglePlay || bCooperative) && GetSP()->sp_ctCredits >= 0)
   {
     BOOL bSharedLives = GetSP()->sp_bSharedLives; 
@@ -2089,6 +2089,24 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
     HUD_DrawText(   fCol+fAdv, fRow, strValue,  C_lGRAY, 1.0f);
     HUD_DrawIcon(   fCol,      fRow, _toExtraLive, C_WHITE /*colMana*/, 1.0f, FALSE, 32, 32);
+    
+    if (GetSP()->sp_iScoreForExtraLive > 0)
+    {
+      CTString strLimitsInfo;
+      
+      INDEX iScoreLeft = ClampDn(GetSP()->sp_iScoreForExtraLive - (bSharedLives ? GetSP()->sp_iScoreForExtraLiveAccum : _penPlayer->m_iScoreAccumulated), INDEX(0));
+      strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("SCORE LEFT"), iScoreLeft);
+      
+      _pfdDisplayFont->SetFixedWidth();
+      _pDP->SetFont( _pfdDisplayFont);
+      _pDP->SetTextScaling( fTextScale*0.8f );
+      _pDP->SetTextCharSpacing( -2.0f*fTextScale);
+      _pDP->PutText( strLimitsInfo, 5.0f*_pixDPWidth/640.0f, 48.0f*_pixDPWidth/640.0f, C_WHITE|CT_OPAQUE);
+      
+      _pfdDisplayFont->SetVariableWidth();
+      _pDP->SetFont( &_fdNumbersFont);
+      _pDP->SetTextCharSpacing(1);
+    }
   }
   //
 

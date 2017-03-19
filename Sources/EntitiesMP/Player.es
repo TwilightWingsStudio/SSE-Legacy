@@ -1059,20 +1059,21 @@ void PrintPlayerDeathMessage(CPlayer *ppl, const EDeath &eDeath)
 {
   CTString strMyName = ppl->GetPlayerName();
   CEntity *penKiller = eDeath.eLastDamage.penInflictor;
+
   // if killed by a valid entity
   if (penKiller != NULL) {
     // if killed by a player
     if (IsOfClass(penKiller, "Player")) {
       // if not self
-      if (penKiller!=ppl) {
+      if (penKiller != ppl) {
         CTString strKillerName = ((CPlayer*)penKiller)->GetPlayerName();
 
-        if (eDeath.eLastDamage.dmtType==DMT_TELEPORT) {
+        if (eDeath.eLastDamage.dmtType == DMT_TELEPORT) {
           CPrintF(TRANS("%s telefragged %s\n"), strKillerName, strMyName);
         } else if (eDeath.eLastDamage.dmtType == DMT_CLOSERANGE) {
           CPrintF(TRANS("%s cut %s into pieces\n"), strKillerName, strMyName);
         } else if (eDeath.eLastDamage.dmtType == DMT_CHAINSAW) {
-          CPrintF(TRANS("%s cut %s into pieces\n"), strKillerName, strMyName);
+          CPrintF(TRANS("%s sawed %s into pieces\n"), strKillerName, strMyName);
         } else if (eDeath.eLastDamage.dmtType == DMT_BULLET) {
           CPrintF(TRANS("%s poured lead into %s\n"), strKillerName, strMyName);
         } else if (eDeath.eLastDamage.dmtType == DMT_PROJECTILE || eDeath.eLastDamage.dmtType==DMT_EXPLOSION) {
@@ -1286,6 +1287,7 @@ properties:
  // [SSE] Personal/Shared Extra Lives
  200 INDEX m_iLives = 0,
  201 INDEX m_iMoney = 0,
+ 202 INDEX m_iScoreAccumulated = 0,
 
 {
   ShellLaunchData ShellLaunchData_array;  // array of data describing flying empty shells
@@ -8050,6 +8052,33 @@ procedures:
         // [SSE] Player Settings Entity
         if (m_penSettings && m_penSettings->IsActive()) {
           iScore *= ((CPlayerSettingsEntity&)*m_penSettings).m_fScoreReceiveMul;
+        }
+        //
+        
+        // [SSE] Extra Lives System
+        if (!IsPredictor() && GetSP()->sp_ctCredits >= 0 && GetSP()->sp_iScoreForExtraLive > 0)
+        {
+          if (GetSP()->sp_bSharedLives) {
+            ((CSessionProperties*)GetSP())->sp_iScoreForExtraLiveAccum += iScore;
+            
+            if (GetSP()->sp_iScoreForExtraLiveAccum >= GetSP()->sp_iScoreForExtraLive) {
+              CPrintF("GET EL\n");
+              INDEX iLives = GetSP()->sp_iScoreForExtraLiveAccum / GetSP()->sp_iScoreForExtraLive;
+
+              ((CSessionProperties*)GetSP())->sp_ctCreditsLeft += iLives;
+              ((CSessionProperties*)GetSP())->sp_iScoreForExtraLiveAccum = GetSP()->sp_iScoreForExtraLiveAccum % GetSP()->sp_iScoreForExtraLive;
+            }
+          } else {
+            m_iScoreAccumulated += iScore;
+
+            if (m_iScoreAccumulated >= GetSP()->sp_iScoreForExtraLive) {
+              CPrintF("GET EL\n");
+              INDEX iLives = m_iScoreAccumulated / GetSP()->sp_iScoreForExtraLive;
+            
+              m_iLives += iLives;
+              m_iScoreAccumulated = m_iScoreAccumulated % GetSP()->sp_iScoreForExtraLive;
+            }
+          }
         }
         //
 
