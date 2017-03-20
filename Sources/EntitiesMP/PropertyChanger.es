@@ -126,7 +126,7 @@ properties:
 
   50 BOOL m_bPenCausedAsSource     "Source Target=penCaused" = FALSE,
   51 BOOL m_bPenCausedAsTarget     "Target=penCaused" = FALSE,
-  52 BOOL m_bPenCausedAsTargetValue "Value Traget=penCaused" = FALSE,
+  52 BOOL m_bPenCausedAsTargetValue "Value Target=penCaused" = FALSE,
 
 components:
   1 model   MODEL_MARKER     "Models\\Editor\\PropertyChanger.mdl",
