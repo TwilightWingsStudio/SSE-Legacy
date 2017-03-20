@@ -53,25 +53,25 @@ uses "EntitiesMP/EnemyBase";
 //uses "EntitiesMP/Water";
 
 enum ElementalType {
-  0 ELT_AIR           "obsolete",        // air elemental
-  1 ELT_ICE           "obsolete",        // ice elemental
-  2 ELT_LAVA          "Lava",       // lava elemental
-  3 ELT_STONE         "obsolete",      // stone elemental
-  4 ELT_WATER         "obsolete",      // water elemental
+  0 ELT_AIR           "0 Air (obsolete)",        // air elemental
+  1 ELT_ICE           "1 Ice (obsolete)",        // ice elemental
+  2 ELT_LAVA          "2 Lava",       // lava elemental
+  3 ELT_STONE         "3 Stone (obsolete)",      // stone elemental
+  4 ELT_WATER         "4 Water (obsolete)",      // water elemental
 };
 
 
 enum ElementalCharacter {
-  0 ELC_SMALL         "Small",      // small (fighter)
-  1 ELC_BIG           "Big",        // big
-  2 ELC_LARGE         "Large",      // large
+  0 ELC_SMALL         "0 Small",      // small (fighter)
+  1 ELC_BIG           "1 Big",        // big
+  2 ELC_LARGE         "2 Large",      // large
 };
 
 
 enum ElementalState {
-  0 ELS_NORMAL        "Normal",     // normal state
-  1 ELS_BOX           "Box",        // in box
-  2 ELS_PLANE         "Plane",      // as plane
+  0 ELS_NORMAL        "0 Normal",     // normal state
+  1 ELS_BOX           "1 Box",        // in box
+  2 ELS_PLANE         "2 Plane",      // as plane
 };
 
 

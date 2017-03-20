@@ -24,21 +24,21 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 uses "EntitiesMP/Marker";
 uses "EntitiesMP/BasicEffects";
 enum EffectMarkerType {
-  0 EMT_NONE                      "None",                      // no FX
-  1 EMT_PLAYER_APPEAR             "Player appear",             // effect of player appearing
-  2 EMT_APPEARING_BIG_BLUE_FLARE  "Appear big blue flare",     // appear big blue flare
-  3 EMT_BLEND_MODELS              "Blend two models",          // blend between two models
-  4 EMT_DISAPPEAR_MODEL           "Disappear model",           // disappear model
-  5 EMT_APPEAR_MODEL              "Appear model",              // appear model
-  6 EMT_HIDE_ENTITY               "Hide entity",               // hide entity
-  7 EMT_SHOW_ENTITY               "Show entity",               // show entity
-  8 EMT_SHAKE_IT_BABY             "Shake it baby",             // earth quaker
-  9 EMT_APPEAR_DISAPPEAR          "Appear or Disappear model", // appear/disappear model
- 10 EMT_SET_PLACEMENT             "Teleport",                  // teleport entity
- 11 EMT_SET_PARENT                "Set parent",                // set parent 
- 12 EMT_CLEAR_PARENT              "Clear parent",              // clear parent 
- 13 EMT_BASIC_EFFECT              "Basic effect",              // spawn basic effect
- 14 EMT_GLARE                     "Glare",                     // glare screen
+  0 EMT_NONE                      "None [00]",                      // no FX
+  1 EMT_PLAYER_APPEAR             "Player appear [01]",             // effect of player appearing
+  2 EMT_APPEARING_BIG_BLUE_FLARE  "Appear big blue flare [02]",     // appear big blue flare
+  3 EMT_BLEND_MODELS              "Blend two models [03]",          // blend between two models
+  4 EMT_DISAPPEAR_MODEL           "Disappear model [04]",           // disappear model
+  5 EMT_APPEAR_MODEL              "Appear model [05]",              // appear model
+  6 EMT_HIDE_ENTITY               "Hide entity [06]",               // hide entity
+  7 EMT_SHOW_ENTITY               "Show entity [07]",               // show entity
+  8 EMT_SHAKE_IT_BABY             "Shake it baby [08]",             // earth quaker
+  9 EMT_APPEAR_DISAPPEAR          "Appear or Disappear model [09]", // appear/disappear model
+ 10 EMT_SET_PLACEMENT             "Teleport [10]",                  // teleport entity
+ 11 EMT_SET_PARENT                "Set parent [11]",                // set parent 
+ 12 EMT_CLEAR_PARENT              "Clear parent [12]",              // clear parent 
+ 13 EMT_BASIC_EFFECT              "Basic effect [13]",              // spawn basic effect
+ 14 EMT_GLARE                     "Glare [14]",                     // glare screen
 };
 
 %{
