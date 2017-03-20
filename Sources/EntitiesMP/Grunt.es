@@ -23,8 +23,8 @@ uses "EntitiesMP/EnemyBase";
 uses "EntitiesMP/BasicEffects";
 
 enum GruntType {
-  0 GT_SOLDIER    "Grunt soldier",
-  1 GT_COMMANDER  "Grunt commander",
+  0 GT_SOLDIER    "0 Grunt soldier",
+  1 GT_COMMANDER  "1 Grunt commander",
 };
 
 %{

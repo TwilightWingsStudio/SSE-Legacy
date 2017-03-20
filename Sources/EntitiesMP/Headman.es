@@ -23,10 +23,10 @@ uses "EntitiesMP/EnemyBase";
 uses "EntitiesMP/BasicEffects";
 
 enum HeadmanType {
-  0 HDT_FIRECRACKER   "Fire Cracker",
-  1 HDT_ROCKETMAN     "Rocketman",
-  2 HDT_BOMBERMAN     "Bomberman",
-  3 HDT_KAMIKAZE      "Kamikaze",
+  0 HDT_FIRECRACKER   "0 Fire Cracker",
+  1 HDT_ROCKETMAN     "1 Rocketman",
+  2 HDT_BOMBERMAN     "2 Bomberman",
+  3 HDT_KAMIKAZE      "3 Kamikaze",
 };
 
 
