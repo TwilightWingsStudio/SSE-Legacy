@@ -26,12 +26,12 @@ uses "EntitiesMP/ModelHolder2";
 uses "EntitiesMP/Player";
 
 enum EBlockAction {
-   0 EBA_STOP         "Stop",
-   1 EBA_SLIDE        "Slide",
-   2 EBA_CLIMBORSLIDE "Climb or Slide",
-   3 EBA_BOUNCE       "Bounce",
-   4 EBA_PUSH         "Push",
-   5 EBA_STOPEXACT    "Stop exact",
+   0 EBA_STOP         "0 Stop",
+   1 EBA_SLIDE        "1 Slide",
+   2 EBA_CLIMBORSLIDE "2 Climb or Slide",
+   3 EBA_BOUNCE       "3 Bounce",
+   4 EBA_PUSH         "4 Push",
+   5 EBA_STOPEXACT    "5 Stop exact",
 };
 
 %{
