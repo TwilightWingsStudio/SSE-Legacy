@@ -1070,8 +1070,10 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user void ListPlayers(void);", &ListPlayers);
   
   // [SSE] Testing
+  #ifdef USE_LUA
   extern void LUAJitTest(void *pArgs);
   _pShell->DeclareSymbol("user void LUAJitTest(void);", &LUAJitTest);
+  #endif
   _pShell->DeclareSymbol("user void BroadcastS2STest(CTString, INDEX, CTString);", &BroadcastS2STest);
   _pShell->DeclareSymbol("user void DumpPlayerSources(void);", &DumpPlayerSources);
   _pShell->DeclareSymbol("user void DumpPlayerTargets(void);", &DumpPlayerTargets);
