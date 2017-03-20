@@ -22,13 +22,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 uses "EntitiesMP/EnemyFly";
 
 enum EyemanChar {
-  0 EYC_SOLDIER   "Soldier",    // soldier
-  1 EYC_SERGEANT  "Sergeant",   // sergeant
+  0 EYC_SOLDIER   "0 Soldier",    // soldier
+  1 EYC_SERGEANT  "1 Sergeant",   // sergeant
 };
 
 enum EyemanEnv {
-  0 EYE_NORMAL    "Normal",
-  1 EYE_LAVA      "Lava",
+  0 EYE_NORMAL    "0 Normal",
+  1 EYE_LAVA      "1 Lava",
 };
 
 %{
