@@ -43,65 +43,65 @@ uses "EntitiesMP/Light";
 uses "EntitiesMP/Flame";
 
 enum ProjectileType {
-  0 PRT_ROCKET                "Rocket",   // player rocket
-  1 PRT_GRENADE               "Grenade",   // player grenade
-  2 PRT_FLAME                 "Flame",   // player flamer flame
-  3 PRT_LASER_RAY             "Laser",   // player laser ray
-  4 PRT_WALKER_ROCKET         "WalkerRocket",   // walker rocket
+  0 PRT_ROCKET                "Rocket [00]",   // player rocket
+  1 PRT_GRENADE               "Grenade [01]",   // player grenade
+  2 PRT_FLAME                 "Flame [02]",   // player flamer flame
+  3 PRT_LASER_RAY             "Laser [03]",   // player laser ray
+  4 PRT_WALKER_ROCKET         "WalkerRocket [04]",   // walker rocket
 
- 10 PRT_CATMAN_FIRE           "Catman",   // catman fire
+ 10 PRT_CATMAN_FIRE           "Catman [10]",   // catman fire
 
- 11 PRT_HEADMAN_FIRECRACKER   "Firecracker",   // headman firecracker
- 12 PRT_HEADMAN_ROCKETMAN     "Rocketman",   // headman rocketman
- 13 PRT_HEADMAN_BOMBERMAN     "Bomberman",   // headman bomberman
+ 11 PRT_HEADMAN_FIRECRACKER   "Firecracker [11]",   // headman firecracker
+ 12 PRT_HEADMAN_ROCKETMAN     "Rocketman [12]",   // headman rocketman
+ 13 PRT_HEADMAN_BOMBERMAN     "Bomberman [13]",   // headman bomberman
 
- 14 PRT_BONEMAN_FIRE          "Boneman",   // boneman fire
+ 14 PRT_BONEMAN_FIRE          "Boneman [14]",   // boneman fire
 
- 15 PRT_WOMAN_FIRE            "Woman",   // woman fire
+ 15 PRT_WOMAN_FIRE            "Woman [15]",   // woman fire
 
- 16 PRT_DRAGONMAN_FIRE        "Dragonman",   // dragonman fire
- 17 PRT_DRAGONMAN_STRONG_FIRE "Dragonman Strong",   // dragonman strong fire
+ 16 PRT_DRAGONMAN_FIRE        "Dragonman [16]",   // dragonman fire
+ 17 PRT_DRAGONMAN_STRONG_FIRE "Dragonman Strong [17]",   // dragonman strong fire
 
- 18 PRT_STONEMAN_FIRE         "Stoneman",   // stoneman fire rock
- 19 PRT_STONEMAN_BIG_FIRE     "Stoneman Big",   // stoneman big fire rock
- 20 PRT_STONEMAN_LARGE_FIRE   "Stoneman Large",   // stoneman large fire rock
- 21 PRT_LAVAMAN_BIG_BOMB      "Lavaman Big Bomb",   // lavaman big bomb
- 22 PRT_LAVAMAN_BOMB          "Lavaman Bomb",   // lavaman bomb
- 23 PRT_LAVAMAN_STONE         "Lavaman Stone",   // lavaman rock projectile
- 27 PRT_ICEMAN_FIRE           "Iceman",   // iceman ice cube
- 28 PRT_ICEMAN_BIG_FIRE       "Iceman Big",   // iceman big ice cube
- 29 PRT_ICEMAN_LARGE_FIRE     "Iceman Large",   // iceman large ice cube
+ 18 PRT_STONEMAN_FIRE         "Stoneman [18]",   // stoneman fire rock
+ 19 PRT_STONEMAN_BIG_FIRE     "Stoneman Big [19]",   // stoneman big fire rock
+ 20 PRT_STONEMAN_LARGE_FIRE   "Stoneman Large [20]",   // stoneman large fire rock
+ 21 PRT_LAVAMAN_BIG_BOMB      "Lavaman Big Bomb [21]",   // lavaman big bomb
+ 22 PRT_LAVAMAN_BOMB          "Lavaman Bomb [22]",   // lavaman bomb
+ 23 PRT_LAVAMAN_STONE         "Lavaman Stone [23]",   // lavaman rock projectile
+ 27 PRT_ICEMAN_FIRE           "Iceman [27]",   // iceman ice cube
+ 28 PRT_ICEMAN_BIG_FIRE       "Iceman Big [28]",   // iceman big ice cube
+ 29 PRT_ICEMAN_LARGE_FIRE     "Iceman Large [29]",   // iceman large ice cube
 
- 41 PRT_HUANMAN_FIRE          "Huanman",   // huanman fire
+ 41 PRT_HUANMAN_FIRE          "Huanman [41]",   // huanman fire
 
- 42 PRT_FISHMAN_FIRE          "Fishman",   // fishman fire
+ 42 PRT_FISHMAN_FIRE          "Fishman [42]",   // fishman fire
 
- 43 PRT_MANTAMAN_FIRE         "Mantaman",   // mantaman fire
+ 43 PRT_MANTAMAN_FIRE         "Mantaman [43]",   // mantaman fire
 
- 44 PRT_CYBORG_LASER          "Cyborg Laser",   // cyborg laser
- 45 PRT_CYBORG_BOMB           "Cyborg Bomb",   // cyborg bomb
+ 44 PRT_CYBORG_LASER          "Cyborg Laser [44]",   // cyborg laser
+ 45 PRT_CYBORG_BOMB           "Cyborg Bomb [45]",   // cyborg bomb
 
- 50 PRT_LAVA_COMET            "Lava Comet",  // lava comet
- 51 PRT_BEAST_PROJECTILE      "Beast Projectile",   // beast projectile
- 52 PRT_BEAST_BIG_PROJECTILE  "Beast Big Projectile",   // big beast projectile
- 53 PRT_BEAST_DEBRIS          "Beast Debris",   // beast projectile's debris
- 54 PRT_BEAST_BIG_DEBRIS      "Beast Big Debris",   // big beast projectile's debris
- 55 PRT_DEVIL_LASER           "Devil Laser",   // devil laser
- 56 PRT_DEVIL_ROCKET          "Devil Rocket",   // devil rocket
- 57 PRT_DEVIL_GUIDED_PROJECTILE "Devil Guided Projectile",   // devil guided projectile
- 60 PRT_GRUNT_PROJECTILE_SOL  "Grunt Soldier Laser",  // grunt laser
- 64 PRT_GRUNT_PROJECTILE_COM  "Grunt Commander Laser", // grunt commander laser          
- 61 PRT_GUFFY_PROJECTILE      "Guffy Projectile", // guffy rocket
- 62 PRT_DEMON_FIREBALL        "Demon Fireball", // demon fireball
- 63 PRT_DEMON_FIREBALL_DEBRIS "Demon Fireball Debris", // demon fireball debris
- 70 PRT_SHOOTER_WOODEN_DART   "Shooter Wooden Dart", // shooter's wooden dart
- 71 PRT_SHOOTER_FIREBALL      "Shooter Fireball", // shooter's fireball
- 72 PRT_SHOOTER_FLAME         "Shooter Flame", // shooter's flame
- 73 PRT_LARVA_PLASMA          "ExotechLarva Plasma", //exotech larva plasma gun
- 74 PRT_LARVA_TAIL_PROJECTILE "ExotechLarva Tail Projectile", //exotech larva tail projectile
- 75 PRT_AIRELEMENTAL_WIND     "Air Elemental Wind Blast", //air elemental wind blast
- 76 PRT_AFTERBURNER_DEBRIS    "Afterburner debris",
- 77 PRT_METEOR                "Meteor",
+ 50 PRT_LAVA_COMET            "Lava Comet [50]",  // lava comet
+ 51 PRT_BEAST_PROJECTILE      "Beast Projectile [51]",   // beast projectile
+ 52 PRT_BEAST_BIG_PROJECTILE  "Beast Big Projectile [52]",   // big beast projectile
+ 53 PRT_BEAST_DEBRIS          "Beast Debris [53]",   // beast projectile's debris
+ 54 PRT_BEAST_BIG_DEBRIS      "Beast Big Debris [54]",   // big beast projectile's debris
+ 55 PRT_DEVIL_LASER           "Devil Laser [55]",   // devil laser
+ 56 PRT_DEVIL_ROCKET          "Devil Rocket [56]",   // devil rocket
+ 57 PRT_DEVIL_GUIDED_PROJECTILE "Devil Guided Projectile [57]",   // devil guided projectile
+ 60 PRT_GRUNT_PROJECTILE_SOL  "Grunt Soldier Laser [60]",  // grunt laser
+ 64 PRT_GRUNT_PROJECTILE_COM  "Grunt Commander Laser [64]", // grunt commander laser          
+ 61 PRT_GUFFY_PROJECTILE      "Guffy Projectile [61]", // guffy rocket
+ 62 PRT_DEMON_FIREBALL        "Demon Fireball [62]", // demon fireball
+ 63 PRT_DEMON_FIREBALL_DEBRIS "Demon Fireball Debris [63]", // demon fireball debris
+ 70 PRT_SHOOTER_WOODEN_DART   "Shooter Wooden Dart [70]", // shooter's wooden dart
+ 71 PRT_SHOOTER_FIREBALL      "Shooter Fireball [71]", // shooter's fireball
+ 72 PRT_SHOOTER_FLAME         "Shooter Flame [72]", // shooter's flame
+ 73 PRT_LARVA_PLASMA          "ExotechLarva Plasma [73]", //exotech larva plasma gun
+ 74 PRT_LARVA_TAIL_PROJECTILE "ExotechLarva Tail Projectile [74]", //exotech larva tail projectile
+ 75 PRT_AIRELEMENTAL_WIND     "Air Elemental Wind Blast [75]", //air elemental wind blast
+ 76 PRT_AFTERBURNER_DEBRIS    "Afterburner debris [76]",
+ 77 PRT_METEOR                "Meteor [77]",
 };
 
 enum ProjectileMovingType {
