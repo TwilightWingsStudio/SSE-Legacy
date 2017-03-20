@@ -44,7 +44,7 @@ properties:
   // class properties
   5 FLOAT m_fValue = 0.0f,                                 // value
   6 FLOAT m_fRespawnTime = 0.0f,                           // default respawn time
- 26 FLOAT m_fCustomRespawnTime "Respawn Time" = 0.0f,      // custom respawn time
+ 26 FLOAT m_fCustomRespawnTime "Respawn Time" = 0.0F,      // custom respawn time
   7 BOOL m_bRespawn "Respawn" 'R' = FALSE,    // respawn item
   8 CEntityPointer m_penTarget  "Target" 'T' COLOR(C_dGRAY|0xFF),   // target to trigger when crossed over
   9 BOOL m_bPickupOnce  "PickupOnce" 'P' = FALSE,   // can be picked by only one player, triggers only when really picked
@@ -58,8 +58,11 @@ properties:
  30 enum EOscillationType m_eotOscillation "Oscillation Anim. Type" = OT_DEFAULT,
  31 BOOL m_bParticles                      "Particles On" = TRUE,
  32 BOOL m_bFlare                          "Flare On" = TRUE,
+ 
  //40 COLOR m_colParticles                   "Particles Color" = COLOR(C_WHITE|CT_OPAQUE),
  //41 COLOR m_colFlare                       "Flare Color" = COLOR(C_WHITE|CT_OPAQUE),
+ 
+  50 FLOAT m_fStretch  "Stretch" = 1.0F,
  
  //60 FLOAT m_tmLastPicked = -1.0F,
 
@@ -276,7 +279,7 @@ functions:
   void StretchItem(const FLOAT3D &vStretch)
   {
     CModelObject &mo = GetModelObject()->GetAttachmentModel(ITEMHOLDER_ATTACHMENT_ITEM)->amo_moModelObject;
-    mo.StretchModel(vStretch);
+    mo.StretchModel(vStretch * m_fStretch);
     ModelChangeNotify();
   };
 
