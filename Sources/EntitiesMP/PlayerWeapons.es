@@ -4944,6 +4944,11 @@ procedures:
   // ***************** FIRE COLT *****************
   FireColt()
   {
+    // Just for safety.
+    if (m_iColtBullets == 0) {
+      jump ReloadColt();
+    }
+    
     GetAnimator()->FireAnimation(BODY_ANIM_COLT_FIRERIGHT, 0);
 
     // fire bullet
@@ -5017,6 +5022,11 @@ procedures:
   // ***************** FIRE DOUBLE COLT *****************
   FireDoubleColt()
   {
+    // Just for safety.
+    if (m_iColtBullets == 0) {
+      jump ReloadDoubleColt();
+    }
+    
     // fire first colt - one bullet less in colt
     GetAnimator()->FireAnimation(BODY_ANIM_COLT_FIRERIGHT, 0);
     FireOneBullet(wpn_fFX[WEAPON_DOUBLECOLT], wpn_fFY[WEAPON_DOUBLECOLT], 500.0f,
