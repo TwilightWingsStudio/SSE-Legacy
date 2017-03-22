@@ -1396,21 +1396,92 @@ CPlacement3D LerpPlacementsPrecise(const CPlacement3D &pl0, const CPlacement3D &
   return pl;
 }
 
+// [SSE] DDA System - Adjustable Damage Resistance
 FLOAT GetGameDamageMultiplier(void)
 {
-  FLOAT fGameDamageMultiplier = 1.0f;
+  FLOAT fGameDamageMultiplier = 1.0f; // Base Value.
   FLOAT fExtraStrength = GetSP()->sp_fExtraEnemyStrength;
-  if (fExtraStrength>0) {
-    fGameDamageMultiplier*=1.0f/(1+fExtraStrength);
+
+  // IF we have constant adjustment then apply it!
+  if (fExtraStrength > 0) {
+    fGameDamageMultiplier *= 1.0f / (1 + fExtraStrength);
   }
+
   FLOAT fExtraStrengthPerPlayer = GetSP()->sp_fExtraEnemyStrengthPerPlayer;
-  if (fExtraStrengthPerPlayer>0) {
-    INDEX ctPlayers = _pNetwork->ga_sesSessionState.GetPlayersCount();
-    fGameDamageMultiplier*=1.0f/(1+fExtraStrengthPerPlayer*ClampDn(ctPlayers-1.0f, 0.0f));
+  BOOL bSharedLives = GetSP()->sp_bSharedLives;
+
+  if (fExtraStrengthPerPlayer > 0)
+  {
+    // If we use limited lives then follow our way.
+    if (GetSP()->sp_ctCredits >= 0) {
+      INDEX ctMaxPlayers = CEntity::GetMaxPlayers();
+
+      // If shared lives then do this shit.
+      if (bSharedLives) {
+        INDEX ctAlive = 0;
+        INDEX ctDead = 0;
+        
+        for (INDEX iPlayer = 0; iPlayer < ctMaxPlayers; iPlayer++)
+        {
+          CEntity *penEntity = CEntity::GetPlayerEntity(iPlayer);
+          
+          // If player is invalid then skip him.
+          if (penEntity == NULL) {
+            continue;
+          }
+          
+          if (penEntity->IsAlive()) {
+            ctAlive++;
+          } else {
+            ctDead++;
+          }
+        }
+
+        INDEX ctCreditsLeft = GetSP()->sp_ctCreditsLeft;
+        
+        INDEX ctDeadCanRespawn = 0;
+
+        // If all dead can be respawned then count them all.
+        if (ctDead <= ctCreditsLeft) {
+          ctDeadCanRespawn = ctDead;
+        } else { // If not enough lives for all.
+          ctDeadCanRespawn = ctCreditsLeft;
+        }
+        
+        fGameDamageMultiplier *= 1.0f / (1 + fExtraStrengthPerPlayer * ClampDn(ctAlive - 1.0F + ctDeadCanRespawn, 0.0f));
+
+      } else {
+        INDEX ctActive = 0;
+        
+        for (INDEX iPlayer = 0; iPlayer < ctMaxPlayers; iPlayer++)
+        {
+          CPlayer *penPlayer = (CPlayer *)CEntity::GetPlayerEntity(iPlayer); 
+          
+          // If player is invalid then skip him.
+          if (penPlayer == NULL) {
+            continue;
+          }
+          
+          // If player is alive or have lives then count him!
+          if (penPlayer->IsAlive() || penPlayer->m_iLives > 0) {
+            ctActive++;
+          }
+        }
+        
+        fGameDamageMultiplier *= 1.0f / (1 + fExtraStrengthPerPlayer * ClampDn(ctActive - 1.0f, 0.0f));
+      }
+
+    // If we don't use lives then follow vanilla way.
+    } else {
+      INDEX ctPlayers = _pNetwork->ga_sesSessionState.GetPlayersCount();
+      fGameDamageMultiplier *= 1.0f / (1 + fExtraStrengthPerPlayer * ClampDn(ctPlayers - 1.0f, 0.0f));
+    }
   }
-  if (GetSP()->sp_gdGameDifficulty==CSessionProperties::GD_TOURIST) {
+
+  if (GetSP()->sp_gdGameDifficulty == CSessionProperties::GD_TOURIST) {
     fGameDamageMultiplier *= 2.0f;
   }
+
   return fGameDamageMultiplier;
 }
 
