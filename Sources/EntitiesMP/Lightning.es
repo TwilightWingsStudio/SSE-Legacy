@@ -78,19 +78,17 @@ functions:
     }
 
     // if light entity
-    if (IsOfClass(m_penLight, "Light"))
-    {
+    if (IsOfClass(m_penLight, "Light")) {
       CLight *penLight = (CLight*)&*m_penLight;
 
-      if (slPropertyOffset==offsetof(CLightning, m_iLightAnim))
+      if (slPropertyOffset == offsetof(CLightning, m_iLightAnim))
       {
         return penLight->m_aoLightAnimation.GetData();
       }
-    }
-    else
-    {
+    } else {
       WarningMessage("Target '%s' is not of light class!", m_penLight->GetName());
     }
+
     return NULL;
   };
 
@@ -99,6 +97,7 @@ functions:
     if( m_penTarget==NULL || m_tmLightningStart == -1) {return;};
 
     TIME tmNow = _pTimer->GetLerpedCurrentTick();
+
     // if lightning is traveling
     if(
       ((tmNow-m_tmLightningStart) > 0.0f) &&
@@ -107,7 +106,11 @@ functions:
       // render lightning particles
       FLOAT3D vSrc = GetPlacement().pl_PositionVector;
       FLOAT3D vDst = m_penTarget->GetPlacement().pl_PositionVector;
-      Particles_Lightning( vSrc, vDst, m_tmLightningStart);
+      
+      // [SSE] Lightning - Potential Crash Fix
+      if (vSrc != vDst) {
+        Particles_Lightning( vSrc, vDst, m_tmLightningStart);
+      }
     }
   }
 
@@ -143,7 +146,7 @@ procedures:
     ((CWorldSettingsController *)&*m_penwsc)->m_fLightningPower = m_fLightningPower;
 
     // trigger light animation
-    if( m_penLight != NULL)
+    if (m_penLight != NULL)
     {
       EChangeAnim eChange;
       eChange.iLightAnim  = m_iLightAnim;
@@ -151,7 +154,7 @@ procedures:
       m_penLight->SendEvent(eChange);
     }
 
-    if( m_fSoundDelay != 0.0f)
+    if (m_fSoundDelay != 0.0f)
     {
       // wait given delay time
       autowait( m_fSoundDelay);
@@ -188,35 +191,28 @@ procedures:
     SetModelMainTexture(TEXTURE_TELEPORT);
 
     // see if it is lightning on background
-    if (m_bBackground)
-    {
+    if (m_bBackground) {
       SetFlags(GetFlags()|ENF_BACKGROUND);
-    }
-    else
-    {
+    } else {
       SetFlags(GetFlags()&~ENF_BACKGROUND);
     }
 
-    // obtain bcg viewer entity
+    // obtain bcg viewer entity then don't do anything
     CBackgroundViewer *penBcgViewer = (CBackgroundViewer *) GetWorld()->GetBackgroundViewer();
-    if( penBcgViewer == NULL)
+    if (penBcgViewer == NULL)
     {
-      // don't do anything
       return;
     }
 
-    // obtain world settings controller 
+    // obtain world settings controller then don't do anything
     m_penwsc = penBcgViewer->m_penWorldSettingsController;
-    if( m_penwsc == NULL)
-    {
-      // don't do anything
+
+    if (m_penwsc == NULL) {
       return;
     }
     
-    // must be world settings controller entity
-    if (!IsOfClass(m_penwsc, "WorldSettingsController"))
-    {
-      // don't do anything
+    // must be world settings controller entity then don't do anything
+    if (!IsOfClass(m_penwsc, "WorldSettingsController")) {
       return;
     }
 
@@ -227,6 +223,7 @@ procedures:
       {
         WarningMessage("Target '%s' is not of Marker class!", m_penTarget->GetName());
       }
+
       // don't do anything
       return;
     }
@@ -250,7 +247,7 @@ procedures:
     ModelChangeNotify();
 
     // correct power factor to fall under 0-1 boundaries
-    m_fLightningPower = Clamp( m_fLightningPower, 0.0f, 1.0f);
+    m_fLightningPower = Clamp(m_fLightningPower, 0.0f, 1.0f);
 
     // spawn in world editor
     autowait(0.1f);
@@ -259,12 +256,17 @@ procedures:
     {
       wait()
       {
-        on (EBegin) : { resume; }
+        on (EBegin) :
+        {
+          resume;
+        }
+
         on (ETrigger eTrigger) :
         {
           call LightningStike();
           resume;
         }
+
         otherwise() :
         {
           resume;
