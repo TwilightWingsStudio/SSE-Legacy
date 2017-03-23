@@ -1678,7 +1678,7 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
     }
 
     HUD_DrawBorder( fCol,         fRow, fOneUnitS, fOneUnitS, colBombBorder);
-    HUD_DrawIcon(   fCol,         fRow, _toASeriousBomb, colBombIcon, fNormValue, FALSE, 32);
+    HUD_DrawIcon(   fCol,         fRow, _toASeriousBomb, colBombIcon, fNormValue, FALSE, 32, 32);
     HUD_DrawBar(    fCol+fBarPos, fRow, fOneUnitS/5, fOneUnitS-2, BO_DOWN, colBombBar, fNormValue);
     // make space for serious bomb
     fCol -= fAdvUnitS;
