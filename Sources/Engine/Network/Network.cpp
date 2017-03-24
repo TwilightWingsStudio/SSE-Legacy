@@ -116,7 +116,9 @@ extern CTString ser_strNameMask = "";
 extern INDEX ser_bInverseBanning = FALSE;
 extern CTString ser_strMOTD = "";
 
-extern INDEX ser_bBetterRandom = FALSE;      // [SSE] Netcode Update - Better Random
+// [SSE] Netcode Update - Better Random
+extern INDEX ser_bBetterRandomOnStart = TRUE;
+extern INDEX ser_bBetterRandomOnLoad = FALSE;
 extern INDEX ser_iMaxAllowedChatPerSec = 15; // [SSE] Server Essentials - Chat Anti-DDOS
 
 // [SSE] Netcode Update - Safe Rejoin
@@ -1180,7 +1182,8 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("persistent user INDEX ser_bInverseBanning;", &ser_bInverseBanning);
   _pShell->DeclareSymbol("persistent user CTString ser_strMOTD;", &ser_strMOTD);
 
-  _pShell->DeclareSymbol("persistent user INDEX ser_bBetterRandom;", &ser_bBetterRandom); // [SSE] Netcode Update - Better Random
+  _pShell->DeclareSymbol("persistent user INDEX ser_bBetterRandomOnStart;", &ser_bBetterRandomOnStart); // [SSE] Netcode Update - Better Random
+  _pShell->DeclareSymbol("persistent user INDEX ser_bBetterRandomOnLoad;", &ser_bBetterRandomOnLoad); // [SSE] Netcode Update - Better Random
   _pShell->DeclareSymbol("persistent user INDEX ser_iMaxAllowedChatPerSec;", &ser_iMaxAllowedChatPerSec); // [SSE] Server Essentials - Chat Anti-DDOS
 
   _pShell->DeclareSymbol("persistent user INDEX cli_bAutoAdjustSettings;",   &cli_bAutoAdjustSettings);
@@ -1386,7 +1389,7 @@ void CNetworkLibrary::StartPeerToPeer_t(const CTString &strSessionName,
     MakeDefaultState(fnmWorld, ulSpawnFlags, pvSessionProperties);
     
     // [SSE] Network Update - Better Random
-    if (ser_bBetterRandom) {
+    if (ser_bBetterRandomOnStart) {
       BetterRandom();
     }
   } else {
@@ -1555,6 +1558,12 @@ void CNetworkLibrary::Load_t(const CTFileName &fnmGame) // throw char *
     ga_sesSessionState.ses_apltPlayers.Clear();
     ga_sesSessionState.ses_apltPlayers.New(NET_MAXGAMEPLAYERS);
     strmFile.ExpectID_t("GEND");   // game end
+    
+    // [SSE] Network Update - Better Random
+    if (ser_bBetterRandomOnLoad) {
+      BetterRandom();
+    }
+    
   } catch(char *) {
     RemoveTimerHandler();
     ga_srvServer.Stop();
