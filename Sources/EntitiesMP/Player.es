@@ -3091,7 +3091,11 @@ functions:
         
         if (iCreditsLeft != 0) {
           CTString strTmp;
-          strTmp.PrintF("%s\n\n%d %s", TRANS("Press FIRE to respawn!"), iCreditsLeft, bSharedLives ? TRANS("shared live(s) left.") : TRANS("personal live(s) left."));
+          if (iCreditsLeft == 1) {
+            strTmp.PrintF("%s\n\n%s", TRANS("Press FIRE to respawn!"), bSharedLives ? TRANS("One shared live left!") : TRANS("One personal live left!"));
+          } else {
+            strTmp.PrintF("%s\n\n%d %s", TRANS("Press FIRE to respawn!"), iCreditsLeft, bSharedLives ? TRANS("shared lives left.") : TRANS("personal lives left."));
+          }
 
           pdp->PutTextCXY(strTmp, pixDPWidth*0.5f, pixDPHeight*0.2f, C_WHITE|255);
         } else {
