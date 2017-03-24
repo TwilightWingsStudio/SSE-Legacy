@@ -98,7 +98,11 @@ components:
   2 texture TEXTURE_CODER "Models\\Editor\\Coder.tex",
 
 functions:
-  const CTString &GetDescription(void) const {
+  // --------------------------------------------------------------------------------------
+  // Returns short entity description to show it in SED.
+  // --------------------------------------------------------------------------------------
+  const CTString &GetDescription(void) const
+  {
     if (m_etType == ECMT_IDECODER) {
       ((CTString&)m_strDescription).PrintF("IDecoder");
     } else if (m_etType == ECMT_FDECODER) {
@@ -112,8 +116,10 @@ functions:
     return m_strDescription;
   }
 
-  void SendToSpecifiedTarget(INDEX i) {
-    switch (i) {
+  void SendToSpecifiedTarget(INDEX i)
+  {
+    switch (i)
+    {
       case  1: SendToTarget(m_penTarget01, m_eetEvent01, m_penCaused); break;
       case  2: SendToTarget(m_penTarget02, m_eetEvent02, m_penCaused); break;
       case  3: SendToTarget(m_penTarget03, m_eetEvent03, m_penCaused); break;
@@ -129,46 +135,30 @@ functions:
     }
   }
 
-  INDEX GetIValueByID(INDEX i) {
-    switch (i) {
-      case  1: return m_iIndex01;
-      case  2: return m_iIndex02;
-      case  3: return m_iIndex03;
-      case  4: return m_iIndex04;
-      case  5: return m_iIndex05;
-      case  6: return m_iIndex06;
-      case  7: return m_iIndex07;
-      case  8: return m_iIndex08;
-      case  9: return m_iIndex09;
-      case 10: return m_iIndex10;
-      
-      default: break;
+  INDEX GetIValueByID(INDEX i)
+  {
+    if (i < 0 || i > 9) {
+      return m_iDefaultIndex;
     }
+    
+    const INDEX* aiValues = &m_iIndex01;
 
-    return m_iDefaultIndex;
+    return aiValues[i];
   }
 
-  FLOAT GetFValueByID(INDEX i) {
-    switch (i) {
-      case  1: return m_fFloat01;
-      case  2: return m_fFloat02;
-      case  3: return m_fFloat03;
-      case  4: return m_fFloat04;
-      case  5: return m_fFloat05;
-      case  6: return m_fFloat06;
-      case  7: return m_fFloat07;
-      case  8: return m_fFloat08;
-      case  9: return m_fFloat09;
-      case 10: return m_fFloat10;
-      
-      default: break;
+  FLOAT GetFValueByID(INDEX i)
+  {
+    if (i < 0 || i > 9) {
+      return m_fDefaultFloat;
     }
 
-    return m_fDefaultFloat;
+    const FLOAT* afValues = &m_fFloat01;
+
+    return afValues[i];
   }
   
-  INDEX GetIDByEventType(EventEType eet) {
-
+  INDEX GetIDByEventType(EventEType eet)
+  {
     if (eet == m_eetEvent01) {
       return 1;
     } else if (eet == m_eetEvent02) {
@@ -220,8 +210,10 @@ functions:
     SendToSpecifiedTarget(i);
   }
   
-  EventEType EventCodeToEventType(INDEX iEvent) {
-    switch (iEvent) {
+  EventEType EventCodeToEventType(INDEX iEvent)
+  {
+    switch (iEvent)
+    {
       case EVENTCODE_EStart: return EET_START;
       case EVENTCODE_EStop: return EET_STOP;
       case EVENTCODE_ETrigger: return EET_TRIGGER;
@@ -267,7 +259,8 @@ functions:
     SendToSpecifiedTarget(i);
   }
   
-  void DoETEncoder(const CEntityEvent &ee) {
+  void DoETEncoder(const CEntityEvent &ee)
+  {
     INDEX i = -1;
 
     EventEType ett = EventCodeToEventType(ee.ee_slEvent);
@@ -292,6 +285,9 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
+  // The entity event handler.
+  // --------------------------------------------------------------------------------------
   BOOL HandleEvent(const CEntityEvent &ee)
   {
     // Decoders can be started only by trigger event.
@@ -315,6 +311,9 @@ functions:
   }
   
 procedures:
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     InitAsEditorModel();
