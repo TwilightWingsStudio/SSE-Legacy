@@ -622,6 +622,9 @@
     <ClCompile Include="ProgressiveSwitch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EntityParticles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1716,6 +1719,12 @@
     <ClInclude Include="ProgressiveSwitch_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EntityParticles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityParticles_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2665,6 +2674,9 @@
     </CustomBuild>
     <CustomBuild Include="ProgressiveSwitch.es">
       <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="EntityParticles.es">
+      <Filter>Class Files\Effects</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
