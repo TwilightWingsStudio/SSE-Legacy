@@ -95,6 +95,10 @@ extern FLOAT hud_fSniperScopeRangeIconOpacity;
 extern BOOL hud_bSniperScopeWheelColoring;
 //
 
+// [SSE]
+extern BOOL hud_bGameDebugMonitor;
+//
+
 // player statistics sorting keys
 enum SortKeys {
   PSK_NAME    = 1,
@@ -2196,6 +2200,80 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
   // in the end, remember the current time so it can be used in the next frame
   _tmLast = _tmNow;
 
+  if (hud_bGameDebugMonitor)
+  {
+    FLOAT fExtraEnemyStrength = GetSP()->sp_fExtraEnemyStrength;
+    FLOAT fExtraStrengthPerPlayer = GetSP()->sp_fExtraEnemyStrengthPerPlayer;
+    INDEX ctCredits = GetSP()->sp_ctCredits;
+    BOOL bSharedLives = GetSP()->sp_bSharedLives;
+
+    INDEX ctMaxPlayers = CEntity::GetMaxPlayers();
+    INDEX ctAlive = 0;
+    INDEX ctDead = 0;
+    INDEX ctDeadCanRespawn = 0;
+    
+    for (INDEX iPlayer = 0; iPlayer < ctMaxPlayers; iPlayer++)
+    {
+      CEntity *penEntity = CEntity::GetPlayerEntity(iPlayer);
+      
+      // If player is invalid then skip him.
+      if (penEntity == NULL) {
+        continue;
+      }
+      
+      if (penEntity->IsAlive()) {
+        ctAlive++;
+      } else {
+        ctDead++;
+        
+        if (!bSharedLives) {
+          CPlayer *penPlayer = static_cast<CPlayer*>(penEntity);
+          if (penPlayer->m_iLives > 0) {
+            ctDeadCanRespawn++;
+          }
+        }
+      }
+    }
+    
+    if (bSharedLives)
+    {
+      INDEX ctCreditsLeft = GetSP()->sp_ctCreditsLeft;
+
+      // If all dead can be respawned then count them all.
+      if (ctDead <= ctCreditsLeft) {
+        ctDeadCanRespawn = ctDead;
+      } else { // If not enough lives for all.
+        ctDeadCanRespawn = ctCreditsLeft;
+      }
+    }
+    
+    CTString strReport;
+ 
+    strReport += "^bDEBUG MONITOR^r\n";
+    strReport += "\n";
+    strReport += "[Common]\n";
+    strReport.PrintF("%s^cCCCCCCPlayers: %02d / %02d\n", strReport, ctAlive + ctDead, ctMaxPlayers);
+    strReport += "\n";
+    strReport.PrintF("%s^c00FF00Alive: %02d\n", strReport, ctAlive);
+    strReport.PrintF("%s^cFF0000Dead:  %02d\n", strReport, ctDead);
+
+    if (ctCredits >= 0) {
+      strReport.PrintF("%s^cCCCCCCCan Respawn: %02d\n", strReport, ctDeadCanRespawn);
+    }
+
+    strReport += "\n\n";
+    strReport += "^r[^cFFFFFFDDA System^r]^cCCCC00\n";
+    strReport.PrintF("%sEES:   %.2f\n", strReport, fExtraEnemyStrength);
+    strReport.PrintF("%sEESPP: %.2f\n", strReport, fExtraStrengthPerPlayer);
+    strReport.PrintF("%sDamage Mul: %.2f\n", strReport, GetGameDamageMultiplier());
+    
+    _pDP->SetFont( _pfdConsoleFont);
+    _pDP->SetTextAspect( 1.0f);
+    _pDP->SetTextScaling(1.0f);
+
+    _pDP->Fill(_pixDPWidth - 128 ,0, _pixDPWidth, _pixDPHeight, C_BLACK|0, C_BLACK|128, C_BLACK|0, C_BLACK|128);
+    _pDP->PutText( strReport, _pixDPWidth - 128 + 4, 65, C_WHITE|CT_OPAQUE);
+  }
 }
 #endif
 
