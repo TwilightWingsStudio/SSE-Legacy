@@ -55,16 +55,23 @@ components:
    2 texture TEXTURE_RAYCASTER   "Models\\Editor\\RayCaster.tex",
 
 functions:
+  // --------------------------------------------------------------------------------------
+  // Returns short entity description to show it in SED.
+  // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const
   {
     ((CTString&)m_strDescription).PrintF("-><none>");
+
     if (m_penTarget != NULL) {
       ((CTString&)m_strDescription).PrintF("->%s", m_penTarget->GetName());
     }
+
     return m_strDescription;
   }
 
-  // returns bytes of memory used by this object
+  // --------------------------------------------------------------------------------------
+  // Returns bytes of memory used by this object.
+  // --------------------------------------------------------------------------------------
   SLONG GetUsedMemory(void)
   {
     // initial
@@ -78,7 +85,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Casts this fucked ray!
   // --------------------------------------------------------------------------------------
-  void DoCastRay() {
+  void DoCastRay()
+  {
     if (!m_bActive) {
       return;
     }
@@ -105,9 +113,8 @@ functions:
     GetWorld()->CastRay(crRay);  
 
     INDEX ctCasts = 0;
-    while (ctCasts < 10){
-
-
+    while (ctCasts < 10)
+    {
       if (crRay.cr_penHit && crRay.cr_fHitDistance < 1.0f && !(crRay.cr_penHit->GetRenderType() != RT_BRUSH)){
         // next casts
         GetWorld()->ContinueCast(crRay);
@@ -154,6 +161,9 @@ functions:
   }
 
 procedures:
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     InitAsEditorModel();
@@ -171,8 +181,10 @@ procedures:
   
     autowait(0.1f);
 
-    while (TRUE) {
-      wait(_pTimer->TickQuantum) {
+    while (TRUE)
+    {
+      wait(_pTimer->TickQuantum)
+      {
         on (EBegin) : { 
           if (m_bPerTickCheck) {
             DoCastRay();
