@@ -1410,66 +1410,54 @@ FLOAT GetGameDamageMultiplier(void)
   FLOAT fExtraStrengthPerPlayer = GetSP()->sp_fExtraEnemyStrengthPerPlayer;
   BOOL bSharedLives = GetSP()->sp_bSharedLives;
 
+  // If EESPP enabled then it should be applied!
   if (fExtraStrengthPerPlayer > 0)
   {
     // If we use limited lives then follow our way.
     if (GetSP()->sp_ctCredits >= 0) {
       INDEX ctMaxPlayers = CEntity::GetMaxPlayers();
+      INDEX ctDeadCanRespawn = 0;
 
-      // If shared lives then do this shit.
-      if (bSharedLives) {
-        INDEX ctAlive = 0;
-        INDEX ctDead = 0;
+      INDEX ctAlive = 0;
+      INDEX ctDead = 0;
+      
+      for (INDEX iPlayer = 0; iPlayer < ctMaxPlayers; iPlayer++)
+      {
+        CEntity *penEntity = CEntity::GetPlayerEntity(iPlayer);
         
-        for (INDEX iPlayer = 0; iPlayer < ctMaxPlayers; iPlayer++)
-        {
-          CEntity *penEntity = CEntity::GetPlayerEntity(iPlayer);
-          
-          // If player is invalid then skip him.
-          if (penEntity == NULL) {
-            continue;
-          }
-          
-          if (penEntity->IsAlive()) {
-            ctAlive++;
-          } else {
+        // If player is invalid then skip him.
+        if (penEntity == NULL) {
+          continue;
+        }
+        
+        if (penEntity->IsAlive()) {
+          ctAlive++;
+        } else {
+          if (bSharedLives) {
             ctDead++;
+          } else {
+            CPlayer *penPlayer = static_cast<CPlayer*>(penEntity);
+
+            if (penPlayer->m_iLives > 0) {
+              ctDeadCanRespawn++;
+            }
           }
         }
+      }
 
-        INDEX ctCreditsLeft = GetSP()->sp_ctCreditsLeft;
-        
-        INDEX ctDeadCanRespawn = 0;
+      INDEX ctCreditsLeft = GetSP()->sp_ctCreditsLeft;
 
-        // If all dead can be respawned then count them all.
+      // If all dead can be respawned then count them all.
+      if (bSharedLives)
+      {
         if (ctDead <= ctCreditsLeft) {
           ctDeadCanRespawn = ctDead;
         } else { // If not enough lives for all.
           ctDeadCanRespawn = ctCreditsLeft;
         }
-        
-        fGameDamageMultiplier *= 1.0f / (1 + fExtraStrengthPerPlayer * ClampDn(ctAlive - 1.0F + ctDeadCanRespawn, 0.0f));
-
-      } else {
-        INDEX ctActive = 0;
-        
-        for (INDEX iPlayer = 0; iPlayer < ctMaxPlayers; iPlayer++)
-        {
-          CPlayer *penPlayer = (CPlayer *)CEntity::GetPlayerEntity(iPlayer); 
-          
-          // If player is invalid then skip him.
-          if (penPlayer == NULL) {
-            continue;
-          }
-          
-          // If player is alive or have lives then count him!
-          if (penPlayer->IsAlive() || penPlayer->m_iLives > 0) {
-            ctActive++;
-          }
-        }
-        
-        fGameDamageMultiplier *= 1.0f / (1 + fExtraStrengthPerPlayer * ClampDn(ctActive - 1.0f, 0.0f));
       }
+
+      fGameDamageMultiplier *= 1.0f / (1 + fExtraStrengthPerPlayer * ClampDn(ctAlive - 1.0F + ctDeadCanRespawn, 0.0f));
 
     // If we don't use lives then follow vanilla way.
     } else {
