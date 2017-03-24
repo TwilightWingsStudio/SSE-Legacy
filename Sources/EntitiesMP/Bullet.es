@@ -67,13 +67,19 @@ functions:
 /************************************************************
  *                      BULLET LAUNCH                       *
  ************************************************************/
-  // set bullet damage
-  void SetDamage(FLOAT fDamage) {
+  // --------------------------------------------------------------------------------------
+  // Set bullet damage.
+  // --------------------------------------------------------------------------------------
+  void SetDamage(FLOAT fDamage)
+  {
     m_fDamage = fDamage;
   };
 
-  // calc jitter target
-  void CalcTarget(FLOAT fRange) {
+  // --------------------------------------------------------------------------------------
+  // Calculates jitter target.
+  // --------------------------------------------------------------------------------------
+  void CalcTarget(FLOAT fRange)
+  {
     // destination in bullet direction
     AnglesToDirectionVector(GetPlacement().pl_OrientationAngle, m_vTarget);
     m_vTarget *= fRange;
@@ -81,7 +87,11 @@ functions:
     m_vTargetCopy = m_vTarget;
   };
 
-  void CalcTarget(CEntity *pen, FLOAT fRange) {
+  // --------------------------------------------------------------------------------------
+  // Calculates target.
+  // --------------------------------------------------------------------------------------
+  void CalcTarget(CEntity *pen, FLOAT fRange)
+  {
     FLOAT3D vTarget;
 
     // target body
@@ -96,7 +106,8 @@ functions:
   };
 
   // calc jitter target - !!! must call CalcTarget first !!!
-  void CalcJitterTarget(FLOAT fR) {
+  void CalcJitterTarget(FLOAT fR)
+  {
     FLOAT3D vJitter;
 /* My Sphere
     FLOAT fXZ = FRnd()*360.0f;
@@ -120,8 +131,11 @@ functions:
     m_vTarget = m_vTargetCopy + vJitter;
   };
 
-  // calc jitter target asymetric - !!! must call CalcTarget first !!!
-  void CalcJitterTargetFixed(FLOAT fX, FLOAT fY, FLOAT fJitter) {
+  // --------------------------------------------------------------------------------------
+  // Calc jitter target asymetric - !!! must call CalcTarget first !!!
+  // --------------------------------------------------------------------------------------
+  void CalcJitterTargetFixed(FLOAT fX, FLOAT fY, FLOAT fJitter)
+  {
     FLOAT fRndX = FRnd()*2.0f - 1.0f;
     FLOAT fRndY = FRnd()*2.0f - 1.0f;
     FLOAT3D vX, vY;
@@ -132,7 +146,9 @@ functions:
     m_vTarget = m_vTargetCopy + (vX*(fX+fRndX*fJitter)) + (vY*(fY+fRndY*fJitter));
   };
 
-  // launch one bullet
+  // --------------------------------------------------------------------------------------
+  // Launch one bullet.
+  // --------------------------------------------------------------------------------------
   void LaunchBullet(BOOL bSound, BOOL bTrail, BOOL bHitFX)
   {
     // cast a ray to find bullet target
@@ -146,25 +162,23 @@ functions:
     AnglesToDirectionVector(GetPlacement().pl_OrientationAngle, vHitDirection);
 
     INDEX ctCasts = 0;
+
     while( ctCasts<10)
     {
-      if(ctCasts == 0)
-      {
-        // perform first cast
-        GetWorld()->CastRay(crRay);       
+      if (ctCasts == 0) {
+        GetWorld()->CastRay(crRay); // perform first cast
+      } else {
+        GetWorld()->ContinueCast(crRay); // next casts
       }
-      else
-      {
-        // next casts
-        GetWorld()->ContinueCast(crRay);
-      }
+
       ctCasts++;
 
       // stop casting if nothing hit
-      if (crRay.cr_penHit==NULL)
+      if (crRay.cr_penHit == NULL)
       {
         break;
       }
+
       // apply damage
       const FLOAT fDamageMul = GetSeriousDamageMultiplier(m_penOwner);
       InflictDirectDamage(crRay.cr_penHit, m_penOwner, m_EdtDamage, m_fDamage*fDamageMul,
@@ -173,7 +187,7 @@ functions:
       m_vHitPoint = crRay.cr_vHit;
 
       // if brush hitted
-      if (crRay.cr_penHit->GetRenderType()==RT_BRUSH && crRay.cr_pbpoBrushPolygon!=NULL)
+      if (crRay.cr_penHit->GetRenderType()==RT_BRUSH && crRay.cr_pbpoBrushPolygon != NULL)
       {
         CBrushPolygon *pbpo = crRay.cr_pbpoBrushPolygon;
         FLOAT3D vHitNormal = FLOAT3D(pbpo->bpo_pbplPlane->bpl_plAbsolute);
@@ -201,19 +215,24 @@ functions:
             bhtType=BHT_BRUSH_UNDER_WATER;
           }
         }
+
         // spawn hit effect
         BOOL bPassable = pbpo->bpo_ulFlags & (BPOF_PASSABLE|BPOF_SHOOTTHRU);
+
         if (!bPassable || iSurfaceType==SURFACE_WATER) {
           SpawnHitTypeEffect(this, bhtType, bSound, vHitNormal, crRay.cr_vHit, vHitDirection, FLOAT3D(0.0f, 0.0f, 0.0f));
         }
+
         if(!bPassable) {
           break;
         }
+
       // if not brush
       } else {
 
         // if flesh entity
-        if (crRay.cr_penHit->GetEntityInfo()!=NULL) {
+        if (crRay.cr_penHit->GetEntityInfo() != NULL)
+        {
           if( ((EntityInfo*)crRay.cr_penHit->GetEntityInfo())->Eeibt == EIBT_FLESH)
           {
             CEntity *penOfFlesh = crRay.cr_penHit;
@@ -223,8 +242,7 @@ functions:
 
             // look behind the entity (for back-stains)
             GetWorld()->ContinueCast(crRay);
-            if( crRay.cr_penHit!=NULL && crRay.cr_pbpoBrushPolygon!=NULL && 
-                crRay.cr_penHit->GetRenderType()==RT_BRUSH)
+            if (crRay.cr_penHit != NULL && crRay.cr_pbpoBrushPolygon!=NULL && crRay.cr_penHit->GetRenderType()==RT_BRUSH)
             {
               vDistance = crRay.cr_vHit-vOldHitPos;
               vHitNormal = FLOAT3D(crRay.cr_pbpoBrushPolygon->bpo_pbplPlane->bpl_plAbsolute);
@@ -235,17 +253,34 @@ functions:
               vHitNormal = FLOAT3D(0,0,0);
             }
 
-            if(IsOfClass(penOfFlesh, "Gizmo") ||
-               IsOfClass(penOfFlesh, "Beast"))
+            /*
+            if (crRay.cr_penHit != NULL && crRay.cr_pbpoBrushPolygon == NULL) {
+              InflictDirectDamage(crRay.cr_penHit, m_penOwner, m_EdtDamage, m_fDamage*fDamageMul,
+                                    crRay.cr_vHit, vHitDirection);
+
+              for (INDEX i = 0; i < 9; i++)
+              {
+                GetWorld()->ContinueCast(crRay);
+
+                if (crRay.cr_penHit != NULL && crRay.cr_pbpoBrushPolygon == NULL) {
+                  InflictDirectDamage(crRay.cr_penHit, m_penOwner, m_EdtDamage, m_fDamage*fDamageMul,
+                                        crRay.cr_vHit, vHitDirection);
+                } else {
+                  break;
+                }
+              }
+            }
+            */
+
+            if(IsOfClass(penOfFlesh, "Gizmo") || IsOfClass(penOfFlesh, "Beast"))
             {
               // spawn green blood hit spill effect
               SpawnHitTypeEffect(this, BHT_ACID, bSound, vHitNormal, crRay.cr_vHit, vHitDirection, vDistance);
-            }
-            else
-            {
+            } else {
               // spawn red blood hit spill effect
               SpawnHitTypeEffect(this, BHT_FLESH, bSound, vHitNormal, crRay.cr_vHit, vHitDirection, vDistance);
             }
+
             break;
           }
         }
@@ -255,23 +290,24 @@ functions:
       }
     }
 
-    if( bTrail)
-    {
+    if (bTrail) {
       SpawnTrail();
     }
   };
 
-  // destroy yourself
+  // --------------------------------------------------------------------------------------
+  // Destroy yourself.
+  // --------------------------------------------------------------------------------------
   void DestroyBullet(void) {
     Destroy();
   };
 
-
-
 /************************************************************
  *                        EFFECTS                           *
  ************************************************************/
-  // spawn trail of this bullet
+ // --------------------------------------------------------------------------------------
+  // Spawns trail of this bullet.
+  // --------------------------------------------------------------------------------------
   void SpawnTrail(void) 
   {
     // get bullet path positions
@@ -315,7 +351,9 @@ functions:
   }
 
 procedures:
-
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main(EBulletInit eInit)
   {
     // remember the initial parameters
