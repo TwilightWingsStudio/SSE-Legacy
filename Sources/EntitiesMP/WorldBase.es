@@ -636,6 +636,16 @@ void CWorldBase_OnWorldInit(CWorld *pwo)
   pwo->wo_actContentTypes[6].ct_fSwimDamageAmount = 5.0f;
   pwo->wo_actContentTypes[6].ct_tmSwimDamageFrequency = 0.5f;
   pwo->wo_actContentTypes[6].ct_ulFlags = CTF_SWIMABLE|CTF_FADESPINNING;
+  
+  // [SSE]
+  pwo->wo_actContentTypes[7].ct_strName = "No Oxygen Atmosphere";
+  pwo->wo_actContentTypes[7].ct_fDensity = 0.0f;
+  pwo->wo_actContentTypes[7].ct_fFluidFriction     = 0.0f;
+  pwo->wo_actContentTypes[7].ct_fControlMultiplier = 1.0f;
+  pwo->wo_actContentTypes[7].ct_fSpeedMultiplier = 1.0f;
+  pwo->wo_actContentTypes[7].ct_fDrowningDamageAmount = 10.0f;
+  pwo->wo_actContentTypes[7].ct_tmDrowningDamageDelay = 1.0f;
+  pwo->wo_actContentTypes[7].ct_ulFlags = CTF_FLYABLE;
 
   // environments
   pwo->wo_aetEnvironmentTypes[ 0].et_strName = "Normal";

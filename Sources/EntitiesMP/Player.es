@@ -3937,13 +3937,17 @@ functions:
 
     // play hurting sound
     if (dmtType == DMT_DROWNING) {
-      SetRandomMouthPitch( 0.9f, 1.1f);
-      PlaySound( m_soMouth, GenderSound(SOUND_DROWN), SOF_3D);
-      if (_pNetwork->IsPlayerLocal(this)) {IFeel_PlayEffect("WoundWater");}
-      m_tmMouthSoundLast = _pTimer->CurrentTick();
-      PlaySound( m_soLocalAmbientOnce, SOUND_WATERBUBBLES, SOF_3D|SOF_VOLUMETRIC|SOF_LOCAL);
-      m_soLocalAmbientOnce.Set3DParameters( 25.0f, 5.0f, 2.0f, Lerp(0.5f, 1.5f, FRnd()) );
-      SpawnBubbles( 10+INDEX(FRnd()*10));
+      if (m_pstState == PST_DIVE)
+      {
+        SetRandomMouthPitch( 0.9f, 1.1f);
+        PlaySound( m_soMouth, GenderSound(SOUND_DROWN), SOF_3D);
+        if (_pNetwork->IsPlayerLocal(this)) {IFeel_PlayEffect("WoundWater");}
+        m_tmMouthSoundLast = _pTimer->CurrentTick();
+        PlaySound( m_soLocalAmbientOnce, SOUND_WATERBUBBLES, SOF_3D|SOF_VOLUMETRIC|SOF_LOCAL);
+        m_soLocalAmbientOnce.Set3DParameters( 25.0f, 5.0f, 2.0f, Lerp(0.5f, 1.5f, FRnd()) );
+        SpawnBubbles( 10+INDEX(FRnd()*10));
+      }
+
     } else if (m_fDamageAmmount>1.0f) {
       // if not dead
       if (GetFlags()&ENF_ALIVE) {
@@ -5475,7 +5479,7 @@ functions:
     
       // if player is almost out of air
       // [SSE] This condition is for custom oxygen capacity
-      if (en_tmMaxHoldBreath > 0.0F)
+      if (en_tmMaxHoldBreath > 0.0F && m_pstState == PST_DIVE)
       {
         FLOAT fOxygenLeft = (en_tmMaxHoldBreath - (tmNow - en_tmLastBreathed)) / en_tmMaxHoldBreath;
 
