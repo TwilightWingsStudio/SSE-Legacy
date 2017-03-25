@@ -75,6 +75,7 @@ properties:
   9 FLOAT m_fStartTime "Time Start" = 0.0f, // Trigger Event sets "m_fStartTime" to "_pTimer->CurrentTick()"
  10 FLOAT m_fAddTime "Time Add" = 0.0f, // how much the particles should be visible (depends on the type)
  11 BOOL m_bActive "Active" = TRUE,
+ 12 BOOL m_bRenderOnlyOnTarget "Render only on Target" = FALSE, // don't render particles if m_penTarget == NULL
 
  20 FLOAT m_fParameter1   "Param FLOAT 1" = 0.0f,
  21 FLOAT m_fParameter2   "Param FLOAT 2" = 0.0f,
@@ -108,6 +109,11 @@ functions:
   void RenderParticles(void)
   {
     if (!m_bActive) {
+      return;
+    }
+
+    // don't render particles if there's no target entity
+    if ((!m_penTarget || m_penTarget->GetFlags()&ENF_DELETED) && m_bRenderOnlyOnTarget) {
       return;
     }
 
