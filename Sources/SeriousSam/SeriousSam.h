@@ -25,6 +25,7 @@ extern INDEX sam_iDisplayDepth;
 extern INDEX sam_iDisplayAdapter;
 extern INDEX sam_iGfxAPI;
 extern INDEX sam_iVideoSetup;  // 0==speed, 1==normal, 2==quality, 3==custom
+extern INDEX sam_iVideoAspectRatio; // [SSE] Aspect Ratio
 extern BOOL  sam_bAutoAdjustAudio;
 
 extern void StartNewMode( enum GfxAPIType eAPI, INDEX iAdapter, PIX pixSizeI, PIX pixSizeJ,

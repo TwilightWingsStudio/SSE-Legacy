@@ -213,6 +213,9 @@
     <ClCompile Include="GUI\Menus\MenuActions.cpp">
       <Filter>Source Files\GUI\Menus</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\Components\MGCheckBox.cpp">
+      <Filter>Source Files\GUI\Gadgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CmdLine.h">
@@ -403,6 +406,9 @@
     </ClInclude>
     <ClInclude Include="GUI\Menus\MenuActions.h">
       <Filter>Header Files\GUI headers\Menus headers</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Components\MGCheckBox.h">
+      <Filter>Header Files\GUI headers\Gadgets headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

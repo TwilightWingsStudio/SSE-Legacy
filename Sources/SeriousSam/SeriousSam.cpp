@@ -75,6 +75,7 @@ static TIME _tmDisplayModeChanged = 100.0f; // when display mode was last change
 
 // rendering preferences for automatic settings
 extern INDEX sam_iVideoSetup = 1;  // 0==speed, 1==normal, 2==quality, 3==custom
+extern INDEX sam_iVideoAspectRatio = 0;  // [SSE] Aspect Ratio 0==4:3, 1==16:9, 2==16:10, 3==21:9 
 // automatic adjustment of audio quality
 extern BOOL sam_bAutoAdjustAudio = TRUE;
 
@@ -466,6 +467,7 @@ BOOL Init( HINSTANCE hInstance, int nCmdShow, CTString strCmdLine)
   _pShell->DeclareSymbol("user void Quit(void);", &QuitGame);
 
   _pShell->DeclareSymbol("persistent user INDEX sam_iVideoSetup;",     &sam_iVideoSetup);
+  _pShell->DeclareSymbol("persistent user INDEX sam_iVideoAspectRatio;",     &sam_iVideoAspectRatio); // [SSE] Aspect Ratio
   _pShell->DeclareSymbol("user void ApplyRenderingPreferences(void);", &ApplyRenderingPreferences);
   _pShell->DeclareSymbol("user void ApplyVideoMode(void);",            &ApplyVideoMode);
   _pShell->DeclareSymbol("user void Benchmark(void);", &BenchMark);
@@ -510,6 +512,8 @@ BOOL Init( HINSTANCE hInstance, int nCmdShow, CTString strCmdLine)
   LoadAndForceTexture(_toLogoODI,  _ptoLogoODI,  CTFILENAME("Textures\\Logo\\GodGamesLogo.tex"));
   LoadAndForceTexture(_toLogoEAX,  _ptoLogoEAX,  CTFILENAME("Textures\\Logo\\LogoEAX.tex"));
 
+  sam_strVersion.PrintF("%s-R%d", sam_strVersion, _ulEngineRevision);
+  
   // !! NOTE !! Re-enable these to allow mod support.
   LoadStringVar(CTString("Data\\Var\\Sam_Version.var"), sam_strVersion);
   LoadStringVar(CTString("Data\\Var\\ModName.var"), sam_strModName);

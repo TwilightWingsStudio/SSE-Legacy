@@ -44,32 +44,37 @@ void CVideoOptionsMenu::Initialize_t(void)
     gm_mgDisplayPrefsTrigger, gm_mgResolutionsTrigger, TRANS("ASPECT RATIO"), astrDisplayAspectRatioTexts);
     
   TRIGGER_MG(gm_mgResolutionsTrigger, 4,
-    gm_mgAspectRatioTrigger, gm_mgFullScreenTrigger, TRANS("RESOLUTION"), astrNoYes);
-
-  TRIGGER_MG(gm_mgFullScreenTrigger, 5,
-    gm_mgResolutionsTrigger, gm_mgBitsPerPixelTrigger, TRANS("FULL SCREEN"), astrNoYes);
+    gm_mgAspectRatioTrigger, gm_mgFullScreenCheckBox, TRANS("RESOLUTION"), astrNoYes);
+    
+  gm_mgFullScreenCheckBox.mg_bfsFontSize = BFS_MEDIUM;
+  gm_mgFullScreenCheckBox.mg_boxOnScreen = BoxMediumRow(5.0f);
+  gm_mgFullScreenCheckBox.mg_pmgUp = &gm_mgResolutionsTrigger;
+  gm_mgFullScreenCheckBox.mg_pmgDown = &gm_mgBitsPerPixelTrigger;
+  gm_mgFullScreenCheckBox.mg_strText = TRANS("FULLSCREEN");
+  gm_mgFullScreenCheckBox.mg_pActivatedFunction = NULL;
+  
+  AddChild(&gm_mgFullScreenCheckBox);
 
   TRIGGER_MG(gm_mgBitsPerPixelTrigger, 6,
-    gm_mgFullScreenTrigger, gm_mgVideoRendering, TRANS("BITS PER PIXEL"), astrBitsPerPixelRadioTexts);
+    gm_mgFullScreenCheckBox, gm_mgVideoRendering, TRANS("BITS PER PIXEL"), astrBitsPerPixelRadioTexts);
     
   gm_mgDisplayAPITrigger.mg_strTip = TRANS("choose graphics API to be used");
   gm_mgDisplayAdaptersTrigger.mg_strTip = TRANS("choose display adapter to be used");
   gm_mgDisplayPrefsTrigger.mg_strTip = TRANS("balance between speed and rendering quality, depending on your system");
   gm_mgResolutionsTrigger.mg_strTip = TRANS("select video mode resolution");
-  gm_mgFullScreenTrigger.mg_strTip = TRANS("make game run in a window or in full screen");
+  gm_mgFullScreenCheckBox.mg_strTip = TRANS("make game run in a window or in full screen");
   gm_mgBitsPerPixelTrigger.mg_strTip = TRANS("select number of colors used for display");
 
   // Reset all pointers.
   gm_mgDisplayPrefsTrigger.mg_pOnTriggerChange = NULL;
   gm_mgDisplayAPITrigger.mg_pOnTriggerChange = NULL;
   gm_mgDisplayAdaptersTrigger.mg_pOnTriggerChange = NULL;
-  gm_mgFullScreenTrigger.mg_pOnTriggerChange = NULL;
   gm_mgResolutionsTrigger.mg_pOnTriggerChange = NULL;
   gm_mgBitsPerPixelTrigger.mg_pOnTriggerChange = NULL;
 
    // Initialize "Rendering Options" button.
   gm_mgVideoRendering.mg_bfsFontSize = BFS_MEDIUM;
-  gm_mgVideoRendering.mg_boxOnScreen = BoxMediumRow(7.0f);
+  gm_mgVideoRendering.mg_boxOnScreen = BoxMediumRow(8.0f);
   gm_mgVideoRendering.mg_pmgUp = &gm_mgBitsPerPixelTrigger;
   gm_mgVideoRendering.mg_pmgDown = &gm_mgApply;
   gm_mgVideoRendering.mg_strText = TRANS("RENDERING OPTIONS");
@@ -78,7 +83,7 @@ void CVideoOptionsMenu::Initialize_t(void)
 
   // Initialize "Apply" button.
   gm_mgApply.mg_bfsFontSize = BFS_LARGE;
-  gm_mgApply.mg_boxOnScreen = BoxBigRow(5.5f);
+  gm_mgApply.mg_boxOnScreen = BoxBigRow(6.0f);
   gm_mgApply.mg_pmgUp = &gm_mgVideoRendering;
   gm_mgApply.mg_pmgDown = &gm_mgDisplayAPITrigger;
   gm_mgApply.mg_strText = TRANS("APPLY");
