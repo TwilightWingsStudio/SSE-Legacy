@@ -562,9 +562,6 @@
     <ClCompile Include="PlayerInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerParenter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MovableModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1608,12 +1605,6 @@
     <ClInclude Include="PlayerInfo_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerParenter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerParenter_tables.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MovableModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2623,9 +2614,6 @@
     </CustomBuild>
     <CustomBuild Include="RayCaster.es">
       <Filter>Class Files\Tools</Filter>
-    </CustomBuild>
-    <CustomBuild Include="PlayerParenter.es">
-      <Filter>Class Files\Players</Filter>
     </CustomBuild>
     <CustomBuild Include="PropertyChanger.es">
       <Filter>Class Files\Tools</Filter>

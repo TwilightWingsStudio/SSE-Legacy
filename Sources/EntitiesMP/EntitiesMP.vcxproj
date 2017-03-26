@@ -192,7 +192,6 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="MovableBrush.cpp" />
     <ClCompile Include="MovableModel.cpp" />
     <ClCompile Include="PlayerInfo.cpp" />
-    <ClCompile Include="PlayerParenter.cpp" />
     <ClCompile Include="PlayerSettings.cpp" />
     <ClCompile Include="ProgressiveSwitch.cpp" />
     <ClCompile Include="PropertiesCloner.cpp" />
@@ -445,8 +444,6 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="MovableModel_tables.h" />
     <ClInclude Include="PlayerInfo.h" />
     <ClInclude Include="PlayerInfo_tables.h" />
-    <ClInclude Include="PlayerParenter.h" />
-    <ClInclude Include="PlayerParenter_tables.h" />
     <ClInclude Include="PlayerSettings.h" />
     <ClInclude Include="PlayerSettings_tables.h" />
     <ClInclude Include="ProgressiveSwitch.h" />
@@ -2810,19 +2807,6 @@ ecc EntitiesMP/%(Filename).es </Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
-ecc EntitiesMP/%(Filename).es </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
-ecc EntitiesMP/%(Filename).es </Command>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="PlayerParenter.es">
-      <FileType>Document</FileType>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
 ecc EntitiesMP/%(Filename).es </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
