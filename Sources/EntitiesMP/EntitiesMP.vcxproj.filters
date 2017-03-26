@@ -625,6 +625,9 @@
     <ClCompile Include="EntityParticles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleParenter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1725,6 +1728,12 @@
     <ClInclude Include="EntityParticles_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SimpleParenter_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleParenter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2677,6 +2686,9 @@
     </CustomBuild>
     <CustomBuild Include="EntityParticles.es">
       <Filter>Class Files\Effects</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SimpleParenter.es">
+      <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
