@@ -338,6 +338,7 @@ void CTString::ReadFromText_t(CTStream &strmStream,
 
   // read the string from the file
   char str[1024];
+  memset(&str, 0, 1024); // [SSE]
   strmStream.GetLine_t(str, sizeof(str));
 
   // copy it here
