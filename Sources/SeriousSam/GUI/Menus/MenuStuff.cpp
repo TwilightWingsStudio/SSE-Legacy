@@ -37,6 +37,14 @@ extern CTString astrWeapon[] = {
   RADIOTRANS("Only if stronger"),
 };
 
+// [SSE] Aspect Ratio
+extern CTString astrDisplayAspectRatioTexts[] = {
+  RADIOTRANS("4:3"),
+  RADIOTRANS("16:9"),
+  RADIOTRANS("16:10"),
+  RADIOTRANS("21:9"),  
+};
+
 extern PIX apixWidths[][2] = {
   320, 240,
   400, 300,

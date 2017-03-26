@@ -28,6 +28,7 @@ public:
   CMGTrigger gm_mgDisplayAPITrigger;
   CMGTrigger gm_mgDisplayAdaptersTrigger;
   CMGTrigger gm_mgFullScreenTrigger;
+  CMGTrigger gm_mgAspectRatioTrigger;
   CMGTrigger gm_mgResolutionsTrigger;
   CMGTrigger gm_mgDisplayPrefsTrigger;
   CMGButton gm_mgVideoRendering;

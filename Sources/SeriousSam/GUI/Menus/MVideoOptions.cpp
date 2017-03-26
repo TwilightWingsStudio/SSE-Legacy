@@ -33,21 +33,30 @@ void CVideoOptionsMenu::Initialize_t(void)
 
   TRIGGER_MG(gm_mgDisplayAPITrigger, 0,
     gm_mgApply, gm_mgDisplayAdaptersTrigger, TRANS("GRAPHICS API"), astrDisplayAPIRadioTexts);
-  gm_mgDisplayAPITrigger.mg_strTip = TRANS("choose graphics API to be used");
+
   TRIGGER_MG(gm_mgDisplayAdaptersTrigger, 1,
     gm_mgDisplayAPITrigger, gm_mgDisplayPrefsTrigger, TRANS("DISPLAY ADAPTER"), astrNoYes);
-  gm_mgDisplayAdaptersTrigger.mg_strTip = TRANS("choose display adapter to be used");
+
   TRIGGER_MG(gm_mgDisplayPrefsTrigger, 2,
     gm_mgDisplayAdaptersTrigger, gm_mgResolutionsTrigger, TRANS("PREFERENCES"), astrDisplayPrefsRadioTexts);
-  gm_mgDisplayPrefsTrigger.mg_strTip = TRANS("balance between speed and rendering quality, depending on your system");
-  TRIGGER_MG(gm_mgResolutionsTrigger, 3,
-    gm_mgDisplayPrefsTrigger, gm_mgFullScreenTrigger, TRANS("RESOLUTION"), astrNoYes);
-  gm_mgResolutionsTrigger.mg_strTip = TRANS("select video mode resolution");
-  TRIGGER_MG(gm_mgFullScreenTrigger, 4,
+
+  TRIGGER_MG(gm_mgAspectRatioTrigger, 3,
+    gm_mgDisplayPrefsTrigger, gm_mgResolutionsTrigger, TRANS("ASPECT RATIO"), astrDisplayAspectRatioTexts);
+    
+  TRIGGER_MG(gm_mgResolutionsTrigger, 4,
+    gm_mgAspectRatioTrigger, gm_mgFullScreenTrigger, TRANS("RESOLUTION"), astrNoYes);
+
+  TRIGGER_MG(gm_mgFullScreenTrigger, 5,
     gm_mgResolutionsTrigger, gm_mgBitsPerPixelTrigger, TRANS("FULL SCREEN"), astrNoYes);
-  gm_mgFullScreenTrigger.mg_strTip = TRANS("make game run in a window or in full screen");
-  TRIGGER_MG(gm_mgBitsPerPixelTrigger, 5,
+
+  TRIGGER_MG(gm_mgBitsPerPixelTrigger, 6,
     gm_mgFullScreenTrigger, gm_mgVideoRendering, TRANS("BITS PER PIXEL"), astrBitsPerPixelRadioTexts);
+    
+  gm_mgDisplayAPITrigger.mg_strTip = TRANS("choose graphics API to be used");
+  gm_mgDisplayAdaptersTrigger.mg_strTip = TRANS("choose display adapter to be used");
+  gm_mgDisplayPrefsTrigger.mg_strTip = TRANS("balance between speed and rendering quality, depending on your system");
+  gm_mgResolutionsTrigger.mg_strTip = TRANS("select video mode resolution");
+  gm_mgFullScreenTrigger.mg_strTip = TRANS("make game run in a window or in full screen");
   gm_mgBitsPerPixelTrigger.mg_strTip = TRANS("select number of colors used for display");
 
   // Reset all pointers.

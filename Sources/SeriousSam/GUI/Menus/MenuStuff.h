@@ -49,6 +49,7 @@ extern CTString astrBitsPerPixelRadioTexts[3];
 extern CTString astrFrequencyRadioTexts[4];
 extern CTString astrSoundAPIRadioTexts[3];
 
+extern CTString astrDisplayAspectRatioTexts[4];
 extern PIX apixWidths[20][2];
 
 ULONG GetSpawnFlagsForGameType(INDEX iGameType);
