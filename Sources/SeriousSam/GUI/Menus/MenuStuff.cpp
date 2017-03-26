@@ -39,10 +39,10 @@ extern CTString astrWeapon[] = {
 
 // [SSE] Aspect Ratio
 extern CTString astrDisplayAspectRatioTexts[] = {
-  RADIOTRANS("4:3"),
-  RADIOTRANS("16:9"),
-  RADIOTRANS("16:10"),
-  RADIOTRANS("21:9"),  
+  CTString("4:3"),
+  CTString("16:9"),
+  CTString("16:10"),
+  CTString("21:9"),  
 };
 
 extern PIX apixWidths[][2] = {
