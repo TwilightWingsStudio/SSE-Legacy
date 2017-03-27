@@ -394,6 +394,7 @@ extern BOOL hud_bSniperScopeWheelColoring = TRUE;
 extern void HUD_ReloadSS(void* pArgs);
 
 extern BOOL hud_bGameDebugMonitor = FALSE;
+extern INDEX hud_iHUDType = 0;
 // [SSE] END
 
 extern FLOAT plr_fBreathingStrength = 0.0f;
@@ -877,6 +878,7 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("user void hud_Reload(void);",  &HUD_ReloadSS);
 
   _pShell->DeclareSymbol("persistent user INDEX hud_bGameDebugMonitor;",  &hud_bGameDebugMonitor);
+  _pShell->DeclareSymbol("persistent user INDEX hud_iHUDType;",  &hud_iHUDType);
   //
   
   _pShell->DeclareSymbol("INDEX cht_bKillFinalBoss;",  &cht_bKillFinalBoss);

@@ -97,6 +97,7 @@ extern BOOL hud_bSniperScopeWheelColoring;
 
 // [SSE]
 extern BOOL hud_bGameDebugMonitor;
+extern INDEX hud_iHUDType;
 //
 
 // player statistics sorting keys
@@ -127,6 +128,7 @@ static PIX   _pixDPWidth, _pixDPHeight;
 static FLOAT _fResolutionScaling;
 static FLOAT _fCustomScaling;
 static ULONG _ulAlphaHUD;
+static ULONG _ulBrAlpha;
 static COLOR _colHUD;
 static COLOR _colHUDText;
 static TIME  _tmNow = -1.0f;
@@ -918,6 +920,81 @@ void HUD_SetEntityForStackDisplay(CRationalEntity *pren)
   return;
 }
 
+static void HUD_DrawDebugMonitor()
+{
+  FLOAT fExtraEnemyStrength = GetSP()->sp_fExtraEnemyStrength;
+  FLOAT fExtraStrengthPerPlayer = GetSP()->sp_fExtraEnemyStrengthPerPlayer;
+  INDEX ctCredits = GetSP()->sp_ctCredits;
+  BOOL bSharedLives = GetSP()->sp_bSharedLives;
+
+  INDEX ctMaxPlayers = CEntity::GetMaxPlayers();
+  INDEX ctAlive = 0;
+  INDEX ctDead = 0;
+  INDEX ctDeadCanRespawn = 0;
+  
+  for (INDEX iPlayer = 0; iPlayer < ctMaxPlayers; iPlayer++)
+  {
+    CEntity *penEntity = CEntity::GetPlayerEntity(iPlayer);
+    
+    // If player is invalid then skip him.
+    if (penEntity == NULL) {
+      continue;
+    }
+    
+    if (penEntity->IsAlive()) {
+      ctAlive++;
+    } else {
+      ctDead++;
+      
+      if (!bSharedLives) {
+        CPlayer *penPlayer = static_cast<CPlayer*>(penEntity);
+        if (penPlayer->m_iLives > 0) {
+          ctDeadCanRespawn++;
+        }
+      }
+    }
+  }
+  
+  if (bSharedLives)
+  {
+    INDEX ctCreditsLeft = GetSP()->sp_ctCreditsLeft;
+
+    // If all dead can be respawned then count them all.
+    if (ctDead <= ctCreditsLeft) {
+      ctDeadCanRespawn = ctDead;
+    } else { // If not enough lives for all.
+      ctDeadCanRespawn = ctCreditsLeft;
+    }
+  }
+  
+  CTString strReport;
+
+  strReport += "^bDEBUG MONITOR^r\n";
+  strReport += "\n";
+  strReport += "[Common]\n";
+  strReport.PrintF("%s^cCCCCCCPlayers: %02d / %02d\n", strReport, ctAlive + ctDead, ctMaxPlayers);
+  strReport += "\n";
+  strReport.PrintF("%s^c00FF00Alive: %02d\n", strReport, ctAlive);
+  strReport.PrintF("%s^cFF0000Dead:  %02d\n", strReport, ctDead);
+
+  if (ctCredits >= 0) {
+    strReport.PrintF("%s^cCCCCCCCan Respawn: %02d\n", strReport, ctDeadCanRespawn);
+  }
+
+  strReport += "\n\n";
+  strReport += "^r[^cFFFFFFDDA System^r]^cCCCC00\n";
+  strReport.PrintF("%sEES:   %.2f\n", strReport, fExtraEnemyStrength);
+  strReport.PrintF("%sEESPP: %.2f\n", strReport, fExtraStrengthPerPlayer);
+  strReport.PrintF("%sDamage Mul: %.2f\n", strReport, GetGameDamageMultiplier());
+  
+  _pDP->SetFont( _pfdConsoleFont);
+  _pDP->SetTextAspect( 1.0f);
+  _pDP->SetTextScaling(1.0f);
+
+  _pDP->Fill(_pixDPWidth - 128 ,0, _pixDPWidth, _pixDPHeight, C_BLACK|0, C_BLACK|128, C_BLACK|0, C_BLACK|128);
+  _pDP->PutText( strReport, _pixDPWidth - 128 + 4, 65, C_WHITE|CT_OPAQUE);
+}
+
 #ifdef ENTITY_DEBUG
 static void HUD_DrawEntityStack()
 {
@@ -1296,9 +1373,24 @@ static void HUD_DrawAnchoredTextInRect( FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, 
 // render interface (frontend) to drawport
 // (units are in pixels for 640x480 resolution - for other res HUD will be scalled automatically)
 // --------------------------------------------------------------------------------------
-//#define NEW_HUD
-#ifdef NEW_HUD
+extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner);
+extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner);
+extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner);
+
 extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner)
+{
+  hud_iHUDType = Clamp(hud_iHUDType, INDEX(0), INDEX(2));
+  
+  if (hud_iHUDType == 2) {
+    DrawNewHUD(penPlayerCurrent, pdpCurrent, bSnooping, penPlayerOwner);
+  } else if (hud_iHUDType == 1) {
+    DrawHybrideHUD(penPlayerCurrent, pdpCurrent, bSnooping, penPlayerOwner);
+  } else {
+    DrawOldHUD(penPlayerCurrent, pdpCurrent, bSnooping, penPlayerOwner);
+  }
+}
+
+extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner)
 {
   // no player - no info, sorry
   if (penPlayerCurrent == NULL || (penPlayerCurrent->GetFlags()&ENF_DELETED)) return;
@@ -1337,13 +1429,14 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
   COLOR colMid = LerpColor(colTop, C_RED, 0.5f);
   
   INDEX iCurrentWeapon = _penWeapons->m_iCurrentWeapon;
+  INDEX iWantedWeapon  = _penWeapons->m_iWantedWeapon;
   
   const BOOL bSinglePlay  =  GetSP()->sp_bSinglePlayer;
   const BOOL bCooperative =  GetSP()->sp_bCooperative && !bSinglePlay;
   const BOOL bScoreMatch  = !GetSP()->sp_bCooperative && !GetSP()->sp_bUseFrags;
   const BOOL bFragMatch   = !GetSP()->sp_bCooperative &&  GetSP()->sp_bUseFrags;
 
-  ULONG _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
+  _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
   
   FLOAT fValue = 0.0F;
 
@@ -1397,7 +1490,7 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
     HUD_DrawAnchoredTextInRect(44, 48, 80, 32, EHHAT_LEFT, EHVAT_BOT, strArmor, NONE, fValue / TOP_ARMOR);
   }
   
-  // Current Weapon
+  // Current Weapon and its Ammo
   {
     CTextureObject *ptoCurrentWeapon = NULL;
     ptoCurrentWeapon = _awiWeapons[iCurrentWeapon].wi_ptoWeapon;
@@ -1573,7 +1666,6 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
   
   for (INDEX i = 8; i >= 0; i--)
   {
-    
     HUD_DrawAnchoredRect( 8 + (24 + 3) * i, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
     
     CTextureObject *ptoAmmo = &_toASeriousBomb;
@@ -1586,10 +1678,14 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
     HUD_DrawAnchroredIcon( 8 + (24 + 3) * i, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, *ptoAmmo, C_WHITE|CT_OPAQUE, 1.0F, TRUE); // Icon
     HUD_DrawAnchoredRectOutline(8 + (24 + 3) * i, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
   }
+  
+  if (hud_bGameDebugMonitor)
+  {
+    HUD_DrawDebugMonitor();
+  }
 }
 
-#else
-void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner)
+extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner)
 {
   // no player - no info, sorry
   if (penPlayerCurrent == NULL || (penPlayerCurrent->GetFlags()&ENF_DELETED)) return;
@@ -1620,6 +1716,750 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
   _colHUD     = 0x4C80BB00;
   _colHUDText = SE_COL_ORANGE_LIGHT;
   _ulAlphaHUD = NormFloatToByte(hud_fOpacity);
+  _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
+  _tmNow = _pTimer->CurrentTick();
+  
+  INDEX iCurrentWeapon = _penWeapons->m_iCurrentWeapon;
+  INDEX iWantedWeapon  = _penWeapons->m_iWantedWeapon;
+
+  // determine hud colorization;
+  COLOR colMax = SE_COL_BLUEGREEN_LT;
+  COLOR colTop = SE_COL_ORANGE_LIGHT;
+  COLOR colMid = LerpColor(colTop, C_RED, 0.5f);
+  
+  // adjust borders color in case of spying mode
+  COLOR colBorder = _colHUD;
+
+  if (bSnooping) {
+    colBorder = SE_COL_ORANGE_NEUTRAL;
+    if (((ULONG)(_tmNow*5))&1) {
+      //colBorder = (colBorder>>1) & 0x7F7F7F00; // darken flash and scale
+      colBorder = SE_COL_ORANGE_DARK;
+      _fCustomScaling *= 0.933f;
+    }
+  }
+
+  // draw sniper mask (original mask even if snooping)
+  if (((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_iCurrentWeapon == WEAPON_SNIPER
+    && ((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_bSniping && hud_bSniperScopeDraw) {
+    HUD_DrawSniperMask();
+  }
+
+  // prepare font and text dimensions
+  CTString strValue;
+  PIX pixCharWidth;
+  FLOAT fValue, fNormValue, fCol, fRow;
+  _pDP->SetFont( &_fdNumbersFont);
+  pixCharWidth = _fdNumbersFont.GetWidth() + _fdNumbersFont.GetCharSpacing() +1;
+  FLOAT fChrUnit = pixCharWidth * _fCustomScaling;
+
+  const PIX pixTopBound    = 6;
+  const PIX pixLeftBound   = 6;
+  const PIX pixBottomBound = (480 * _pDP->dp_fWideAdjustment) -pixTopBound;
+  const PIX pixRightBound  = 640-pixLeftBound;
+  FLOAT fOneUnit  = (32+0) * _fCustomScaling;  // unit size
+  FLOAT fAdvUnit  = (32+4) * _fCustomScaling;  // unit advancer
+  FLOAT fNextUnit = (32+8) * _fCustomScaling;  // unit advancer
+  FLOAT fHalfUnit = fOneUnit * 0.5f;
+  FLOAT fMoverX, fMoverY;
+
+  // Health
+  {
+    fValue = Clamp(ceil(_penPlayer->GetHealth()), 0.0f, 999.0F);
+    
+    PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+    
+    HUD_DrawAnchoredRect(8, 8, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchoredRect(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchroredIcon(8, 8, 32, 32, EHHAT_LEFT, EHVAT_BOT, _toHealth, C_WHITE|CT_OPAQUE, fValue / TOP_HEALTH, FALSE);
+
+    HUD_DrawAnchoredRectOutline( 8, 8, 32, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+    HUD_DrawAnchoredRectOutline(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+
+    CTString strHealth;
+    strHealth.PrintF("%.0f", fValue);
+    HUD_DrawAnchoredTextInRect(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, strHealth, NONE, fValue / TOP_HEALTH);
+  }
+
+
+  // Armor
+  if (_penPlayer->m_fArmor > 0.0F) {
+    fValue = Clamp(ceil(_penPlayer->m_fArmor), 0.0f, 999.0F);
+    CTextureObject *ptoCurrentArmor = NULL;
+      
+    if (fValue <= 50.5f) {
+      ptoCurrentArmor = &_toArmorSmall;
+    } else if (fValue<=100.5f) {
+      ptoCurrentArmor = &_toArmorMedium;
+    } else {
+      ptoCurrentArmor = &_toArmorLarge;
+    }
+    
+    PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
+    
+    HUD_DrawAnchoredRect( 8, 48, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchoredRect(44, 48, 80, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchroredIcon(8, 48, 32, 32, EHHAT_LEFT, EHVAT_BOT, *ptoCurrentArmor, C_WHITE|CT_OPAQUE, fValue / TOP_ARMOR, FALSE); // Icon
+
+    HUD_DrawAnchoredRectOutline( 8, 48, 32, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+    HUD_DrawAnchoredRectOutline(44, 48, 80, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+    
+    CTString strArmor;
+    strArmor.PrintF("%.0f", fValue);
+    HUD_DrawAnchoredTextInRect(44, 48, 80, 32, EHHAT_LEFT, EHVAT_BOT, strArmor, NONE, fValue / TOP_ARMOR);
+  }
+
+  CTextureObject *ptoCurrentAmmo = NULL;
+  
+  // Current Weapon and its Ammo
+  {
+    CTextureObject *ptoCurrentWeapon = NULL;
+    ptoCurrentWeapon = _awiWeapons[iCurrentWeapon].wi_ptoWeapon;
+    
+    if (ptoCurrentWeapon != NULL)
+    {
+      HUD_DrawAnchoredRect (-60 - 32, 8, 32, 32, EHHAT_CENTER, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchroredIcon(-60 - 32, 8, 32, 32, EHHAT_CENTER, EHVAT_BOT, *ptoCurrentWeapon, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
+      HUD_DrawAnchoredRectOutline(-60 - 32, 8, 32, 32, EHHAT_CENTER, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+    }
+
+    
+    BOOL bAnyColt = iCurrentWeapon == WEAPON_COLT || iCurrentWeapon == WEAPON_DOUBLECOLT;
+
+    AmmoInfo *paiCurrent = _awiWeapons[iCurrentWeapon].wi_paiAmmo;
+    if (paiCurrent != NULL) ptoCurrentAmmo = paiCurrent->ai_ptoAmmo;
+
+    if (bAnyColt || (ptoCurrentAmmo != NULL && !GetSP()->sp_bInfiniteAmmo))
+    {
+      FLOAT fMaxValue = _penWeapons->GetMaxAmmo();
+      fValue = _penWeapons->GetAmmo();
+
+      CTString strCurrentAmmo;
+      strCurrentAmmo.PrintF( "%d", (SLONG)ceil(fValue));
+      PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.30f, 0.15f, FALSE);
+        
+      if (bAnyColt) {
+        ptoCurrentAmmo = &_toAColt;
+      }
+      
+      HUD_DrawAnchoredRect(  0 - 32, 8, 80, 32, EHHAT_CENTER, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchoredRectOutline(  0 - 32, 8, 80, 32, EHHAT_CENTER, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+      HUD_DrawAnchoredTextInRect(0 - 32, 8, 80, 32, EHHAT_CENTER, EHVAT_BOT, strCurrentAmmo, NONE, fValue / TOP_ARMOR);
+      
+      if (ptoCurrentAmmo != NULL)
+      {
+        HUD_DrawAnchoredRect (60 - 32, 8, 32, 32, EHHAT_CENTER, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+        HUD_DrawAnchroredIcon(60 - 32, 8, 32, 32, EHHAT_CENTER, EHVAT_BOT, *ptoCurrentAmmo, C_WHITE|CT_OPAQUE, fValue / fMaxValue, TRUE); // Icon
+        HUD_DrawAnchoredRectOutline(60 - 32, 8, 32, 32, EHHAT_CENTER, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+      }
+    }
+  }
+
+  CTextureObject *ptoWantedWeapon = NULL;
+  ptoWantedWeapon  = _awiWeapons[iWantedWeapon].wi_ptoWeapon;
+  
+  // display all ammo infos
+  INDEX i;
+  FLOAT fAdv;
+  COLOR colIcon, colBar;
+  PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+  // reduce the size of icon slightly
+  _fCustomScaling = ClampDn( _fCustomScaling*0.8f, 0.5f);
+  const FLOAT fOneUnitS  = fOneUnit  * 0.8f;
+  const FLOAT fAdvUnitS  = fAdvUnit  * 0.8f;
+  const FLOAT fNextUnitS = fNextUnit * 0.8f;
+  const FLOAT fHalfUnitS = fHalfUnit * 0.8f;
+
+  // prepare postition and ammo quantities
+  fRow = pixBottomBound-fHalfUnitS;
+  fCol = pixRightBound -fHalfUnitS;
+  const FLOAT fBarPos = fHalfUnitS * 0.7f;
+  FillWeaponAmmoTables();
+
+  FLOAT fBombCount = penPlayerCurrent->m_iSeriousBombCount;
+  BOOL  bBombFiring = FALSE;
+  // draw serious bomb
+#define BOMB_FIRE_TIME 1.5f
+  if (penPlayerCurrent->m_tmSeriousBombFired+BOMB_FIRE_TIME>_pTimer->GetLerpedCurrentTick()) {
+    fBombCount++;
+    if (fBombCount>3) { fBombCount = 3; }
+    bBombFiring = TRUE;
+  }
+
+  if (fBombCount > 0) {
+    fNormValue = (FLOAT) fBombCount / 3.0f;
+    COLOR colBombBorder = _colHUD;
+    COLOR colBombIcon = C_WHITE;
+    COLOR colBombBar = _colHUDText;
+    
+    if (fBombCount == 1) {
+      colBombBar = C_RED;
+    }
+
+    if (bBombFiring) {
+      FLOAT fFactor = (_pTimer->GetLerpedCurrentTick() - penPlayerCurrent->m_tmSeriousBombFired)/BOMB_FIRE_TIME;
+      colBombBorder = LerpColor(colBombBorder, C_RED, fFactor);
+      colBombIcon = LerpColor(colBombIcon, C_RED, fFactor);
+      colBombBar = LerpColor(colBombBar, C_RED, fFactor);
+    }
+
+    HUD_DrawBorder( fCol,         fRow, fOneUnitS, fOneUnitS, colBombBorder);
+    HUD_DrawIcon(   fCol,         fRow, _toASeriousBomb, colBombIcon, fNormValue, FALSE, 32, 32);
+    HUD_DrawBar(    fCol+fBarPos, fRow, fOneUnitS/5, fOneUnitS-2, BO_DOWN, colBombBar, fNormValue);
+    // make space for serious bomb
+    fCol -= fAdvUnitS;
+  }
+
+  // loop thru all ammo types
+  if (!GetSP()->sp_bInfiniteAmmo)
+  {
+    for (INDEX ii = 7; ii>=0; ii--)
+    {
+      i = aiAmmoRemap[ii];
+      
+      AmmoInfo &ai = _aaiAmmo[i];
+      
+      // if no ammo and hasn't got that weapon - just skip this ammo // [SSE] Or if you don't want to see empty ammo types.
+      if (ai.ai_iAmmoAmmount <= 0 && (!ai.ai_bHasWeapon || !hud_bShowEmptyAmmoInList)) continue;
+
+      // display ammo info
+      colIcon = C_WHITE /*_colHUD*/;
+      if (ptoCurrentAmmo == ai.ai_ptoAmmo) colIcon = C_WHITE;
+      if (ai.ai_iAmmoAmmount <= 0) colIcon = C_mdGRAY;
+
+      fNormValue = (FLOAT)ai.ai_iAmmoAmmount / ai.ai_iMaxAmmoAmmount;
+      colBar = AddShaker( 4, ai.ai_iAmmoAmmount, ai.ai_iLastAmmoAmmount, ai.ai_tmAmmoChanged, fMoverX, fMoverY);
+      HUD_DrawBorder( fCol,         fRow+fMoverY, fOneUnitS, fOneUnitS, colBorder);
+      HUD_DrawIcon(   fCol,         fRow+fMoverY, *_aaiAmmo[i].ai_ptoAmmo, colIcon, fNormValue, FALSE, 32, 32);
+      HUD_DrawBar(    fCol+fBarPos, fRow+fMoverY, fOneUnitS/5, fOneUnitS-2, BO_DOWN, colBar, fNormValue);
+      // advance to next position
+      fCol -= fAdvUnitS;
+    }
+  }
+
+  // draw powerup(s) if needed
+  PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.66f, 0.33f, FALSE);
+  TIME *ptmPowerups = (TIME*)&_penPlayer->m_tmInvisibility;
+  TIME *ptmPowerupsMax = (TIME*)&_penPlayer->m_tmInvisibilityMax;
+  fRow = pixBottomBound-fOneUnitS-fAdvUnitS;
+  fCol = pixRightBound -fHalfUnitS;
+
+  for (i=0; i<MAX_POWERUPS; i++)
+  {
+    // skip if not active
+    const TIME tmDelta = ptmPowerups[i] - _tmNow;
+    if (tmDelta<=0) continue;
+    fNormValue = tmDelta / ptmPowerupsMax[i];
+    // draw icon and a little bar
+    HUD_DrawBorder( fCol,         fRow, fOneUnitS, fOneUnitS, colBorder);
+    HUD_DrawIcon(   fCol,         fRow, _atoPowerups[i], C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
+    HUD_DrawBar(    fCol+fBarPos, fRow, fOneUnitS/5, fOneUnitS-2, BO_DOWN, NONE, fNormValue);
+    // play sound if icon is flashing
+    if (fNormValue<=(_cttHUD.ctt_fLowMedium/2)) {
+      // activate blinking only if value is <= half the low edge
+      INDEX iLastTime = (INDEX)(_tmLast*4);
+      INDEX iCurrentTime = (INDEX)(_tmNow*4);
+      if (iCurrentTime&1 & !(iLastTime&1)) {
+        ((CPlayer *)penPlayerCurrent)->PlayPowerUpSound();
+      }
+    }
+    // advance to next position
+    fCol -= fAdvUnitS;
+  }
+
+
+  // if weapon change is in progress
+  _fCustomScaling = hud_fScaling;
+  hud_tmWeaponsOnScreen = Clamp( hud_tmWeaponsOnScreen, 0.0f, 10.0f);
+  if ((_tmNow - _penWeapons->m_tmWeaponChangeRequired) < hud_tmWeaponsOnScreen) {
+    // determine number of weapons that player has
+    INDEX ctWeapons = 0;
+    for (i=WEAPON_NONE+1; i<WEAPON_LAST; i++) {
+      if (_awiWeapons[i].wi_wtWeapon!=WEAPON_NONE && _awiWeapons[i].wi_wtWeapon!=WEAPON_DOUBLECOLT &&
+          _awiWeapons[i].wi_bHasWeapon) ctWeapons++;
+    }
+    // display all available weapons
+    fRow = pixBottomBound - fHalfUnit - 3*fNextUnit;
+    fCol = 320.0f - (ctWeapons*fAdvUnit-fHalfUnit)/2.0f;
+    // display all available weapons
+    for (INDEX ii=WEAPON_NONE+1; ii<WEAPON_LAST; ii++) {
+      i = aiWeaponsRemap[ii];
+      // skip if hasn't got this weapon
+      if (_awiWeapons[i].wi_wtWeapon==WEAPON_NONE || _awiWeapons[i].wi_wtWeapon==WEAPON_DOUBLECOLT
+         || !_awiWeapons[i].wi_bHasWeapon) continue;
+      // display weapon icon
+      COLOR colBorder = _colHUD;
+      colIcon = 0xccddff00;
+      // weapon that is currently selected has different colors
+      if (ptoWantedWeapon == _awiWeapons[i].wi_ptoWeapon) {
+        colIcon = 0xffcc0000;
+        colBorder = 0xffcc0000;
+      }
+      // no ammo
+      if (_awiWeapons[i].wi_paiAmmo!=NULL && _awiWeapons[i].wi_paiAmmo->ai_iAmmoAmmount==0) {
+        HUD_DrawBorder( fCol, fRow, fOneUnit, fOneUnit, 0x22334400);
+        HUD_DrawIcon(   fCol, fRow, *_awiWeapons[i].wi_ptoWeapon, 0x22334400, 1.0f, FALSE, 32, 32);
+      // yes ammo
+      } else {
+        HUD_DrawBorder( fCol, fRow, fOneUnit, fOneUnit, colBorder);
+        HUD_DrawIcon(   fCol, fRow, *_awiWeapons[i].wi_ptoWeapon, colIcon, 1.0f, FALSE, 32, 32);
+      }
+      // advance to next position
+      fCol += fAdvUnit;
+    }
+  }
+
+
+  // reduce icon sizes a bit
+  const FLOAT fUpperSize = ClampDn(_fCustomScaling*0.5f, 0.5f)/_fCustomScaling;
+  _fCustomScaling*=fUpperSize;
+  ASSERT( _fCustomScaling>=0.5f);
+  fChrUnit  *= fUpperSize;
+  fOneUnit  *= fUpperSize;
+  fHalfUnit *= fUpperSize;
+  fAdvUnit  *= fUpperSize;
+  fNextUnit *= fUpperSize;
+
+  
+  BOOL bOxygenOnScreen = FALSE;
+  const TIME tmMaxHoldBreath = _penPlayer->en_tmMaxHoldBreath;
+  
+  if (tmMaxHoldBreath > 0.0F)
+  {
+    fValue = tmMaxHoldBreath - (_pTimer->CurrentTick() - _penPlayer->en_tmLastBreathed);
+
+    if (_penPlayer->IsConnected() && (_penPlayer->GetFlags()&ENF_ALIVE) && fValue < (tmMaxHoldBreath - 1.0F)) {
+      // prepare and draw oxygen info
+      fRow = pixTopBound + fOneUnit + fNextUnit;
+      fCol = 280.0f;
+      fAdv = fAdvUnit + fOneUnit*4/2 - fHalfUnit;
+      PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+      fNormValue = fValue / tmMaxHoldBreath;
+      fNormValue = ClampDn(fNormValue, 0.0f);
+
+      HUD_DrawBorder( fCol,      fRow, fOneUnit,         fOneUnit, colBorder);
+      HUD_DrawBorder( fCol+fAdv, fRow, fOneUnit*4,       fOneUnit, colBorder);
+      HUD_DrawBar(    fCol+fAdv, fRow, fOneUnit*4*0.975, fOneUnit*0.9375, BO_LEFT, NONE, fNormValue);
+      HUD_DrawIcon(   fCol,      fRow, _toOxygen, C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
+      bOxygenOnScreen = TRUE;
+    }
+  }
+
+  // draw boss energy if needed
+  if (_penPlayer->m_penMainMusicHolder!=NULL) {
+    CMusicHolder &mh = (CMusicHolder&)*_penPlayer->m_penMainMusicHolder;
+    fNormValue = 0;
+
+    if (mh.m_penBoss!=NULL && (mh.m_penBoss->en_ulFlags&ENF_ALIVE)) {
+      CEnemyBase &eb = (CEnemyBase&)*mh.m_penBoss;
+      ASSERT( eb.m_fMaxHealth>0);
+      fValue = eb.GetHealth();
+      fNormValue = fValue/eb.m_fMaxHealth;
+    }
+    if (mh.m_penCounter!=NULL) {
+      CEnemyCounter &ec = (CEnemyCounter&)*mh.m_penCounter;
+      if (ec.m_iCount>0) {
+        fValue = ec.m_iCount;
+        fNormValue = fValue/ec.m_iCountFrom;
+      }
+    }
+    if (fNormValue>0) {
+      // prepare and draw boss energy info
+      //PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+      PrepareColorTransitions( colMax, colMax, colTop, C_RED, 0.5f, 0.25f, FALSE);
+
+      fRow = pixTopBound + fOneUnit + fNextUnit;
+      fCol = 184.0f;
+      fAdv = fAdvUnit+ fOneUnit*16/2 -fHalfUnit;
+      if (bOxygenOnScreen) fRow += fNextUnit;
+      HUD_DrawBorder( fCol,      fRow, fOneUnit,          fOneUnit, colBorder);
+      HUD_DrawBorder( fCol+fAdv, fRow, fOneUnit*16,       fOneUnit, colBorder);
+      HUD_DrawBar(    fCol+fAdv, fRow, fOneUnit*16*0.995, fOneUnit*0.9375, BO_LEFT, NONE, fNormValue);
+      HUD_DrawIcon(   fCol,      fRow, _toHealth, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
+    }
+  }
+
+
+  // determine scaling of normal text and play mode
+  const FLOAT fTextScale  = (_fResolutionScaling+1) *0.5f;
+  const BOOL bSinglePlay  =  GetSP()->sp_bSinglePlayer;
+  const BOOL bCooperative =  GetSP()->sp_bCooperative && !bSinglePlay;
+  const BOOL bScoreMatch  = !GetSP()->sp_bCooperative && !GetSP()->sp_bUseFrags;
+  const BOOL bFragMatch   = !GetSP()->sp_bCooperative &&  GetSP()->sp_bUseFrags;
+  COLOR colMana, colFrags, colDeaths, colHealth, colArmor, colPing;
+  COLOR colScore  = _colHUD;
+  INDEX iScoreSum = 0;
+
+  // if not in single player mode, we'll have to calc (and maybe printout) other players' info
+  if (!bSinglePlay)
+  {
+    // set font and prepare font parameters
+    _pfdDisplayFont->SetVariableWidth();
+    _pDP->SetFont( _pfdDisplayFont);
+    _pDP->SetTextScaling( fTextScale);
+    FLOAT fCharHeight = (_pfdDisplayFont->GetHeight()-2)*fTextScale;
+    // generate and sort by mana list of active players
+    BOOL bMaxScore=TRUE, bMaxMana=TRUE, bMaxFrags=TRUE, bMaxDeaths=TRUE;
+    hud_iSortPlayers = Clamp( hud_iSortPlayers, -1L, 6L);
+    SortKeys eKey = (SortKeys)hud_iSortPlayers;
+    if (hud_iSortPlayers==-1) {
+           if (bCooperative) eKey = PSK_HEALTH;
+      else if (bScoreMatch)  eKey = PSK_SCORE;
+      else if (bFragMatch)   eKey = PSK_FRAGS;
+      else { ASSERT(FALSE);  eKey = PSK_NAME; }
+    }
+    if (bCooperative) eKey = (SortKeys)Clamp( (INDEX)eKey, 0L, 3L);
+    if (eKey==PSK_HEALTH && (bScoreMatch || bFragMatch)) { eKey = PSK_NAME; }; // prevent health snooping in deathmatch
+    INDEX iPlayers = SetAllPlayersStats(eKey);
+
+    // loop thru players
+    for (INDEX i=0; i<iPlayers; i++)
+    {
+      // get player name and mana
+      CPlayer *penPlayer = _apenPlayers[i];
+      const CTString strName = penPlayer->GetPlayerName();
+      const INDEX iScore  = penPlayer->m_psGameStats.ps_iScore;
+      const INDEX iMana   = penPlayer->m_iMana;
+      const INDEX iFrags  = penPlayer->m_psGameStats.ps_iKills;
+      const INDEX iDeaths = penPlayer->m_psGameStats.ps_iDeaths;
+      const INDEX iHealth = ClampDn( (INDEX)ceil( penPlayer->GetHealth()), 0L);
+      const INDEX iArmor  = ClampDn( (INDEX)ceil( penPlayer->m_fArmor),    0L);
+      const INDEX iPing = ceil(penPlayer->en_tmPing*1000.0f);
+
+      CTString strScore, strMana, strFrags, strDeaths, strHealth, strArmor, strPing;
+      strScore.PrintF(  "%d", iScore);
+      strMana.PrintF(   "%d", iMana);
+      strFrags.PrintF(  "%d", iFrags);
+      strDeaths.PrintF( "%d", iDeaths);
+      
+      // [SSE]
+      if (iArmor >= 10000) {
+        strArmor.PrintF( "%.1fk", iArmor / 1000.0F);
+      } else if (iArmor >= 1000) {
+        strArmor.PrintF( "%.2fk", iArmor / 1000.0F);
+      } else {
+        strArmor.PrintF( "%d", iArmor);
+      }
+
+      if (iHealth >= 10000) {
+        strHealth.PrintF( "%.1fk", iHealth / 1000.0F);
+      } else if (iHealth >= 1000) {
+        strHealth.PrintF( "%.2fk", iHealth / 1000.0F);
+      } else {
+        strHealth.PrintF( "%d", iHealth);
+      }
+      //
+      
+			if ( iPing > 300 ) {
+				colPing = C_RED;
+        strPing.PrintF("^f9/^r^c808080///");
+
+      } else if (iPing > 200) {
+				colPing = C_RED;
+        strPing.PrintF("/^c808080///");
+        
+      } else if (iPing > 140) {
+				colPing = C_ORANGE;
+        strPing.PrintF("//^c808080//");
+
+			} else if ( iPing > 80 ) {
+				colPing = C_YELLOW;
+        strPing.PrintF("///^c808080/");
+
+			} else {
+        strPing.PrintF("////");
+				colPing = C_GREEN;
+			}
+
+      // detemine corresponding colors
+      colHealth = C_mlRED;
+      colMana = colScore = colFrags = colDeaths = colArmor = C_lGRAY;
+      if (iMana   > _penPlayer->m_iMana)                      { bMaxMana   = FALSE; colMana   = C_WHITE; }
+      if (iScore  > _penPlayer->m_psGameStats.ps_iScore)      { bMaxScore  = FALSE; colScore  = C_WHITE; }
+      if (iFrags  > _penPlayer->m_psGameStats.ps_iKills)      { bMaxFrags  = FALSE; colFrags  = C_WHITE; }
+      if (iDeaths > _penPlayer->m_psGameStats.ps_iDeaths)     { bMaxDeaths = FALSE; colDeaths = C_WHITE; }
+      if (penPlayer == _penPlayer) colScore = colMana = colFrags = colDeaths = _colHUD; // current player
+      if (iHealth > 25) colHealth = _colHUD;
+      if (iArmor  > 25) colArmor  = _colHUD;
+
+      // eventually print it out
+      if (hud_iShowPlayers==1 || hud_iShowPlayers==-1 && !bSinglePlay)
+      {
+        // printout location and info aren't the same for deathmatch and coop play
+        const FLOAT fCharWidth = (PIX)((_pfdDisplayFont->GetWidth()-2) *fTextScale);
+
+        if (bCooperative) {
+          _pDP->PutTextR( strName+":", _pixDPWidth - 12 *fCharWidth, fCharHeight*i+fOneUnit*2, colScore |_ulAlphaHUD);
+          
+          if (penPlayer->GetFlags()&ENF_ALIVE) {
+            _pDP->PutText(  "/",         _pixDPWidth-8*fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD  |_ulAlphaHUD);
+            _pDP->PutTextC( strHealth,   _pixDPWidth-10*fCharWidth, fCharHeight*i+fOneUnit*2, colHealth|_ulAlphaHUD);
+            _pDP->PutTextC( strArmor,    _pixDPWidth-6*fCharWidth, fCharHeight*i+fOneUnit*2, colArmor |_ulAlphaHUD);
+          } else {
+            _pDP->PutTextC(  TRANS("DEAD"), _pixDPWidth-8*fCharWidth, fCharHeight*i+fOneUnit*2, C_RED|_ulAlphaHUD); // [SSE] No Stupid Zeros If Player Dead
+          }
+          
+          _pDP->PutTextC( strPing,     _pixDPWidth- 2 * fCharWidth, fCharHeight * i + fOneUnit * 2, colPing|_ulAlphaHUD);
+
+        } else if (bScoreMatch) {
+          _pDP->PutTextR( strName+":", _pixDPWidth - 14 * fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD |_ulAlphaHUD);
+          _pDP->PutText(  "/",         _pixDPWidth- 9 * fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD |_ulAlphaHUD);
+          _pDP->PutTextC( strScore,    _pixDPWidth- 12 * fCharWidth, fCharHeight*i+fOneUnit*2, colScore|_ulAlphaHUD);
+          _pDP->PutTextC( strMana,     _pixDPWidth- 6 * fCharWidth, fCharHeight*i+fOneUnit*2, colMana |_ulAlphaHUD);
+          _pDP->PutTextC( strPing,     _pixDPWidth- 2 * fCharWidth, fCharHeight * i + fOneUnit * 2, colPing|_ulAlphaHUD);
+
+        } else { // fragmatch!
+          _pDP->PutTextR( strName+":", _pixDPWidth-12 * fCharWidth, fCharHeight * i + fOneUnit * 2, _colHUD  |_ulAlphaHUD);
+          _pDP->PutText(  "/",         _pixDPWidth-8 * fCharWidth, fCharHeight * i + fOneUnit * 2, _colHUD  |_ulAlphaHUD);
+          _pDP->PutTextC( strFrags,    _pixDPWidth-10 * fCharWidth, fCharHeight * i + fOneUnit * 2, colFrags |_ulAlphaHUD);
+          _pDP->PutTextC( strDeaths,   _pixDPWidth-6 * fCharWidth, fCharHeight * i + fOneUnit * 2, colDeaths|_ulAlphaHUD);
+          _pDP->PutTextC( strPing,      _pixDPWidth-2 * fCharWidth, fCharHeight * i + fOneUnit * 2, colPing|_ulAlphaHUD);
+        }
+      }
+
+      // calculate summ of scores (for coop mode)
+      iScoreSum += iScore;
+    }
+
+    // draw remaining time if time based death- or scorematch
+    if ((bScoreMatch || bFragMatch) && hud_bShowMatchInfo) {
+      CTString strLimitsInfo="";
+      if (GetSP()->sp_iTimeLimit>0) {
+        FLOAT fTimeLeft = ClampDn(GetSP()->sp_iTimeLimit*60.0f - _pNetwork->GetGameTime(), 0.0f);
+        strLimitsInfo.PrintF("%s^cFFFFFF%s: %s\n", strLimitsInfo, TRANS("TIME LEFT"), TimeToString(fTimeLeft));
+      }
+      extern INDEX SetAllPlayersStats( INDEX iSortKey);
+      // fill players table
+      const INDEX ctPlayers = SetAllPlayersStats(bFragMatch?5:3); // sort by frags or by score
+      // find maximum frags/score that one player has
+      INDEX iMaxFrags = LowerLimit(INDEX(0));
+      INDEX iMaxScore = LowerLimit(INDEX(0));
+      {for(INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
+        CPlayer *penPlayer = _apenPlayers[iPlayer];
+        iMaxFrags = Max(iMaxFrags, penPlayer->m_psLevelStats.ps_iKills);
+        iMaxScore = Max(iMaxScore, penPlayer->m_psLevelStats.ps_iScore);
+      }}
+      if (GetSP()->sp_iFragLimit>0) {
+        INDEX iFragsLeft = ClampDn(GetSP()->sp_iFragLimit-iMaxFrags, INDEX(0));
+        strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("FRAGS LEFT"), iFragsLeft);
+      }
+      if (GetSP()->sp_iScoreLimit>0) {
+        INDEX iScoreLeft = ClampDn(GetSP()->sp_iScoreLimit-iMaxScore, INDEX(0));
+        strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("SCORE LEFT"), iScoreLeft);
+      }
+      _pfdDisplayFont->SetFixedWidth();
+      _pDP->SetFont( _pfdDisplayFont);
+      _pDP->SetTextScaling( fTextScale*0.8f );
+      _pDP->SetTextCharSpacing( -2.0f*fTextScale);
+      _pDP->PutText( strLimitsInfo, 5.0f*_pixDPWidth/640.0f, 48.0f*_pixDPWidth/640.0f, C_WHITE|CT_OPAQUE);
+    }
+
+
+    // prepare color for local player printouts
+    bMaxScore  ? colScore  = C_WHITE : colScore  = C_lGRAY;
+    bMaxMana   ? colMana   = C_WHITE : colMana   = C_lGRAY;
+    bMaxFrags  ? colFrags  = C_WHITE : colFrags  = C_lGRAY;
+    bMaxDeaths ? colDeaths = C_WHITE : colDeaths = C_lGRAY;
+  }
+
+  // printout player latency if needed
+  if (hud_bShowLatency) {
+    CTString strLatency;
+    strLatency.PrintF( "%4.0fms", _penPlayer->m_tmLatency*1000.0f);
+    PIX pixFontHeight = (PIX)(_pfdDisplayFont->GetHeight() *fTextScale +fTextScale+1);
+    _pfdDisplayFont->SetFixedWidth();
+    _pDP->SetFont( _pfdDisplayFont);
+    _pDP->SetTextScaling( fTextScale);
+    _pDP->SetTextCharSpacing( -2.0f*fTextScale);
+    _pDP->PutTextR( strLatency, _pixDPWidth, _pixDPHeight-pixFontHeight, C_WHITE|CT_OPAQUE);
+  }
+
+  // restore font defaults
+  _pfdDisplayFont->SetVariableWidth();
+  _pDP->SetFont( &_fdNumbersFont);
+  _pDP->SetTextCharSpacing(1);
+
+  // prepare output strings and formats depending on game type
+  FLOAT fWidthAdj = 8;
+  INDEX iScore = _penPlayer->m_psGameStats.ps_iScore;
+  INDEX iMana  = _penPlayer->m_iMana;
+  if (bFragMatch) {
+    if (!hud_bShowMatchInfo) { fWidthAdj = 4; }
+    iScore = _penPlayer->m_psGameStats.ps_iKills;
+    iMana  = _penPlayer->m_psGameStats.ps_iDeaths;
+  } else if (bCooperative) {
+    // in case of coop play, show squad (common) score
+    iScore = iScoreSum;
+  }
+
+  // prepare and draw score or frags info
+  strValue.PrintF( "%d", iScore);
+  fRow = pixTopBound + fHalfUnit;
+  fCol = pixLeftBound + fHalfUnit;
+  fAdv = fAdvUnit+ fChrUnit*fWidthAdj/2 -fHalfUnit;
+  HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
+  HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
+  HUD_DrawText(   fCol+fAdv, fRow, strValue, colScore, 1.0f);
+  HUD_DrawIcon(   fCol,      fRow, _toFrags, C_WHITE /*colScore*/, 1.0f, FALSE, 32, 32);
+  
+  // [SSE] Extra Lives System
+  if ((bSinglePlay || bCooperative) && GetSP()->sp_ctCredits >= 0)
+  {
+    BOOL bSharedLives = GetSP()->sp_bSharedLives; 
+    strValue.PrintF( "%d", bSharedLives ? GetSP()->sp_ctCreditsLeft : _penPlayer->m_iLives);
+    fRow = pixTopBound  + fNextUnit+fHalfUnit;
+    fCol = pixLeftBound + fHalfUnit;
+    fAdv = fAdvUnit+ fChrUnit*fWidthAdj/2 -fHalfUnit;
+
+    HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
+    HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
+    HUD_DrawText(   fCol+fAdv, fRow, strValue,  C_lGRAY, 1.0f);
+    HUD_DrawIcon(   fCol,      fRow, _toExtraLive, C_WHITE /*colMana*/, 1.0f, FALSE, 32, 32);
+    
+    if (GetSP()->sp_iScoreForExtraLive > 0)
+    {
+      CTString strLimitsInfo;
+      
+      INDEX iScoreLeft = ClampDn(GetSP()->sp_iScoreForExtraLive - (bSharedLives ? GetSP()->sp_iScoreForExtraLiveAccum : _penPlayer->m_iScoreAccumulated), INDEX(0));
+      strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("SCORE LEFT"), iScoreLeft);
+      
+      _pfdDisplayFont->SetFixedWidth();
+      _pDP->SetFont( _pfdDisplayFont);
+      _pDP->SetTextScaling( fTextScale*0.8f );
+      _pDP->SetTextCharSpacing( -2.0f*fTextScale);
+      _pDP->PutText( strLimitsInfo, 5.0f*_pixDPWidth/640.0f, 48.0f*_pixDPWidth/640.0f, C_WHITE|CT_OPAQUE);
+      
+      _pfdDisplayFont->SetVariableWidth();
+      _pDP->SetFont( &_fdNumbersFont);
+      _pDP->SetTextCharSpacing(1);
+    }
+  }
+  //
+
+  // eventually draw mana info
+  if (bScoreMatch || bFragMatch)
+  {
+    strValue.PrintF( "%d", iMana);
+    fRow = pixTopBound  + fNextUnit+fHalfUnit;
+    fCol = pixLeftBound + fHalfUnit;
+    fAdv = fAdvUnit+ fChrUnit*fWidthAdj/2 -fHalfUnit;
+
+    HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
+    HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
+    HUD_DrawText(   fCol+fAdv, fRow, strValue,  colMana, 1.0f);
+    HUD_DrawIcon(   fCol,      fRow, _toDeaths, C_WHITE /*colMana*/, 1.0f, FALSE, 32, 32);
+  }
+
+  // if single player or cooperative mode
+  if (bSinglePlay || bCooperative)
+  {
+    // prepare and draw hiscore info
+    strValue.PrintF( "%d", Max(_penPlayer->m_iHighScore, _penPlayer->m_psGameStats.ps_iScore));
+    BOOL bBeating = _penPlayer->m_psGameStats.ps_iScore>_penPlayer->m_iHighScore;
+    fRow = pixTopBound+fHalfUnit;
+    fCol = 320.0f-fOneUnit-fChrUnit*8/2;
+    fAdv = fAdvUnit+ fChrUnit*8/2 -fHalfUnit;
+    HUD_DrawBorder( fCol,      fRow, fOneUnit,   fOneUnit, colBorder);
+    HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*8, fOneUnit, colBorder);
+    HUD_DrawText(   fCol+fAdv, fRow, strValue, NONE, bBeating ? 0.0f : 1.0f);
+    HUD_DrawIcon(   fCol,      fRow, _toHiScore, C_WHITE /*_colHUD*/, 1.0f, FALSE, 32, 32);
+
+    // prepare and draw unread messages
+    if (hud_bShowMessages && _penPlayer->m_ctUnreadMessages > 0) {
+      strValue.PrintF( "%d", _penPlayer->m_ctUnreadMessages);
+      fRow = pixTopBound+fHalfUnit;
+      fCol = pixRightBound-fHalfUnit-fAdvUnit-fChrUnit*4;
+      const FLOAT tmIn = 0.5f;
+      const FLOAT tmOut = 0.5f;
+      const FLOAT tmStay = 2.0f;
+      FLOAT tmDelta = _pTimer->GetLerpedCurrentTick()-_penPlayer->m_tmAnimateInbox;
+      COLOR col = _colHUD;
+      if (tmDelta > 0 && tmDelta<(tmIn+tmStay+tmOut) && bSinglePlay) {
+        FLOAT fRatio = 0.0f;
+        if (tmDelta < tmIn) {
+          fRatio = tmDelta/tmIn;
+        } else if (tmDelta>tmIn+tmStay) {
+          fRatio = (tmIn+tmStay+tmOut-tmDelta)/tmOut;
+        } else {
+          fRatio = 1.0f;
+        }
+        fRow+=fAdvUnit*5*fRatio;
+        fCol-=fAdvUnit*15*fRatio;
+        col = LerpColor(_colHUD, C_WHITE|0xFF, fRatio);
+      }
+      fAdv = fAdvUnit+ fChrUnit*4/2 -fHalfUnit;
+      HUD_DrawBorder( fCol,      fRow, fOneUnit,   fOneUnit, col);
+      HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*4, fOneUnit, col);
+      HUD_DrawText(   fCol+fAdv, fRow, strValue,   col, 1.0f);
+      HUD_DrawIcon(   fCol,      fRow, _toMessage, C_WHITE /*col*/, 0.0f, TRUE, 32 ,32);
+    }
+  }
+
+  #ifdef ENTITY_DEBUG
+  // if entity debug is on, draw entity stack
+  HUD_DrawEntityStack();
+  #endif
+
+  // draw cheat modes if singleplayer
+  if (GetSP()->sp_ctMaxPlayers == 1) {
+    INDEX iLine=1;
+    ULONG ulAlpha = sin(_tmNow*16)*96 +128;
+    PIX pixFontHeight = _pfdConsoleFont->fd_pixCharHeight;
+    const COLOR colCheat = _colHUDText;
+    _pDP->SetFont( _pfdConsoleFont);
+    _pDP->SetTextScaling( 1.0f);
+    const FLOAT fchtTM = cht_fTranslationMultiplier; // for text formatting sake :)
+
+    if (fchtTM > 1.0f)     { _pDP->PutTextR( "turbo",     _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+    if (cht_bGhost)        { _pDP->PutTextR( "ghost",     _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+    if (cht_bFly)          { _pDP->PutTextR( "fly",       _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+    if (cht_bGod)          { _pDP->PutTextR( "god",       _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+    if (cht_bInfiniteAmmo) { _pDP->PutTextR( "noammo",    _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+    if (cht_bKillAllAura)  { _pDP->PutTextR( "killaura",  _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+    if (cht_bInvisible)    { _pDP->PutTextR( "invisible", _pixDPWidth-1, _pixDPHeight-pixFontHeight*iLine, colCheat|ulAlpha); iLine++; }
+  }
+
+  // in the end, remember the current time so it can be used in the next frame
+  _tmLast = _tmNow;
+
+  if (hud_bGameDebugMonitor)
+  {
+    HUD_DrawDebugMonitor();
+  }
+}
+
+extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner)
+{
+  // no player - no info, sorry
+  if (penPlayerCurrent == NULL || (penPlayerCurrent->GetFlags()&ENF_DELETED)) return;
+  
+  if (!_bHUDFontsLoaded) return;
+
+  // if snooping and owner player ins NULL, return
+  if (bSnooping && penPlayerOwner == NULL) return;
+
+  // find last values in case of predictor
+  CPlayer *penLast = (CPlayer*)penPlayerCurrent;
+  if (penPlayerCurrent->IsPredictor()) penLast = (CPlayer*)(((CPlayer*)penPlayerCurrent)->GetPredicted());
+  ASSERT(penLast != NULL);
+  if (penLast == NULL) return; // !!!! just in case
+
+  // cache local variables
+  hud_fOpacity = Clamp( hud_fOpacity, 0.1f, 1.0f);
+  hud_fScaling = Clamp( hud_fScaling, 0.5f, 1.2f);
+  
+  _penPlayer  = penPlayerCurrent;
+  _penWeapons = (CPlayerWeapons*)&*_penPlayer->m_penWeapons;
+  _pDP        = pdpCurrent;
+  _pixDPWidth   = _pDP->GetWidth();
+  _pixDPHeight  = _pDP->GetHeight();
+
+  _fCustomScaling     = hud_fScaling;
+  _fResolutionScaling = (FLOAT)_pixDPWidth / 640.0f;
+  _colHUD     = 0x4C80BB00;
+  _colHUDText = SE_COL_ORANGE_LIGHT;
+  _ulAlphaHUD = NormFloatToByte(hud_fOpacity);
+  _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
   _tmNow = _pTimer->CurrentTick();
 
   // determine hud colorization;
@@ -2324,81 +3164,9 @@ void DrawHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnoop
 
   if (hud_bGameDebugMonitor)
   {
-    FLOAT fExtraEnemyStrength = GetSP()->sp_fExtraEnemyStrength;
-    FLOAT fExtraStrengthPerPlayer = GetSP()->sp_fExtraEnemyStrengthPerPlayer;
-    INDEX ctCredits = GetSP()->sp_ctCredits;
-    BOOL bSharedLives = GetSP()->sp_bSharedLives;
-
-    INDEX ctMaxPlayers = CEntity::GetMaxPlayers();
-    INDEX ctAlive = 0;
-    INDEX ctDead = 0;
-    INDEX ctDeadCanRespawn = 0;
-    
-    for (INDEX iPlayer = 0; iPlayer < ctMaxPlayers; iPlayer++)
-    {
-      CEntity *penEntity = CEntity::GetPlayerEntity(iPlayer);
-      
-      // If player is invalid then skip him.
-      if (penEntity == NULL) {
-        continue;
-      }
-      
-      if (penEntity->IsAlive()) {
-        ctAlive++;
-      } else {
-        ctDead++;
-        
-        if (!bSharedLives) {
-          CPlayer *penPlayer = static_cast<CPlayer*>(penEntity);
-          if (penPlayer->m_iLives > 0) {
-            ctDeadCanRespawn++;
-          }
-        }
-      }
-    }
-    
-    if (bSharedLives)
-    {
-      INDEX ctCreditsLeft = GetSP()->sp_ctCreditsLeft;
-
-      // If all dead can be respawned then count them all.
-      if (ctDead <= ctCreditsLeft) {
-        ctDeadCanRespawn = ctDead;
-      } else { // If not enough lives for all.
-        ctDeadCanRespawn = ctCreditsLeft;
-      }
-    }
-    
-    CTString strReport;
- 
-    strReport += "^bDEBUG MONITOR^r\n";
-    strReport += "\n";
-    strReport += "[Common]\n";
-    strReport.PrintF("%s^cCCCCCCPlayers: %02d / %02d\n", strReport, ctAlive + ctDead, ctMaxPlayers);
-    strReport += "\n";
-    strReport.PrintF("%s^c00FF00Alive: %02d\n", strReport, ctAlive);
-    strReport.PrintF("%s^cFF0000Dead:  %02d\n", strReport, ctDead);
-
-    if (ctCredits >= 0) {
-      strReport.PrintF("%s^cCCCCCCCan Respawn: %02d\n", strReport, ctDeadCanRespawn);
-    }
-
-    strReport += "\n\n";
-    strReport += "^r[^cFFFFFFDDA System^r]^cCCCC00\n";
-    strReport.PrintF("%sEES:   %.2f\n", strReport, fExtraEnemyStrength);
-    strReport.PrintF("%sEESPP: %.2f\n", strReport, fExtraStrengthPerPlayer);
-    strReport.PrintF("%sDamage Mul: %.2f\n", strReport, GetGameDamageMultiplier());
-    
-    _pDP->SetFont( _pfdConsoleFont);
-    _pDP->SetTextAspect( 1.0f);
-    _pDP->SetTextScaling(1.0f);
-
-    _pDP->Fill(_pixDPWidth - 128 ,0, _pixDPWidth, _pixDPHeight, C_BLACK|0, C_BLACK|128, C_BLACK|0, C_BLACK|128);
-    _pDP->PutText( strReport, _pixDPWidth - 128 + 4, 65, C_WHITE|CT_OPAQUE);
+    HUD_DrawDebugMonitor();
   }
 }
-#endif
-
 
 static void InitDefaultTexture()
 {
