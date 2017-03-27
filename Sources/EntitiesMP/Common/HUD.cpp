@@ -1192,7 +1192,7 @@ static void HUD_DrawAnchroredIconEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOA
     } break;
 
     case EHVAT_MID: {
-      fOriginY = _pixDPHeight / 2.0F + fOriginY;
+      fOriginY = _pixDPHeight / 2.0F + fOriginY - fHalfSizeJ;
     } break;
 
     case EHVAT_BOT: {
@@ -1532,6 +1532,61 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
         HUD_DrawAnchroredIcon(60 - 32, 8, 32, 32, EHHAT_CENTER, EHVAT_BOT, *ptoCurrentAmmo, C_WHITE|CT_OPAQUE, fValue / fMaxValue, TRUE); // Icon
         HUD_DrawAnchoredRectOutline(60 - 32, 8, 32, 32, EHHAT_CENTER, EHVAT_BOT, _colHUD|_ulAlphaHUD);
       }
+    }
+  }
+  
+  FillWeaponAmmoTables();
+  
+  // if weapon change is in progress
+  hud_tmWeaponsOnScreen = Clamp( hud_tmWeaponsOnScreen, 0.0f, 10.0f);
+  if ((_tmNow - _penWeapons->m_tmWeaponChangeRequired) < hud_tmWeaponsOnScreen)
+  {
+    CTextureObject *ptoWantedWeapon = NULL;
+    ptoWantedWeapon = _awiWeapons[iWantedWeapon].wi_ptoWeapon;
+    
+    INDEX i;
+    
+    // determine number of weapons that player has
+    INDEX ctWeapons = 0;
+    for (i = WEAPON_NONE + 1; i < WEAPON_LAST; i++)
+    {
+      if (_awiWeapons[i].wi_wtWeapon!=WEAPON_NONE && _awiWeapons[i].wi_wtWeapon!=WEAPON_DOUBLECOLT && _awiWeapons[i].wi_bHasWeapon)
+      {
+        ctWeapons++;
+      }
+    }
+    
+    FLOAT fHorOffset = (ctWeapons * (32 + 4) - 4) / 2.0F - 16;
+    fHorOffset = -fHorOffset;
+    
+    // display all available weapons
+    for (INDEX ii = WEAPON_NONE+1; ii < WEAPON_LAST; ii++)
+    {
+      i = aiWeaponsRemap[ii];
+
+      // skip if hasn't got this weapon
+      if (_awiWeapons[i].wi_wtWeapon==WEAPON_NONE || _awiWeapons[i].wi_wtWeapon==WEAPON_DOUBLECOLT || !_awiWeapons[i].wi_bHasWeapon) continue;
+
+      COLOR colBorder = _colHUD;
+      COLOR colIcon = 0xccddff00;
+      
+      // weapon that is currently selected has different colors
+      if (ptoWantedWeapon == _awiWeapons[i].wi_ptoWeapon)
+      {
+        colIcon = 0xffcc0000;
+        colBorder = 0xffcc0000;
+      }
+      
+      if (_awiWeapons[i].wi_paiAmmo != NULL && _awiWeapons[i].wi_paiAmmo->ai_iAmmoAmmount == 0)
+      {
+        colBorder = 0x22334400;
+        colIcon = 0x22334400;
+      }
+
+      HUD_DrawAnchoredRect (fHorOffset, 120, 32, 32, EHHAT_CENTER, EHVAT_MID, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchroredIcon(fHorOffset, 120, 32, 32, EHHAT_CENTER, EHVAT_MID, *_awiWeapons[i].wi_ptoWeapon, colIcon|CT_OPAQUE, 1.0F, FALSE); // Icon
+      HUD_DrawAnchoredRectOutline(fHorOffset, 120, 32, 32, EHHAT_CENTER, EHVAT_MID, colBorder|_ulAlphaHUD);
+      fHorOffset += 32 + 4;
     }
   }
   
@@ -2012,45 +2067,58 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
   // if weapon change is in progress
   _fCustomScaling = hud_fScaling;
+  // if weapon change is in progress
   hud_tmWeaponsOnScreen = Clamp( hud_tmWeaponsOnScreen, 0.0f, 10.0f);
-  if ((_tmNow - _penWeapons->m_tmWeaponChangeRequired) < hud_tmWeaponsOnScreen) {
+  if ((_tmNow - _penWeapons->m_tmWeaponChangeRequired) < hud_tmWeaponsOnScreen)
+  {
+    CTextureObject *ptoWantedWeapon = NULL;
+    ptoWantedWeapon = _awiWeapons[iWantedWeapon].wi_ptoWeapon;
+    
+    INDEX i;
+    
     // determine number of weapons that player has
     INDEX ctWeapons = 0;
-    for (i=WEAPON_NONE+1; i<WEAPON_LAST; i++) {
-      if (_awiWeapons[i].wi_wtWeapon!=WEAPON_NONE && _awiWeapons[i].wi_wtWeapon!=WEAPON_DOUBLECOLT &&
-          _awiWeapons[i].wi_bHasWeapon) ctWeapons++;
+    for (i = WEAPON_NONE + 1; i < WEAPON_LAST; i++)
+    {
+      if (_awiWeapons[i].wi_wtWeapon!=WEAPON_NONE && _awiWeapons[i].wi_wtWeapon!=WEAPON_DOUBLECOLT && _awiWeapons[i].wi_bHasWeapon)
+      {
+        ctWeapons++;
+      }
     }
+    
+    FLOAT fHorOffset = (ctWeapons * (32 + 4) - 4) / 2.0F - 16;
+    fHorOffset = -fHorOffset;
+    
     // display all available weapons
-    fRow = pixBottomBound - fHalfUnit - 3*fNextUnit;
-    fCol = 320.0f - (ctWeapons*fAdvUnit-fHalfUnit)/2.0f;
-    // display all available weapons
-    for (INDEX ii=WEAPON_NONE+1; ii<WEAPON_LAST; ii++) {
+    for (INDEX ii = WEAPON_NONE+1; ii < WEAPON_LAST; ii++)
+    {
       i = aiWeaponsRemap[ii];
+
       // skip if hasn't got this weapon
-      if (_awiWeapons[i].wi_wtWeapon==WEAPON_NONE || _awiWeapons[i].wi_wtWeapon==WEAPON_DOUBLECOLT
-         || !_awiWeapons[i].wi_bHasWeapon) continue;
-      // display weapon icon
+      if (_awiWeapons[i].wi_wtWeapon==WEAPON_NONE || _awiWeapons[i].wi_wtWeapon==WEAPON_DOUBLECOLT || !_awiWeapons[i].wi_bHasWeapon) continue;
+
       COLOR colBorder = _colHUD;
-      colIcon = 0xccddff00;
+      COLOR colIcon = 0xccddff00;
+      
       // weapon that is currently selected has different colors
-      if (ptoWantedWeapon == _awiWeapons[i].wi_ptoWeapon) {
+      if (ptoWantedWeapon == _awiWeapons[i].wi_ptoWeapon)
+      {
         colIcon = 0xffcc0000;
         colBorder = 0xffcc0000;
       }
-      // no ammo
-      if (_awiWeapons[i].wi_paiAmmo!=NULL && _awiWeapons[i].wi_paiAmmo->ai_iAmmoAmmount==0) {
-        HUD_DrawBorder( fCol, fRow, fOneUnit, fOneUnit, 0x22334400);
-        HUD_DrawIcon(   fCol, fRow, *_awiWeapons[i].wi_ptoWeapon, 0x22334400, 1.0f, FALSE, 32, 32);
-      // yes ammo
-      } else {
-        HUD_DrawBorder( fCol, fRow, fOneUnit, fOneUnit, colBorder);
-        HUD_DrawIcon(   fCol, fRow, *_awiWeapons[i].wi_ptoWeapon, colIcon, 1.0f, FALSE, 32, 32);
+      
+      if (_awiWeapons[i].wi_paiAmmo != NULL && _awiWeapons[i].wi_paiAmmo->ai_iAmmoAmmount == 0)
+      {
+        colBorder = 0x22334400;
+        colIcon = 0x22334400;
       }
-      // advance to next position
-      fCol += fAdvUnit;
+
+      HUD_DrawAnchoredRect (fHorOffset, 120, 32, 32, EHHAT_CENTER, EHVAT_MID, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchroredIcon(fHorOffset, 120, 32, 32, EHHAT_CENTER, EHVAT_MID, *_awiWeapons[i].wi_ptoWeapon, colIcon|CT_OPAQUE, 1.0F, FALSE); // Icon
+      HUD_DrawAnchoredRectOutline(fHorOffset, 120, 32, 32, EHHAT_CENTER, EHVAT_MID, colBorder|_ulAlphaHUD);
+      fHorOffset += 32 + 4;
     }
   }
-
 
   // reduce icon sizes a bit
   const FLOAT fUpperSize = ClampDn(_fCustomScaling*0.5f, 0.5f)/_fCustomScaling;
