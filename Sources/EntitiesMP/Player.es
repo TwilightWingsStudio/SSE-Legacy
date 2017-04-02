@@ -5437,7 +5437,7 @@ functions:
       }
       iSoundWalkL+=m_iGender*GENDEROFFSET;
       iSoundWalkR+=m_iGender*GENDEROFFSET;
-      if (bRunning) {
+      if (bRunning && en_penReference) {
         if (tmNow>m_tmMoveSound+plr_fRunSoundDelay) {
           m_tmMoveSound = tmNow;
           m_bMoveSoundLeft = !m_bMoveSoundLeft;
@@ -5447,7 +5447,7 @@ functions:
             PlaySound(m_soFootR, iSoundWalkR, SOF_3D);
           }
         }
-      } else if (bWalking) {
+      } else if (bWalking && en_penReference) {
         if (tmNow>m_tmMoveSound+plr_fWalkSoundDelay) {
           m_tmMoveSound = tmNow;
           m_bMoveSoundLeft = !m_bMoveSoundLeft;
