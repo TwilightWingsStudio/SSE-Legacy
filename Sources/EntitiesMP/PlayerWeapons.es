@@ -2313,10 +2313,16 @@ functions:
         FLOAT3D vToTarget = penClosest->GetPlacement().pl_PositionVector - m_penPlayer->GetPlacement().pl_PositionVector;
         FLOAT3D vTargetHeading = FLOAT3D(0.0, 0.0, -1.0f)*penClosest->GetRotationMatrix();
         vToTarget.Normalize(); vTargetHeading.Normalize();
-        if (vToTarget%vTargetHeading>0.64279) //CosFast(50.0f)
+        if (vToTarget%vTargetHeading > 0.64279) //CosFast(50.0f)
         {
-          PrintCenterMessage(this, m_penPlayer, TRANS("Backstab!"), 3.0F, MSS_NONE);
-          fDamage *= KNIFE_BACKSTAB_MULTIPLIER;
+          if (m_iCurrentWeapon == WEAPON_KNIFE) {
+            PrintCenterMessage(this, m_penPlayer, TRANS("Backstab!"), 3.0F, MSS_NONE);
+            fDamage *= KNIFE_BACKSTAB_MULTIPLIER;
+          // [SSE]
+          } else {
+            PrintCenterMessage(this, m_penPlayer, TRANS("POW! HAHA!"), 3.0F, MSS_NONE);
+            fDamage *= KNIFE_BACKSTAB_MULTIPLIER;
+          }
         }
       }
 
