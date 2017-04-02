@@ -54,7 +54,7 @@ properties:
    4 BOOL m_bDebugMessages       "Debug Messages" = FALSE, 
    
    5 CEntityPointer m_penTarget  "Target" 'T',
-   6 enum EPlayerSettingsType  m_epstType "Type" = EPST_TARGETTED,
+   6 enum EPlayerSettingsType  m_epstType "Type" = EPST_PENCAUSED,
    7 BOOL m_bUntilDeath          "Until Death" = FALSE,
    
   // Physics 

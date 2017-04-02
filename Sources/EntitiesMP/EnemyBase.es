@@ -858,6 +858,12 @@ functions:
       return;
     }
 
+    // boss can't be telefragged
+    if (m_bBoss && dmtType == DMT_TELEPORT)
+    {
+      return;
+    }
+
     FLOAT fNewDamage = fDamageAmmount;
 
     // adjust damage
