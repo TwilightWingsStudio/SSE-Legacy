@@ -69,6 +69,9 @@ extern void JumpFromBouncer(CEntity *penToBounce, CEntity *penBouncer);
 #define GENDER_FEMALE   1
 #define GENDEROFFSET    100   // sound components for genders are offset by this value
 
+// [SSE] Weapon Inertia Effect
+#define WEAPON_INERTIA_MUL 0.05F
+
 %}
 
 enum PlayerViewType {
@@ -396,6 +399,8 @@ extern void HUD_ReloadSS(void* pArgs);
 extern BOOL hud_bGameDebugMonitor = FALSE;
 extern INDEX hud_iHUDType = 0;
 // [SSE] END
+
+extern INDEX hud_bWeaponInertiaEffect = TRUE; // [SSE] Weapon Inertia Effect
 
 extern FLOAT plr_fBreathingStrength = 0.0f;
 extern FLOAT plr_tmSnoopingTime;
@@ -881,6 +886,10 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("persistent user INDEX hud_iHUDType;",  &hud_iHUDType);
   //
   
+  // [SSE] Weapon Inertia Effect
+  _pShell->DeclareSymbol("persistent user INDEX hud_bWeaponInertiaEffect;",  &hud_bWeaponInertiaEffect);
+  //
+  
   _pShell->DeclareSymbol("INDEX cht_bKillFinalBoss;",  &cht_bKillFinalBoss);
   _pShell->DeclareSymbol("INDEX cht_bDebugFinalBoss;", &cht_bDebugFinalBoss);
   _pShell->DeclareSymbol("INDEX cht_bDumpFinalBossData;", &cht_bDumpFinalBossData);
@@ -1294,6 +1303,10 @@ properties:
  200 INDEX m_iLives = 0,
  201 INDEX m_iMoney = 0,
  202 INDEX m_iScoreAccumulated = 0,
+ 
+ // [SSE] Weapon Inertia Effect
+ 350 ANGLE3D m_aWeaponSway = ANGLE3D(0, 0, 0),
+ 351 ANGLE3D m_aWeaponSwayOld = ANGLE3D(0, 0, 0),
 
 {
   ShellLaunchData ShellLaunchData_array;  // array of data describing flying empty shells
@@ -4584,6 +4597,23 @@ functions:
     // calculate delta from last received actions
     ANGLE3D aDeltaRotation     = paAction.pa_aRotation    -m_aLastRotation;
     ANGLE3D aDeltaViewRotation = paAction.pa_aViewRotation-m_aLastViewRotation;
+    
+    // [SSE] Weapon Inertia Effect BEGIN
+    m_aWeaponSwayOld = m_aWeaponSway;
+
+    if (TRUE)
+    {
+      if (en_plViewpoint.pl_OrientationAngle(2) > -90 && en_plViewpoint.pl_OrientationAngle(2) < 90)
+      {
+        m_aWeaponSway(2) -= aDeltaRotation(2) * WEAPON_INERTIA_MUL;
+      }
+
+      m_aWeaponSway(1) -= aDeltaRotation(1) * WEAPON_INERTIA_MUL;
+    }
+
+    m_aWeaponSway /= 2;
+    // [SSE] Weapon Inertia Effect END
+    
     
     if (m_ulFlags&PLF_ISZOOMING) {
       FLOAT fRotationDamping = ((CPlayerWeapons &)*m_penWeapons).m_fSniperFOV/((CPlayerWeapons &)*m_penWeapons).m_fSniperMaxFOV;

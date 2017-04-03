@@ -69,12 +69,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   // [SSE]
   #include "EntitiesMP/SimpleSwitch.h"
   #include "EntitiesMP/ProgressiveSwitch.h"
+  //
 
   extern INDEX hud_bShowWeapon;
 
+  extern INDEX hud_bWeaponInertiaEffect; // [SSE] Weapon Inertia Effect
+
   extern const INDEX aiWeaponsRemap[19] = { 0,  1,  2, 11,  3,  4,  5,  6,  7,  8,
                                             9, 10, 12, 14, 13, 15, 16, 17, 18 };
-  //
+                                           
   extern INDEX cht_bInfiniteAmmo; // [SSE] Cheats Expansion
 %}
 
@@ -988,9 +991,20 @@ functions:
     // flare attachment
     ControlFlareAttachment();
 
-    if (!bRender || m_iCurrentWeapon==WEAPON_NONE
-     || GetPlayer()->GetSettings()->ps_ulFlags&PSF_HIDEWEAPON) { return; }
+    if (!bRender || m_iCurrentWeapon==WEAPON_NONE || GetPlayer()->GetSettings()->ps_ulFlags&PSF_HIDEWEAPON) {
+      return;
+    }
 
+    // [SSE] Weapon Inertia Effect
+    ANGLE3D aWeaponSway = ANGLE3D(0, 0, 0);
+
+    if (hud_bWeaponInertiaEffect) {
+      aWeaponSway = Lerp(GetPlayer()->m_aWeaponSwayOld, GetPlayer()->m_aWeaponSway, _pTimer->GetLerpFactor());
+
+      aWeaponSway(1) = Clamp(aWeaponSway(1), -22.5F, 22.5F);
+    }
+    //
+    
     // nuke and iron cannons have the same view settings
     INDEX iWeaponData = m_iCurrentWeapon;
 
@@ -1055,7 +1069,7 @@ functions:
     // DRAW WEAPON MODEL
     //  Double colt - second colt in mirror
     //  Double shotgun - hand with ammo
-    if (iWeaponData==WEAPON_DOUBLECOLT|| iWeaponData==WEAPON_DOUBLESHOTGUN )
+    if (iWeaponData == WEAPON_DOUBLECOLT || iWeaponData == WEAPON_DOUBLESHOTGUN )
     { 
       // prepare render model structure and projection
       CRenderModel rmMain;
@@ -1088,6 +1102,12 @@ functions:
       apr = prMirror;
       Stereo_AdjustProjection(*apr, iEye, 0.1f);
       BeginModelRenderingView(apr, pdp);
+      
+      // [SSE] Weapon Inertia Effect
+      if (hud_bWeaponInertiaEffect) {
+        plWeaponMirror.pl_OrientationAngle += aWeaponSway;
+      }
+      //
 
       WeaponMovingOffset(plWeaponMirror.pl_PositionVector);
       plWeaponMirror.RelativeToAbsoluteSmooth(plView);
@@ -1130,6 +1150,12 @@ functions:
     apr = prProjection;
     Stereo_AdjustProjection(*apr, iEye, 0.1f);
     BeginModelRenderingView(apr, pdp);
+    
+    // [SSE] Weapon Inertia Effect
+    if (hud_bWeaponInertiaEffect) {
+      plWeapon.pl_OrientationAngle += aWeaponSway;
+    }
+    //
 
     WeaponMovingOffset(plWeapon.pl_PositionVector);
     plWeapon.RelativeToAbsoluteSmooth(plView);
@@ -2318,7 +2344,7 @@ functions:
           if (m_iCurrentWeapon == WEAPON_KNIFE) {
             PrintCenterMessage(this, m_penPlayer, TRANS("Backstab!"), 3.0F, MSS_NONE);
             fDamage *= KNIFE_BACKSTAB_MULTIPLIER;
-          // [SSE]
+          // [SSE] Fists Weapon
           } else {
             PrintCenterMessage(this, m_penPlayer, TRANS("POW! HAHA!"), 3.0F, MSS_NONE);
             fDamage *= KNIFE_BACKSTAB_MULTIPLIER;
