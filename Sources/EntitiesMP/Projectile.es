@@ -433,6 +433,10 @@ properties:
 
  50 BOOL bLockedOn = TRUE,
  51 BOOL m_bLeftFlame = FALSE,
+
+ // [SSE]
+ 60 COLOR m_colParticles = COLOR(C_WHITE|CT_OPAQUE),
+ 
 {
   CLightSource m_lsLightSource;
 }
@@ -821,12 +825,14 @@ functions:
   }
 
   // render particles
-  void RenderParticles(void) {
-    switch (m_prtType) {
+  void RenderParticles(void)
+  {
+    switch (m_prtType)
+    {
       case PRT_ROCKET:
-      case PRT_WALKER_ROCKET: Particles_RocketTrail(this, 1.0f); break;
-      case PRT_DEVIL_ROCKET: Particles_RocketTrail(this, 8.0f); break;
-      case PRT_GUFFY_PROJECTILE: break;// Particles_RocketTrail(this, 1.0f); break;
+      case PRT_WALKER_ROCKET: Particles_RocketTrail(this, 1.0f, m_colParticles); break;
+      case PRT_DEVIL_ROCKET: Particles_RocketTrail(this, 8.0f, m_colParticles); break;
+      case PRT_GUFFY_PROJECTILE: break;// Particles_RocketTrail(this, 1.0f, m_colParticles); break;
       case PRT_GRENADE: {
         //Particles_GrenadeTrail(this);
         FLOAT fSpeedRatio = en_vCurrentTranslationAbsolute.Length()/140.0f;
@@ -903,7 +909,7 @@ functions:
         }
         break;
       }
-      case PRT_CATMAN_FIRE: Particles_RocketTrail(this, 1.0f); break;
+      case PRT_CATMAN_FIRE: Particles_RocketTrail(this, 1.0f, m_colParticles); break;
       case PRT_HEADMAN_FIRECRACKER: Particles_FirecrackerTrail(this); break;
       case PRT_HEADMAN_ROCKETMAN: Particles_Fireball01Trail(this); break;
       case PRT_HEADMAN_BOMBERMAN: Particles_BombTrail(this); break;
@@ -921,7 +927,7 @@ functions:
         break;
       case PRT_BEAST_DEBRIS: Particles_BeastProjectileDebrisTrail(this, 0.20f); break;
       case PRT_BEAST_BIG_DEBRIS: Particles_BeastProjectileDebrisTrail(this, 0.25f); break;
-      case PRT_SHOOTER_WOODEN_DART: Particles_RocketTrail(this, 0.25f); break;
+      case PRT_SHOOTER_WOODEN_DART: Particles_RocketTrail(this, 0.25f, m_colParticles); break;
       case PRT_SHOOTER_FIREBALL: Particles_Fireball01Trail(this); break;
       case PRT_SHOOTER_FLAME: {
         // elapsed time
@@ -955,36 +961,75 @@ functions:
     }
   }
 
-
-
-
 /************************************************************
  *              PLAYER ROCKET / GRENADE                     *
  ************************************************************/
-void PlayerRocket(void) {
+void PlayerRocket(void)
+{
   // set appearance
   InitAsModel();
   SetPhysicsFlags(EPF_PROJECTILE_FLYING);
   SetCollisionFlags(ECF_PROJECTILE_SOLID);
   SetModel(MODEL_ROCKET);
   SetModelMainTexture(TEXTURE_ROCKET);
+
   // start moving
-  LaunchAsPropelledProjectile(FLOAT3D(0.0f, 0.0f, -30.0f), (CMovableEntity*)(CEntity*)m_penLauncher);
+  
+  //LaunchAsPropelledProjectile(FLOAT3D(0.0f, 0.0f, -30.0f), (CMovableEntity*)(CEntity*)m_penLauncher);
+  
+  //
+  FLOAT3D vImpulseSpeedRelative = FLOAT3D(0.0f, 0.0f, -30.0f);
+
+  en_vDesiredTranslationRelative = vImpulseSpeedRelative;
+  en_vCurrentTranslationAbsolute += vImpulseSpeedRelative * en_mRotation;
+
+  // [SSE]
+  if (m_penLauncher)
+  {
+    CMovableEntity *penMovableLauncher = (CMovableEntity*)(CEntity*)m_penLauncher;
+    
+    CPlacement3D plSpeed = CPlacement3D(penMovableLauncher->en_vCurrentTranslationAbsolute, ANGLE3D(0, 0, 0));
+    CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0), penMovableLauncher->GetPlacement().pl_OrientationAngle);
+    plSpeed.AbsoluteToRelative(plRot);
+    
+    //CPrintF("%f %f %f\n", plSpeed.pl_PositionVector(1), plSpeed.pl_PositionVector(2), plSpeed.pl_PositionVector(3));
+    
+    // If we moving back then don't slowdown the rocket.
+    if (plSpeed.pl_PositionVector(3) > 0.0F) {
+      plSpeed.pl_PositionVector(3) = 0.0F;
+    }
+
+    en_vCurrentTranslationAbsolute += (vImpulseSpeedRelative + FLOAT3D(0.0F, 0.0F, plSpeed.pl_PositionVector(3))) * en_mRotation;
+    //en_vCurrentTranslationAbsolute += ((CMovableEntity*)(CEntity*)m_penLauncher)->en_vCurrentTranslationAbsolute; // OLD
+  }
+
+  AddToMovers();
+  //
+
   SetDesiredRotation(ANGLE3D(0, 0, 0));
+
   // play the flying sound
   m_soEffect.Set3DParameters(20.0f, 2.0f, 1.0f, 1.0f);
   PlaySound(m_soEffect, SOUND_FLYING, SOF_3D|SOF_LOOP);
   m_fFlyTime = 30.0f;
-  if( GetSP()->sp_bCooperative)
-  {
-    m_fDamageAmount = 100.0f;
-    m_fRangeDamageAmount = 50.0f;
+  
+  BOOL bCooperative = GetSP()->sp_bCooperative;
+
+  m_fDamageAmount = bCooperative ? 100.0F : 75.0f;
+  m_fRangeDamageAmount = bCooperative ? 50.0F : 75.0f;
+
+  // [SSE] Better Serious Damage
+  if (GetSP()->sp_bKeepSeriousDamageOnProjectiles) {
+    FLOAT fMulDamage = GetSeriousDamageMultiplier(m_penLauncher);
+
+    if (fMulDamage > 1.0F) {
+      m_colParticles = C_ORANGE|CT_OPAQUE;
+    }
+    
+    m_fDamageAmount *= fMulDamage;
+    m_fRangeDamageAmount *= fMulDamage;
   }
-  else
-  {
-    m_fDamageAmount = 75.0f;
-    m_fRangeDamageAmount = 75.0f;
-  }
+
   m_fDamageHotSpotRange = 4.0f;
   m_fDamageFallOffRange = 8.0f;
   m_fSoundRange = 50.0f;
@@ -2962,17 +3007,20 @@ void ProjectileTouch(CEntityPointer penHit)
   // direct damage
   FLOAT3D vDirection;
   FLOAT fTransLen = en_vIntendedTranslation.Length();
-  if( fTransLen>0.5f)
-  {
+
+  if (fTransLen > 0.5f) {
     vDirection = en_vIntendedTranslation/fTransLen;
-  }
-  else
-  {
+  } else {
     vDirection = -en_vGravityDir;
   }
 
+  FLOAT fDamageMul = GetSeriousDamageMultiplier(m_penLauncher);
+
+  if (GetSP()->sp_bKeepSeriousDamageOnProjectiles && m_prtType == PRT_ROCKET) {
+    fDamageMul = 1.0F;
+  }
+  
   // spawn flame
-  const FLOAT fDamageMul = GetSeriousDamageMultiplier(m_penLauncher);
   if ((m_prtType==PRT_FLAME||m_prtType==PRT_SHOOTER_FLAME) && m_fWaitAfterDeath>0.0f) {
     // don't burn the same entity twice while passing through it
     if (m_penLastDamaged==penHit) {
@@ -3029,7 +3077,12 @@ void ProjectileHit(void)
 {
   // explode ...
   if (m_bExplode) {
-    const FLOAT fDamageMul = GetSeriousDamageMultiplier(m_penLauncher);
+    FLOAT fDamageMul = GetSeriousDamageMultiplier(m_penLauncher);
+    
+    if (GetSP()->sp_bKeepSeriousDamageOnProjectiles && m_prtType == PRT_ROCKET) {
+      fDamageMul = 1.0F;
+    }
+    
     InflictRangeDamage(m_penLauncher, DMT_EXPLOSION, m_fRangeDamageAmount*fDamageMul,
         GetPlacement().pl_PositionVector, m_fDamageHotSpotRange, m_fDamageFallOffRange);
   }
@@ -3658,19 +3711,22 @@ procedures:
   };
 
   // --->>> MAIN
-  Main(ELaunchProjectile eLaunch) {
+  Main(ELaunchProjectile eLaunch)
+  {
     // remember the initial parameters
-    ASSERT(eLaunch.penLauncher!=NULL);
+    ASSERT(eLaunch.penLauncher != NULL);
     m_penLauncher = eLaunch.penLauncher;
     m_prtType = eLaunch.prtType;
     m_fSpeed = eLaunch.fSpeed;
-    m_fStretch=eLaunch.fStretch;
+    m_fStretch = eLaunch.fStretch;
     SetPredictable(TRUE);
+
     // remember lauching time
     m_fIgnoreTime = _pTimer->CurrentTick() + 1.0f;
     m_penLastDamaged = NULL;
 
-    switch (m_prtType) {
+    switch (m_prtType)
+    {
       case PRT_DEVIL_ROCKET:
       case PRT_WALKER_ROCKET:
       case PRT_ROCKET:
@@ -3697,6 +3753,7 @@ procedures:
          break;
       case PRT_SHOOTER_FIREBALL: Particles_Fireball01Trail_Prepare(this); break;
     }
+
     // projectile initialization
     switch (m_prtType)
     {
@@ -3771,11 +3828,13 @@ procedures:
     }
 
     // projectile explosion
-    switch (m_prtType) {
+    switch (m_prtType)
+    {
       case PRT_WALKER_ROCKET: WalkerRocketExplosion(); break;
       case PRT_ROCKET: PlayerRocketExplosion(); break;
       case PRT_GRENADE: PlayerGrenadeExplosion(); break;
       case PRT_LASER_RAY: PlayerLaserWave(); break;
+      //case PRT_CYBORG_LASER: PlayerLaserWave(); break;
       case PRT_HEADMAN_BOMBERMAN: HeadmanBombermanExplosion(); break;
       case PRT_CYBORG_BOMB: CyborgBombExplosion(); break;
       case PRT_LAVA_COMET: LavamanBombDebrisExplosion(); break;
