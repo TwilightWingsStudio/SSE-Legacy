@@ -50,6 +50,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 ENGINE_API CTString _strEngineBuild  = "";
 ENGINE_API ULONG _ulEngineBuildMajor = _SE_BUILD_MAJOR;
 ENGINE_API ULONG _ulEngineBuildMinor = _SE_BUILD_MINOR;
+
 ENGINE_API ULONG _ulEngineRevision = REVISION_ID;
 
 ENGINE_API BOOL _bDedicatedServer = FALSE;
