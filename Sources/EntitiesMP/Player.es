@@ -2183,9 +2183,14 @@ functions:
   {
     // first put in your full stats
     strStats += "^b"+CenterString(TRANS("YOUR STATS"))+"^r\n";
-    strStats+="\n";
+    strStats += "\n";
+    // [SSE] Ping Display In Computer
+    INDEX iPing = ceil(en_tmPing * 1000.0f);
+    strStats += AlignString(CTString(0, "^cFFFFFF%s:^r\n%d", TRANS("PING"), iPing));
+    strStats += "\n";
+    //
     GetDetailStatsSP(strStats, 1);
-
+    
     // get stats from all players
     extern INDEX SetAllPlayersStats( INDEX iSortKey);
     extern CPlayer *_apenPlayers[NET_MAXGAMEPLAYERS];
