@@ -1304,6 +1304,9 @@ properties:
  201 INDEX m_iMoney = 0,
  202 INDEX m_iScoreAccumulated = 0,
  
+ // [SSE] Respawn Delay
+ 220 FLOAT m_tmKilled = -1.0f, 
+ 
  // [SSE] Weapon Inertia Effect
  350 ANGLE3D m_aWeaponSway = ANGLE3D(0, 0, 0),
  351 ANGLE3D m_aWeaponSwayOld = ANGLE3D(0, 0, 0),
@@ -3097,24 +3100,36 @@ functions:
     }
     
     // [SSE] Respawn Sign
-    if (!(GetFlags() & ENF_ALIVE) && !GetSP()->sp_bSinglePlayer) { // If player dead and in MP.
+    if (!(GetFlags() & ENF_ALIVE) && !GetSP()->sp_bSinglePlayer) // If player dead and in MP.
+    {
       pdp->SetFont( _pfdDisplayFont);
       pdp->SetTextScaling( fScale);
       pdp->SetTextAspect( 1.0f);
       
+      const FLOAT tmRespawnDelay = GetSP()->sp_tmRespawnDelay; // [SSE] Respawn Delay
+      const FLOAT tmNow = _pTimer->CurrentTick();
+
+      CTString strTmp;
+      
+      // [SSE] Respawn Delay
+      if (tmRespawnDelay > 0.0F && (m_tmKilled + tmRespawnDelay) > tmNow) {
+        strTmp.PrintF("%s [%.1f]", TRANS("Wait to respawn"), (m_tmKilled + tmRespawnDelay) - _pTimer->CurrentTick());
+      } else {
+        strTmp.PrintF("%s", TRANS("Press FIRE to respawn!"));
+      }
+
       if (GetSP()->sp_ctCredits == -1) {
-        pdp->PutTextCXY(TRANS("Press FIRE to respawn!"), pixDPWidth*0.5f, pixDPHeight*0.2f, C_WHITE|255);
+        pdp->PutTextCXY(strTmp, pixDPWidth*0.5f, pixDPHeight*0.2f, C_WHITE|255);
         
       } else {
         BOOL bSharedLives = GetSP()->sp_bSharedLives; // [SSE] Personal/Shared Extra Lives
         INDEX iCreditsLeft = (bSharedLives ? GetSP()->sp_ctCreditsLeft : m_iLives);
         
         if (iCreditsLeft != 0) {
-          CTString strTmp;
           if (iCreditsLeft == 1) {
-            strTmp.PrintF("%s\n\n%s", TRANS("Press FIRE to respawn!"), bSharedLives ? TRANS("One shared live left!") : TRANS("One personal live left!"));
+            strTmp.PrintF("%s\n\n%s", strTmp, bSharedLives ? TRANS("One shared live left!") : TRANS("One personal live left!"));
           } else {
-            strTmp.PrintF("%s\n\n%d %s", TRANS("Press FIRE to respawn!"), iCreditsLeft, bSharedLives ? TRANS("shared lives left.") : TRANS("personal lives left."));
+            strTmp.PrintF("%s\n\n%d %s", strTmp, iCreditsLeft, bSharedLives ? TRANS("shared lives left.") : TRANS("personal lives left."));
           }
 
           pdp->PutTextCXY(strTmp, pixDPWidth*0.5f, pixDPHeight*0.2f, C_WHITE|255);
@@ -5578,17 +5593,37 @@ functions:
 
       // If deathmatch or similar then rebirth.
       } else if (!GetSP()->sp_bCooperative) {
-        SendEvent(EEnd());
+        FLOAT tmRespawnDelay = GetSP()->sp_tmRespawnDelay;
+        
+        // [SSE] Respawn Delay
+        if (tmRespawnDelay > 0.0F) {
+          if ((m_tmKilled + tmRespawnDelay) <= _pTimer->CurrentTick()) {
+            SendEvent(EEnd());
+          }
+        } else {
+          SendEvent(EEnd());
+        }
 
       // If cooperative.
       } else {
+        // [SSE] Respawn Delay
+        FLOAT tmRespawnDelay = GetSP()->sp_tmRespawnDelay;
+        BOOL bRespawnDelayPassed = FALSE;
+        
+        if (tmRespawnDelay > 0.0F) {
+          bRespawnDelayPassed = (m_tmKilled + tmRespawnDelay) <= _pTimer->CurrentTick();
+        } else {
+          bRespawnDelayPassed = TRUE;
+        }
+        //
+        
         // If holding down reload button then forbid respawning in-place.
         if (m_ulLastButtons&PLACT_RELOAD) {
           m_ulFlags &= ~PLF_RESPAWNINPLACE;
         }
 
         // If playing with respawn with limited (> 0) credits or infinite credits (<= -1).
-        if (GetSP()->sp_ctCredits != 0)
+        if (bRespawnDelayPassed && GetSP()->sp_ctCredits != 0)
         {
           BOOL bSharedLives = GetSP()->sp_bSharedLives;
           
@@ -6882,6 +6917,13 @@ procedures:
 
     // stop rotating minigun
     penWeapon->m_aMiniGunLast = penWeapon->m_aMiniGun;
+    
+    // [SSE] Respawn Delay
+    if (!GetSP()->sp_bSinglePlayer && !IsPredictor()) {
+      TIME tmNow = _pTimer->CurrentTick();
+      m_tmKilled = tmNow;
+    }
+    //
     
     // if in single player, or if this is a predictor entity
     if (GetSP()->sp_bSinglePlayer || IsPredictor()) {
