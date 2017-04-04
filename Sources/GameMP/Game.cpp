@@ -129,6 +129,8 @@ extern INDEX gam_iScoreForExtraLive = 100000;
 
 extern INDEX gam_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
 
+extern FLOAT gam_tmRespawnDelay = 0.0F; // [SSE] Respawn Delay
+
 static INDEX hud_iEnableStats = 1;
 static FLOAT hud_fEnableFPS   = 1;
 static INDEX hud_iStats    = 0;
@@ -976,6 +978,8 @@ void CGame::InitInternal( void)
   _pShell->DeclareSymbol("persistent user INDEX gam_iScoreForExtraLive;", &gam_iScoreForExtraLive); 
   //
   _pShell->DeclareSymbol("persistent user INDEX gam_bKeepSeriousDamageOnProjectiles;",  &gam_bKeepSeriousDamageOnProjectiles); // [SSE] Better Serious Damage
+
+  _pShell->DeclareSymbol("persistent user FLOAT gam_tmRespawnDelay;", &gam_tmRespawnDelay); // [SSE] Respawn Delay
 
   _pShell->DeclareSymbol("user INDEX gam_bQuickLoad;", &gam_bQuickLoad);
   _pShell->DeclareSymbol("user INDEX gam_bQuickSave;", &gam_bQuickSave);

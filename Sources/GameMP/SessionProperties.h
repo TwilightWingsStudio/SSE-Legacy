@@ -89,6 +89,9 @@ public:
   //
   
   BOOL sp_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
+  
+  // [SSE] Respawn Delay
+  FLOAT sp_tmRespawnDelay; // How many seconds should pass after player death to be able respawn.
 };
 
 // NOTE: never instantiate CSessionProperties, as its size is not fixed to the size defined in engine

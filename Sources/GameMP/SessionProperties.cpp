@@ -57,6 +57,7 @@ extern INDEX gam_iScoreForExtraLive;
 
 extern INDEX gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
 
+extern FLOAT gam_tmRespawnDelay; // [SSE] Respawn Delay
 
 static void SetGameModeParameters(CSessionProperties &sp)
 {
@@ -177,6 +178,8 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   //
   
   sp.sp_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
+  
+  sp.sp_tmRespawnDelay = 0; // [SSE] Respawn Delay
 
   sp.sp_iBlood = Clamp( gam_iBlood, 0L, 3L);
   sp.sp_bGibs  = gam_bGibs;
@@ -240,6 +243,8 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_bUseExtraEnemies = gam_bUseExtraEnemies;
 
   sp.sp_bKeepSeriousDamageOnProjectiles = gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
+  
+  sp.sp_tmRespawnDelay = Clamp(gam_tmRespawnDelay, 0.0F, 60.0F); // [SSE] Respawn Delay
 
   // set credits and limits
   if (sp.sp_bCooperative) {
