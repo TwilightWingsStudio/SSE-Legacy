@@ -28,6 +28,8 @@ enum HealthItemType {
   2 HIT_MEDIUM    "2 Medium (+25)",     // Medium health.
   3 HIT_LARGE     "3 Large (+50)",      // Large health.
   4 HIT_SUPER     "4 Super (+100)",     // Super health.
+  5 HIT_MEGA      "5 Mega (+200)",      // Mega health.
+  6 HIT_CAPSULE   "6 Capsule (+5)",     // Capsule health.
 };
 
 // Event for sending through receive item.
@@ -52,6 +54,9 @@ components:
   1 model   MODEL_PILL        "Models\\Items\\Health\\Pill\\Pill.mdl",
   2 texture TEXTURE_PILL      "Models\\Items\\Health\\Pill\\Pill.tex",
   3 texture TEXTURE_PILL_BUMP "Models\\Items\\Health\\Pill\\PillBump.tex",
+  
+  5 model   MODEL_CAPSULE     "Models\\Items\\Health\\Capsule\\Capsule.mdl",
+  6 texture TEXTURE_CAPSULE   "Models\\Items\\Health\\Capsule\\Capsule.tex",
 
 // ********* SMALL HEALTH *********
  10 model   MODEL_SMALL       "Models\\Items\\Health\\Small\\Small.mdl",
@@ -157,6 +162,10 @@ functions:
       case HIT_SUPER:
         Particles_Stardust(this, 2.3F * 0.75F * m_fStretch, (bOnGround ? 0.8625F : 1.5F*0.75F) * m_fStretch, PT_STAR08, 320);
         break;
+      // [SSE] More Health Item Types
+      case HIT_CAPSULE:
+        Particles_Stardust(this, 0.9F * 0.75F * m_fStretch, (bOnGround ? 0.375F : 0.70F*0.75F) * m_fStretch, PT_STAR08, 32);
+        break;
     }
   }
 
@@ -197,7 +206,7 @@ functions:
         m_iSoundComponent = SOUND_SMALL;
       } break;
 
-      case HIT_MEDIUM:
+      case HIT_MEDIUM: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
         m_fValue = 25.0F;
         m_bOverTopHealth = FALSE;
@@ -210,9 +219,9 @@ functions:
         AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.6F, 0.0F), FLOAT3D(2.5F, 2.5F, 0.5F) );
         StretchItem(FLOAT3D(1.5F*0.75F, 1.5F*0.75F, 1.5F*0.75));
         m_iSoundComponent = SOUND_MEDIUM;
-        break;
+      } break;
 
-      case HIT_LARGE:
+      case HIT_LARGE: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
         m_fValue = 50.0F;
         m_bOverTopHealth = FALSE;
@@ -225,9 +234,9 @@ functions:
         AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.8F, 0.0F), FLOAT3D(2.8F, 2.8F, 1.0F) );
         StretchItem(FLOAT3D(1.2F*0.75F, 1.2F*0.75F, 1.2F*0.75F));
         m_iSoundComponent = SOUND_LARGE;
-        break;
+      } break;
 
-      case HIT_SUPER:
+      case HIT_SUPER: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
         m_fValue = 100.0F;
         m_bOverTopHealth = TRUE;
@@ -242,7 +251,39 @@ functions:
         CModelObject &mo = GetModelObject()->GetAttachmentModel(ITEMHOLDER_ATTACHMENT_ITEM)->amo_moModelObject;
         mo.PlayAnim(0, AOF_LOOPING);
         m_iSoundComponent = SOUND_SUPER;
-        break;
+      } break;
+      
+      case HIT_CAPSULE: {
+        ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_SMALL);
+        m_fValue = 5.0F;
+        m_bOverTopHealth = TRUE;
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
+        m_strDescription.PrintF("Capsule - H:%g  T:%g", m_fValue, m_fRespawnTime);
+        
+        // set appearance
+        AddItem(MODEL_CAPSULE, TEXTURE_CAPSULE, 0, TEXTURE_SPECULAR_STRONG, 0);
+        // add flare
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
+        StretchItem(FLOAT3D(1.0F*0.75F, 1.0F*0.75F, 1.0F*0.75F));
+        m_iSoundComponent = SOUND_PILL;
+      } break;
+      
+      case HIT_MEGA: {
+        ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
+        m_fValue = 200.0F;
+        m_bOverTopHealth = TRUE;
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 120.0F; 
+        m_strDescription.PrintF("Mega - H:%g  T:%g", m_fValue, m_fRespawnTime);
+        
+        // set appearance
+        AddItem(MODEL_SUPER, TEXTURE_SUPER, 0, TEXTURE_SPECULAR_MEDIUM, 0);
+        // add flare
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 1.0F, 0.0F), FLOAT3D(3.0F, 3.0F, 1.0F) );
+        StretchItem(FLOAT3D(1.0F*0.75F, 1.0F*0.75F, 1.0F*0.75));
+        CModelObject &mo = GetModelObject()->GetAttachmentModel(ITEMHOLDER_ATTACHMENT_ITEM)->amo_moModelObject;
+        mo.PlayAnim(0, AOF_LOOPING);
+        m_iSoundComponent = SOUND_SUPER;
+      } break;
     }
   };
 
