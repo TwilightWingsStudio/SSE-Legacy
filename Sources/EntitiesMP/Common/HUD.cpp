@@ -13,9 +13,10 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
 
-
 #include "StdH.h"
 #include "GameMP/SEColors.h"
+
+#include "HUD.h"
 
 #include <Engine/Graphics/DrawPort.h>
 
@@ -40,20 +41,6 @@ class CHUDTextureEntry
     CListNode he_lnNode;
     CTFileName he_fnTexture;
     CTextureObject *he_ptoTexture;
-};
-
-enum EHUDHorAnchorType
-{
-  EHHAT_LEFT = 0,
-  EHHAT_CENTER = 1,
-  EHHAT_RIGHT = 2,
-};
-
-enum EHUDVerAnchorType
-{
-  EHVAT_TOP = 0,
-  EHVAT_MID = 1,
-  EHVAT_BOT = 2,
 };
 
 // Cheats
@@ -100,6 +87,10 @@ extern BOOL hud_bGameDebugMonitor;
 extern INDEX hud_iHUDType;
 //
 
+// [SSE]
+extern void HUD_DrawAnchoredRectEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, COLOR colRect);
+//
+
 // player statistics sorting keys
 enum SortKeys {
   PSK_NAME    = 1,
@@ -120,20 +111,27 @@ enum BarOrientations {
 
 extern const INDEX aiWeaponsRemap[19];
 
+// Base.
+extern CDrawPort *_pDP = NULL;
+extern PIX _pixDPWidth = 0;
+extern PIX _pixDPHeight = 0;
+
+extern FLOAT _fResolutionScaling = 1.0F;
+extern FLOAT _fCustomScaling = 1.0F;
+
+extern ULONG _ulAlphaHUD = C_WHITE|CT_OPAQUE;
+extern ULONG _ulBrAlpha = C_WHITE|CT_OPAQUE;
+
+extern TIME _tmNow = -1.0f;
+extern TIME _tmLast = -1.0f;
+
 // drawing variables
 static const CPlayer *_penPlayer;
 static CPlayerWeapons *_penWeapons;
-static CDrawPort *_pDP;
-static PIX   _pixDPWidth, _pixDPHeight;
-static FLOAT _fResolutionScaling;
-static FLOAT _fCustomScaling;
-static ULONG _ulAlphaHUD;
-static ULONG _ulBrAlpha;
+
 static COLOR _colHUD;
 static COLOR _colHUDText;
-static TIME  _tmNow = -1.0f;
-static TIME  _tmLast = -1.0f;
-static CFontData _fdNumbersFont;
+extern CFontData &_fdNumbersFont = *new CFontData;
 
 // array for pointers of all players
 extern CPlayer *_apenPlayers[NET_MAXGAMEPLAYERS] = {0};
@@ -204,18 +202,7 @@ static CTextureObject _toSniperLed;
 
 static BOOL _bHUDFontsLoaded = FALSE; // [SSE] HUD No Crash If No Assets
 
-// all info about color transitions
-struct ColorTransitionTable {
-  COLOR ctt_colFine;      // color for values over 1.0
-  COLOR ctt_colHigh;      // color for values from 1.0 to 'fMedium'
-  COLOR ctt_colMedium;    // color for values from 'fMedium' to 'fLow'
-  COLOR ctt_colLow;       // color for values under fLow
-  FLOAT ctt_fMediumHigh;  // when to switch to high color   (normalized float!)
-  FLOAT ctt_fLowMedium;   // when to switch to medium color (normalized float!)
-  BOOL  ctt_bSmooth;      // should colors have smooth transition
-};
-
-static struct ColorTransitionTable _cttHUD;
+extern struct ColorTransitionTable &_cttHUD = *(new ColorTransitionTable);
 
 // ammo's info structure
 struct AmmoInfo {
@@ -402,7 +389,7 @@ static COLOR AddShaker( PIX const pixAmmount, INDEX const iCurrentValue, INDEX &
 // --------------------------------------------------------------------------------------
 // Get current color from local color transitions table.
 // --------------------------------------------------------------------------------------
-static COLOR GetCurrentColor( FLOAT fNormalizedValue)
+extern COLOR GetCurrentColor( FLOAT fNormalizedValue)
 {
   // if value is in 'low' zone just return plain 'low' alert color
   if (fNormalizedValue < _cttHUD.ctt_fLowMedium) return( _cttHUD.ctt_colLow & 0xFFFFFF00);
@@ -1029,343 +1016,7 @@ static void HUD_DrawEntityStack()
 #endif
 //<<<<<<< DEBUG FUNCTIONS >>>>>>>
 
-static void HUD_DrawAnchoredRectEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, COLOR colRect)
-{
-  FLOAT fOriginX = fPosX;
-  FLOAT fOriginY = fPosY;
-  
-  FLOAT fModSizeX = fSizeX;
-  FLOAT fModSizeY = fSizeY;
-  
-  switch (ehPos)
-  {
-    default: {
-      fOriginX = fOriginX;
-    } break;
 
-    case EHHAT_CENTER: {
-      fOriginX = _pixDPWidth / 2.0F + fOriginX - fSizeX / 2.0F;
-    } break;
-
-    case EHHAT_RIGHT: {
-      fOriginX = _pixDPWidth - fOriginX - fSizeX;
-    } break;
-  }
-
-  switch (evPos)
-  {
-    default: {
-      fOriginY = fOriginY;
-    } break;
-
-    case EHVAT_MID: {
-      fOriginY = _pixDPHeight / 2.0F + fOriginY - fSizeY;
-    } break;
-
-    case EHVAT_BOT: {
-      fOriginY = _pixDPHeight - fOriginY - fSizeY;
-    } break;
-  }
-  
-  _pDP->Fill(fOriginX, fOriginY, fModSizeX, fModSizeY, colRect);
-}
-
-static void HUD_DrawAnchoredRect(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, COLOR colRect)
-{
-  FLOAT fMul;
-  
-  if (_pixDPWidth > _pixDPHeight) {
-    fMul = _pixDPHeight / 480.0F;
-  } else {
-    fMul = _pixDPWidth / 640.0F;
-  }
-
-  fPosX *= fMul;
-  fPosY *= fMul;
-  fSizeX *= fMul;
-  fSizeY *= fMul;
-  
-  HUD_DrawAnchoredRectEx(fPosX, fPosY, fSizeX, fSizeY, ehPos, evPos, colRect);
-}
-
-static void HUD_DrawAnchoredRectOutlineEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, COLOR colRect)
-{
-  FLOAT fOriginX = fPosX;
-  FLOAT fOriginY = fPosY;
-  
-  FLOAT fModSizeX = fSizeX;
-  FLOAT fModSizeY = fSizeY;
-  
-  switch (ehPos)
-  {
-    default: {
-      fOriginX = fOriginX;
-    } break;
-
-    case EHHAT_CENTER: {
-      fOriginX = _pixDPWidth / 2.0F + fOriginX - fSizeX / 2.0F;
-    } break;
-
-    case EHHAT_RIGHT: {
-      fOriginX = _pixDPWidth - fOriginX - fSizeX;
-    } break;
-  }
-
-  switch (evPos)
-  {
-    default: {
-      fOriginY = fOriginY;
-    } break;
-
-    case EHVAT_MID: {
-      fOriginY = _pixDPHeight / 2.0F + fOriginY - fSizeY;
-    } break;
-
-    case EHVAT_BOT: {
-      fOriginY = _pixDPHeight - fOriginY - fSizeY;
-    } break;
-  }
-  
-  _pDP->DrawBorder(fOriginX - 1, fOriginY - 1, fModSizeX + 2, fModSizeY + 2, colRect);
-}
-
-static void HUD_DrawAnchoredRectOutline(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, COLOR colRect)
-{
-  FLOAT fMul;
-  
-  if (_pixDPWidth > _pixDPHeight) {
-    fMul = _pixDPHeight / 480.0F;
-  } else {
-    fMul = _pixDPWidth / 640.0F;
-  }
-
-  fPosX *= fMul;
-  fPosY *= fMul;
-  fSizeX *= fMul;
-  fSizeY *= fMul;
-  
-  HUD_DrawAnchoredRectOutlineEx(fPosX, fPosY, fSizeX, fSizeY, ehPos, evPos, colRect);
-}
-
-static void HUD_DrawAnchroredIconEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, CTextureObject &toIcon, COLOR colDefault, FLOAT fNormValue, BOOL bBlink)
-{
-  if (toIcon.GetData() == NULL) return;
-  if (toIcon.GetData()->ad_Anims == NULL) return;
-  
-  // Determine color
-  COLOR col = colDefault;
-  if (col == NONE) col = GetCurrentColor( fNormValue);
-
-  // determine blinking state
-  if (bBlink && fNormValue<=(_cttHUD.ctt_fLowMedium/2)) {
-    // activate blinking only if value is <= half the low edge
-    INDEX iCurrentTime = (INDEX)(_tmNow*4);
-    if (iCurrentTime&1) col = C_vdGRAY;
-  }
-  
-  FLOAT fOriginX = fPosX;
-  FLOAT fOriginY = fPosY;
-  
-  
-  const FLOAT fHalfSizeI = fSizeX * 0.5F;
-  const FLOAT fHalfSizeJ = fSizeY * 0.5F;
-  
-  switch (ehPos)
-  {
-    default: {
-      fOriginX = fOriginX + fHalfSizeI;
-    } break;
-
-    case EHHAT_CENTER: {
-      fOriginX = _pixDPWidth / 2.0F + fOriginX;
-    } break;
-
-    case EHHAT_RIGHT: {
-      fOriginX = _pixDPWidth - fOriginX - fHalfSizeI;
-    } break;
-  }
-
-  switch (evPos)
-  {
-    default: {
-      fOriginY = fOriginY + fHalfSizeJ;
-    } break;
-
-    case EHVAT_MID: {
-      fOriginY = _pixDPHeight / 2.0F + fOriginY - fHalfSizeJ;
-    } break;
-
-    case EHVAT_BOT: {
-      fOriginY = _pixDPHeight - fOriginY - fHalfSizeJ;
-    } break;
-  }
-
-  // done
-  _pDP->InitTexture( &toIcon);
-  _pDP->AddTexture( fOriginX - fHalfSizeI, fOriginY - fHalfSizeI, fOriginX + fHalfSizeI, fOriginY + fHalfSizeJ, col);
-  _pDP->FlushRenderingQueue();
-}
-
-static void HUD_DrawAnchroredIcon(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, CTextureObject &toIcon, COLOR colDefault, FLOAT fNormValue, BOOL bBlink)
-{
-  if (toIcon.GetData() == NULL) return;
-  if (toIcon.GetData()->ad_Anims == NULL) return;
-  
-  FLOAT fMul;
-  
-  if (_pixDPWidth > _pixDPHeight) {
-    fMul = _pixDPHeight / 480.0F;
-  } else {
-    fMul = _pixDPWidth / 640.0F;
-  }
-
-  fPosX *= fMul;
-  fPosY *= fMul;
-  fSizeX *= fMul;
-  fSizeY *= fMul;
-  
-  HUD_DrawAnchroredIconEx(fPosX, fPosY, fSizeX, fSizeY, ehPos, evPos, toIcon, colDefault, fNormValue, bBlink);
-}
-
-static void HUD_DrawAnchoredTextEx( FLOAT fPosX, FLOAT fPosY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, const CTString &strText, COLOR colDefault, FLOAT fNormValue)
-{
-  if (_pDP->dp_FontData == NULL) return; // TODO: Maybe make assert.
-  
-  // determine color
-  COLOR col = colDefault;
-  if (col == NONE) {
-    col = GetCurrentColor( fNormValue);
-  }
-
-  FLOAT fOriginX = fPosX;
-  FLOAT fOriginY = fPosY;
-  
-  FLOAT fTextScale = _fResolutionScaling * _fCustomScaling;
-  
-  FLOAT fCharHeight = _pfdDisplayFont->GetHeight() * fTextScale;
-
-  _pDP->SetTextScaling(fTextScale);
-  
-  switch (ehPos)
-  {
-    default: {
-      fOriginX = fOriginX + _pDP->GetTextWidth(strText) / 2;
-    } break;
-
-    case EHHAT_CENTER: {
-      fOriginX = _pixDPWidth / 2.0F + fOriginX;
-    } break;
-
-    case EHHAT_RIGHT: {
-      fOriginX = _pixDPWidth - fOriginX - _pDP->GetTextWidth(strText) / 2.0F;
-    } break;
-  }
-
-  switch (evPos)
-  {
-    default: {
-      fOriginY = fOriginY + fCharHeight / 2.0F;
-    } break;
-
-    case EHVAT_MID: {
-      fOriginY = _pixDPHeight / 2.0F + fOriginY;
-    } break;
-
-    case EHVAT_BOT: {
-      fOriginY = _pixDPHeight - fOriginY - fCharHeight;
-    } break;
-  }
-
-  // done
-  _pDP->PutTextCXY( strText, fOriginX, fOriginY, col|_ulAlphaHUD);
-}
-
-static void HUD_DrawAnchoredText( FLOAT fPosX, FLOAT fPosY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, const CTString &strText, COLOR colDefault, FLOAT fNormValue)
-{
-  FLOAT fMul;
-  
-  if (_pixDPWidth > _pixDPHeight) {
-    fMul = _pixDPHeight / 480.0F;
-  } else {
-    fMul = _pixDPWidth / 640.0F;
-  }
-
-  fPosX *= fMul;
-  fPosY *= fMul;
-  
-  HUD_DrawAnchoredTextEx(fPosX, fPosY, ehPos, evPos, strText, colDefault, fNormValue);
-}
-
-static void HUD_DrawAnchoredTextInRectEx( FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, const CTString &strText, COLOR colDefault, FLOAT fNormValue)
-{
-  if (_pDP->dp_FontData == NULL) return; // TODO: Maybe make assert.
-  
-  // determine color
-  COLOR col = colDefault;
-  if (col == NONE) {
-    col = GetCurrentColor( fNormValue);
-  }
-
-  FLOAT fOriginX = fPosX;
-  FLOAT fOriginY = fPosY;
-  
-  FLOAT fTextScale = fSizeY / _fdNumbersFont.GetHeight();
-  
-  FLOAT fCharHeight = _fdNumbersFont.GetHeight() * fTextScale;
-
-  _pDP->SetTextScaling(fTextScale);
-  
-  switch (ehPos)
-  {
-    default: {
-      fOriginX = fOriginX + fSizeX / 2.0F;
-    } break;
-
-    case EHHAT_CENTER: {
-      fOriginX = _pixDPWidth / 2.0F + fOriginX;
-    } break;
-
-    case EHHAT_RIGHT: {
-      fOriginX = _pixDPWidth - fOriginX - fSizeX / 2.0F;
-    } break;
-  }
-
-  switch (evPos)
-  {
-    default: {
-      fOriginY = fOriginY + fSizeY / 2.0F;
-    } break;
-
-    case EHVAT_MID: {
-      fOriginY = _pixDPHeight / 2.0F + fOriginY;
-    } break;
-
-    case EHVAT_BOT: {
-      fOriginY = _pixDPHeight - fOriginY - fSizeY / 2.0F;
-    } break;
-  }
-
-  // done
-  _pDP->PutTextCXY( strText, fOriginX, fOriginY, col|_ulAlphaHUD);
-}
-
-static void HUD_DrawAnchoredTextInRect( FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, const CTString &strText, COLOR colDefault, FLOAT fNormValue)
-{
-  FLOAT fMul;
-  
-  if (_pixDPWidth > _pixDPHeight) {
-    fMul = _pixDPHeight / 480.0F;
-  } else {
-    fMul = _pixDPWidth / 640.0F;
-  }
-
-  fPosX *= fMul;
-  fPosY *= fMul;
-  fSizeX *= fMul;
-  fSizeY *= fMul;
-  
-  HUD_DrawAnchoredTextInRectEx(fPosX, fPosY, fSizeX, fSizeY, ehPos, evPos, strText, colDefault, fNormValue);
-}
 
 // --------------------------------------------------------------------------------------
 // main

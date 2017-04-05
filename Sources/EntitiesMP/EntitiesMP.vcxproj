@@ -182,6 +182,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="Common\Common.cpp" />
     <ClCompile Include="Common\EmanatingParticles.cpp" />
     <ClCompile Include="Common\HUD.cpp" />
+    <ClCompile Include="Common\HUD_AnchoredFunctions.cpp" />
     <ClCompile Include="Common\Particles.cpp" />
     <ClCompile Include="Common\PathFinding.cpp" />
     <ClCompile Include="Condition.cpp" />
@@ -428,6 +429,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="Common\Common.h" />
     <ClInclude Include="Common\Flags.h" />
     <ClInclude Include="Common\GameInterface.h" />
+    <ClInclude Include="Common\HUD.h" />
     <ClInclude Include="Common\Particles.h" />
     <ClInclude Include="Common\PathFinding.h" />
     <ClInclude Include="Condition.h" />

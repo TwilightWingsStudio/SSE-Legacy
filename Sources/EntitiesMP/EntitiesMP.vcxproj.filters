@@ -625,6 +625,9 @@
     <ClCompile Include="SimpleParenter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Common\HUD_AnchoredFunctions.cpp">
+      <Filter>Source Files\Common sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1724,6 +1727,9 @@
     </ClInclude>
     <ClInclude Include="SimpleParenter.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\HUD.h">
+      <Filter>Header Files\Common headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
