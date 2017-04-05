@@ -64,6 +64,10 @@ extern void HUD_DrawAnchoredRectEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT
   _pDP->Fill(fOriginX, fOriginY, fModSizeX, fModSizeY, colRect);
 }
 
+// --------------------------------------------------------------------------------------
+// Draws filled rectangle on anchor-based relative coords.
+// Uses relative rescalling.
+// --------------------------------------------------------------------------------------
 extern void HUD_DrawAnchoredRect(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, COLOR colRect)
 {
   FLOAT fMul;
@@ -83,7 +87,7 @@ extern void HUD_DrawAnchoredRect(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT f
 }
 
 // --------------------------------------------------------------------------------------
-// Draws rectangle outline with given color.
+// Draws 1 pix outline around rectangle with given color on anchor-based relative coords.
 // --------------------------------------------------------------------------------------
 extern void HUD_DrawAnchoredRectOutlineEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, COLOR colRect)
 {
@@ -126,6 +130,10 @@ extern void HUD_DrawAnchoredRectOutlineEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX
   _pDP->DrawBorder(fOriginX - 1, fOriginY - 1, fModSizeX + 2, fModSizeY + 2, colRect);
 }
 
+// --------------------------------------------------------------------------------------
+// Draws 1 pix outline around rectangle with given color on anchor-based relative coords.
+// Uses relative rescalling.
+// --------------------------------------------------------------------------------------
 extern void HUD_DrawAnchoredRectOutline(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, COLOR colRect)
 {
   FLOAT fMul;
@@ -142,6 +150,108 @@ extern void HUD_DrawAnchoredRectOutline(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, 
   fSizeY *= fMul;
   
   HUD_DrawAnchoredRectOutlineEx(fPosX, fPosY, fSizeX, fSizeY, ehPos, evPos, colRect);
+}
+
+// --------------------------------------------------------------------------------------
+// Draws filled bar on anchor-based relative coords.
+// --------------------------------------------------------------------------------------
+extern void HUD_DrawAnchoredBarEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos,
+    enum BarOrientations eBarOrientation, COLOR colBar, FLOAT fNormValue)
+{
+  FLOAT fOriginX = fPosX;
+  FLOAT fOriginY = fPosY;
+  
+  FLOAT fModSizeX = fSizeX;
+  FLOAT fModSizeY = fSizeY;
+  
+  FLOAT fFilledSizeX = fSizeX;
+  FLOAT fFilledSizeY = fSizeY;
+  
+  // determine color
+  COLOR col = colBar;
+  if (col == NONE) {
+    col = GetCurrentColor( fNormValue);
+  }
+  
+  switch (ehPos)
+  {
+    default: {
+      fOriginX = fOriginX;
+    } break;
+
+    case EHHAT_CENTER: {
+      fOriginX = _pixDPWidth / 2.0F + fOriginX - fSizeX / 2.0F;
+    } break;
+
+    case EHHAT_RIGHT: {
+      fOriginX = _pixDPWidth - fOriginX - fSizeX;
+    } break;
+  }
+
+  switch (evPos)
+  {
+    default: {
+      fOriginY = fOriginY;
+    } break;
+
+    case EHVAT_MID: {
+      fOriginY = _pixDPHeight / 2.0F + fOriginY - fSizeY;
+    } break;
+
+    case EHVAT_BOT: {
+      fOriginY = _pixDPHeight - fOriginY - fSizeY;
+    } break;
+  }
+  
+  switch (eBarOrientation)
+  {
+    case BO_LEFT: {
+      fFilledSizeX *= fNormValue;
+      fModSizeX = fFilledSizeX;
+    } break;
+
+    case BO_RIGHT: {
+      fFilledSizeX *= fNormValue;
+      fModSizeX = fFilledSizeX;
+      fOriginX += fSizeX - fFilledSizeX;
+    } break;
+
+    case BO_UP: {
+      fFilledSizeY *= fNormValue;
+      fModSizeY = fFilledSizeY;
+    } break;
+
+    case BO_DOWN: {
+      fFilledSizeY *= fNormValue;
+      fModSizeY = fFilledSizeY;
+      fOriginY += fSizeY - fFilledSizeY;
+    } break;
+  }
+  
+  _pDP->Fill(fOriginX, fOriginY, fModSizeX, fModSizeY, col);
+}
+
+// --------------------------------------------------------------------------------------
+// Draws filled bar on anchor-based relative coords.
+// Uses relative rescalling.
+// --------------------------------------------------------------------------------------
+extern void HUD_DrawAnchoredBar(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos,
+    enum BarOrientations eBarOrientation, COLOR colBar, FLOAT fNormValue)
+{
+  FLOAT fMul;
+
+  if (_pixDPWidth > _pixDPHeight) {
+    fMul = _pixDPHeight / 480.0F;
+  } else {
+    fMul = _pixDPWidth / 640.0F;
+  }
+
+  fPosX *= fMul;
+  fPosY *= fMul;
+  fSizeX *= fMul;
+  fSizeY *= fMul;
+  
+  HUD_DrawAnchoredBarEx(fPosX, fPosY, fSizeX, fSizeY, ehPos, evPos, eBarOrientation, colBar, fNormValue);
 }
 
 // --------------------------------------------------------------------------------------
@@ -206,6 +316,10 @@ extern void HUD_DrawAnchroredIconEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOA
   _pDP->FlushRenderingQueue();
 }
 
+// --------------------------------------------------------------------------------------
+// Draws icon on anchor-based relative coordinates.
+// Uses relative rescalling.
+// --------------------------------------------------------------------------------------
 extern void HUD_DrawAnchroredIcon(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, CTextureObject &toIcon, COLOR colDefault, FLOAT fNormValue, BOOL bBlink)
 {
   if (toIcon.GetData() == NULL) return;

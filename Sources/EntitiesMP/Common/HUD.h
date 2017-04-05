@@ -44,6 +44,14 @@ enum EHUDVerAnchorType
   EHVAT_BOT = 2,
 };
 
+// where is the bar lowest value
+enum BarOrientations {
+  BO_LEFT  = 1,
+  BO_RIGHT = 2,
+  BO_UP    = 3,
+  BO_DOWN  = 4,
+};
+
 extern CDrawPort *_pDP;
 extern PIX _pixDPWidth;
 extern PIX _pixDPHeight;
@@ -73,5 +81,10 @@ extern void HUD_DrawAnchoredTextEx( FLOAT fPosX, FLOAT fPosY, EHUDHorAnchorType 
 extern void HUD_DrawAnchoredText( FLOAT fPosX, FLOAT fPosY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, const CTString &strText, COLOR colDefault, FLOAT fNormValue);
 extern void HUD_DrawAnchoredTextInRectEx( FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, const CTString &strText, COLOR colDefault, FLOAT fNormValue);
 extern void HUD_DrawAnchoredTextInRect( FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, const CTString &strText, COLOR colDefault, FLOAT fNormValue);
+
+extern void HUD_DrawAnchoredBarEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos,
+    enum BarOrientations eBarOrientation, COLOR colBar, FLOAT fNormValue);
+extern void HUD_DrawAnchoredBar(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos,
+    enum BarOrientations eBarOrientation, COLOR colBar, FLOAT fNormValue);
 
 #endif
