@@ -1332,27 +1332,65 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   //HUD_DrawAnchoredRect(  9, 28, 104, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
   
   // BossBar
+  if (_penPlayer->m_penMainMusicHolder != NULL)
   {
-    HUD_DrawAnchoredRect( -130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon(-130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toHealth, C_WHITE|CT_OPAQUE, 1.0F, FALSE);
-    HUD_DrawAnchoredRect(   10, 48, 256, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    FLOAT fNormValue = 0.0F;
     
-    HUD_DrawAnchoredBar(10, 48, 256, 16, EHHAT_CENTER, EHVAT_TOP, BO_LEFT, C_GREEN|_ulAlphaHUD, 0.75F);
+    CMusicHolder &mh = (CMusicHolder&)*_penPlayer->m_penMainMusicHolder;
+    fNormValue = 0;
 
-    HUD_DrawAnchoredRectOutline(-130, 48,  16, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
-    HUD_DrawAnchoredRectOutline(  10, 48, 256, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+    if (mh.m_penBoss != NULL && (mh.m_penBoss->en_ulFlags&ENF_ALIVE)) {
+      CEnemyBase &eb = (CEnemyBase&)*mh.m_penBoss;
+      ASSERT( eb.m_fMaxHealth>0);
+      fValue = eb.GetHealth();
+      fNormValue = fValue/eb.m_fMaxHealth;
+    }
+
+    if (mh.m_penCounter != NULL) {
+      CEnemyCounter &ec = (CEnemyCounter&)*mh.m_penCounter;
+      if (ec.m_iCount>0) {
+        fValue = ec.m_iCount;
+        fNormValue = fValue/ec.m_iCountFrom;
+      }
+    }
+
+    if (fNormValue > 0)
+    {
+      PrepareColorTransitions( colMax, colMax, colTop, C_RED, 0.5f, 0.25f, FALSE); // prepare and draw boss energy info
+
+      HUD_DrawAnchoredRect( -130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchroredIcon(-130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toHealth, C_WHITE|CT_OPAQUE, 1.0F, FALSE);
+      HUD_DrawAnchoredRect(   10, 48, 256, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      
+      HUD_DrawAnchoredBar(10, 48, 256, 16, EHHAT_CENTER, EHVAT_TOP, BO_LEFT, NONE, fNormValue);
+
+      HUD_DrawAnchoredRectOutline(-130, 48,  16, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+      HUD_DrawAnchoredRectOutline(  10, 48, 256, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+    }
   }
 
+  const TIME tmMaxHoldBreath = _penPlayer->en_tmMaxHoldBreath;
+  
   // Oxygen
+  if (tmMaxHoldBreath > 0.0F)
   {
-    HUD_DrawAnchoredRect (-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchoredRect ( 10, 68, 64, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon(-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toOxygen, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
-    
-    HUD_DrawAnchoredBar(10, 68, 64, 16, EHHAT_CENTER, EHVAT_TOP, BO_LEFT, C_YELLOW|_ulAlphaHUD, 0.75F);
-    
-    HUD_DrawAnchoredRectOutline(-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
-    HUD_DrawAnchoredRectOutline( 10, 68, 64, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+    FLOAT fValue = tmMaxHoldBreath - (_pTimer->CurrentTick() - _penPlayer->en_tmLastBreathed);
+
+    if (_penPlayer->IsConnected() && (_penPlayer->GetFlags()&ENF_ALIVE) && fValue < (tmMaxHoldBreath - 1.0F))
+    {
+      PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+      FLOAT fNormValue = fValue / tmMaxHoldBreath;
+      fNormValue = ClampDn(fNormValue, 0.0f);
+      
+      HUD_DrawAnchoredRect (-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchoredRect ( 10, 68, 64, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchroredIcon(-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toOxygen, C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
+      
+      HUD_DrawAnchoredBar(10, 68, 64, 16, EHHAT_CENTER, EHVAT_TOP, BO_LEFT, NONE, fNormValue);
+      
+      HUD_DrawAnchoredRectOutline(-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+      HUD_DrawAnchoredRectOutline( 10, 68, 64, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+    }
   }
   
   // Right - Messages
@@ -1835,7 +1873,6 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       HUD_DrawIcon(   fCol,      fRow, _toHealth, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
     }
   }
-
 
   // determine scaling of normal text and play mode
   const FLOAT fTextScale  = (_fResolutionScaling+1) *0.5f;

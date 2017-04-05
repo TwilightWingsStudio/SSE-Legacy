@@ -228,7 +228,7 @@ extern void HUD_DrawAnchoredBarEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT 
     } break;
   }
   
-  _pDP->Fill(fOriginX, fOriginY, fModSizeX, fModSizeY, col);
+  _pDP->Fill(fOriginX, fOriginY, fModSizeX, fModSizeY, col|_ulAlphaHUD);
 }
 
 // --------------------------------------------------------------------------------------
