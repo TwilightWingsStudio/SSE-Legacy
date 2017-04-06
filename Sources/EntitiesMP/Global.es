@@ -25,43 +25,70 @@ with this program; if not, write to the Free Software Foundation, Inc.,
  */
 
 event EStop {         // stop your actions
-};                    
+};
+
 event EStart {        // start your actions
   CEntityPointer penCaused,   // who caused the trigger (transitive)
-};                    
+};
+
 event EActivate {     // activate class (usually touch field)
 };
+
 event EDeactivate {   // deactivate class (usually touch field)
 };
+
 event EEnvironmentStart {   // activate environment classes
 };
+
 event EEnvironmentStop {    // deactivate environment classes
 };
+
 event EEnd {          // general purpose end of procedure event
-};                    
+};     
+
 event ETrigger {      // sent by trigger class
   CEntityPointer penCaused,   // who caused the trigger (transitive)
 };
+
 event ETeleportMovingBrush {    // teleport moving brush
 };
 event EReminder {     // reminder event
   INDEX iValue,       // value for return
 };
+
 event EStartAttack {  // OBSOLETE!
 };
+
 event EStopAttack {  // OBSOLETE!
 };
+
 event EStopBlindness {  // make enemy not blind any more
 };
+
 event EStopDeafness {  // make enemy not blind any more
 };
+
 event EReceiveScore { // sent to player when enemy is killed
   INDEX iPoints
 };
+
 event EKilledEnemy { // sent to player when enemy is killed
 };
+
 event ESecretFound { // sent to player secret is found
 };
+
+// [SSE]
+event EArgumentedI {
+  CEntityPointer penCaused,
+  INDEX iValue
+};
+
+event EArgumentedF {
+  CEntityPointer penCaused,
+  FLOAT fValue
+};
+// [SSE]
 
 enum BoolEType {
   0 BET_TRUE      "True",   // true
