@@ -29,7 +29,7 @@ enum HealthItemType {
   3 HIT_LARGE     "3 Large (+50)",      // Large health.
   4 HIT_SUPER     "4 Super (+100)",     // Super health.
   5 HIT_MEGA      "5 Mega (+200)",      // Mega health.
-  6 HIT_CAPSULE   "6 Capsule (+5)",     // Capsule health.
+  6 HIT_TINY      "6 Tiny (+5)",        // Tiny health.
 };
 
 // Event for sending through receive item.
@@ -55,8 +55,9 @@ components:
   2 texture TEXTURE_PILL      "Models\\Items\\Health\\Pill\\Pill.tex",
   3 texture TEXTURE_PILL_BUMP "Models\\Items\\Health\\Pill\\PillBump.tex",
   
-  5 model   MODEL_CAPSULE     "Models\\Items\\Health\\Capsule\\Capsule.mdl",
-  6 texture TEXTURE_CAPSULE   "Models\\Items\\Health\\Capsule\\Capsule.tex",
+// ********* TINY HEALTH *********
+  5 model   MODEL_TINY     "Models\\Items\\Health\\Tiny\\Tiny.mdl",
+  6 texture TEXTURE_TINY   "Models\\Items\\Health\\Tiny\\Tiny.tex",
 
 // ********* SMALL HEALTH *********
  10 model   MODEL_SMALL       "Models\\Items\\Health\\Small\\Small.mdl",
@@ -90,6 +91,9 @@ components:
 304 sound   SOUND_LARGE        "Sounds\\Items\\HealthLarge.wav",
 305 sound   SOUND_SUPER        "Sounds\\Items\\HealthSuper.wav",
 
+306 sound   SOUND_MEGA         "Sounds\\Items\\HealthMega.wav",
+307 sound   SOUND_TINY         "Sounds\\Items\\HealthTiny.wav",
+
 functions:
   // --------------------------------------------------------------------------------------
   // No comments.
@@ -103,6 +107,10 @@ functions:
       case HIT_MEDIUM: PrecacheSound(SOUND_MEDIUM); break;
       case HIT_LARGE:  PrecacheSound(SOUND_LARGE ); break;
       case HIT_SUPER:  PrecacheSound(SOUND_SUPER ); break;
+      
+      // [SSE] More Health Item Types
+      case HIT_MEGA:   PrecacheSound(SOUND_MEGA ); break;
+      case HIT_TINY:   PrecacheSound(SOUND_TINY ); break;
     }
   }
 
@@ -119,11 +127,15 @@ functions:
     
     switch (m_EhitType)
     {
-      case HIT_PILL:  pes->es_strName+=" pill";   break;
-      case HIT_SMALL: pes->es_strName+=" small";  break;
-      case HIT_MEDIUM:pes->es_strName+=" medium"; break;
-      case HIT_LARGE: pes->es_strName+=" large";  break;
-      case HIT_SUPER: pes->es_strName+=" super";  break;
+      case HIT_PILL:  pes->es_strName += " pill";   break;
+      case HIT_SMALL: pes->es_strName += " small";  break;
+      case HIT_MEDIUM:pes->es_strName += " medium"; break;
+      case HIT_LARGE: pes->es_strName += " large";  break;
+      case HIT_SUPER: pes->es_strName += " super";  break;
+
+      // [SSE] More Health Item Types
+      case HIT_MEGA:  pes->es_strName += " mega";  break;
+      case HIT_TINY:  pes->es_strName += " tiny";  break;
     }
 
     return TRUE;
@@ -150,21 +162,30 @@ functions:
       case HIT_PILL:
         Particles_Stardust(this, 0.9F * 0.75F * m_fStretch, (bOnGround ? 0.375F : 0.70F*0.75F) * m_fStretch, PT_STAR08, 32);
         break;
+
       case HIT_SMALL:
         Particles_Stardust(this, 1.0F * 0.75F * m_fStretch, (bOnGround ? 0.375F : 0.75F*0.75F) * m_fStretch, PT_STAR08, 128);
         break;
+
       case HIT_MEDIUM:
         Particles_Stardust(this, 1.0F * 0.75F * m_fStretch, (bOnGround ? 0.375F : 0.75F*0.75F) * m_fStretch, PT_STAR08, 128);
         break;
+
       case HIT_LARGE:
         Particles_Stardust(this, 2.0F * 0.75F * m_fStretch, (bOnGround ? 0.75F : 1.0F*0.75F) * m_fStretch, PT_STAR08, 192);
         break;
+
       case HIT_SUPER:
         Particles_Stardust(this, 2.3F * 0.75F * m_fStretch, (bOnGround ? 0.8625F : 1.5F*0.75F) * m_fStretch, PT_STAR08, 320);
         break;
+
       // [SSE] More Health Item Types
-      case HIT_CAPSULE:
-        Particles_Stardust(this, 0.9F * 0.75F * m_fStretch, (bOnGround ? 0.375F : 0.70F*0.75F) * m_fStretch, PT_STAR08, 32);
+      case HIT_MEGA:
+        Particles_Stardust(this, 2.3F * 0.75F * m_fStretch, (bOnGround ? 0.8625F : 1.5F*0.75F) * m_fStretch, PT_STAR08, 320);
+        break;
+      
+      case HIT_TINY:
+        Particles_Stardust(this, 1.0F * 0.75F * m_fStretch, (bOnGround ? 0.375F : 0.70F*0.75F) * m_fStretch, PT_STAR08, 32);
         break;
     }
   }
@@ -253,19 +274,20 @@ functions:
         m_iSoundComponent = SOUND_SUPER;
       } break;
       
-      case HIT_CAPSULE: {
+      // [SSE] More Health Item Types
+      case HIT_TINY: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_SMALL);
         m_fValue = 5.0F;
         m_bOverTopHealth = TRUE;
         m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F; 
-        m_strDescription.PrintF("Capsule - H:%g  T:%g", m_fValue, m_fRespawnTime);
+        m_strDescription.PrintF("Tiny - H:%g  T:%g", m_fValue, m_fRespawnTime);
         
         // set appearance
-        AddItem(MODEL_CAPSULE, TEXTURE_CAPSULE, 0, TEXTURE_SPECULAR_STRONG, 0);
+        AddItem(MODEL_TINY, TEXTURE_TINY, 0, TEXTURE_SPECULAR_STRONG, 0);
         // add flare
         AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );
         StretchItem(FLOAT3D(1.0F*0.75F, 1.0F*0.75F, 1.0F*0.75F));
-        m_iSoundComponent = SOUND_PILL;
+        m_iSoundComponent = SOUND_TINY;
       } break;
       
       case HIT_MEGA: {
@@ -282,7 +304,7 @@ functions:
         StretchItem(FLOAT3D(1.0F*0.75F, 1.0F*0.75F, 1.0F*0.75));
         CModelObject &mo = GetModelObject()->GetAttachmentModel(ITEMHOLDER_ATTACHMENT_ITEM)->amo_moModelObject;
         mo.PlayAnim(0, AOF_LOOPING);
-        m_iSoundComponent = SOUND_SUPER;
+        m_iSoundComponent = SOUND_MEGA;
       } break;
     }
   };
@@ -331,6 +353,10 @@ procedures:
           case HIT_MEDIUM:IFeel_PlayEffect("PU_HealthMedium"); break;
           case HIT_LARGE: IFeel_PlayEffect("PU_HealthLarge"); break;
           case HIT_SUPER: IFeel_PlayEffect("PU_HealthSuper"); break;
+          
+          // [SSE] More Health Item Types
+          case HIT_MEGA: IFeel_PlayEffect("PU_HealthSuper"); break;
+          case HIT_TINY: IFeel_PlayEffect("PU_HealthSmall"); break;
         }
       }
 
