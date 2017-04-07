@@ -800,6 +800,7 @@ void CMainFrame::CustomColorPicker( PIX pixX, PIX pixY)
   }
 
   _pcolColorToSet = NULL;
+  
   if( m_pColorPalette == NULL)
   {
     // instantiate new choose color palette window
@@ -808,10 +809,11 @@ void CMainFrame::CustomColorPicker( PIX pixX, PIX pixY)
     BOOL bResult = m_pColorPalette->CreateEx( WS_EX_TOOLWINDOW,
       NULL, L"Palette", WS_CHILD|WS_POPUP|WS_VISIBLE,
       rectWindow.left, rectWindow.top, rectWindow.Width(), rectWindow.Height(),
-      m_hWnd, NULL, NULL);
+      this->m_hWnd, NULL, NULL);
     if( !bResult)
     {
       AfxMessageBox( L"Error: Failed to create color palette");
+      //m_pColorPalette = NULL;
       return;
     }
     // initialize canvas for active texture button
@@ -820,8 +822,48 @@ void CMainFrame::CustomColorPicker( PIX pixX, PIX pixY)
   }
   else
   {
-    m_pColorPalette->ShowWindow(SW_SHOW);
+    if (!m_pColorPalette->ShowWindow(SW_SHOW)) {
+      //AfxMessageBox(L"Error: Failed to show color palette");
+
+      COLORREF TmpColor = CLRF_CLR(m_pColorPalette->m_iSelectedColor);
+      if (MyChooseColor(TmpColor, *this))
+      {
+        // restore alpha value
+        COLOR tcol = CLR_CLRF(TmpColor) | m_pColorPalette->m_iSelectedColor & 0x000000FF;
+
+
+        // obtain document
+        CWorldEditorDoc *pDoc = theApp.GetDocument();
+        // must not be null
+        ASSERT(pDoc != NULL);
+        // if polygon mode
+        if (pDoc->m_iMode == POLYGON_MODE)
+        {
+          // polygon selection must contain selected polygons
+          ASSERT(pDoc->m_selPolygonSelection.Count() != 0);
+          // for each of the selected polygons
+          FOREACHINDYNAMICCONTAINER(pDoc->m_selPolygonSelection, CBrushPolygon, itbpo)
+          {
+            // set new polygon's color
+            itbpo->bpo_colColor = tcol;
+          }
+        } else if (pDoc->m_iMode == SECTOR_MODE) {
+          // sector selection must contain selected sectors
+          ASSERT(pDoc->m_selSectorSelection.Count() != 0);
+          // for each of the selected sectors
+          FOREACHINDYNAMICCONTAINER(pDoc->m_selSectorSelection, CBrushSector, itbsc)
+          {
+            // set new polygon's color
+            itbsc->bsc_colColor = tcol;
+          }
+        }
+
+        pDoc->UpdateAllViews(NULL);
+      }
+      return;
+    }
   }
+
   m_pColorPalette->m_iSelectedColor = iSelectedColor;
 }
 
