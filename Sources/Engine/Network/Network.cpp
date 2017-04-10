@@ -2657,15 +2657,88 @@ void CNetworkLibrary::WriteVersion_t(CTStream &strm)
   strm.WriteID_t("BUIV"); // build version
   strm<<INDEX(_SE_BUILD_MAJOR);
 }
+
+static BOOL RecognieeIdiotism_t(CTStream &strm)
+{
+  CChunkID cidPeakedChunk = strm.PeekID_t();
+  
+  if (cidPeakedChunk == CChunkID("SIGS"))
+  {
+    ThrowF_t(TRANS("File '%s' contains credentials data!\n\nThat means it was created by SE3 or newer, so it cannot be loaded!\nAnd I can't even recognise engine version because I don't know credentals lenght!"), strm.GetDescription());
+    return TRUE;
+  }
+  
+  if (cidPeakedChunk == CChunkID("TVER"))
+  {
+    ThrowF_t(TRANS("File '%s' is not a world document and cannot be loaded! It is texture because it has texture data!\n\nTrying to open texture as world is supreme stage of idiotism! Ask somebody to award you!"), strm.GetDescription());
+    return TRUE;
+  }
+  
+  if (cidPeakedChunk == CChunkID("MDAT"))
+  {
+    ThrowF_t(TRANS("File '%s' is not a world document and cannot be loaded! It is model because it has model data!\n\nThank you for your endless autism!"), strm.GetDescription());
+    return TRUE;
+  }
+  
+  if (cidPeakedChunk == CChunkID("CTSE"))
+  {
+    strm.ExpectID_t("CTSE");
+    
+    cidPeakedChunk = strm.PeekID_t();
+
+    if (cidPeakedChunk == CChunkID("META"))
+    {
+      strm.ExpectID_t("META");
+
+      CTString strVersion;
+      INDEX iFormatVersion;
+
+      try {
+        INDEX iEndianess;
+        strm >> iEndianess;
+        
+        strm >> iFormatVersion;
+        
+        
+        if (iFormatVersion <= 8) {
+          strVersion.PrintF("Serious Engine 2");
+        } else if (iFormatVersion <= 10) {
+          strVersion.PrintF("Serious Engine 3/3.5");
+        } else if (iFormatVersion == 11) {
+          strVersion.PrintF("Serious Engine 4.0/2017");
+        } else {
+          strVersion.PrintF("Serious Engine 2017+");
+        }
+
+        
+      } catch (char) {
+        ThrowF_t(TRANS("File '%s' contains metadata.\nThat means file was created by SE2 or newer, so it cannot be loaded!"), strm.GetDescription());
+        return TRUE;
+      }
+
+      ThrowF_t(TRANS("File '%s' contains metadata.\nMetadata has version: %d\nThat means file was created by %s, so it cannot be loaded!"), strm.GetDescription(), iFormatVersion, strVersion);
+      
+      return TRUE;
+    } else {
+      ThrowF_t(TRANS("File '%s' cannot be loaded as world document!\nUnknown signature!"), strm.GetDescription());
+      return TRUE;
+    }
+  }
+  
+  return FALSE;
+}
+
 // load version of engine saved in file and check against current
 void CNetworkLibrary::CheckVersion_t(CTStream &strm, BOOL bAllowReinit, BOOL &bNeedsReinit)
-{
-  // if not saved
-  if (strm.PeekID_t()!=CChunkID("BUIV")) { // build version
-    // behave as if everything is ok (for old versions)
+{ 
+  if (RecognieeIdiotism_t(strm)) return;
+
+  // if not saved then behave as if everything is ok (for old versions)
+  if (strm.PeekID_t() != CChunkID("BUIV")) { // build version
     bNeedsReinit = FALSE;
     return;
   }
+
   strm.ExpectID_t("BUIV"); // build version
   // read the saved one
   INDEX iSaved;
