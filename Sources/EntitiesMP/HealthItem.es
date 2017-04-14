@@ -74,6 +74,9 @@ components:
 // ********* SUPER HEALTH *********
  40 model   MODEL_SUPER     "Models\\Items\\Health\\Super\\Super.mdl",
  41 texture TEXTURE_SUPER   "Models\\Items\\Health\\Super\\Super.tex",
+ 
+ 45 model   MODEL_MEGA     "Models\\Items\\Health\\Mega\\Mega.mdl",
+ 46 texture TEXTURE_MEGA   "Models\\Items\\Health\\Mega\\Mega.tex",
 
 // ********* MISC *********
  50 texture TEXTURE_SPECULAR_STRONG "Models\\SpecularTextures\\Strong.tex",
@@ -298,7 +301,7 @@ functions:
         m_strDescription.PrintF("Mega - H:%g  T:%g", m_fValue, m_fRespawnTime);
         
         // set appearance
-        AddItem(MODEL_SUPER, TEXTURE_SUPER, 0, TEXTURE_SPECULAR_MEDIUM, 0);
+        AddItem(MODEL_MEGA, TEXTURE_MEGA, TEXTURE_REFLECTION_GOLD01, TEXTURE_SPECULAR_MEDIUM, 0);
         // add flare
         AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 1.0F, 0.0F), FLOAT3D(3.0F, 3.0F, 1.0F) );
         StretchItem(FLOAT3D(1.0F*0.75F, 1.0F*0.75F, 1.0F*0.75));
@@ -323,7 +326,8 @@ procedures:
   // --------------------------------------------------------------------------------------
   // Called every time when any player trying to pick up item.
   // --------------------------------------------------------------------------------------
-  ItemCollected(EPass epass) : CItem::ItemCollected {
+  ItemCollected(EPass epass) : CItem::ItemCollected
+  {
     ASSERT(epass.penOther!=NULL);
 
     // If health stays...

@@ -28,7 +28,8 @@ enum ArmorItemType {
   2 ARIT_MEDIUM       "2 Medium (+50)",  // Medium armor
   3 ARIT_STRONG       "3 Strong (+100)", // Strong armor
   4 ARIT_SUPER        "4 Super (+200)",  // Super armor
-  5 ARIT_HELM         "5 Helm (+5)",     // Helm
+  5 ARIT_HELM         "5 Helm (+5)",     // Helm armor.
+  6 ARIT_TINY         "6 Tiny (+10)",    // Tiny armor.
 };
 
 // Event for sending through receive item.
@@ -95,8 +96,10 @@ functions:
   // --------------------------------------------------------------------------------------
   // No comments.
   // --------------------------------------------------------------------------------------
-  void Precache(void) {
-    switch (m_EaitType) {
+  void Precache(void)
+  {
+    switch (m_EaitType)
+    {
       case ARIT_SHARD:  PrecacheSound(SOUND_SHARD ); break;
       case ARIT_SMALL:  PrecacheSound(SOUND_SMALL ); break;                                      
       case ARIT_MEDIUM: PrecacheSound(SOUND_MEDIUM); break;
@@ -118,12 +121,15 @@ functions:
     pes->es_iScore = 0;//m_iScore;
 
     switch (m_EaitType) {
-      case ARIT_SHARD:  pes->es_strName+=" shard";  break;
-      case ARIT_SMALL:  pes->es_strName+=" small";  break;                                      
-      case ARIT_MEDIUM: pes->es_strName+=" medium"; break;
-      case ARIT_STRONG: pes->es_strName+=" strong"; break;
-      case ARIT_SUPER:  pes->es_strName+=" super";  break;
-      case ARIT_HELM:   pes->es_strName+=" helm";   break;
+      case ARIT_SHARD:  pes->es_strName += " shard";  break;
+      case ARIT_SMALL:  pes->es_strName += " small";  break;                                      
+      case ARIT_MEDIUM: pes->es_strName += " medium"; break;
+      case ARIT_STRONG: pes->es_strName += " strong"; break;
+      case ARIT_SUPER:  pes->es_strName += " super";  break;
+      case ARIT_HELM:   pes->es_strName += " helm";   break;
+
+      // [SSE] More Armor Item Types
+      case ARIT_TINY:   pes->es_strName += " tiny";   break;
     }
 
     return TRUE;
@@ -171,6 +177,11 @@ functions:
       case ARIT_HELM: {
         Particles_Emanate(this, 0.875F * 0.75F * m_fStretch, (bOnGround ? 0.335F : 0.875F*0.75F) * m_fStretch, PT_STAR04, 16, 7.0F);
       } break;
+
+      // [SSE] More Armor Item Types
+      case ARIT_TINY: {
+        Particles_Emanate(this, 0.875F * 0.75F * m_fStretch, (bOnGround ? 0.335F : 0.875F*0.75F) * m_fStretch, PT_STAR04, 16, 7.0F);
+      } break;
     }
   }
 
@@ -193,6 +204,7 @@ functions:
         StretchItem(FLOAT3D(0.75F*0.75F, 0.75F*0.75F, 0.75F*0.75F));
         m_iSoundComponent = SOUND_SHARD;
       } break;
+
       case ARIT_SMALL: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
         m_fValue = 25.0F;
@@ -205,6 +217,7 @@ functions:
         StretchItem(FLOAT3D(2.0F, 2.0F, 2.0F));
         m_iSoundComponent = SOUND_SMALL;
       } break;
+
       case ARIT_MEDIUM: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
         m_fValue = 50.0F;
@@ -217,6 +230,7 @@ functions:
         StretchItem(FLOAT3D(2.0F, 2.0F, 2.0F));
         m_iSoundComponent = SOUND_MEDIUM;
       } break;
+
       case ARIT_STRONG: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
         m_fValue = 100.0F;
@@ -229,6 +243,7 @@ functions:
         StretchItem(FLOAT3D(2.5F, 2.5F, 2.5F));
         m_iSoundComponent = SOUND_STRONG;
       } break;
+
       case ARIT_SUPER: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_MEDIUM);
         m_fValue = 200.0F;
@@ -242,6 +257,7 @@ functions:
         StretchItem(FLOAT3D(2.5F, 2.5F, 2.5F));
         m_iSoundComponent = SOUND_SUPER;
       } break;
+
       case ARIT_HELM: {
         ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_SMALL);
         m_fValue = 5.0F;
@@ -253,7 +269,21 @@ functions:
         AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.5F, 0.0F), FLOAT3D(1.5F, 1.5F, 0.4F) );
         StretchItem(FLOAT3D(0.875F*0.75F, 0.875F*0.75F, 0.875F*0.75F));
         m_iSoundComponent = SOUND_HELM;
-      } break;        
+      } break;  
+
+      // [SSE] More Armor Item Types
+      case ARIT_TINY: {
+        ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_SMALL);
+        m_fValue = 10.0F;
+        m_bOverTopArmor = FALSE;
+        m_fRespawnTime = (m_fCustomRespawnTime > 0) ? m_fCustomRespawnTime : 10.0F; 
+        m_strDescription.PrintF("Tiny - H:%g  T:%g", m_fValue, m_fRespawnTime);
+        // set appearance
+        AddItem(MODEL_5, TEXTURE_5, 0, TEX_SPEC_MEDIUM, 0);
+        AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.5F, 0.0F), FLOAT3D(1.5F, 1.5F, 0.4F) );
+        StretchItem(FLOAT3D(0.875F*0.75F, 0.875F*0.75F, 0.875F*0.75F));
+        m_iSoundComponent = SOUND_HELM;
+      } break;
     }
   };
 
@@ -303,7 +333,10 @@ procedures:
           case ARIT_MEDIUM: IFeel_PlayEffect("PU_ArmourMedium"); break;
           case ARIT_STRONG: IFeel_PlayEffect("PU_ArmourStrong"); break; 
           case ARIT_SUPER:  IFeel_PlayEffect("PU_ArmourSuper"); break; 
-          case ARIT_HELM:   IFeel_PlayEffect("PU_ArmourHelm"); break; 
+          case ARIT_HELM:   IFeel_PlayEffect("PU_ArmourHelm"); break;
+          
+          // [SSE] More Armor Item Types
+          case ARIT_TINY:   IFeel_PlayEffect("PU_ArmourHelm"); break;
         }
       }
 

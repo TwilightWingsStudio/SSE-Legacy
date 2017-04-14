@@ -225,6 +225,7 @@ extern void HUD_DrawAnchoredBarEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT 
       fFilledSizeY *= fNormValue;
       fModSizeY = fFilledSizeY;
       fOriginY += fSizeY - fFilledSizeY;
+      fOriginY = ceil(fOriginY);
     } break;
   }
   

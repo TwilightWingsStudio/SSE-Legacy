@@ -1252,8 +1252,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       
       iScoreSum += static_cast<CPlayer*>(penEntity)->m_psGameStats.ps_iScore;
     }
-  
-    
+
     iScore = iScoreSum; // in case of coop play, show squad (common) score
   }
   
@@ -1434,30 +1433,97 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     }
   }
   
-  for (INDEX i = 0; i < 4; i++)
+  // PowerUps dock.
   {
-    INDEX ii = 3 - i;
+    PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.66f, 0.33f, FALSE);
+    
+    TIME *ptmPowerups = (TIME*)&_penPlayer->m_tmInvisibility;
+    TIME *ptmPowerupsMax = (TIME*)&_penPlayer->m_tmInvisibilityMax;
+	
+    INDEX iCol = 0;
 
-    HUD_DrawAnchoredRect (8 + (24 + 3) * i, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon(8 + (24 + 3) * i, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _atoPowerups[ii], C_WHITE|CT_OPAQUE, 1.0F, TRUE); // Icon
-    HUD_DrawAnchoredRectOutline(8 + (24 + 3) * i, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
-  }
-  
-  for (INDEX i = 8; i >= 0; i--)
-  {
-    HUD_DrawAnchoredRect( 8 + (24 + 3) * i, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
-    
-    CTextureObject *ptoAmmo = &_toASeriousBomb;
-    
-    INDEX ii = 8 - i;
-    if (ii < 8) {
-      ptoAmmo = _aaiAmmo[ii].ai_ptoAmmo;
+    for (INDEX i = 0; i < 4; i++)
+    {
+      INDEX ii = 3 - i;
+      
+      // skip if not active
+      const TIME tmDelta = ptmPowerups[ii] - _tmNow;
+      if (tmDelta <= 0) continue;
+
+      FLOAT fNormValue = tmDelta / ptmPowerupsMax[ii];
+      HUD_DrawAnchoredRect (8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchroredIcon(8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _atoPowerups[ii], C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
+      
+      HUD_DrawAnchoredBar(8 + (24 + 3) * iCol, 48, 4, 24, EHHAT_RIGHT, EHVAT_BOT, BO_DOWN, NONE, fNormValue);
+      
+      HUD_DrawAnchoredRectOutline(8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+	  
+      // Play sound if icon is flashing.
+      if (fNormValue<=(_cttHUD.ctt_fLowMedium/2))
+      {
+        // activate blinking only if value is <= half the low edge
+        INDEX iLastTime = (INDEX)(_tmLast * 4);
+        INDEX iCurrentTime = (INDEX)(_tmNow * 4);
+
+        if (iCurrentTime&1 & !(iLastTime&1)) {
+          ((CPlayer *)penPlayerCurrent)->PlayPowerUpSound();
+        }
+      }
+
+      iCol++;
     }
+  }
 
-    HUD_DrawAnchroredIcon( 8 + (24 + 3) * i, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, *ptoAmmo, C_WHITE|CT_OPAQUE, 1.0F, TRUE); // Icon
-    HUD_DrawAnchoredRectOutline(8 + (24 + 3) * i, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+  // Ammo dock.
+  {
+    PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+    
+    FLOAT fNormValue = 0.0F;
+    
+    INDEX iCol = 0;
+
+    for (INDEX i = 8; i >= 0; i--)
+    {
+      CTextureObject *ptoAmmo = &_toASeriousBomb;
+      
+      INDEX ii = 8 - i;
+
+      if (i < 8)
+      {
+        ii = aiAmmoRemap[i];
+        
+        
+        AmmoInfo &ai = _aaiAmmo[i];
+        
+        // if no ammo and hasn't got that weapon - just skip this ammo // [SSE] Or if you don't want to see empty ammo types.
+        //if (ai.ai_iAmmoAmmount <= 0 && (!ai.ai_bHasWeapon || !hud_bShowEmptyAmmoInList)) continue;
+        
+        fNormValue = (FLOAT)ai.ai_iAmmoAmmount / ai.ai_iMaxAmmoAmmount;
+        
+        ptoAmmo = _aaiAmmo[i].ai_ptoAmmo;
+
+      } else {
+        fNormValue = (FLOAT)penPlayerCurrent->m_iSeriousBombCount / 3;
+
+        if (fNormValue <= 0) {
+          continue;
+        }
+      }
+
+      HUD_DrawAnchoredRect( 8 + (24 + 3) * iCol, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchroredIcon( 8 + (24 + 3) * iCol, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, *ptoAmmo, C_WHITE|CT_OPAQUE, 1.0F, TRUE); // Icon
+      
+      HUD_DrawAnchoredBar( 8 + (24 + 3) * iCol, 8, 4, 24, EHHAT_RIGHT, EHVAT_BOT, BO_DOWN, NONE, fNormValue);
+      
+      HUD_DrawAnchoredRectOutline(8 + (24 + 3) * iCol, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+      
+      iCol++;
+    }
   }
   
+  // in the end, remember the current time so it can be used in the next frame
+  _tmLast = _tmNow;
+
   if (hud_bGameDebugMonitor)
   {
     HUD_DrawDebugMonitor();
