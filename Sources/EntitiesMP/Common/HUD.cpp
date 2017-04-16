@@ -1501,6 +1501,10 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
         fNormValue = (FLOAT)ai.ai_iAmmoAmmount / ai.ai_iMaxAmmoAmmount;
         
         ptoAmmo = _aaiAmmo[i].ai_ptoAmmo;
+        
+        if (fNormValue <= 0) {
+          continue;
+        }
 
       } else {
         fNormValue = (FLOAT)penPlayerCurrent->m_iSeriousBombCount / 3;

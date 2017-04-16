@@ -628,6 +628,9 @@
     <ClCompile Include="Common\HUD_AnchoredFunctions.cpp">
       <Filter>Source Files\Common sources</Filter>
     </ClCompile>
+    <ClCompile Include="DigitalAnimationChanger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1731,6 +1734,12 @@
     <ClInclude Include="Common\HUD.h">
       <Filter>Header Files\Common headers</Filter>
     </ClInclude>
+    <ClInclude Include="DigitalAnimationChanger_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DigitalAnimationChanger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2682,6 +2691,9 @@
       <Filter>Class Files\Effects</Filter>
     </CustomBuild>
     <CustomBuild Include="SimpleParenter.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="DigitalAnimationChanger.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>
