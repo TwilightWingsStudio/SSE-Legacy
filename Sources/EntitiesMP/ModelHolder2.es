@@ -64,12 +64,12 @@ properties:
  21 BOOL m_bTargetable     "Targetable" = FALSE, // st if model should be targetable
 
  // parameters for custom shading of a model (overrides automatic shading calculation)
- 14 enum CustomShadingType m_cstCustomShading "Custom shading" 'H' = CST_NONE,
- 15 ANGLE3D m_aShadingDirection "Light direction" 'D' = ANGLE3D( AngleDeg(45.0f),AngleDeg(45.0f),AngleDeg(45.0f)),
- 16 COLOR m_colLight            "Light color" 'O' = C_WHITE,
- 17 COLOR m_colAmbient          "Ambient color" 'A' = C_BLACK,
+ 14 enum CustomShadingType m_cstCustomShading "Shading mode" 'H' = CST_NONE,
+ 15 ANGLE3D m_aShadingDirection "Shade. Light direction" 'D' = ANGLE3D( AngleDeg(45.0f),AngleDeg(45.0f),AngleDeg(45.0f)),
+ 16 COLOR m_colLight            "Shade. Light color" 'O' = C_WHITE,
+ 17 COLOR m_colAmbient          "Shade. Ambient color" 'A' = C_BLACK,
  18 CTFileName m_fnmLightAnimation "Light animation file" = CTString(""),
- 19 ANIMATION m_iLightAnimation "Light animation" = 0,
+ 19 ANIMATION m_iLightAnimation    "Light animation" = 0,
  20 CAnimObject m_aoLightAnimation,
  25 BOOL m_bAttachments      "Attachments" = TRUE, // set if model should auto load attachments
  26 BOOL m_bActive "Active" = TRUE,
@@ -117,7 +117,8 @@ components:
   1 class   CLASS_BLOOD_SPRAY     "Classes\\BloodSpray.ecl",
 
 functions:
-  void Precache(void) {
+  void Precache(void)
+  {
     PrecacheClass(CLASS_BLOOD_SPRAY, 0);
   };
 
@@ -127,6 +128,7 @@ functions:
     pes->es_strName = m_fnModel.FileName()+", "+m_fnTexture.FileName();
     pes->es_ctCount = 1;
     pes->es_ctAmmount = 1;
+
     if (m_penDestruction!=NULL) {
       pes->es_strName += " (destroyable)";
       pes->es_fValue = GetDestruction()->m_fHealth;
@@ -135,6 +137,7 @@ functions:
       pes->es_fValue = 0;
       pes->es_iScore = 0;
     }
+
     return TRUE;
   }
 
@@ -151,50 +154,54 @@ functions:
     return m_fMaxTessellationLevel;
   }
 
-
   /* Receive damage */
   void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
     FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection) 
   {
     FLOAT fNewDamage = fDamageAmmount;
 
-    // if not destroyable
-    if (m_penDestruction==NULL) {
-      // do nothing
+    // If not destroyable then do nothing.
+    if (m_penDestruction == NULL) {
       return;
     }
-    if( dmtType==DMT_BURNING)
+
+    if (dmtType == DMT_BURNING)
     {
       UBYTE ubR, ubG, ubB, ubA;
       ColorToRGBA(m_colBurning, ubR, ubG, ubB, ubA);
-      ubR=ClampDn(ubR-4, 32);
-      m_colBurning=RGBAToColor(ubR, ubR, ubR, ubA);
+      ubR = ClampDn(ubR-4, 32);
+      m_colBurning = RGBAToColor(ubR, ubR, ubR, ubA);
     }
     
     CModelDestruction *penDestruction = GetDestruction();
+
     // adjust damage
-    fNewDamage *=DamageStrength(penDestruction->m_eibtBodyType, dmtType);
-    // if no damage
-    if (fNewDamage==0) {
-      // do nothing
+    fNewDamage *= DamageStrength(penDestruction->m_eibtBodyType, dmtType);
+
+    // If no damage then do nothing.
+    if (fNewDamage == 0) {
       return;
     }
+    
     FLOAT fKickDamage = fNewDamage;
-    if( (dmtType == DMT_EXPLOSION) || (dmtType == DMT_IMPACT) || (dmtType == DMT_CANNONBALL_EXPLOSION) )
+    if ((dmtType == DMT_EXPLOSION) || (dmtType == DMT_IMPACT) || (dmtType == DMT_CANNONBALL_EXPLOSION))
     {
       fKickDamage*=1.5f;
     }
+
     if (dmtType == DMT_CLOSERANGE) {
       fKickDamage=0.0f;
     }
+
     if (dmtType == DMT_CHAINSAW) {
-      fKickDamage=0.0f;
-    }    
-    if(dmtType == DMT_BULLET && penDestruction->m_eibtBodyType==EIBT_ROCK) {
-      fKickDamage=0.0f;
+      fKickDamage = 0.0f;
     }
-    if( dmtType==DMT_BURNING)
-    {
+    
+    if (dmtType == DMT_BULLET && penDestruction->m_eibtBodyType == EIBT_ROCK) {
+      fKickDamage = 0.0f;
+    }
+
+    if (dmtType == DMT_BURNING) {
       fKickDamage=0.0f;
     }
 
@@ -203,41 +210,41 @@ functions:
     TIME tmDelta = tmNow-m_tmLastDamage;
     m_tmLastDamage = tmNow;
 
-    // remember who damaged you
-    m_penLastDamager = penInflictor;
+    m_penLastDamager = penInflictor; // remember who damaged you
 
     // fade damage out
-    if (tmDelta>=_pTimer->TickQuantum*3) {
-      m_vDamage=FLOAT3D(0,0,0);
+    if (tmDelta >= _pTimer->TickQuantum*3) {
+      m_vDamage = FLOAT3D(0, 0, 0);
     }
+
     // add new damage
     FLOAT3D vDirectionFixed;
-    if (vDirection.ManhattanNorm()>0.5f) {
+
+    if (vDirection.ManhattanNorm() > 0.5f) {
       vDirectionFixed = vDirection;
     } else {
-      vDirectionFixed = FLOAT3D(0,1,0);
+      vDirectionFixed = FLOAT3D(0, 1, 0);
     }
+
     FLOAT3D vDamageOld = m_vDamage;
     m_vDamage += vDirectionFixed*fKickDamage;
 
     // NOTE: we don't receive damage here, but handle death differently
     if (m_vDamage.Length()>GetHealth()) {
-      if (!penDestruction->m_bRequireExplosion || 
-        dmtType==DMT_EXPLOSION || dmtType==DMT_CANNONBALL || dmtType==DMT_CANNONBALL_EXPLOSION)
+      if (!penDestruction->m_bRequireExplosion || dmtType == DMT_EXPLOSION || dmtType == DMT_CANNONBALL || dmtType == DMT_CANNONBALL_EXPLOSION)
       {
         EDeath eDeath;  // we don't need any extra parameters
         SendEvent(eDeath);
-        //remember last dammage type
-        m_dmtLastDamageType=dmtType;
+        m_dmtLastDamageType = dmtType; //remember last dammage type
       }
     }
 
-    if( m_fMaxDamageAmmount<fDamageAmmount) {
+    if (m_fMaxDamageAmmount < fDamageAmmount) {
       m_fMaxDamageAmmount = fDamageAmmount;
     }
 
     // if it has no spray, or if this damage overflows it
-    if( (dmtType!=DMT_BURNING) && (dmtType!=DMT_CHAINSAW) &&
+    if ((dmtType != DMT_BURNING) && (dmtType != DMT_CHAINSAW) &&
       (m_tmSpraySpawned<=_pTimer->CurrentTick()-_pTimer->TickQuantum*8 || 
       m_fSprayDamage+fNewDamage>50.0f))
     {
@@ -248,7 +255,7 @@ functions:
       ESpawnSpray eSpawnSpray;
     
       // adjust spray power
-      if( m_fMaxDamageAmmount > 10.0f) {
+      if (m_fMaxDamageAmmount > 10.0f) {
         eSpawnSpray.fDamagePower = 3.0f;
       } else if(m_fSprayDamage+fNewDamage>50.0f) {
         eSpawnSpray.fDamagePower = 2.0f;
@@ -276,6 +283,7 @@ functions:
       eSpawnSpray.colCentralColor=penDestruction->m_colParticles;
       eSpawnSpray.colBurnColor=m_colBurning;
       eSpawnSpray.fLaunchPower=penDestruction->m_fParticleLaunchPower;
+
       // initialize spray
       m_penSpray->Initialize( eSpawnSpray);
       m_tmSpraySpawned = _pTimer->CurrentTick();
@@ -283,28 +291,30 @@ functions:
       m_fMaxDamageAmmount = 0.0f;
     }
     
-    if( dmtType==DMT_CHAINSAW && m_fChainSawCutDamage>0)
+    if (dmtType == DMT_CHAINSAW && m_fChainSawCutDamage > 0)
     {
-      m_fChainSawCutDamage-=fDamageAmmount;
-      if(m_fChainSawCutDamage<=0)
+      m_fChainSawCutDamage -= fDamageAmmount;
+
+      if (m_fChainSawCutDamage <= 0)
       {
         EDeath eDeath;  // we don't need any extra parameters
         SendEvent(eDeath);
-        //remember last dammage type
-        m_dmtLastDamageType=dmtType;
+        m_dmtLastDamageType = dmtType; //remember last dammage type
       }
     }
 
-    m_fSprayDamage+=fNewDamage;
+    m_fSprayDamage += fNewDamage;
   };
 
   // Entity info
-  void *GetEntityInfo(void) {
+  void *GetEntityInfo(void)
+  {
     CModelDestruction *pmd=GetDestruction();
-    if( pmd!=NULL)
-    {
+
+    if (pmd != NULL) {
       return GetStdEntityInfo(pmd->m_eibtBodyType);
     }
+
     return CEntity::GetEntityInfo();
   };
 
@@ -313,6 +323,7 @@ functions:
     ASSERT(m_penDestruction==NULL || IsOfClass(m_penDestruction, "ModelDestruction"));
     return (CModelDestruction*)&*m_penDestruction;
   }
+
   BOOL IsTargetable(void) const
   {
     return m_bTargetable;
@@ -321,11 +332,11 @@ functions:
   /* Get anim data for given animation property - return NULL for none. */
   CAnimData *GetAnimData(SLONG slPropertyOffset) 
   {
-    if (slPropertyOffset==offsetof(CModelHolder2, m_iModelAnimation)) {
+    if (slPropertyOffset == offsetof(CModelHolder2, m_iModelAnimation)) {
       return GetModelObject()->GetData();
-    } else if (slPropertyOffset==offsetof(CModelHolder2, m_iTextureAnimation)) {
+    } else if (slPropertyOffset == offsetof(CModelHolder2, m_iTextureAnimation)) {
       return GetModelObject()->mo_toTexture.GetData();
-    } else if (slPropertyOffset==offsetof(CModelHolder2, m_iLightAnimation)) {
+    } else if (slPropertyOffset == offsetof(CModelHolder2, m_iLightAnimation)) {
       return m_aoLightAnimation.GetData();
     } else {
       return CEntity::GetAnimData(slPropertyOffset);
@@ -336,11 +347,14 @@ functions:
   void AdjustMipFactor(FLOAT &fMipFactor)
   {
     // if should fade last mip
-    if (m_fMipFadeDist>0) {
+    if (m_fMipFadeDist > 0)
+    {
+
       CModelObject *pmo = GetModelObject();
-      if(pmo==NULL) {
+      if(pmo == NULL) {
         return;
       }
+
       // adjust for stretch
       FLOAT fMipForFade = fMipFactor;
       // TODO: comment the next 3 lines for mip factors conversion
@@ -357,20 +371,20 @@ functions:
 
       // adjust fading
       FLOAT fFade = (m_fMipFadeDist-fMipForFade);
-      if (m_fMipFadeLen>0) {
-        fFade/=m_fMipFadeLen;
+
+      if (m_fMipFadeLen > 0) {
+        fFade /= m_fMipFadeLen;
       } else {
-        if (fFade>0) {
+        if (fFade > 0) {
           fFade = 1.0f;
         }
       }
       
       fFade = Clamp(fFade, 0.0f, 1.0f);
-      // make it invisible
-      pmo->mo_colBlendColor = (pmo->mo_colBlendColor&~255)|UBYTE(255*fFade);
+      pmo->mo_colBlendColor = (pmo->mo_colBlendColor &~ 255) | UBYTE(255 * fFade); // make it invisible
     }
 
-    fMipFactor = fMipFactor*m_fMipMul+m_fMipAdd;
+    fMipFactor = fMipFactor * m_fMipMul + m_fMipAdd;
   }
 
   /* Adjust model shading parameters if needed. */
@@ -378,10 +392,10 @@ functions:
   {
     switch( m_cstCustomShading)
     {
-    case CST_FULL_CUSTOMIZED:
+      case CST_FULL_CUSTOMIZED:
       {
         // if there is color animation
-        if (m_aoLightAnimation.GetData()!=NULL) {
+        if (m_aoLightAnimation.GetData() != NULL) {
           // get lerping info
           SLONG colFrame0, colFrame1; FLOAT fRatio;
           m_aoLightAnimation.GetFrame( colFrame0, colFrame1, fRatio);
@@ -411,7 +425,8 @@ functions:
 
         // obtain world settings controller
         CWorldSettingsController *pwsc = GetWSC(this);
-        if( pwsc!=NULL && pwsc->m_bApplyShadingToModels)
+
+        if (pwsc != NULL && pwsc->m_bApplyShadingToModels)
         {
           // apply animating shading
           COLOR colShade = GetWorld()->wo_atbTextureBlendings[9].tb_colMultiply;
@@ -423,7 +438,8 @@ functions:
         vLightDirection = -vLightDirection;
         break;
       }
-    case CST_CONSTANT_SHADING:
+
+      case CST_CONSTANT_SHADING:
       {
         // combine colors with clamp
         UBYTE lR,lG,lB,aR,aG,aB,rR,rG,rB;
@@ -436,84 +452,92 @@ functions:
         colAmbient = RGBToColor( rR, rG, rB);
         break;
       }
-    case CST_NONE:
+
+      case CST_NONE:
       {
-        // do nothing
-        break;
+        break; // do nothing
       }
     }
 
-    if(m_colBurning!=COLOR(C_WHITE|CT_OPAQUE))
-    {
+    if (m_colBurning != COLOR(C_WHITE|CT_OPAQUE)) {
       colAmbient = MulColors( colAmbient, m_colBurning);
       colLight = MulColors( colLight, m_colBurning);
       return TRUE;
     }
-    return m_stClusterShadows!=ST_NONE;
+
+    return m_stClusterShadows != ST_NONE;
   };
 
   // apply mirror and stretch to the entity
   void MirrorAndStretch(FLOAT fStretch, BOOL bMirrorX)
   {
-    m_fStretchAll*=fStretch;
+    m_fStretchAll *= fStretch;
+
     if (bMirrorX) {
       m_fStretchX = -m_fStretchX;
     }
   }
 
-  // Stretch model
-  void StretchModel(void) {
+  // --------------------------------------------------------------------------------------
+  // Stretches model.
+  // --------------------------------------------------------------------------------------
+  void StretchModel(void)
+  {
     // stretch factors must not have extreme values
-    if (Abs(m_fStretchX)  < 0.01f) { m_fStretchX   = 0.01f;  }
-    if (Abs(m_fStretchY)  < 0.01f) { m_fStretchY   = 0.01f;  }
-    if (Abs(m_fStretchZ)  < 0.01f) { m_fStretchZ   = 0.01f;  }
-    if (m_fStretchAll< 0.01f) { m_fStretchAll = 0.01f;  }
+    if (Abs(m_fStretchX)  < 0.01f) { m_fStretchX   = 0.01f; }
+    if (Abs(m_fStretchY)  < 0.01f) { m_fStretchY   = 0.01f; }
+    if (Abs(m_fStretchZ)  < 0.01f) { m_fStretchZ   = 0.01f; }
+    if (m_fStretchAll < 0.01f)     { m_fStretchAll = 0.01f; }
 
-    if (Abs(m_fStretchX)  >1000.0f) { m_fStretchX   = 1000.0f*Sgn(m_fStretchX); }
-    if (Abs(m_fStretchY)  >1000.0f) { m_fStretchY   = 1000.0f*Sgn(m_fStretchY); }
-    if (Abs(m_fStretchZ)  >1000.0f) { m_fStretchZ   = 1000.0f*Sgn(m_fStretchZ); }
-    if (m_fStretchAll>1000.0f) { m_fStretchAll = 1000.0f; }
+    if (Abs(m_fStretchX)  > 1000.0f) { m_fStretchX   = 1000.0f * Sgn(m_fStretchX); }
+    if (Abs(m_fStretchY)  > 1000.0f) { m_fStretchY   = 1000.0f * Sgn(m_fStretchY); }
+    if (Abs(m_fStretchZ)  > 1000.0f) { m_fStretchZ   = 1000.0f * Sgn(m_fStretchZ); }
+    if (m_fStretchAll > 1000.0f)     { m_fStretchAll = 1000.0f; }
 
-    if (m_bRandomStretch) {
+    if (m_bRandomStretch)
+    {
       m_bRandomStretch = FALSE;
       // stretch
-      m_fStretchRndX   = Clamp( m_fStretchRndX   , 0.0f, 1.0f);
-      m_fStretchRndY   = Clamp( m_fStretchRndY   , 0.0f, 1.0f);
-      m_fStretchRndZ   = Clamp( m_fStretchRndZ   , 0.0f, 1.0f);
-      m_fStretchRndAll = Clamp( m_fStretchRndAll , 0.0f, 1.0f);
+      m_fStretchRndX   = Clamp(m_fStretchRndX   , 0.0f, 1.0f);
+      m_fStretchRndY   = Clamp(m_fStretchRndY   , 0.0f, 1.0f);
+      m_fStretchRndZ   = Clamp(m_fStretchRndZ   , 0.0f, 1.0f);
+      m_fStretchRndAll = Clamp(m_fStretchRndAll , 0.0f, 1.0f);
 
-      m_fStretchRandom(1) = (FRnd()*m_fStretchRndX*2 - m_fStretchRndX) + 1;
-      m_fStretchRandom(2) = (FRnd()*m_fStretchRndY*2 - m_fStretchRndY) + 1;
-      m_fStretchRandom(3) = (FRnd()*m_fStretchRndZ*2 - m_fStretchRndZ) + 1;
+      m_fStretchRandom(1) = (FRnd() * m_fStretchRndX * 2 - m_fStretchRndX) + 1;
+      m_fStretchRandom(2) = (FRnd() * m_fStretchRndY * 2 - m_fStretchRndY) + 1;
+      m_fStretchRandom(3) = (FRnd() * m_fStretchRndZ * 2 - m_fStretchRndZ) + 1;
 
-      FLOAT fRNDAll = (FRnd()*m_fStretchRndAll*2 - m_fStretchRndAll) + 1;
+      FLOAT fRNDAll = (FRnd() * m_fStretchRndAll * 2 - m_fStretchRndAll) + 1;
       m_fStretchRandom(1) *= fRNDAll;
       m_fStretchRandom(2) *= fRNDAll;
       m_fStretchRandom(3) *= fRNDAll;
     }
 
     GetModelObject()->StretchModel( FLOAT3D(
-      m_fStretchAll*m_fStretchX*m_fStretchRandom(1),
-      m_fStretchAll*m_fStretchY*m_fStretchRandom(2),
-      m_fStretchAll*m_fStretchZ*m_fStretchRandom(3)) );
+      m_fStretchAll * m_fStretchX * m_fStretchRandom(1),
+      m_fStretchAll * m_fStretchY * m_fStretchRandom(2),
+      m_fStretchAll * m_fStretchZ * m_fStretchRandom(3)) );
+
     ModelChangeNotify();
   };
 
   /* Init model holder*/
-  void InitModelHolder(void) {
-
+  void InitModelHolder(void)
+  {
     // must not crash when model is removed
-    if (m_fnModel=="") {
+    if (m_fnModel == "") {
       m_fnModel=CTFILENAME("Models\\Editor\\Axis.mdl");
     }
 
-    if( m_fnReflection == CTString("Models\\Editor\\Vector.tex")) {
+    if (m_fnReflection == CTString("Models\\Editor\\Vector.tex")) {
       m_fnReflection = CTString("");
     }
-    if( m_fnSpecular == CTString("Models\\Editor\\Vector.tex")) {
+
+    if (m_fnSpecular == CTString("Models\\Editor\\Vector.tex")) {
       m_fnSpecular = CTString("");
     }
-    if( m_fnBump == CTString("Models\\Editor\\Vector.tex")) {
+
+    if (m_fnBump == CTString("Models\\Editor\\Vector.tex")) {
       m_fnBump = CTString("");
     }
 
@@ -522,22 +546,24 @@ functions:
     } else {
       InitAsEditorModel();
     }
+
     // set appearance
     SetModel(m_fnModel);
     INDEX iAnim=m_iModelAnimation;
     FLOAT tmOffsetPhase=0.0f;
-    if(m_iFirstRandomAnimation>=0)
+
+    if (m_iFirstRandomAnimation >= 0)
     {
-      INDEX ctAnims=GetModelObject()->GetAnimsCt()-m_iFirstRandomAnimation;
-      iAnim=m_iFirstRandomAnimation+Clamp(INDEX(FRnd()*ctAnims), INDEX(0), ctAnims);
-      tmOffsetPhase=FRnd()*10.0f;
+      INDEX ctAnims = GetModelObject()->GetAnimsCt()-m_iFirstRandomAnimation;
+      iAnim = m_iFirstRandomAnimation+Clamp(INDEX(FRnd()*ctAnims), INDEX(0), ctAnims);
+      tmOffsetPhase = FRnd() * 10.0f;
     }
 
     GetModelObject()->PlayAnim(iAnim, AOF_LOOPING);
     GetModelObject()->OffsetPhase(tmOffsetPhase);
 
     // if initialized for the first time
-    if (m_fnOldModel=="") {
+    if (m_fnOldModel == "") {
       // just remember the model filename
       m_fnOldModel = m_fnModel;
     // if re-initialized
@@ -553,12 +579,9 @@ functions:
       }
     }
     
-    if( m_bAttachments)
-    {
+    if (m_bAttachments) {
       GetModelObject()->AutoSetAttachments();
-    }
-    else
-    {
+    } else {
       GetModelObject()->RemoveAllAttachmentModels();
     }
 
@@ -585,20 +608,21 @@ functions:
       SetCollisionFlags(ECF_IMMATERIAL);
     }
 
-    switch(m_stClusterShadows) {
-    case ST_NONE:
+    switch (m_stClusterShadows)
+    {
+      case ST_NONE:
       {
         SetFlags(GetFlags()&~ENF_CLUSTERSHADOWS);
         //SetFlags(GetFlags()&~ENF_POLYGONALSHADOWS);
         break;
       }
-    case ST_CLUSTER:
+      case ST_CLUSTER:
       {
         SetFlags(GetFlags()|ENF_CLUSTERSHADOWS);
         //SetFlags(GetFlags()&~ENF_POLYGONALSHADOWS);
         break;
       }
-    case ST_POLYGONAL:
+      case ST_POLYGONAL:
       {
         //SetFlags(GetFlags()|ENF_POLYGONALSHADOWS);
         SetFlags(GetFlags()&~ENF_CLUSTERSHADOWS);
@@ -618,11 +642,12 @@ functions:
       WarningMessage(TRANS("Cannot load '%s': %s"), (CTString&)m_fnmLightAnimation, strError);
       m_fnmLightAnimation = "";
     }
-    if (m_aoLightAnimation.GetData()!=NULL) {
+
+    if (m_aoLightAnimation.GetData() != NULL) {
       m_aoLightAnimation.PlayAnim(m_iLightAnimation, AOF_LOOPING);
     }
 
-    if (m_penDestruction==NULL) {
+    if (m_penDestruction == NULL) {
       m_strDescription.PrintF("%s,%s undestroyable", (CTString&)m_fnModel.FileName(), (CTString&)m_fnTexture.FileName());
     } else {
       m_strDescription.PrintF("%s,%s -> %s", (CTString&)m_fnModel.FileName(), (CTString&)m_fnTexture.FileName(),
@@ -632,12 +657,14 @@ functions:
     return;
   }
 
-
-  // returns bytes of memory used by this object
+  // --------------------------------------------------------------------------------------
+  // Returns bytes of memory used by this object.
+  // --------------------------------------------------------------------------------------
   SLONG GetUsedMemory(void)
   {
     // initial
     SLONG slUsedMemory = sizeof(CLight) - sizeof(CRationalEntity) + CRationalEntity::GetUsedMemory();
+
     // add some more
     slUsedMemory += m_fnModel.Length();
     slUsedMemory += m_fnTexture.Length();
@@ -648,50 +675,50 @@ functions:
     slUsedMemory += m_strDescription.Length();
     slUsedMemory += m_fnmLightAnimation.Length();
     slUsedMemory += 1* sizeof(CAnimObject); // only 1
+
     return slUsedMemory;
   }
-
-
 
 procedures:
   Die()
   {
     // for each child of this entity
     {FOREACHINLIST(CEntity, en_lnInParent, en_lhChildren, itenChild) {
-      // send it destruction event
-      itenChild->SendEvent(ERangeModelDestruction());
+      itenChild->SendEvent(ERangeModelDestruction()); // send it destruction event
     }}
 
     // spawn debris 
     CModelDestruction *pmd=GetDestruction();
     pmd->SpawnDebris(this);
+
     // if there is another phase in destruction
     CModelHolder2 *penNext = pmd->GetNextPhase();
-    if (penNext!=NULL) {
+
+    if (penNext != NULL)
+    {
       // copy it here
       CEntity *penNew = GetWorld()->CopyEntityInWorld( *penNext, GetPlacement() );
       penNew->GetModelObject()->StretchModel(GetModelObject()->mo_Stretch);
       penNew->ModelChangeNotify();
-      ((CModelHolder2 *)penNew)->m_colBurning=m_colBurning;
-      ((CModelHolder2 *)penNew)->m_fChainSawCutDamage=m_fChainSawCutDamage;
+      ((CModelHolder2 *)penNew)->m_colBurning = m_colBurning;
+      ((CModelHolder2 *)penNew)->m_fChainSawCutDamage = m_fChainSawCutDamage;
 
-      if( pmd->m_iStartAnim!=-1)
-      {
+      if (pmd->m_iStartAnim != -1) {
         penNew->GetModelObject()->PlayAnim(pmd->m_iStartAnim, 0);
       }
 
       // copy custom shading parameters
-      CModelHolder2 &mhNew=*((CModelHolder2 *)penNew);
-      mhNew.m_cstCustomShading=m_cstCustomShading;
-      mhNew.m_colLight=m_colLight;
-      mhNew.m_colAmbient=m_colAmbient;
+      CModelHolder2 &mhNew = *((CModelHolder2 *)penNew);
+      mhNew.m_cstCustomShading = m_cstCustomShading;
+      mhNew.m_colLight = m_colLight;
+      mhNew.m_colAmbient = m_colAmbient;
       mhNew.m_fMipFadeDist = m_fMipFadeDist;
       mhNew.m_fMipFadeLen  = m_fMipFadeLen;
       mhNew.m_fMipAdd = m_fMipAdd;
       mhNew.m_fMipMul = m_fMipMul;
 
       // domino death for cannonball
-      if( /*m_dmtLastDamageType==DMT_CANNONBALL ||*/ m_dmtLastDamageType==DMT_CHAINSAW)
+      if( /*m_dmtLastDamageType==DMT_CANNONBALL ||*/ m_dmtLastDamageType == DMT_CHAINSAW)
       {
         EDeath eDeath;  // we don't need any extra parameters
         mhNew.m_fChainSawCutDamage=0.0f;
@@ -709,9 +736,8 @@ procedures:
       m_penLastDamager->SendEvent(eScore);
     }*/
 
-    // if there is a destruction target
-    if (m_penDestroyTarget!=NULL) {
-      // notify it
+    // If there is a destruction target then notify it.
+    if (m_penDestroyTarget != NULL) {
       SendToTarget(m_penDestroyTarget, EET_TRIGGER, m_penLastDamager);
     }
 
@@ -719,13 +745,18 @@ procedures:
     Destroy();
     return;
   }
+  
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     // initialize the model
     InitModelHolder();
 
     // TODO: decomment this AFTER mip factors conversion
-    if (m_fMipFadeLenMetric>m_rMipFadeDistMetric) { m_fMipFadeLenMetric = m_rMipFadeDistMetric; }
+    if (m_fMipFadeLenMetric > m_rMipFadeDistMetric) { m_fMipFadeLenMetric = m_rMipFadeDistMetric; }
+
     // TODO: decomment this for mip factors conversion
     /*if (m_fMipFadeLen<0.0f) { m_fMipFadeLen = 0.0f; }
     if (m_fMipFadeDist<0.0f) { m_fMipFadeDist = 0.0f; }
@@ -748,42 +779,49 @@ procedures:
     }*/
     
     // convert metric factors to mip factors
-    if (m_rMipFadeDistMetric>0.0f) {
-      m_fMipFadeDist = Log2(m_rMipFadeDistMetric*1024.0f*MIPRATIO);
-      m_fMipFadeLen  = Log2((m_rMipFadeDistMetric+m_fMipFadeLenMetric)*1024.0f*MIPRATIO) - m_fMipFadeDist;
+    if (m_rMipFadeDistMetric > 0.0f) {
+      m_fMipFadeDist = Log2(m_rMipFadeDistMetric * 1024.0f * MIPRATIO);
+      m_fMipFadeLen  = Log2((m_rMipFadeDistMetric + m_fMipFadeLenMetric) * 1024.0f * MIPRATIO) - m_fMipFadeDist;
     } else {
       m_fMipFadeDist = 0.0f;
       m_fMipFadeLen  = 0.0f;
     }
-    
-    
+
     // check your destruction pointer
-    if (m_penDestruction!=NULL && !IsOfClass(m_penDestruction, "ModelDestruction")) {
+    if (m_penDestruction != NULL && !IsOfClass(m_penDestruction, "ModelDestruction")) {
       WarningMessage("Destruction '%s' is wrong class!", m_penDestruction->GetName());
-      m_penDestruction=NULL;
+      m_penDestruction = NULL;
     }
 
     // wait forever
-    wait() {
+    wait()
+    {
       // on the beginning
-      on(EBegin): {
-        // set your health
-        if (m_penDestruction!=NULL) {
-          SetHealth(GetDestruction()->m_fHealth);
+      on (EBegin) :
+      {
+        if (m_penDestruction != NULL) {
+          SetHealth(GetDestruction()->m_fHealth); // set your health
         }
+
         resume;
       }
+
       // activate/deactivate shows/hides model
-      on (EActivate): {
+      on (EActivate) :
+      {
         SwitchToModel();
         m_bActive = TRUE;
+
         if (m_bColliding) {
           SetPhysicsFlags(EPF_MODEL_FIXED);
           SetCollisionFlags(ECF_MODEL_HOLDER);
         }
+
         resume;
       }
-      on (EDeactivate): {
+
+      on (EDeactivate) :
+      {
         SwitchToEditorModel();
         SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
         SetCollisionFlags(ECF_IMMATERIAL);
@@ -792,41 +830,52 @@ procedures:
         SetCollisionFlags(ECF_IMMATERIAL);
         resume;
       }
+
       // when your parent is destroyed
-      on(ERangeModelDestruction): {
+      on (ERangeModelDestruction) :
+      {
         // for each child of this entity
         {FOREACHINLIST(CEntity, en_lnInParent, en_lhChildren, itenChild) {
-          // send it destruction event
-          itenChild->SendEvent(ERangeModelDestruction());
+          itenChild->SendEvent(ERangeModelDestruction()); // send it destruction event
         }}
-        // destroy yourself
-        Destroy();
+
+        Destroy(); // destroy yourself
         resume;
       }
+
       // when dead
-      on(EDeath): {
-        if (m_penDestruction!=NULL) {
+      on (EDeath) :
+      {
+        if (m_penDestruction != NULL) {
           jump Die();
         }
+
         resume;
       }
+
       // when animation should be changed
-      on(EChangeAnim eChange): {
+      on (EChangeAnim eChange) :
+      {
         m_iModelAnimation   = eChange.iModelAnim;
         m_iTextureAnimation = eChange.iTextureAnim;
         m_iLightAnimation   = eChange.iLightAnim;
-        if (m_aoLightAnimation.GetData()!=NULL) {
+
+        if (m_aoLightAnimation.GetData() != NULL) {
           m_aoLightAnimation.PlayAnim(m_iLightAnimation, eChange.bLightLoop?AOF_LOOPING:0);
         }
-        if (GetModelObject()->GetData()!=NULL) {
+
+        if (GetModelObject()->GetData() != NULL) {
           GetModelObject()->PlayAnim(m_iModelAnimation, eChange.bModelLoop?AOF_LOOPING:0);
         }
-        if (GetModelObject()->mo_toTexture.GetData()!=NULL) {
+
+        if (GetModelObject()->mo_toTexture.GetData() != NULL) {
           GetModelObject()->mo_toTexture.PlayAnim(m_iTextureAnimation, eChange.bTextureLoop?AOF_LOOPING:0);
         }
+
         resume;
       }
-      otherwise(): {
+
+      otherwise (): {
         resume;
       }
     };
