@@ -43,6 +43,7 @@ features  "HasName", "IsTargetable";
 
 properties:
    1 CTString m_strName              "Name" 'N' = "Trigger",         // class name
+   2 CTString m_strDescription = "",
 
    3 CEntityPointer m_penTarget1     "Target 01" 'T' COLOR(C_RED|0xFF),                 // send event to entity
    4 CEntityPointer m_penTarget2     "Target 02" 'Y' COLOR(C_RED|0xFF),
@@ -114,6 +115,29 @@ components:
   2 texture TEXTURE_MARKER   "Models\\Editor\\Camera.tex"
 
 functions:
+  // --------------------------------------------------------------------------------------
+  // Returns short entity description to show it in SED.
+  // --------------------------------------------------------------------------------------
+  const CTString &GetDescription(void) const
+  {
+    INDEX ctUsed = 0;
+
+    if (m_penTarget1)  { ctUsed++; }
+    if (m_penTarget2)  { ctUsed++; }
+    if (m_penTarget3)  { ctUsed++; }
+    if (m_penTarget4)  { ctUsed++; }
+    if (m_penTarget5)  { ctUsed++; }
+    if (m_penTarget6)  { ctUsed++; }
+    if (m_penTarget7)  { ctUsed++; }
+    if (m_penTarget8)  { ctUsed++; }
+    if (m_penTarget9)  { ctUsed++; }
+    if (m_penTarget10) { ctUsed++; }
+    
+    ((CTString&)m_strDescription).PrintF("[%d/10]", ctUsed);
+    
+    return m_strDescription;
+  }
+
   void SendToTargetM(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused) {
     if (m_eetGlobal == EET_IGNORE) {
       SendToTarget(penSendEvent, eetEventType, m_penCaused);
