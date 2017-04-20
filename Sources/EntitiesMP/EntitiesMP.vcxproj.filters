@@ -631,6 +631,9 @@
     <ClCompile Include="DigitalAnimationChanger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleTrigger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1740,6 +1743,12 @@
     <ClInclude Include="DigitalAnimationChanger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SimpleTrigger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleTrigger_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2696,5 +2705,10 @@
     <CustomBuild Include="DigitalAnimationChanger.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SimpleTrigger.es">
+      <Filter>Class Files\Tools</Filter>
+    </None>
   </ItemGroup>
 </Project>
