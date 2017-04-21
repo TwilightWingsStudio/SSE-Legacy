@@ -1487,6 +1487,8 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       CTextureObject *ptoAmmo = &_toASeriousBomb;
       
       INDEX ii = 8 - i;
+      
+      COLOR colIcon = C_WHITE;
 
       if (i < 8)
       {
@@ -1496,15 +1498,13 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
         AmmoInfo &ai = _aaiAmmo[i];
         
         // if no ammo and hasn't got that weapon - just skip this ammo // [SSE] Or if you don't want to see empty ammo types.
-        //if (ai.ai_iAmmoAmmount <= 0 && (!ai.ai_bHasWeapon || !hud_bShowEmptyAmmoInList)) continue;
+        if (ai.ai_iAmmoAmmount <= 0 && (!ai.ai_bHasWeapon || !hud_bShowEmptyAmmoInList)) continue;
+
+        if (ai.ai_iAmmoAmmount <= 0) colIcon = C_mdGRAY;
         
         fNormValue = (FLOAT)ai.ai_iAmmoAmmount / ai.ai_iMaxAmmoAmmount;
         
         ptoAmmo = _aaiAmmo[i].ai_ptoAmmo;
-        
-        if (fNormValue <= 0) {
-          continue;
-        }
 
       } else {
         fNormValue = (FLOAT)penPlayerCurrent->m_iSeriousBombCount / 3;
@@ -1515,7 +1515,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       }
 
       HUD_DrawAnchoredRect( 8 + (24 + 3) * iCol, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
-      HUD_DrawAnchroredIcon( 8 + (24 + 3) * iCol, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, *ptoAmmo, C_WHITE|CT_OPAQUE, 1.0F, TRUE); // Icon
+      HUD_DrawAnchroredIcon( 8 + (24 + 3) * iCol, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, *ptoAmmo, colIcon|CT_OPAQUE, 1.0F, TRUE); // Icon
       
       HUD_DrawAnchoredBar( 8 + (24 + 3) * iCol, 8, 4, 24, EHHAT_RIGHT, EHVAT_BOT, BO_DOWN, NONE, fNormValue);
       
