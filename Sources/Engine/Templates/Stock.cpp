@@ -58,18 +58,21 @@ TYPE *CStock_TYPE::Obtain_t(const CTFileName &fnmFileName)
   // create new stock object
   TYPE *ptNew = new TYPE;
   ptNew->ser_FileName = fnmFileName;
-  st_ctObjects.Add(ptNew);
-  st_ntObjects.Add(ptNew);
 
   // load it
   try {
     ptNew->Load_t(fnmFileName);
   } catch(char *) {
-    st_ctObjects.Remove(ptNew);
-    st_ntObjects.Remove(ptNew);
+    //st_ctObjects.Remove(ptNew); // No more need remove from stock if it won't be added!
+    //st_ntObjects.Remove(ptNew);
     delete ptNew;
     throw;
   }
+
+  // [SSE]
+  // NOTE: Were before try but this logic works wrongly for tex thumbnails!
+  st_ctObjects.Add(ptNew);
+  st_ntObjects.Add(ptNew);
 
   // mark that it is used for the first time
   //ASSERT(!ptNew->IsUsed());
