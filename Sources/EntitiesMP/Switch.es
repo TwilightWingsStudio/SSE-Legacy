@@ -39,7 +39,7 @@ properties:
   7 ANIMATION m_iTextureOFFAnimation  "Texture OFF animation" = 0,
 
  10 CEntityPointer m_penTarget      "ON-OFF Target" 'T' COLOR(C_dBLUE|0xFF),                      // send event to entity
- 11 enum EventEType m_eetEvent      "ON  Event type" 'U' = EET_START,  // type of event to send
+ 11 enum EventEType m_eetEvent      "ON  Event type" 'U' = EET_TRIGGER,  // type of event to send
  12 enum EventEType m_eetOffEvent   "OFF Event type" 'I' = EET_IGNORE, // type of event to send
  13 CEntityPointer m_penOffTarget   "OFF Target" COLOR(C_dBLUE|0xFF),  // off target, if not null recives off event
 
