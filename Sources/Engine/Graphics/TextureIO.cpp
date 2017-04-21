@@ -32,6 +32,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <Engine/Base/Statistics_internal.h>
 
+#define TEXTURE_VERSION_MINIMAL 3
+#define TEXTURE_VERSION 4
+
 extern BOOL _bExport;
 
 extern void Convert( CTextureData *pTD);
@@ -240,20 +243,43 @@ void CTextureData::Read_t( CTStream *inFile)
 
   // determine driver context presence (must have at least 1 texture unit!)
   const BOOL bHasContext = (_pGfx->gl_ctRealTextureUnits>0);
+  
+  CChunkID cidPeek = inFile->PeekID_t();
+  
+  // [SSE] Better Error Messages
+  if (cidPeek == CChunkID("SIGS") || cidPeek == CChunkID("WRKS") || cidPeek == CChunkID("CTSE")) {
+    CTFileName fnTex = inFile->GetDescription();
+    ThrowF_t(TRANS("File: '%s'\nThis file was created by one of new engines!\nSo it cannot be loaded!"), (CTString&)fnTex);
+    return;
+  }
 
   // read version
   INDEX iVersion;
-  inFile->ExpectID_t( "TVER");
+  inFile->ExpectID_t("TVER");
   *inFile >> iVersion;
 
-  // check currently supported versions
-  if( iVersion!=4 && iVersion!=3) throw( TRANS("Invalid texture format version."));
+  // [SSE] Better Error Messages
+  if (iVersion < TEXTURE_VERSION_MINIMAL) {
+    CTFileName fnTex = inFile->GetDescription();
+    ThrowF_t(TRANS("File: '%s'\nTexture format version is too old!\nMinimal supported: %d\n\nSo texture has version %d and cannot be loaded!"), (CTString&)fnTex, TEXTURE_VERSION_MINIMAL, iVersion);
+    return;
+  }
+  
+  // [SSE] Better Error Messages
+  if (iVersion > TEXTURE_VERSION) {
+    CTFileName fnTex = inFile->GetDescription();
+    ThrowF_t(TRANS("File: '%s'\nTexture format version is too new!\nMaximum supported: %d\n\nSo texture has version %d and cannot be loaded!"), (CTString&)fnTex, TEXTURE_VERSION, iVersion);
+    return;
+  }
   
   // mark if this texture was loaded form the old format
   if( iVersion==3) td_ulFlags |= TEX_WASOLD;
   BOOL bResetEffectBuffers = FALSE;
   BOOL bFramesLoaded = FALSE;
+  BOOL bCompressed = FALSE; // [SSE] Compressed Textures
+	SLONG slCompressedFrameSize = 0; // [SSE] Compressed Textures
   BOOL bAlphaChannel = FALSE;
+
   // loop trough file and react according to chunk ID
   do
   {
@@ -278,16 +304,31 @@ void CTextureData::Read_t( CTStream *inFile)
       *inFile >> td_iFirstMipLevel;
       if( iVersion!=4) *inFile >> td_slFrameSize;
       *inFile >> td_ctFrames;
-      // combine flags
-      td_ulFlags |= ulFlags;
+
+      td_ulFlags |= ulFlags; // combine flags
+
       bAlphaChannel = td_ulFlags&TEX_ALPHACHANNEL;
+      bCompressed = td_ulFlags&TEX_COMPRESSED; // [SSE] Compressed Textures
+      
+      if (bCompressed) {
+        CTFileName fnTex = inFile->GetDescription();
+        ThrowF_t(TRANS("File: '%s'\n\nTexture contains compressed data!\nSo texture cannot be loaded because compressed textures currently unsupported!"), (CTString&)fnTex);
+        return;
+      }
+
       // determine frame size
-      if( iVersion==4) td_slFrameSize = GetMipmapOffset( 15, GetPixWidth(), GetPixHeight())
-                                      * BYTES_PER_TEXEL;
+      if (iVersion == 4) td_slFrameSize = GetMipmapOffset( 15, GetPixWidth(), GetPixHeight()) * BYTES_PER_TEXEL;
+
     }
     // if this is chunk containing raw frames
     else if( idChunk == CChunkID("FRMS")) 
-    { 
+    {
+      if (bCompressed) {
+        CTFileName fnTex = inFile->GetDescription();
+        ThrowF_t(TRANS("File: '%s'\n\nError while loading texture!\nTexture contains uncompressed data while it is marked in flags as compressed!"), (CTString&)fnTex);
+        return;
+      }
+      
       // if no driver is present and texture is not static
       if( !(bHasContext || td_ulFlags&TEX_STATIC))
       { // determine frames' size
@@ -301,9 +342,11 @@ void CTextureData::Read_t( CTStream *inFile)
         inFile->Seek_t( slSkipSize*td_ctFrames, CTStream::SD_CUR);
         continue;
       }
+
       // calculate texture size for corresponding texture format and allocate memory
       SLONG slTexSize = td_slFrameSize * td_ctFrames;
       td_pulFrames = (ULONG*)AllocMemory( slTexSize);
+
       // if older version
       if( iVersion==3) {
         // alloc memory block and read mip-maps
@@ -327,6 +370,26 @@ void CTextureData::Read_t( CTStream *inFile)
         }
       }
       bFramesLoaded = TRUE;
+    }
+    // If this chunk containing  compressed frames.
+    else if (idChunk == CChunkID("FRMC"))
+    {
+      // If we have uncompressed texture then it should NOT have compressed data!
+      if (!bCompressed) {
+        CTFileName fnTex = inFile->GetDescription();
+        ThrowF_t(TRANS("File: '%s'\n\nError while loading texture!\nTexture contains compressed data while it is NOT marked in flags as compressed!"), (CTString&)fnTex);
+        return;
+      }
+      
+      const SLONG slCompressedDataSize = slCompressedFrameSize * td_ctFrames;
+      
+			// If no driver is present then just skip the frames.
+			if (!bHasContext) {
+				inFile->Seek_t( slCompressedDataSize, CTStream::SD_CUR);
+
+			} else {
+        // TODO: [ZCaliptium] Write code later.
+      }
     }
     // if this is chunk containing texture animation data
     else if( idChunk == CChunkID("ANIM"))

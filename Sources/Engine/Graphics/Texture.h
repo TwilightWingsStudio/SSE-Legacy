@@ -29,6 +29,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // (on disk and in memory)
 #define TEX_ALPHACHANNEL (1UL<<0)   // texture has alpha channel (for old version support)
 #define TEX_32BIT        (1UL<<1)   // texture needs to be in 32-bit quality uploaded if can
+#define TEX_COMPRESSED   (1UL<<2)   // [SSE] Compressed Textures
+
 // (only in memory)
 #define TEX_STATIC       (1UL<<5)   // remain loaded after being bound (i.e. uploaded - for base textures)
 #define TEX_CONSTANT     (1UL<<6)   // cannot be changed (no mip-map disposing, no LOD biasing, no colorizing, nothing!)
@@ -39,6 +41,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define TEX_KEEPCOLOR    (1UL<<11)  // don't (de)saturate (for heightmaps and such!)
 #define TEX_SINGLEMIPMAP (1UL<<18)  // set if last uploading was in single-mipmap
 #define TEX_PROBED       (1UL<<19)  // set if last binding was as probe-texture
+
 // (flags that shows if texture mipmaps has been changed)
 #define TEX_DISPOSED     (1UL<<20)  // largest mip-map(s) has been left-out
 #define TEX_DITHERED     (1UL<<21)  // dithering has been applied on this texture
