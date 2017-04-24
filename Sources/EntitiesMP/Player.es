@@ -342,7 +342,7 @@ static struct PlayerControls pctlCurrent;
 // Cheats
 static INDEX cht_iGoToMarker   = -1;
 static INDEX cht_bKillAll      = FALSE;
-extern INDEX cht_bKillAllAura  = FALSE; // [SSE] Cheats Expansion
+extern INDEX cht_bAutoKill  = FALSE; // [SSE] Cheats Expansion
 static INDEX cht_bGiveAll      = FALSE;
 static INDEX cht_bOpen         = FALSE;
 static INDEX cht_bAllKeys      = FALSE; // [SSE] Cheats Expansion
@@ -361,6 +361,8 @@ extern INDEX cht_bSpectator    = FALSE; // [SSE] Spectator Camera
 
 extern INDEX cht_bBadSync      = FALSE; // [SSE] Cheats Expansion
 extern INDEX cht_bSuicide      = FALSE; // [SSE] Cheats Expansion
+extern INDEX cht_bArsenal      = FALSE; // [SSE] Cheats Expansion
+extern INDEX cht_bAmmoPack     = FALSE; // [SSE] Cheats Expansion
 
 // Interface Control
 static INDEX hud_bShowAll     = TRUE; // used internaly in menu/console
@@ -912,7 +914,7 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("user INDEX cht_bInvisible;", &cht_bInvisible);
   _pShell->DeclareSymbol("user INDEX cht_bGiveAll;",   &cht_bGiveAll);
   _pShell->DeclareSymbol("user INDEX cht_bKillAll;",   &cht_bKillAll);
-  _pShell->DeclareSymbol("user INDEX cht_bKillAllAura;", &cht_bKillAllAura);   // [SSE] Cheats Expansion
+  _pShell->DeclareSymbol("user INDEX cht_bAutoKill;", &cht_bAutoKill);   // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bSuicide;", &cht_bSuicide);           // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bRevive;", &cht_bRevive);             // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bInfiniteAmmo;", &cht_bInfiniteAmmo); // [SSE] Cheats Expansion
@@ -920,6 +922,8 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("user INDEX cht_bSpectator;",      &cht_bSpectator);  // [SSE] Spectator Camera
   _pShell->DeclareSymbol("user INDEX cht_bBadSync;",      &cht_bBadSync);      // [SSE]
   _pShell->DeclareSymbol("user INDEX cht_bAllKeys;", &cht_bAllKeys);           // [SSE] Cheats Expansion
+  _pShell->DeclareSymbol("user INDEX cht_bArsenal;", &cht_bArsenal);           // [SSE] Cheats Expansion
+  _pShell->DeclareSymbol("user INDEX cht_bAmmoPack;", &cht_bAmmoPack);           // [SSE] Cheats Expansion
   _pShell->DeclareSymbol("user INDEX cht_bAllMessages;", &cht_bAllMessages);
   _pShell->DeclareSymbol("user FLOAT cht_fTranslationMultiplier ;", &cht_fTranslationMultiplier);
   _pShell->DeclareSymbol("user INDEX cht_bRefresh;", &cht_bRefresh);
@@ -5861,7 +5865,21 @@ functions:
     if (cht_bGiveAll)
     {
       cht_bGiveAll = FALSE;
-      ((CPlayerWeapons&)*m_penWeapons).CheatGiveAll();
+      ((CPlayerWeapons&)*m_penWeapons).CheatGiveAll(TRUE, TRUE);
+    }
+    
+    // [SSE] Cheats Expansion
+    if (cht_bArsenal)
+    {
+      cht_bArsenal = FALSE;
+      ((CPlayerWeapons&)*m_penWeapons).CheatGiveAll(TRUE, FALSE);
+    }
+    
+    // [SSE] Cheats Expansion
+    if (cht_bAmmoPack)
+    {
+      cht_bAmmoPack = FALSE;
+      ((CPlayerWeapons&)*m_penWeapons).CheatGiveAll(FALSE, TRUE);
     }
     
     // [SSE] Cheats Expansion
@@ -5887,7 +5905,8 @@ functions:
       KillAllEnemies(this);
     }
 
-    if (cht_bKillAllAura) {
+    // [SSE] Cheats Expansion
+    if (cht_bAutoKill) {
       KillAllEnemies(this);
     }
 

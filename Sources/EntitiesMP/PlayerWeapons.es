@@ -3037,22 +3037,28 @@ functions:
   // --------------------------------------------------------------------------------------
   // Cheat give all.
   // --------------------------------------------------------------------------------------
-  void CheatGiveAll(void)
+  void CheatGiveAll(BOOL bWeapons, BOOL bAmmo)
   {
     // all weapons
-    m_iAvailableWeapons = WEAPONS_ALLAVAILABLEMASK;
-    // m_iAvailableWeapons &= ~WEAPONS_DISABLEDMASK;
+    if (bWeapons) {
+      m_iAvailableWeapons = WEAPONS_ALLAVAILABLEMASK;
+      // m_iAvailableWeapons &= ~WEAPONS_DISABLEDMASK;
+    }
+
     // ammo for all weapons
-    m_iBullets = m_iMaxBullets;
-    m_iShells = m_iMaxShells;
-    m_iRockets = m_iMaxRockets;
-    m_iGrenades = m_iMaxGrenades;
-    m_iNapalm = m_iMaxNapalm;
-    m_iElectricity = m_iMaxElectricity;
-    m_iIronBalls = m_iMaxIronBalls;
-    //m_iNukeBalls = m_iMaxNukeBalls;
-    // precache eventual new weapons
-    m_iSniperBullets = m_iMaxSniperBullets;
+    if (bAmmo)
+    {
+      m_iBullets = m_iMaxBullets;
+      m_iShells = m_iMaxShells;
+      m_iRockets = m_iMaxRockets;
+      m_iGrenades = m_iMaxGrenades;
+      m_iNapalm = m_iMaxNapalm;
+      m_iElectricity = m_iMaxElectricity;
+      m_iIronBalls = m_iMaxIronBalls;
+      //m_iNukeBalls = m_iMaxNukeBalls;
+      // precache eventual new weapons
+      m_iSniperBullets = m_iMaxSniperBullets;
+    }
 
     Precache();
   };
