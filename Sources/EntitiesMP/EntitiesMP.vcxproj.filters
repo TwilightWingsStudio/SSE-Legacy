@@ -634,6 +634,12 @@
     <ClCompile Include="SimpleTrigger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleCloudsHolder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleCloudsMarker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1749,6 +1755,18 @@
     <ClInclude Include="SimpleTrigger_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleCloudsHolder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleCloudsHolder_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleCloudsMarker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleCloudsMarker_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2705,10 +2723,14 @@
     <CustomBuild Include="DigitalAnimationChanger.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="SimpleTrigger.es">
-      <Filter>Class Files\Tools</Filter>
-    </None>
+    <CustomBuild Include="SimpleTrigger.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ParticleCloudsHolder.es">
+      <Filter>Class Files\Effects</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ParticleCloudsMarker.es">
+      <Filter>Class Files\Effects</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

@@ -193,6 +193,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="MBTeleporter.cpp" />
     <ClCompile Include="MovableBrush.cpp" />
     <ClCompile Include="MovableModel.cpp" />
+    <ClCompile Include="ParticleCloudsHolder.cpp" />
+    <ClCompile Include="ParticleCloudsMarker.cpp" />
     <ClCompile Include="PlayerInfo.cpp" />
     <ClCompile Include="PlayerSettings.cpp" />
     <ClCompile Include="ProgressiveSwitch.cpp" />
@@ -448,6 +450,10 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="MovableBrush_tables.h" />
     <ClInclude Include="MovableModel.h" />
     <ClInclude Include="MovableModel_tables.h" />
+    <ClInclude Include="ParticleCloudsHolder.h" />
+    <ClInclude Include="ParticleCloudsHolder_tables.h" />
+    <ClInclude Include="ParticleCloudsMarker.h" />
+    <ClInclude Include="ParticleCloudsMarker_tables.h" />
     <ClInclude Include="PlayerInfo.h" />
     <ClInclude Include="PlayerInfo_tables.h" />
     <ClInclude Include="PlayerSettings.h" />
@@ -3111,6 +3117,30 @@ ecc EntitiesMP/%(Filename).es </Command>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="SimpleTrigger.es">
+      <FileType>Document</FileType>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="ParticleCloudsHolder.es">
+      <FileType>Document</FileType>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+    </CustomBuild>
+    <CustomBuild Include="ParticleCloudsMarker.es">
       <FileType>Document</FileType>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>

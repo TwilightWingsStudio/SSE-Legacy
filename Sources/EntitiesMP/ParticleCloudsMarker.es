@@ -13,3 +13,40 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
 
+244
+%{
+  #include "StdH.h"
+%}
+
+class CParticleCloudsMarker : CEntity {
+name      "ParticleCloudsMarker";
+thumbnail "Thumbnails\\ParticleCloudsMarker.tbn";
+features "IsTargetable", "IsImportant";
+
+properties:
+
+components:
+
+  1 model   MODEL_MARKER     "Models\\Editor\\Axis.mdl",
+  2 texture TEXTURE_MARKER   "Models\\Editor\\Vector.tex"
+  
+functions:
+
+procedures:
+
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
+  Main()
+  {
+    InitAsEditorModel();
+    SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
+    SetCollisionFlags(ECF_IMMATERIAL);
+
+    // Set appearance
+    SetModel(MODEL_MARKER);
+    SetModelMainTexture(TEXTURE_MARKER);
+
+    return;
+  }
+};
