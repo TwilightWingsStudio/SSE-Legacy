@@ -1489,6 +1489,8 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       INDEX ii = 8 - i;
       
       COLOR colIcon = C_WHITE;
+      COLOR colBorder = _colHUD;
+      COLOR colBar = NONE;
 
       if (i < 8)
       {
@@ -1507,7 +1509,22 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
         ptoAmmo = _aaiAmmo[i].ai_ptoAmmo;
 
       } else {
-        fNormValue = (FLOAT)penPlayerCurrent->m_iSeriousBombCount / 3;
+        INDEX iBombCount = penPlayerCurrent->m_iSeriousBombCount;
+        
+        #define BOMB_FIRE_TIME 1.5f
+        BOOL  bBombFiring = penPlayerCurrent->m_tmSeriousBombFired + BOMB_FIRE_TIME > _pTimer->GetLerpedCurrentTick();
+        
+        if (bBombFiring) {
+          iBombCount++;
+          iBombCount = ClampUp(iBombCount, INDEX(3));
+          
+          FLOAT fFactor = (_pTimer->GetLerpedCurrentTick() - penPlayerCurrent->m_tmSeriousBombFired) / BOMB_FIRE_TIME;
+          colBorder = LerpColor(colBorder, C_RED, fFactor);
+          colIcon = LerpColor(colIcon, C_RED, fFactor);
+          colBar = LerpColor(colBar, C_RED, fFactor) | _ulAlphaHUD;
+        }
+
+        fNormValue = iBombCount / 3.0F;
 
         if (fNormValue <= 0) {
           continue;
@@ -1517,7 +1534,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       HUD_DrawAnchoredRect( 8 + (24 + 3) * iCol, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
       HUD_DrawAnchroredIcon( 8 + (24 + 3) * iCol, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, *ptoAmmo, colIcon|CT_OPAQUE, 1.0F, TRUE); // Icon
       
-      HUD_DrawAnchoredBar( 8 + (24 + 3) * iCol, 8, 4, 24, EHHAT_RIGHT, EHVAT_BOT, BO_DOWN, NONE, fNormValue);
+      HUD_DrawAnchoredBar( 8 + (24 + 3) * iCol, 8, 4, 24, EHHAT_RIGHT, EHVAT_BOT, BO_DOWN, colBar, fNormValue);
       
       HUD_DrawAnchoredRectOutline(8 + (24 + 3) * iCol, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
       

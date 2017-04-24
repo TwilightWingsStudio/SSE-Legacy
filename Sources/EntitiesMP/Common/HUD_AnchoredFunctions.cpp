@@ -207,22 +207,30 @@ extern void HUD_DrawAnchoredBarEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT 
   {
     case BO_LEFT: {
       fFilledSizeX *= fNormValue;
+      if (fNormValue > 0.0F) fFilledSizeX = ClampDn(fFilledSizeX, 2.0F);
+
       fModSizeX = fFilledSizeX;
     } break;
 
     case BO_RIGHT: {
       fFilledSizeX *= fNormValue;
+      if (fNormValue > 0.0F) fFilledSizeX = ClampDn(fFilledSizeX, 2.0F);
+
       fModSizeX = fFilledSizeX;
       fOriginX += fSizeX - fFilledSizeX;
     } break;
 
     case BO_UP: {
       fFilledSizeY *= fNormValue;
+      if (fNormValue > 0.0F) fFilledSizeY = ClampDn(fFilledSizeY, 2.0F);
+
       fModSizeY = fFilledSizeY;
     } break;
 
     case BO_DOWN: {
       fFilledSizeY *= fNormValue;
+      if (fNormValue > 0.0F) fFilledSizeY = ClampDn(fFilledSizeY, 2.0F);
+      
       fModSizeY = fFilledSizeY;
       fOriginY += fSizeY - fFilledSizeY;
       fOriginY = ceil(fOriginY);
