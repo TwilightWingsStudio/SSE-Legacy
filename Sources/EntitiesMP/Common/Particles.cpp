@@ -2507,7 +2507,7 @@ void Particles_PowerUpIndicator( CEntity *pen, enum ParticleTexture ptTexture, F
 
 #define CT_LIGHTNINGS 8
 void Particles_Ghostbuster(const FLOAT3D &vSrc, const FLOAT3D &vDst, INDEX ctRays, FLOAT fSize, FLOAT fPower,
-                           FLOAT fKneeDivider/*=33.3333333f*/)
+                           FLOAT fKneeDivider/*=33.3333333f*/, COLOR colMultiply /*=C_WHITE|CT_OPAQUE*/)
 {
   Particle_PrepareTexture(&_toGhostbusterBeam, PBT_ADD);
   Particle_SetTexturePart( 512, 512, 0, 0);
@@ -2536,6 +2536,8 @@ void Particles_Ghostbuster(const FLOAT3D &vSrc, const FLOAT3D &vDst, INDEX ctRay
     if( fFade>1 || fFade<=0) continue;
     UBYTE ubFade = NormFloatToByte(fFade*fPower);
     COLOR colFade = RGBToColor( ubFade, ubFade, ubFade);
+    colFade = AddColors(colFade, colMultiply); // [SSE] More Colored Particles
+
     for(FLOAT fPos=fStep; fPos<fLen+fStep/2; fPos+=fStep)
     {
       INDEX iOffset = ULONG(fPos*1234.5678f+iRay*103)%32;

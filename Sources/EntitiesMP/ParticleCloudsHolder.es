@@ -27,10 +27,17 @@ properties:
 
 components:
 
-  1 model   MODEL_MARKER     "Models\\Editor\\Axis.mdl",
-  2 texture TEXTURE_MARKER   "Models\\Editor\\Vector.tex"
+  1 model   MODEL_PARTICLECLOUDSHOLDER   "Models\\Editor\\ParticleCloudsHolder.mdl",
+  2 texture TEXTURE_PARTICLECLOUDSHOLDER "Models\\Editor\\ParticleCloudsHolder.tex"
   
 functions:
+  // --------------------------------------------------------------------------------------
+  // Renders particles.
+  // --------------------------------------------------------------------------------------
+  void RenderParticles(void)
+  {
+    
+  }
 
 procedures:
 
@@ -44,8 +51,8 @@ procedures:
     SetCollisionFlags(ECF_IMMATERIAL);
 
     // Set appearance
-    SetModel(MODEL_MARKER);
-    SetModelMainTexture(TEXTURE_MARKER);
+    SetModel(MODEL_PARTICLECLOUDSHOLDER);
+    SetModelMainTexture(TEXTURE_PARTICLECLOUDSHOLDER);
 
     return;
   }

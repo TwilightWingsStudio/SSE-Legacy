@@ -21,14 +21,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class CParticleCloudsMarker : CEntity {
 name      "ParticleCloudsMarker";
 thumbnail "Thumbnails\\ParticleCloudsMarker.tbn";
-features "IsTargetable", "IsImportant";
+features  "HasName", "HasDescription", "IsTargetable", "IsImportant";
 
 properties:
 
+  1 CTString m_strName         "Name" 'N' = "ParticleCloudsMarker",
+  2 CTString m_strDescription             = "",
+  
 components:
 
-  1 model   MODEL_MARKER     "Models\\Editor\\Axis.mdl",
-  2 texture TEXTURE_MARKER   "Models\\Editor\\Vector.tex"
+  1 model   MODEL_MARKER     "Models\\Editor\\ParticleCloudsMarker.mdl",
+  2 texture TEXTURE_MARKER   "Models\\Editor\\ParticleCloudsMarker.tex"
   
 functions:
 

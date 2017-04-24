@@ -49,8 +49,10 @@ void DECL_DLL Particles_ExplosionDebris2(CEntity *pen, FLOAT tmStart, FLOAT3D vS
 void DECL_DLL Particles_ExplosionDebris3(CEntity *pen, FLOAT tmStart, FLOAT3D vStretch, COLOR colMultiply=C_WHITE|CT_OPAQUE);
 void DECL_DLL Particles_ExplosionSmoke(CEntity *pen, FLOAT tmStart, FLOAT3D vStretch, COLOR colMultiply=C_WHITE|CT_OPAQUE);
 void DECL_DLL Particles_BloodTrail(CEntity *pen);
+
 void DECL_DLL Particles_Ghostbuster(const FLOAT3D &vSrc, const FLOAT3D &vDst, INDEX ctRays, FLOAT fSize, FLOAT fPower = 1.0f,
-                           FLOAT fKneeDivider = 33.3333333f);
+                           FLOAT fKneeDivider = 33.3333333f, COLOR colMultiply=C_WHITE|CT_OPAQUE);
+
 void DECL_DLL Particles_Burning(CEntity *pen, FLOAT fPower, FLOAT fTimeRatio);
 void DECL_DLL Particles_BrushBurning(CEntity *pen, FLOAT3D vPos[], INDEX ctCount, FLOAT3D vPlane,
                                      FLOAT fPower, FLOAT fTimeRatio);
@@ -127,6 +129,7 @@ public:
   CStaticStackArray<CGrowth> acgParticles;
 };
 
+// Environment Particles
 void DECL_DLL Particles_Growth(CEntity *pen, CTextureData *ptdGrowthMap, FLOATaabbox3D &boxGrowthMap, CEntity *penEPH, INDEX iDrawPort);
 
 void DECL_DLL Particles_Rain( CEntity *pen, FLOAT fGridSize, INDEX ctGrids, FLOAT fFactor, 
@@ -134,6 +137,8 @@ void DECL_DLL Particles_Rain( CEntity *pen, FLOAT fGridSize, INDEX ctGrids, FLOA
 void DECL_DLL Particles_Snow( CEntity *pen, FLOAT fGridSize, INDEX ctGrids, FLOAT fPower,
                     CTextureData *ptdRainMap, FLOATaabbox3D &boxRainMap, FLOAT fSnowStart);
 void DECL_DLL Particles_Lightning( FLOAT3D vSrc, FLOAT3D vDst, FLOAT fTimeStart);
+
+
 void DECL_DLL Particles_BulletSpray(INDEX iRndBase,  FLOAT3D vSource, FLOAT3D vGDir, enum EffectParticlesType eptType, FLOAT tmSpawn,
                                     FLOAT3D vDirection, FLOAT fStretch);
 void DECL_DLL Particles_MachineBullets( CEntity *pen, TIME tmStart, TIME tmEnd, FLOAT fFrequency);
