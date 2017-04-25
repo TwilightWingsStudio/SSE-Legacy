@@ -252,7 +252,16 @@ ENGINE_API void SE_InitEngine(CTString strGameID)
   if (_strLogFile=="") {
     _strLogFile = CTFileName(CTString(strExePath)).FileName();
   }
-  _pConsole->Initialize(_fnmApplicationPath+_strLogFile+".log", 90, 512);
+  
+  // [SSE] Separate Directory For Logs
+  CTFileName fnmLogsDir = _fnmApplicationPath + "Logs\\";
+  DWORD dwAttrib = GetFileAttributesA(fnmLogsDir);
+  if (dwAttrib == -1)
+  {
+    CreateDirectoryA(fnmLogsDir, NULL);
+  }
+
+  _pConsole->Initialize(fnmLogsDir + _strLogFile+".log", 90, 512);
 
   _pAnimStock        = new CStock_CAnimData;
   _pTextureStock     = new CStock_CTextureData;
