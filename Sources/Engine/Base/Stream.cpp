@@ -116,11 +116,37 @@ extern BOOL FileMatchesList(CDynamicStackArray<CTFileName> &afnm, const CTFileNa
 
 static CTFileName _fnmApp;
 
+static void _AddGROsFromFolder(const CTFileName &fnm)
+{
+  struct _finddata_t c_file;
+  long hFile;
+  
+  hFile = _findfirst(fnm + "*.gro", &c_file); // "*.gro", &c_file);
+  BOOL bOK = (hFile!=-1);
+
+  while(bOK)
+  {
+    if (CTString(c_file.name).Matches("*.gro")) {
+      // add it to active set
+      UNZIPAddArchive(fnm + c_file.name);
+    }
+
+    bOK = _findnext(hFile, &c_file) == 0;
+  }
+
+  _findclose( hFile );
+}
+
+// [SSE] Filesystem Rework - Content Folder
+// As you know before game always loaded GROs from root folder.
+// Now it is more organized.
+
 void InitStreams(void)
 {
   // obtain information about system
   SYSTEM_INFO siSystemInfo;
   GetSystemInfo( &siSystemInfo);
+
   // and remember page size
   _ulPageSize = siSystemInfo.dwPageSize*16;   // cca. 64kB on WinNT/Win95
 
@@ -134,8 +160,10 @@ void InitStreams(void)
   }
 
   CPrintF(TRANS("Current mod: %s\n"), _fnmMod==""?TRANS("<none>"):(CTString&)_fnmMod);
+
   // if there is a mod active
-  if (_fnmMod!="") {
+  if (_fnmMod!="") 
+  {
     // load mod's include/exclude lists
     CPrintF(TRANS("Loading mod include/exclude lists...\n"));
     BOOL bOK = FALSE;
@@ -157,108 +185,44 @@ void InitStreams(void)
       _strModName = CTFileName(_strModName).FileName();
     }
   }
+
   // find eventual extension for the mod's dlls
   _strModExt = "";
   LoadStringVar(CTString("ModExt.txt"), _strModExt);
 
-
   CPrintF(TRANS("Loading group files...\n"));
 
-  // for each group file in base directory
-  struct _finddata_t c_file;
-  long hFile;
-
-  // [SSE] Filesystem Rework - Content Folder
-  hFile = _findfirst(_fnmApplicationPath + "Content\\*.gro", &c_file); // "*.gro", &c_file);
-  BOOL bOK = (hFile!=-1);
-
-  while(bOK)
-  {
-    if (CTString(c_file.name).Matches("*.gro")) {
-      // add it to active set
-      UNZIPAddArchive(_fnmApplicationPath + "Content\\" + c_file.name); // [SSE] Filesystem Rework - Content Folder
-    }
-
-    bOK = _findnext(hFile, &c_file) == 0;
-  }
-
-  _findclose( hFile );
+  _AddGROsFromFolder(_fnmApplicationPath + "Content\\_Custom\\");
+  _AddGROsFromFolder(_fnmApplicationPath + "Content\\Base\\");
+  _AddGROsFromFolder(_fnmApplicationPath + "Content\\Coremods\\");
 
   // if there is a mod active
   if (_fnmMod != "")
   {
-    // for each group file in mod directory
-    struct _finddata_t c_file;
-    long hFile;
-
-    // [SSE] Filesystem Rework - Content Folder
-    hFile = _findfirst(_fnmApplicationPath + _fnmMod + "Content\\*.gro", &c_file); // "*.gro", &c_file);
-    BOOL bOK = (hFile != -1);
-
-    while(bOK)
-    {
-      if (CTString(c_file.name).Matches("*.gro")) {
-        // add it to active set
-        UNZIPAddArchive(_fnmApplicationPath + _fnmMod + "Content\\" + c_file.name); // [SSE] Filesystem Rework - Content Folder
-      }
-
-      bOK = _findnext(hFile, &c_file)==0;
-    }
-
-    _findclose( hFile );
+    _AddGROsFromFolder(_fnmApplicationPath + _fnmMod + "Content\\_Custom\\");
+    _AddGROsFromFolder(_fnmApplicationPath + _fnmMod + "Content\\Base\\");
+    _AddGROsFromFolder(_fnmApplicationPath + _fnmMod + "Content\\Coremods\\");
   }
-
+  
+  #if 0
   // if there is a CD path
   if (_fnmCDPath != "")
   {
-    // for each group file on the CD
-    struct _finddata_t c_file;
-    long hFile;
-
-    // [SSE] Filesystem Rework - Content Folder
-    hFile = _findfirst(_fnmCDPath + "Content\\*.gro", &c_file); //"*.gro", &c_file);
-    BOOL bOK = (hFile!=-1);
-
-    while(bOK)
-    {
-      if (CTString(c_file.name).Matches("*.gro")) {
-        // add it to active set
-        UNZIPAddArchive(_fnmCDPath + "Content\\" + c_file.name); // [SSE] Filesystem Rework - Content Folder
-      }
-
-      bOK = _findnext(hFile, &c_file)==0;
-    }
-
-    _findclose( hFile );
+    _AddGROsFromFolder(_fnmCDPath + "Content\\_Custom\\");
+    _AddGROsFromFolder(_fnmCDPath + "Content\\Base\\");
+    _AddGROsFromFolder(_fnmCDPath + "Content\\Coremods\\");
 
     // if there is a mod active
-    if (_fnmMod!="")
-    {
-      // for each group file in mod directory
-      struct _finddata_t c_file;
-      long hFile;
-
-      // [SSE] Filesystem Rework - Content Folder
-      hFile = _findfirst(_fnmCDPath + _fnmMod + "Content\\*.gro", &c_file); //"*.gro", &c_file); 
-      BOOL bOK = (hFile!=-1);
-
-      while(bOK)
-      {
-        if (CTString(c_file.name).Matches("*.gro")) {
-          // add it to active set
-          UNZIPAddArchive(_fnmCDPath + _fnmMod + "Content\\" + c_file.name); // [SSE] Filesystem Rework - Content Folder
-        }
-
-        bOK = _findnext(hFile, &c_file) == 0;
-      }
-
-      _findclose( hFile );
+    if (_fnmMod != "") {
+      _AddGROsFromFolder(_fnmCDPath + _fnmMod + "Content\\_Custom\\");
+      _AddGROsFromFolder(_fnmCDPath + _fnmMod + "Content\\Base\\");
+      _AddGROsFromFolder(_fnmCDPath + _fnmMod + "Content\\Coremods\\");
     }
   }
-
-  // try to
+  #endif
+  
+  // try to read the zip directories
   try {
-    // read the zip directories
     UNZIPReadDirectoriesReverse_t();
   // if failed
   } catch( char *strError) {
