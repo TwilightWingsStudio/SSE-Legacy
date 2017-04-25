@@ -167,64 +167,91 @@ void InitStreams(void)
   // for each group file in base directory
   struct _finddata_t c_file;
   long hFile;
-  hFile = _findfirst(_fnmApplicationPath+"*.gro", &c_file);
+
+  // [SSE] Filesystem Rework - Content Folder
+  hFile = _findfirst(_fnmApplicationPath + "Content\\*.gro", &c_file); // "*.gro", &c_file);
   BOOL bOK = (hFile!=-1);
-  while(bOK) {
+
+  while(bOK)
+  {
     if (CTString(c_file.name).Matches("*.gro")) {
       // add it to active set
-      UNZIPAddArchive(_fnmApplicationPath+c_file.name);
+      UNZIPAddArchive(_fnmApplicationPath + "Content\\" + c_file.name); // [SSE] Filesystem Rework - Content Folder
     }
-    bOK = _findnext(hFile, &c_file)==0;
+
+    bOK = _findnext(hFile, &c_file) == 0;
   }
+
   _findclose( hFile );
 
   // if there is a mod active
-  if (_fnmMod!="") {
+  if (_fnmMod != "")
+  {
     // for each group file in mod directory
     struct _finddata_t c_file;
     long hFile;
-    hFile = _findfirst(_fnmApplicationPath+_fnmMod+"*.gro", &c_file);
-    BOOL bOK = (hFile!=-1);
-    while(bOK) {
+
+    // [SSE] Filesystem Rework - Content Folder
+    hFile = _findfirst(_fnmApplicationPath + _fnmMod + "Content\\*.gro", &c_file); // "*.gro", &c_file);
+    BOOL bOK = (hFile != -1);
+
+    while(bOK)
+    {
       if (CTString(c_file.name).Matches("*.gro")) {
         // add it to active set
-        UNZIPAddArchive(_fnmApplicationPath+_fnmMod+c_file.name);
+        UNZIPAddArchive(_fnmApplicationPath + _fnmMod + "Content\\" + c_file.name); // [SSE] Filesystem Rework - Content Folder
       }
+
       bOK = _findnext(hFile, &c_file)==0;
     }
+
     _findclose( hFile );
   }
 
   // if there is a CD path
-  if (_fnmCDPath!="") {
+  if (_fnmCDPath != "")
+  {
     // for each group file on the CD
     struct _finddata_t c_file;
     long hFile;
-    hFile = _findfirst(_fnmCDPath+"*.gro", &c_file);
+
+    // [SSE] Filesystem Rework - Content Folder
+    hFile = _findfirst(_fnmCDPath + "Content\\*.gro", &c_file); //"*.gro", &c_file);
     BOOL bOK = (hFile!=-1);
-    while(bOK) {
+
+    while(bOK)
+    {
       if (CTString(c_file.name).Matches("*.gro")) {
         // add it to active set
-        UNZIPAddArchive(_fnmCDPath+c_file.name);
+        UNZIPAddArchive(_fnmCDPath + "Content\\" + c_file.name); // [SSE] Filesystem Rework - Content Folder
       }
+
       bOK = _findnext(hFile, &c_file)==0;
     }
+
     _findclose( hFile );
 
     // if there is a mod active
-    if (_fnmMod!="") {
+    if (_fnmMod!="")
+    {
       // for each group file in mod directory
       struct _finddata_t c_file;
       long hFile;
-      hFile = _findfirst(_fnmCDPath+_fnmMod+"*.gro", &c_file);
+
+      // [SSE] Filesystem Rework - Content Folder
+      hFile = _findfirst(_fnmCDPath + _fnmMod + "Content\\*.gro", &c_file); //"*.gro", &c_file); 
       BOOL bOK = (hFile!=-1);
-      while(bOK) {
+
+      while(bOK)
+      {
         if (CTString(c_file.name).Matches("*.gro")) {
           // add it to active set
-          UNZIPAddArchive(_fnmCDPath+_fnmMod+c_file.name);
+          UNZIPAddArchive(_fnmCDPath + _fnmMod + "Content\\" + c_file.name); // [SSE] Filesystem Rework - Content Folder
         }
-        bOK = _findnext(hFile, &c_file)==0;
+
+        bOK = _findnext(hFile, &c_file) == 0;
       }
+
       _findclose( hFile );
     }
   }
@@ -238,6 +265,7 @@ void InitStreams(void)
     // report warning
     CPrintF( TRANS("There were group file errors:\n%s"), strError);
   }
+
   CPrintF("\n");
 
   LoadFileList(_afnmNoCRC, CTFILENAME("Data\\NoCRC.lst"));
@@ -512,10 +540,11 @@ void CTStream::ExpectID_t(const CChunkID &cidExpected) // throws char *
 	Read_t( &cidToCompare.cid_ID[0], CID_LENGTH);
 	if( !(cidToCompare == cidExpected))
 	{
-		ThrowF_t(TRANS("Chunk ID validation failed.\nExpected ID \"%s\" but found \"%s\"\n"),
-      cidExpected.cid_ID, cidToCompare.cid_ID);
+		ThrowF_t(TRANS("Chunk ID validation failed at %d.\nExpected ID \"%s\" but found \"%s\"\n"),
+      GetPos_t(), cidExpected.cid_ID, cidToCompare.cid_ID);
 	}
 }
+
 void CTStream::ExpectKeyword_t(const CTString &strKeyword) // throw char *
 {
   // check that the keyword is present
@@ -777,6 +806,24 @@ void CTStream::ReadDictionary_intenal_t(SLONG slOffset)
       #else
       *this >> strm_afnmDictionary[iFileName]; // Default Code.
 
+      #endif
+      
+      // [SSE]
+      // TODO: [ZCaliptium] Temp Code
+      #if 0
+      if (!FileExists(strm_afnmDictionary[iFileName])) {
+        if (strm_afnmDictionary[iFileName].FileExt() == ".bm") {
+          strm_afnmDictionary[iFileName] = CTFILENAME("Models\\Ska\\Dummy\\Dummy.bm");
+        } else if (strm_afnmDictionary[iFileName].FileExt() == ".smc") {
+          strm_afnmDictionary[iFileName] = CTFILENAME("Models\\Ska\\Dummy\\Dummy.smc");
+        } else if (strm_afnmDictionary[iFileName].FileExt() == ".tex") {
+          strm_afnmDictionary[iFileName] = CTFILENAME("Textures\\Editor\\Default.tex");
+        } else if (strm_afnmDictionary[iFileName].FileExt() == ".wav" || strm_afnmDictionary[iFileName].FileExt() == ".ogg") {
+          strm_afnmDictionary[iFileName] = CTFILENAME("Sounds\\Default.wav");
+        } else if (strm_afnmDictionary[iFileName].FileExt() == ".txt") {
+          strm_afnmDictionary[iFileName] = CTFILENAME("Data\\Default.txt");
+        }
+      }
       #endif
     }
   }
