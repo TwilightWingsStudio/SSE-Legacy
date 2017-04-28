@@ -1632,7 +1632,7 @@ void LoadPlayer(CPlayerCharacter &pc, INDEX i)
 {
   try {
     CTFileName fnm;
-    fnm.PrintF("Players\\Player%d.plr", i);
+    fnm.PrintF("UserData\\Players\\Player%d.plr", i); // [SSE] Userdata folder.
     pc.Load_t(fnm);
   } catch (char *strError) {
     (void) strError;
@@ -1665,6 +1665,14 @@ void CGame::LoadPlayersAndControls( void)
   SavePlayersAndControls();
 }
 
+void SavePlayer_t(CPlayerCharacter &pc, INDEX i)
+{
+  CTFileName fnm;
+  fnm.PrintF("UserData\\Players\\Player%d.plr", i); // [SSE] Userdata folder.
+
+  pc.Save_t(fnm);
+}
+
 /*
  * Saves 8 players and 8 controls
  */
@@ -1673,14 +1681,10 @@ void CGame::SavePlayersAndControls( void)
   try
   {
     // save players
-    gm_apcPlayers[0].Save_t( CTString( "Players\\Player0.plr"));
-    gm_apcPlayers[1].Save_t( CTString( "Players\\Player1.plr"));
-    gm_apcPlayers[2].Save_t( CTString( "Players\\Player2.plr"));
-    gm_apcPlayers[3].Save_t( CTString( "Players\\Player3.plr"));
-    gm_apcPlayers[4].Save_t( CTString( "Players\\Player4.plr"));
-    gm_apcPlayers[5].Save_t( CTString( "Players\\Player5.plr"));
-    gm_apcPlayers[6].Save_t( CTString( "Players\\Player6.plr"));
-    gm_apcPlayers[7].Save_t( CTString( "Players\\Player7.plr"));
+    for (INDEX iPlayer = 0; iPlayer < 8; iPlayer++) {
+      SavePlayer_t(gm_apcPlayers[iPlayer], iPlayer);
+    }
+
     // save controls
     gm_actrlControls[0].Save_t( CTString( "Controls\\Controls0.ctl"));
     gm_actrlControls[1].Save_t( CTString( "Controls\\Controls1.ctl"));
