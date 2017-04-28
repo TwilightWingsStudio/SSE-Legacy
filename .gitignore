@@ -54,10 +54,8 @@ Debug/
 
 # Generated configuration files
 *.plr
-Temp/ConsoleHistory.txt
-Temp/Profile_CSG.txt
-Temp/Profile_Open.txt
-Temp/*.wld
+Temp/*
+!Temp/empty
 *.log
 *.rpt	# crashinfo
 *.gms
@@ -68,6 +66,10 @@ Data/*.bin
 Scripts/PersistentSymbols.ini
 SaveGame/*
 ScreenShots/*
+Content/Coremods/*.gro
+Content/_Custom/*.gro
+UserData/Demos/*
+UserData/SaveGame/*
 
 # Game Resources
 Classes/*
