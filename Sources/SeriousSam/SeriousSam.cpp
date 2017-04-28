@@ -136,7 +136,7 @@ static void PlayDemo(void* pArgs)
 {
   CTString strDemoFilename = *NEXTARGUMENT(CTString*);
   _gmMenuGameMode = GM_DEMO;
-  CTFileName fnDemo = "demos\\" + strDemoFilename + ".dem";
+  CTFileName fnDemo = "UserData\\Demos\\" + strDemoFilename + ".dem"; // [SSE] Userdata Folder
   extern BOOL LSLoadDemo(const CTFileName &fnm);
   LSLoadDemo(fnDemo);
 }

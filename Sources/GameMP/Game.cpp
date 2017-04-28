@@ -1321,8 +1321,9 @@ BOOL CGame::StartDemoPlay(const CTFileName &fnDemo)
 
   CTFileName fnmScript = fnDemo.NoExt()+".ini";
   if (!FileExists(fnmScript)) {
-    fnmScript = CTString("Demos\\Default.ini");
+    fnmScript = CTString("UserData\\Demos\\Default.ini"); // [SSE] Userdata Folder
   }
+
   CTString strCmd;
   strCmd.PrintF("include \"%s\"", (const char*)fnmScript);
   _pShell->Execute(strCmd);
@@ -2620,15 +2621,17 @@ CTFileName CGame::GetQuickSaveName(BOOL bSave)
   CTFileName fnmDir;
   if (GetSP()->sp_ctMaxPlayers==1) {
     INDEX iPlayer = gm_iSinglePlayer;
+
     if (GetSP()->sp_bQuickTest) {
       iPlayer = gm_iWEDSinglePlayer;
     }
-    fnmDir.PrintF("SaveGame\\Player%d\\Quick\\", iPlayer);
+
+    fnmDir.PrintF("UserData\\SaveGame\\Player%d\\Quick\\", iPlayer); // [SSE] Userdata Folder
   } else {
     if (_pNetwork->IsNetworkEnabled()) {
-      fnmDir = CTString("SaveGame\\Network\\Quick\\");
+      fnmDir = CTString("UserData\\SaveGame\\Network\\Quick\\");
     } else {
-      fnmDir = CTString("SaveGame\\SplitScreen\\Quick\\");
+      fnmDir = CTString("UserData\\SaveGame\\SplitScreen\\Quick\\");
     }
   }
   // load last saved number 

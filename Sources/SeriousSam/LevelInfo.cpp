@@ -253,7 +253,7 @@ void LoadDemosList(void)
 
   // list the levels directory with subdirs
   CDynamicStackArray<CTFileName> afnmDir;
-  MakeDirList(afnmDir, CTString("Demos\\"), "Demos\\Auto-*.dem", DLI_RECURSIVE);
+  MakeDirList(afnmDir, CTString("UserData\\Demos\\"), "UserData\\Demos\\Auto-*.dem", DLI_RECURSIVE); // [SSE] Userdata Folder
 
   // for each file in the directory
   for (INDEX i=0; i<afnmDir.Count(); i++) {

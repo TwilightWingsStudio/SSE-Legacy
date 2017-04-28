@@ -609,7 +609,7 @@ void StartSinglePlayerQuickLoadMenu(void)
   gmCurrent.gm_iSortType = LSSORT_FILEDN;
   gmCurrent.gm_bSave = FALSE;
   gmCurrent.gm_bManage = TRUE;
-  gmCurrent.gm_fnmDirectory.PrintF("SaveGame\\Player%d\\Quick\\", _pGame->gm_iSinglePlayer);
+  gmCurrent.gm_fnmDirectory.PrintF("UserData\\SaveGame\\Player%d\\Quick\\", _pGame->gm_iSinglePlayer); // [SSE] Userdata Folder
   gmCurrent.gm_fnmSelected = CTString("");
   gmCurrent.gm_fnmExt = CTString(".sav");
   gmCurrent.gm_pAfterFileChosen = &LSLoadSinglePlayer;
@@ -630,7 +630,7 @@ void StartSinglePlayerLoadMenu(void)
   gmCurrent.gm_iSortType = LSSORT_FILEDN;
   gmCurrent.gm_bSave = FALSE;
   gmCurrent.gm_bManage = TRUE;
-  gmCurrent.gm_fnmDirectory.PrintF("SaveGame\\Player%d\\", _pGame->gm_iSinglePlayer);
+  gmCurrent.gm_fnmDirectory.PrintF("UserData\\SaveGame\\Player%d\\", _pGame->gm_iSinglePlayer); // [SSE] Userdata Folder
   gmCurrent.gm_fnmSelected = CTString("");
   gmCurrent.gm_fnmExt = CTString(".sav");
   gmCurrent.gm_pAfterFileChosen = &LSLoadSinglePlayer;
@@ -659,7 +659,7 @@ void StartSinglePlayerSaveMenu(void)
   gmCurrent.gm_iSortType = LSSORT_FILEDN;
   gmCurrent.gm_bSave = TRUE;
   gmCurrent.gm_bManage = TRUE;
-  gmCurrent.gm_fnmDirectory.PrintF("SaveGame\\Player%d\\", _pGame->gm_iSinglePlayer);
+  gmCurrent.gm_fnmDirectory.PrintF("UserData\\SaveGame\\Player%d\\", _pGame->gm_iSinglePlayer); // [SSE] Userdata Folder
   gmCurrent.gm_fnmSelected = CTString("");
   gmCurrent.gm_fnmBaseName = CTString("SaveGame");
   gmCurrent.gm_fnmExt = CTString(".sav");
@@ -682,7 +682,7 @@ void StartDemoLoadMenu(void)
   gmCurrent.gm_iSortType = LSSORT_FILEDN;
   gmCurrent.gm_bSave = FALSE;
   gmCurrent.gm_bManage = TRUE;
-  gmCurrent.gm_fnmDirectory = CTString("Demos\\");
+  gmCurrent.gm_fnmDirectory = CTString("UserData\\Demos\\"); // [SSE] Userdata Folder
   gmCurrent.gm_fnmSelected = CTString("");
   gmCurrent.gm_fnmExt = CTString(".dem");
   gmCurrent.gm_pAfterFileChosen = &LSLoadDemo;
@@ -704,7 +704,7 @@ void StartDemoSaveMenu(void)
   gmCurrent.gm_iSortType = LSSORT_FILEUP;
   gmCurrent.gm_bSave = TRUE;
   gmCurrent.gm_bManage = TRUE;
-  gmCurrent.gm_fnmDirectory = CTString("Demos\\");
+  gmCurrent.gm_fnmDirectory = CTString("UserData\\Demos\\"); // [SSE] Userdata Folder
   gmCurrent.gm_fnmSelected = CTString("");
   gmCurrent.gm_fnmBaseName = CTString("Demo");
   gmCurrent.gm_fnmExt = CTString(".dem");
@@ -727,7 +727,7 @@ void StartNetworkQuickLoadMenu(void)
   gmCurrent.gm_iSortType = LSSORT_FILEDN;
   gmCurrent.gm_bSave = FALSE;
   gmCurrent.gm_bManage = TRUE;
-  gmCurrent.gm_fnmDirectory = CTString("SaveGame\\Network\\Quick\\");
+  gmCurrent.gm_fnmDirectory = CTString("UserData\\SaveGame\\Network\\Quick\\"); // [SSE] Userdata Folder
   gmCurrent.gm_fnmSelected = CTString("");
   gmCurrent.gm_fnmExt = CTString(".sav");
   gmCurrent.gm_pAfterFileChosen = &LSLoadNetwork;
@@ -748,7 +748,7 @@ void StartNetworkLoadMenu(void)
   gmCurrent.gm_iSortType = LSSORT_FILEDN;
   gmCurrent.gm_bSave = FALSE;
   gmCurrent.gm_bManage = TRUE;
-  gmCurrent.gm_fnmDirectory = CTString("SaveGame\\Network\\");
+  gmCurrent.gm_fnmDirectory = CTString("UserData\\SaveGame\\Network\\"); // [SSE] Userdata Folder
   gmCurrent.gm_fnmSelected = CTString("");
   gmCurrent.gm_fnmExt = CTString(".sav");
   gmCurrent.gm_pAfterFileChosen = &LSLoadNetwork;
@@ -770,7 +770,7 @@ void StartNetworkSaveMenu(void)
   gmCurrent.gm_iSortType = LSSORT_FILEDN;
   gmCurrent.gm_bSave = TRUE;
   gmCurrent.gm_bManage = TRUE;
-  gmCurrent.gm_fnmDirectory = CTString("SaveGame\\Network\\");
+  gmCurrent.gm_fnmDirectory = CTString("UserData\\SaveGame\\Network\\"); // [SSE] Userdata Folder
   gmCurrent.gm_fnmSelected = CTString("");
   gmCurrent.gm_fnmBaseName = CTString("SaveGame");
   gmCurrent.gm_fnmExt = CTString(".sav");
@@ -793,7 +793,7 @@ void StartSplitScreenQuickLoadMenu(void)
   gmCurrent.gm_iSortType = LSSORT_FILEDN;
   gmCurrent.gm_bSave = FALSE;
   gmCurrent.gm_bManage = TRUE;
-  gmCurrent.gm_fnmDirectory = CTString("SaveGame\\SplitScreen\\Quick\\");
+  gmCurrent.gm_fnmDirectory = CTString("UserData\\SaveGame\\SplitScreen\\Quick\\"); // [SSE] Userdata Folder
   gmCurrent.gm_fnmSelected = CTString("");
   gmCurrent.gm_fnmExt = CTString(".sav");
   gmCurrent.gm_pAfterFileChosen = &LSLoadSplitScreen;
@@ -814,7 +814,7 @@ void StartSplitScreenLoadMenu(void)
   gmCurrent.gm_iSortType = LSSORT_FILEDN;
   gmCurrent.gm_bSave = FALSE;
   gmCurrent.gm_bManage = TRUE;
-  gmCurrent.gm_fnmDirectory = CTString("SaveGame\\SplitScreen\\");
+  gmCurrent.gm_fnmDirectory = CTString("UserData\\SaveGame\\SplitScreen\\"); // [SSE] Userdata Folder
   gmCurrent.gm_fnmSelected = CTString("");
   gmCurrent.gm_fnmExt = CTString(".sav");
   gmCurrent.gm_pAfterFileChosen = &LSLoadSplitScreen;
@@ -836,7 +836,7 @@ void StartSplitScreenSaveMenu(void)
   gmCurrent.gm_iSortType = LSSORT_FILEDN;
   gmCurrent.gm_bSave = TRUE;
   gmCurrent.gm_bManage = TRUE;
-  gmCurrent.gm_fnmDirectory = CTString("SaveGame\\SplitScreen\\");
+  gmCurrent.gm_fnmDirectory = CTString("UserData\\SaveGame\\SplitScreen\\"); // [SSE] Userdata Folder
   gmCurrent.gm_fnmSelected = CTString("");
   gmCurrent.gm_fnmBaseName = CTString("SaveGame");
   gmCurrent.gm_fnmExt = CTString(".sav");
