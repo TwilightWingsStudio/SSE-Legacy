@@ -2615,7 +2615,7 @@ void CModelerView::OnTakeScreenShoot()
 
   CTFileName fnSSFileName = _EngineGUI.FileRequester( "Select name for screen shot",
                             FILTER_TGA FILTER_END, "Take screen shoots directory",
-                            "ScreenShots\\", "", NULL, FALSE);
+                            "UserData\\ScreenShots\\", "", NULL, FALSE); // [SSE] Userdata Folder
   if( fnSSFileName == "") return;
 
   CWaitCursor StartWaitCursor;

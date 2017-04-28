@@ -303,7 +303,7 @@ static void SayFromTo(void* pArgs)
 static CTFileName MakeScreenShotName(void)
 {
   // create base name from the world name
-  CTFileName fnmBase = CTString("ScreenShots\\")+_pNetwork->GetCurrentWorld().FileName();
+  CTFileName fnmBase = CTString("UserData\\ScreenShots\\")+_pNetwork->GetCurrentWorld().FileName(); // [SSE] Userdata Folder
 
   // start at counter of zero
   INDEX iShot = 0;
@@ -2405,7 +2405,7 @@ void CGame::GameRedrawView( CDrawPort *pdpDrawPort, ULONG ulFlags)
     // make the screen shot directory if it doesn't already exist
     bSaveScreenShot = FALSE;
     CTFileName fnmExpanded;
-    ExpandFilePath(EFP_WRITE, CTString("ScreenShots"), fnmExpanded);
+    ExpandFilePath(EFP_WRITE, CTString("UserData\\ScreenShots"), fnmExpanded); // [SSE] Userdata Folder
     _mkdir(fnmExpanded);
 
     // create a name for screenshot
@@ -2416,7 +2416,7 @@ void CGame::GameRedrawView( CDrawPort *pdpDrawPort, ULONG ulFlags)
       // create number for the file
       CTString strNumber;
       strNumber.PrintF("%05d", (INDEX)dem_iAnimFrame);
-      fnmScreenShot = CTString("ScreenShots\\Anim_")+strNumber+".tga";
+      fnmScreenShot = CTString("UserData\\ScreenShots\\Anim_")+strNumber+".tga"; // [SSE] Userdata Folder
       dem_iAnimFrame+=1;
     }
     // grab screen creating image info

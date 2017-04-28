@@ -5737,7 +5737,7 @@ void CWorldEditorView::OnTakeSs()
   CTFileName fnDocName = CTString( CStringA(GetDocument()->GetPathName()));
   CTFileName fnScreenShoot =  _EngineGUI.FileRequester(
     "Choose file name for screen shoot", FILTER_TGA FILTER_ALL FILTER_END, KEY_NAME_SCREEN_SHOT_DIR,
-    "ScreenShots\\", fnDocName.FileName()+"xx"+".tga", NULL, FALSE);
+    "UserData\\ScreenShots\\", fnDocName.FileName()+"xx"+".tga", NULL, FALSE); // [SSE] Userdata Folder
   if( fnScreenShoot == "") return;
 
   // try to
