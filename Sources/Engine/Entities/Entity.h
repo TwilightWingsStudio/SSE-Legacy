@@ -669,9 +669,16 @@ public:
     return en_ulFlags&ENF_ALIVE;
   }
 
+  // [SSE] Extended Engine API
   inline BOOL IsDead(void) const
   {
     return !(en_ulFlags&ENF_ALIVE);
+  }
+  
+  // [SSE] Extended Engine API
+  virtual BOOL IsLiveEntity()
+  {
+    return FALSE;
   }
   
   // [SSE] Network Update
@@ -767,6 +774,12 @@ public:
   virtual FLOAT GetArmor(void) const { return 0.0F; };
   virtual FLOAT GetShields(void) const { return 0.0F; };
   virtual INDEX GetLevel(void) const { return 0; };
+  
+  // [SSE] Extended Engine API
+  virtual BOOL IsLiveEntity()
+  {
+    return TRUE;
+  }
 
   // apply some damage to the entity (see event EDamage for more info)
   virtual void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
