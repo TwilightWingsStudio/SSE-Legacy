@@ -3385,6 +3385,10 @@ void CEntity::Read_t( CTStream *istr) // throw char *
            >>en_ulSpawnFlags
            >>en_ulFlags;
   } else {
+    #ifndef NDEBUG
+    CPrintF("[DBG] Entity #%d at %d without ENT2, ENT3, ENT4 or other header! It is potential reason of loading error!\n", en_ulID, istr->GetPos_t()); // [SSE]
+    #endif
+
     (*istr)>>(ULONG &)en_RenderType
            >>en_ulPhysicsFlags
            >>en_ulCollisionFlags
