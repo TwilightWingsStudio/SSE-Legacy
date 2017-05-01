@@ -19,6 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "EntitiesMP/BackgroundViewer.h"
 #include "EntitiesMP/WorldSettingsController.h"
 // for error checking:
+#include "EntitiesMP/EnemySpawner.h"
 #include "EntitiesMP/SoundHolder.h"
 %}
 
@@ -42,6 +43,41 @@ EntityStats *FindStats(const CTString &strName)
     }
   }}
   return NULL;
+}
+
+// [SSE] Map Debug Tools
+static void DoSpawnersSafetyCheck(void)
+{
+  // get the world pointer
+  CWorld *pwo = (CWorld *)_pShell->GetINDEX("pwoCurrentWorld");
+  // if there is no current world
+  if (pwo==NULL) {
+    CPrintF("No current world.\n");
+    return;
+  }
+  
+  BOOL bAnySpawner = FALSE;
+  
+  FOREACHINDYNAMICCONTAINER(pwo->wo_cenEntities, CEntity, iten)
+  {
+    CEntity *pen = iten;
+    
+    if (IsOfClass(pen, "Enemy Spawner"))
+    {
+      CEnemySpawner *penSpawner = static_cast<CEnemySpawner*>(pen);
+      
+      if (penSpawner->m_ctTotal > 0)
+      {
+        FLOAT3D vPos = penSpawner->GetPlacement().pl_PositionVector;
+        CPrintF("  enemy spawner '%s' at (%2.2f, %2.2f, %2.2f) has %d enemy(es) left\n", penSpawner->m_strName, vPos(1), vPos(2), vPos(3), penSpawner->m_ctTotal);
+        bAnySpawner = TRUE;
+      }
+    }
+  }
+  
+  if (!bAnySpawner) {
+    CPrintF("  No any spawners left!\n");
+  }
 }
 
 static void MakeWorldStatistics(void)
@@ -708,6 +744,7 @@ void CWorldBase_OnWorldInit(CWorld *pwo)
   _pShell->DeclareSymbol("user void MakeWorldStatistics(void);",  &MakeWorldStatistics);
   _pShell->DeclareSymbol("user void ReoptimizeAllBrushes(void);", &ReoptimizeAllBrushes);
   _pShell->DeclareSymbol("user void DoLevelSafetyChecks(void);", &DoLevelSafetyChecks);
+  _pShell->DeclareSymbol("user void DoSpawnersSafetyCheck(void);", &DoSpawnersSafetyCheck); // [SSE] Map Debug Tools
 }
 
 void CWorldBase_OnWorldRender(CWorld *pwo)
