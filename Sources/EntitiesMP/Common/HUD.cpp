@@ -962,6 +962,45 @@ static void HUD_DrawDebugMonitor()
   strReport.PrintF("%sEESPP: %.2f\n", strReport, fExtraStrengthPerPlayer);
   strReport.PrintF("%sDamage Mul: %.2f\n", strReport, GetGameDamageMultiplier());
   
+  strReport += "\n\n";
+  strReport += "^r[^cFFFFFFEnemies^r]^cCCCC00\n";
+  
+  INDEX ctAliveEnemies = 0;
+  INDEX ctAliveBosses = 0;
+  INDEX ctDeadEnemies = 0;
+  INDEX ctTemplateEnemies = 0;
+  
+  FOREACHINDYNAMICCONTAINER(((CEntity&)*_penPlayer).GetWorld()->wo_cenEntities, CEntity, iten)
+  {
+    CEntity *pen = iten;
+    
+    if (pen == NULL) continue;
+    
+    if (pen->IsLiveEntity() && IsDerivedFromClass(pen, "Enemy Base")) {
+      CEnemyBase *penEnemy = static_cast<CEnemyBase *>(pen);
+
+      if (penEnemy->m_bTemplate) {
+        ctTemplateEnemies++;
+        continue;
+      }
+      
+      if (penEnemy->IsDead()) {
+        ctDeadEnemies++;
+      } else {
+        ctAliveEnemies++;
+
+        if (penEnemy->m_bBoss) {
+          ctAliveBosses++;
+        }
+      }
+    }
+  }
+  
+  strReport.PrintF("%sAlive:      %04d\n", strReport, ctAliveEnemies);
+  strReport.PrintF("%sAl. Bosses: %04d\n", strReport, ctAliveBosses);
+  strReport.PrintF("%sDead:       %04d\n", strReport, ctDeadEnemies);
+  strReport.PrintF("%sTemplate:   %04d\n", strReport, ctTemplateEnemies);
+
   _pDP->SetFont( _pfdConsoleFont);
   _pDP->SetTextAspect( 1.0f);
   _pDP->SetTextScaling(1.0f);
@@ -1077,7 +1116,13 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   const BOOL bSharedLives = GetSP()->sp_bSharedLives;
 
   _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
-  
+
+  // draw sniper mask (original mask even if snooping)
+  if (((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_iCurrentWeapon == WEAPON_SNIPER && ((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_bSniping && hud_bSniperScopeDraw)
+  {
+    HUD_DrawSniperMask();
+  }
+
   FLOAT fValue = 0.0F;
 
   _pfdDisplayFont->SetVariableWidth();
@@ -1475,6 +1520,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   }
 
   // Ammo dock.
+  if (!GetSP()->sp_bInfiniteAmmo)
   {
     PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
     
@@ -1608,15 +1654,14 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
   }
 
   // draw sniper mask (original mask even if snooping)
-  if (((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_iCurrentWeapon == WEAPON_SNIPER
-    && ((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_bSniping && hud_bSniperScopeDraw) {
+  if (((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_iCurrentWeapon == WEAPON_SNIPER && ((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_bSniping && hud_bSniperScopeDraw)
+  {
     HUD_DrawSniperMask();
   }
 
   // prepare font and text dimensions
   CTString strValue;
   PIX pixCharWidth;
-  FLOAT fValue, fNormValue, fCol, fRow;
   _pDP->SetFont( &_fdNumbersFont);
   pixCharWidth = _fdNumbersFont.GetWidth() + _fdNumbersFont.GetCharSpacing() +1;
   FLOAT fChrUnit = pixCharWidth * _fCustomScaling;
@@ -1625,11 +1670,13 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
   const PIX pixLeftBound   = 6;
   const PIX pixBottomBound = (480 * _pDP->dp_fWideAdjustment) -pixTopBound;
   const PIX pixRightBound  = 640-pixLeftBound;
+
   FLOAT fOneUnit  = (32+0) * _fCustomScaling;  // unit size
   FLOAT fAdvUnit  = (32+4) * _fCustomScaling;  // unit advancer
   FLOAT fNextUnit = (32+8) * _fCustomScaling;  // unit advancer
   FLOAT fHalfUnit = fOneUnit * 0.5f;
-  FLOAT fMoverX, fMoverY;
+
+  FLOAT fValue = 0.0F;
 
   // Health
   {
@@ -1727,115 +1774,117 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
   CTextureObject *ptoWantedWeapon = NULL;
   ptoWantedWeapon  = _awiWeapons[iWantedWeapon].wi_ptoWeapon;
   
-  // display all ammo infos
-  INDEX i;
-  FLOAT fAdv;
-  COLOR colIcon, colBar;
-  PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
-  // reduce the size of icon slightly
-  _fCustomScaling = ClampDn( _fCustomScaling*0.8f, 0.5f);
-  const FLOAT fOneUnitS  = fOneUnit  * 0.8f;
-  const FLOAT fAdvUnitS  = fAdvUnit  * 0.8f;
-  const FLOAT fNextUnitS = fNextUnit * 0.8f;
-  const FLOAT fHalfUnitS = fHalfUnit * 0.8f;
-
-  // prepare postition and ammo quantities
-  fRow = pixBottomBound-fHalfUnitS;
-  fCol = pixRightBound -fHalfUnitS;
-  const FLOAT fBarPos = fHalfUnitS * 0.7f;
   FillWeaponAmmoTables();
 
-  FLOAT fBombCount = penPlayerCurrent->m_iSeriousBombCount;
-  BOOL  bBombFiring = FALSE;
-  // draw serious bomb
-#define BOMB_FIRE_TIME 1.5f
-  if (penPlayerCurrent->m_tmSeriousBombFired+BOMB_FIRE_TIME>_pTimer->GetLerpedCurrentTick()) {
-    fBombCount++;
-    if (fBombCount>3) { fBombCount = 3; }
-    bBombFiring = TRUE;
-  }
-
-  if (fBombCount > 0) {
-    fNormValue = (FLOAT) fBombCount / 3.0f;
-    COLOR colBombBorder = _colHUD;
-    COLOR colBombIcon = C_WHITE;
-    COLOR colBombBar = _colHUDText;
-    
-    if (fBombCount == 1) {
-      colBombBar = C_RED;
-    }
-
-    if (bBombFiring) {
-      FLOAT fFactor = (_pTimer->GetLerpedCurrentTick() - penPlayerCurrent->m_tmSeriousBombFired)/BOMB_FIRE_TIME;
-      colBombBorder = LerpColor(colBombBorder, C_RED, fFactor);
-      colBombIcon = LerpColor(colBombIcon, C_RED, fFactor);
-      colBombBar = LerpColor(colBombBar, C_RED, fFactor);
-    }
-
-    HUD_DrawBorder( fCol,         fRow, fOneUnitS, fOneUnitS, colBombBorder);
-    HUD_DrawIcon(   fCol,         fRow, _toASeriousBomb, colBombIcon, fNormValue, FALSE, 32, 32);
-    HUD_DrawBar(    fCol+fBarPos, fRow, fOneUnitS/5, fOneUnitS-2, BO_DOWN, colBombBar, fNormValue);
-    // make space for serious bomb
-    fCol -= fAdvUnitS;
-  }
-
-  // loop thru all ammo types
+  // Ammo dock.
   if (!GetSP()->sp_bInfiniteAmmo)
   {
-    for (INDEX ii = 7; ii>=0; ii--)
+    PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+    
+    FLOAT fNormValue = 0.0F;
+    
+    INDEX iCol = 0;
+
+    for (INDEX i = 8; i >= 0; i--)
     {
-      i = aiAmmoRemap[ii];
+      CTextureObject *ptoAmmo = &_toASeriousBomb;
       
-      AmmoInfo &ai = _aaiAmmo[i];
+      INDEX ii = 8 - i;
       
-      // if no ammo and hasn't got that weapon - just skip this ammo // [SSE] Or if you don't want to see empty ammo types.
-      if (ai.ai_iAmmoAmmount <= 0 && (!ai.ai_bHasWeapon || !hud_bShowEmptyAmmoInList)) continue;
+      COLOR colIcon = C_WHITE;
+      COLOR colBorder = _colHUD;
+      COLOR colBar = NONE;
 
-      // display ammo info
-      colIcon = C_WHITE /*_colHUD*/;
-      if (ptoCurrentAmmo == ai.ai_ptoAmmo) colIcon = C_WHITE;
-      if (ai.ai_iAmmoAmmount <= 0) colIcon = C_mdGRAY;
+      if (i < 8)
+      {
+        ii = aiAmmoRemap[i];
+        
+        
+        AmmoInfo &ai = _aaiAmmo[i];
+        
+        // if no ammo and hasn't got that weapon - just skip this ammo // [SSE] Or if you don't want to see empty ammo types.
+        if (ai.ai_iAmmoAmmount <= 0 && (!ai.ai_bHasWeapon || !hud_bShowEmptyAmmoInList)) continue;
 
-      fNormValue = (FLOAT)ai.ai_iAmmoAmmount / ai.ai_iMaxAmmoAmmount;
-      colBar = AddShaker( 4, ai.ai_iAmmoAmmount, ai.ai_iLastAmmoAmmount, ai.ai_tmAmmoChanged, fMoverX, fMoverY);
-      HUD_DrawBorder( fCol,         fRow+fMoverY, fOneUnitS, fOneUnitS, colBorder);
-      HUD_DrawIcon(   fCol,         fRow+fMoverY, *_aaiAmmo[i].ai_ptoAmmo, colIcon, fNormValue, FALSE, 32, 32);
-      HUD_DrawBar(    fCol+fBarPos, fRow+fMoverY, fOneUnitS/5, fOneUnitS-2, BO_DOWN, colBar, fNormValue);
-      // advance to next position
-      fCol -= fAdvUnitS;
-    }
-  }
+        if (ai.ai_iAmmoAmmount <= 0) colIcon = C_mdGRAY;
+        
+        fNormValue = (FLOAT)ai.ai_iAmmoAmmount / ai.ai_iMaxAmmoAmmount;
+        
+        ptoAmmo = _aaiAmmo[i].ai_ptoAmmo;
 
-  // draw powerup(s) if needed
-  PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.66f, 0.33f, FALSE);
-  TIME *ptmPowerups = (TIME*)&_penPlayer->m_tmInvisibility;
-  TIME *ptmPowerupsMax = (TIME*)&_penPlayer->m_tmInvisibilityMax;
-  fRow = pixBottomBound-fOneUnitS-fAdvUnitS;
-  fCol = pixRightBound -fHalfUnitS;
+      } else {
+        INDEX iBombCount = penPlayerCurrent->m_iSeriousBombCount;
+        
+        #define BOMB_FIRE_TIME 1.5f
+        BOOL  bBombFiring = penPlayerCurrent->m_tmSeriousBombFired + BOMB_FIRE_TIME > _pTimer->GetLerpedCurrentTick();
+        
+        if (bBombFiring) {
+          iBombCount++;
+          iBombCount = ClampUp(iBombCount, INDEX(3));
+          
+          FLOAT fFactor = (_pTimer->GetLerpedCurrentTick() - penPlayerCurrent->m_tmSeriousBombFired) / BOMB_FIRE_TIME;
+          colBorder = LerpColor(colBorder, C_RED, fFactor);
+          colIcon = LerpColor(colIcon, C_RED, fFactor);
+          colBar = LerpColor(colBar, C_RED, fFactor) | _ulAlphaHUD;
+        }
 
-  for (i=0; i<MAX_POWERUPS; i++)
-  {
-    // skip if not active
-    const TIME tmDelta = ptmPowerups[i] - _tmNow;
-    if (tmDelta<=0) continue;
-    fNormValue = tmDelta / ptmPowerupsMax[i];
-    // draw icon and a little bar
-    HUD_DrawBorder( fCol,         fRow, fOneUnitS, fOneUnitS, colBorder);
-    HUD_DrawIcon(   fCol,         fRow, _atoPowerups[i], C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
-    HUD_DrawBar(    fCol+fBarPos, fRow, fOneUnitS/5, fOneUnitS-2, BO_DOWN, NONE, fNormValue);
-    // play sound if icon is flashing
-    if (fNormValue<=(_cttHUD.ctt_fLowMedium/2)) {
-      // activate blinking only if value is <= half the low edge
-      INDEX iLastTime = (INDEX)(_tmLast*4);
-      INDEX iCurrentTime = (INDEX)(_tmNow*4);
-      if (iCurrentTime&1 & !(iLastTime&1)) {
-        ((CPlayer *)penPlayerCurrent)->PlayPowerUpSound();
+        fNormValue = iBombCount / 3.0F;
+
+        if (fNormValue <= 0) {
+          continue;
+        }
       }
+
+      HUD_DrawAnchoredRect( 8 + (24 + 3) * iCol, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchroredIcon( 8 + (24 + 3) * iCol, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, *ptoAmmo, colIcon|CT_OPAQUE, 1.0F, TRUE); // Icon
+      
+      HUD_DrawAnchoredBar( 8 + (24 + 3) * iCol, 8, 4, 24, EHHAT_RIGHT, EHVAT_BOT, BO_DOWN, colBar, fNormValue);
+      
+      HUD_DrawAnchoredRectOutline(8 + (24 + 3) * iCol, 8, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+      
+      iCol++;
     }
-    // advance to next position
-    fCol -= fAdvUnitS;
   }
 
+  // PowerUps dock.
+  {
+    PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.66f, 0.33f, FALSE);
+    
+    TIME *ptmPowerups = (TIME*)&_penPlayer->m_tmInvisibility;
+    TIME *ptmPowerupsMax = (TIME*)&_penPlayer->m_tmInvisibilityMax;
+	
+    INDEX iCol = 0;
+
+    for (INDEX i = 0; i < 4; i++)
+    {
+      INDEX ii = 3 - i;
+      
+      // skip if not active
+      const TIME tmDelta = ptmPowerups[ii] - _tmNow;
+      if (tmDelta <= 0) continue;
+
+      FLOAT fNormValue = tmDelta / ptmPowerupsMax[ii];
+      HUD_DrawAnchoredRect (8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchroredIcon(8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _atoPowerups[ii], C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
+      
+      HUD_DrawAnchoredBar(8 + (24 + 3) * iCol, 48, 4, 24, EHHAT_RIGHT, EHVAT_BOT, BO_DOWN, NONE, fNormValue);
+      
+      HUD_DrawAnchoredRectOutline(8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+	  
+      // Play sound if icon is flashing.
+      if (fNormValue<=(_cttHUD.ctt_fLowMedium/2))
+      {
+        // activate blinking only if value is <= half the low edge
+        INDEX iLastTime = (INDEX)(_tmLast * 4);
+        INDEX iCurrentTime = (INDEX)(_tmNow * 4);
+
+        if (iCurrentTime&1 & !(iLastTime&1)) {
+          ((CPlayer *)penPlayerCurrent)->PlayPowerUpSound();
+        }
+      }
+
+      iCol++;
+    }
+  }
 
   // if weapon change is in progress
   _fCustomScaling = hud_fScaling;
@@ -1891,73 +1940,66 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       fHorOffset += 32 + 4;
     }
   }
-
-  // reduce icon sizes a bit
-  const FLOAT fUpperSize = ClampDn(_fCustomScaling*0.5f, 0.5f)/_fCustomScaling;
-  _fCustomScaling*=fUpperSize;
-  ASSERT( _fCustomScaling>=0.5f);
-  fChrUnit  *= fUpperSize;
-  fOneUnit  *= fUpperSize;
-  fHalfUnit *= fUpperSize;
-  fAdvUnit  *= fUpperSize;
-  fNextUnit *= fUpperSize;
-
   
-  BOOL bOxygenOnScreen = FALSE;
-  const TIME tmMaxHoldBreath = _penPlayer->en_tmMaxHoldBreath;
-  
-  if (tmMaxHoldBreath > 0.0F)
+  // BossBar
+  if (_penPlayer->m_penMainMusicHolder != NULL)
   {
-    fValue = tmMaxHoldBreath - (_pTimer->CurrentTick() - _penPlayer->en_tmLastBreathed);
-
-    if (_penPlayer->IsConnected() && (_penPlayer->GetFlags()&ENF_ALIVE) && fValue < (tmMaxHoldBreath - 1.0F)) {
-      // prepare and draw oxygen info
-      fRow = pixTopBound + fOneUnit + fNextUnit;
-      fCol = 280.0f;
-      fAdv = fAdvUnit + fOneUnit*4/2 - fHalfUnit;
-      PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
-      fNormValue = fValue / tmMaxHoldBreath;
-      fNormValue = ClampDn(fNormValue, 0.0f);
-
-      HUD_DrawBorder( fCol,      fRow, fOneUnit,         fOneUnit, colBorder);
-      HUD_DrawBorder( fCol+fAdv, fRow, fOneUnit*4,       fOneUnit, colBorder);
-      HUD_DrawBar(    fCol+fAdv, fRow, fOneUnit*4*0.975, fOneUnit*0.9375, BO_LEFT, NONE, fNormValue);
-      HUD_DrawIcon(   fCol,      fRow, _toOxygen, C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
-      bOxygenOnScreen = TRUE;
-    }
-  }
-
-  // draw boss energy if needed
-  if (_penPlayer->m_penMainMusicHolder!=NULL) {
+    FLOAT fNormValue = 0.0F;
+    
     CMusicHolder &mh = (CMusicHolder&)*_penPlayer->m_penMainMusicHolder;
     fNormValue = 0;
 
-    if (mh.m_penBoss!=NULL && (mh.m_penBoss->en_ulFlags&ENF_ALIVE)) {
+    if (mh.m_penBoss != NULL && (mh.m_penBoss->en_ulFlags&ENF_ALIVE)) {
       CEnemyBase &eb = (CEnemyBase&)*mh.m_penBoss;
       ASSERT( eb.m_fMaxHealth>0);
       fValue = eb.GetHealth();
       fNormValue = fValue/eb.m_fMaxHealth;
     }
-    if (mh.m_penCounter!=NULL) {
+
+    if (mh.m_penCounter != NULL) {
       CEnemyCounter &ec = (CEnemyCounter&)*mh.m_penCounter;
       if (ec.m_iCount>0) {
         fValue = ec.m_iCount;
         fNormValue = fValue/ec.m_iCountFrom;
       }
     }
-    if (fNormValue>0) {
-      // prepare and draw boss energy info
-      //PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
-      PrepareColorTransitions( colMax, colMax, colTop, C_RED, 0.5f, 0.25f, FALSE);
 
-      fRow = pixTopBound + fOneUnit + fNextUnit;
-      fCol = 184.0f;
-      fAdv = fAdvUnit+ fOneUnit*16/2 -fHalfUnit;
-      if (bOxygenOnScreen) fRow += fNextUnit;
-      HUD_DrawBorder( fCol,      fRow, fOneUnit,          fOneUnit, colBorder);
-      HUD_DrawBorder( fCol+fAdv, fRow, fOneUnit*16,       fOneUnit, colBorder);
-      HUD_DrawBar(    fCol+fAdv, fRow, fOneUnit*16*0.995, fOneUnit*0.9375, BO_LEFT, NONE, fNormValue);
-      HUD_DrawIcon(   fCol,      fRow, _toHealth, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
+    if (fNormValue > 0)
+    {
+      PrepareColorTransitions( colMax, colMax, colTop, C_RED, 0.5f, 0.25f, FALSE); // prepare and draw boss energy info
+
+      HUD_DrawAnchoredRect( -130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchroredIcon(-130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toHealth, C_WHITE|CT_OPAQUE, 1.0F, FALSE);
+      HUD_DrawAnchoredRect(   10, 48, 256, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      
+      HUD_DrawAnchoredBar(10, 48, 256, 16, EHHAT_CENTER, EHVAT_TOP, BO_LEFT, NONE, fNormValue);
+
+      HUD_DrawAnchoredRectOutline(-130, 48,  16, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+      HUD_DrawAnchoredRectOutline(  10, 48, 256, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+    }
+  }
+
+  const TIME tmMaxHoldBreath = _penPlayer->en_tmMaxHoldBreath;
+  
+  // Oxygen
+  if (tmMaxHoldBreath > 0.0F)
+  {
+    FLOAT fValue = tmMaxHoldBreath - (_pTimer->CurrentTick() - _penPlayer->en_tmLastBreathed);
+
+    if (_penPlayer->IsConnected() && (_penPlayer->GetFlags()&ENF_ALIVE) && fValue < (tmMaxHoldBreath - 1.0F))
+    {
+      PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+      FLOAT fNormValue = fValue / tmMaxHoldBreath;
+      fNormValue = ClampDn(fNormValue, 0.0f);
+      
+      HUD_DrawAnchoredRect (-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchoredRect ( 10, 68, 64, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchroredIcon(-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toOxygen, C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
+      
+      HUD_DrawAnchoredBar(10, 68, 64, 16, EHHAT_CENTER, EHVAT_TOP, BO_LEFT, NONE, fNormValue);
+      
+      HUD_DrawAnchoredRectOutline(-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+      HUD_DrawAnchoredRectOutline( 10, 68, 64, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     }
   }
 
@@ -2378,8 +2420,8 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   }
 
   // draw sniper mask (original mask even if snooping)
-  if (((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_iCurrentWeapon == WEAPON_SNIPER
-    && ((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_bSniping && hud_bSniperScopeDraw) {
+  if (((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_iCurrentWeapon == WEAPON_SNIPER && ((CPlayerWeapons*)&*penPlayerOwner->m_penWeapons)->m_bSniping && hud_bSniperScopeDraw)
+  {
     HUD_DrawSniperMask();
   }
 
