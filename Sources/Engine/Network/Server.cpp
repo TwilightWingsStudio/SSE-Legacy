@@ -1633,6 +1633,19 @@ void CServer::Handle(INDEX iClient, CNetworkMessage &nmMessage)
       ulTo = -1;
     }
 
+    // [SSE] Netcode Update - SayFromTo exploit fix.
+    if (ulFrom == 0) {
+      for(INDEX ipl = 0; ipl < srv_aplbPlayers.Count(); ipl++)
+      {
+        CPlayerBuffer &plb = srv_aplbPlayers[ipl];
+
+        if (plb.IsActive() && plb.plb_iClient == iClient) {
+          ulFrom |= 1UL << ipl;
+          break;
+        }
+      }
+    }
+
     // make the outgoing message
     CNetworkMessage nmOut(MSG_CHAT_OUT);
     nmOut<<ulFrom;
