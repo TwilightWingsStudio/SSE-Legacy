@@ -302,7 +302,7 @@ void CServer::Start_t(void)
 /*
  * Send disconnect message to some node.
  */
-void CServer::SendDisconnectMessage(INDEX iClient, const char *strExplanation, BOOL bStream)
+void CServer::SendDisconnectMessage(INDEX iClient, const char *strExplanation, BOOL bStream, BOOL bReportDisconnect)
 {
   CSessionSocket &sso = srv_assoSessions[iClient];
 
@@ -320,9 +320,12 @@ void CServer::SendDisconnectMessage(INDEX iClient, const char *strExplanation, B
     // send the stream to the remote session state
     _pNetwork->SendToClientReliable(iClient, strmDisconnect);
   }
-  // report that it has gone away
-  CPrintF(TRANS("Client '%s' ordered to disconnect: %s\n"), 
-    _cmiComm.Server_GetClientName(iClient), strExplanation);
+
+  if (bReportDisconnect) {
+    CPrintF(TRANS("Client '%s' ordered to disconnect: %s\n"), 
+      _cmiComm.Server_GetClientName(iClient), strExplanation); // report that it has gone away
+  }
+    
   // if not disconnected before
   if (sso.sso_iDisconnectedState==0) {
     // mark the disconnection
@@ -891,9 +894,8 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
   // find session of this client
   CSessionSocket &sso = srv_assoSessions[iClient];
   
-  // if the IP is banned
+  // if the IP is banned then disconnect the client.
   if (!MatchesBanMask(_cmiComm.Server_GetClientName(iClient), ser_strIPMask) != !ser_bInverseBanning) {
-    // disconnect the client
     SendDisconnectMessage(iClient, TRANS("You are banned from this server"), /*bStream=*/TRUE);
     return;
   }
@@ -907,15 +909,22 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
     iMajor = 109;
     iMinor = 1;
   }
-  // if wrong
-  if (iMajor != _SE_BUILD_MAJOR || iMinor != _SE_BUILD_MINOR) {
-    // disconnect the client
+  
+  // [SSE] Netcode Update
+  extern INDEX ser_bReportJoinAttemptsMod;
+  extern INDEX ser_bReportJoinAttemptsVersion;
+  //
+  
+  // if wrong version then disconnect the client
+  if (iMajor != _SE_BUILD_MAJOR || iMinor != _SE_BUILD_MINOR)
+  {
     CTString strExplanation;
     strExplanation.PrintF(TRANS(
       "This server runs version %d.%d, your version is %d.%d.\n"
       "Please visit http://www.croteam.com for information on version updating."),
       _SE_BUILD_MAJOR, _SE_BUILD_MINOR, iMajor, iMinor);
-    SendDisconnectMessage(iClient, strExplanation, /*bStream=*/TRUE);
+
+    SendDisconnectMessage(iClient, strExplanation, /*bStream=*/TRUE, ser_bReportJoinAttemptsVersion);
     return;
   }
   
@@ -932,21 +941,23 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
   nm>>strGivenMod>>strGivenPassword;
   INDEX ctWantedLocalPlayers;
   nm>>ctWantedLocalPlayers;
-  // if wrong mod
+
+  // if wrong mod then disconnect the client
   if (_strModName!=strGivenMod) {
-    // disconnect the client
     // NOTE: DO NOT TRANSLATE THIS STRING!
     CTString strMod(0, "MOD:%s\\%s", _strModName, _strModURL);
-    SendDisconnectMessage(iClient, strMod, /*bStream=*/TRUE);
+    SendDisconnectMessage(iClient, strMod, /*bStream=*/TRUE, ser_bReportJoinAttemptsMod);
     return;
   }
 
   // get counts of allowed players, clients, vips and  check for connection allowance
   INDEX ctMaxAllowedPlayers = _pNetwork->ga_sesSessionState.ses_ctMaxPlayers;
   INDEX ctMaxAllowedClients = ctMaxAllowedPlayers;
+
   if (net_iMaxClients > 0) {
     ctMaxAllowedClients = ClampUp(net_iMaxClients, (INDEX)NET_MAXGAMECOMPUTERS);
   }
+
   INDEX ctMaxAllowedVIPPlayers = 0;
   INDEX ctMaxAllowedVIPClients = 0;
 

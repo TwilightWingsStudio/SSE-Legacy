@@ -130,6 +130,11 @@ extern INDEX ser_bDetachOnSyncBad = TRUE;
 extern INDEX ser_bReportMsgActionsWrongClient = FALSE;
 //
 
+// [SSE] Netcode Update
+extern INDEX ser_bReportJoinAttemptsMod = FALSE;
+extern INDEX ser_bReportJoinAttemptsVersion = FALSE;
+//
+
 extern INDEX cli_bEmulateDesync  = FALSE;
 extern INDEX cli_bDumpSync       = FALSE;
 extern INDEX cli_bDumpSyncEachTick = FALSE;
@@ -1076,6 +1081,14 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   extern void LUAJitTest(void *pArgs);
   _pShell->DeclareSymbol("user void LUAJitTest(void);", &LUAJitTest);
   #endif
+  
+  //#define USE_SE2LOADER
+  
+  #ifdef USE_SE2LOADER
+  extern void __SE2_LoaderTest(void *pArgs);
+  _pShell->DeclareSymbol("user void SE2LoaderTest(void);", &__SE2_LoaderTest);
+  #endif
+
   _pShell->DeclareSymbol("user void BroadcastS2STest(CTString, INDEX, CTString);", &BroadcastS2STest);
   _pShell->DeclareSymbol("user void DumpPlayerSources(void);", &DumpPlayerSources);
   _pShell->DeclareSymbol("user void DumpPlayerTargets(void);", &DumpPlayerTargets);
@@ -1118,6 +1131,11 @@ void CNetworkLibrary::Init(const CTString &strGameID)
 
   // [SSE] Netcode Update - For Debugging Player Detaching
   _pShell->DeclareSymbol("user INDEX ser_bReportMsgActionsWrongClient;", &ser_bReportMsgActionsWrongClient);
+  //
+  
+  // [SSE] Netcode Update
+  _pShell->DeclareSymbol("user INDEX ser_bReportJoinAttemptsMod;", &ser_bReportJoinAttemptsMod);
+  _pShell->DeclareSymbol("user INDEX ser_bReportJoinAttemptsVersion;", &ser_bReportJoinAttemptsVersion);
   //
 
   _pShell->DeclareSymbol("user INDEX ser_bPauseOnSyncBad;",  &ser_bPauseOnSyncBad);
@@ -2658,25 +2676,18 @@ void CNetworkLibrary::WriteVersion_t(CTStream &strm)
   strm<<INDEX(_SE_BUILD_MAJOR);
 }
 
-static BOOL RecognieeIdiotism_t(CTStream &strm)
+static BOOL RecognizeNewEngine_t(CTStream &strm)
 {
   CChunkID cidPeakedChunk = strm.PeekID_t();
+  
+  if (cidPeakedChunk == CChunkID("WRKS"))
+  {
+    strm.ExpectID_t("WRKS");
+  }
   
   if (cidPeakedChunk == CChunkID("SIGS"))
   {
     ThrowF_t(TRANS("File '%s' contains credentials data!\n\nThat means it was created by SE3 or newer, so it cannot be loaded!\nAnd I can't even recognise engine version because I don't know credentals lenght!"), strm.GetDescription());
-    return TRUE;
-  }
-  
-  if (cidPeakedChunk == CChunkID("TVER"))
-  {
-    ThrowF_t(TRANS("File '%s' is not a world document and cannot be loaded! It is texture because it has texture data!\n\nTrying to open texture as world is supreme stage of idiotism! Ask somebody to award you!"), strm.GetDescription());
-    return TRUE;
-  }
-  
-  if (cidPeakedChunk == CChunkID("MDAT"))
-  {
-    ThrowF_t(TRANS("File '%s' is not a world document and cannot be loaded! It is model because it has model data!\n\nThank you for your endless autism!"), strm.GetDescription());
     return TRUE;
   }
   
@@ -2728,9 +2739,28 @@ static BOOL RecognieeIdiotism_t(CTStream &strm)
   return FALSE;
 }
 
+static BOOL RecognieeIdiotism_t(CTStream &strm)
+{
+  CChunkID cidPeakedChunk = strm.PeekID_t();
+
+  if (cidPeakedChunk == CChunkID("TVER"))
+  {
+    ThrowF_t(TRANS("File '%s' is not a world document and cannot be loaded! It is texture because it has texture data!\n\nTrying to open texture as world is supreme stage of idiotism! Ask somebody to award you!"), strm.GetDescription());
+    return TRUE;
+  }
+  
+  if (cidPeakedChunk == CChunkID("MDAT"))
+  {
+    ThrowF_t(TRANS("File '%s' is not a world document and cannot be loaded! It is model because it has model data!\n\nThank you for your endless autism!"), strm.GetDescription());
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
 // load version of engine saved in file and check against current
 void CNetworkLibrary::CheckVersion_t(CTStream &strm, BOOL bAllowReinit, BOOL &bNeedsReinit)
-{ 
+{
   if (RecognieeIdiotism_t(strm)) return;
 
   // if not saved then behave as if everything is ok (for old versions)

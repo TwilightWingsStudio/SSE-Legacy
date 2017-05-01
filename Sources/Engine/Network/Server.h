@@ -44,7 +44,7 @@ public:
 
   public:
     /* Send disconnect message to some client. */
-    void SendDisconnectMessage(INDEX iClient, const char *strExplanation, BOOL bStream = FALSE);
+    void SendDisconnectMessage(INDEX iClient, const char *strExplanation, BOOL bStream = FALSE, BOOL bReportDisconnect = TRUE);
     /* Get total number of active players. */
     INDEX GetPlayersCount(void);
     /* Get number of active vip players. */

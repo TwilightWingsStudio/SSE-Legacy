@@ -466,7 +466,7 @@ void CSessionState::WaitStream_t(CTMemoryStream &strmMessage, const CTString &st
         tmWait=0;
       }
       // progress with receiving
-      SetProgressDescription(TRANS("receiving ")+strName+"  ");
+      SetProgressDescription(TRANS("receiving ") + strName + "  ");
       CallProgressHook_t((float)slReceivedSize/slExpectedSize);
     }
 
