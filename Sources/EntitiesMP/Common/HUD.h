@@ -86,5 +86,8 @@ extern void HUD_DrawAnchoredBarEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT 
     enum BarOrientations eBarOrientation, COLOR colBar, FLOAT fNormValue);
 extern void HUD_DrawAnchoredBar(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos,
     enum BarOrientations eBarOrientation, COLOR colBar, FLOAT fNormValue);
+	
+extern void HUD_DrawDebugMonitor();
+extern void HUD_DrawEntityStack();
 
 #endif

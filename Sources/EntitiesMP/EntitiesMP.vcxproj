@@ -183,6 +183,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="Common\EmanatingParticles.cpp" />
     <ClCompile Include="Common\HUD.cpp" />
     <ClCompile Include="Common\HUD_AnchoredFunctions.cpp" />
+    <ClCompile Include="Common\HUD_Debug.cpp" />
     <ClCompile Include="Common\Particles.cpp" />
     <ClCompile Include="Common\PathFinding.cpp" />
     <ClCompile Include="Condition.cpp" />

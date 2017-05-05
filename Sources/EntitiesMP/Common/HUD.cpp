@@ -114,10 +114,10 @@ extern TIME _tmNow = -1.0f;
 extern TIME _tmLast = -1.0f;
 
 // drawing variables
-static const CPlayer *_penPlayer;
+extern const CPlayer *_penPlayer = NULL;
 static CPlayerWeapons *_penWeapons;
 
-static COLOR _colHUD;
+extern COLOR _colHUD = C_WHITE;
 static COLOR _colHUDText;
 extern CFontData &_fdNumbersFont = *new CFontData;
 
@@ -716,7 +716,6 @@ static void HUD_DrawSniperMask( void )
                     _pTimer->GetLerpFactor());
   CTString strTmp;
   
-  
   FLOAT fZoom = 1.0f/tan(RadAngle(aFOV)*0.5f);  // 2.0 - 8.0
 
   // wheel
@@ -884,163 +883,6 @@ static void FillWeaponAmmoTables(void)
 
 //<<<<<<< DEBUG FUNCTIONS >>>>>>>
 
-#ifdef ENTITY_DEBUG
-CRationalEntity *DBG_prenStackOutputEntity = NULL;
-#endif
-void HUD_SetEntityForStackDisplay(CRationalEntity *pren)
-{
-#ifdef ENTITY_DEBUG
-  DBG_prenStackOutputEntity = pren;
-#endif
-  return;
-}
-
-static void HUD_DrawDebugMonitor()
-{
-  FLOAT fExtraEnemyStrength = GetSP()->sp_fExtraEnemyStrength;
-  FLOAT fExtraStrengthPerPlayer = GetSP()->sp_fExtraEnemyStrengthPerPlayer;
-  INDEX ctCredits = GetSP()->sp_ctCredits;
-  BOOL bSharedLives = GetSP()->sp_bSharedLives;
-
-  INDEX ctMaxPlayers = CEntity::GetMaxPlayers();
-  INDEX ctAlive = 0;
-  INDEX ctDead = 0;
-  INDEX ctDeadCanRespawn = 0;
-  
-  for (INDEX iPlayer = 0; iPlayer < ctMaxPlayers; iPlayer++)
-  {
-    CEntity *penEntity = CEntity::GetPlayerEntity(iPlayer);
-    
-    // If player is invalid then skip him.
-    if (penEntity == NULL) {
-      continue;
-    }
-    
-    if (penEntity->IsAlive()) {
-      ctAlive++;
-    } else {
-      ctDead++;
-      
-      if (!bSharedLives) {
-        CPlayer *penPlayer = static_cast<CPlayer*>(penEntity);
-        if (penPlayer->m_iLives > 0) {
-          ctDeadCanRespawn++;
-        }
-      }
-    }
-  }
-  
-  if (bSharedLives)
-  {
-    INDEX ctCreditsLeft = GetSP()->sp_ctCreditsLeft;
-
-    // If all dead can be respawned then count them all.
-    if (ctDead <= ctCreditsLeft) {
-      ctDeadCanRespawn = ctDead;
-    } else { // If not enough lives for all.
-      ctDeadCanRespawn = ctCreditsLeft;
-    }
-  }
-  
-  CTString strReport;
-
-  strReport += "^bDEBUG MONITOR^r\n";
-  strReport += "\n";
-  strReport += "[Common]\n";
-  strReport.PrintF("%s^cCCCCCCPlayers: %02d / %02d\n", strReport, ctAlive + ctDead, ctMaxPlayers);
-  strReport += "\n";
-  strReport.PrintF("%s^c00FF00Alive: %02d\n", strReport, ctAlive);
-  strReport.PrintF("%s^cFF0000Dead:  %02d\n", strReport, ctDead);
-
-  if (ctCredits >= 0) {
-    strReport.PrintF("%s^cCCCCCCCan Respawn: %02d\n", strReport, ctDeadCanRespawn);
-  }
-
-  strReport += "\n\n";
-  strReport += "^r[^cFFFFFFDDA System^r]^cCCCC00\n";
-  strReport.PrintF("%sEES:   %.2f\n", strReport, fExtraEnemyStrength);
-  strReport.PrintF("%sEESPP: %.2f\n", strReport, fExtraStrengthPerPlayer);
-  strReport.PrintF("%sDamage Mul: %.2f\n", strReport, GetGameDamageMultiplier());
-  
-  strReport += "\n\n";
-  strReport += "^r[^cFFFFFFEnemies^r]^cCCCC00\n";
-  
-  INDEX ctAliveEnemies = 0;
-  INDEX ctAliveBosses = 0;
-  INDEX ctDeadEnemies = 0;
-  INDEX ctTemplateEnemies = 0;
-  
-  FOREACHINDYNAMICCONTAINER(((CEntity&)*_penPlayer).GetWorld()->wo_cenEntities, CEntity, iten)
-  {
-    CEntity *pen = iten;
-    
-    if (pen == NULL) continue;
-    
-    if (pen->IsLiveEntity() && IsDerivedFromClass(pen, "Enemy Base")) {
-      CEnemyBase *penEnemy = static_cast<CEnemyBase *>(pen);
-
-      if (penEnemy->m_bTemplate) {
-        ctTemplateEnemies++;
-        continue;
-      }
-      
-      if (penEnemy->IsDead()) {
-        ctDeadEnemies++;
-      } else {
-        ctAliveEnemies++;
-
-        if (penEnemy->m_bBoss) {
-          ctAliveBosses++;
-        }
-      }
-    }
-  }
-  
-  strReport.PrintF("%sAlive:      %04d\n", strReport, ctAliveEnemies);
-  strReport.PrintF("%sAl. Bosses: %04d\n", strReport, ctAliveBosses);
-  strReport.PrintF("%sDead:       %04d\n", strReport, ctDeadEnemies);
-  strReport.PrintF("%sTemplate:   %04d\n", strReport, ctTemplateEnemies);
-
-  _pDP->SetFont( _pfdConsoleFont);
-  _pDP->SetTextAspect( 1.0f);
-  _pDP->SetTextScaling(1.0f);
-
-  _pDP->Fill(_pixDPWidth - 128 ,0, _pixDPWidth, _pixDPHeight, C_BLACK|0, C_BLACK|128, C_BLACK|0, C_BLACK|128);
-  _pDP->PutText( strReport, _pixDPWidth - 128 + 4, 65, C_WHITE|CT_OPAQUE);
-}
-
-#ifdef ENTITY_DEBUG
-static void HUD_DrawEntityStack()
-{
-  CTString strTemp;
-  PIX pixFontHeight;
-  ULONG pixTextBottom;
-
-  if (tmp_ai[9]==12345)
-  {
-    if (DBG_prenStackOutputEntity!=NULL)
-    {
-      pixFontHeight = _pfdConsoleFont->fd_pixCharHeight;
-      pixTextBottom = _pixDPHeight*0.83;
-      _pDP->SetFont( _pfdConsoleFont);
-      _pDP->SetTextScaling( 1.0f);
-
-      INDEX ctStates = DBG_prenStackOutputEntity->en_stslStateStack.Count();
-      strTemp.PrintF("-- stack of '%s'(%s)@%gs\n", DBG_prenStackOutputEntity->GetName(),
-        DBG_prenStackOutputEntity->en_pecClass->ec_pdecDLLClass->dec_strName,
-        _pTimer->CurrentTick());
-      _pDP->PutText( strTemp, 1, pixTextBottom-pixFontHeight*(ctStates+1), _colHUD|_ulAlphaHUD);
-
-      for(INDEX iState=ctStates-1; iState>=0; iState--) {
-        SLONG slState = DBG_prenStackOutputEntity->en_stslStateStack[iState];
-        strTemp.PrintF("0x%08x %s\n", slState,
-          DBG_prenStackOutputEntity->en_pecClass->ec_pdecDLLClass->HandlerNameForState(slState));
-        _pDP->PutText( strTemp, 1, pixTextBottom-pixFontHeight*(iState+1), _colHUD|_ulAlphaHUD);
-      }
-    }
-  }
-}
-#endif
 //<<<<<<< DEBUG FUNCTIONS >>>>>>>
 
 
@@ -1146,7 +988,6 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     strHealth.PrintF("%.0f", fValue);
     HUD_DrawAnchoredTextInRect(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, strHealth, NONE, fValue / TOP_HEALTH);
   }
-
 
   // Armor
   if (_penPlayer->m_fArmor > 0.0F) {
