@@ -35,9 +35,17 @@ extern FLOAT ded_tmTimeout = -1;
 extern CGame *_pGame = NULL;
 extern CTString sam_strFirstLevel = "Levels\\KarnakDemo.wld";
 extern CTString sam_strIntroLevel = "Levels\\Intro.wld";
-extern CTString sam_strGameName = "serioussam";
+extern CTString sam_strGameName   = "serioussam";
+
+extern CTString ded_strRoundBeginScript = "round_begin.ini";
+extern CTString ded_strRoundEndScript = "round_end.ini";
+
+extern INDEX ded_bEnableRoundBeginScript = FALSE;
+extern INDEX ded_bEnableRoundEndScript = FALSE;
 
 CTimerValue _tvLastLevelEnd(-1i64);
+
+CDynamicStackArray<CTString> _astrMaps;
 
 void InitializeGame(void)
 {
@@ -47,18 +55,24 @@ void InitializeGame(void)
     #else
       #define GAMEDLL _fnmApplicationExe.FileDir()+"Game"+_strModExt+".dll"
     #endif
+
     CTFileName fnmExpanded;
     ExpandFilePath(EFP_READ, CTString(GAMEDLL), fnmExpanded);
 
     CPrintF(TRANS("Loading game library '%s'...\n"), (const char *)fnmExpanded);
+
     HMODULE hGame = LoadLibraryA(fnmExpanded);
-    if (hGame==NULL) {
+
+    if (hGame == NULL) {
       ThrowF_t("%s", GetWindowsError(GetLastError()));
     }
+
     CGame* (*GAME_Create)(void) = (CGame* (*)(void))GetProcAddress(hGame, "GAME_Create");
-    if (GAME_Create==NULL) {
+
+    if (GAME_Create == NULL) {
       ThrowF_t("%s", GetWindowsError(GetLastError()));
     }
+
     _pGame = GAME_Create();
 
   } catch (char *strError) {
@@ -82,6 +96,18 @@ static void NextMap(void)
   _bForceNextMap = TRUE;
 }
 
+// [SSE]
+static void AddMap(void* pArgs)
+{
+  CTString strMap = *NEXTARGUMENT(CTString*);
+  
+  if (strMap == "") {
+    return;
+  }
+
+  _astrMaps.Push() = strMap;
+  CPrintF("  Added map '%s'\n", strMap);
+}
 
 void End(void);
 
@@ -193,14 +219,13 @@ BOOL Init(int argc, char* argv[])
 
   SetConsoleTitleA(argv[1]);
 
-  ded_strConfig = CTString("Scripts\\Dedicated\\")+argv[1]+"\\";
+  ded_strConfig = CTString("Scripts\\Dedicated\\") + argv[1] + "\\";
 
   if (argc==2+1) {
-    _fnmMod = CTString("Mods\\")+argv[2]+"\\";
+    _fnmMod = CTString("Mods\\") + argv[2] + "\\";
   }
 
-
-  _strLogFile = CTString("Dedicated_")+argv[1];
+  _strLogFile = CTString("Dedicated_") + argv[1];
 
   // initialize engine
   SE_InitEngine(sam_strGameName);
@@ -242,6 +267,14 @@ BOOL Init(int argc, char* argv[])
   _pShell->DeclareSymbol("persistent user CTString sam_strGameName;",      &sam_strGameName);
   _pShell->DeclareSymbol("user CTString sam_strFirstLevel;", &sam_strFirstLevel);
 
+  // [SSE]
+  _pShell->DeclareSymbol("user void AddMap(CTString);", &AddMap);
+
+  _pShell->DeclareSymbol("user INDEX ded_bEnableRoundBeginScript;", &ded_bEnableRoundBeginScript);
+  _pShell->DeclareSymbol("user INDEX ded_bEnableRoundEndScript;",   &ded_bEnableRoundEndScript);
+  _pShell->DeclareSymbol("user CTString ded_strRoundBeginScript;",  &ded_strRoundBeginScript);
+  _pShell->DeclareSymbol("user CTString ded_strRoundEndScript;",    &ded_strRoundEndScript);
+
   // init game - this will load persistent symbols
   InitializeGame();
   _pNetwork->md_strGameID = sam_strGameName;
@@ -261,7 +294,6 @@ BOOL Init(int argc, char* argv[])
 }
 void End(void)
 {
-
   // cleanup level-info subsystem
 //  ClearDemosList();
 
@@ -272,7 +304,7 @@ void End(void)
   SE_EndEngine();
 }
 
-static INDEX iRound = 1;
+static INDEX iRound = 0;
 static BOOL _bHadPlayers = 0;
 static BOOL _bRestart = 0;
 CTString strBegScript;
@@ -280,36 +312,47 @@ CTString strEndScript;
 
 void RoundBegin(void)
 {
-  // repeat generate script names
-  FOREVER {
-    strBegScript.PrintF("%s%d_begin.ini", ded_strConfig, iRound);
-    strEndScript.PrintF("%s%d_end.ini",   ded_strConfig, iRound);
-    // if start script exists
-    if (FileExists(strBegScript)) {
-      // stop searching
-      break;
+  if (_astrMaps.Count() == 0)
+  {
+    CPrintF(TRANS("Maplist is empty!\n"));
+    _bRunning = FALSE;
+    return;
+  }
+  
+  BOOL bAnyMap = FALSE;
+  
+  for (INDEX iMap = 0; iMap < _astrMaps.Count(); iMap++)
+  {
+    CTString &strMap = _astrMaps[iMap];
 
-    // if start script doesn't exist
-    } else {
-      // if this is first round
-      if (iRound==1) {
-        // error
-        CPrintF(TRANS("No scripts present!\n"));
-        _bRunning = FALSE;
-        return;
-      }
-      // try again with first round
-      iRound = 1;
+    if (FileExists(strMap)) {
+      bAnyMap = TRUE;
     }
   }
   
+  if (!bAnyMap)
+  {
+    CPrintF(TRANS("Maplist doesn't contain any existing map!\n"));
+    _bRunning = FALSE;
+    return;
+  }
+  
   // run start script
-  ExecScript(strBegScript);
+  if (ded_bEnableRoundBeginScript) {
+    ExecScript(ded_strConfig + ded_strRoundBeginScript);
+  }
 
+  if (iRound > (_astrMaps.Count() - 1)) {
+    iRound = 0;
+  }
+  
+  ded_strLevel = _astrMaps[iRound];
+  
   // start the level specified there
-  if (ded_strLevel=="") {
+  if (ded_strLevel == "") {
     CPrintF(TRANS("ERROR: No next level specified!\n"));
     _bRunning = FALSE;
+
   } else {
     EnableLoadingHook();
     StartGame(ded_strLevel);
@@ -337,7 +380,10 @@ void RoundEnd(void)
 {
   CPrintF("end of round---------------------------\n");
 
-  ExecScript(strEndScript);
+  if (ded_bEnableRoundEndScript) {
+    ExecScript(ded_strConfig + ded_strRoundEndScript);
+  }
+
   iRound++;
 }
 
@@ -373,9 +419,8 @@ void DoGame(void)
       }
     }
 
-  // if game is not started
+  // if game is not started then just handle broadcast messages
   } else {
-    // just handle broadcast messages
     _pNetwork->GameInactive();
   }
 
@@ -397,8 +442,10 @@ int SubMain(int argc, char* argv[])
 
   // execute dedicated server startup script
   ExecScript(CTFILENAME("Scripts\\Dedicated_startup.ini"));
+
   // execute startup script for this config
-  ExecScript(ded_strConfig+"init.ini");
+  ExecScript(ded_strConfig + "init.ini");
+
   // start first round
   RoundBegin();
 
@@ -409,25 +456,24 @@ int SubMain(int argc, char* argv[])
     DoGame();
 
     // if game is finished
-    if (_pNetwork->IsGameFinished()) {
+    if (_pNetwork->IsGameFinished())
+    {
       // if not yet remembered end of level
-      if (_tvLastLevelEnd.tv_llValue<0) {
-        // remember end of level
-        _tvLastLevelEnd = _pTimer->GetHighPrecisionTimer();
-        // finish this round
-        RoundEnd();
+      if (_tvLastLevelEnd.tv_llValue < 0) {
+        _tvLastLevelEnd = _pTimer->GetHighPrecisionTimer(); // remember end of level
+        RoundEnd(); // finish this round
+
       // if already remembered
       } else {
-        // if time is out
+        // if time is out start next round
         if ((_pTimer->GetHighPrecisionTimer()-_tvLastLevelEnd).GetSeconds()>ded_tmTimeout) {
-          // start next round
           RoundBegin();
         }
       }
     }
 
-    if (_bRestart||_bForceRestart) {
-      if (ded_bRestartWhenEmpty||_bForceRestart) {
+    if (_bRestart || _bForceRestart) {
+      if (ded_bRestartWhenEmpty || _bForceRestart) {
         _bForceRestart = FALSE;
         _bRestart = FALSE;
         RoundEnd();
@@ -438,11 +484,14 @@ int SubMain(int argc, char* argv[])
         _bHadPlayers = FALSE;
       }
     }
-    if (_bForceNextMap) {
-      ForceNextMap();
-      _bForceNextMap = FALSE;
-    }
 
+    if (_bForceNextMap) {
+      _bForceNextMap = FALSE;
+
+      RoundEnd();
+      CPrintF(TRANS("\nNOTE: Processing force map change!\n\n"));
+      RoundBegin();
+    }
   } // end of main application loop
 
   _pGame->StopGame();
@@ -456,6 +505,7 @@ int SubMain(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
   int iResult;
+
   CTSTREAM_BEGIN {
     iResult = SubMain(argc, argv);
   } CTSTREAM_END;
