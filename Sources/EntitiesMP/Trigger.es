@@ -91,7 +91,7 @@ properties:
   93 enum ETType m_eTType  "Type" = TT_NORMAL,
   94 INDEX m_iPos                 = 0,
 
-  95 BOOL m_bDebug        "Debug Messages" = FALSE,
+  95 BOOL m_bDebugMessages        "Debug Messages" = FALSE,
 
  100 CTString m_strCausedOnlyByClass "Triggerable only by class" = "",
 
@@ -137,8 +137,30 @@ functions:
     
     return m_strDescription;
   }
-
-  void SendToTargetM(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused) {
+  
+  // --------------------------------------------------------------------------------------
+  // Returns number of used targets. For debugging stuff.
+  // --------------------------------------------------------------------------------------
+  INDEX GetNumbersOfUsedTargets()
+  {
+    INDEX ctUsed = 0;
+    
+    if (m_penTarget1  && m_eetEvent1  != EET_IGNORE)   { ctUsed++; }
+    if (m_penTarget2  && m_eetEvent2  != EET_IGNORE)   { ctUsed++; }
+    if (m_penTarget3  && m_eetEvent3  != EET_IGNORE)   { ctUsed++; }
+    if (m_penTarget4  && m_eetEvent4  != EET_IGNORE)   { ctUsed++; }
+    if (m_penTarget5  && m_eetEvent5  != EET_IGNORE)   { ctUsed++; }
+    if (m_penTarget6  && m_eetEvent6  != EET_IGNORE)   { ctUsed++; }
+    if (m_penTarget7  && m_eetEvent7  != EET_IGNORE)   { ctUsed++; }
+    if (m_penTarget8  && m_eetEvent8  != EET_IGNORE)   { ctUsed++; }
+    if (m_penTarget9  && m_eetEvent9  != EET_IGNORE)   { ctUsed++; }
+    if (m_penTarget10 && m_eetEvent10 != EET_IGNORE) { ctUsed++; }
+    
+    return ctUsed;
+  }
+  
+  void SendToTargetM(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused)
+  {
     if (m_eetGlobal == EET_IGNORE) {
       SendToTarget(penSendEvent, eetEventType, m_penCaused);
       return;
@@ -147,13 +169,17 @@ functions:
     SendToTarget(penSendEvent, m_eetGlobal, m_penCaused);
   }
 
+  // --------------------------------------------------------------------------------------
   // get target 1 (there is no property 'm_penTarget')
+  // --------------------------------------------------------------------------------------
   CEntity *GetTarget(void) const
   {
     return m_penTarget1;
   }
 
-  // returns bytes of memory used by this object
+  // --------------------------------------------------------------------------------------
+  // Returns bytes of memory used by this object.
+  // --------------------------------------------------------------------------------------
   SLONG GetUsedMemory(void)
   {
     // initial
@@ -172,7 +198,8 @@ functions:
     return true;
   }
 
-  void Stuff(void) {
+  void Stuff(void)
+  {
     // if there is event to send in range
     if (m_eetRange != EET_IGNORE) {
       SendInRange(this, m_eetRange, FLOATaabbox3D(GetPlacement().pl_PositionVector, m_fSendRange));
@@ -242,7 +269,8 @@ functions:
     return;
   }
 
-  void UpdateCurrentPos(void) {
+  void UpdateCurrentPos(void)
+  {
     CEntityPointer penCurrent;
     do {
       if (m_iPos < 10) {
@@ -267,8 +295,10 @@ functions:
     return;
   }
 
-  void SendToSpecifiedTarget(void) {
-    switch(m_iPos) {
+  void SendToSpecifiedTarget(void)
+  {
+    switch(m_iPos)
+    {
       case 1: SendToTargetM(m_penTarget1, m_eetEvent1, m_penCaused); break;
       case 2: SendToTargetM(m_penTarget2, m_eetEvent2, m_penCaused); break;
       case 3: SendToTargetM(m_penTarget3, m_eetEvent3, m_penCaused); break;
@@ -287,12 +317,28 @@ functions:
 procedures:
   SendEventToTargets() {
     // if needed wait some time before event is send
-    if (m_fWaitTime > 0.0f) {
+    if (m_fWaitTime > 0.0f)
+    {
+      if (m_bDebugMessages) {
+        CPrintF("[%s] : Processing delay %.2f second(s).\n", m_strName, m_fWaitTime);
+      }
+      
       wait (m_fWaitTime) {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
         on (EDeactivate) : { pass; }
         otherwise(): { resume; }
+      }
+    }
+    
+    if (m_bDebugMessages)
+    {
+      INDEX ctUsed = GetNumbersOfUsedTargets();
+
+      if (ctUsed == 0) {
+        CPrintF("[%s] : Haven't targets to send events.\n", m_strName);
+      } else {
+        CPrintF("[%s] : Sending events to %d targets.\n", m_strName, ctUsed);
       }
     }
 
@@ -346,14 +392,14 @@ procedures:
       // cascade trigger
       on (ETrigger eTrigger) : {
         if (m_fMinTime > 0 && m_tmLastTriggered != 0 && (_pTimer->CurrentTick() - m_fMinTime) < m_tmLastTriggered) {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF(TRANS("[%s] : received Trigger event, but min Time was not reached\n"), m_strName);
           }
           resume;
         }
 
         if (!(m_strCausedOnlyByClass == "" || IsOfClass(eTrigger.penCaused, m_strCausedOnlyByClass))) {
-          if (m_bDebug) {
+          if (m_bDebugMessages) {
             CPrintF(TRANS("[%s] : received Trigger event, but from wrong class\n"),m_strName);
           }
           resume;
@@ -361,11 +407,11 @@ procedures:
 
         m_tmLastTriggered = _pTimer->CurrentTick();
 
-        if (m_bDebug) {
+        if (m_bDebugMessages) {
           if (eTrigger.penCaused != NULL) {
-            CPrintF(TRANS("[%s] : triggered through %s\n"), m_strName, eTrigger.penCaused->GetName());
+            CPrintF(TRANS("[%s] : triggered by %s\n"), m_strName, eTrigger.penCaused->GetName());
           } else {
-            CPrintF(TRANS("[%s] : triggered through unknown entity\n"), m_strName);
+            CPrintF(TRANS("[%s] : triggered by unknown entity\n"), m_strName);
           }
         }
 
@@ -483,7 +529,7 @@ procedures:
   };
 
   Delayed() {
-    if (m_bDebug) {
+    if (m_bDebugMessages) {
       CPrintF(TRANS("  Type=Delayed\n"));
     }
 
@@ -594,7 +640,7 @@ procedures:
   };
 
   DelayedRandomly() {
-    if (m_bDebug) {
+    if (m_bDebugMessages) {
       CPrintF(TRANS("  Type=DelayedRandomly\n"));
     }
 
@@ -745,7 +791,7 @@ procedures:
       }
     }
 
-    if (m_bDebug) {
+    if (m_bDebugMessages) {
       CPrintF(TRANS("  Type=Procedural\n"));
       CPrintF(TRANS("  Sending event to Target %d\n"), m_iPos);
     }
@@ -767,7 +813,7 @@ procedures:
 
     m_iPos = FRnd()*9+1;
 
-    if (m_bDebug) {
+    if (m_bDebugMessages) {
       CPrintF(TRANS("  Type=Random\n"));
       CPrintF(TRANS("  Sending event to Target %d\n"), m_iPos);
     }
