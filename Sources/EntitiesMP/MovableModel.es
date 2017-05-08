@@ -70,12 +70,12 @@ properties:
  
    7 CTString m_strName            "Name" 'N'          = "Movable Model",
   12 CTString m_strDescription                         = "",
-   8 BOOL m_bColliding             "Colliding" 'L'     = FALSE,    // set if model is not immatierial
+   8 BOOL m_bColliding             "Colliding" 'L'     = TRUE,    // set if model is not immatierial
    9 ANIMATION m_iModelAnimation   "Model animation"   = 0,
   10 ANIMATION m_iTextureAnimation "Texture animation" = 0,
   11 enum ShadowType m_stClusterShadows "Shadows" 'W'  = ST_CLUSTER,   // set if model uses cluster shadows
   13 BOOL m_bBackground            "Background" 'B'    = FALSE,   // set if model is rendered in background
-  21 BOOL m_bTargetable                                = TRUE, // st if model should be targetable
+  21 BOOL m_bTargetable                                = TRUE, // set if model should be targetable
  
   // Parameters for custom shading of a model (overrides automatic shading calculation).
   14 enum CustomShadingType m_cstCustomShading "Custom shading" 'H' = CST_NONE,
@@ -190,10 +190,12 @@ functions:
     return m_penSwitch;
   }
 
-  /* Fill in entity statistics - for AI purposes only */
+  // --------------------------------------------------------------------------------------
+  // Fill in entity statistics - for AI purposes only.
+  // --------------------------------------------------------------------------------------
   BOOL FillEntityStatistics(EntityStats *pes)
   {
-    pes->es_strName = m_fnModel.FileName() + ", "+m_fnTexture.FileName();
+    pes->es_strName = m_fnModel.FileName() + ", " + m_fnTexture.FileName();
     pes->es_ctCount = 1;
     pes->es_ctAmmount = 1;
    
