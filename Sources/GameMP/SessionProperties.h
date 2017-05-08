@@ -23,6 +23,7 @@ public:
     GM_COOPERATIVE = 0,
     GM_SCOREMATCH,
     GM_FRAGMATCH,
+    GM_TEAMDEATHMATCH, // [SSE] Team DeathMatch
   };
   enum GameDifficulty {
     GD_TOURIST = -1,
@@ -92,6 +93,11 @@ public:
   
   // [SSE] Respawn Delay
   FLOAT sp_tmRespawnDelay; // How many seconds should pass after player death to be able respawn.
+  
+  // [SSE] Team DeathMatch
+  INDEX sp_iTeamScore1;
+  INDEX sp_iTeamScore2;
+  //
 };
 
 // NOTE: never instantiate CSessionProperties, as its size is not fixed to the size defined in engine

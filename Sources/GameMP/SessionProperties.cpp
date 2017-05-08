@@ -61,7 +61,7 @@ extern FLOAT gam_tmRespawnDelay; // [SSE] Respawn Delay
 
 static void SetGameModeParameters(CSessionProperties &sp)
 {
-  sp.sp_gmGameMode = (CSessionProperties::GameMode) Clamp(INDEX(gam_iStartMode), -1L, 2L);
+  sp.sp_gmGameMode = (CSessionProperties::GameMode) Clamp(INDEX(gam_iStartMode), -1L, 3L);
 
   switch (sp.sp_gmGameMode) {
   default:
@@ -74,6 +74,7 @@ static void SetGameModeParameters(CSessionProperties &sp)
     break;
   case CSessionProperties::GM_SCOREMATCH:
   case CSessionProperties::GM_FRAGMATCH:
+  case CSessionProperties::GM_TEAMDEATHMATCH: // [SSE] Team DeathMatch
     sp.sp_ulSpawnFlags |= SPF_DEATHMATCH;
     break;
   }
@@ -89,44 +90,50 @@ static void SetDifficultyParameters(CSessionProperties &sp)
   }
   sp.sp_gdGameDifficulty = (CSessionProperties::GameDifficulty) Clamp(INDEX(iDifficulty), -1L, 3L);
 
-  switch (sp.sp_gdGameDifficulty) {
-  case CSessionProperties::GD_TOURIST:
-    sp.sp_ulSpawnFlags = SPF_EASY;//SPF_TOURIST; !!!!
-    sp.sp_fEnemyMovementSpeed = gam_afEnemyMovementSpeed [0];
-    sp.sp_fEnemyAttackSpeed   = gam_afEnemyAttackSpeed   [0];
-    sp.sp_fDamageStrength     = gam_afDamageStrength     [0];
-    sp.sp_fAmmoQuantity       = gam_afAmmoQuantity       [0];
-    break;
-  case CSessionProperties::GD_EASY:
-    sp.sp_ulSpawnFlags = SPF_EASY;
-    sp.sp_fEnemyMovementSpeed = gam_afEnemyMovementSpeed [1];
-    sp.sp_fEnemyAttackSpeed   = gam_afEnemyAttackSpeed   [1];
-    sp.sp_fDamageStrength     = gam_afDamageStrength     [1];
-    sp.sp_fAmmoQuantity       = gam_afAmmoQuantity       [1];
-    break;
-  default:
-    ASSERT(FALSE);
-  case CSessionProperties::GD_NORMAL:
-    sp.sp_ulSpawnFlags = SPF_NORMAL;
-    sp.sp_fEnemyMovementSpeed = gam_afEnemyMovementSpeed [2];
-    sp.sp_fEnemyAttackSpeed   = gam_afEnemyAttackSpeed   [2];
-    sp.sp_fDamageStrength     = gam_afDamageStrength     [2];
-    sp.sp_fAmmoQuantity       = gam_afAmmoQuantity       [2];
-    break;
-  case CSessionProperties::GD_HARD:
-    sp.sp_ulSpawnFlags = SPF_HARD;
-    sp.sp_fEnemyMovementSpeed = gam_afEnemyMovementSpeed [3];
-    sp.sp_fEnemyAttackSpeed   = gam_afEnemyAttackSpeed   [3];
-    sp.sp_fDamageStrength     = gam_afDamageStrength     [3];
-    sp.sp_fAmmoQuantity       = gam_afAmmoQuantity       [3];
-    break;
-  case CSessionProperties::GD_EXTREME:
-    sp.sp_ulSpawnFlags = SPF_EXTREME;
-    sp.sp_fEnemyMovementSpeed = gam_afEnemyMovementSpeed [4];
-    sp.sp_fEnemyAttackSpeed   = gam_afEnemyAttackSpeed   [4];
-    sp.sp_fDamageStrength     = gam_afDamageStrength     [4];
-    sp.sp_fAmmoQuantity       = gam_afAmmoQuantity       [4];
-    break;
+  switch (sp.sp_gdGameDifficulty)
+  {
+    case CSessionProperties::GD_TOURIST:
+      sp.sp_ulSpawnFlags = SPF_EASY;//SPF_TOURIST; !!!!
+      sp.sp_fEnemyMovementSpeed = gam_afEnemyMovementSpeed [0];
+      sp.sp_fEnemyAttackSpeed   = gam_afEnemyAttackSpeed   [0];
+      sp.sp_fDamageStrength     = gam_afDamageStrength     [0];
+      sp.sp_fAmmoQuantity       = gam_afAmmoQuantity       [0];
+      break;
+
+    case CSessionProperties::GD_EASY:
+      sp.sp_ulSpawnFlags = SPF_EASY;
+      sp.sp_fEnemyMovementSpeed = gam_afEnemyMovementSpeed [1];
+      sp.sp_fEnemyAttackSpeed   = gam_afEnemyAttackSpeed   [1];
+      sp.sp_fDamageStrength     = gam_afDamageStrength     [1];
+      sp.sp_fAmmoQuantity       = gam_afAmmoQuantity       [1];
+      break;
+
+    default:
+      ASSERT(FALSE);
+
+    case CSessionProperties::GD_NORMAL:
+      sp.sp_ulSpawnFlags = SPF_NORMAL;
+      sp.sp_fEnemyMovementSpeed = gam_afEnemyMovementSpeed [2];
+      sp.sp_fEnemyAttackSpeed   = gam_afEnemyAttackSpeed   [2];
+      sp.sp_fDamageStrength     = gam_afDamageStrength     [2];
+      sp.sp_fAmmoQuantity       = gam_afAmmoQuantity       [2];
+      break;
+
+    case CSessionProperties::GD_HARD:
+      sp.sp_ulSpawnFlags = SPF_HARD;
+      sp.sp_fEnemyMovementSpeed = gam_afEnemyMovementSpeed [3];
+      sp.sp_fEnemyAttackSpeed   = gam_afEnemyAttackSpeed   [3];
+      sp.sp_fDamageStrength     = gam_afDamageStrength     [3];
+      sp.sp_fAmmoQuantity       = gam_afAmmoQuantity       [3];
+      break;
+
+    case CSessionProperties::GD_EXTREME:
+      sp.sp_ulSpawnFlags = SPF_EXTREME;
+      sp.sp_fEnemyMovementSpeed = gam_afEnemyMovementSpeed [4];
+      sp.sp_fEnemyAttackSpeed   = gam_afEnemyAttackSpeed   [4];
+      sp.sp_fDamageStrength     = gam_afDamageStrength     [4];
+      sp.sp_fAmmoQuantity       = gam_afAmmoQuantity       [4];
+      break;
   }
 }
 
@@ -183,6 +190,10 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
 
   sp.sp_iBlood = Clamp( gam_iBlood, 0L, 3L);
   sp.sp_bGibs  = gam_bGibs;
+  
+  // [SSE] Team DeathMatch
+  sp.sp_iTeamScore1 = 0;
+  sp.sp_iTeamScore2 = 0;
 }
 
 // set properties for a quick start session
@@ -215,10 +226,11 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_bEndOfGame = FALSE;
 
   sp.sp_bQuickTest = FALSE;
-  sp.sp_bCooperative = sp.sp_gmGameMode==CSessionProperties::GM_COOPERATIVE;
+  sp.sp_bCooperative = sp.sp_gmGameMode == CSessionProperties::GM_COOPERATIVE;
   sp.sp_bSinglePlayer = FALSE;
   sp.sp_bPlayEntireGame = gam_bPlayEntireGame;
-  sp.sp_bUseFrags = sp.sp_gmGameMode==CSessionProperties::GM_FRAGMATCH;
+  sp.sp_bUseFrags = sp.sp_gmGameMode == CSessionProperties::GM_FRAGMATCH || sp.sp_gmGameMode == CSessionProperties::GM_TEAMDEATHMATCH; // [SSE] Team DeathMatch
+  sp.sp_bTeamPlay = sp.sp_gmGameMode == CSessionProperties::GM_TEAMDEATHMATCH; // [SSE] Team DeathMatch
   sp.sp_bWeaponsStay = gam_bWeaponsStay;
   sp.sp_bFriendlyFire = gam_bFriendlyFire;
   sp.sp_ctMaxPlayers = gam_ctMaxPlayers;
@@ -245,6 +257,10 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_bKeepSeriousDamageOnProjectiles = gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
   
   sp.sp_tmRespawnDelay = Clamp(gam_tmRespawnDelay, 0.0F, 60.0F); // [SSE] Respawn Delay
+  
+  // [SSE] Team DeathMatch
+  sp.sp_iTeamScore1 = 0;
+  sp.sp_iTeamScore2 = 0;
 
   // set credits and limits
   if (sp.sp_bCooperative) {
@@ -315,21 +331,25 @@ BOOL IsMenuEnabledCfunc(void* pArgs)
 CTString GetGameTypeName(INDEX iMode)
 {
   switch (iMode) {
-  default:
-    return "";
-    break;
-  case CSessionProperties::GM_COOPERATIVE:
-    return TRANS("Cooperative");
-    break;
-  case CSessionProperties::GM_FLYOVER:
-    return TRANS("Flyover");
-    break;
-  case CSessionProperties::GM_SCOREMATCH:
-    return TRANS("Scorematch");
-    break;
-  case CSessionProperties::GM_FRAGMATCH:
-    return TRANS("Fragmatch");
-    break;
+    default:
+      return "";
+      break;
+    case CSessionProperties::GM_COOPERATIVE:
+      return TRANS("Cooperative");
+      break;
+    case CSessionProperties::GM_FLYOVER:
+      return TRANS("Flyover");
+      break;
+    case CSessionProperties::GM_SCOREMATCH:
+      return TRANS("Scorematch");
+      break;
+    case CSessionProperties::GM_FRAGMATCH:
+      return TRANS("Fragmatch");
+      break;
+    // [SSE] Team DeathMatch
+    case CSessionProperties::GM_TEAMDEATHMATCH:
+      return TRANS("TDM");
+      break;
   }
 }
 CTString GetGameTypeNameCfunc(void* pArgs)
@@ -350,27 +370,29 @@ CTString GetGameAgentRulesInfo(void)
   const CSessionProperties &sp = *GetSP();
 
   CTString strDifficulty;
+
   if (sp.sp_bMental) {
     strDifficulty = TRANS("Mental");
   } else {
-    switch(sp.sp_gdGameDifficulty) {
-    case CSessionProperties::GD_TOURIST:
-      strDifficulty = TRANS("Tourist");
-      break;
-    case CSessionProperties::GD_EASY:
-      strDifficulty = TRANS("Easy");
-      break;
-    default:
-      ASSERT(FALSE);
-    case CSessionProperties::GD_NORMAL:
-      strDifficulty = TRANS("Normal");
-      break;
-    case CSessionProperties::GD_HARD:
-      strDifficulty = TRANS("Hard");
-      break;
-    case CSessionProperties::GD_EXTREME:
-      strDifficulty = TRANS("Serious");
-      break;
+    switch (sp.sp_gdGameDifficulty)
+    {
+      case CSessionProperties::GD_TOURIST:
+        strDifficulty = TRANS("Tourist");
+        break;
+      case CSessionProperties::GD_EASY:
+        strDifficulty = TRANS("Easy");
+        break;
+      default:
+        ASSERT(FALSE);
+      case CSessionProperties::GD_NORMAL:
+        strDifficulty = TRANS("Normal");
+        break;
+      case CSessionProperties::GD_HARD:
+        strDifficulty = TRANS("Hard");
+        break;
+      case CSessionProperties::GD_EXTREME:
+        strDifficulty = TRANS("Serious");
+        break;
     }
   }
 
@@ -421,12 +443,15 @@ CTString GetGameAgentRulesInfo(void)
 
 ULONG GetSpawnFlagsForGameType(INDEX iGameType)
 {
-  switch(iGameType) {
-  default:
-    ASSERT(FALSE);
-  case CSessionProperties::GM_COOPERATIVE:  return SPF_COOPERATIVE;
-  case CSessionProperties::GM_SCOREMATCH:   return SPF_DEATHMATCH;
-  case CSessionProperties::GM_FRAGMATCH:    return SPF_DEATHMATCH;
+  switch(iGameType)
+  {
+    default:
+      ASSERT(FALSE);
+
+    case CSessionProperties::GM_COOPERATIVE:    return SPF_COOPERATIVE;
+    case CSessionProperties::GM_SCOREMATCH:     return SPF_DEATHMATCH;
+    case CSessionProperties::GM_FRAGMATCH:      return SPF_DEATHMATCH;
+    case CSessionProperties::GM_TEAMDEATHMATCH: return SPF_DEATHMATCH; // [SSE] Team DeathMatch
   };
 }
 
