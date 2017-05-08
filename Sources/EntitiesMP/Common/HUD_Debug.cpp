@@ -36,6 +36,7 @@ extern void HUD_DrawDebugMonitor()
   INDEX ctAlive = 0;
   INDEX ctDead = 0;
   INDEX ctDeadCanRespawn = 0;
+  INDEX ctLocal = 0;
   
   for (INDEX iPlayer = 0; iPlayer < ctMaxPlayers; iPlayer++)
   {
@@ -44,6 +45,10 @@ extern void HUD_DrawDebugMonitor()
     // If player is invalid then skip him.
     if (penEntity == NULL) {
       continue;
+    }
+    
+    if (_pNetwork->IsPlayerLocal(penEntity)) {
+      ctLocal++;
     }
     
     if (penEntity->IsAlive()) {
@@ -78,6 +83,7 @@ extern void HUD_DrawDebugMonitor()
   strReport += "\n";
   strReport += "[Common]\n";
   strReport.PrintF("%s^cCCCCCCPlayers: %02d / %02d\n", strReport, ctAlive + ctDead, ctMaxPlayers);
+  strReport.PrintF("%s^cCCCCCCLocal:   %02d\n", strReport, ctLocal);
   strReport += "\n";
   strReport.PrintF("%s^c00FF00Alive: %02d\n", strReport, ctAlive);
   strReport.PrintF("%s^cFF0000Dead:  %02d\n", strReport, ctDead);
@@ -87,10 +93,41 @@ extern void HUD_DrawDebugMonitor()
   }
 
   strReport += "\n\n";
+  strReport += "^r[Mode Flags]^cCCCCCC\n";
+  if (GetSP()->sp_bCooperative) {
+    strReport.PrintF("%s  Cooperative\n", strReport);
+  }
+  
+  if (GetSP()->sp_bTeamPlay) {
+    strReport.PrintF("%s  TeamPlay\n", strReport);
+  }
+  
+  if (GetSP()->sp_bSinglePlayer) {
+    strReport.PrintF("%s  SinglePlayer\n", strReport);
+  }
+  
+  if (GetSP()->sp_bQuickTest) {
+    strReport.PrintF("%s  QuickTest\n", strReport);
+  }
+  
+  if (GetSP()->sp_bUseFrags) {
+    strReport.PrintF("%s  UseFrags\n", strReport);
+  }
+  
+  strReport += "\n\n";
   strReport += "^r[^cFFFFFFDDA System^r]^cCCCC00\n";
   strReport.PrintF("%sEES:   %.2f\n", strReport, fExtraEnemyStrength);
   strReport.PrintF("%sEESPP: %.2f\n", strReport, fExtraStrengthPerPlayer);
   strReport.PrintF("%sDamage Mul: %.2f\n", strReport, GetGameDamageMultiplier());
+  
+  FLOAT3D vPlayerPos = _penPlayer->GetPlacement().pl_PositionVector;
+  
+  strReport += "\n\n";
+  strReport += "^r[^cFFFFFFPlacement^r]^cCCCC00\n";
+  strReport.PrintF("%sX: %-6.2f\n", strReport, vPlayerPos(1));
+  strReport.PrintF("%sY: %-6.2f\n", strReport, vPlayerPos(2));
+  strReport.PrintF("%sZ: %-6.2f\n", strReport, vPlayerPos(3));
+  
   
   strReport += "\n\n";
   strReport += "^r[^cFFFFFFEnemies^r]^cCCCC00\n";
