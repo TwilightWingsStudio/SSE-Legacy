@@ -852,12 +852,12 @@ static void BroadcastS2STest(void *pArgs)
   }
 }
 
-static void AttachPlayerTest(void* pArgs)
+static void NET_AttachPlayer(void* pArgs)
 {
   INDEX iClient = NEXTARGUMENT(INDEX);
   INDEX iEntity = NEXTARGUMENT(INDEX);
   
-  CPrintF("attachplayertest:\n");
+  CPrintF("NET_AttachPlayer:\n");
   if (!_pNetwork->ga_srvServer.srv_bActive) {
     CPrintF("  <not a server>\n");
     return;
@@ -918,11 +918,11 @@ static void AttachPlayerTest(void* pArgs)
   _pNetwork->SendToClientReliable(iClient, nmPlayerRegistered);
 }
 
-static void DetachPlayerTest(void* pArgs)
+static void NET_DetachPlayer(void* pArgs)
 {
   INDEX iPlayer = NEXTARGUMENT(INDEX);
 
-  CPrintF("remplayertest:\n");
+  CPrintF("NET_DetachPlayer:\n");
   if (!_pNetwork->ga_srvServer.srv_bActive) {
     CPrintF("  <not a server>\n");
     return;
@@ -948,12 +948,12 @@ static void DetachPlayerTest(void* pArgs)
   CPrintF("  Detached!\n");
 }
 
-static void SwapPlayersTest(void* pArgs)
+static void NET_SwapPlayers(void* pArgs)
 {
   INDEX iFirstPlayer = NEXTARGUMENT(INDEX);
   INDEX iSecondPlayer = NEXTARGUMENT(INDEX);
 
-  CPrintF("swapplayerstest:\n");
+  CPrintF("NET_SwapPlayers:\n");
   if (!_pNetwork->ga_srvServer.srv_bActive) {
     CPrintF("  <not a server>\n");
     return;
@@ -985,11 +985,11 @@ static void SwapPlayersTest(void* pArgs)
   CPrintF("  Swapped!\n");
 }
 
-static void DestroyEntityTest(void *pArgs)
+static void NET_DestroyEntity(void *pArgs)
 {
   INDEX iEntity = NEXTARGUMENT(INDEX);
   
-  CPrintF("destroyentitytest:\n");
+  CPrintF("NET_DestroyEntity:\n");
   if (!_pNetwork->ga_srvServer.srv_bActive) {
     CPrintF("  <not a server>\n");
     return;
@@ -1014,15 +1014,16 @@ static void DestroyEntityTest(void *pArgs)
   CPrintF("  done! Entity marked for removing!\n");
 }
 
-static void EntityRPCTest(void *pArgs)
+static void NET_SetEntityHealth(void *pArgs)
 {
-  INDEX iEntity = NEXTARGUMENT(INDEX);
-  
-  CPrintF("entityrpctest:\n");
+  CPrintF("NET_SetEntityHealth:\n");
   if (!_pNetwork->ga_srvServer.srv_bActive) {
     CPrintF("  <not a server>\n");
     return;
   }
+  
+  INDEX iEntity = NEXTARGUMENT(INDEX);
+  FLOAT fValue = NEXTARGUMENT(FLOAT);
   
   CEntity *penEntity = _pNetwork->ga_World.EntityFromID(iEntity);
 
@@ -1033,10 +1034,14 @@ static void EntityRPCTest(void *pArgs)
   
   CServer &srvServer = _pNetwork->ga_srvServer;
   
+  INDEX iCommandID = 1;
+  
   // create message for destroying entity in all sessions
   CNetworkStreamBlock nsbEntityRPC(MSG_SEQ_ENTITYRPC, ++srvServer.srv_iLastProcessedSequence);
-  nsbEntityRPC<<iEntity;
-
+  nsbEntityRPC << iEntity;
+  nsbEntityRPC << iCommandID;
+  nsbEntityRPC << fValue;
+  
   // put the message in buffer to be sent to all sessions
   _pNetwork->ga_srvServer.AddBlockToAllSessions(nsbEntityRPC);
   
@@ -1051,13 +1056,13 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   // remember the game ID
   CMessageDispatcher::Init(strGameID);
   
-  // [SSE] Netcode Update - Test For Attaching/Detaching/Swapping
-  _pShell->DeclareSymbol("user void AttachPlayerTest(INDEX, INDEX);", &AttachPlayerTest);
-  _pShell->DeclareSymbol("user void DetachPlayerTest(INDEX);", &DetachPlayerTest);
-  _pShell->DeclareSymbol("user void SwapPlayersTest(INDEX, INDEX);", &SwapPlayersTest);
-  _pShell->DeclareSymbol("user void DestroyEntityTest(INDEX);", &DestroyEntityTest);
+  // [SSE] Netcode Update - Testing functions for player Attaching/Detaching/Swapping
+  _pShell->DeclareSymbol("user void NET_AttachPlayer(INDEX, INDEX);", &NET_AttachPlayer);
+  _pShell->DeclareSymbol("user void NET_DetachPlayer(INDEX);", &NET_DetachPlayer);
+  _pShell->DeclareSymbol("user void NET_SwapPlayers(INDEX, INDEX);", &NET_SwapPlayers);
 
-  _pShell->DeclareSymbol("user void EntityRPCTest(INDEX);", &EntityRPCTest);
+  _pShell->DeclareSymbol("user void NET_DestroyEntity(INDEX);", &NET_DestroyEntity);
+  _pShell->DeclareSymbol("user void NET_SetEntityHealth(INDEX, FLOAT);", &NET_SetEntityHealth);
 
   // Add shell symbols.
   _pShell->DeclareSymbol("user INDEX dbg_bBreak;", &dbg_bBreak);
@@ -1193,7 +1198,6 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("persistent user FLOAT ser_tmKeepAlive;", &ser_tmKeepAlive);
   _pShell->DeclareSymbol("persistent user FLOAT ser_tmPingUpdate;", &ser_tmPingUpdate);
   _pShell->DeclareSymbol("persistent user INDEX ser_bWaitFirstPlayer;", &ser_bWaitFirstPlayer);
-  _pShell->DeclareSymbol("persistent user INDEX ser_iMaxAllowedBPS;", &ser_iMaxAllowedBPS);
   _pShell->DeclareSymbol("persistent user INDEX ser_iMaxAllowedBPS;", &ser_iMaxAllowedBPS);
   _pShell->DeclareSymbol("persistent user CTString ser_strIPMask;", &ser_strIPMask);
   _pShell->DeclareSymbol("persistent user CTString ser_strNameMask;", &ser_strNameMask);
