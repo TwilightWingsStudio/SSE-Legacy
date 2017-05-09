@@ -201,6 +201,7 @@ enum WeaponType {
 #define COLT_DAMAGE_COOP 10.0F
 #define COLT_MAG_SIZE 6
 
+
 #define DOUBLE_COLT_DAMAGE 17.5F      // [SSE] Balance Change. Default=10.0F
 #define DOUBLE_COLT_DAMAGE_COOP 10.0F
 
@@ -220,6 +221,11 @@ enum WeaponType {
 #define SNIPER_DAMAGE_SNIPING_COOP 300.0F
 
 // [SSE] Anim Wait Constants
+#define COLT_ANIM_RELOAD_LENGTH 1.1F
+#define COLT_ANIM_FIRE1_LENGTH 0.5F
+#define COLT_ANIM_FIRE2_LENGTH 0.5F
+#define COLT_ANIM_FIRE3_LENGTH 0.6F
+
 #define SINGLESHOTGUN_ANIM_FIRE_LENGTH 0.6F      // 1.1 - 0.5
 #define SINGLESHOTGUN_ANIM_FIREFAST_LENGTH 0.45F // 0.825 - 0.375
 
@@ -1172,7 +1178,8 @@ functions:
     m_moWeapon.SetupModelRendering(rmMain);
     m_moWeapon.RenderModel(rmMain);
 
-    /*if (tmSeriousDamage>tmNow && tmInvulnerability>tmNow) {
+    /*
+    if (tmSeriousDamage>tmNow && tmInvulnerability>tmNow) {
       Particle_PrepareSystem(pdp, apr);
       Particle_PrepareEntity( 1, 0, 0, NULL);
       Particles_ModelGlow2(&m_moWeapon, plWeapon, Max(tmSeriousDamage, tmInvulnerability),PT_STAR08, 0.025f, 2, 0.01f, 0xff00ff00);
@@ -1187,7 +1194,8 @@ functions:
       Particle_PrepareEntity( 1, 0, 0, NULL);
       Particles_ModelGlow2(&m_moWeapon, plWeapon, tmSeriousDamage, PT_STAR08, 0.025f, 2, 0.01f, 0xff777700);
       Particle_EndSystem();
-    }*/
+    }
+    */
 
     EndModelRenderingView();
 
@@ -5019,15 +5027,26 @@ procedures:
 
     // random colt fire
     INDEX iAnim;
-
-    switch (IRnd()%3) {
-      case 0: iAnim = COLT_ANIM_FIRE1; break;
-      case 1: iAnim = COLT_ANIM_FIRE2; break;
-      case 2: iAnim = COLT_ANIM_FIRE3; break;
+    FLOAT tmAnimLength;
+    
+    switch (IRnd()%3)
+    {
+      case 0:
+        iAnim = COLT_ANIM_FIRE1;
+        tmAnimLength = COLT_ANIM_FIRE1_LENGTH;
+        break;
+      case 1:
+        iAnim = COLT_ANIM_FIRE2;
+        tmAnimLength = COLT_ANIM_FIRE2_LENGTH;
+        break;
+      case 2:
+        iAnim = COLT_ANIM_FIRE3;
+        tmAnimLength = COLT_ANIM_FIRE3_LENGTH;
+        break;
     }
 
     m_moWeapon.PlayAnim(iAnim, 0);
-    autowait(m_moWeapon.GetAnimLength(iAnim)-0.05f); // TODO: Huyna
+    autowait(tmAnimLength - 0.05f); // TODO: Huyna
     m_moWeapon.PlayAnim(COLT_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART);
 
     // no more bullets in colt -> reload
@@ -5051,7 +5070,8 @@ procedures:
 
     m_moWeapon.PlayAnim(COLT_ANIM_RELOAD, 0);
     if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Colt_reload");}
-    autowait(m_moWeapon.GetAnimLength(COLT_ANIM_RELOAD)); // TODO: Huyna
+    autowait(COLT_ANIM_RELOAD_LENGTH);
+    
     m_iColtBullets = 6;
 
     return EEnd();
@@ -5093,16 +5113,29 @@ procedures:
     // sound
     CPlayer &plSnd = (CPlayer&)*m_penPlayer;
     PlaySound(plSnd.m_soWeapon0, SOUND_COLT_FIRE, SOF_3D|SOF_VOLUMETRIC);
+    
+    FLOAT tmAnimLength;
 
     // random colt fire
     switch (IRnd()%3) {
-      case 0: m_iAnim = COLT_ANIM_FIRE1; break;
-      case 1: m_iAnim = COLT_ANIM_FIRE2; break;
-      case 2: m_iAnim = COLT_ANIM_FIRE3; break;
+      case 0:
+        m_iAnim = COLT_ANIM_FIRE1;
+        tmAnimLength = COLT_ANIM_FIRE1_LENGTH;
+        break;
+      
+      case 1:
+        m_iAnim = COLT_ANIM_FIRE2;
+        tmAnimLength = COLT_ANIM_FIRE2_LENGTH;
+        break;
+
+      case 2:
+        m_iAnim = COLT_ANIM_FIRE3;
+        tmAnimLength = COLT_ANIM_FIRE3_LENGTH;
+        break;
     }
 
     m_moWeapon.PlayAnim(m_iAnim, 0);                  // play first colt anim
-    autowait(m_moWeapon.GetAnimLength(m_iAnim) / 2);    // wait half of the anim  // TODO: Huyna
+    autowait(tmAnimLength / 2);    // wait half of the anim
 
     // fire second colt
     GetAnimator()->FireAnimation(BODY_ANIM_COLT_FIRELEFT, 0);
@@ -5135,7 +5168,25 @@ procedures:
     PlaySound(pl.m_soWeapon1, SOUND_COLT_FIRE, SOF_3D|SOF_VOLUMETRIC);
 
     m_moWeaponSecond.PlayAnim(m_iAnim, 0);
-    autowait(m_moWeapon.GetAnimLength(m_iAnim) / 2);    // wait half of the anim  // TODO: Huyna
+    
+    FLOAT tmAnimLength;
+
+    // random colt fire
+    switch (m_iAnim) {
+      case COLT_ANIM_FIRE1:
+        tmAnimLength = COLT_ANIM_FIRE1_LENGTH;
+        break;
+      
+      case COLT_ANIM_FIRE2:
+        tmAnimLength = COLT_ANIM_FIRE2_LENGTH;
+        break;
+
+      case COLT_ANIM_FIRE3:
+        tmAnimLength = COLT_ANIM_FIRE3_LENGTH;
+        break;
+    }
+    
+    autowait(tmAnimLength/ 2);    // wait half of the anim 
 
     // no more bullets in colt -> reload
     if (m_iColtBullets == 0) {
@@ -5159,7 +5210,7 @@ procedures:
     PlaySound(pl.m_soWeapon2, SOUND_COLT_RELOAD, SOF_3D|SOF_VOLUMETRIC);
 
     // wait half of reload time
-    autowait(m_moWeapon.GetAnimLength(COLT_ANIM_RELOAD)/2); // TODO: Huyna
+    autowait(COLT_ANIM_RELOAD_LENGTH / 2);
 
     m_moWeaponSecond.PlayAnim(COLT_ANIM_RELOAD, 0);
 
@@ -5169,7 +5220,7 @@ procedures:
     if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Colt_reload");}
 
     // wait second halt minus half shortest fire animation
-    autowait(m_moWeapon.GetAnimLength(COLT_ANIM_RELOAD)-0.25f);  // TODO: Huyna
+    autowait(COLT_ANIM_RELOAD_LENGTH - 0.25f);
 
     m_iColtBullets = COLT_MAG_SIZE;
 
