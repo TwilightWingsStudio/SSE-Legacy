@@ -1214,32 +1214,43 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     HUD_DrawAnchoredTextInRect (10, 8, 104, 16, EHHAT_CENTER, EHVAT_TOP, strHiScore, NONE, bBeating ? 0.0f : 1.0f);
   }
 
+  // TeamPlay Frags
   if (bTeamDeathMatch) {
     CTString strTeam1, strTeam2;
-
-    strTeam1.PrintF( "%d", GetSP()->sp_iTeamScore1);
-    strTeam2.PrintF( "%d", GetSP()->sp_iTeamScore2);
 
     COLOR col = _colHUD;
     COLOR colIcon = C_WHITE;
     
+    COLOR colLeft = C_lGRAY;
+    COLOR colRight = C_lGRAY;
+    
     if (_penPlayer->m_iTeamID == 1) {
       colIcon = C_lBLUE;
+      colLeft = C_lBLUE;
+      colRight = C_lRED;
+      
+      strTeam1.PrintF( "%d", GetSP()->sp_iTeamScore1);
+      strTeam2.PrintF( "%d", GetSP()->sp_iTeamScore2);
     } else {
       colIcon = C_lRED;
+      colLeft = C_lRED;
+      colRight = C_lBLUE;
+      
+      strTeam1.PrintF( "%d", GetSP()->sp_iTeamScore2);
+      strTeam2.PrintF( "%d", GetSP()->sp_iTeamScore1);
     }
     
     HUD_DrawAnchoredRect (-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRectOutline(-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, strTeam1, C_lBLUE|_ulAlphaHUD, 1.0F);
+    HUD_DrawAnchoredTextInRect (-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, strTeam1, colLeft|_ulAlphaHUD, 1.0F);
       
     HUD_DrawAnchoredRect ( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchroredIcon( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toSwords, colIcon|CT_OPAQUE, 0.0F, FALSE); // Icon
-    HUD_DrawAnchoredRectOutline(0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+    HUD_DrawAnchoredRectOutline(0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
     
     HUD_DrawAnchoredRect (38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRectOutline(38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, strTeam2, C_lRED|_ulAlphaHUD, 1.0F);
+    HUD_DrawAnchoredTextInRect (38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, strTeam2, colRight|_ulAlphaHUD, 1.0F);
   }
   
   // CSC Down
@@ -1506,6 +1517,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
   INDEX iWantedWeapon  = _penWeapons->m_iWantedWeapon;
   
   const BOOL bSharedLives = GetSP()->sp_bSharedLives;
+  const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags;
 
   // determine hud colorization;
   COLOR colMax = SE_COL_BLUEGREEN_LT;
@@ -1810,6 +1822,45 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       HUD_DrawAnchoredRectOutline(fHorOffset, 120, 32, 32, EHHAT_CENTER, EHVAT_MID, colBorder|_ulAlphaHUD);
       fHorOffset += 32 + 4;
     }
+  }
+  
+  // TeamPlay Frags
+  if (bTeamDeathMatch) {
+    CTString strTeam1, strTeam2;
+
+    COLOR col = _colHUD;
+    COLOR colIcon = C_WHITE;
+    
+    COLOR colLeft = C_lGRAY;
+    COLOR colRight = C_lGRAY;
+    
+    if (_penPlayer->m_iTeamID == 1) {
+      colIcon = C_lBLUE;
+      colLeft = C_lBLUE;
+      colRight = C_lRED;
+      
+      strTeam1.PrintF( "%d", GetSP()->sp_iTeamScore1);
+      strTeam2.PrintF( "%d", GetSP()->sp_iTeamScore2);
+    } else {
+      colIcon = C_lRED;
+      colLeft = C_lRED;
+      colRight = C_lBLUE;
+      
+      strTeam1.PrintF( "%d", GetSP()->sp_iTeamScore2);
+      strTeam2.PrintF( "%d", GetSP()->sp_iTeamScore1);
+    }
+    
+    HUD_DrawAnchoredRect (-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchoredRectOutline(-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
+    HUD_DrawAnchoredTextInRect (-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, strTeam1, colLeft|_ulAlphaHUD, 1.0F);
+      
+    HUD_DrawAnchoredRect ( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchroredIcon( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toSwords, colIcon|CT_OPAQUE, 0.0F, FALSE); // Icon
+    HUD_DrawAnchoredRectOutline(0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
+    
+    HUD_DrawAnchoredRect (38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchoredRectOutline(38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
+    HUD_DrawAnchoredTextInRect (38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, strTeam2, colRight|_ulAlphaHUD, 1.0F);
   }
   
   // BossBar

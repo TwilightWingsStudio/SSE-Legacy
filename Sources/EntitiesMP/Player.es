@@ -399,7 +399,7 @@ extern BOOL hud_bSniperScopeWheelColoring = TRUE;
 extern void HUD_ReloadSS(void* pArgs);
 
 extern BOOL hud_bGameDebugMonitor = FALSE;
-extern INDEX hud_iHUDType = 0;
+extern INDEX hud_iHUDType = 1;
 // [SSE] END
 
 extern INDEX hud_bWeaponInertiaEffect = TRUE; // [SSE] Weapon Inertia Effect
@@ -3276,13 +3276,12 @@ functions:
         CEntity *pen = GetPlayerEntity(iPlayer);
         if (pen != NULL) {
           CPlayer *penPlayer = static_cast<CPlayer*>(pen);
-          
-          if (penPlayer->m_iTeamID == 0) {
-            ctUnassigned++;
-          } else if (penPlayer->m_iTeamID == 1) {
-            ctTeam1++;
-          } else {
-            ctTeam2++;
+
+          switch (penPlayer->m_iTeamID)
+          {
+            case 0: ctUnassigned++; break;
+            case 1: ctTeam1++; break;
+            default: ctTeam2++; break;
           }
         }
       }
@@ -3309,6 +3308,10 @@ functions:
       
       pdp->Fill(0, 0, pixDPWidth, 128 * fMul, C_BLACK|128, C_BLACK|128, C_BLACK|0, C_BLACK|0);
       pdp->PutText( strMessage, 16, 16, C_WHITE|CT_OPAQUE);
+      
+      CTString strTmp;
+      strTmp.PrintF("%s", TRANS("Press USE to confirm selection!"));
+      pdp->PutText(strTmp, 16, pixDPHeight*0.2f, C_WHITE|255);
     }
 
     // camera fading
@@ -7116,6 +7119,15 @@ procedures:
             // [SSE] Team DeathMatch
             if (GetSP()->sp_bTeamPlay && pplKillerPlayer->m_iTeamID == m_iTeamID) {
               eDeath.eLastDamage.penInflictor->SendEvent(EKilledAlly());
+              
+              // Only actual player can work with CSessionProperties!
+              if (!IsPredictor()) {
+                if (pplKillerPlayer->m_iTeamID == 1) {
+                  ((CSessionProperties*)GetSP())->sp_iTeamScore1 -= 1;
+                } else {
+                  ((CSessionProperties*)GetSP())->sp_iTeamScore2 -= 1;
+                }
+              }
             } else {
               eDeath.eLastDamage.penInflictor->SendEvent(eScore);
               eDeath.eLastDamage.penInflictor->SendEvent(EKilledEnemy());
@@ -7136,7 +7148,17 @@ procedures:
             m_psGameStats.ps_iScore -= m_iMana;
             m_psLevelStats.ps_iKills -= 1;
             m_psGameStats.ps_iKills -= 1;
+            
+            // Only actual player can work with CSessionProperties!
+            if (!IsPredictor()) {
+              if (m_iTeamID == 1) {
+                ((CSessionProperties*)GetSP())->sp_iTeamScore1 -= 1;
+              } else {
+                ((CSessionProperties*)GetSP())->sp_iTeamScore2 -= 1;
+              }
+            }
           }
+
         // if killed by non-player
         } else {
           m_psLevelStats.ps_iScore -= m_iMana;
