@@ -143,6 +143,7 @@ static CTextureObject _toArmorMedium;
 static CTextureObject _toArmorLarge;
 
 static CTextureObject _toExtraLive; // [SSE]
+static CTextureObject _toSwords; // [SSE]
 
 static CTextureObject _toTestIken; // [SSE]
 
@@ -955,6 +956,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   const BOOL bCooperative =  GetSP()->sp_bCooperative && !bSinglePlay;
   const BOOL bScoreMatch  = !GetSP()->sp_bCooperative && !GetSP()->sp_bUseFrags;
   const BOOL bFragMatch   = !GetSP()->sp_bCooperative &&  GetSP()->sp_bUseFrags;
+  const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags;
   const BOOL bSharedLives = GetSP()->sp_bSharedLives;
 
   _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
@@ -1210,6 +1212,34 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     HUD_DrawAnchoredRectOutline( 10, 8, 104, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     
     HUD_DrawAnchoredTextInRect (10, 8, 104, 16, EHHAT_CENTER, EHVAT_TOP, strHiScore, NONE, bBeating ? 0.0f : 1.0f);
+  }
+
+  if (bTeamDeathMatch) {
+    CTString strTeam1, strTeam2;
+
+    strTeam1.PrintF( "%d", GetSP()->sp_iTeamScore1);
+    strTeam2.PrintF( "%d", GetSP()->sp_iTeamScore2);
+
+    COLOR col = _colHUD;
+    COLOR colIcon = C_WHITE;
+    
+    if (_penPlayer->m_iTeamID == 1) {
+      colIcon = C_lBLUE;
+    } else {
+      colIcon = C_lRED;
+    }
+    
+    HUD_DrawAnchoredRect (-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchoredRectOutline(-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
+    HUD_DrawAnchoredTextInRect (-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, strTeam1, C_lBLUE|_ulAlphaHUD, 1.0F);
+      
+    HUD_DrawAnchoredRect ( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchroredIcon( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toSwords, colIcon|CT_OPAQUE, 0.0F, FALSE); // Icon
+    HUD_DrawAnchoredRectOutline(0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+    
+    HUD_DrawAnchoredRect (38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchoredRectOutline(38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
+    HUD_DrawAnchoredTextInRect (38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, strTeam2, C_lRED|_ulAlphaHUD, 1.0F);
   }
   
   // CSC Down
@@ -3059,6 +3089,7 @@ static void HUD_RegisterTextures()
   HUD_RegisterTexture(&_toArmorLarge,  CTFILENAME("TexturesMP\\Interface\\ArStrong.tex"));
   
   HUD_RegisterTexture(&_toExtraLive,  CTFILENAME("TexturesMP\\Interface\\IExtraLive.tex"));
+  HUD_RegisterTexture(&_toSwords,     CTFILENAME("TexturesMP\\Interface\\ISwords.tex"));
 
   // initialize ammo textures
   HUD_RegisterTexture(&_toAColt,          CTFILENAME("TexturesMP\\Interface\\AmColt.tex"));

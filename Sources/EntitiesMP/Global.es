@@ -75,6 +75,11 @@ event EReceiveScore { // sent to player when enemy is killed
 event EKilledEnemy { // sent to player when enemy is killed
 };
 
+// [SSE] Team DeathMatch
+event EKilledAlly { // sent to player when ally is killed
+};
+//
+
 event ESecretFound { // sent to player secret is found
 };
 

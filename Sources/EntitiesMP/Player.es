@@ -617,12 +617,12 @@ DECL_DLL void ctl_ComposeActionPacket(INDEX iPlayer/*const CPlayerCharacter &pc*
 
     // Left
     if (pctlCurrent.bMoveLeft) {
-      paAction.pa_ulButtons |= PLACT_WEAPON_PREV;
+      paAction.pa_ulButtons |= PLACT_SNIPER_ZOOMIN;
     }
 
     // Right
     if (pctlCurrent.bMoveRight) {
-      paAction.pa_ulButtons |= PLACT_WEAPON_NEXT;
+      paAction.pa_ulButtons |= PLACT_SNIPER_ZOOMOUT;
     }
     
     // Up
@@ -638,6 +638,16 @@ DECL_DLL void ctl_ComposeActionPacket(INDEX iPlayer/*const CPlayerCharacter &pc*
     // Acceleration
     if (pctlCurrent.bFire) {
       paAction.pa_ulButtons |= PLACT_FIRE;
+    }
+    
+    // Select Next
+    if (pctlCurrent.bWeaponNext) {
+      paAction.pa_ulButtons |= PLACT_WEAPON_NEXT;
+    }
+    
+    // Select Previous
+    if (pctlCurrent.bWeaponPrev) {
+      paAction.pa_ulButtons |= PLACT_WEAPON_PREV;
     }
 
     // view
@@ -1303,13 +1313,19 @@ properties:
  191 INDEX m_iLastSeriousBombCount = 0,  // ammount of serious bombs player had before firing
  192 FLOAT m_tmSeriousBombFired = -10.0f,  // when the bomb was last fired
  
+ 199 INDEX m_iCheatFlags = 0,
+ 
  // [SSE] Personal/Shared Extra Lives
  200 INDEX m_iLives = 0,
  201 INDEX m_iMoney = 0,
  202 INDEX m_iScoreAccumulated = 0,
  
  // [SSE] Respawn Delay
- 220 FLOAT m_tmKilled = -1.0f, 
+ 220 FLOAT m_tmKilled = -1.0f,
+ 
+ // [SSE] Team DeathMatch
+ 250 INDEX m_iTeamID = 0,
+ 251 INDEX m_iTeamSelection = 0,
  
  // [SSE] Weapon Inertia Effect
  350 ANGLE3D m_aWeaponSway = ANGLE3D(0, 0, 0),
@@ -1493,7 +1509,14 @@ functions:
   // --------------------------------------------------------------------------------------
   virtual void ReceiveRPC(CNetworkMessage &nmMessage)
   {
-    CPrintF("PLID %d received direct RPC!\n", GetMyPlayerIndex());
+    INDEX iCommandID;
+    FLOAT fValue;
+
+    nmMessage >> iCommandID;
+    nmMessage >> fValue;
+    
+    SetHealth(fValue);
+    //CPrintF("PLID %d received direct RPC!\n", GetMyPlayerIndex());
   };
   
   // --------------------------------------------------------------------------------------
@@ -1627,9 +1650,47 @@ functions:
     CSpectatorCamera *pen = (CSpectatorCamera*)&*m_penSpectatorCamera;
     
     // Use.
-    if (ulNewButtons & PLACT_USE) {
-      pen->TogglePlayerControl();
-      pen->StopCamera();
+    if (!GetSP()->sp_bTeamPlay || m_iTeamID != 0) {
+      if (ulNewButtons & PLACT_USE) {
+        pen->TogglePlayerControl();
+        pen->StopCamera();
+      }
+    } else {
+      if (m_iTeamSelection != -1)
+      {
+        if (ulNewButtons & PLACT_WEAPON_NEXT) {
+          m_iTeamSelection += 1;
+          if (m_iTeamSelection > 2) {
+            m_iTeamSelection = 0;
+          }
+        }
+        
+        if (ulNewButtons & PLACT_WEAPON_PREV) {
+          m_iTeamSelection -= 1;
+          if (m_iTeamSelection < 0) {
+            m_iTeamSelection = 2;
+          }
+        }
+        
+        if (ulNewButtons & PLACT_USE) {
+          if (m_iTeamSelection == 0) {
+            m_iTeamSelection = -1;
+          } else {
+            m_iTeamID = m_iTeamSelection;
+            ToggleSpectatorCamera();
+            
+            SetPhysicsFlags(EPF_MODEL_WALKING|EPF_HASLUNGS);
+            SetCollisionFlags(ECF_MODEL|((ECBI_PLAYER)<<ECB_IS));
+
+            SwitchToModel();
+            SpawnTeleport();
+          }
+        }
+      } else {
+        if (ulNewButtons & PLACT_USE) {
+          m_iTeamSelection = 0;
+        }
+      }
     }
     
     // Forward.
@@ -1643,12 +1704,12 @@ functions:
     }
 
     // Left.
-    if (ulNewButtons & PLACT_WEAPON_PREV) {
+    if (ulNewButtons & PLACT_SNIPER_ZOOMIN) {
       pen->m_bButtonLeft = TRUE;
     }
 
     // Right.
-    if (ulNewButtons & PLACT_WEAPON_NEXT) {
+    if (ulNewButtons & PLACT_SNIPER_ZOOMOUT) {
       pen->m_bButtonRight = TRUE;
     }
     
@@ -1676,11 +1737,11 @@ functions:
       pen->m_bButtonDown = FALSE;
     }
 
-    if (ulReleasedButtons & PLACT_WEAPON_PREV) {
+    if (ulReleasedButtons & PLACT_SNIPER_ZOOMIN) {
       pen->m_bButtonLeft = FALSE;
     }
 
-    if (ulReleasedButtons & PLACT_WEAPON_NEXT) {
+    if (ulReleasedButtons & PLACT_SNIPER_ZOOMOUT) {
       pen->m_bButtonRight = FALSE;
     }
     
@@ -3203,6 +3264,52 @@ functions:
 
     pdpCamera->Unlock();
     pdp->Lock();
+    
+    // [SSE] Team DeathMatch
+    if (GetSP()->sp_bTeamPlay && m_iTeamSelection != -1) {
+      INDEX ctTeam1 = 0;
+      INDEX ctTeam2 = 0;
+      INDEX ctUnassigned = 0;
+      
+      for (INDEX iPlayer = 0; iPlayer < CEntity::GetMaxPlayers(); iPlayer++)
+      {
+        CEntity *pen = GetPlayerEntity(iPlayer);
+        if (pen != NULL) {
+          CPlayer *penPlayer = static_cast<CPlayer*>(pen);
+          
+          if (penPlayer->m_iTeamID == 0) {
+            ctUnassigned++;
+          } else if (penPlayer->m_iTeamID == 1) {
+            ctTeam1++;
+          } else {
+            ctTeam2++;
+          }
+        }
+      }
+      
+      CTString strMessage;
+      strMessage.PrintF("%s ^c7F7FFFBLU Team ^r(%d players)\n", m_iTeamSelection == 1 ? "->" : "", ctTeam1);
+      strMessage.PrintF("%s%s ^cFF7F7FRED Team ^r(%d players)\n\n", strMessage, m_iTeamSelection == 2 ? "->" : "", ctTeam2);
+      strMessage.PrintF("%s%s ^cBFBFBFUnassigned ^r(%d players)\n", strMessage, m_iTeamSelection == 0 ? "->" : "", ctUnassigned);
+      
+      PIX pixDPWidth  = pdp->GetWidth();
+      PIX pixDPHeight = pdp->GetHeight();
+      
+      FLOAT fMul;
+      
+      if (pixDPWidth > pixDPHeight) {
+        fMul = pixDPHeight / 480.0F;
+      } else {
+        fMul = pixDPWidth / 640.0F;
+      }
+
+      pdp->SetFont( _pfdDisplayFont);
+      pdp->SetTextScaling(fMul);
+      pdp->SetTextAspect( 1.0f);
+      
+      pdp->Fill(0, 0, pixDPWidth, 128 * fMul, C_BLACK|128, C_BLACK|128, C_BLACK|0, C_BLACK|0);
+      pdp->PutText( strMessage, 16, 16, C_WHITE|CT_OPAQUE);
+    }
 
     // camera fading
     if ((colBlend&CT_AMASK)!=0) {
@@ -3836,9 +3943,14 @@ functions:
       return;
     }
 
-    // if not connected
+    // If not connected then noone can harm you.
     if (m_ulFlags&PLF_NOTCONNECTED) {
-      // noone can harm you
+      return;
+    }
+    
+    // [SSE] Team DeathMatch
+    // If have no team selected then nobody can harm you!
+    if (GetSP()->sp_bTeamPlay && m_iTeamID == 0) {
       return;
     }
 
@@ -3857,9 +3969,23 @@ functions:
     }
 
     // check for friendly fire
-    if (!GetSP()->sp_bFriendlyFire && GetSP()->sp_bCooperative) {
-      if (IsOfClass(penInflictor, "Player") && penInflictor != this) {
-        return;
+    if (!GetSP()->sp_bFriendlyFire)
+    {
+      if (GetSP()->sp_bCooperative) {
+        if (IsOfClass(penInflictor, "Player") && penInflictor != this) {
+          return;
+        }
+
+      // [SSE] Team DeathMatch
+      } else if (GetSP()->sp_bTeamPlay) {
+        if (IsOfClass(penInflictor, "Player") && penInflictor != this) {
+          
+          CPlayer *penPlayer = static_cast<CPlayer*>(penInflictor);
+
+          if (penPlayer->m_iTeamID == m_iTeamID) {
+            return;
+          }
+        }
       }
     }
 
@@ -5826,6 +5952,7 @@ functions:
   // --------------------------------------------------------------------------------------
   BOOL CheatsEnabled(void)
   {
+    return TRUE;
     return (GetSP()->sp_ctMaxPlayers == 1 || GetSP()->sp_bQuickTest) && m_penActionMarker == NULL && !_SE_DEMO;
   }
 
@@ -6314,6 +6441,7 @@ functions:
     SetPhysicsFlags(EPF_MODEL_WALKING|EPF_HASLUNGS);
     SetCollisionFlags(ECF_MODEL|((ECBI_PLAYER)<<ECB_IS));
     SetFlags(GetFlags()|ENF_ALIVE);
+
     // animation
     StartModelAnim(PLAYER_ANIM_STAND, AOF_LOOPING);
     TeleportPlayer(WLT_FIXED);
@@ -6652,14 +6780,22 @@ functions:
     GetPlayerAnimator()->SetWeapon();
     m_ulFlags |= PLF_SYNCWEAPON;
 
-    // spawn teleport effect
-    SpawnTeleport();
-
-    // return from editor model (if was fragged into pieces)
-    SwitchToModel();
     m_tmSpawned = _pTimer->CurrentTick();
 
     en_tmLastBreathed = _pTimer->CurrentTick()+0.1f;  // do not take breath when spawned in air
+   
+    // [SSE] Team DeathMatch
+    // If not teamplay or have team selected.
+    if (!GetSP()->sp_bTeamPlay || m_iTeamID != 0) {
+      SpawnTeleport(); // spawn teleport effect
+      SwitchToModel(); // return from editor model (if was fragged into pieces)
+      
+    } else {
+      SwitchToEditorModel();
+      StartSpectatorCameraFromOwner();
+      SetPhysicsFlags(EPF_MODEL_CORPSE);
+      SetCollisionFlags(ECF_CORPSE);
+    }
   };
 
   // --------------------------------------------------------------------------------------
@@ -6970,13 +7106,30 @@ procedures:
       if (penKiller!=NULL) {
         // if killed by player
         if (IsOfClass(penKiller, "Player")) {
+          pplKillerPlayer = static_cast<CPlayer*>(penKiller);
+
           // if someone other then you
-          if (penKiller!=this) {
-            pplKillerPlayer = (CPlayer*)penKiller;
+          if (penKiller != this) {
             EReceiveScore eScore;
             eScore.iPoints = m_iMana;
-            eDeath.eLastDamage.penInflictor->SendEvent(eScore);
-            eDeath.eLastDamage.penInflictor->SendEvent(EKilledEnemy());
+            
+            // [SSE] Team DeathMatch
+            if (GetSP()->sp_bTeamPlay && pplKillerPlayer->m_iTeamID == m_iTeamID) {
+              eDeath.eLastDamage.penInflictor->SendEvent(EKilledAlly());
+            } else {
+              eDeath.eLastDamage.penInflictor->SendEvent(eScore);
+              eDeath.eLastDamage.penInflictor->SendEvent(EKilledEnemy());
+              
+              // Only actual player can work with CSessionProperties!
+              if (!IsPredictor()) {
+                if (pplKillerPlayer->m_iTeamID == 1) {
+                  ((CSessionProperties*)GetSP())->sp_iTeamScore1 += 1;
+                } else {
+                  ((CSessionProperties*)GetSP())->sp_iTeamScore2 += 1;
+                }
+              }
+            }
+            
           // if it was yourself
           } else {
             m_psLevelStats.ps_iScore -= m_iMana;
@@ -8204,6 +8357,12 @@ procedures:
       on (EKilledEnemy) : {
         m_psLevelStats.ps_iKills += 1;
         m_psGameStats.ps_iKills += 1;
+        resume;
+      }
+      
+      on (EKilledAlly) : {
+        m_psLevelStats.ps_iKills -= 1;
+        m_psGameStats.ps_iKills -= 1;
         resume;
       }
 
