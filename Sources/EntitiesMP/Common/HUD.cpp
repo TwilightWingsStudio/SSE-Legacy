@@ -2054,7 +2054,24 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
           _pDP->PutTextC( strPing,     _pixDPWidth- 2 * fCharWidth, fCharHeight * i + fOneUnit * 2, colPing|_ulAlphaHUD);
 
         } else { // fragmatch!
-          _pDP->PutTextR( strName+":", _pixDPWidth-12 * fCharWidth, fCharHeight * i + fOneUnit * 2, _colHUD  |_ulAlphaHUD);
+          CTString strNameString;
+
+          // [SSE]
+          if (bTeamDeathMatch) {
+            INDEX iTeamID = penPlayer->m_iTeamID;
+            
+            if (iTeamID == 0) {
+              strNameString.PrintF("^cAAAAAA> ^r%s", strName);
+            } else if (iTeamID == 1) {
+              strNameString.PrintF("^c7F7FFF> ^r%s", strName);
+            } else {
+              strNameString.PrintF("^cFF7F7F> ^r%s", strName);
+            }
+          } else {
+            strNameString = strName;
+          }
+
+          _pDP->PutTextR( strNameString+":", _pixDPWidth-12 * fCharWidth, fCharHeight * i + fOneUnit * 2, _colHUD  |_ulAlphaHUD);
           _pDP->PutText(  "/",         _pixDPWidth-8 * fCharWidth, fCharHeight * i + fOneUnit * 2, _colHUD  |_ulAlphaHUD);
           _pDP->PutTextC( strFrags,    _pixDPWidth-10 * fCharWidth, fCharHeight * i + fOneUnit * 2, colFrags |_ulAlphaHUD);
           _pDP->PutTextC( strDeaths,   _pixDPWidth-6 * fCharWidth, fCharHeight * i + fOneUnit * 2, colDeaths|_ulAlphaHUD);
@@ -2688,6 +2705,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   const BOOL bCooperative =  GetSP()->sp_bCooperative && !bSinglePlay;
   const BOOL bScoreMatch  = !GetSP()->sp_bCooperative && !GetSP()->sp_bUseFrags;
   const BOOL bFragMatch   = !GetSP()->sp_bCooperative &&  GetSP()->sp_bUseFrags;
+  const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
   COLOR colMana, colFrags, colDeaths, colHealth, colArmor, colPing;
   COLOR colScore  = _colHUD;
   INDEX iScoreSum = 0;
@@ -2811,7 +2829,24 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
           _pDP->PutTextC( strPing,     _pixDPWidth- 2 * fCharWidth, fCharHeight * i + fOneUnit * 2, colPing|_ulAlphaHUD);
 
         } else { // fragmatch!
-          _pDP->PutTextR( strName+":", _pixDPWidth-12 * fCharWidth, fCharHeight * i + fOneUnit * 2, _colHUD  |_ulAlphaHUD);
+          CTString strNameString;
+        
+          // [SSE]
+          if (bTeamDeathMatch) {
+            INDEX iTeamID = penPlayer->m_iTeamID;
+            
+            if (iTeamID == 0) {
+              strNameString.PrintF("^cAAAAAA> ^r%s", strName);
+            } else if (iTeamID == 1) {
+              strNameString.PrintF("^c7F7FFF> ^r%s", strName);
+            } else {
+              strNameString.PrintF("^cFF7F7F> ^r%s", strName);
+            }
+          } else {
+            strNameString = strName;
+          }
+        
+          _pDP->PutTextR( strNameString+":", _pixDPWidth-12 * fCharWidth, fCharHeight * i + fOneUnit * 2, _colHUD  |_ulAlphaHUD);
           _pDP->PutText(  "/",         _pixDPWidth-8 * fCharWidth, fCharHeight * i + fOneUnit * 2, _colHUD  |_ulAlphaHUD);
           _pDP->PutTextC( strFrags,    _pixDPWidth-10 * fCharWidth, fCharHeight * i + fOneUnit * 2, colFrags |_ulAlphaHUD);
           _pDP->PutTextC( strDeaths,   _pixDPWidth-6 * fCharWidth, fCharHeight * i + fOneUnit * 2, colDeaths|_ulAlphaHUD);
