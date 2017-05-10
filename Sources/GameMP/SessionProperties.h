@@ -74,6 +74,7 @@ public:
   INDEX sp_ctCredits;           // number of credits for this game
   INDEX sp_ctCreditsLeft;       // number of credits left on this level
   FLOAT sp_tmSpawnInvulnerability;   // how many seconds players are invunerable after respawning
+  FLOAT sp_tmRespawnDelay; // [SSE] Respawn Delay - How many seconds should pass after player death to be able respawn.
 
   INDEX sp_iBlood;         // blood/gibs type (0=none, 1=green, 2=red, 3=hippie)
   BOOL  sp_bGibs;          // enable/disable gibbing
@@ -91,13 +92,13 @@ public:
   //
   
   BOOL sp_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
-  
-  // [SSE] Respawn Delay
-  FLOAT sp_tmRespawnDelay; // How many seconds should pass after player death to be able respawn.
+  BOOL sp_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
   
   // [SSE] Team DeathMatch
   INDEX sp_iTeamScore1;
   INDEX sp_iTeamScore2;
+  INDEX sp_iTeamScore3;
+  INDEX sp_iTeamScore4;
   //
 };
 

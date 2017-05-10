@@ -1825,6 +1825,16 @@ functions:
 
       m_penSpectatorCamera = pen;
   }
+  
+  // [SSE]
+  void DecreaseTeamScore()
+  {
+    if (m_iTeamID == 1) {
+      ((CSessionProperties*)GetSP())->sp_iTeamScore1 -= 1;
+    } else {
+      ((CSessionProperties*)GetSP())->sp_iTeamScore2 -= 1;
+    }
+  }
 
   // --------------------------------------------------------------------------------------
   class CPlayerWeapons *GetPlayerWeapons(void)
@@ -4078,7 +4088,7 @@ functions:
       }
     }
 
-    DamageImpact(dmtType, fSubHealth, vHitPoint, vDirection);
+    DamageImpact(dmtType, GetSP()->sp_bArmorInertiaDamping ? fSubHealth : fDamageAmmount, vHitPoint, vDirection);
 
     // receive damage
     CPlayerEntity::ReceiveDamage( penInflictor, dmtType, fSubHealth, vHitPoint, vDirection);
@@ -7148,14 +7158,10 @@ procedures:
             m_psGameStats.ps_iScore -= m_iMana;
             m_psLevelStats.ps_iKills -= 1;
             m_psGameStats.ps_iKills -= 1;
-            
+
             // Only actual player can work with CSessionProperties!
             if (!IsPredictor()) {
-              if (m_iTeamID == 1) {
-                ((CSessionProperties*)GetSP())->sp_iTeamScore1 -= 1;
-              } else {
-                ((CSessionProperties*)GetSP())->sp_iTeamScore2 -= 1;
-              }
+              DecreaseTeamScore();
             }
           }
 
@@ -7165,6 +7171,11 @@ procedures:
           m_psGameStats.ps_iScore -= m_iMana;
           m_psLevelStats.ps_iKills -= 1;
           m_psGameStats.ps_iKills -= 1;
+          
+          // Only actual player can work with CSessionProperties!
+          if (!IsPredictor()) {
+            DecreaseTeamScore();
+          }
         }
       // if killed by NULL (shouldn't happen, but anyway)
       } else {
@@ -7172,6 +7183,11 @@ procedures:
         m_psGameStats.ps_iScore -= m_iMana;
         m_psLevelStats.ps_iKills -= 1;
         m_psGameStats.ps_iKills -= 1;
+        
+        // Only actual player can work with CSessionProperties!
+        if (!IsPredictor()) {
+          DecreaseTeamScore();
+        }
       }
 
       // if playing scorematch

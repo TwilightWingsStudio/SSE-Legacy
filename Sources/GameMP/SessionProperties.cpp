@@ -25,6 +25,7 @@ extern FLOAT gam_fExtraEnemyStrength          ;
 extern FLOAT gam_fExtraEnemyStrengthPerPlayer ;
 extern INDEX gam_iCredits;
 extern FLOAT gam_tmSpawnInvulnerability;
+extern FLOAT gam_tmRespawnDelay; // [SSE] Respawn Delay
 extern INDEX gam_iScoreLimit;
 extern INDEX gam_iFragLimit;
 extern INDEX gam_iTimeLimit;
@@ -57,8 +58,7 @@ extern INDEX gam_iScoreForExtraLive;
 //
 
 extern INDEX gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
-
-extern FLOAT gam_tmRespawnDelay; // [SSE] Respawn Delay
+extern INDEX gam_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
 
 static void SetGameModeParameters(CSessionProperties &sp)
 {
@@ -164,6 +164,7 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   sp.sp_ctCredits     = 0;
   sp.sp_ctCreditsLeft = 0;
   sp.sp_tmSpawnInvulnerability = 0;
+  sp.sp_tmRespawnDelay = 0; // [SSE] Respawn Delay
 
   sp.sp_bTeamPlay = FALSE;
   sp.sp_bFriendlyFire = FALSE;
@@ -187,8 +188,7 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   //
   
   sp.sp_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
-  
-  sp.sp_tmRespawnDelay = 0; // [SSE] Respawn Delay
+  sp.sp_bArmorInertiaDamping = TRUE;
 
   sp.sp_iBlood = Clamp( gam_iBlood, 0L, 3L);
   sp.sp_bGibs  = gam_bGibs;
@@ -196,6 +196,8 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   // [SSE] Team DeathMatch
   sp.sp_iTeamScore1 = 0;
   sp.sp_iTeamScore2 = 0;
+  sp.sp_iTeamScore3 = 0;
+  sp.sp_iTeamScore4 = 0;
 }
 
 // set properties for a quick start session
@@ -254,16 +256,19 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_iBlood = Clamp( gam_iBlood, 0L, 3L);
   sp.sp_bGibs  = gam_bGibs;
   sp.sp_tmSpawnInvulnerability = gam_tmSpawnInvulnerability;
+  sp.sp_tmRespawnDelay = Clamp(gam_tmRespawnDelay, 0.0F, 60.0F); // [SSE] Respawn Delay
 
   sp.sp_bUseExtraEnemies = gam_bUseExtraEnemies;
 
   sp.sp_bKeepSeriousDamageOnProjectiles = gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
   
-  sp.sp_tmRespawnDelay = Clamp(gam_tmRespawnDelay, 0.0F, 60.0F); // [SSE] Respawn Delay
+  sp.sp_bArmorInertiaDamping = gam_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
   
   // [SSE] Team DeathMatch
   sp.sp_iTeamScore1 = 0;
   sp.sp_iTeamScore2 = 0;
+  sp.sp_iTeamScore3 = 0;
+  sp.sp_iTeamScore4 = 0;
 
   // set credits and limits
   if (sp.sp_bCooperative) {

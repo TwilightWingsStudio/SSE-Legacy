@@ -129,6 +129,7 @@ extern INDEX gam_iScoreForExtraLive = 100000;
 //
 
 extern INDEX gam_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
+extern INDEX gam_bArmorInertiaDamping = TRUE; // [SSE] Armor Inertia Damping Toggle
 
 extern FLOAT gam_tmRespawnDelay = 0.0F; // [SSE] Respawn Delay
 
@@ -970,6 +971,7 @@ void CGame::InitInternal( void)
 
   _pShell->DeclareSymbol("persistent user INDEX gam_iCredits;", &gam_iCredits);
   _pShell->DeclareSymbol("persistent user FLOAT gam_tmSpawnInvulnerability;", &gam_tmSpawnInvulnerability);
+  _pShell->DeclareSymbol("persistent user FLOAT gam_tmRespawnDelay;", &gam_tmRespawnDelay); // [SSE] Respawn Delay
 
   _pShell->DeclareSymbol("persistent user INDEX gam_iBlood;", &gam_iBlood);
   _pShell->DeclareSymbol("persistent user INDEX gam_bGibs;",  &gam_bGibs);
@@ -980,9 +982,9 @@ void CGame::InitInternal( void)
   _pShell->DeclareSymbol("persistent user INDEX gam_bSharedLives;", &gam_bSharedLives);
   _pShell->DeclareSymbol("persistent user INDEX gam_iScoreForExtraLive;", &gam_iScoreForExtraLive); 
   //
-  _pShell->DeclareSymbol("persistent user INDEX gam_bKeepSeriousDamageOnProjectiles;",  &gam_bKeepSeriousDamageOnProjectiles); // [SSE] Better Serious Damage
 
-  _pShell->DeclareSymbol("persistent user FLOAT gam_tmRespawnDelay;", &gam_tmRespawnDelay); // [SSE] Respawn Delay
+  _pShell->DeclareSymbol("persistent user INDEX gam_bKeepSeriousDamageOnProjectiles;",  &gam_bKeepSeriousDamageOnProjectiles); // [SSE] Better Serious Damage
+  _pShell->DeclareSymbol("persistent user INDEX gam_bArmorInertiaDamping;",  &gam_bArmorInertiaDamping); // [SSE] Armor Inertia Damping Toggle
 
   _pShell->DeclareSymbol("user INDEX gam_bQuickLoad;", &gam_bQuickLoad);
   _pShell->DeclareSymbol("user INDEX gam_bQuickSave;", &gam_bQuickSave);
