@@ -36,6 +36,7 @@ extern INDEX gam_bHealthArmorStays;
 extern INDEX gam_bAllowHealth     ;
 extern INDEX gam_bAllowArmor      ;
 extern INDEX gam_bAllowPowerUps; // [SSE] PowerUps Allow
+extern INDEX gam_bAllowWeapons;  // [SSE] Weapons Allow
 extern INDEX gam_bInfiniteAmmo    ;
 extern INDEX gam_bRespawnInPlace  ;
 extern INDEX gam_bPlayEntireGame;
@@ -176,6 +177,7 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   sp.sp_bAllowHealth = TRUE;
   sp.sp_bAllowArmor = TRUE;
   sp.sp_bAllowPowerUps = TRUE; // [SSE] PowerUps Allow
+  sp.sp_bAllowWeapons = TRUE; // [SSE] Weapons Allow
   sp.sp_bInfiniteAmmo = FALSE;
   sp.sp_bRespawnInPlace = FALSE;
   sp.sp_fExtraEnemyStrength          = 0;
@@ -245,6 +247,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_bAllowHealth      = gam_bAllowHealth     ;
   sp.sp_bAllowArmor       = gam_bAllowArmor      ;
   sp.sp_bAllowPowerUps    = gam_bAllowPowerUps; // [SSE] PowerUps Allow
+  sp.sp_bAllowWeapons     = gam_bAllowWeapons;  // [SSE] Weapons Allow
   sp.sp_bInfiniteAmmo     = gam_bInfiniteAmmo    ;
   sp.sp_bRespawnInPlace   = gam_bRespawnInPlace  ;
 

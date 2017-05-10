@@ -433,7 +433,18 @@ functions:
 
       // add flare
     AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.6F, 0.0F), FLOAT3D(3.0F, 3.0F, 0.3F) );
-};
+  };
+
+  // --------------------------------------------------------------------------------------
+  // Change item by session properties.
+  // --------------------------------------------------------------------------------------
+  void AdjustDifficulty(void)
+  {
+    // [SSE] Weapons Allow
+    if (!GetSP()->sp_bAllowWeapons && m_penTarget == NULL) {
+      Destroy();
+    }
+  }
 
 procedures:
   // --------------------------------------------------------------------------------------

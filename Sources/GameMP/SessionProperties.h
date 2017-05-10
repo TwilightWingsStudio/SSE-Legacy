@@ -59,6 +59,7 @@ public:
   BOOL sp_bAllowHealth;       // health items do exist
   BOOL sp_bAllowArmor;        // armor items do exist
   BOOL sp_bAllowPowerUps;     // [SSE] PowerUps Allow
+  BOOL sp_bAllowWeapons;      // [SSE] Weapons Allow
   BOOL sp_bInfiniteAmmo;      // ammo is not consumed when firing
   BOOL sp_bRespawnInPlace;    // players respawn on the place where they were killed, not on markers (coop only)
 
