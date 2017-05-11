@@ -53,6 +53,8 @@ extern INDEX gam_bGibs;
 extern INDEX gam_bUseExtraEnemies;
 extern CTString gam_strGameAgentExtras;
 
+extern INDEX gam_bPickUpWeaponsOnce; // [SSE] Pick up weapons once.
+
 // [SSE] Extra Lives System
 extern INDEX gam_bSharedLives;
 extern INDEX gam_iScoreForExtraLive;
@@ -189,12 +191,14 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   sp.sp_iScoreForExtraLiveAccum = 0;
   //
   
+  sp.sp_bPickUpWeaponsOnce = FALSE; // [SSE] Pick up weapons once.
+
   sp.sp_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
   sp.sp_bArmorInertiaDamping = TRUE;
 
   sp.sp_iBlood = Clamp( gam_iBlood, 0L, 3L);
   sp.sp_bGibs  = gam_bGibs;
-  
+
   // [SSE] Team DeathMatch
   sp.sp_iTeamScore1 = 0;
   sp.sp_iTeamScore2 = 0;
@@ -289,6 +293,8 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_iTimeLimit  = 0;
     sp.sp_bAllowHealth = TRUE;
     sp.sp_bAllowArmor  = TRUE;
+    
+    sp.sp_bPickUpWeaponsOnce = FALSE; // [SSE] Pick up weapons once.
 
   } else {
     sp.sp_ctCredits     = -1;
@@ -306,6 +312,8 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_bWeaponsStay = FALSE;
     sp.sp_bAmmoStays = FALSE;
     sp.sp_bHealthArmorStays = FALSE;
+    
+    sp.sp_bPickUpWeaponsOnce = gam_bPickUpWeaponsOnce; // [SSE] Pick up weapons once.
 
     if (sp.sp_bUseFrags) {
       sp.sp_iScoreLimit = 0;

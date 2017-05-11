@@ -3249,6 +3249,35 @@ functions:
     FLOAT3D vSpeed = FLOAT3D( 5.0f, 10.0f, -7.5f);
     pwi->GiveImpulseTranslationAbsolute(vSpeed*m);
   }
+  
+  BOOL HasWeaponByWIT(INDEX iWeapon)
+  {
+    switch (iWeapon)
+    {
+      case WIT_KNIFE: iWeapon = WEAPON_KNIFE; break;
+      case WIT_COLT: iWeapon = WEAPON_COLT; break;
+      case WIT_SINGLESHOTGUN: iWeapon = WEAPON_SINGLESHOTGUN; break;
+      case WIT_DOUBLESHOTGUN: iWeapon = WEAPON_DOUBLESHOTGUN; break;
+      case WIT_TOMMYGUN: iWeapon = WEAPON_TOMMYGUN; break;
+      case WIT_SNIPER: iWeapon = WEAPON_SNIPER; break;
+      case WIT_MINIGUN: iWeapon = WEAPON_MINIGUN; break;
+      case WIT_ROCKETLAUNCHER: iWeapon = WEAPON_ROCKETLAUNCHER; break;
+      case WIT_GRENADELAUNCHER: iWeapon = WEAPON_GRENADELAUNCHER; break;
+      case WIT_FLAMER: iWeapon = WEAPON_FLAMER; break;
+      case WIT_CHAINSAW: iWeapon = WEAPON_CHAINSAW; break;
+      case WIT_LASER: iWeapon = WEAPON_LASER; break;
+      case WIT_CANNON: iWeapon = WEAPON_IRONCANNON; break;
+
+      default:
+        ASSERTALWAYS("Unknown weapon type");
+    }
+    
+    if (HasWeapon((WeaponType)iWeapon)) {
+      return TRUE;
+    }
+    
+    return FALSE;
+  }
 
   // --------------------------------------------------------------------------------------
   // Receive weapon.

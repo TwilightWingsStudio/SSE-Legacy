@@ -95,6 +95,8 @@ public:
   BOOL sp_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
   BOOL sp_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
   
+  BOOL sp_bPickUpWeaponsOnce; // [SSE] Pick up weapons once.
+  
   // [SSE] Team DeathMatch
   INDEX sp_iTeamScore1;
   INDEX sp_iTeamScore2;

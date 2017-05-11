@@ -3320,7 +3320,7 @@ functions:
       pdp->PutText( strMessage, 16, 16, C_WHITE|CT_OPAQUE);
       
       CTString strTmp;
-      strTmp.PrintF("%s", TRANS("Press USE to confirm selection!"));
+      strTmp.PrintF("%s", TRANS("Use NEXT / PREV WEAPON buttons to switch.\nPress USE to confirm selection!"));
       pdp->PutText(strTmp, 16, pixDPHeight*0.2f, C_WHITE|255);
     }
 
@@ -4376,6 +4376,14 @@ functions:
           return FALSE;
         }
       }
+      
+      if (GetSP()->sp_bPickUpWeaponsOnce) {
+        EWeaponItem &eWeaponItem = (EWeaponItem&)ee;
+        
+        if (!eWeaponItem.bDropped && ((CPlayerWeapons&)*m_penWeapons).HasWeaponByWIT(eWeaponItem.iWeapon)) {
+          return FALSE;
+        }
+      }
 
       return ((CPlayerWeapons&)*m_penWeapons).ReceiveWeapon(ee);
     }
@@ -4708,16 +4716,28 @@ functions:
   void CheckGameEnd(void)
   {
     BOOL bFinished = FALSE;
+
     // if time limit is out
     INDEX iTimeLimit = GetSP()->sp_iTimeLimit;
     if (iTimeLimit>0 && _pTimer->CurrentTick()>=iTimeLimit*60.0f) {
       bFinished = TRUE;
     }
+
     // if frag limit is out
     INDEX iFragLimit = GetSP()->sp_iFragLimit;
-    if (iFragLimit>0 && m_psLevelStats.ps_iKills>=iFragLimit) {
-      bFinished = TRUE;
+    
+    // [SSE] Team DeathMatch
+    if (GetSP()->sp_bTeamPlay && iFragLimit > 0) {
+      if (GetSP()->sp_iTeamScore1 >= iFragLimit || GetSP()->sp_iTeamScore2 >= iFragLimit) {
+        bFinished = TRUE;
+      }
+      
+    } else {
+      if (iFragLimit > 0 && m_psLevelStats.ps_iKills>=iFragLimit) {
+        bFinished = TRUE;
+      }
     }
+
     // if score limit is out
     INDEX iScoreLimit = GetSP()->sp_iScoreLimit;
     if (iScoreLimit>0 && m_psLevelStats.ps_iScore>=iScoreLimit) {

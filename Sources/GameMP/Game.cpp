@@ -124,6 +124,8 @@ extern INDEX gam_bGibs  = TRUE;
 
 extern INDEX gam_bUseExtraEnemies = TRUE;
 
+extern INDEX gam_bPickUpWeaponsOnce = FALSE; // [SSE] Pick up weapons once.
+
 // [SSE] Extra Lives System
 extern INDEX gam_bSharedLives = TRUE;
 extern INDEX gam_iScoreForExtraLive = 100000;
@@ -966,7 +968,7 @@ void CGame::InitInternal( void)
   _pShell->DeclareSymbol("persistent user INDEX gam_bAllowHealth     ;", &gam_bAllowHealth     );
   _pShell->DeclareSymbol("persistent user INDEX gam_bAllowArmor      ;", &gam_bAllowArmor      );
   _pShell->DeclareSymbol("persistent user INDEX gam_bAllowPowerUps   ;", &gam_bAllowPowerUps   ); // [SSE] PowerUps Allow
-  _pShell->DeclareSymbol("persistent user INDEX gam_bAllowWeapons    ;", &gam_bAllowWeapons   ); // [SSE] Weapons Allow
+  _pShell->DeclareSymbol("persistent user INDEX gam_bAllowWeapons    ;", &gam_bAllowWeapons    ); // [SSE] Weapons Allow
 
   _pShell->DeclareSymbol("persistent user INDEX gam_bInfiniteAmmo    ;", &gam_bInfiniteAmmo    );
   _pShell->DeclareSymbol("persistent user INDEX gam_bRespawnInPlace  ;", &gam_bRespawnInPlace  );
@@ -979,6 +981,8 @@ void CGame::InitInternal( void)
   _pShell->DeclareSymbol("persistent user INDEX gam_bGibs;",  &gam_bGibs);
 
   _pShell->DeclareSymbol("persistent user INDEX gam_bUseExtraEnemies;",  &gam_bUseExtraEnemies);
+
+  _pShell->DeclareSymbol("persistent user INDEX gam_bPickUpWeaponsOnce;", &gam_bPickUpWeaponsOnce);// [SSE] Pick up weapons once.
 
   // [SSE] Extra Lives System
   _pShell->DeclareSymbol("persistent user INDEX gam_bSharedLives;", &gam_bSharedLives);
