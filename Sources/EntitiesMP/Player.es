@@ -1677,11 +1677,14 @@ functions:
             m_iTeamSelection = -1;
           } else {
             m_iTeamID = m_iTeamSelection;
+            m_iTeamSelection = -1; // Reset selection.
             ToggleSpectatorCamera();
             
             SetPhysicsFlags(EPF_MODEL_WALKING|EPF_HASLUNGS);
             SetCollisionFlags(ECF_MODEL|((ECBI_PLAYER)<<ECB_IS));
 
+            CTString strDummy;
+            SetPlayerAppearance(&m_moRender, &en_pcCharacter, strDummy, /*bPreview=*/FALSE);
             SwitchToModel();
             SpawnTeleport();
           }
