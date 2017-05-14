@@ -7314,8 +7314,11 @@ procedures:
 
     // if in deathmatch
     if (!GetSP()->sp_bCooperative) {
-      // drop current weapon as item so others can pick it
-      GetPlayerWeapons()->DropWeapon();
+      // [SSE] Weapons Drop
+      if (GetSP()->sp_bDropWeapons) {
+        // drop current weapon as item so others can pick it
+        GetPlayerWeapons()->DropWeapon();
+      }
 
       if (GetSP()->sp_bDropPowerUps) {
         DropPowerUps();
