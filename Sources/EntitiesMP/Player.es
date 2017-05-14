@@ -1375,6 +1375,8 @@ components:
   5 class   CLASS_BLOOD_SPRAY     "Classes\\BloodSpray.ecl", 
   6 class   CLASS_SERIOUSBOMB     "Classes\\SeriousBomb.ecl",
   
+  7 class   CLASS_POWERUPITEM     "Classes\\PowerUpItem.ecl",
+  
  10 class   CLASS_SPECTATOR_CAMERA "Classes\\SpectatorCamera.ecl",
 
 // gender specific sounds - make sure that offset is exactly 100 
@@ -4277,6 +4279,44 @@ functions:
 
     return &eiPlayerGround;
   };
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] PowerUps Drop
+  // Drop one of active powerups (in deathmatch).
+  // --------------------------------------------------------------------------------------
+  void DropPowerUp(INDEX puit)
+  {
+    FLOAT tmNow = _pTimer->CurrentTick();
+    FLOAT *ptmPowerups = &m_tmInvisibility;
+    FLOAT *ptmPowerupsMax = &m_tmInvisibilityMax;
+    const FLOAT tmDelta = ptmPowerups[puit] - tmNow; // NOTE: Unsafe
+    
+    if (tmDelta > 0.0F) {
+      CEntityPointer penPowerUpItem = CreateEntity(GetPlacement(), CLASS_POWERUPITEM);
+      CPowerUpItem *pwi = (CPowerUpItem*)&*penPowerUpItem;
+
+      pwi->m_puitType = (PowerUpItemType)puit;
+      pwi->m_fValue = Clamp(tmDelta, 0.0F, ptmPowerupsMax[puit]);
+      pwi->m_bDropped = TRUE;
+      pwi->CEntity::Initialize();
+      
+      const FLOATmatrix3D &m = GetRotationMatrix();
+      FLOAT3D vSpeed = FLOAT3D( 5.0f, 10.0f, -7.5f);
+      pwi->GiveImpulseTranslationAbsolute(vSpeed*m);
+    }
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] PowerUps Drop
+  // Drop all active powerups (in deathmatch).
+  // --------------------------------------------------------------------------------------
+  void DropPowerUps(void) 
+  {
+    DropPowerUp((INDEX)PUIT_INVISIB);
+    DropPowerUp((INDEX)PUIT_INVULNER); // ye-ye it possible
+    DropPowerUp((INDEX)PUIT_DAMAGE);
+    DropPowerUp((INDEX)PUIT_SPEED);
+  }
 
   // --------------------------------------------------------------------------------------
   // Receive item
@@ -4489,28 +4529,34 @@ functions:
           return FALSE;
         }
       }
+      
+      EPowerUp &ePowerUp = (EPowerUp&)ee;
 
       const FLOAT tmNow = _pTimer->CurrentTick();
 
-      switch (((EPowerUp&)ee).puitType)
+      switch (ePowerUp.puitType)
       {
-        case PUIT_INVISIB :  m_tmInvisibility    = tmNow + m_tmInvisibilityMax;
+        case PUIT_INVISIB:
+          m_tmInvisibility = tmNow + (ePowerUp.fValue > 0.0F ? ePowerUp.fValue : m_tmInvisibilityMax);
           ItemPicked(TRANS("^cABE3FFInvisibility"), 0);
           return TRUE;
 
-        case PUIT_INVULNER:  m_tmInvulnerability = tmNow + m_tmInvulnerabilityMax;
+        case PUIT_INVULNER:
+          m_tmInvulnerability = tmNow + (ePowerUp.fValue > 0.0F ? ePowerUp.fValue : m_tmInvulnerabilityMax);
           ItemPicked(TRANS("^c00B440Invulnerability"), 0);
           return TRUE;
 
-        case PUIT_DAMAGE  :  m_tmSeriousDamage   = tmNow + m_tmSeriousDamageMax;
+        case PUIT_DAMAGE:
+          m_tmSeriousDamage = tmNow + (ePowerUp.fValue > 0.0F ? ePowerUp.fValue : m_tmSeriousDamageMax);
           ItemPicked(TRANS("^cFF0000Serious Damage!"), 0);
           return TRUE;
 
-        case PUIT_SPEED   :  m_tmSeriousSpeed    = tmNow + m_tmSeriousSpeedMax;
+        case PUIT_SPEED:
+          m_tmSeriousSpeed = tmNow + (ePowerUp.fValue > 0.0F ? ePowerUp.fValue : m_tmSeriousSpeedMax);
           ItemPicked(TRANS("^cFF9400Serious Speed"), 0);
           return TRUE;
 
-        case PUIT_BOMB    :
+        case PUIT_BOMB:
           m_iSeriousBombCount++;
           ItemPicked(TRANS("^cFF0000Serious Bomb!"), 0);
           //ItemPicked(TRANS("^cFF0000S^cFFFF00e^cFF0000r^cFFFF00i^cFF0000o^cFFFF00u^cFF0000s ^cFF0000B^cFFFF00o^cFF0000m^cFFFF00b!"), 0);
@@ -7270,6 +7316,10 @@ procedures:
     if (!GetSP()->sp_bCooperative) {
       // drop current weapon as item so others can pick it
       GetPlayerWeapons()->DropWeapon();
+
+      if (GetSP()->sp_bDropPowerUps) {
+        DropPowerUps();
+      }
     }
 
     // play death animations

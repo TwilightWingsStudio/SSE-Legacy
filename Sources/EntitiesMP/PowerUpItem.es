@@ -34,6 +34,7 @@ enum PowerUpItemType {
 // Event for sending through receive item.
 event EPowerUp {
   enum PowerUpItemType puitType,
+  FLOAT fValue, // [SSE] PowerUps Drop
 };
 
 class CPowerUpItem : CItem 
@@ -262,6 +263,7 @@ procedures:
     // Prepare PowerUp to send it to entity.
     EPowerUp ePowerUp;
     ePowerUp.puitType = m_puitType;
+    ePowerUp.fValue = m_fValue; // [SSE] PowerUps Drop
 
     // If powerup is received...
     if (epass.penOther->ReceiveItem(ePowerUp))
@@ -289,7 +291,7 @@ procedures:
         m_fPickSoundLen = GetSoundLength(SOUND_PICKUP);
       }
 
-      if (m_bPickupOnce || m_bRespawn) {
+      if (m_bDropped || m_bPickupOnce || m_bRespawn) {
         jump CItem::ItemReceived();
       }
     }
@@ -301,7 +303,7 @@ procedures:
   // --------------------------------------------------------------------------------------
   Main()
   {
-    Initialize();     // initialize base class
+    Initialize();     // Initialize base class.
     
     // [SSE] Standart Items Expansion
     if (m_eotOscillation <= 0) {
@@ -310,7 +312,23 @@ procedures:
       StartModelAnim((m_eotOscillation-1), AOF_LOOPING|AOF_NORESTART);
     }
     
-    SetProperties();  // set properties
-    jump CItem::ItemLoop();
+    SetProperties();  // Set properties.
+
+    // [SSE] PowerUps Drop
+    if (!m_bDropped) {
+      jump CItem::ItemLoop();
+    } else if (TRUE) {
+      wait() {
+        on (EBegin) : {
+          SpawnReminder(this, m_fRespawnTime, 0);
+          call CItem::ItemLoop();
+        }
+
+        on (EReminder) : {
+          SendEvent(EEnd()); 
+          resume;
+        }
+      }
+    }
   };
 };

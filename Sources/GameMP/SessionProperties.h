@@ -97,6 +97,8 @@ public:
   
   BOOL sp_bPickUpWeaponsOnce; // [SSE] Pick up weapons once.
   
+  BOOL sp_bDropPowerUps; // [SSE] PowerUps Drop
+  
   // [SSE] Team DeathMatch
   INDEX sp_iTeamScore1;
   INDEX sp_iTeamScore2;

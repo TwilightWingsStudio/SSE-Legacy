@@ -54,6 +54,7 @@ extern INDEX gam_bUseExtraEnemies;
 extern CTString gam_strGameAgentExtras;
 
 extern INDEX gam_bPickUpWeaponsOnce; // [SSE] Pick up weapons once.
+extern INDEX gam_bDropPowerUps; // [SSE] PowerUps Drop
 
 // [SSE] Extra Lives System
 extern INDEX gam_bSharedLives;
@@ -192,6 +193,7 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   //
   
   sp.sp_bPickUpWeaponsOnce = FALSE; // [SSE] Pick up weapons once.
+  sp.sp_bDropPowerUps = FALSE; // [SSE] PowerUps Drop
 
   sp.sp_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
   sp.sp_bArmorInertiaDamping = TRUE;
@@ -295,6 +297,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_bAllowArmor  = TRUE;
     
     sp.sp_bPickUpWeaponsOnce = FALSE; // [SSE] Pick up weapons once.
+    sp.sp_bDropPowerUps = FALSE; // [SSE] PowerUps Drop
 
   } else {
     sp.sp_ctCredits     = -1;
@@ -314,6 +317,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_bHealthArmorStays = FALSE;
     
     sp.sp_bPickUpWeaponsOnce = gam_bPickUpWeaponsOnce; // [SSE] Pick up weapons once.
+    sp.sp_bDropPowerUps = gam_bDropPowerUps; // [SSE] PowerUps Drop
 
     if (sp.sp_bUseFrags) {
       sp.sp_iScoreLimit = 0;

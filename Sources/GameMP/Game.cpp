@@ -125,6 +125,7 @@ extern INDEX gam_bGibs  = TRUE;
 extern INDEX gam_bUseExtraEnemies = TRUE;
 
 extern INDEX gam_bPickUpWeaponsOnce = FALSE; // [SSE] Pick up weapons once.
+extern INDEX gam_bDropPowerUps = FALSE; // [SSE] PowerUps Drop
 
 // [SSE] Extra Lives System
 extern INDEX gam_bSharedLives = TRUE;
@@ -982,7 +983,8 @@ void CGame::InitInternal( void)
 
   _pShell->DeclareSymbol("persistent user INDEX gam_bUseExtraEnemies;",  &gam_bUseExtraEnemies);
 
-  _pShell->DeclareSymbol("persistent user INDEX gam_bPickUpWeaponsOnce;", &gam_bPickUpWeaponsOnce);// [SSE] Pick up weapons once.
+  _pShell->DeclareSymbol("persistent user INDEX gam_bPickUpWeaponsOnce;", &gam_bPickUpWeaponsOnce); // [SSE] Pick up weapons once.
+  _pShell->DeclareSymbol("persistent user INDEX gam_bDropPowerUps;", &gam_bDropPowerUps); // [SSE] PowerUps Drop
 
   // [SSE] Extra Lives System
   _pShell->DeclareSymbol("persistent user INDEX gam_bSharedLives;", &gam_bSharedLives);
