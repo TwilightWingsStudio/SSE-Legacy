@@ -209,6 +209,7 @@ void CloseLensFlares(void);
 
 DECL_DLL BOOL SetPlayerAppearanceCfunc(void* pArgs);
 DECL_DLL BOOL SetPlayerAppearance(CModelObject *mo, CPlayerCharacter *ppc, CTString &strName, BOOL bPreview);
+DECL_DLL BOOL SetPlayerAppearanceEx(CEntity *pen, CModelObject *pmo, CPlayerCharacter *ppc, CTString &strName, BOOL bPreview);
 
 // debugging functions
 DECL_DLL const char *PrintConsole(void);

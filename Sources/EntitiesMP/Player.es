@@ -1684,7 +1684,7 @@ functions:
             SetCollisionFlags(ECF_MODEL|((ECBI_PLAYER)<<ECB_IS));
 
             CTString strDummy;
-            SetPlayerAppearance(&m_moRender, &en_pcCharacter, strDummy, /*bPreview=*/FALSE);
+            SetPlayerAppearanceEx(this, &m_moRender, &en_pcCharacter, strDummy, /*bPreview=*/FALSE);
             SwitchToModel();
             SpawnTeleport();
           }
@@ -2037,7 +2037,7 @@ functions:
     // set your real appearance if possible
     ValidateCharacter();
     CTString strDummy;
-    SetPlayerAppearance(&m_moRender, &en_pcCharacter, strDummy, /*bPreview=*/FALSE);
+    SetPlayerAppearanceEx(this, &m_moRender, &en_pcCharacter, strDummy, /*bPreview=*/FALSE);
     ParseGender(strDummy);
     m_ulFlags |= PLF_SYNCWEAPON;
     // setup light source
@@ -5015,7 +5015,7 @@ functions:
     if (memcmp(ppsOrg->ps_achModelFile, ppsNew->ps_achModelFile, sizeof(ppsOrg->ps_achModelFile))!=0) {
       // update your real appearance if possible
       CTString strNewLook;
-      BOOL bSuccess = SetPlayerAppearance(&m_moRender, &en_pcCharacter, strNewLook, /*bPreview=*/FALSE);
+      BOOL bSuccess = SetPlayerAppearanceEx(this, &m_moRender, &en_pcCharacter, strNewLook, /*bPreview=*/FALSE);
       // if succeeded
       if (bSuccess) {
         ParseGender(strNewLook);
@@ -6809,9 +6809,9 @@ functions:
 
     // reset model appearance
     CTString strDummy;
-    SetPlayerAppearance(GetModelObject(), NULL, strDummy, /*bPreview=*/FALSE);
+    SetPlayerAppearanceEx(this, GetModelObject(), NULL, strDummy, /*bPreview=*/FALSE);
     ValidateCharacter();
-    SetPlayerAppearance(&m_moRender, &en_pcCharacter, strDummy, /*bPreview=*/FALSE);
+    SetPlayerAppearanceEx(this, &m_moRender, &en_pcCharacter, strDummy, /*bPreview=*/FALSE);
     ParseGender(strDummy);
     GetPlayerAnimator()->SetWeapon();
     m_ulFlags |= PLF_SYNCWEAPON;
@@ -8202,10 +8202,10 @@ procedures:
 
     // set default model for physics etc
     CTString strDummy;
-    SetPlayerAppearance(GetModelObject(), NULL, strDummy, /*bPreview=*/FALSE);
+    SetPlayerAppearanceEx(this, GetModelObject(), NULL, strDummy, /*bPreview=*/FALSE);
     // set your real appearance if possible
     ValidateCharacter();
-    SetPlayerAppearance(&m_moRender, &en_pcCharacter, strDummy, /*bPreview=*/FALSE);
+    SetPlayerAppearanceEx(this, &m_moRender, &en_pcCharacter, strDummy, /*bPreview=*/FALSE);
     ParseGender(strDummy);
 
     // if unsuccessful

@@ -923,7 +923,7 @@ BOOL SetPlayerAppearance_internal(CModelObject *pmo, const CTFileName &fnmAMC, C
   }
 }
 
-BOOL SetPlayerAppearance(CModelObject *pmo, CPlayerCharacter *ppc, CTString &strName, BOOL bPreview)
+BOOL SetPlayerAppearanceEx(CEntity *pen, CModelObject *pmo, CPlayerCharacter *ppc, CTString &strName, BOOL bPreview)
 {
   // first kill any existing model
   pmo->SetData(NULL);
@@ -934,8 +934,6 @@ BOOL SetPlayerAppearance(CModelObject *pmo, CPlayerCharacter *ppc, CTString &str
   pmo->RemoveAllAttachmentModels();
 
   DECLARE_CTFILENAME(fnmDefault, "ModelsMP\\Player\\SeriousSam.amc");
-  
-  // [SSE] Team DeathMatch
   DECLARE_CTFILENAME(fnmTeam1, "Models\\Player\\SeriousSamBlue.amc");
   DECLARE_CTFILENAME(fnmTeam2, "Models\\Player\\SeriousSamRed.amc");
 
@@ -951,32 +949,68 @@ BOOL SetPlayerAppearance(CModelObject *pmo, CPlayerCharacter *ppc, CTString &str
     return FALSE;
   }
   
-  if (!bPreview && GetSP()->sp_bTeamPlay) {
-    for (INDEX iPlayer = 0; iPlayer < CEntity::GetMaxPlayers(); iPlayer++)
-    {
-      CEntity *pen = CEntity::GetPlayerEntity(iPlayer);
-      
-      if (pen != NULL) {
-        CPlayer *penPlayer = static_cast<CPlayer*>(pen);
-        
-        if (ppc == &penPlayer->en_pcCharacter) {
-          
-          if (penPlayer->m_iTeamID == 0) {
-            break;
-          } else if (penPlayer->m_iTeamID == 1) {
-            if (!SetPlayerAppearance_internal(pmo, fnmTeam1, strName, bPreview)) {
-              SetPlayerAppearance_internal(pmo, fnmDefault, strName, bPreview);
-            }
-          } else {
-            if (!SetPlayerAppearance_internal(pmo, fnmTeam2, strName, bPreview)) {
-              SetPlayerAppearance_internal(pmo, fnmDefault, strName, bPreview);
-            }
-          }
-          
-          return TRUE;
-        }
+  if (pen && !bPreview && GetSP()->sp_bTeamPlay)
+  {
+    CPlayer *penPlayer = static_cast<CPlayer*>(pen);
+
+    if (penPlayer->m_iTeamID == 0) {
+    } else if (penPlayer->m_iTeamID == 1) {
+      if (!SetPlayerAppearance_internal(pmo, fnmTeam1, strName, bPreview)) {
+        SetPlayerAppearance_internal(pmo, fnmDefault, strName, bPreview);
       }
+
+      return TRUE;
+    } else {
+      if (!SetPlayerAppearance_internal(pmo, fnmTeam2, strName, bPreview)) {
+        SetPlayerAppearance_internal(pmo, fnmDefault, strName, bPreview);
+      }
+      
+      return TRUE;
     }
+  }
+
+  // get filename from the settings
+  CPlayerSettings *pps = (CPlayerSettings *)ppc->pc_aubAppearance;
+  CTFileName fnmModelFile = pps->GetModelFilename();
+
+  // if dummy (empty settings) then use default
+  if (fnmModelFile.FileName() == "") {
+    fnmModelFile = fnmDefault;
+  }
+
+  extern INDEX plr_bOnlySam;
+
+  if (!plr_bOnlySam && SetPlayerAppearance_internal(pmo, fnmModelFile, strName, bPreview)) {
+    return TRUE;
+  } else if (SetPlayerAppearance_internal(pmo, fnmDefault, strName, bPreview)) {  // HAVE TO SET DEFAULT HERE!
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
+BOOL SetPlayerAppearance(CModelObject *pmo, CPlayerCharacter *ppc, CTString &strName, BOOL bPreview)
+{
+  // first kill any existing model
+  pmo->SetData(NULL);
+  pmo->mo_toTexture.SetData(NULL);
+  pmo->mo_toSpecular.SetData(NULL);
+  pmo->mo_toReflection.SetData(NULL);
+  pmo->mo_toBump.SetData(NULL);
+  pmo->RemoveAllAttachmentModels();
+
+  DECLARE_CTFILENAME(fnmDefault, "ModelsMP\\Player\\SeriousSam.amc");
+
+  // if no character, or player models are disabled then set default appearance
+  if (ppc == NULL)
+  {
+    BOOL bSucceeded = SetPlayerAppearance_internal(pmo, fnmDefault, strName, bPreview);
+
+    if (!bSucceeded) {
+      FatalError(TRANS("Cannot load default player model!"));
+    }
+
+    return FALSE;
   }
 
   // get filename from the settings
