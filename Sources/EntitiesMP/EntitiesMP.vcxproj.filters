@@ -643,6 +643,9 @@
     <ClCompile Include="Common\HUD_Debug.cpp">
       <Filter>Source Files\Common sources</Filter>
     </ClCompile>
+    <ClCompile Include="ChancedExecutor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1770,6 +1773,12 @@
     <ClInclude Include="ParticleCloudsMarker_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ChancedExecutor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChancedExecutor_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2734,6 +2743,9 @@
     </CustomBuild>
     <CustomBuild Include="ParticleCloudsMarker.es">
       <Filter>Class Files\Effects</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ChancedExecutor.es">
+      <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
