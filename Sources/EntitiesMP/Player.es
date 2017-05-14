@@ -1649,6 +1649,16 @@ functions:
   {
     CSpectatorCamera *pen = (CSpectatorCamera*)&*m_penSpectatorCamera;
     
+    if (m_iTeamSelection == -1) {
+      if (ulNewButtons & PLACT_WEAPON_NEXT) {
+        pen->m_fSpeedMul = ClampUp(pen->m_fSpeedMul + 0.1F, 10.0F);
+      }
+      
+      if (ulNewButtons & PLACT_WEAPON_PREV) {
+        pen->m_fSpeedMul = ClampDn(pen->m_fSpeedMul - 0.1F, 0.1F);
+      }
+    }
+    
     // Use.
     if (!GetSP()->sp_bTeamPlay || m_iTeamID != 0) {
       if (ulNewButtons & PLACT_USE) {
@@ -1695,7 +1705,7 @@ functions:
         }
       }
     }
-    
+
     // Forward.
     if (ulNewButtons & PLACT_WEAPON_FLIP) {
       pen->m_bButtonUp = TRUE;
@@ -3278,6 +3288,17 @@ functions:
     pdpCamera->Unlock();
     pdp->Lock();
     
+    PIX pixDPWidth  = pdp->GetWidth();
+    PIX pixDPHeight = pdp->GetHeight();
+    
+    FLOAT fMul;
+      
+    if (pixDPWidth > pixDPHeight) {
+      fMul = pixDPHeight / 480.0F;
+    } else {
+      fMul = pixDPWidth / 640.0F;
+    }
+    
     // [SSE] Team DeathMatch
     if (GetSP()->sp_bTeamPlay && m_iTeamSelection != -1) {
       INDEX ctTeam1 = 0;
@@ -3300,20 +3321,10 @@ functions:
       }
       
       CTString strMessage;
-      strMessage.PrintF("%s ^c7F7FFFBLU Team ^r(%d players)\n", m_iTeamSelection == 1 ? "->" : "", ctTeam1);
+      strMessage.PrintF("Camera Speed: %.2f\n\n", ((CSpectatorCamera*)&*m_penSpectatorCamera)->m_fSpeedMul);
+      strMessage.PrintF("%s%s ^c7F7FFFBLU Team ^r(%d players)\n", strMessage, m_iTeamSelection == 1 ? "->" : "", ctTeam1);
       strMessage.PrintF("%s%s ^cFF7F7FRED Team ^r(%d players)\n\n", strMessage, m_iTeamSelection == 2 ? "->" : "", ctTeam2);
       strMessage.PrintF("%s%s ^cBFBFBFUnassigned ^r(%d players)\n", strMessage, m_iTeamSelection == 0 ? "->" : "", ctUnassigned);
-      
-      PIX pixDPWidth  = pdp->GetWidth();
-      PIX pixDPHeight = pdp->GetHeight();
-      
-      FLOAT fMul;
-      
-      if (pixDPWidth > pixDPHeight) {
-        fMul = pixDPHeight / 480.0F;
-      } else {
-        fMul = pixDPWidth / 640.0F;
-      }
 
       pdp->SetFont( _pfdDisplayFont);
       pdp->SetTextScaling(fMul);
@@ -3325,6 +3336,16 @@ functions:
       CTString strTmp;
       strTmp.PrintF("%s", TRANS("Use NEXT / PREV WEAPON buttons to switch.\nPress USE to confirm selection!"));
       pdp->PutText(strTmp, 16, pixDPHeight*0.2f, C_WHITE|255);
+    } else {
+      CTString strMessage;
+      strMessage.PrintF("Camera Speed: %.2f\n", ((CSpectatorCamera*)&*m_penSpectatorCamera)->m_fSpeedMul);
+      
+      pdp->SetFont( _pfdDisplayFont);
+      pdp->SetTextScaling(fMul);
+      pdp->SetTextAspect( 1.0f);
+      
+      pdp->Fill(0, 0, pixDPWidth, 128 * fMul, C_BLACK|128, C_BLACK|128, C_BLACK|0, C_BLACK|0);
+      pdp->PutText( strMessage, 16, 16, C_WHITE|CT_OPAQUE);
     }
 
     // camera fading

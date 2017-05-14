@@ -25,6 +25,8 @@ properties:
   20 BOOL m_bButtonMDown = FALSE,
   21 BOOL m_bButtonFire = FALSE,
   
+  25 FLOAT m_fSpeedMul = 1.0F,
+  
   30 ANGLE3D m_a3dRotationAngle = ANGLE3D(0, 0, 0),
 
 components:
@@ -96,6 +98,8 @@ functions:
     if (m_bButtonFire) {
       fSpeed *= 3;
     }
+    
+    fSpeed *= m_fSpeedMul;
     
     if (m_bButtonLeft) {
       vSpeed(1) = -fSpeed;
