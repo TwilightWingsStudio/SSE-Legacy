@@ -3994,16 +3994,23 @@ functions:
     }
 
     // god mode -> no one can harm you
-    if (cht_bGod && CheatsEnabled()) { return; }
+    if (cht_bGod && CheatsEnabled()) {
+      return;
+    }
+
+    const TIME tmDelta = m_tmInvulnerability - _pTimer->CurrentTick();
 
     // if invulnerable, nothing can harm you except telefrag or abyss
-    const TIME tmDelta = m_tmInvulnerability - _pTimer->CurrentTick();
-    if (tmDelta>0 && dmtType!=DMT_ABYSS && dmtType!=DMT_TELEPORT) { return; }
+    // [SSE] Kill By Traps Always
+    if (tmDelta > 0 && dmtType != DMT_ABYSS && dmtType != DMT_TELEPORT && dmtType != DMT_SPIKESTAB) {
+      return;
+    }
 
-    // if invunerable after spawning
     FLOAT tmSpawnInvulnerability = GetSP()->sp_tmSpawnInvulnerability;
-    if (tmSpawnInvulnerability>0 && _pTimer->CurrentTick()-m_tmSpawned < tmSpawnInvulnerability) {
-      // ignore damage
+
+    // if invunerable after spawning then ignore damage
+    // [SSE] Kill By Traps Always
+    if (dmtType != DMT_ABYSS && dmtType != DMT_SPIKESTAB && tmSpawnInvulnerability > 0 && _pTimer->CurrentTick() - m_tmSpawned < tmSpawnInvulnerability) {
       return;
     }
 
@@ -4081,9 +4088,9 @@ functions:
     if (fSubHealth > 0) { 
       // if camera is active
       if (m_penCamera != NULL) {
-        // if the camera has onbreak
         CEntity *penOnBreak = ((CCamera&)*m_penCamera).m_penOnBreak;
 
+        // if the camera has onbreak
         if (penOnBreak != NULL) {
           // trigger it
           SendToTarget(penOnBreak, EET_TRIGGER, this);
