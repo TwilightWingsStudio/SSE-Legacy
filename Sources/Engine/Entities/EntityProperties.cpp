@@ -99,7 +99,7 @@ void CEntity::ReadProperties_t(CTStream &istrm) // throw char *
   
   // [SSE] Better Error Messages
   if (cidPreProp != CChunkID("PRPS")) {
-    ThrowF_t(TRANS("Error occured while loading entity properties.\n\nEntityID: %d\nClass: %s\n\nChunk ID validation failed.\nExpected ID \"PRPS\" but found \"%s\"\nHEX: %02x %02x %02x %02x\nPosition: %d\n"),
+    ThrowF_t(TRANS("Error occured while loading entity properties.\n\nEntityID: %d\nClass: %s (may be wrong!)\n\nChunk ID validation failed.\nExpected ID \"PRPS\" but found \"%s\"\nHEX: %02x %02x %02x %02x\nPosition: %d\n"),
       en_ulID, en_pecClass->ec_pdecDLLClass->dec_strName, cidPreProp.cid_ID, cidPreProp.cid_ID[0], cidPreProp.cid_ID[1], cidPreProp.cid_ID[2], cidPreProp.cid_ID[3], istrm.GetPos_t() - 4);
   }
   

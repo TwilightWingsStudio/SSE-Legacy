@@ -46,6 +46,13 @@ functions:
   {
     return en_pcCharacter.GetName();
   }
+  
+  // [SSE] Extended Engine API
+  virtual BOOL IsPlayerEntity()
+  {
+    return TRUE;
+  }
+  
   /* Get index of this player in the game. */
   export INDEX GetMyPlayerIndex(void)
   {

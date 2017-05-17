@@ -681,6 +681,18 @@ public:
     return FALSE;
   }
   
+  // [SSE] Extended Engine API
+  virtual BOOL IsRationalEntity()
+  {
+    return FALSE;
+  }
+  
+  // [SSE] Extended Engine API
+  virtual BOOL IsPlayerEntity()
+  {
+    return FALSE;
+  }
+  
   // [SSE] Network Update
   virtual void ReceiveRPC(CNetworkMessage &nmMessage) {};
   
@@ -853,6 +865,12 @@ public:
 
   /* Handle an event - return false if event was not handled. */
   virtual BOOL HandleEvent(const CEntityEvent &ee);
+  
+  // [SSE] Extended Engine API
+  virtual BOOL IsRationalEntity()
+  {
+    return TRUE;
+  }
 
   // returns bytes of memory used by this object
   inline SLONG GetUsedMemory(void) {
