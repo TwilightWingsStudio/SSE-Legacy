@@ -1301,10 +1301,12 @@ functions:
   /* Get gradient type name, return empty string if not used. */
   const CTString &GetGradientName(INDEX iGradient)
   {
-    INDEX ctGradientMarkers = &m_penGradient19-&m_penGradient0+1;
+    INDEX ctGradientMarkers = &m_penGradient19 - &m_penGradient0 + 1;
     static const CTString strDummyName("");
     static const CTString strMarkerUnused("Marker not set");
-    if (iGradient<ctGradientMarkers){
+
+    if (iGradient < ctGradientMarkers)
+    {
       CGradientMarker *pgm = (CGradientMarker *)&*(&m_penGradient0)[iGradient];
       if (pgm != NULL) {
         return pgm->GetGradientName();
@@ -1312,15 +1314,19 @@ functions:
         return strMarkerUnused;
       }
     }
+
     return strDummyName;
   }
+
   /* Uncache shadows for given gradient */
   void UncacheShadowsForGradient(class CGradientMarker *penDiscard)
   {
-    INDEX ctGradientMarkers = &m_penGradient19-&m_penGradient0+1;
-    for( INDEX iGradient=0; iGradient<ctGradientMarkers; iGradient++)
+    INDEX ctGradientMarkers = &m_penGradient19 - &m_penGradient0 + 1;
+
+    for( INDEX iGradient = 0; iGradient < ctGradientMarkers; iGradient++)
     {
       CGradientMarker *pgm = (CGradientMarker *)&*(&m_penGradient0)[iGradient];
+
       if(pgm == penDiscard)
       {
         CEntity::UncacheShadowsForGradient( iGradient+1);
@@ -1331,13 +1337,18 @@ functions:
   /* Get gradient, return FALSE for none. */
   BOOL GetGradient(INDEX iGradient, class CGradientParameters &fpGradient)
   {
-    INDEX ctGradientMarkers = &m_penGradient19-&m_penGradient0+1;
-    if ( (iGradient<ctGradientMarkers) && (iGradient>0) ){
-      CGradientMarker *pgm = (CGradientMarker *)&*(&m_penGradient0)[iGradient-1];
+    INDEX ctGradientMarkers = &m_penGradient19 - &m_penGradient0 + 1;
+    
+    // iGradient starts from 1.
+    if ( (iGradient <= ctGradientMarkers) && (iGradient > 0) )
+    {
+      CGradientMarker *pgm = (CGradientMarker *)&*(&m_penGradient0)[iGradient - 1];
+
       if (pgm != NULL) {
         return pgm->GetGradient(0, fpGradient);
       }
     }
+
     return FALSE;
   }
   
