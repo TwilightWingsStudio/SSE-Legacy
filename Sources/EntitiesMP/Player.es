@@ -1651,7 +1651,7 @@ functions:
   {
     CSpectatorCamera *pen = (CSpectatorCamera*)&*m_penSpectatorCamera;
     
-    if (m_iTeamSelection == -1) {
+    if (!GetSP()->sp_bTeamPlay || m_iTeamSelection == -1) {
       if (ulNewButtons & PLACT_WEAPON_NEXT) {
         pen->m_fSpeedMul = ClampUp(pen->m_fSpeedMul + 0.1F, 10.0F);
       }
@@ -4123,8 +4123,10 @@ functions:
 
     DamageImpact(dmtType, GetSP()->sp_bArmorInertiaDamping ? fSubHealth : fDamageAmmount, vHitPoint, vDirection);
 
-    // receive damage
-    CPlayerEntity::ReceiveDamage( penInflictor, dmtType, fSubHealth, vHitPoint, vDirection);
+    // [SSE] RocketJump Mode
+    if (penInflictor != this || !GetSP()->sp_bRocketJumpMode) {
+      CPlayerEntity::ReceiveDamage( penInflictor, dmtType, fSubHealth, vHitPoint, vDirection); // receive damage
+    }
 
     // red screen and hit translation
     if (fDamageAmmount > 1.0f) {
@@ -4977,8 +4979,12 @@ functions:
     // [SSE] Spectator Camera
     if (IsSpectatorCameraActive() && !((CSpectatorCamera*)&*m_penSpectatorCamera)->m_bPlayerControl) {
       ((CSpectatorCamera*)&*m_penSpectatorCamera)->Rotation(paAction.pa_aRotation);
-      
+
       SpectatorControl();
+
+      if (GetFlags() & ENF_ALIVE) {
+        AliveActions(paAction);
+      }
     } else {
       if (IsSpectatorCameraActive() && ((CSpectatorCamera*)&*m_penSpectatorCamera)->m_bPlayerControl) {
         if (ulNewButtons & PLACT_USE) {
@@ -5120,20 +5126,31 @@ functions:
   void AliveActions(const CPlayerAction &pa) 
   {
     CPlayerAction paAction = pa;
+    
+    BOOL bButtonActions = TRUE;
+    
+    // [SSE] Spectator Camera
+    if (IsSpectatorCameraActive() && !((CSpectatorCamera*)&*m_penSpectatorCamera)->m_bPlayerControl) {
+      bButtonActions = FALSE;
+    }
 
     // if camera is active
     if (m_penCamera != NULL && ((CCamera&)*m_penCamera).m_bDisablePlayerControl) {
+      bButtonActions = FALSE;
+
+      // if fire or use is pressed then stop camera
+      if (ulNewButtons&(PLACT_FIRE|PLACT_USE)) {
+        m_penCamera = NULL;
+      }
+    }
+    
+    if (bButtonActions) {
+      ButtonsActions(paAction);
+    } else {
       // ignore keyboard/mouse/joystick commands
       paAction.pa_vTranslation  = FLOAT3D(0,0,0);
       paAction.pa_aRotation     = ANGLE3D(0,0,0);
       paAction.pa_aViewRotation = ANGLE3D(0,0,0);
-      // if fire or use is pressed
-      if (ulNewButtons&(PLACT_FIRE|PLACT_USE)) {
-        // stop camera
-        m_penCamera = NULL;
-      }
-    } else {
-      ButtonsActions(paAction);
     }
 
     // TODO: [ZCaliptium] Remove this shit!

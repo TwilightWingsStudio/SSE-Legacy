@@ -94,6 +94,7 @@ public:
   
   BOOL sp_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
   BOOL sp_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
+  BOOL sp_bRocketJumpMode; // [SSE] RocketJump Mode
   
   BOOL sp_bPickUpWeaponsOnce; // [SSE] Pick up weapons once.
   

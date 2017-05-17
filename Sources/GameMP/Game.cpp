@@ -135,6 +135,7 @@ extern INDEX gam_iScoreForExtraLive = 100000;
 
 extern INDEX gam_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
 extern INDEX gam_bArmorInertiaDamping = TRUE; // [SSE] Armor Inertia Damping Toggle
+extern INDEX gam_bRocketJumpMode = FALSE; // [SSE] RocketJump Mode
 
 extern FLOAT gam_tmRespawnDelay = 0.0F; // [SSE] Respawn Delay
 
@@ -995,6 +996,7 @@ void CGame::InitInternal( void)
 
   _pShell->DeclareSymbol("persistent user INDEX gam_bKeepSeriousDamageOnProjectiles;",  &gam_bKeepSeriousDamageOnProjectiles); // [SSE] Better Serious Damage
   _pShell->DeclareSymbol("persistent user INDEX gam_bArmorInertiaDamping;",  &gam_bArmorInertiaDamping); // [SSE] Armor Inertia Damping Toggle
+  _pShell->DeclareSymbol("persistent user INDEX gam_bRocketJumpMode;",  &gam_bRocketJumpMode); // [SSE] RocketJump Mode
 
   _pShell->DeclareSymbol("user INDEX gam_bQuickLoad;", &gam_bQuickLoad);
   _pShell->DeclareSymbol("user INDEX gam_bQuickSave;", &gam_bQuickSave);

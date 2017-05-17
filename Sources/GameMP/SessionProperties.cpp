@@ -64,6 +64,7 @@ extern INDEX gam_iScoreForExtraLive;
 
 extern INDEX gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
 extern INDEX gam_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
+extern INDEX gam_bRocketJumpMode; // [SSE] RocketJump Mode
 
 static void SetGameModeParameters(CSessionProperties &sp)
 {
@@ -199,6 +200,7 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
 
   sp.sp_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
   sp.sp_bArmorInertiaDamping = TRUE;
+  sp.sp_bRocketJumpMode = FALSE; // [SSE] RocketJump Mode
 
   sp.sp_iBlood = Clamp( gam_iBlood, 0L, 3L);
   sp.sp_bGibs  = gam_bGibs;
@@ -274,6 +276,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_bKeepSeriousDamageOnProjectiles = gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
   
   sp.sp_bArmorInertiaDamping = gam_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
+  sp.sp_bRocketJumpMode = gam_bRocketJumpMode; // [SSE] RocketJump Mode
   
   // [SSE] Team DeathMatch
   sp.sp_iTeamScore1 = 0;
