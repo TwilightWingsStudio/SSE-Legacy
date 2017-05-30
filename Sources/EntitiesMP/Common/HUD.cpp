@@ -87,6 +87,12 @@ extern BOOL hud_bGameDebugMonitor;
 extern INDEX hud_iHUDType;
 //
 
+// [SSE] Radar
+/*
+extern BOOL hud_bRadarDraw;
+*/
+//
+
 // player statistics sorting keys
 enum SortKeys {
   PSK_NAME    = 1,
@@ -146,6 +152,15 @@ static CTextureObject _toExtraLive; // [SSE]
 static CTextureObject _toSwords; // [SSE]
 
 static CTextureObject _toTestIken; // [SSE]
+
+// [SSE] Radar
+static CTextureObject _toRadarCircle;
+static CTextureObject _toRadarMask;
+static CTextureObject _toRadarBorder;
+static CTextureObject _toRadarDot;
+static CTextureObject _toRadarDotUp;
+static CTextureObject _toRadarDotDown;
+//
 
 // ammo textures
 static CTextureObject _toAColt;
@@ -956,7 +971,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   const BOOL bCooperative =  GetSP()->sp_bCooperative && !bSinglePlay;
   const BOOL bScoreMatch  = !GetSP()->sp_bCooperative && !GetSP()->sp_bUseFrags;
   const BOOL bFragMatch   = !GetSP()->sp_bCooperative &&  GetSP()->sp_bUseFrags;
-  const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags;
+  const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
   const BOOL bSharedLives = GetSP()->sp_bSharedLives;
 
   _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
@@ -1144,6 +1159,8 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     iScore = iScoreSum; // in case of coop play, show squad (common) score
   }
   
+  #define agafasga
+  #ifdef agafasga
   // LSC Up - Score / Frags
   {
     CTString strScore;
@@ -1166,7 +1183,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     HUD_DrawAnchoredRectOutline( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
   }*/
-  
+
   // LSC Down - SP/Coop = Extra Lives
   if ((bSinglePlay || bCooperative) && GetSP()->sp_ctCredits >= 0)
   {
@@ -1196,6 +1213,65 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     HUD_DrawAnchoredRectOutline(28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredTextInRect (28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, strMana, C_lGRAY, 1.0F);
   }
+  #endif
+  
+  // [SSE] Radar
+  #ifdef RADARAMA
+  {
+    HUD_DrawAnchroredIcon( 8, 8,  128, 128, EHHAT_LEFT, EHVAT_TOP, _toRadarCircle, C_WHITE|_ulBrAlpha, 1.0F, FALSE);
+    HUD_DrawAnchroredIcon( 8, 8,  128, 128, EHHAT_LEFT, EHVAT_TOP, _toRadarMask,   _colHUD|_ulAlphaHUD, 1.0F, FALSE);
+    HUD_DrawAnchroredIcon( 8, 8,  128, 128, EHHAT_LEFT, EHVAT_TOP, _toRadarBorder, _colHUD|_ulAlphaHUD, 1.0F, FALSE);
+    
+    CPlacement3D plView = _penPlayer->en_plViewpoint;
+    ANGLE3D a3dPlayerLookDir = ANGLE3D(((CEntity&)*_penPlayer).GetPlacement().pl_OrientationAngle(1) + plView.pl_OrientationAngle(1),0,0);
+    CPlacement3D plPlayer(((CEntity&)*_penPlayer).GetPlacement().pl_PositionVector, a3dPlayerLookDir);
+    
+    FOREACHINDYNAMICCONTAINER(((CEntity&)*_penPlayer).GetWorld()->wo_cenEntities, CEntity, iten)
+    {
+      CEntity *pen = iten;
+      
+      if (pen == NULL) continue;
+      if (pen->IsDead()) continue;
+      
+      if (IsDerivedFromClass(pen, "Enemy Base"))
+      {
+        CEnemyBase *penEB = static_cast<CEnemyBase*>(pen);
+        
+        if (penEB->m_bTemplate) continue;
+        
+        CPlacement3D plEnemy;
+        plEnemy.pl_PositionVector = pen->GetPlacement().pl_PositionVector;
+        plEnemy.pl_OrientationAngle = FLOAT3D(0, 0, 0);
+        plEnemy.AbsoluteToRelativeSmooth(plPlayer);
+        
+				FLOAT3D vEnemyFlat = plEnemy.pl_PositionVector;
+				vEnemyFlat(2) = 0;
+        
+        #define RRAD 50.0F
+        #define RHDIFF 5.0F
+        
+				if (plEnemy.pl_PositionVector.Length() > RRAD) 
+				{
+          vEnemyFlat = vEnemyFlat.Normalize() * RRAD;
+				}
+        
+        if (plEnemy.pl_PositionVector.Length() < 200) {
+          CTextureObject *ptoDot = &_toRadarDot;
+          
+          if (Abs(plEnemy.pl_PositionVector(2)) > RHDIFF) {
+            if (plEnemy.pl_PositionVector(2) > 0) {
+              ptoDot = &_toRadarDotUp;
+            } else if (plEnemy.pl_PositionVector(2) < 0) {
+              ptoDot = &_toRadarDotDown;
+            }
+          }
+
+          HUD_DrawAnchroredIcon( 8 + 64 + vEnemyFlat(1) - 4, 8 + 64 + vEnemyFlat(3) - 4,  8, 8, EHHAT_LEFT, EHVAT_TOP, *ptoDot, C_RED|_ulAlphaHUD, 1.0F, FALSE);
+        }
+      }
+    }
+  }
+  #endif
   
   // CSC Up
   if (bSinglePlay || bCooperative)
@@ -1517,7 +1593,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
   INDEX iWantedWeapon  = _penWeapons->m_iWantedWeapon;
   
   const BOOL bSharedLives = GetSP()->sp_bSharedLives;
-  const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags;
+  const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
 
   // determine hud colorization;
   COLOR colMax = SE_COL_BLUEGREEN_LT;
@@ -2096,19 +2172,32 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       // find maximum frags/score that one player has
       INDEX iMaxFrags = LowerLimit(INDEX(0));
       INDEX iMaxScore = LowerLimit(INDEX(0));
+
       {for(INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
         CPlayer *penPlayer = _apenPlayers[iPlayer];
         iMaxFrags = Max(iMaxFrags, penPlayer->m_psLevelStats.ps_iKills);
         iMaxScore = Max(iMaxScore, penPlayer->m_psLevelStats.ps_iScore);
       }}
+
+      // [SSE] TeamDeathmatch
+      if (bTeamDeathMatch) {
+        if (GetSP()->sp_iTeamScore1 > GetSP()->sp_iTeamScore2) {
+          iMaxFrags = GetSP()->sp_iTeamScore1;
+        } else {
+          iMaxFrags = GetSP()->sp_iTeamScore2;
+        }
+      }
+
       if (GetSP()->sp_iFragLimit>0) {
         INDEX iFragsLeft = ClampDn(GetSP()->sp_iFragLimit-iMaxFrags, INDEX(0));
         strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("FRAGS LEFT"), iFragsLeft);
       }
+
       if (GetSP()->sp_iScoreLimit>0) {
         INDEX iScoreLeft = ClampDn(GetSP()->sp_iScoreLimit-iMaxScore, INDEX(0));
         strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("SCORE LEFT"), iScoreLeft);
       }
+
       _pfdDisplayFont->SetFixedWidth();
       _pDP->SetFont( _pfdDisplayFont);
       _pDP->SetTextScaling( fTextScale*0.8f );
@@ -2871,19 +2960,32 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
       // find maximum frags/score that one player has
       INDEX iMaxFrags = LowerLimit(INDEX(0));
       INDEX iMaxScore = LowerLimit(INDEX(0));
+
       {for(INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
         CPlayer *penPlayer = _apenPlayers[iPlayer];
         iMaxFrags = Max(iMaxFrags, penPlayer->m_psLevelStats.ps_iKills);
         iMaxScore = Max(iMaxScore, penPlayer->m_psLevelStats.ps_iScore);
       }}
+
+      // [SSE] TeamDeathmatch
+      if (bTeamDeathMatch) {
+        if (GetSP()->sp_iTeamScore1 > GetSP()->sp_iTeamScore2) {
+          iMaxFrags = GetSP()->sp_iTeamScore1;
+        } else {
+          iMaxFrags = GetSP()->sp_iTeamScore2;
+        }
+      }
+
       if (GetSP()->sp_iFragLimit>0) {
         INDEX iFragsLeft = ClampDn(GetSP()->sp_iFragLimit-iMaxFrags, INDEX(0));
         strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("FRAGS LEFT"), iFragsLeft);
       }
+
       if (GetSP()->sp_iScoreLimit>0) {
         INDEX iScoreLeft = ClampDn(GetSP()->sp_iScoreLimit-iMaxScore, INDEX(0));
         strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("SCORE LEFT"), iScoreLeft);
       }
+
       _pfdDisplayFont->SetFixedWidth();
       _pDP->SetFont( _pfdDisplayFont);
       _pDP->SetTextScaling( fTextScale*0.8f );
@@ -3176,6 +3278,15 @@ static void HUD_RegisterTextures()
   
   HUD_RegisterTexture(&_toExtraLive,  CTFILENAME("TexturesMP\\Interface\\IExtraLive.tex"));
   HUD_RegisterTexture(&_toSwords,     CTFILENAME("TexturesMP\\Interface\\ISwords.tex"));
+  
+  // [SSE] Radar
+  HUD_RegisterTexture(&_toRadarCircle,  CTFILENAME("TexturesMP\\Interface\\RadarCircle.tex"));
+  HUD_RegisterTexture(&_toRadarMask,    CTFILENAME("TexturesMP\\Interface\\RadarMask.tex"));
+  HUD_RegisterTexture(&_toRadarBorder,  CTFILENAME("TexturesMP\\Interface\\RadarBorder.tex"));
+  HUD_RegisterTexture(&_toRadarDot,     CTFILENAME("TexturesMP\\Interface\\RadarDot.tex"));
+  HUD_RegisterTexture(&_toRadarDotUp,   CTFILENAME("TexturesMP\\Interface\\RadarDotUp.tex"));
+  HUD_RegisterTexture(&_toRadarDotDown, CTFILENAME("TexturesMP\\Interface\\RadarDotDown.tex"));
+  //
 
   // initialize ammo textures
   HUD_RegisterTexture(&_toAColt,          CTFILENAME("TexturesMP\\Interface\\AmColt.tex"));
