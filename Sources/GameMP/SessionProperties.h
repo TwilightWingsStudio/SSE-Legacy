@@ -24,7 +24,16 @@ public:
     GM_SCOREMATCH,
     GM_FRAGMATCH,
     GM_TEAMDEATHMATCH, // [SSE] Team DeathMatch
+    GM_CAPTURETHEFLAG, // [SSE] CTF
+    GM_LASTMANSTANDING,
+    GM_LASTTEAMSTANDING,
+    GM_PAYLOAD,
+    GM_PAYLOADRACE,
+    GM_HOLDTHEOBJECT,
+    GM_KINGOFTHEHILL,
+    GM_SURVIVAL, // [SSE] Survival
   };
+
   enum GameDifficulty {
     GD_TOURIST = -1,
     GD_EASY = 0,
@@ -88,8 +97,10 @@ public:
   
   // [SSE] Extra Lives System
   BOOL sp_bSharedLives;
+  BOOL sp_bRaisingLiveCost;
   INDEX sp_iScoreForExtraLive;
   INDEX sp_iScoreForExtraLiveAccum;
+  FLOAT sp_fLiveCostMultiplier;
   //
   
   BOOL sp_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage

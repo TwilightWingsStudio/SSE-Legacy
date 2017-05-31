@@ -88,8 +88,11 @@ extern void HUD_DrawDebugMonitor()
   strReport.PrintF("%s^c00FF00Alive: %02d\n", strReport, ctAlive);
   strReport.PrintF("%s^cFF0000Dead:  %02d\n", strReport, ctDead);
 
+  // If using lives.
   if (ctCredits >= 0) {
     strReport.PrintF("%s^cCCCCCCCan Respawn: %02d\n", strReport, ctDeadCanRespawn);
+
+    strReport.PrintF("%s^cCCCCCCLives: %s\n", strReport, bSharedLives ? "Shared" : "Personal");
   }
 
   strReport += "\n\n";

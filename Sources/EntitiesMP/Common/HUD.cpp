@@ -2275,7 +2275,11 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     {
       CTString strLimitsInfo;
       
-      INDEX iScoreLeft = ClampDn(GetSP()->sp_iScoreForExtraLive - (bSharedLives ? GetSP()->sp_iScoreForExtraLiveAccum : _penPlayer->m_iScoreAccumulated), INDEX(0));
+      FLOAT fLiveCostMultipleir = bSharedLives ? GetSP()->sp_fLiveCostMultiplier : _penPlayer->m_fLiveCostMultiplier;
+      INDEX iLiveCost = GetSP()->sp_iScoreForExtraLive * fLiveCostMultipleir;
+      INDEX iAccumulateScore = bSharedLives ? GetSP()->sp_iScoreForExtraLiveAccum : _penPlayer->m_iScoreAccumulated;
+      INDEX iScoreLeft = ClampDn(iLiveCost - iAccumulateScore, INDEX(0));
+
       strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("SCORE LEFT"), iScoreLeft);
       
       _pfdDisplayFont->SetFixedWidth();
@@ -3059,7 +3063,11 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
     {
       CTString strLimitsInfo;
       
-      INDEX iScoreLeft = ClampDn(GetSP()->sp_iScoreForExtraLive - (bSharedLives ? GetSP()->sp_iScoreForExtraLiveAccum : _penPlayer->m_iScoreAccumulated), INDEX(0));
+      FLOAT fLiveCostMultipleir = bSharedLives ? GetSP()->sp_fLiveCostMultiplier : _penPlayer->m_fLiveCostMultiplier;
+      INDEX iLiveCost = GetSP()->sp_iScoreForExtraLive * fLiveCostMultipleir;
+      INDEX iAccumulateScore = bSharedLives ? GetSP()->sp_iScoreForExtraLiveAccum : _penPlayer->m_iScoreAccumulated;
+      INDEX iScoreLeft = ClampDn(iLiveCost - iAccumulateScore, INDEX(0));
+
       strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("SCORE LEFT"), iScoreLeft);
       
       _pfdDisplayFont->SetFixedWidth();

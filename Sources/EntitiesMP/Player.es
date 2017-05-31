@@ -1319,6 +1319,7 @@ properties:
  200 INDEX m_iLives = 0,
  201 INDEX m_iMoney = 0,
  202 INDEX m_iScoreAccumulated = 0,
+ 203 FLOAT m_fLiveCostMultiplier = 1.0F,
  
  // [SSE] Respawn Delay
  220 FLOAT m_tmKilled = -1.0f,
@@ -5888,7 +5889,8 @@ functions:
           if (GetSP()->sp_ctCredits == -1 || (bSharedLives ? GetSP()->sp_ctCreditsLeft : m_iLives) != 0) // [SSE] Personal/Shared Extra Lives
           {
             // If credits used then decrement credits.
-            if (GetSP()->sp_ctCredits != -1) {
+            if (GetSP()->sp_ctCredits != -1)
+            {
               if (bSharedLives) {
                 ((CSessionProperties*)GetSP())->sp_ctCreditsLeft--;
               } else {
@@ -7099,12 +7101,12 @@ procedures:
   // --------------------------------------------------------------------------------------
   WorldChange()
   {
-    // if in single player
+    // if in single player then mark world as visited.
     if (GetSP()->sp_bSinglePlayer) {
-      // mark world as visited
       CTString strDummy("1");
       SaveStringVar(GetWorld()->wo_fnmFileName.NoExt()+".vis", strDummy);
     }
+
     // find music holder on new world
     FindMusicHolder();
     // store group name
@@ -7118,7 +7120,6 @@ procedures:
     penWeapon->m_fSniperFOVlast = penWeapon->m_fSniperFOV = penWeapon->m_fSniperMaxFOV;      
     penWeapon->m_bSniping=FALSE;
     m_ulFlags&=~PLF_ISZOOMING;
-
     
     // turn off possible chainsaw engine sound
     PlaySound(m_soWeaponAmbient, SOUND_SILENCE, SOF_3D);
@@ -8393,7 +8394,7 @@ procedures:
       }
 
       on (EPostLevelChange) : {
-        if (GetSP()->sp_bSinglePlayer || (GetFlags()&ENF_ALIVE)) {
+        if (GetSP()->sp_bSinglePlayer || IsAlive()) {
           call WorldChange(); 
         } else {
           call WorldChangeDead(); 
@@ -8479,29 +8480,58 @@ procedures:
         //
         
         // [SSE] Extra Lives System
-        // NOTE: Only non-predicted because we have here SessionProperties editing!
+        // NOTE: Only non-predicted because we operate here with SessionProperties!
         if (!IsPredictor() && GetSP()->sp_ctCredits >= 0 && GetSP()->sp_iScoreForExtraLive > 0)
         {
-          if (GetSP()->sp_bSharedLives) {
+          BOOL bRaisingLiveCost = GetSP()->sp_bRaisingLiveCost;
+          BOOL bSharedLives = GetSP()->sp_bSharedLives;
+          INDEX iScoreForExtraLive = GetSP()->sp_iScoreForExtraLive;
+          
+          INDEX iLivesToAdd = 0;
+          
+          if (bSharedLives) {
             ((CSessionProperties*)GetSP())->sp_iScoreForExtraLiveAccum += iScore;
             
-            if (GetSP()->sp_iScoreForExtraLiveAccum >= GetSP()->sp_iScoreForExtraLive)
+            // If we afford to get at least one live.
+            if (GetSP()->sp_iScoreForExtraLiveAccum >= iScoreForExtraLive * GetSP()->sp_fLiveCostMultiplier)
             {
-              INDEX iLives = GetSP()->sp_iScoreForExtraLiveAccum / GetSP()->sp_iScoreForExtraLive;
-
-              ((CSessionProperties*)GetSP())->sp_ctCreditsLeft += iLives;
-              ((CSessionProperties*)GetSP())->sp_iScoreForExtraLiveAccum = GetSP()->sp_iScoreForExtraLiveAccum % GetSP()->sp_iScoreForExtraLive;
+              if (bRaisingLiveCost) {
+                while (GetSP()->sp_iScoreForExtraLiveAccum > iScoreForExtraLive * GetSP()->sp_fLiveCostMultiplier) {
+                  iLivesToAdd++;
+                  ((CSessionProperties*)GetSP())->sp_iScoreForExtraLiveAccum -= iScoreForExtraLive * GetSP()->sp_fLiveCostMultiplier;
+                  ((CSessionProperties*)GetSP())->sp_fLiveCostMultiplier *= 2.0F;
+                }
+              } else {
+                iLivesToAdd = GetSP()->sp_iScoreForExtraLiveAccum / iScoreForExtraLive;
+                ((CSessionProperties*)GetSP())->sp_iScoreForExtraLiveAccum = GetSP()->sp_iScoreForExtraLiveAccum % iScoreForExtraLive;
+              }              
             }
+
+          // Personal Lives
           } else {
             m_iScoreAccumulated += iScore;
 
-            if (m_iScoreAccumulated >= GetSP()->sp_iScoreForExtraLive)
+            // If we afford to get at least one live.
+            if (m_iScoreAccumulated >= iScoreForExtraLive * m_fLiveCostMultiplier)
             {
-              INDEX iLives = m_iScoreAccumulated / GetSP()->sp_iScoreForExtraLive;
-            
-              m_iLives += iLives;
-              m_iScoreAccumulated = m_iScoreAccumulated % GetSP()->sp_iScoreForExtraLive;
+              if (bRaisingLiveCost) {
+                while (m_iScoreAccumulated > iScoreForExtraLive * m_fLiveCostMultiplier) {
+                  iLivesToAdd++;
+                  m_iScoreAccumulated -= GetSP()->sp_iScoreForExtraLive * m_fLiveCostMultiplier;
+                  m_fLiveCostMultiplier *= 2.0F;
+                }
+              } else {
+                iLivesToAdd = m_iScoreAccumulated / iScoreForExtraLive;
+                m_iScoreAccumulated = m_iScoreAccumulated % iScoreForExtraLive;
+              }
             }
+          }
+          
+          // Finally we can add lives depending on settings.
+          if (bSharedLives) {
+            ((CSessionProperties*)GetSP())->sp_ctCreditsLeft += iLivesToAdd;
+          } else {
+            m_iLives += iLivesToAdd;
           }
         }
         //

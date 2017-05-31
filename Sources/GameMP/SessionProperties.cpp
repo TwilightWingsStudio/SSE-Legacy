@@ -59,6 +59,7 @@ extern INDEX gam_bDropWeapons; // [SSE] Weapons Drop
 
 // [SSE] Extra Lives System
 extern INDEX gam_bSharedLives;
+extern INDEX gam_bRaisingLiveCost;
 extern INDEX gam_iScoreForExtraLive;
 //
 
@@ -190,8 +191,10 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   
   // [SSE] Extra Lives System
   sp.sp_bSharedLives = FALSE;
+  sp.sp_bRaisingLiveCost = FALSE;
   sp.sp_iScoreForExtraLive = 0;
   sp.sp_iScoreForExtraLiveAccum = 0;
+  sp.sp_fLiveCostMultiplier = 1.0F;
   //
   
   sp.sp_bPickUpWeaponsOnce = FALSE; // [SSE] Pick up weapons once.
@@ -291,8 +294,10 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
 
     // [SSE] Extra Lives System
     sp.sp_bSharedLives = gam_bSharedLives;
+    sp.sp_bRaisingLiveCost = gam_bRaisingLiveCost;
     sp.sp_iScoreForExtraLive = gam_iScoreForExtraLive;
     sp.sp_iScoreForExtraLiveAccum = 0;
+    sp.sp_fLiveCostMultiplier = 1.0F;
     //
     
     sp.sp_iScoreLimit = 0;
@@ -311,8 +316,10 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
 
     // [SSE] Extra Lives System
     sp.sp_bSharedLives = FALSE;
+    sp.sp_bRaisingLiveCost = FALSE;
     sp.sp_iScoreForExtraLive = 0;
     sp.sp_iScoreForExtraLiveAccum = 0;
+    sp.sp_fLiveCostMultiplier = 1.0F;
     //
 
     sp.sp_iScoreLimit = gam_iScoreLimit;
@@ -360,26 +367,44 @@ BOOL IsMenuEnabledCfunc(void* pArgs)
 
 CTString GetGameTypeName(INDEX iMode)
 {
-  switch (iMode) {
-    default:
+  switch (iMode)
+  {
+    default: {
       return "";
-      break;
-    case CSessionProperties::GM_COOPERATIVE:
+    } break;
+
+    case CSessionProperties::GM_COOPERATIVE: {
       return TRANS("Cooperative");
-      break;
-    case CSessionProperties::GM_FLYOVER:
+    } break;
+
+    case CSessionProperties::GM_FLYOVER: {
       return TRANS("Flyover");
-      break;
-    case CSessionProperties::GM_SCOREMATCH:
+    } break;
+
+    case CSessionProperties::GM_SCOREMATCH: {
       return TRANS("Scorematch");
-      break;
-    case CSessionProperties::GM_FRAGMATCH:
+    } break;
+
+    case CSessionProperties::GM_FRAGMATCH: {
       return TRANS("Fragmatch");
-      break;
+    } break;
+
     // [SSE] Team DeathMatch
-    case CSessionProperties::GM_TEAMDEATHMATCH:
+    case CSessionProperties::GM_TEAMDEATHMATCH: {
       return TRANS("TDM");
-      break;
+    } break;
+    
+    /*
+    // [SSE] CTF
+    case CSessionProperties::GM_CAPTURETHEFLAG: {
+      return TRANS("CTF");
+    } break;
+    
+    // [SSE] Survival
+    case CSessionProperties::GM_SURVIVAL: {
+      return TRANS("Survival");
+    } break;
+    */
   }
 }
 CTString GetGameTypeNameCfunc(void* pArgs)
@@ -482,6 +507,7 @@ ULONG GetSpawnFlagsForGameType(INDEX iGameType)
     case CSessionProperties::GM_SCOREMATCH:     return SPF_DEATHMATCH;
     case CSessionProperties::GM_FRAGMATCH:      return SPF_DEATHMATCH;
     case CSessionProperties::GM_TEAMDEATHMATCH: return SPF_DEATHMATCH; // [SSE] Team DeathMatch
+    case CSessionProperties::GM_CAPTURETHEFLAG: return SPF_DEATHMATCH; // [SSE] CTF
   };
 }
 
