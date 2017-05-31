@@ -8393,7 +8393,23 @@ procedures:
         resume; 
       }
 
-      on (EPostLevelChange) : {
+      on (EPostLevelChange) :
+      {
+        // [SSE] Extra Lives System
+        // NOTE: Only non-predicted because we operate here with SessionProperties!
+        if (!IsPredictor() && GetSP()->sp_ctCredits >= 0 && GetSP()->sp_iScoreForExtraLive > 0)
+        {
+          BOOL bRaisingLiveCost = GetSP()->sp_bRaisingLiveCost;
+          BOOL bSharedLives = GetSP()->sp_bSharedLives;
+          
+          if (bSharedLives) {            
+            ((CSessionProperties*)GetSP())->sp_fLiveCostMultiplier = 1.0F; 
+          } else {
+            m_fLiveCostMultiplier = 1.0F;
+          }
+        }
+        //
+        
         if (GetSP()->sp_bSinglePlayer || IsAlive()) {
           call WorldChange(); 
         } else {
@@ -8496,7 +8512,7 @@ procedures:
             if (GetSP()->sp_iScoreForExtraLiveAccum >= iScoreForExtraLive * GetSP()->sp_fLiveCostMultiplier)
             {
               if (bRaisingLiveCost) {
-                while (GetSP()->sp_iScoreForExtraLiveAccum > iScoreForExtraLive * GetSP()->sp_fLiveCostMultiplier) {
+                while (GetSP()->sp_iScoreForExtraLiveAccum >= iScoreForExtraLive * GetSP()->sp_fLiveCostMultiplier) {
                   iLivesToAdd++;
                   ((CSessionProperties*)GetSP())->sp_iScoreForExtraLiveAccum -= iScoreForExtraLive * GetSP()->sp_fLiveCostMultiplier;
                   ((CSessionProperties*)GetSP())->sp_fLiveCostMultiplier *= 2.0F;
@@ -8515,7 +8531,7 @@ procedures:
             if (m_iScoreAccumulated >= iScoreForExtraLive * m_fLiveCostMultiplier)
             {
               if (bRaisingLiveCost) {
-                while (m_iScoreAccumulated > iScoreForExtraLive * m_fLiveCostMultiplier) {
+                while (m_iScoreAccumulated >= iScoreForExtraLive * m_fLiveCostMultiplier) {
                   iLivesToAdd++;
                   m_iScoreAccumulated -= GetSP()->sp_iScoreForExtraLive * m_fLiveCostMultiplier;
                   m_fLiveCostMultiplier *= 2.0F;

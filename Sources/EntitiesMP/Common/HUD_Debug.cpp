@@ -93,6 +93,12 @@ extern void HUD_DrawDebugMonitor()
     strReport.PrintF("%s^cCCCCCCCan Respawn: %02d\n", strReport, ctDeadCanRespawn);
 
     strReport.PrintF("%s^cCCCCCCLives: %s\n", strReport, bSharedLives ? "Shared" : "Personal");
+    
+    BOOL bRaisingLiveCost = GetSP()->sp_bRaisingLiveCost;
+    
+    if (bRaisingLiveCost) {
+      strReport.PrintF("%s^cCCCCCCCost Mul: %0.2f\n", strReport, bSharedLives ? GetSP()->sp_fLiveCostMultiplier : _penPlayer->m_fLiveCostMultiplier);
+    }
   }
 
   strReport += "\n\n";
