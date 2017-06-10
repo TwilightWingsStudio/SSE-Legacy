@@ -63,6 +63,11 @@ extern INDEX gam_bRaisingLiveCost;
 extern INDEX gam_iScoreForExtraLive;
 //
 
+// [SSE] Gameplay - Better Keys
+extern INDEX gam_bSharedKeys;
+extern INDEX gam_bSaveKeysWhenServerEmpty;
+//
+
 extern INDEX gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
 extern INDEX gam_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
 extern INDEX gam_bRocketJumpMode; // [SSE] RocketJump Mode
@@ -300,6 +305,12 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_fLiveCostMultiplier = 1.0F;
     //
     
+    // [SSE] Gameplay - Better Keys
+    sp.sp_bSharedKeys = gam_bSharedKeys;
+    sp.sp_bSaveKeysWhenServerEmpty = gam_bSaveKeysWhenServerEmpty;
+    sp.sp_ulPickedKeys = 0;
+    //
+    
     sp.sp_iScoreLimit = 0;
     sp.sp_iFragLimit  = 0;
     sp.sp_iTimeLimit  = 0;
@@ -310,6 +321,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_bDropPowerUps = FALSE; // [SSE] PowerUps Drop
     sp.sp_bDropWeapons = FALSE; // [SSE] Weapons Drop
 
+  // Versus/TeamPlay
   } else {
     sp.sp_ctCredits     = -1;
     sp.sp_ctCreditsLeft = -1;
@@ -320,6 +332,12 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_iScoreForExtraLive = 0;
     sp.sp_iScoreForExtraLiveAccum = 0;
     sp.sp_fLiveCostMultiplier = 1.0F;
+    //
+    
+    // [SSE] Gameplay - Better Keys
+    sp.sp_bSharedKeys = FALSE;
+    sp.sp_bSaveKeysWhenServerEmpty = FALSE;
+    sp.sp_ulPickedKeys = 0;
     //
 
     sp.sp_iScoreLimit = gam_iScoreLimit;
@@ -389,20 +407,55 @@ CTString GetGameTypeName(INDEX iMode)
       return TRANS("Fragmatch");
     } break;
 
-    // [SSE] Team DeathMatch
+    // [SSE] GameModes - Team DeathMatch
     case CSessionProperties::GM_TEAMDEATHMATCH: {
       return TRANS("TDM");
     } break;
     
     /*
-    // [SSE] CTF
+    // [SSE] GameModes - CTF
     case CSessionProperties::GM_CAPTURETHEFLAG: {
       return TRANS("CTF");
     } break;
-    
-    // [SSE] Survival
+
+    // [SSE] GameModes - LMS
+    case CSessionProperties::GM_LASTMANSTANDING: {
+      return TRANS("LMS");
+    } break;
+
+    // [SSE] GameModes - LTS
+    case CSessionProperties::GM_LASTTEAMSTANDING: {
+      return TRANS("LTS");
+    } break;
+
+    // [SSE] GameModes - PD
+    case CSessionProperties::GM_PAYLOAD: {
+      return TRANS("Payload");
+    } break;
+
+    // [SSE] GameModes - PDR
+    case CSessionProperties::GM_PAYLOADRACE: {
+      return TRANS("Payload Race");
+    } break;
+
+    // [SSE] GameModes - Survival
     case CSessionProperties::GM_SURVIVAL: {
       return TRANS("Survival");
+    } break;
+
+    // [SSE] GameModes - HTO
+    case CSessionProperties::GM_HOLDTHEOBJECT: {
+      return TRANS("Hold The Object");
+    } break;
+
+    // [SSE] GameModes - KotH
+    case CSessionProperties::GM_KINGOFTHEHILL: {
+      return TRANS("King of the Hill");
+    } break;
+
+    // [SSE] GameModes - Defend
+    case CSessionProperties::GM_DEFEND: {
+      return TRANS("Defend");
     } break;
     */
   }
@@ -506,8 +559,9 @@ ULONG GetSpawnFlagsForGameType(INDEX iGameType)
     case CSessionProperties::GM_COOPERATIVE:    return SPF_COOPERATIVE;
     case CSessionProperties::GM_SCOREMATCH:     return SPF_DEATHMATCH;
     case CSessionProperties::GM_FRAGMATCH:      return SPF_DEATHMATCH;
-    case CSessionProperties::GM_TEAMDEATHMATCH: return SPF_DEATHMATCH; // [SSE] Team DeathMatch
-    case CSessionProperties::GM_CAPTURETHEFLAG: return SPF_DEATHMATCH; // [SSE] CTF
+
+    case CSessionProperties::GM_TEAMDEATHMATCH: return SPF_DEATHMATCH; // [SSE] GameModes - Team DeathMatch
+    case CSessionProperties::GM_CAPTURETHEFLAG: return SPF_DEATHMATCH; // [SSE] GameModes - CTF
   };
 }
 

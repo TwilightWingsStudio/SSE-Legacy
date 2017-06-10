@@ -152,9 +152,12 @@ procedures:
   DoorAutoActive()
   {
     ASSERT(m_bActive);
-    while (TRUE) {
+
+    while (TRUE)
+    {
       // wait 
-      wait() {
+      wait()
+      {
         // when someone enters
         on (EPass ePass) : {
           // if he can open the door
@@ -176,12 +179,14 @@ procedures:
           }
           resume;
         }
+
         // if door is deactivated
         on (EDeactivate) : {
           // go to inactive state
           m_bActive = FALSE;
           jump DoorAutoInactive();
         }
+
         otherwise() : {
           resume;
         };
@@ -196,15 +201,19 @@ procedures:
   DoorAutoInactive()
   {
     ASSERT(!m_bActive);
-    while (TRUE) {
+
+    while (TRUE)
+    {
       // wait 
-      wait() {
+      wait()
+      {
         // if door is activated
         on (EActivate) : {
           // go to active state
           m_bActive = TRUE;
           jump DoorAutoActive();
         }
+
         otherwise() : {
           resume;
         };
@@ -218,10 +227,12 @@ procedures:
   // door when do not function anymore
   DoorDummy()
   {
-    wait() {
+    wait()
+    {
       on (EBegin) : {
         resume;
       }
+
       otherwise() : {
         resume;
       };
@@ -231,9 +242,11 @@ procedures:
   // door that wait to be triggered to open
   DoorTriggered()
   {
-    while (TRUE) {
+    while (TRUE)
+    {
       // wait to someone enter
-      wait() {
+      wait()
+      {
         on (EPass ePass) : {
           if (CanReactOnEntity(ePass.penOther)) {
             if (m_strLockedMessage!="") {
@@ -245,11 +258,13 @@ procedures:
             resume;
           }
         }
+
         on (ETrigger eTrigger) : {
           m_penCaused = eTrigger.penCaused;
           TriggerDoor();
           jump DoorDummy();
         }
+
         otherwise() : {
           resume;
         };
@@ -263,17 +278,34 @@ procedures:
   // door that need a key to be unlocked to open
   DoorLocked()
   {
-    while (TRUE) {
+    while (TRUE)
+    {
       // wait to someone enter
-      wait() {
-        on (EPass ePass) : {
-          if (IsDerivedFromClass(ePass.penOther, "Player")) {
+      wait()
+      {
+        on (EPass ePass) :
+        {
+          if (IsDerivedFromClass(ePass.penOther, "Player"))
+          {
             CPlayer *penPlayer = (CPlayer*)&*ePass.penOther;
             // if he has the key
             ULONG ulKey = (1<<INDEX(m_kitKey));
-            if (penPlayer->m_ulKeys&ulKey) {
-              // use the key
-              penPlayer->m_ulKeys&=~ulKey;
+            
+            // [SSE] Gameplay - Better Keys
+            BOOL bSharedKeys = GetSP()->sp_bSharedKeys;
+            BOOL bHasKey = bSharedKeys ? GetSP()->sp_ulPickedKeys&ulKey : penPlayer->m_ulKeys&ulKey;
+            //
+            
+            if (bHasKey) {
+              // [SSE] Gameplay - Better Keys
+              if (bSharedKeys) {
+                ((CSessionProperties*)GetSP())->sp_ulPickedKeys &= ~ulKey;
+              } else {
+              //
+                // use the key
+                penPlayer->m_ulKeys &= ~ulKey;
+              }
+
               // open the dook
               TriggerDoor();
 
@@ -283,17 +315,20 @@ procedures:
               strMsg.PrintF(TRANS("%s used"), GetKeyName(m_kitKey));
               PrintCenterMessage(this, ePass.penOther, strMsg, 3.0f, MSS_INFO);
               */
+
               // become automatic door
               jump DoorAuto();
             // if he has no key
             } else {
-              if (m_penLockedTarget!=NULL) {
+              if (m_penLockedTarget != NULL) {
                 SendToTarget(m_penLockedTarget, EET_TRIGGER, ePass.penOther);
               }
             }
+
             resume;
           }
         }
+
         otherwise() : {
           resume;
         };
@@ -307,13 +342,16 @@ procedures:
   // door that need to be triggered to start working automatically
   DoorTriggeredAuto()
   {
-    while (TRUE) {
+    while (TRUE)
+    {
       // wait to be triggered
-      wait() {
+      wait()
+      {
         on (ETrigger eTrigger) : {
           // become auto door
           jump DoorAuto();
         }
+
         on (EPass ePass) : {
           if (CanReactOnEntity(ePass.penOther)) {
             if (m_strLockedMessage!="") {
@@ -325,6 +363,7 @@ procedures:
           }
           resume;
         }
+
         otherwise() : {
           resume;
         };
@@ -351,19 +390,23 @@ procedures:
     autowait(0.1f);
 
     // dispatch to aproppriate loop
-    switch(m_dtType) {
-    case DT_AUTO: {
-      jump DoorAuto();
-                  } break;
-    case DT_TRIGGERED: {
-      jump DoorTriggered();
-                       } break;
-    case DT_TRIGGEREDAUTO: {
-      jump DoorTriggeredAuto();
-                       } break;
-    case DT_LOCKED: {
-      jump DoorLocked();
-                    } break;
+    switch(m_dtType)
+    {
+      case DT_AUTO: {
+        jump DoorAuto();
+      } break;
+
+      case DT_TRIGGERED: {
+        jump DoorTriggered();
+      } break;
+
+      case DT_TRIGGEREDAUTO: {
+        jump DoorTriggeredAuto();
+      } break;
+
+      case DT_LOCKED: {
+        jump DoorLocked();
+      } break;
     }
   }
 };

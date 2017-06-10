@@ -134,6 +134,11 @@ extern INDEX gam_bRaisingLiveCost = TRUE;
 extern INDEX gam_iScoreForExtraLive = 100000;
 //
 
+// [SSE] Gameplay - Better Keys
+extern INDEX gam_bSharedKeys = FALSE;
+extern INDEX gam_bSaveKeysWhenServerEmpty = FALSE;
+//
+
 extern INDEX gam_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
 extern INDEX gam_bArmorInertiaDamping = TRUE; // [SSE] Armor Inertia Damping Toggle
 extern INDEX gam_bRocketJumpMode = FALSE; // [SSE] RocketJump Mode
@@ -994,6 +999,11 @@ void CGame::InitInternal( void)
   _pShell->DeclareSymbol("persistent user INDEX gam_bSharedLives;", &gam_bSharedLives);
   _pShell->DeclareSymbol("persistent user INDEX gam_bRaisingLiveCost;", &gam_bRaisingLiveCost);
   _pShell->DeclareSymbol("persistent user INDEX gam_iScoreForExtraLive;", &gam_iScoreForExtraLive); 
+  //
+  
+  // [SSE] Gameplay - Better Keys
+  _pShell->DeclareSymbol("persistent user INDEX gam_bSharedKeys;", &gam_bSharedKeys);
+  _pShell->DeclareSymbol("persistent user INDEX gam_bSaveKeysWhenServerEmpty;", &gam_bSaveKeysWhenServerEmpty);
   //
 
   _pShell->DeclareSymbol("persistent user INDEX gam_bKeepSeriousDamageOnProjectiles;",  &gam_bKeepSeriousDamageOnProjectiles); // [SSE] Better Serious Damage

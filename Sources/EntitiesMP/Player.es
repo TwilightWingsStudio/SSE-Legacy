@@ -2779,6 +2779,41 @@ functions:
     m_psLevelTotal.ps_iSecrets = mh.m_ctSecretsInWorld;
     m_psGameTotal.ps_iSecrets += mh.m_ctSecretsInWorld;
   }
+  
+  void TryToTransferKeys(void)
+  {
+    // NOTE: Only non-predicted because we operate here with SessionProperties!
+    // If we have some keys...
+    if (!IsPredictor() && m_ulKeys != 0)
+    {
+      // find first live player
+      CPlayer *penNextPlayer = NULL;
+
+      for(INDEX iPlayer = 0; iPlayer < GetMaxPlayers(); iPlayer++)
+      {
+        CPlayer *pen = (CPlayer*)&*GetPlayerEntity(iPlayer);
+
+        if (pen != NULL && pen != this && (pen->GetFlags()&ENF_ALIVE) && !(pen->GetFlags()&ENF_DELETED) ) {
+          penNextPlayer = pen;
+        }
+      }
+
+      // if any found
+      if (penNextPlayer != NULL) {
+        // transfer keys to that player
+        CPrintF(TRANS("%s leaving, all keys transfered to %s\n"), 
+          (const char*)m_strName, (const char*)penNextPlayer->GetPlayerName());
+        penNextPlayer->m_ulKeys |= m_ulKeys;
+      
+      // [SSE] Gameplay - Better Keys
+      // If saves should be saved and personal keys.
+      } else if (GetSP()->sp_bSaveKeysWhenServerEmpty && !GetSP()->sp_bSharedKeys) {
+        CPrintF(TRANS("%s leaving, all keys saved to buffer.\n"), (const char*)m_strName);
+        
+        ((CSessionProperties*)GetSP())->sp_ulPickedKeys |= m_ulKeys;
+      }
+    }
+  }
 
   // --------------------------------------------------------------------------------------
   // Check if there is fuss.
@@ -4507,10 +4542,30 @@ functions:
       ULONG ulKey = 1<<INDEX(((EKey&)ee).kitType);
       EKey &eKey = (EKey&)ee;
       if (eKey.kitType == KIT_HAWKWINGS01DUMMY || eKey.kitType == KIT_HAWKWINGS02DUMMY
-        || eKey.kitType == KIT_TABLESDUMMY || eKey.kitType ==KIT_JAGUARGOLDDUMMY)
+        || eKey.kitType == KIT_TABLESDUMMY || eKey.kitType == KIT_JAGUARGOLDDUMMY)
       {
         ulKey = 0;
       }
+      
+      // [SSE] Gameplay - Better Keys
+      if (GetSP()->sp_bSharedKeys)
+      {
+        // NOTE: Only non-predicted because we operate here with SessionProperties!
+        if (!IsPredictor()) {
+          ((CSessionProperties*)GetSP())->sp_ulPickedKeys |= ulKey;
+        }
+        
+        CTString strKey = GetKeyName(((EKey&)ee).kitType);
+        ItemPicked(strKey, 0);
+
+        // if in cooperative
+        if (GetSP()->sp_bCooperative && !GetSP()->sp_bSinglePlayer) {
+          CPrintF(TRANS("^cFFFFFF%s - %s^r\n"), GetPlayerName(), strKey);
+        }
+
+        return TRUE;
+      }
+
       // if key is already in inventory
       if (m_ulKeys&ulKey) {
         // ignore it
@@ -8344,6 +8399,15 @@ procedures:
     if (!GetSP()->sp_bSharedLives && GetSP()->sp_ctCredits > 0) {
       m_iLives = GetSP()->sp_ctCredits;
     }
+    
+    // [SSE] Gameplay - Better Keys
+    // NOTE: Only non-predicted because we operate here with SessionProperties!
+    if (!IsPredictor() && GetSP()->sp_bSaveKeysWhenServerEmpty && !GetSP()->sp_bSharedKeys && GetSP()->sp_ulPickedKeys > 0) {
+      CPrintF(TRANS("%s receiving keys from buffer.\n"), (const char*)m_strName);
+      m_ulKeys |= GetSP()->sp_ulPickedKeys;
+      ((CSessionProperties*)GetSP())->sp_ulPickedKeys = 0;
+    }
+    //
 
     ModelChangeNotify();
 
@@ -8612,25 +8676,7 @@ procedures:
 
     // we get here if the player is disconnected from the server
 
-    // if we have some keys
-    if (!IsPredictor() && m_ulKeys!=0) {
-      // find first live player
-      CPlayer *penNextPlayer = NULL;
-      for(INDEX iPlayer=0; iPlayer<GetMaxPlayers(); iPlayer++) {
-        CPlayer *pen = (CPlayer*)&*GetPlayerEntity(iPlayer);
-        if (pen!=NULL && pen!=this && (pen->GetFlags()&ENF_ALIVE) && !(pen->GetFlags()&ENF_DELETED) ) {
-          penNextPlayer = pen;
-        }
-      }
-
-      // if any found
-      if (penNextPlayer!=NULL) {
-        // transfer keys to that player
-        CPrintF(TRANS("%s leaving, all keys transfered to %s\n"), 
-          (const char*)m_strName, (const char*)penNextPlayer->GetPlayerName());
-        penNextPlayer->m_ulKeys |= m_ulKeys;
-      }
-    }
+    TryToTransferKeys();
 
     // spawn teleport effect
     SpawnTeleport();

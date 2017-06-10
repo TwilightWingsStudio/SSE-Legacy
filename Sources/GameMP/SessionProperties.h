@@ -13,6 +13,8 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
 
+#define GMF_TEAMPLAY
+
 /*
  * Class responsible for describing game session
  */
@@ -23,15 +25,18 @@ public:
     GM_COOPERATIVE = 0,
     GM_SCOREMATCH,
     GM_FRAGMATCH,
-    GM_TEAMDEATHMATCH, // [SSE] Team DeathMatch
-    GM_CAPTURETHEFLAG, // [SSE] CTF
-    GM_LASTMANSTANDING,
-    GM_LASTTEAMSTANDING,
-    GM_PAYLOAD,
-    GM_PAYLOADRACE,
-    GM_HOLDTHEOBJECT,
-    GM_KINGOFTHEHILL,
-    GM_SURVIVAL, // [SSE] Survival
+
+    GM_TEAMDEATHMATCH,   // [SSE] GameModes - Team DeathMatch
+    GM_CAPTURETHEFLAG,   // [SSE] GameModes - CTF
+    GM_LASTMANSTANDING,  // [SSE] GameModes - LMS
+    GM_LASTTEAMSTANDING, // [SSE] GameModes - LTS
+    GM_PAYLOAD,          // [SSE] GameModes - PD
+    GM_PAYLOADRACE,      // [SSE] GameModes - PFR
+    GM_HOLDTHEOBJECT,    // [SSE] GameModes - HTO
+    GM_KINGOFTHEHILL,    // [SSE] GameModes - KotH
+    GM_DOMINATION,       // [SSE] GameModes - Domination
+    GM_SURVIVAL,         // [SSE] GameModes - Survival
+    GM_DEFEND,           // [SSE] GameModes - Defend
   };
 
   enum GameDifficulty {
@@ -58,6 +63,8 @@ public:
   INDEX sp_iScoreLimit;       // stop game after a player/team reaches given score
   INDEX sp_iFragLimit;        // stop game after a player/team reaches given score
   INDEX sp_iTimeLimit;        // stop game after given number of minutes elapses
+  
+  // TODO: [ZCaliptium] Move gamemode-related booleans like sp_bTeamPlay into gamemode flags mask variable.
 
   BOOL sp_bTeamPlay;          // players are divided in teams
   BOOL sp_bFriendlyFire;      // can harm player of same team
@@ -81,10 +88,10 @@ public:
   FLOAT sp_fExtraEnemyStrength;            // fixed adder for extra enemy power 
   FLOAT sp_fExtraEnemyStrengthPerPlayer;   // adder for extra enemy power per each player playing
 
-  INDEX sp_ctCredits;           // number of credits for this game
-  INDEX sp_ctCreditsLeft;       // number of credits left on this level
-  FLOAT sp_tmSpawnInvulnerability;   // how many seconds players are invunerable after respawning
-  FLOAT sp_tmRespawnDelay; // [SSE] Respawn Delay - How many seconds should pass after player death to be able respawn.
+  INDEX sp_ctCredits;               // number of credits for this game
+  INDEX sp_ctCreditsLeft;           // number of credits left on this level
+  FLOAT sp_tmSpawnInvulnerability;  // how many seconds players are invunerable after respawning
+  FLOAT sp_tmRespawnDelay;          // [SSE] Respawn Delay - How many seconds should pass after player death to be able respawn.
 
   INDEX sp_iBlood;         // blood/gibs type (0=none, 1=green, 2=red, 3=hippie)
   BOOL  sp_bGibs;          // enable/disable gibbing
@@ -99,20 +106,26 @@ public:
   BOOL sp_bSharedLives;
   BOOL sp_bRaisingLiveCost;
   INDEX sp_iScoreForExtraLive;
-  INDEX sp_iScoreForExtraLiveAccum;
-  FLOAT sp_fLiveCostMultiplier;
+  INDEX sp_iScoreForExtraLiveAccum; // Internal.
+  FLOAT sp_fLiveCostMultiplier;     // Internal.
+  //
+  
+  // [SSE] Gameplay - Better Keys
+  BOOL sp_bSharedKeys;
+  BOOL sp_bSaveKeysWhenServerEmpty;
+  ULONG sp_ulPickedKeys;
   //
   
   BOOL sp_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
-  BOOL sp_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
-  BOOL sp_bRocketJumpMode; // [SSE] RocketJump Mode
+  BOOL sp_bArmorInertiaDamping;            // [SSE] Armor Inertia Damping Toggle
+  BOOL sp_bRocketJumpMode;                 // [SSE] RocketJump Mode
   
   BOOL sp_bPickUpWeaponsOnce; // [SSE] Pick up weapons once.
   
   BOOL sp_bDropPowerUps; // [SSE] PowerUps Drop
-  BOOL sp_bDropWeapons; // [SSE] Weapons Drop
+  BOOL sp_bDropWeapons;  // [SSE] Weapons Drop
   
-  // [SSE] Team DeathMatch
+  // [SSE] GameModes - Team DeathMatch
   INDEX sp_iTeamScore1;
   INDEX sp_iTeamScore2;
   INDEX sp_iTeamScore3;
