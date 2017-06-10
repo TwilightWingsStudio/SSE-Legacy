@@ -27,16 +27,18 @@ extern COLOR _colHUD;
 
 extern void HUD_DrawDebugMonitor()
 {
-  FLOAT fExtraEnemyStrength = GetSP()->sp_fExtraEnemyStrength;
-  FLOAT fExtraStrengthPerPlayer = GetSP()->sp_fExtraEnemyStrengthPerPlayer;
-  INDEX ctCredits = GetSP()->sp_ctCredits;
-  BOOL bSharedLives = GetSP()->sp_bSharedLives;
+  const FLOAT fExtraEnemyStrength = GetSP()->sp_fExtraEnemyStrength;
+  const FLOAT fExtraStrengthPerPlayer = GetSP()->sp_fExtraEnemyStrengthPerPlayer;
+  const INDEX ctCredits = GetSP()->sp_ctCredits;
+  const BOOL bSharedLives = GetSP()->sp_bSharedLives;
+  const BOOL bSharedKeys = GetSP()->sp_bSharedKeys;
 
   INDEX ctMaxPlayers = CEntity::GetMaxPlayers();
   INDEX ctAlive = 0;
   INDEX ctDead = 0;
   INDEX ctDeadCanRespawn = 0;
   INDEX ctLocal = 0;
+  INDEX ctHaveKeys = 0;
   
   for (INDEX iPlayer = 0; iPlayer < ctMaxPlayers; iPlayer++)
   {
@@ -51,13 +53,18 @@ extern void HUD_DrawDebugMonitor()
       ctLocal++;
     }
     
+    CPlayer *penPlayer = static_cast<CPlayer*>(penEntity);
+    
+    if (penPlayer->m_ulKeys != 0) {
+      ctHaveKeys++;
+    }
+
     if (penEntity->IsAlive()) {
       ctAlive++;
     } else {
       ctDead++;
       
       if (!bSharedLives) {
-        CPlayer *penPlayer = static_cast<CPlayer*>(penEntity);
         if (penPlayer->m_iLives > 0) {
           ctDeadCanRespawn++;
         }
@@ -99,6 +106,12 @@ extern void HUD_DrawDebugMonitor()
     if (bRaisingLiveCost) {
       strReport.PrintF("%s^cCCCCCCCost Mul: %0.2f\n", strReport, bSharedLives ? GetSP()->sp_fLiveCostMultiplier : _penPlayer->m_fLiveCostMultiplier);
     }
+  }
+
+  strReport += "\n";
+  strReport.PrintF("%s^cCCCCCCKeys:  %s\n", strReport, bSharedKeys ? "Shared" : "Personal");
+  if (!bSharedKeys) {
+    strReport.PrintF("%s^cCCCCCCHave Keys: %d\n", strReport, ctHaveKeys);
   }
 
   strReport += "\n\n";

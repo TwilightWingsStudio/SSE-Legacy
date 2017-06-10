@@ -150,6 +150,7 @@ static CTextureObject _toArmorLarge;
 
 static CTextureObject _toExtraLive; // [SSE]
 static CTextureObject _toSwords; // [SSE]
+static CTextureObject _toKey; // [SSE] Better Keys
 
 static CTextureObject _toTestIken; // [SSE]
 
@@ -335,6 +336,19 @@ static int qsort_CompareLatencies( const void *ppPEN0, const void *ppPEN1) {
   if (     sl0<sl1) return +1;
   else if (sl0>sl1) return -1;
   else              return  0;
+}
+
+static INDEX bit_count(INDEX num)
+{
+    INDEX count = 0;
+
+    while(num)
+    {
+        num = (num) & (num - 1);
+        count++;
+    }
+
+    return count;
 }
 
 // --------------------------------------------------------------------------------------
@@ -973,6 +987,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   const BOOL bFragMatch   = !GetSP()->sp_bCooperative &&  GetSP()->sp_bUseFrags;
   const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
   const BOOL bSharedLives = GetSP()->sp_bSharedLives;
+  const BOOL bSharedKeys = GetSP()->sp_bSharedKeys;
 
   _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
 
@@ -1395,12 +1410,16 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     }
   }
   
-  // Right - Messages
+  BOOL bMessagesBoxDrawn = FALSE;
+  
+  // Right Top - Messages
   if (bSinglePlay || bCooperative)
   {
     // prepare and draw unread messages
     if (hud_bShowMessages && _penPlayer->m_ctUnreadMessages > 0)
     {
+      bMessagesBoxDrawn = TRUE;
+      
       CTString strMessages;
       strMessages.PrintF( "%d", _penPlayer->m_ctUnreadMessages);
 
@@ -1434,6 +1453,31 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       
       HUD_DrawAnchoredTextInRect (28, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, strMessages, col|_ulAlphaHUD, 1.0F);
     }
+  }
+  
+  BOOL bHasAnyKey = bSharedKeys ? GetSP()->sp_ulPickedKeys : _penPlayer->m_ulKeys;
+  
+  // Right Top - Keys
+  if (bHasAnyKey) {
+    PIX pixShiftX = 0;
+    
+    if (bMessagesBoxDrawn) {
+      pixShiftX = 76;
+    }
+
+    COLOR col = _colHUD;
+
+    CTString strKeys;
+    strKeys.PrintF("%d", bSharedKeys ? bit_count(GetSP()->sp_ulPickedKeys) : bit_count(_penPlayer->m_ulKeys));
+    
+    HUD_DrawAnchoredRect ( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchoredRect (28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchroredIcon( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, _toKey, C_WHITE|CT_OPAQUE, 0.0F, FALSE); // Icon
+    
+    HUD_DrawAnchoredRectOutline( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
+    HUD_DrawAnchoredRectOutline(28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
+    
+    HUD_DrawAnchoredTextInRect (28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, strKeys, C_lGRAY|_ulAlphaHUD, 1.0F);
   }
   
   // PowerUps dock.
@@ -1592,8 +1636,9 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
   INDEX iCurrentWeapon = _penWeapons->m_iCurrentWeapon;
   INDEX iWantedWeapon  = _penWeapons->m_iWantedWeapon;
   
-  const BOOL bSharedLives = GetSP()->sp_bSharedLives;
   const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
+  const BOOL bSharedLives = GetSP()->sp_bSharedLives;
+  const BOOL bSharedKeys = GetSP()->sp_bSharedKeys;
 
   // determine hud colorization;
   COLOR colMax = SE_COL_BLUEGREEN_LT;
@@ -2326,12 +2371,16 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     HUD_DrawAnchoredTextInRect (10, 8, 104, 16, EHHAT_CENTER, EHVAT_TOP, strHiScore, NONE, bBeating ? 0.0f : 1.0f);
   }
   
-  // Right - Messages
+  BOOL bMessagesBoxDrawn = FALSE;
+  
+  // Right Top - Messages
   if (bSinglePlay || bCooperative)
   {
     // prepare and draw unread messages
     if (hud_bShowMessages && _penPlayer->m_ctUnreadMessages > 0)
     {
+      bMessagesBoxDrawn = TRUE;
+      
       CTString strMessages;
       strMessages.PrintF( "%d", _penPlayer->m_ctUnreadMessages);
 
@@ -2365,6 +2414,31 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       
       HUD_DrawAnchoredTextInRect (28, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, strMessages, col|_ulAlphaHUD, 1.0F);
     }
+  }
+  
+  BOOL bHasAnyKey = bSharedKeys ? GetSP()->sp_ulPickedKeys : _penPlayer->m_ulKeys;
+  
+  // Right Top - Keys
+  if (bHasAnyKey) {
+    PIX pixShiftX = 0;
+    
+    if (bMessagesBoxDrawn) {
+      pixShiftX = 76;
+    }
+
+    COLOR col = _colHUD;
+
+    CTString strKeys;
+    strKeys.PrintF("%d", bSharedKeys ? bit_count(GetSP()->sp_ulPickedKeys) : bit_count(_penPlayer->m_ulKeys));
+    
+    HUD_DrawAnchoredRect ( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchoredRect (28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchroredIcon( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, _toKey, C_WHITE|CT_OPAQUE, 0.0F, FALSE); // Icon
+    
+    HUD_DrawAnchoredRectOutline( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
+    HUD_DrawAnchoredRectOutline(28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
+    
+    HUD_DrawAnchoredTextInRect (28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, strKeys, C_lGRAY|_ulAlphaHUD, 1.0F);
   }
 
   #ifdef ENTITY_DEBUG
@@ -2433,6 +2507,9 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   _ulAlphaHUD = NormFloatToByte(hud_fOpacity);
   _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
   _tmNow = _pTimer->CurrentTick();
+  
+  const BOOL bSharedLives = GetSP()->sp_bSharedLives; 
+  const BOOL bSharedKeys = GetSP()->sp_bSharedKeys;
 
   // determine hud colorization;
   COLOR colMax = SE_COL_BLUEGREEN_LT;
@@ -3048,7 +3125,6 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   // [SSE] Extra Lives System
   if ((bSinglePlay || bCooperative) && GetSP()->sp_ctCredits >= 0)
   {
-    BOOL bSharedLives = GetSP()->sp_bSharedLives; 
     strValue.PrintF( "%d", bSharedLives ? GetSP()->sp_ctCreditsLeft : _penPlayer->m_iLives);
     fRow = pixTopBound  + fNextUnit+fHalfUnit;
     fCol = pixLeftBound + fHalfUnit;
@@ -3286,7 +3362,8 @@ static void HUD_RegisterTextures()
   
   HUD_RegisterTexture(&_toExtraLive,  CTFILENAME("TexturesMP\\Interface\\IExtraLive.tex"));
   HUD_RegisterTexture(&_toSwords,     CTFILENAME("TexturesMP\\Interface\\ISwords.tex"));
-  
+  HUD_RegisterTexture(&_toKey,        CTFILENAME("TexturesMP\\Interface\\IKey.tex")); // [SSE] Better Keys
+
   // [SSE] Radar
   HUD_RegisterTexture(&_toRadarCircle,  CTFILENAME("TexturesMP\\Interface\\RadarCircle.tex"));
   HUD_RegisterTexture(&_toRadarMask,    CTFILENAME("TexturesMP\\Interface\\RadarMask.tex"));
