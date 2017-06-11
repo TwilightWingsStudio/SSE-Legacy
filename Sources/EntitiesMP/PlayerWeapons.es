@@ -5599,7 +5599,7 @@ procedures:
     }
 
     // fire one bullet
-    if (m_bSniping) {
+    if (GetSP()->sp_bSniperFullDamageInNoScope || m_bSniping) { // [SSE] Gameplay - Sniper No Scope
       FireSniperBullet(0.0f, 0.0f, 1500.0f, 
                        (GetSP()->sp_bCooperative) ? SNIPER_DAMAGE_SNIPING_COOP : SNIPER_DAMAGE_SNIPING, 0.0f);
     } else {

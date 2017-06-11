@@ -116,6 +116,10 @@ public:
   ULONG sp_ulPickedKeys;
   //
   
+  // [SSE] Gameplay - Sniper No Scope
+  BOOL sp_bSniperFullDamageInNoScope;
+  //
+  
   BOOL sp_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
   BOOL sp_bArmorInertiaDamping;            // [SSE] Armor Inertia Damping Toggle
   BOOL sp_bRocketJumpMode;                 // [SSE] RocketJump Mode

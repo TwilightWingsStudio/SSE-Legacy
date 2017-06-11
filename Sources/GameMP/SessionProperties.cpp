@@ -68,6 +68,8 @@ extern INDEX gam_bSharedKeys;
 extern INDEX gam_bSaveKeysWhenServerEmpty;
 //
 
+extern INDEX gam_bSniperFullDamageInNoScope; // [SSE] Gameplay - Sniper No Scope
+
 extern INDEX gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
 extern INDEX gam_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
 extern INDEX gam_bRocketJumpMode; // [SSE] RocketJump Mode
@@ -317,6 +319,8 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_bSaveKeysWhenServerEmpty = gam_bSaveKeysWhenServerEmpty;
     sp.sp_ulPickedKeys = 0;
     //
+
+    sp.sp_bSniperFullDamageInNoScope = FALSE; // [SSE] Gameplay - Sniper No Scope
     
     sp.sp_iScoreLimit = 0;
     sp.sp_iFragLimit  = 0;
@@ -346,6 +350,8 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_bSaveKeysWhenServerEmpty = FALSE;
     sp.sp_ulPickedKeys = 0;
     //
+    
+    sp.sp_bSniperFullDamageInNoScope = gam_bSniperFullDamageInNoScope; // [SSE] Gameplay - Sniper No Scope
 
     sp.sp_iScoreLimit = gam_iScoreLimit;
     sp.sp_iFragLimit  = gam_iFragLimit;
