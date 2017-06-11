@@ -75,7 +75,16 @@ void CSinglePlayerNewMenu::Initialize_t(void)
   gm_mgMental.mg_strTip = TRANS("you are not serious!");
   gm_mgMental.mg_pmgUp = &gm_mgSerious;
   gm_mgMental.mg_pmgDown = &gm_mgTourist;
-  gm_mgMental.mg_bBlinking = TRUE;
+  gm_mgMental.mg_bBlinking = FALSE;
+  
+  // Initialize "Serious Mental" button.
+  gm_mgSeriousMental.mg_strText = TRANS("SERIOUS MENTAL");
+  gm_mgSeriousMental.mg_bfsFontSize = BFS_LARGE;
+  gm_mgSeriousMental.mg_boxOnScreen = BoxBigRow(6.0f);
+  gm_mgSeriousMental.mg_strTip = TRANS("you are too serious!");
+  gm_mgSeriousMental.mg_pmgUp = &gm_mgMental;
+  gm_mgSeriousMental.mg_pmgDown = &gm_mgTourist;
+  gm_mgSeriousMental.mg_bBlinking = TRUE;
 
   // Reset pointers.
   gm_mgTourist.mg_pActivatedFunction = NULL;
@@ -84,6 +93,7 @@ void CSinglePlayerNewMenu::Initialize_t(void)
   gm_mgHard.mg_pActivatedFunction = NULL;
   gm_mgSerious.mg_pActivatedFunction = NULL;
   gm_mgMental.mg_pActivatedFunction = NULL;
+  gm_mgSeriousMental.mg_pActivatedFunction = NULL;
   
   // Add components.
   AddChild(&gm_mgTitle);
@@ -93,6 +103,7 @@ void CSinglePlayerNewMenu::Initialize_t(void)
   AddChild(&gm_mgHard);
   AddChild(&gm_mgSerious);
   AddChild(&gm_mgMental);
+  AddChild(&gm_mgSeriousMental);
 }
 
 void CSinglePlayerNewMenu::StartMenu(void)
@@ -104,8 +115,16 @@ void CSinglePlayerNewMenu::StartMenu(void)
     gm_mgMental.Appear();
     gm_mgSerious.mg_pmgDown = &gm_mgMental;
     gm_mgTourist.mg_pmgUp = &gm_mgMental;
+    
+    // [SSE] Serious Mental
+    gm_mgMental.mg_pmgDown = &gm_mgSeriousMental;
+    gm_mgTourist.mg_pmgUp = &gm_mgSeriousMental;
+    //
+    
   } else {
     gm_mgMental.Disappear();
+    gm_mgSeriousMental.Disappear(); // [SSE] Serious Mental
+
     gm_mgSerious.mg_pmgDown = &gm_mgTourist;
     gm_mgTourist.mg_pmgUp = &gm_mgSerious;
   }

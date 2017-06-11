@@ -33,6 +33,7 @@ public:
   CMGButton gm_mgHard;
   CMGButton gm_mgSerious;
   CMGButton gm_mgMental;
+  CMGButton gm_mgSeriousMental; // [SSE]
 
   void Initialize_t(void);
   void StartMenu(void);

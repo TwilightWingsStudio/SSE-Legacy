@@ -432,7 +432,16 @@ static void StartSinglePlayerGame_Mental(void)
   StartSinglePlayerGame();
 }
 
-void InitActionsForSinglePlayerNewMenu() {
+// [SSE] Serious Mental
+static void StartSinglePlayerGame_SeriousMental(void)
+{
+  _pShell->SetINDEX("gam_iStartDifficulty", CSessionProperties::GD_EXTREME + 2);
+  _pShell->SetINDEX("gam_iStartMode", CSessionProperties::GM_COOPERATIVE);
+  StartSinglePlayerGame();
+}
+
+void InitActionsForSinglePlayerNewMenu()
+{
   CSinglePlayerNewMenu &gmCurrent = _pGUIM->gmSinglePlayerNewMenu;
 
   gmCurrent.gm_mgTourist.mg_pActivatedFunction = &StartSinglePlayerGame_Tourist;
@@ -441,6 +450,7 @@ void InitActionsForSinglePlayerNewMenu() {
   gmCurrent.gm_mgHard.mg_pActivatedFunction = &StartSinglePlayerGame_Hard;
   gmCurrent.gm_mgSerious.mg_pActivatedFunction = &StartSinglePlayerGame_Serious;
   gmCurrent.gm_mgMental.mg_pActivatedFunction = &StartSinglePlayerGame_Mental;
+  gmCurrent.gm_mgSeriousMental.mg_pActivatedFunction = &StartSinglePlayerGame_SeriousMental;
 }
 
 // ------------------------ CPlayerProfileMenu implementation

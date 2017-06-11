@@ -115,7 +115,7 @@ void CNetworkStartMenu::Initialize_t(void)
 
 void CNetworkStartMenu::StartMenu(void)
 {
-  gm_mgDifficulty.mg_ctTexts = sam_bMentalActivated ? 6 : 5;
+  gm_mgDifficulty.mg_ctTexts = sam_bMentalActivated ? 7 : 5;
 
   gm_mgGameType.mg_iSelected = Clamp(_pShell->GetINDEX("gam_iStartMode"), 0L, ctGameTypeRadioTexts - 1L);
   gm_mgGameType.ApplyCurrentSelection();

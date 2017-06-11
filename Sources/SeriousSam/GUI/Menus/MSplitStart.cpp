@@ -84,7 +84,7 @@ void CSplitStartMenu::Initialize_t(void)
 void CSplitStartMenu::StartMenu(void)
 {
   extern INDEX sam_bMentalActivated;
-  gm_mgDifficulty.mg_ctTexts = sam_bMentalActivated ? 6 : 5;
+  gm_mgDifficulty.mg_ctTexts = sam_bMentalActivated ? 7 : 5;
 
   gm_mgGameType.mg_iSelected = Clamp(_pShell->GetINDEX("gam_iStartMode"), 0L, ctGameTypeRadioTexts - 1L);
   gm_mgGameType.ApplyCurrentSelection();

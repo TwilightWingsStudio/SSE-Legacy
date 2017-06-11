@@ -40,29 +40,33 @@ extern CTString astrWeapon[] = {
 // [SSE] Aspect Ratio
 extern CTString astrDisplayAspectRatioTexts[] = {
   CTString("4:3"),
+  CTString("5:4"),
   CTString("16:9"),
   CTString("16:10"),
   CTString("21:9"),  
 };
 
 extern PIX apixWidths[][2] = {
-  320, 240,
+  320, 240, // 4:3
   400, 300,
   512, 384,
   640, 240,
-  640, 480,
+  640, 480, // 4:3
   720, 540,
   800, 300,
-  800, 600,
+  800, 600, // 4:3
   960, 720,
   1024, 384,
-  1024, 768,
+  1024, 768, // 4:3
   1152, 864,
   1280, 480,
+  1280, 720, // HD 16:9
   1280, 960,
+  1280, 1024, // 5:4
   1600, 600,
   1600, 1200,
   1920, 720,
+  1920, 1080, // FHD 16:9
   1920, 1440,
   2048, 786,
   2048, 1536,
@@ -114,6 +118,7 @@ extern CTString astrDifficultyRadioTexts[] = {
   RADIOTRANS("Hard"),
   RADIOTRANS("Serious"),
   RADIOTRANS("Mental"),
+  RADIOTRANS("Serious Mental"), // [SSE] Serious Mental
 };
 
 extern CTString astrSplitScreenRadioTexts[] = {

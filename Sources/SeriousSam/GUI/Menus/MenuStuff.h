@@ -41,7 +41,7 @@ extern CTString astrComputerInvoke[2];
 extern CTString astrCrosshair[8];
 extern CTString astrMaxPlayersRadioTexts[15];
 extern CTString astrGameTypeRadioTexts[20];
-extern CTString astrDifficultyRadioTexts[6];
+extern CTString astrDifficultyRadioTexts[7];
 extern CTString astrSplitScreenRadioTexts[4];
 extern CTString astrDisplayPrefsRadioTexts[4];
 extern CTString astrDisplayAPIRadioTexts[2];
@@ -49,8 +49,8 @@ extern CTString astrBitsPerPixelRadioTexts[3];
 extern CTString astrFrequencyRadioTexts[4];
 extern CTString astrSoundAPIRadioTexts[3];
 
-extern CTString astrDisplayAspectRatioTexts[4];
-extern PIX apixWidths[20][2];
+extern CTString astrDisplayAspectRatioTexts[5];
+extern PIX apixWidths[23][2];
 
 ULONG GetSpawnFlagsForGameType(INDEX iGameType);
 BOOL IsMenuEnabled(const CTString &strMenuName);

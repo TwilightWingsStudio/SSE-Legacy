@@ -95,12 +95,19 @@ static void SetGameModeParameters(CSessionProperties &sp)
 static void SetDifficultyParameters(CSessionProperties &sp)
 {
   INDEX iDifficulty = gam_iStartDifficulty;
-  if (iDifficulty==4) {
+
+  // [SSE] Serious Mental
+  if (iDifficulty == 5) {
     sp.sp_bMental = TRUE;
-    iDifficulty=2;
+    iDifficulty = CSessionProperties::GD_EXTREME;
+  //
+  } else if (iDifficulty == 4) {
+    sp.sp_bMental = TRUE;
+    iDifficulty = 2;
   } else {
     sp.sp_bMental = FALSE;
   }
+
   sp.sp_gdGameDifficulty = (CSessionProperties::GameDifficulty) Clamp(INDEX(iDifficulty), -1L, 3L);
 
   switch (sp.sp_gdGameDifficulty)
