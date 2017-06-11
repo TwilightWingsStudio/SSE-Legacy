@@ -419,7 +419,7 @@ extern void HUD_DrawAnchoredText( FLOAT fPosX, FLOAT fPosY, EHUDHorAnchorType eh
   HUD_DrawAnchoredTextEx(fPosX, fPosY, ehPos, evPos, strText, colDefault, fNormValue);
 }
 
-extern void HUD_DrawAnchoredTextInRectEx( FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, const CTString &strText, COLOR colDefault, FLOAT fNormValue)
+extern void HUD_DrawAnchoredTextInRectEx(FLOAT2D vPos, FLOAT2D vSize, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, const CTString &strText, COLOR colDefault, FLOAT fNormValue, FLOAT fFontSizeMul)
 {
   if (_pDP->dp_FontData == NULL) return; // TODO: Maybe make assert.
   
@@ -429,19 +429,17 @@ extern void HUD_DrawAnchoredTextInRectEx( FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX
     col = GetCurrentColor( fNormValue);
   }
 
-  FLOAT fOriginX = fPosX;
-  FLOAT fOriginY = fPosY;
+  FLOAT fOriginX = vPos(1);
+  FLOAT fOriginY = vPos(2);
   
-  FLOAT fTextScale = fSizeY / _fdNumbersFont.GetHeight();
-  
-  FLOAT fCharHeight = _fdNumbersFont.GetHeight() * fTextScale;
+  FLOAT fTextScale = vSize(2) / _pDP->dp_FontData->GetHeight();
 
-  _pDP->SetTextScaling(fTextScale);
+  _pDP->SetTextScaling(fTextScale * fFontSizeMul);
   
   switch (ehPos)
   {
     default: {
-      fOriginX = fOriginX + fSizeX / 2.0F;
+      fOriginX = fOriginX + vSize(1) / 2.0F;
     } break;
 
     case EHHAT_CENTER: {
@@ -449,14 +447,14 @@ extern void HUD_DrawAnchoredTextInRectEx( FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX
     } break;
 
     case EHHAT_RIGHT: {
-      fOriginX = _pixDPWidth - fOriginX - fSizeX / 2.0F;
+      fOriginX = _pixDPWidth - fOriginX - vSize(1) / 2.0F;
     } break;
   }
 
   switch (evPos)
   {
     default: {
-      fOriginY = fOriginY + fSizeY / 2.0F;
+      fOriginY = fOriginY + vSize(2) / 2.0F;
     } break;
 
     case EHVAT_MID: {
@@ -464,7 +462,7 @@ extern void HUD_DrawAnchoredTextInRectEx( FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX
     } break;
 
     case EHVAT_BOT: {
-      fOriginY = _pixDPHeight - fOriginY - fSizeY / 2.0F;
+      fOriginY = _pixDPHeight - fOriginY - vSize(2) / 2.0F;
     } break;
   }
 
@@ -472,7 +470,7 @@ extern void HUD_DrawAnchoredTextInRectEx( FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX
   _pDP->PutTextCXY( strText, fOriginX, fOriginY, col|_ulAlphaHUD);
 }
 
-extern void HUD_DrawAnchoredTextInRect( FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, const CTString &strText, COLOR colDefault, FLOAT fNormValue)
+extern void HUD_DrawAnchoredTextInRect(FLOAT2D vPos, FLOAT2D vSize, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, const CTString &strText, COLOR colDefault, FLOAT fNormValue, FLOAT fFontSizeMul)
 {
   FLOAT fMul;
   
@@ -482,10 +480,8 @@ extern void HUD_DrawAnchoredTextInRect( FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, 
     fMul = _pixDPWidth / 640.0F;
   }
 
-  fPosX *= fMul;
-  fPosY *= fMul;
-  fSizeX *= fMul;
-  fSizeY *= fMul;
+  vPos *= fMul;
+  vSize *= fMul;
   
-  HUD_DrawAnchoredTextInRectEx(fPosX, fPosY, fSizeX, fSizeY, ehPos, evPos, strText, colDefault, fNormValue);
+  HUD_DrawAnchoredTextInRectEx(vPos, vSize, ehPos, evPos, strText, colDefault, fNormValue, fFontSizeMul);
 }

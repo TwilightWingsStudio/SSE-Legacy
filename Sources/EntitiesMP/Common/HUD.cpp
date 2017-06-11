@@ -151,6 +151,7 @@ static CTextureObject _toArmorLarge;
 static CTextureObject _toExtraLive; // [SSE]
 static CTextureObject _toSwords; // [SSE]
 static CTextureObject _toKey; // [SSE] Better Keys
+static CTextureObject _toClock; // [SSE]
 
 static CTextureObject _toTestIken; // [SSE]
 
@@ -1018,7 +1019,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
     CTString strHealth;
     strHealth.PrintF("%.0f", fValue);
-    HUD_DrawAnchoredTextInRect(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, strHealth, NONE, fValue / TOP_HEALTH);
+    HUD_DrawAnchoredTextInRect(FLOAT2D(44, 8), FLOAT2D(80, 32), EHHAT_LEFT, EHVAT_BOT, strHealth, NONE, fValue / TOP_HEALTH);
   }
 
   // Armor
@@ -1045,7 +1046,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     
     CTString strArmor;
     strArmor.PrintF("%.0f", fValue);
-    HUD_DrawAnchoredTextInRect(44, 48, 80, 32, EHHAT_LEFT, EHVAT_BOT, strArmor, NONE, fValue / TOP_ARMOR);
+    HUD_DrawAnchoredTextInRect(FLOAT2D(44, 48), FLOAT2D(80, 32), EHHAT_LEFT, EHVAT_BOT, strArmor, NONE, fValue / TOP_ARMOR);
   }
   
   // Current Weapon and its Ammo
@@ -1081,7 +1082,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       
       HUD_DrawAnchoredRect(  0 - 32, 8, 80, 32, EHHAT_CENTER, EHVAT_BOT, C_BLACK|_ulBrAlpha);
       HUD_DrawAnchoredRectOutline(  0 - 32, 8, 80, 32, EHHAT_CENTER, EHVAT_BOT, _colHUD|_ulAlphaHUD);
-      HUD_DrawAnchoredTextInRect(0 - 32, 8, 80, 32, EHHAT_CENTER, EHVAT_BOT, strCurrentAmmo, NONE, fValue / fMaxValue);
+      HUD_DrawAnchoredTextInRect(FLOAT2D(0 - 32, 8), FLOAT2D(80, 32), EHHAT_CENTER, EHVAT_BOT, strCurrentAmmo, NONE, fValue / fMaxValue);
       
       if (ptoCurrentAmmo != NULL)
       {
@@ -1187,17 +1188,8 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     
     HUD_DrawAnchoredRectOutline( 8, 8,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 8, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (28, 8, 104, 16, EHHAT_LEFT, EHVAT_TOP, strScore, C_lGRAY, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(28, 8), FLOAT2D(104, 16), EHHAT_LEFT, EHVAT_TOP, strScore, C_lGRAY, 1.0F);
   }
-
-  /*{
-    HUD_DrawAnchoredRect ( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchoredRect (28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _toExtraLive, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
-    
-    HUD_DrawAnchoredRectOutline( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
-    HUD_DrawAnchoredRectOutline(28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
-  }*/
 
   // LSC Down - SP/Coop = Extra Lives
   if ((bSinglePlay || bCooperative) && GetSP()->sp_ctCredits >= 0)
@@ -1211,7 +1203,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     
     HUD_DrawAnchoredRectOutline( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, strLives, C_lGRAY, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(28, 28), FLOAT2D(104, 16), EHHAT_LEFT, EHVAT_TOP, strLives, C_lGRAY, 1.0F);
   }
   
   // LSC Down - DM/SM = Death/Mana
@@ -1226,8 +1218,34 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     
     HUD_DrawAnchoredRectOutline( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, strMana, C_lGRAY, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(28, 28), FLOAT2D(104, 16), EHHAT_LEFT, EHVAT_TOP, strMana, C_lGRAY, 1.0F);
   }
+  
+  // set font and prepare font parameters
+  _pfdDisplayFont->SetFixedWidth();
+  _pDP->SetFont( _pfdDisplayFont);
+  _pDP->SetTextLineSpacing(0);
+  
+  // Time Limit
+  if ((bScoreMatch || bFragMatch) && hud_bShowMatchInfo && GetSP()->sp_iTimeLimit > 0)
+  {
+    FLOAT fTimeLeft = ClampDn(GetSP()->sp_iTimeLimit*60.0f - _pNetwork->GetGameTime(), 0.0f);
+    
+    CTString strTime;
+    strTime.PrintF( "%s", TimeToString(fTimeLeft));
+
+    HUD_DrawAnchoredRect ( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchoredRect (28, 48, 104, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchroredIcon( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, _toClock, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
+    
+    HUD_DrawAnchoredRectOutline( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+    HUD_DrawAnchoredRectOutline(28, 48, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(28, 48 + 2), FLOAT2D(104, 16), EHHAT_LEFT, EHVAT_TOP, strTime, C_WHITE|_ulAlphaHUD, 1.0F, 0.75F);
+  }
+  
+  _pfdDisplayFont->SetVariableWidth();
+  _pDP->SetFont( &_fdNumbersFont);
+  _pDP->SetTextCharSpacing(1);
   #endif
   
   // [SSE] Radar
@@ -1302,7 +1320,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     HUD_DrawAnchoredRectOutline(-54, 8,  16, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline( 10, 8, 104, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     
-    HUD_DrawAnchoredTextInRect (10, 8, 104, 16, EHHAT_CENTER, EHVAT_TOP, strHiScore, NONE, bBeating ? 0.0f : 1.0f);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(10, 8), FLOAT2D(104, 16), EHHAT_CENTER, EHVAT_TOP, strHiScore, NONE, bBeating ? 0.0f : 1.0f);
   }
 
   // TeamPlay Frags
@@ -1333,7 +1351,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     
     HUD_DrawAnchoredRect (-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRectOutline(-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, strTeam1, colLeft|_ulAlphaHUD, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(-38, 8), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, strTeam1, colLeft|_ulAlphaHUD, 1.0F);
       
     HUD_DrawAnchoredRect ( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchroredIcon( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toSwords, colIcon|CT_OPAQUE, 0.0F, FALSE); // Icon
@@ -1341,7 +1359,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     
     HUD_DrawAnchoredRect (38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRectOutline(38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, strTeam2, colRight|_ulAlphaHUD, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(38, 8), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, strTeam2, colRight|_ulAlphaHUD, 1.0F);
   }
   
   // CSC Down
@@ -1451,7 +1469,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       HUD_DrawAnchoredRectOutline( 8, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
       HUD_DrawAnchoredRectOutline(28, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
       
-      HUD_DrawAnchoredTextInRect (28, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, strMessages, col|_ulAlphaHUD, 1.0F);
+      HUD_DrawAnchoredTextInRect (FLOAT2D(28, 8), FLOAT2D(52, 16), EHHAT_RIGHT, EHVAT_TOP, strMessages, col|_ulAlphaHUD, 1.0F);
     }
   }
   
@@ -1477,7 +1495,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     HUD_DrawAnchoredRectOutline( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
     
-    HUD_DrawAnchoredTextInRect (28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, strKeys, C_lGRAY|_ulAlphaHUD, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(28 + pixShiftX, 8), FLOAT2D(52, 16), EHHAT_RIGHT, EHVAT_TOP, strKeys, C_lGRAY|_ulAlphaHUD, 1.0F);
   }
   
   // PowerUps dock.
@@ -1697,7 +1715,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
     CTString strHealth;
     strHealth.PrintF("%.0f", fValue);
-    HUD_DrawAnchoredTextInRect(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, strHealth, NONE, fValue / TOP_HEALTH);
+    HUD_DrawAnchoredTextInRect(FLOAT2D(44, 8), FLOAT2D(80, 32), EHHAT_LEFT, EHVAT_BOT, strHealth, NONE, fValue / TOP_HEALTH);
   }
 
 
@@ -1726,7 +1744,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     
     CTString strArmor;
     strArmor.PrintF("%.0f", fValue);
-    HUD_DrawAnchoredTextInRect(44, 48, 80, 32, EHHAT_LEFT, EHVAT_BOT, strArmor, NONE, fValue / TOP_ARMOR);
+    HUD_DrawAnchoredTextInRect(FLOAT2D(44, 48), FLOAT2D(80, 32), EHHAT_LEFT, EHVAT_BOT, strArmor, NONE, fValue / TOP_ARMOR);
   }
 
   CTextureObject *ptoCurrentAmmo = NULL;
@@ -1764,7 +1782,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       
       HUD_DrawAnchoredRect(  0 - 32, 8, 80, 32, EHHAT_CENTER, EHVAT_BOT, C_BLACK|_ulBrAlpha);
       HUD_DrawAnchoredRectOutline(  0 - 32, 8, 80, 32, EHHAT_CENTER, EHVAT_BOT, _colHUD|_ulAlphaHUD);
-      HUD_DrawAnchoredTextInRect(0 - 32, 8, 80, 32, EHHAT_CENTER, EHVAT_BOT, strCurrentAmmo, NONE, fValue / fMaxValue);
+      HUD_DrawAnchoredTextInRect(FLOAT2D(0 - 32, 8), FLOAT2D(80, 32), EHHAT_CENTER, EHVAT_BOT, strCurrentAmmo, NONE, fValue / fMaxValue);
       
       if (ptoCurrentAmmo != NULL)
       {
@@ -1973,7 +1991,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     
     HUD_DrawAnchoredRect (-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRectOutline(-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, strTeam1, colLeft|_ulAlphaHUD, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(-38, 8), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, strTeam1, colLeft|_ulAlphaHUD, 1.0F);
       
     HUD_DrawAnchoredRect ( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchroredIcon( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toSwords, colIcon|CT_OPAQUE, 0.0F, FALSE); // Icon
@@ -1981,7 +1999,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     
     HUD_DrawAnchoredRect (38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRectOutline(38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, strTeam2, colRight|_ulAlphaHUD, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(38, 8), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, strTeam2, colRight|_ulAlphaHUD, 1.0F);
   }
   
   // BossBar
@@ -2205,12 +2223,10 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     }
 
     // draw remaining time if time based death- or scorematch
-    if ((bScoreMatch || bFragMatch) && hud_bShowMatchInfo) {
-      CTString strLimitsInfo="";
-      if (GetSP()->sp_iTimeLimit>0) {
-        FLOAT fTimeLeft = ClampDn(GetSP()->sp_iTimeLimit*60.0f - _pNetwork->GetGameTime(), 0.0f);
-        strLimitsInfo.PrintF("%s^cFFFFFF%s: %s\n", strLimitsInfo, TRANS("TIME LEFT"), TimeToString(fTimeLeft));
-      }
+    if ((bScoreMatch || bFragMatch) && hud_bShowMatchInfo)
+    {
+      CTString strLimitsInfo = "";
+
       extern INDEX SetAllPlayersStats( INDEX iSortKey);
       // fill players table
       const INDEX ctPlayers = SetAllPlayersStats(bFragMatch?5:3); // sort by frags or by score
@@ -2247,7 +2263,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       _pDP->SetFont( _pfdDisplayFont);
       _pDP->SetTextScaling( fTextScale*0.8f );
       _pDP->SetTextCharSpacing( -2.0f*fTextScale);
-      _pDP->PutText( strLimitsInfo, 5.0f*_pixDPWidth/640.0f, 48.0f*_pixDPWidth/640.0f, C_WHITE|CT_OPAQUE);
+      _pDP->PutText( strLimitsInfo, 5.0f*_pixDPWidth/640.0f, 68.0f*_pixDPWidth/640.0f, C_WHITE|CT_OPAQUE);
     }
 
 
@@ -2299,7 +2315,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     
     HUD_DrawAnchoredRectOutline( 8, 8,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 8, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (28, 8, 104, 16, EHHAT_LEFT, EHVAT_TOP, strScore, C_lGRAY, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(28, 8), FLOAT2D(104, 16), EHHAT_LEFT, EHVAT_TOP, strScore, C_lGRAY, 1.0F);
   }
 
   // LSC Down - SP/Coop = Extra Lives
@@ -2314,7 +2330,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     
     HUD_DrawAnchoredRectOutline( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, strLives, C_lGRAY, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(28, 28), FLOAT2D(104, 16), EHHAT_LEFT, EHVAT_TOP, strLives, C_lGRAY, 1.0F);
 
     if (GetSP()->sp_iScoreForExtraLive > 0)
     {
@@ -2351,8 +2367,34 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     
     HUD_DrawAnchoredRectOutline( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, strMana, C_lGRAY, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(28, 28), FLOAT2D(104, 16), EHHAT_LEFT, EHVAT_TOP, strMana, C_lGRAY, 1.0F);
   }
+  
+  // set font and prepare font parameters
+  _pfdDisplayFont->SetFixedWidth();
+  _pDP->SetFont( _pfdDisplayFont);
+  _pDP->SetTextLineSpacing(0);
+  
+  // Time Limit
+  if ((bScoreMatch || bFragMatch) && hud_bShowMatchInfo && GetSP()->sp_iTimeLimit > 0)
+  {
+    FLOAT fTimeLeft = ClampDn(GetSP()->sp_iTimeLimit*60.0f - _pNetwork->GetGameTime(), 0.0f);
+    
+    CTString strTime;
+    strTime.PrintF( "%s", TimeToString(fTimeLeft));
+
+    HUD_DrawAnchoredRect ( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchoredRect (28, 48, 104, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchroredIcon( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, _toClock, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
+    
+    HUD_DrawAnchoredRectOutline( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+    HUD_DrawAnchoredRectOutline(28, 48, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(28, 48 + 2), FLOAT2D(104, 16), EHHAT_LEFT, EHVAT_TOP, strTime, C_WHITE|_ulAlphaHUD, 1.0F, 0.75F);
+  }
+  
+  _pfdDisplayFont->SetVariableWidth();
+  _pDP->SetFont( &_fdNumbersFont);
+  _pDP->SetTextCharSpacing(1);
 
   // If single player or cooperative mode then draw HiScore info.
   if (bSinglePlay || bCooperative)
@@ -2368,7 +2410,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     HUD_DrawAnchoredRectOutline(-54, 8,  16, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline( 10, 8, 104, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     
-    HUD_DrawAnchoredTextInRect (10, 8, 104, 16, EHHAT_CENTER, EHVAT_TOP, strHiScore, NONE, bBeating ? 0.0f : 1.0f);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(10, 8), FLOAT2D(104, 16), EHHAT_CENTER, EHVAT_TOP, strHiScore, NONE, bBeating ? 0.0f : 1.0f);
   }
   
   BOOL bMessagesBoxDrawn = FALSE;
@@ -2412,7 +2454,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       HUD_DrawAnchoredRectOutline( 8, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
       HUD_DrawAnchoredRectOutline(28, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
       
-      HUD_DrawAnchoredTextInRect (28, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, strMessages, col|_ulAlphaHUD, 1.0F);
+      HUD_DrawAnchoredTextInRect (FLOAT2D(28, 8), FLOAT2D(52, 16), EHHAT_RIGHT, EHVAT_TOP, strMessages, col|_ulAlphaHUD, 1.0F);
     }
   }
   
@@ -2438,7 +2480,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     HUD_DrawAnchoredRectOutline( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
     
-    HUD_DrawAnchoredTextInRect (28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, strKeys, C_lGRAY|_ulAlphaHUD, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(28 + pixShiftX, 8), FLOAT2D(52, 16), EHHAT_RIGHT, EHVAT_TOP, strKeys, C_lGRAY|_ulAlphaHUD, 1.0F);
   }
 
   #ifdef ENTITY_DEBUG
@@ -3029,12 +3071,15 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
     }
 
     // draw remaining time if time based death- or scorematch
-    if ((bScoreMatch || bFragMatch) && hud_bShowMatchInfo) {
-      CTString strLimitsInfo="";
-      if (GetSP()->sp_iTimeLimit>0) {
+    if ((bScoreMatch || bFragMatch) && hud_bShowMatchInfo)
+    {
+      CTString strLimitsInfo = "";
+
+      if (GetSP()->sp_iTimeLimit > 0) {
         FLOAT fTimeLeft = ClampDn(GetSP()->sp_iTimeLimit*60.0f - _pNetwork->GetGameTime(), 0.0f);
         strLimitsInfo.PrintF("%s^cFFFFFF%s: %s\n", strLimitsInfo, TRANS("TIME LEFT"), TimeToString(fTimeLeft));
       }
+
       extern INDEX SetAllPlayersStats( INDEX iSortKey);
       // fill players table
       const INDEX ctPlayers = SetAllPlayersStats(bFragMatch?5:3); // sort by frags or by score
@@ -3363,6 +3408,7 @@ static void HUD_RegisterTextures()
   HUD_RegisterTexture(&_toExtraLive,  CTFILENAME("TexturesMP\\Interface\\IExtraLive.tex"));
   HUD_RegisterTexture(&_toSwords,     CTFILENAME("TexturesMP\\Interface\\ISwords.tex"));
   HUD_RegisterTexture(&_toKey,        CTFILENAME("TexturesMP\\Interface\\IKey.tex")); // [SSE] Better Keys
+  HUD_RegisterTexture(&_toClock,        CTFILENAME("TexturesMP\\Interface\\IClock.tex"));
 
   // [SSE] Radar
   HUD_RegisterTexture(&_toRadarCircle,  CTFILENAME("TexturesMP\\Interface\\RadarCircle.tex"));
