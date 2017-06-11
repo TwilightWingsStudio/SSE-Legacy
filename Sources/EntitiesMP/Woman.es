@@ -380,7 +380,12 @@ procedures:
     StartModelAnim(WOMAN_ANIM_AIRATTACK02, 0);
     autowait(0.6f);
     ShootProjectile(PRT_WOMAN_FIRE, FIRE_AIR, ANGLE3D(0, 0, 0));
-    PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+    }
+
     autowait(0.6f);
     StandingAnim();
     autowait(FRnd()/2 + _pTimer->TickQuantum);
@@ -451,7 +456,11 @@ procedures:
     vDir *= !GetRotationMatrix();
     vDir *= m_fFlyCloseRunSpeed*1.9f;
     SetDesiredTranslation(vDir);
-    PlaySound(m_soSound, SOUND_KICK, SOF_3D);
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_KICK, SOF_3D);
+    }
 
     // animation - IGNORE DAMAGE WOUND -
     SpawnReminder(this, 0.9f, 0);
@@ -476,7 +485,12 @@ procedures:
     StartModelAnim(WOMAN_ANIM_GROUNDATTACK02, 0);
     autowait(0.3f);
     ShootProjectile(PRT_WOMAN_FIRE, FIRE_GROUND, ANGLE3D(0, 0, 0));
-    PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+    }
+
     autowait(0.3f);
     StandingAnim();
     autowait(FRnd()/2 + _pTimer->TickQuantum);
@@ -498,7 +512,11 @@ procedures:
     vDir *= m_fCloseRunSpeed*1.75f;
     vDir(2) = 2.5f;
     SetDesiredTranslation(vDir);
-    PlaySound(m_soSound, SOUND_KICK, SOF_3D);
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_KICK, SOF_3D);
+    }
 
     // animation - IGNORE DAMAGE WOUND -
     SpawnReminder(this, 0.9f, 0);

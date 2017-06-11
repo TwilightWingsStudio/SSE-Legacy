@@ -26,9 +26,9 @@ uses "EntitiesMP/EnemyBase";
 uses "EntitiesMP/BasicEffects";
 
 enum BeastType {
-  0 BT_NORMAL         "0 Small",      // normal (fighter)
-  1 BT_BIG            "1 Big",        // big
-  2 BT_HUGE           "2 Huge",       // huge
+  0 BT_NORMAL         "Small [0]",      // normal (fighter)
+  1 BT_BIG            "Big [1]",        // big
+  2 BT_HUGE           "Huge [2]",       // huge
 };
 
 %{
@@ -442,8 +442,13 @@ procedures:
     if (m_bcType == BT_NORMAL)
     {
       StartModelAnim(BEAST_ANIM_ATTACK, AOF_SMOOTHCHANGE);
-      autocall CMovableModelEntity::WaitUntilScheduledAnimStarts() EReturn;    
-      PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+      autocall CMovableModelEntity::WaitUntilScheduledAnimStarts() EReturn;
+
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+      }
+
       autowait(0.51f);
 
       ShootProjectile(PRT_BEAST_PROJECTILE, FLOAT3D(0.0f, 1.5f * BEAST_STRETCH * ClampDn(m_fStretchMultiplier, 0.3F), 0.0f), // [SSE] Better Enemy Stretching
@@ -462,7 +467,11 @@ procedures:
           StartModelAnim(BEAST_ANIM_ATTACKFAST, AOF_SMOOTHCHANGE);
           autocall CMovableModelEntity::WaitUntilScheduledAnimStarts() EReturn;    
 
-          PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+          // [SSE] Enemy Settings Entity - Silent
+          if (!IsSilent()) {
+            PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+          }
+
           autowait(0.34f);
           ShootProjectile(PRT_BEAST_BIG_PROJECTILE, FLOAT3D( 0.0f, 1.5f * BIG_BEAST_STRETCH * ClampDn(m_fStretchMultiplier, 0.1F), 0.0f), // [SSE] Better Enemy Stretching
             ANGLE3D(0.0f, 0.0f, 0.0f));
@@ -483,7 +492,11 @@ procedures:
           StartModelAnim(BEAST_ANIM_ATTACK, AOF_SMOOTHCHANGE);
           autocall CMovableModelEntity::WaitUntilScheduledAnimStarts() EReturn;    
 
-          PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+          // [SSE] Enemy Settings Entity - Silent
+          if (!IsSilent()) {
+            PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+          }
+
           autowait(0.5f);
           ShootProjectile(PRT_BEAST_BIG_PROJECTILE, FLOAT3D( 0.0f, 1.5f * BIG_BEAST_STRETCH * ClampDn(m_fStretchMultiplier, 0.1F), 0.0f), // [SSE] Better Enemy Stretching
             ANGLE3D(0.0f, 0.0f, 0.0f));
@@ -506,7 +519,11 @@ procedures:
           StartModelAnim(BEAST_ANIM_ATTACKFAST, AOF_SMOOTHCHANGE);
           autocall CMovableModelEntity::WaitUntilScheduledAnimStarts() EReturn;    
 
-          PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+          // [SSE] Enemy Settings Entity - Silent
+          if (!IsSilent()) {
+            PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+          }
+
           autowait(0.34f);
           ShootProjectile(PRT_BEAST_BIG_PROJECTILE, FLOAT3D( 0.0f, 1.5f * HUGE_BEAST_STRETCH * ClampDn(m_fStretchMultiplier, 0.05F), 0.0f), // [SSE] Better Enemy Stretching
             ANGLE3D(0.0f, 0.0f, 0.0f));
@@ -527,7 +544,11 @@ procedures:
           StartModelAnim(BEAST_ANIM_ATTACK, AOF_SMOOTHCHANGE);
           autocall CMovableModelEntity::WaitUntilScheduledAnimStarts() EReturn;    
 
-          PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+          // [SSE] Enemy Settings Entity - Silent
+          if (!IsSilent()) {
+            PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+          }
+
           autowait(0.5f);
           ShootProjectile(PRT_BEAST_BIG_PROJECTILE, FLOAT3D( 0.0f, 1.5f * HUGE_BEAST_STRETCH * ClampDn(m_fStretchMultiplier, 0.05F), 0.0f), // [SSE] Better Enemy Stretching
             ANGLE3D(0.0f, 0.0f, 0.0f));
@@ -572,7 +593,10 @@ procedures:
     autocall CMovableModelEntity::WaitUntilScheduledAnimStarts() EReturn;    
     */
 
-    PlaySound(m_soSound, SOUND_KICK, SOF_3D);
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_KICK, SOF_3D);
+    }
 
     if (CalcDist(m_penEnemy) < m_fCloseDistance)
     {

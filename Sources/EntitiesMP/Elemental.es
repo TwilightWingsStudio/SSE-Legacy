@@ -548,18 +548,21 @@ functions:
   void IdleSound(void) {
     PlaySound(m_soSound, SOUND_LAVA_IDLE, SOF_3D);
   };
+
   void SightSound(void) {
   };
+
   void WoundSound(void) {
     PlaySound(m_soSound, SOUND_LAVA_WOUND, SOF_3D);
   };
+
   void DeathSound(void) {
     PlaySound(m_soSound, SOUND_LAVA_DEATH, SOF_3D);
   };
 
   BOOL CountAsKill(void)
   {
-    return m_bCountAsKill;
+    return CEnemyBase::CountAsKill() && m_bCountAsKill;
   }
 
   // spawn new elemental
@@ -1027,10 +1030,20 @@ procedures:
       StartModelAnim(ELEMENTALLAVA_ANIM_ATTACKBOSS, AOF_SMOOTHCHANGE);
       autowait(tmWait+0.95f);
       BossFirePredictedLavaRock(LAVAMAN_FIRE_LARGE_RIGHT);
-      PlaySound(m_soFireR, SOUND_LAVA_FIRE, SOF_3D);
+      
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soFireR, SOUND_LAVA_FIRE, SOF_3D);
+      }
+
       autowait(2.0150f-0.95f);
       BossFirePredictedLavaRock(LAVAMAN_FIRE_LARGE_LEFT);
-      PlaySound(m_soFireL, SOUND_LAVA_FIRE, SOF_3D);
+
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soFireL, SOUND_LAVA_FIRE, SOF_3D);
+      }
+
       StartModelAnim(ELEMENTALLAVA_ANIM_WALKBIG, AOF_SMOOTHCHANGE);
       autocall CMovableModelEntity::WaitUntilScheduledAnimStarts() EReturn;
       MaybeSwitchToAnotherPlayer();
@@ -1069,7 +1082,11 @@ procedures:
       eLaunch.prtType = PRT_LAVAMAN_BOMB;
       eLaunch.fSpeed = fLaunchSpeed;
       penProjectile->Initialize(eLaunch);
-      PlaySound(m_soSound, SOUND_LAVA_FIRE, SOF_3D);
+      
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soSound, SOUND_LAVA_FIRE, SOF_3D);
+      }
     }
     else if (TRUE)
     {
@@ -1078,7 +1095,11 @@ procedures:
       StartModelAnim(ELEMENTALLAVA_ANIM_ATTACKLEFTHAND, AOF_SMOOTHCHANGE);
       autowait(tmWait+0.8f);
       ShootProjectile(PRT_LAVAMAN_STONE, LAVAMAN_FIRE_SMALL, ANGLE3D(0, 0, 0));
-      PlaySound(m_soSound, SOUND_LAVA_FIRE, SOF_3D);
+      
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soSound, SOUND_LAVA_FIRE, SOF_3D);
+      }
     }
 
     autowait( GetModelObject()->GetAnimLength( ELEMENTALLAVA_ANIM_ATTACKLEFTHAND) - 0.9f);
@@ -1108,7 +1129,12 @@ procedures:
     } else {
       ThrowRocks(PRT_LAVAMAN_STONE);
     }
-    PlaySound(m_soSound, SOUND_LAVA_FIRE, SOF_3D);
+
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_LAVA_FIRE, SOF_3D);
+    }
+
     autowait(0.9f);
     // stand a while
     StandingAnim();
@@ -1121,7 +1147,12 @@ procedures:
     StartModelAnim(ELEMENTALLAVA_ANIM_ATTACKTWOHANDS, 0);
     autowait(0.6f);
     HitGround();
-    PlaySound(m_soFireL, SOUND_LAVA_KICK, SOF_3D);
+
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soFireL, SOUND_LAVA_KICK, SOF_3D);
+    }
+    
     StartModelAnim(ELEMENTALLAVA_ANIM_WALKBIG, AOF_SMOOTHCHANGE);
     autocall CMovableModelEntity::WaitUntilScheduledAnimStarts() EReturn;
     return EReturn();
@@ -1236,7 +1267,12 @@ procedures:
     m_EesCurrentState = ELS_NORMAL;
     SetPhysicsFlags(EPF_MODEL_WALKING);
     ChangeCollisionBoxIndexWhenPossible(STONEMAN_COLLISION_BOX_NORMAL);
-    PlaySound(m_soFireL, SOUND_LAVA_GROW, SOF_3D);
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soFireL, SOUND_LAVA_GROW, SOF_3D);
+    }
+
     StartModelAnim(STONEMAN_ANIM_MORPHBOXUP, 0);
     AddAttachments();
     autowait(GetModelObject()->GetAnimLength(STONEMAN_ANIM_MORPHBOXUP));
@@ -1260,7 +1296,12 @@ procedures:
     SwitchToModel();
     SetPhysicsFlags(EPF_MODEL_WALKING);
     ChangeCollisionBoxIndexWhenPossible(ELEMENTALLAVA_COLLISION_BOX_NORMAL);
-    PlaySound(m_soFireL, SOUND_LAVA_GROW, SOF_3D);
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soFireL, SOUND_LAVA_GROW, SOF_3D);
+    }
+    
     INDEX iAnim;
     if (m_EetType == ELT_LAVA) {
       iAnim = ELEMENTALLAVA_ANIM_MELTUP;
@@ -1340,21 +1381,35 @@ procedures:
     autowait(2.0f);
     m_fFadeStartTime = _pTimer->CurrentTick();
     GetModelObject()->PlayAnim(ELEMENTALLAVA_ANIM_ANGER, 0);
-    PlaySound(m_soSound, SOUND_LAVA_ANGER, SOF_3D);
+
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_LAVA_ANGER, SOF_3D);
+    }
+    
     autowait(GetModelObject()->GetAnimLength(ELEMENTALLAVA_ANIM_ANGER)-_pTimer->TickQuantum);
 
     StartModelAnim(ELEMENTALLAVA_ANIM_ATTACKTWOHANDS, AOF_SMOOTHCHANGE);
     autowait(0.7f);
     HitGround();
-    PlaySound(m_soFireL, SOUND_LAVA_KICK, SOF_3D);
+
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soFireL, SOUND_LAVA_KICK, SOF_3D);
+    }
+
     autowait(GetModelObject()->GetAnimLength(ELEMENTALLAVA_ANIM_ATTACKTWOHANDS)-0.7f-_pTimer->TickQuantum);
 
     StartModelAnim(ELEMENTALLAVA_ANIM_ATTACKTWOHANDS, 0);
     autowait(0.6f);
     HitGround();
-    PlaySound(m_soFireR, SOUND_LAVA_KICK, SOF_3D);
-    autowait(GetModelObject()->GetAnimLength(ELEMENTALLAVA_ANIM_ATTACKTWOHANDS)-0.6f-_pTimer->TickQuantum);
 
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soFireR, SOUND_LAVA_KICK, SOF_3D);
+    }
+
+    autowait(GetModelObject()->GetAnimLength(ELEMENTALLAVA_ANIM_ATTACKTWOHANDS)-0.6f-_pTimer->TickQuantum);
 
     return EReturn();
   }
@@ -1368,13 +1423,14 @@ procedures:
       m_bCountAsKill = FALSE;
       // wait till touching the ground
       autocall FallOnFloor() EReturn;
-    } else {
-      m_bSpawned = m_bCountKillInStatistcs;
     }
 
     if (m_EecChar==ELC_LARGE || m_EecChar==ELC_BIG && m_EetType==ELT_LAVA)
     {
-      PlaySound(m_soBackground, SOUND_LAVA_LAVABURN, SOF_3D|SOF_LOOP);
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soBackground, SOUND_LAVA_LAVABURN, SOF_3D|SOF_LOOP);
+      }
     }
 
     if( m_EecChar==ELC_LARGE)
@@ -1407,6 +1463,7 @@ procedures:
     } else {
       SetCollisionFlags(ECF_MODEL);
     }
+
     SetFlags(GetFlags()|ENF_ALIVE);
     en_fDensity = m_fDensity;
     m_fSpawnDamage = 1e6f;

@@ -23,12 +23,11 @@ uses "EntitiesMP/EnemyBase";
 uses "EntitiesMP/BasicEffects";
 
 enum HeadmanType {
-  0 HDT_FIRECRACKER   "0 Fire Cracker",
-  1 HDT_ROCKETMAN     "1 Rocketman",
-  2 HDT_BOMBERMAN     "2 Bomberman",
-  3 HDT_KAMIKAZE      "3 Kamikaze",
+  0 HDT_FIRECRACKER   "Fire Cracker [0]",
+  1 HDT_ROCKETMAN     "Rocketman [1]",
+  2 HDT_BOMBERMAN     "Bomberman [2]",
+  3 HDT_KAMIKAZE      "Kamikaze [3]",
 };
-
 
 %{
 // info structure
@@ -297,47 +296,63 @@ functions:
       StartModelAnim(HEADMAN_ANIM_RUN, AOF_LOOPING|AOF_NORESTART);
     }
   };
+
   void RotatingAnim(void) {
     RunningAnim();
   };
 
   // virtual sound functions
-  void IdleSound(void) {
+  void IdleSound(void)
+  {
     if (m_bAttackSound) {
       return;
     }
+
     if (m_hdtType==HDT_KAMIKAZE) {
       PlaySound(m_soSound, SOUND_IDLEKAMIKAZE, SOF_3D);
     } else {
       PlaySound(m_soSound, SOUND_IDLE, SOF_3D);
     }
   };
-  void SightSound(void) {
+
+  void SightSound(void)
+  {
     if (m_bAttackSound) {
       return;
     }
+
     PlaySound(m_soSound, SOUND_SIGHT, SOF_3D);
   };
-  void WoundSound(void) {
+
+  void WoundSound(void)
+  {
     if (m_bAttackSound) {
       return;
     }
+
     PlaySound(m_soSound, SOUND_WOUND, SOF_3D);
   };
-  void DeathSound(void) {
+
+  void DeathSound(void)
+  {
     if (m_bAttackSound) {
       return;
     }
+
     PlaySound(m_soSound, SOUND_DEATH, SOF_3D);
   };
 
-  void KamikazeSoundOn(void) {
-    if (!m_bAttackSound) {
+  void KamikazeSoundOn(void)
+  {
+    // [SSE] Enemy Settings Entity - Silent
+    if (!m_bAttackSound && !IsSilent()) {
       m_bAttackSound = TRUE;
       PlaySound(m_soSound, SOUND_ATTACKKAMIKAZE, SOF_3D|SOF_LOOP);
     }
   }
-  void KamikazeSoundOff(void) {
+
+  void KamikazeSoundOff(void)
+  {
     if (m_bAttackSound) {
       m_soSound.Stop();
       m_bAttackSound = FALSE;
@@ -401,7 +416,8 @@ functions:
   };*/
 
   // bomberman and kamikaze explode only once
-  void Explode(void) {
+  void Explode(void)
+  {
     if (!m_bExploded) {
       m_bExploded = TRUE;
 
@@ -504,7 +520,8 @@ procedures:
   };
 
   // Bomberman attack
-  BombermanAttack(EVoid) {
+  BombermanAttack(EVoid)
+  {
     // don't shoot if enemy above or below you too much
     if ( !IsInFrustum(m_penEnemy, CosFast(80.0f)) ) {
       return EEnd();
@@ -513,7 +530,12 @@ procedures:
     autowait(0.2f + FRnd()/4);
 
     StartModelAnim(HEADMAN_ANIM_BOMBERMAN_ATTACK, 0);
-    PlaySound(m_soSound, SOUND_FIREBOMBERMAN, SOF_3D);
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_FIREBOMBERMAN, SOF_3D);
+    }
+
     autowait(0.15f);
 
     AddAttachment(HEADMAN_ATTACHMENT_BOMB_RIGHT_HAND, MODEL_BOMB, TEXTURE_BOMB);
@@ -554,7 +576,8 @@ procedures:
   };
 
   // Firecraker attack
-  FirecrackerAttack(EVoid) {
+  FirecrackerAttack(EVoid)
+  {
     // don't shoot if enemy above you more than quare of two far from you
     if (-en_vGravityDir%CalcDelta(m_penEnemy) > CalcDist(m_penEnemy)/1.41421f) {
       return EEnd();
@@ -564,7 +587,12 @@ procedures:
 
     StartModelAnim(HEADMAN_ANIM_FIRECRACKER_ATTACK, 0);
     autowait(0.15f);
-    PlaySound(m_soSound, SOUND_FIREFIRECRACKER, SOF_3D);
+
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_FIREFIRECRACKER, SOF_3D);
+    }
+    
     autowait(0.52f);
     ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f)*m_fStretchMultiplier, ANGLE3D(-16.0f, 0, 0));
 
@@ -585,19 +613,22 @@ procedures:
   };
 
   // Rocketman attack
-  RocketmanAttack(EVoid) {
+  RocketmanAttack(EVoid)
+  {
     StandingAnimFight();   //StartModelAnim(_ANIM_STAND, AOF_LOOPING|AOF_NORESTART);
     autowait(0.2f + FRnd()/4);
 
     StartModelAnim(HEADMAN_ANIM_ROCKETMAN_ATTACK, 0);
     ShootProjectile(PRT_HEADMAN_ROCKETMAN, FLOAT3D(0.0f, 1.0f, 0.0f)*m_fStretchMultiplier, ANGLE3D(0, 0, 0));
-    PlaySound(m_soSound, SOUND_FIREROCKETMAN, SOF_3D);
+
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_FIREROCKETMAN, SOF_3D);
+    }
 
     autowait(1.0f + FRnd()/3);
     return EEnd();
   };
-
-
 
 /************************************************************
  *                    D  E  A  T  H                         *

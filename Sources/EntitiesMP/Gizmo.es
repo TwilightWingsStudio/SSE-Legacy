@@ -241,12 +241,20 @@ procedures:
         // but don't jump too much
         fSpeedY /= 2.0f;
         fSpeedZ /= 4.0f;
-        PlaySound(m_soSound, SOUND_JUMP, SOF_3D);
+        
+        // [SSE] Enemy Settings Entity - Silent
+        if (!IsSilent()) {
+          PlaySound(m_soSound, SOUND_JUMP, SOF_3D);
+        }
       }
       else
       {
-        PlaySound(m_soSound, SOUND_DEATH_JUMP, SOF_3D);
+        // [SSE] Enemy Settings Entity - Silent
+        if (!IsSilent()) {
+          PlaySound(m_soSound, SOUND_DEATH_JUMP, SOF_3D);
+        }
       }
+
       FLOAT3D vTranslation(fSpeedX, fSpeedY, fSpeedZ);
       SetDesiredTranslation(vTranslation);
       MortalJumpAnim();

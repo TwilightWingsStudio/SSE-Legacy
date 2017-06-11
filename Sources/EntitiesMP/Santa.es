@@ -79,8 +79,9 @@ functions:
 
   // running sounds
   void ActivateRunningSound(void)
-  {
-    if (!m_bRunSoundPlaying) {
+  {  
+    // [SSE] Enemy Settings Entity - Silent
+    if (!m_bRunSoundPlaying && !IsSilent()) {
       PlaySound(m_soRunning, SOUND_RUN, SOF_3D|SOF_LOOP);
       m_bRunSoundPlaying = TRUE;
     }

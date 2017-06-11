@@ -200,9 +200,11 @@ functions:
   /*void SightSound(void) {
     PlaySound(m_soFeet, SOUND_SIGHT, SOF_3D|SOF_SMOOTHCHANGE);
   };*/
+
   void WoundSound(void) {
     PlaySound(m_soSound, SOUND_WOUND, SOF_3D);
   };
+
   void DeathSound(void) {
     PlaySound(m_soSound, SOUND_DEATH, SOF_3D);
   };
@@ -210,11 +212,13 @@ functions:
   // running sounds
   void ActivateRunningSound(void)
   {
-    if (!m_bRunSoundPlaying) {
+    // [SSE] Enemy Settings Entity - Silent
+    if (!m_bRunSoundPlaying && !IsSilent()) {
       PlaySound(m_soFeet, SOUND_RUN, SOF_3D|SOF_LOOP);
       m_bRunSoundPlaying = TRUE;
     }
   }
+
   void DeactivateRunningSound(void)
   {
     m_soFeet.Stop();
@@ -238,7 +242,12 @@ functions:
         if (!IsOfSameClass(this, etouch.penOther)) {
           IncreaseKickedMass(etouch.penOther);
         }
-        PlaySound(m_soSound, SOUND_ATTACK, SOF_3D);
+
+        // [SSE] Enemy Settings Entity - Silent
+        if (!IsSilent()) {
+          PlaySound(m_soSound, SOUND_ATTACK, SOF_3D);
+        }
+
         // store last touched
         m_penLastTouched = etouch.penOther;
         m_fLastTouchedTime = _pTimer->CurrentTick();
@@ -308,7 +317,12 @@ procedures:
       //DeactivateRunningSound();
       m_bSawHit = FALSE;
       autowait(0.4f);
-      PlaySound(m_soSound, SOUND_ATTACK, SOF_3D);
+
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soSound, SOUND_ATTACK, SOF_3D);
+      }
+
       if (CalcDist(m_penEnemy) < HIT_DISTANCE) { m_bSawHit = TRUE; }
       autowait(0.1f);
       if (CalcDist(m_penEnemy) < HIT_DISTANCE) { m_bSawHit = TRUE; }
@@ -334,9 +348,15 @@ procedures:
     return EReturn();
   };
 
-  AttackEnemy(EVoid) : CEnemyBase::AttackEnemy {
+  AttackEnemy(EVoid) : CEnemyBase::AttackEnemy
+  {
     m_bAttacking = TRUE;
-    PlaySound(m_soSound, SOUND_SIGHT, SOF_3D|SOF_SMOOTHCHANGE);
+
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_SIGHT, SOF_3D|SOF_SMOOTHCHANGE);
+    }
+
     m_fSightSoundBegin = _pTimer->CurrentTick();
     jump CEnemyBase::AttackEnemy();
   }

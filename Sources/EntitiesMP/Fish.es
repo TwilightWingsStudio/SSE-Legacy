@@ -250,7 +250,12 @@ procedures:
 
     // bite
     StartModelAnim(FISH_ANIM_ATTACK, 0);
-    PlaySound(m_soSound, SOUND_ATTACK, SOF_3D|SOF_NOFILTER);
+
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_ATTACK, SOF_3D|SOF_NOFILTER);
+    }
+
     if (CalcDist(m_penEnemy)<DISTANCE_ELECTRICITY)
     {
       // damage enemy

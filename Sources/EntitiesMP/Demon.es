@@ -291,7 +291,11 @@ procedures:
     
     SetDesiredTranslation(FLOAT3D(0.0f, 0.0f, 0.0f));
     
-    PlaySound(m_soSound, SOUND_CAST, SOF_3D);
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_CAST, SOF_3D);
+    }
+
     SpawnReminder(this, 3.0f, REMINDER_DEATTACH_FIREBALL);
 
     autowait(1.0f);
@@ -338,7 +342,11 @@ procedures:
     {
       StartModelAnim(DEMON_ANIM_WOUND, 0);
       autowait(0.45f);
-      PlaySound(m_soSound, SOUND_WOUND, SOF_3D);
+      
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soSound, SOUND_WOUND, SOF_3D);
+      }
 
       if (CalcDist(m_penEnemy) < CLOSE_ATTACK_RANGE && IsInPlaneFrustum(m_penEnemy, CosFast(60.0f)))
       {

@@ -189,7 +189,8 @@ functions:
   // running sounds
   void ActivateRunningSound(void)
   {
-    if (!m_bRunSoundPlaying) {
+    // [SSE] Enemy Settings Entity - Silent
+    if (!m_bRunSoundPlaying && !IsSilent()) {
       PlaySound(m_soFeet, SOUND_RUN, SOF_3D|SOF_LOOP);
       m_bRunSoundPlaying = TRUE;
     }
@@ -211,13 +212,20 @@ functions:
       FLOAT3D vDirection = en_vCurrentTranslationAbsolute;
       vDirection.Normalize();
       ANGLE aHitAngle = FLOAT3D(etouch.plCollision)%vDirection;
+
       // only hit target in front of you
-      if (aHitAngle < 0.0f) {
+      if (aHitAngle < 0.0f)
+      {
         // increase mass - only if not another bull
         if (!IsOfSameClass(this, etouch.penOther)) {
           IncreaseKickedMass(etouch.penOther);
         }
-        PlaySound(m_soSound, SOUND_IMPACT, SOF_3D);
+        
+        // [SSE] Enemy Settings Entity - Silent
+        if (!IsSilent()) {
+          PlaySound(m_soSound, SOUND_IMPACT, SOF_3D);
+        }
+        
         // store last touched
         m_penLastTouched = etouch.penOther;
         m_fLastTouchedTime = _pTimer->CurrentTick();
@@ -270,7 +278,12 @@ procedures:
       DeactivateRunningSound();
       m_bHornHit = FALSE;
       autowait(0.4f);
-      PlaySound(m_soSound, SOUND_KICKHORN, SOF_3D);
+
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soSound, SOUND_KICKHORN, SOF_3D);
+      }
+      
       if (CalcDist(m_penEnemy) < HIT_DISTANCE) { m_bHornHit = TRUE; }
       autowait(0.1f);
       if (CalcDist(m_penEnemy) < HIT_DISTANCE) { m_bHornHit = TRUE; }

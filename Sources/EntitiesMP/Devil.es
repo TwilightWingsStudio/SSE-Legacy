@@ -314,26 +314,34 @@ functions:
     PrecacheSound   (SOUND_DISAPPEAR             );
   }
 
+  // --------------------------------------------------------------------------------------
   // Validate offered target for one property
+  // --------------------------------------------------------------------------------------
   BOOL IsTargetValid(SLONG slPropertyOffset, CEntity *penTarget)
   {
-    if(penTarget==NULL)
-    {
+    if (penTarget == NULL) {
       return FALSE;
     }
+
     return (IsDerivedFromClass(penTarget, "Devil Marker"));
   }
 
+  // --------------------------------------------------------------------------------------
   /* Read from stream. */
-  void Read_t( CTStream *istr) { // throw char *
+  // --------------------------------------------------------------------------------------
+  void Read_t( CTStream *istr) // throw char *
+  { 
     CEnemyBase::Read_t(istr);
 
     // setup light source
     SetupLightSource();
   }
 
+  // --------------------------------------------------------------------------------------
   /* Get static light source information. */
-  CLightSource *GetLightSource(void) {
+  // --------------------------------------------------------------------------------------
+  CLightSource *GetLightSource(void)
+  {
     if (!IsPredictor()) {
       return &m_lsLightSource;
     } else {
@@ -341,8 +349,11 @@ functions:
     }
   }
 
+  // --------------------------------------------------------------------------------------
   // Setup light source
-  void SetupLightSource(void) {
+  // --------------------------------------------------------------------------------------
+  void SetupLightSource(void)
+  {
     // setup light source
     CLightSource lsNew;
     lsNew.ls_ulFlags = LSF_NONPERSISTENT|LSF_DYNAMIC;
@@ -356,19 +367,27 @@ functions:
     m_lsLightSource.ls_penEntity = this;
     m_lsLightSource.SetLightSource(lsNew);
   }
-  // play light animation
-  void PlayLightAnim(INDEX iAnim, ULONG ulFlags) {
-    if (m_aoLightAnimation.GetData()!=NULL) {
+  
+  // --------------------------------------------------------------------------------------
+  // Starts light animation playback.
+  // --------------------------------------------------------------------------------------
+  void PlayLightAnim(INDEX iAnim, ULONG ulFlags)
+  {
+    if (m_aoLightAnimation.GetData() != NULL) {
       m_aoLightAnimation.PlayAnim(iAnim, ulFlags);
     }
   };
 
-
+  // --------------------------------------------------------------------------------------
   /* Entity info */
+  // --------------------------------------------------------------------------------------
   void *GetEntityInfo(void) {
     return &eiDevil;
   };
 
+  // --------------------------------------------------------------------------------------
+  // Causes cannonballs explode when touching them.
+  // --------------------------------------------------------------------------------------
   BOOL ForcesCannonballToExplode(void)
   {
     return TRUE;

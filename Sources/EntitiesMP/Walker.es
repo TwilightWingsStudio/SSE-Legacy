@@ -23,8 +23,8 @@ uses "EntitiesMP/EnemyBase";
 uses "EntitiesMP/Projectile";
 
 enum WalkerChar {
-  0 WLC_SOLDIER   "Soldier",    // soldier
-  1 WLC_SERGEANT  "Sergeant",   // sergeant
+  0 WLC_SOLDIER   "Soldier [0]",    // soldier
+  1 WLC_SERGEANT  "Sergeant [1]",   // sergeant
 };
 
 %{
@@ -226,9 +226,11 @@ functions:
   void IdleSound(void) {
     PlaySound(m_soSound, WALKERSOUND(IDLE), SOF_3D);
   };
+
   void SightSound(void) {
     PlaySound(m_soSound, WALKERSOUND(SIGHT), SOF_3D);
   };
+
   void DeathSound(void) {
     PlaySound(m_soSound, WALKERSOUND(DEATH), SOF_3D);
   };
@@ -236,11 +238,13 @@ functions:
   // walking sounds
   void ActivateWalkingSound(void)
   {
-    if (!m_bWalkSoundPlaying) {
+    // [SSE] Enemy Settings Entity - Silent
+    if (!m_bWalkSoundPlaying && !IsSilent()) {
       PlaySound(m_soFeet, WALKERSOUND(WALK), SOF_3D|SOF_LOOP);
       m_bWalkSoundPlaying = TRUE;
     }
   }
+
   void DeactivateWalkingSound(void)
   {
     m_soFeet.Stop();
@@ -259,6 +263,7 @@ functions:
     eLaunch.prtType = PRT_WALKER_ROCKET;
     penProjectile->Initialize(eLaunch);
   };
+
   // fire death laser
   void FireDeathLaser(FLOAT3D &vPos) {
     CPlacement3D plLaser;
@@ -271,8 +276,6 @@ functions:
     eLaunch.prtType = PRT_CYBORG_LASER;
     penProjectile->Initialize(eLaunch);
   };
-
-
 
   // adjust sound and watcher parameters here if needed
   void EnemyPostInit(void) 
@@ -335,7 +338,12 @@ procedures:
     if (m_EwcChar==WLC_SERGEANT) {
       StartModelAnim(WALKER_ANIM_FIRERIGHT, AOF_LOOPING);
       ShootProjectile(PRT_WALKER_ROCKET, FIRE_RIGHT_ARM*m_fSize*m_fStretchMultiplier, ANGLE3D(0, 0, 0));
-      PlaySound(m_soFire1, SOUND_SERGEANT_FIRE_ROCKET, SOF_3D);
+      
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soFire1, SOUND_SERGEANT_FIRE_ROCKET, SOF_3D);
+      }
+      
       if (GetSP()->sp_gdGameDifficulty<=CSessionProperties::GD_EASY) {
         m_fLockOnEnemyTime = 1.0f;
       } else {
@@ -344,17 +352,24 @@ procedures:
       autocall CEnemyBase::LockOnEnemy() EReturn;
       StartModelAnim(WALKER_ANIM_FIRELEFT, AOF_LOOPING);
       ShootProjectile(PRT_WALKER_ROCKET, FIRE_LEFT_ARM*m_fSize*m_fStretchMultiplier, ANGLE3D(0, 0, 0));
-      PlaySound(m_soFire2, SOUND_SERGEANT_FIRE_ROCKET, SOF_3D);
+      
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soFire2, SOUND_SERGEANT_FIRE_ROCKET, SOF_3D);
+      }
 
 //      m_fLockOnEnemyTime = 0.25f;
 //      autocall CEnemyBase::LockOnEnemy() EReturn;
-    } 
-    if (m_EwcChar==WLC_SOLDIER) {
+    }
+
+    if (m_EwcChar==WLC_SOLDIER)
+    {
       if (GetSP()->sp_gdGameDifficulty<=CSessionProperties::GD_EASY) {
         m_iLoopCounter = 4;
       } else {
         m_iLoopCounter = 8;
       }
+
       while(m_iLoopCounter>0) {
         if (m_iLoopCounter%2) {
           StartModelAnim(WALKER_ANIM_FIRELEFT, AOF_LOOPING);
@@ -364,15 +379,21 @@ procedures:
           ShootProjectile(PRT_CYBORG_LASER, FIRE_RIGHT_ARM*m_fSize*m_fStretchMultiplier, ANGLE3D(0, 0, 0));
         }
         INDEX iChannel = m_iLoopCounter%4;
-        if (iChannel==0) {
-          PlaySound(m_soFire1, SOUND_SOLDIER_FIRE_LASER, SOF_3D);
-        } else if (iChannel==1) {
-          PlaySound(m_soFire2, SOUND_SOLDIER_FIRE_LASER, SOF_3D);
-        } else if (iChannel==2) {
-          PlaySound(m_soFire3, SOUND_SOLDIER_FIRE_LASER, SOF_3D);
-        } else if (iChannel==3) {
-          PlaySound(m_soFire4, SOUND_SOLDIER_FIRE_LASER, SOF_3D);
+
+        // [SSE] Enemy Settings Entity - Silent
+        if (!IsSilent())
+        {
+          if (iChannel==0) {
+            PlaySound(m_soFire1, SOUND_SOLDIER_FIRE_LASER, SOF_3D);
+          } else if (iChannel==1) {
+            PlaySound(m_soFire2, SOUND_SOLDIER_FIRE_LASER, SOF_3D);
+          } else if (iChannel==2) {
+            PlaySound(m_soFire3, SOUND_SOLDIER_FIRE_LASER, SOF_3D);
+          } else if (iChannel==3) {
+            PlaySound(m_soFire4, SOUND_SOLDIER_FIRE_LASER, SOF_3D);
+          }
         }
+
         if (m_iLoopCounter>1) {
           if (GetSP()->sp_gdGameDifficulty<=CSessionProperties::GD_EASY) {
             m_fLockOnEnemyTime = 0.4f;
@@ -384,6 +405,7 @@ procedures:
         m_iLoopCounter--;
       }
     }
+
     StopMoving();
 
     MaybeSwitchToAnotherPlayer();
@@ -428,16 +450,26 @@ procedures:
       } else {
         FireDeathRocket(FIRE_DEATH_LEFT*m_fSize*m_fStretchMultiplier);
       }
-      PlaySound(m_soSound, SOUND_SERGEANT_FIRE_ROCKET, SOF_3D);
+      
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soSound, SOUND_SERGEANT_FIRE_ROCKET, SOF_3D);
+      }
     }
+
     if (m_EwcChar==WLC_SOLDIER) {
       if (IRnd()&1) {
         FireDeathLaser(FIRE_DEATH_RIGHT*m_fSize*m_fStretchMultiplier);
       } else {
         FireDeathLaser(FIRE_DEATH_LEFT*m_fSize*m_fStretchMultiplier);
       }
-      PlaySound(m_soFire2, SOUND_SOLDIER_FIRE_LASER, SOF_3D);
+      
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soFire2, SOUND_SOLDIER_FIRE_LASER, SOF_3D);
+      }
     }
+
     autowait(0.25f);
 
     FLOAT fStretch=2.0f;

@@ -22,13 +22,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 uses "EntitiesMP/EnemyFly";
 
 enum EyemanChar {
-  0 EYC_SOLDIER   "0 Soldier",    // soldier
-  1 EYC_SERGEANT  "1 Sergeant",   // sergeant
+  0 EYC_SOLDIER   "Soldier [0]",    // soldier
+  1 EYC_SERGEANT  "Sergeant [1]",   // sergeant
 };
 
 enum EyemanEnv {
-  0 EYE_NORMAL    "0 Normal",
-  1 EYE_LAVA      "1 Lava",
+  0 EYE_NORMAL    "Normal [0]",
+  1 EYE_LAVA      "Lava [1]",
 };
 
 %{
@@ -245,7 +245,8 @@ functions:
   // mumbling sounds
   void ActivateMumblingSound(void)
   {
-    if (!m_bMumbleSoundPlaying) {
+    // [SSE] Enemy Settings Entity - Silent
+    if (!m_bMumbleSoundPlaying && !IsSilent()) {
       PlaySound(m_soMumble, SOUND_MUMBLE, SOF_3D|SOF_LOOP);
       m_bMumbleSoundPlaying = TRUE;
     }
@@ -384,14 +385,20 @@ procedures:
  *                A T T A C K   E N E M Y                   *
  ************************************************************/
 
-  FlyHit(EVoid) : CEnemyFly::FlyHit {
+  FlyHit(EVoid) : CEnemyFly::FlyHit
+  {
     if (CalcDist(m_penEnemy) > BITE_AIR) {
       m_fShootTime = _pTimer->CurrentTick() + 0.25f;
       return EReturn();
     }
     StartModelAnim(EYEMAN_ANIM_MORPHATTACK, 0);
     StopMoving();
-    PlaySound(m_soSound, SOUND_BITE, SOF_3D);
+
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_BITE, SOF_3D);
+    }
+
     // damage enemy
     autowait(0.4f);
     // damage enemy
@@ -417,11 +424,13 @@ procedures:
     return EReturn();
   };
 
-  GroundHit(EVoid) : CEnemyFly::GroundHit {
+  GroundHit(EVoid) : CEnemyFly::GroundHit
+  {
     if (CalcDist(m_penEnemy) > HIT_GROUND) {
       m_fShootTime = _pTimer->CurrentTick() + 0.25f;
       return EReturn();
     }
+
     StartModelAnim(EYEMAN_ANIM_ATTACK02, 0);
     StopMoving();
     // damage enemy
@@ -431,16 +440,26 @@ procedures:
       FLOAT3D vDirection = m_penEnemy->GetPlacement().pl_PositionVector-GetPlacement().pl_PositionVector;
       vDirection.SafeNormalize();
       InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, 3.5f, FLOAT3D(0, 0, 0), vDirection);
-      PlaySound(m_soSound, SOUND_PUNCH, SOF_3D);
+
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soSound, SOUND_PUNCH, SOF_3D);
+      }
     }
+
     autowait(0.3f);
     // damage enemy
     if (CalcDist(m_penEnemy) < HIT_GROUND) {
       FLOAT3D vDirection = m_penEnemy->GetPlacement().pl_PositionVector-GetPlacement().pl_PositionVector;
       vDirection.SafeNormalize();
       InflictDirectDamage(m_penEnemy, this, DMT_CLOSERANGE, 3.5f, FLOAT3D(0, 0, 0), vDirection);
-      PlaySound(m_soSound, SOUND_PUNCH, SOF_3D);
+      
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soSound, SOUND_PUNCH, SOF_3D);
+      }
     }
+
     autowait(0.4f);
 
     StandingAnim();

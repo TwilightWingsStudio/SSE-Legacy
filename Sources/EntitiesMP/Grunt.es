@@ -264,13 +264,20 @@ procedures:
 
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
     ShootProjectile(PRT_GRUNT_PROJECTILE_SOL, FIREPOS_SOLDIER * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(0, 0, 0)); // [SSE] Better Enemy Stretching
-    PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
+    }
 
     autowait(0.15f + FRnd()*0.1f);
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
     ShootProjectile(PRT_GRUNT_PROJECTILE_SOL, FIREPOS_SOLDIER * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(0, 0, 0)); // [SSE] Better Enemy Stretching
-    PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
     
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
+    }
 
     autowait(FRnd()*0.333f);
     return EEnd();
@@ -294,28 +301,48 @@ procedures:
 
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
     ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(-20, 0, 0)); // [SSE] Better Enemy Stretching
-    PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
+
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
+    }
 
     autowait(0.035f);
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
     ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(-10, 0, 0)); // [SSE] Better Enemy Stretching
-    PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
+    }
 
     autowait(0.035f);
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
     ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(0, 0, 0)); // [SSE] Better Enemy Stretching
-    PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
+    }
 
     autowait(0.035f);
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
     ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(10, 0, 0)); // [SSE] Better Enemy Stretching
-    PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
+    }
 
     autowait(0.035f);
     StartModelAnim(GRUNT_ANIM_FIRE, 0);
     ShootProjectile(PRT_GRUNT_PROJECTILE_COM, FIREPOS_COMMANDER_DN * ClampDn(m_fStretchMultiplier, 0.2F), ANGLE3D(20, 0, 0)); // [SSE] Better Enemy Stretching
-    PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
-
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
+    }
+    
     autowait(FRnd()*0.5f);
     return EEnd();
   };

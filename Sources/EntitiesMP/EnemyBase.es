@@ -31,6 +31,7 @@ uses "EntitiesMP/EnemyMarker";
 uses "EntitiesMP/MusicHolder";
 uses "EntitiesMP/BloodSpray";
 uses "EntitiesMP/EnemyFactionHolder";
+uses "EntitiesMP/EnemySettings"; // [SSE] Enemy Settings Entity
 
 event ERestartAttack {
 };
@@ -191,17 +192,13 @@ properties:
 190 INDEX m_iLastReminderValue = 0,
 
 200 BOOL m_bCountEnemyInStatistics "Count As Enemy (statistics)" = TRUE,
-201 BOOL m_bCountKillInStatistcs   "Count As Kill (statistics)" = TRUE,
+//201 BOOL m_bCountKillInStatistcs   "Count As Kill (statistics)" = TRUE,
 
-213 CEntityPointer m_penFriend,
-214 BOOL m_bRunningToFriend = FALSE,
+//213 CEntityPointer m_penFriend,
+//214 BOOL m_bRunningToFriend = FALSE,
 
 220 CEntityPointer m_penFactionHolder "Faction Holder",
-221 CEntityPointer m_penSwitch        "TEMP Switch",
-
-240 FLOAT m_fSpeedMultiplier "Speed Multiplier" = 1.0f,
-
-245 BOOL m_bTouchSenseless "Touch Senseless" = FALSE,
+222 CEntityPointer m_penSettings      "Settings",
 
 250 BOOL m_bCoward   "Coward" = FALSE,
 
@@ -272,6 +269,26 @@ functions:
   }
   
   // --------------------------------------------------------------------------------------
+  // [SSE] Enemy Settings Entity
+  // --------------------------------------------------------------------------------------
+  BOOL IsSilent()
+  {
+    return m_penSettings && m_penSettings->IsActive() && static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_bSilent;
+  }
+
+  // --------------------------------------------------------------------------------------
+  // [SSE] Enemy Settings Entity
+  // --------------------------------------------------------------------------------------
+  BOOL IsTargetValid(SLONG slPropertyOffset, CEntity *penTarget)
+  {
+    if (slPropertyOffset == offsetof(CEnemyBase, m_penSettings)) {
+      return IsOfClass(penTarget, "EnemySettings");
+    }
+
+    return CEntity::IsTargetValid(slPropertyOffset, penTarget);
+  }
+  
+  // --------------------------------------------------------------------------------------
   // [SSE] Interaction API
   // Return true if this entity can act act like interaction relay.
   // --------------------------------------------------------------------------------------
@@ -279,14 +296,20 @@ functions:
   {
     return TRUE;
   }
-
+  
   // --------------------------------------------------------------------------------------
   // [SSE] Interaction API
   // Return pointer to interaction provider if needed.
   // --------------------------------------------------------------------------------------
   virtual CEntity *GetInteractionProvider()
   {
-    return m_penSwitch;
+    // [SSE] Enemy Settings Entity
+    if (m_penSettings && m_penSettings->IsActive()) {
+      return static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_penSwitch;
+    }
+    //
+
+    return NULL;
   }
 
   // --------------------------------------------------------------------------------------
@@ -336,7 +359,13 @@ functions:
   // --------------------------------------------------------------------------------------
   virtual BOOL CountAsKill(void)
   {
-    return m_bCountKillInStatistcs;
+    // [SSE] Enemy Settings Entity
+    if (m_penSettings && m_penSettings->IsActive()) {
+      return static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_bCountAsKill;
+    }
+    //
+    
+    return TRUE;
   }
 
   // --------------------------------------------------------------------------------------
@@ -782,12 +811,12 @@ functions:
   // --------------------------------------------------------------------------------------
   // Check for faction system.
   // --------------------------------------------------------------------------------------
-  BOOL ShouldReceiveDamageFromInflictor(CEntity *penInflictor) {
-    // Friendly fire for factions.
-
+  BOOL ShouldReceiveDamageFromInflictor(CEntity *penInflictor)
+  {
     CEnemyFactionHolder* penEFH = GetFactionHolder(TRUE);
 
-    if (IsOfClass(penInflictor, "Player")) {
+    // Friendly fire for factions.
+    if (penInflictor->IsPlayerEntity()) {
       if (penEFH && penEFH->IsIndexValid()) {
         if (!penEFH->m_bDamageFromPlayers) {
           return FALSE;
@@ -854,13 +883,12 @@ functions:
       return;
     }
 
-    if (!ShouldReceiveDamageFromInflictor(penInflictor)) {
+    // boss can't be telefragged
+    if (m_bBoss && dmtType == DMT_TELEPORT) {
       return;
     }
 
-    // boss can't be telefragged
-    if (m_bBoss && dmtType == DMT_TELEPORT)
-    {
+    if (!ShouldReceiveDamageFromInflictor(penInflictor)) {
       return;
     }
 
@@ -871,10 +899,15 @@ functions:
 
     // apply game extra damage per enemy and per player
     fNewDamage *= GetGameDamageMultiplier();
+    
+    // [SSE] Enemy Settings Entity
+    if (m_penSettings && m_penSettings->IsActive()) {
+      fNewDamage *= static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_fDamageTakeMul;
+    }
+    //
 
-    // if no damage
+    // if no damage then do nothing
     if (fNewDamage == 0) {
-      // do nothing
       return;
     }
 
@@ -1392,6 +1425,15 @@ functions:
     FLOAT fStopDistance = GetProp(m_fStopDistance);
     // find relative direction angle
     FLOAT fCos = GetPlaneFrustumAngle(vPosDelta);
+
+    FLOAT fSpeedMultiplier = 1.0F;
+    
+    // [SSE] Enemy Settings Entity
+    if (m_penSettings && m_penSettings->IsActive()) {
+      fSpeedMultiplier = static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_fSpeedMultiplier;
+    }
+    //
+
     // if may move and
     if (MayMoveToAttack() && 
       // more or less ahead and
@@ -1400,10 +1442,10 @@ functions:
       fEnemyDistance>fStopDistance) {
       // move and rotate towards it
       if (fEnemyDistance<fCloseDistance) {
-        m_fMoveSpeed = GetProp(m_fCloseRunSpeed)*m_fSpeedMultiplier;
+        m_fMoveSpeed = GetProp(m_fCloseRunSpeed) * fSpeedMultiplier;
         m_aRotateSpeed = GetProp(m_aCloseRotateSpeed);
       } else {
-        m_fMoveSpeed = GetProp(m_fAttackRunSpeed)*m_fSpeedMultiplier;
+        m_fMoveSpeed = GetProp(m_fAttackRunSpeed) * fSpeedMultiplier;
         m_aRotateSpeed = GetProp(m_aAttackRotateSpeed);
       }
 
@@ -1411,10 +1453,10 @@ functions:
     } else if (m_bTacticActive) {
       // move and rotate towards it  
       if (fEnemyDistance<fCloseDistance) {
-        m_fMoveSpeed = GetProp(m_fCloseRunSpeed)*m_fSpeedMultiplier;
+        m_fMoveSpeed = GetProp(m_fCloseRunSpeed) * fSpeedMultiplier;
         m_aRotateSpeed = GetProp(m_aCloseRotateSpeed);
       } else {
-        m_fMoveSpeed = GetProp(m_fAttackRunSpeed)*m_fSpeedMultiplier;
+        m_fMoveSpeed = GetProp(m_fAttackRunSpeed) * fSpeedMultiplier;
         m_aRotateSpeed = GetProp(m_aAttackRotateSpeed);
       }
 
@@ -1437,7 +1479,7 @@ functions:
         m_aRotateSpeed = 0;
       // if going to some other location (some pathfinding AI scheme)
       } else {
-        m_fMoveSpeed = GetProp(m_fCloseRunSpeed)*m_fSpeedMultiplier;
+        m_fMoveSpeed = GetProp(m_fCloseRunSpeed) * fSpeedMultiplier;
         m_aRotateSpeed = GetProp(m_aCloseRotateSpeed);
       }
     }
@@ -1448,9 +1490,17 @@ functions:
   // --------------------------------------------------------------------------------------
   virtual void MovementAnimation(ULONG ulFlags)
   {
+    FLOAT fSpeedMultiplier = 1.0F;
+    
+    // [SSE] Enemy Settings Entity
+    if (m_penSettings && m_penSettings->IsActive()) {
+      fSpeedMultiplier = static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_fSpeedMultiplier;
+    }
+    //
+    
     if (ulFlags&MF_MOVEZ) {
-      if (m_fMoveSpeed==GetProp(m_fAttackRunSpeed)*m_fSpeedMultiplier || m_fMoveSpeed==GetProp(m_fCloseRunSpeed)*m_fSpeedMultiplier
-        || m_fMoveSpeed>GetProp(m_fWalkSpeed)*m_fSpeedMultiplier) {
+      if (m_fMoveSpeed==GetProp(m_fAttackRunSpeed) * fSpeedMultiplier || m_fMoveSpeed==GetProp(m_fCloseRunSpeed) * fSpeedMultiplier
+        || m_fMoveSpeed>GetProp(m_fWalkSpeed) * fSpeedMultiplier) {
         RunningAnim();
       } else {
         WalkingAnim();
@@ -2567,9 +2617,17 @@ procedures:
     FLOAT3D vOffsetDir;
     GetHeadingDirection(fA, vOffsetDir);
     m_vDesiredPosition = m_vStartPosition+vOffsetDir*fR;
+    
+    FLOAT fSpeedMultiplier = 1.0F;
+    
+    // [SSE] Enemy Settings Entity
+    if (m_penSettings && m_penSettings->IsActive()) {
+      fSpeedMultiplier = static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_fSpeedMultiplier;
+    }
+    //
 
     // use walking to get there
-    m_fMoveSpeed = GetProp(m_fWalkSpeed) * m_fSpeedMultiplier;
+    m_fMoveSpeed = GetProp(m_fWalkSpeed) * fSpeedMultiplier;
     m_aRotateSpeed = GetProp(m_aWalkRotateSpeed);
     WalkingAnim();
 
@@ -2609,11 +2667,15 @@ procedures:
     StandingAnim();
 
     // repeat forever
-    while(TRUE) {
+    while(TRUE)
+    {
       // wait some time
       autowait(Lerp(5.0f, 20.0f, FRnd()));
-      // play idle sound
-      IdleSound();
+
+      // [SSE] Enemy Settings Entity
+      if (!IsSilent()) {
+        IdleSound(); // play idle sound
+      }
     }
   }
 
@@ -2671,7 +2733,8 @@ procedures:
     GetWatcher()->SendEvent(EStart());
   
     // while there is a valid marker, take values from it
-    while (m_penMarker!=NULL && IsOfClass(m_penMarker, "Enemy Marker")) {
+    while (m_penMarker!=NULL && IsOfClass(m_penMarker, "Enemy Marker"))
+    {
       CEnemyMarker *pem = (CEnemyMarker *)&*m_penMarker;
 
       // the marker position is our new start position for attack range
@@ -2682,15 +2745,31 @@ procedures:
       m_vDesiredPosition = m_vStartPosition+FLOAT3D(CosFast(fA)*fR, 0, SinFast(fA)*fR);
       // if running 
       if (pem->m_betRunToMarker==BET_TRUE) {
+        FLOAT fSpeedMultiplier = 1.0F;
+        
+        // [SSE] Enemy Settings Entity
+        if (m_penSettings && m_penSettings->IsActive()) {
+          fSpeedMultiplier = static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_fSpeedMultiplier;
+        }
+        //
+        
         // use attack speeds
-        m_fMoveSpeed = GetProp(m_fAttackRunSpeed) * m_fSpeedMultiplier;
+        m_fMoveSpeed = GetProp(m_fAttackRunSpeed) * fSpeedMultiplier;
         m_aRotateSpeed = GetProp(m_aAttackRotateSpeed);
         // start running anim
         RunningAnim();
       // if not running
       } else {
+        FLOAT fSpeedMultiplier = 1.0F;
+        
+        // [SSE] Enemy Settings Entity
+        if (m_penSettings && m_penSettings->IsActive()) {
+          fSpeedMultiplier = static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_fSpeedMultiplier;
+        }
+        //
+        
         // use walk speeds
-        m_fMoveSpeed = GetProp(m_fWalkSpeed) * m_fSpeedMultiplier;
+        m_fMoveSpeed = GetProp(m_fWalkSpeed) * fSpeedMultiplier;
         m_aRotateSpeed = GetProp(m_aWalkRotateSpeed);
         // start walking anim
         WalkingAnim();
@@ -2788,8 +2867,10 @@ procedures:
       }
     }
 
-    // play sight sound
-    SightSound();
+    // [SSE] Enemy Settings Entity
+    if (!IsSilent()) {
+      SightSound(); // make sound that you spotted the player
+    }
 
     // return to caller
     return EReturn();
@@ -3257,15 +3338,32 @@ procedures:
     }
 
     // if killed by someone
-    if (penKiller != NULL) {
-      // give him score
-      EReceiveScore eScore;
-      eScore.iPoints = m_iScore;
-      penKiller->SendEvent(eScore);
-      if ( CountAsKill())
+    if (penKiller != NULL)
+    {
+      INDEX iScore = -1;
+      
+      // [SSE] Enemy Settings Entity
+      if (m_penSettings && m_penSettings->IsActive()) {
+        iScore = static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_iScore;
+      }
+      //
+      
+      if (iScore < 0) {
+        iScore = m_iScore;
+      }
+
+      // If we have any score which we should give then do it!
+      if (iScore > 0) {
+        EReceiveScore eScore;
+        eScore.iPoints = iScore;
+        penKiller->SendEvent(eScore);
+      }
+
+      if (CountAsKill())
       {
         penKiller->SendEvent(EKilledEnemy());
       }
+
       // send computer message if in coop
       if (GetSP()->sp_bCooperative) {
         EComputerMessage eMsg;
@@ -3288,7 +3386,6 @@ procedures:
     if (m_penSpawnerTarget) {
       SendToTarget(m_penSpawnerTarget, EET_TRIGGER, this);
     }
-    
 
     // wait
     wait() {
@@ -3329,23 +3426,23 @@ procedures:
     RemoveFromFuss();
 
     // tell our friends goodbye
-    {FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten) {
-      CEntity *pen = iten;
-
-      // Skip non enemies.
-      if (!IsDerivedFromClass(pen,"Enemy Base")) {
-        continue;
-      }
-
-      // Skip dead enemies.
-      if (!(pen->GetFlags()&ENF_ALIVE)) {
-        continue;
-      }
-
-      if (&(*(((CEnemyBase*)pen)->m_penFriend)) == this) {
-        ((CEnemyBase*)pen)->m_penFriend = NULL; //pointers!! pointers!!! aaaaahh!
-      } 
-    }}
+    //{FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten) {
+    //  CEntity *pen = iten;
+    //
+    //  // Skip non enemies.
+    //  if (!IsDerivedFromClass(pen,"Enemy Base")) {
+    //    continue;
+    //  }
+    //
+    //  // Skip dead enemies.
+    //  if (!(pen->GetFlags()&ENF_ALIVE)) {
+    //    continue;
+    //  }
+    //
+    //  //if (&(*(((CEnemyBase*)pen)->m_penFriend)) == this) {
+    //  //  ((CEnemyBase*)pen)->m_penFriend = NULL; //pointers!! pointers!!! aaaaahh!
+    //  //} 
+    //}}
 
     // cease to exist
     Destroy();
@@ -3361,7 +3458,12 @@ procedures:
   {
 
     StopMoving();     // stop moving
-    DeathSound();     // death sound
+
+    // [SSE] Enemy Settings Entity
+    if (!IsSilent()) {
+      DeathSound(); // death sound
+    }
+
     LeaveStain(FALSE);
 
     // set physic flags
@@ -3554,18 +3656,24 @@ procedures:
 
         // if confused
         m_fDamageConfused -= eDamage.fAmount;
-        if (m_fDamageConfused < 0.001f) {
+        if (m_fDamageConfused < 0.001f)
+        {
           m_fDamageConfused = m_fDamageWounded;
           // notify wounding to others
           WoundedNotify(eDamage);
-          // make pain sound
-          WoundSound();
+          
+          // [SSE] Enemy Settings Entity
+          if (!IsSilent()) {
+            WoundSound(); // make pain sound
+          }
+          
           // play wounding animation
           call BeWounded(eDamage);
         }
 
         resume;
       }
+
       on (EForceWound) :
       {
         call BeWounded(EDamage());
@@ -3602,10 +3710,13 @@ procedures:
       }
 
       // on touch
-      on (ETouch eTouch) : {
-        if (m_bTouchSenseless) {
+      on (ETouch eTouch) :
+      {
+        // [SSE] Enemy Settings Entity
+        if (m_penSettings && m_penSettings->IsActive() && static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_bTouchSenseless) {
           pass;
         }
+        //
 
         CEnemyFactionHolder* penEFH = GetFactionHolder(TRUE);
 
@@ -3613,10 +3724,15 @@ procedures:
         if (penEFH == NULL) {
           // set the new target if needed
           BOOL bTargetChanged = SetTargetHard(eTouch.penOther);
+
           // if target changed
-          if (bTargetChanged) {
-            // make sound that you spotted the player
-            SightSound();
+          if (bTargetChanged)
+          {
+            // [SSE] Enemy Settings Entity
+            if (!IsSilent()) {
+              SightSound(); // make sound that you spotted the player
+            }
+
             // start new behavior
             SendEvent(EReconsiderBehavior());
           }
@@ -3655,9 +3771,13 @@ procedures:
       on (ETrigger eTrigger) : {
         CEntity *penCaused = FixupCausedToPlayer(this, eTrigger.penCaused);
         // if can set the trigerer as soft target
-        if (SetTargetSoft(penCaused)) {
-          // make sound that you spotted the player
-          SightSound();
+        if (SetTargetSoft(penCaused))
+        {
+          // [SSE] Enemy Settings Entity
+          if (!IsSilent()) {
+            SightSound(); // make sound that you spotted the player
+          }
+
           // start new behavior
           SendEvent(EReconsiderBehavior());
         }
@@ -3721,22 +3841,28 @@ procedures:
         }
 
         // if can set the damager as hard target
-        if (SetTargetHard(eDamage.penInflictor)) {
+        if (SetTargetHard(eDamage.penInflictor))
+        {
           // notify wounding to others
           WoundedNotify(eDamage);
-          // make pain sound
-          WoundSound();
+ 
+          // [SSE] Enemy Settings Entity
+          if (!IsSilent()) {
+            WoundSound(); // make pain sound
+          }
+
           // play wounding animation
           call BeWounded(eDamage);
         }
+
         return;
       }
 
-      on (EWatch eWatch) : {
-        if (m_penFriend != NULL) {
-            jump Active();
-        }
-      }
+      //on (EWatch eWatch) : {
+      //  if (m_penFriend != NULL) {
+      //      jump Active();
+      //  }
+      //}
     }
   };
 

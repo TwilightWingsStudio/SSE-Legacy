@@ -269,17 +269,23 @@ procedures:
     
     if (bEnemyRight >= 0) {  // enemy is to the right of guffy
       ShootProjectile(PRT_GUFFY_PROJECTILE, FIRE_LEFT_ARM*m_fSize * fSMul, ANGLE3D(0, 0, 0));
-      PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
-      
       ShootProjectile(PRT_GUFFY_PROJECTILE, FIRE_RIGHT_ARM*m_fSize * fSMul, ANGLE3D(-9, 0, 0) * fSMul);
-      PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
+
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
+        PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
+      }
 
     } else { // enemy is to the left of guffy
       ShootProjectile(PRT_GUFFY_PROJECTILE, FIRE_LEFT_ARM*m_fSize * fSMul, ANGLE3D(9, 0, 0) * fSMul);
-      PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
-      
       ShootProjectile(PRT_GUFFY_PROJECTILE, FIRE_RIGHT_ARM*m_fSize * fSMul, ANGLE3D(0, 0, 0));
-      PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
+      
+      // [SSE] Enemy Settings Entity - Silent
+      if (!IsSilent()) {
+        PlaySound(m_soFire1, SOUND_FIRE, SOF_3D);
+        PlaySound(m_soFire2, SOUND_FIRE, SOF_3D);
+      }
     }
     
     autowait(1.0f);

@@ -25,9 +25,9 @@ uses "EntitiesMP/Bullet";
 uses "EntitiesMP/Reminder";
 
 enum ScorpmanType {
-  0 SMT_SOLDIER    "0 Soldier",
-  1 SMT_GENERAL    "1 General",
-  2 SMT_MONSTER    "2 Monster",
+  0 SMT_SOLDIER    "Soldier [0]",
+  1 SMT_GENERAL    "General [1]",
+  2 SMT_MONSTER    "Monster [2]",
 };
 
 %{
@@ -523,7 +523,12 @@ procedures:
     m_iSpawnEffect = 0;                         // effect every 'x' frames
     m_fFireTime += _pTimer->CurrentTick();
     m_bFireBulletCount = 0;
-    PlaySound(m_soSound, SOUND_FIRE, SOF_3D|SOF_LOOP);
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_FIRE, SOF_3D|SOF_LOOP);
+    }
+    
     MinigunOn();
 
     while (m_fFireTime > _pTimer->CurrentTick())
@@ -585,7 +590,11 @@ procedures:
     // close attack
     StartModelAnim(SCORPMAN_ANIM_SPIKEHIT, 0);
     autowait(0.5f);
-    PlaySound(m_soSound, SOUND_KICK, SOF_3D);
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_KICK, SOF_3D);
+    }
 
     if (CalcDist(m_penEnemy) < m_fCloseDistance)
     {

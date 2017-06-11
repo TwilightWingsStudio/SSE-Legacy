@@ -247,7 +247,8 @@ functions:
   // --------------------------------------------------------------------------------------
   void ActivateRunningSound(void)
   {
-    if (!m_bRunSoundPlaying) {
+    // [SSE] Enemy Settings Entity - Silent
+    if (!m_bRunSoundPlaying && !IsSilent()) {
       PlaySound(m_soFeet, SOUND_RUN, SOF_3D|SOF_LOOP);
       m_bRunSoundPlaying = TRUE;
     }
@@ -315,11 +316,19 @@ procedures:
 
     autowait(0.35f);
     ShootProjectile(PRT_BONEMAN_FIRE, FIRE_RIGHT_HAND, ANGLE3D(0, 0, 0));
-    PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+    }
 
     autowait(0.45f);
     ShootProjectile(PRT_BONEMAN_FIRE, FIRE_LEFT_HAND, ANGLE3D(0, 0, 0));
-    PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
+    }
 
     autowait(FRnd()/3+0.6f);
 
@@ -359,7 +368,11 @@ procedures:
     vDir *= m_fCloseRunSpeed*1.5f;
     vDir(2) = 2.5f;
     SetDesiredTranslation(vDir);
-    PlaySound(m_soSound, SOUND_KICK, SOF_3D);
+    
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_KICK, SOF_3D);
+    }
 
     // animation - IGNORE DAMAGE WOUND -
     SpawnReminder(this, 0.5f, 0);
@@ -391,7 +404,10 @@ procedures:
       m_bFistHit = TRUE;
     }
 
-    PlaySound(m_soSound, SOUND_PUNCH, SOF_3D);
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_PUNCH, SOF_3D);
+    }
 
     autowait(0.10f);
 
@@ -421,7 +437,10 @@ procedures:
       m_bFistHit = TRUE;
     }
 
-    PlaySound(m_soSound, SOUND_PUNCH, SOF_3D);
+    // [SSE] Enemy Settings Entity - Silent
+    if (!IsSilent()) {
+      PlaySound(m_soSound, SOUND_PUNCH, SOF_3D);
+    }
 
     autowait(0.10f);
 
