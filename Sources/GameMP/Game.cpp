@@ -131,6 +131,7 @@ extern INDEX gam_bDropWeapons = TRUE; // [SSE] Weapons Drop
 // [SSE] Extra Lives System
 extern INDEX gam_bSharedLives = TRUE;
 extern INDEX gam_bRaisingLiveCost = TRUE;
+extern INDEX gam_bTransferLivesWhenPlayerLeft = TRUE;
 extern INDEX gam_iScoreForExtraLive = 100000;
 //
 
@@ -1000,6 +1001,7 @@ void CGame::InitInternal( void)
   // [SSE] Extra Lives System
   _pShell->DeclareSymbol("persistent user INDEX gam_bSharedLives;", &gam_bSharedLives);
   _pShell->DeclareSymbol("persistent user INDEX gam_bRaisingLiveCost;", &gam_bRaisingLiveCost);
+  _pShell->DeclareSymbol("persistent user INDEX gam_bTransferLivesWhenPlayerLeft;", &gam_bTransferLivesWhenPlayerLeft);
   _pShell->DeclareSymbol("persistent user INDEX gam_iScoreForExtraLive;", &gam_iScoreForExtraLive); 
   //
   

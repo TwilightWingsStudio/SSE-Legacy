@@ -60,6 +60,7 @@ extern INDEX gam_bDropWeapons; // [SSE] Weapons Drop
 // [SSE] Extra Lives System
 extern INDEX gam_bSharedLives;
 extern INDEX gam_bRaisingLiveCost;
+extern INDEX gam_bTransferLivesWhenPlayerLeft;
 extern INDEX gam_iScoreForExtraLive;
 //
 
@@ -309,6 +310,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     // [SSE] Extra Lives System
     sp.sp_bSharedLives = gam_bSharedLives;
     sp.sp_bRaisingLiveCost = gam_bRaisingLiveCost;
+    sp.sp_bTransferLivesWhenPlayerLeft = gam_bTransferLivesWhenPlayerLeft;
     sp.sp_iScoreForExtraLive = gam_iScoreForExtraLive;
     sp.sp_iScoreForExtraLiveAccum = 0;
     sp.sp_fLiveCostMultiplier = 1.0F;
@@ -340,6 +342,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     // [SSE] Extra Lives System
     sp.sp_bSharedLives = FALSE;
     sp.sp_bRaisingLiveCost = FALSE;
+    sp.sp_bTransferLivesWhenPlayerLeft = FALSE;
     sp.sp_iScoreForExtraLive = 0;
     sp.sp_iScoreForExtraLiveAccum = 0;
     sp.sp_fLiveCostMultiplier = 1.0F;

@@ -2789,7 +2789,7 @@ functions:
       // find first live player
       CPlayer *penNextPlayer = NULL;
 
-      for(INDEX iPlayer = 0; iPlayer < GetMaxPlayers(); iPlayer++)
+      for (INDEX iPlayer = 0; iPlayer < GetMaxPlayers(); iPlayer++)
       {
         CPlayer *pen = (CPlayer*)&*GetPlayerEntity(iPlayer);
 
@@ -2811,6 +2811,40 @@ functions:
         CPrintF(TRANS("%s leaving, all keys saved to buffer.\n"), (const char*)m_strName);
         
         ((CSessionProperties*)GetSP())->sp_ulPickedKeys |= m_ulKeys;
+      }
+    }
+  }
+  
+  void TryToTransferLives(void)
+  {
+    // If we have some lives and non-predictor...
+    if (!IsPredictor() && m_iLives > 0)
+    {
+      // find first live player
+      CPlayer *penNextPlayer = NULL;
+
+      for (INDEX iPlayer = 0; iPlayer < GetMaxPlayers(); iPlayer++)
+      {
+        CPlayer *pen = (CPlayer*)&*GetPlayerEntity(iPlayer);
+
+        if (pen != NULL && pen != this && (pen->GetFlags()&ENF_ALIVE) && !(pen->GetFlags()&ENF_DELETED) ) {
+          if (penNextPlayer == NULL) {
+            penNextPlayer = pen;
+          } else {
+            if (pen->m_iLives < penNextPlayer->m_iLives) {
+              penNextPlayer = pen;
+            }
+          }
+        }
+      }
+
+      // if any found then transfer lives to that player.
+      if (penNextPlayer != NULL)
+      {
+        CPrintF(TRANS("%s leaving, all lives transfered to %s\n"), 
+          (const char*)m_strName, (const char*)penNextPlayer->GetPlayerName());
+        
+        penNextPlayer->m_iLives += m_iLives;
       }
     }
   }
@@ -8677,6 +8711,11 @@ procedures:
     // we get here if the player is disconnected from the server
 
     TryToTransferKeys();
+    
+    // [SSE] Extra Lives System
+    if (!GetSP()->sp_bSharedLives && GetSP()->sp_bTransferLivesWhenPlayerLeft) {
+      TryToTransferLives();
+    }
 
     // spawn teleport effect
     SpawnTeleport();

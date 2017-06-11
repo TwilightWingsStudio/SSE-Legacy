@@ -105,6 +105,7 @@ public:
   // [SSE] Extra Lives System
   BOOL sp_bSharedLives;
   BOOL sp_bRaisingLiveCost;
+  BOOL sp_bTransferLivesWhenPlayerLeft;
   INDEX sp_iScoreForExtraLive;
   INDEX sp_iScoreForExtraLiveAccum; // Internal.
   FLOAT sp_fLiveCostMultiplier;     // Internal.
