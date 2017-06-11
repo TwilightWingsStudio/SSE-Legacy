@@ -23,22 +23,22 @@ uses "EntitiesMP/Item";
 
 // key type 
 enum KeyItemType {
-  0 KIT_BOOKOFWISDOM      "00 Book of wisdom",
-  1 KIT_CROSSWOODEN       "01 Wooden cross",
-  2 KIT_CROSSMETAL        "02 Silver cross",
-  3 KIT_CROSSGOLD         "03 Gold cross",
-  4 KIT_JAGUARGOLDDUMMY   "04 Gold jaguar",
-  5 KIT_HAWKWINGS01DUMMY  "05 Hawk wings - part 1",
-  6 KIT_HAWKWINGS02DUMMY  "06 Hawk wings - part 2",
-  7 KIT_HOLYGRAIL         "07 Holy grail",
-  8 KIT_TABLESDUMMY       "08 Tablet of wisdom",
-  9 KIT_WINGEDLION        "09 Winged lion",
- 10 KIT_ELEPHANTGOLD      "10 Gold elephant",
- 11 KIT_STATUEHEAD01      "11 Seriously scary ceremonial mask",
- 12 KIT_STATUEHEAD02      "12 Hilariously happy ceremonial mask",
- 13 KIT_STATUEHEAD03      "13 Ix Chel mask",
- 14 KIT_KINGSTATUE        "14 Statue of King Tilmun",
- 15 KIT_CRYSTALSKULL      "15 Crystal Skull",
+  0 KIT_BOOKOFWISDOM      "Book of wisdom [0]",
+  1 KIT_CROSSWOODEN       "Wooden cross [1]",
+  2 KIT_CROSSMETAL        "Silver cross [2]",
+  3 KIT_CROSSGOLD         "Gold cross [3]",
+  4 KIT_JAGUARGOLDDUMMY   "Gold jaguar [4]",
+  5 KIT_HAWKWINGS01DUMMY  "Hawk wings [5] - part 1",
+  6 KIT_HAWKWINGS02DUMMY  "Hawk wings [6] - part 2",
+  7 KIT_HOLYGRAIL         "Holy grail [7]",
+  8 KIT_TABLESDUMMY       "Tablet of wisdom [8]",
+  9 KIT_WINGEDLION        "Winged lion [9]",
+ 10 KIT_ELEPHANTGOLD      "Gold elephant [10]",
+ 11 KIT_STATUEHEAD01      "Seriously scary [11] ceremonial mask",
+ 12 KIT_STATUEHEAD02      "Hilariously [12] happy ceremonial mask",
+ 13 KIT_STATUEHEAD03      "Ix Chel mask [13]",
+ 14 KIT_KINGSTATUE        "Statue of King Tilmun [14]",
+ 15 KIT_CRYSTALSKULL      "Crystal Skull [15]",
 };
 
 // event for sending through receive item

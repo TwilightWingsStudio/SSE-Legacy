@@ -232,6 +232,12 @@ enum WeaponType {
 #define DOUBLESHOTGUN_ANIM_FIRE_LENGTH 1.5F      // 1.75 - 0.25
 #define DOUBLESHOTGUN_ANIM_FIREFAST_LENGTH 0.9F  // 1.05 - 0.15
 
+#define FLAMER_ANIM_FIRESTART_LENGTH 0.25F
+#define FLAMER_ANIM_FIREEND_LENGTH 0.25F
+
+#define CHAINSAW_ANIM_WAIT2FIRE_LENGTH 0.2F
+#define CHAINSAW_ANIM_FIRE2WAIT_LENGTH 0.2F
+
 // mana for ammo adjustment (multiplier)
 #define MANA_AMMO (0.1f)
 
@@ -5075,7 +5081,7 @@ procedures:
     }
 
     m_moWeapon.PlayAnim(iAnim, 0);
-    autowait(tmAnimLength - 0.05f); // TODO: Huyna
+    autowait(tmAnimLength - 0.05f);
     m_moWeapon.PlayAnim(COLT_ANIM_WAIT1, AOF_LOOPING|AOF_NORESTART);
 
     // no more bullets in colt -> reload
@@ -6100,9 +6106,9 @@ procedures:
 
     m_tmFlamerStart = _pTimer->CurrentTick();
     m_tmFlamerStop = 1e9;
-    
+
     m_moWeapon.PlayAnim(FLAMER_ANIM_FIRESTART, 0);
-    autowait(m_moWeapon.GetAnimLength(FLAMER_ANIM_FIRESTART)); // TODO: Huyna
+    autowait(FLAMER_ANIM_FIRESTART_LENGTH);
 
     // play fire sound
     CPlayer &pl = (CPlayer&)*m_penPlayer;
@@ -6154,7 +6160,7 @@ procedures:
     }
 
     m_moWeapon.PlayAnim(FLAMER_ANIM_FIREEND, 0);
-    autowait(m_moWeapon.GetAnimLength(FLAMER_ANIM_FIREEND)); // TODO: Huyna
+    autowait(FLAMER_ANIM_FIREEND_LENGTH);
 
     if (m_iNapalm <= 0) {
       // select new weapon
@@ -6176,7 +6182,7 @@ procedures:
   
     // bring the chainsaw down to cutting height (fire position)
     m_moWeapon.PlayAnim(CHAINSAW_ANIM_WAIT2FIRE, 0);
-    autowait(m_moWeapon.GetAnimLength(CHAINSAW_ANIM_WAIT2FIRE)-0.05f); // TODO: Huyna
+    autowait(CHAINSAW_ANIM_WAIT2FIRE_LENGTH - 0.05f);
 
     CPlayerAnimator &pa=*GetAnimator();
     pa.FireAnimation(BODY_ANIM_MINIGUN_FIRELONG, 0);
@@ -6221,9 +6227,9 @@ procedures:
 //    PlaySound(pl.m_soWeapon0, SOUND_SILENCE, SOF_3D|SOF_VOLUMETRIC/*|SOF_SMOOTHCHANGE*/);
     // restore volume to engine sound
     pl.m_soWeaponAmbient.Set3DParameters(30.0f, 3.0f, 1.0f, 1.0f);        
-    
+
     m_moWeapon.PlayAnim(CHAINSAW_ANIM_FIRE2WAIT, 0);
-    autowait(m_moWeapon.GetAnimLength(CHAINSAW_ANIM_FIRE2WAIT)); // TODO: Huyna
+    autowait(CHAINSAW_ANIM_FIRE2WAIT_LENGTH);
 
     // stop teeth rotation
     CModelObject *pmo1 = &(m_moWeapon.GetAttachmentModel(CHAINSAW_ATTACHMENT_BLADE)->amo_moModelObject);
@@ -6242,7 +6248,7 @@ procedures:
   {
     // bring it back to idle position
     m_moWeapon.PlayAnim(CHAINSAW_ANIM_FIRE2WAIT, 0);
-    autowait(m_moWeapon.GetAnimLength(CHAINSAW_ANIM_FIRE2WAIT)); // TODO: Huyna
+    autowait(CHAINSAW_ANIM_FIRE2WAIT_LENGTH);
     jump Idle();
   }
 
