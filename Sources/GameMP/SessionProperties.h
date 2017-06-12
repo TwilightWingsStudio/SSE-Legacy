@@ -121,6 +121,10 @@ public:
   BOOL sp_bSniperFullDamageInNoScope;
   //
   
+  // [SSE] Gameplay - Safe Flamethrower
+  BOOL sp_bSafeFlamethrower;
+  //
+  
   BOOL sp_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
   BOOL sp_bArmorInertiaDamping;            // [SSE] Armor Inertia Damping Toggle
   BOOL sp_bRocketJumpMode;                 // [SSE] RocketJump Mode

@@ -141,6 +141,7 @@ extern INDEX gam_bSaveKeysWhenServerEmpty = FALSE;
 //
 
 extern INDEX gam_bSniperFullDamageInNoScope = FALSE; // [SSE] Gameplay - Sniper No Scope
+extern INDEX gam_bSafeFlamethrower = FALSE; // [SSE] Gameplay - Safe Flamethrower
 
 extern INDEX gam_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
 extern INDEX gam_bArmorInertiaDamping = TRUE; // [SSE] Armor Inertia Damping Toggle
@@ -1011,6 +1012,7 @@ void CGame::InitInternal( void)
   //
 
   _pShell->DeclareSymbol("persistent user INDEX gam_bSniperFullDamageInNoScope;",  &gam_bSniperFullDamageInNoScope); // [SSE] Gameplay - Sniper No Scope
+  _pShell->DeclareSymbol("persistent user INDEX gam_bSafeFlamethrower;",  &gam_bSafeFlamethrower); // [SSE] Gameplay - Safe Flamethrower
 
   _pShell->DeclareSymbol("persistent user INDEX gam_bKeepSeriousDamageOnProjectiles;",  &gam_bKeepSeriousDamageOnProjectiles); // [SSE] Better Serious Damage
   _pShell->DeclareSymbol("persistent user INDEX gam_bArmorInertiaDamping;",  &gam_bArmorInertiaDamping); // [SSE] Armor Inertia Damping Toggle

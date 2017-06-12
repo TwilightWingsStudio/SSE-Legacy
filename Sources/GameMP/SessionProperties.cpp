@@ -70,6 +70,7 @@ extern INDEX gam_bSaveKeysWhenServerEmpty;
 //
 
 extern INDEX gam_bSniperFullDamageInNoScope; // [SSE] Gameplay - Sniper No Scope
+extern INDEX gam_bSafeFlamethrower; // [SSE] Gameplay - Safe Flamethrower
 
 extern INDEX gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
 extern INDEX gam_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
@@ -296,6 +297,8 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_bArmorInertiaDamping = gam_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
   sp.sp_bRocketJumpMode = gam_bRocketJumpMode; // [SSE] RocketJump Mode
   
+  sp.sp_bSafeFlamethrower = gam_bSafeFlamethrower; // [SSE] Gameplay - Safe Flamethrower
+
   // [SSE] Team DeathMatch
   sp.sp_iTeamScore1 = 0;
   sp.sp_iTeamScore2 = 0;

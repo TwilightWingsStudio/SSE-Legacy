@@ -3146,6 +3146,12 @@ void ProjectileTouch(CEntityPointer penHit)
     } else {
       m_penLastDamaged=penHit;
     }
+    
+    // [SSE] Gameplay - Safe Flamethrower
+    if (GetSP()->sp_bSafeFlamethrower && m_penLauncher == penHit)
+    {
+      return;
+    }
 
     // don't spawn flame on AirElemental
     BOOL bSpawnFlame = TRUE;
