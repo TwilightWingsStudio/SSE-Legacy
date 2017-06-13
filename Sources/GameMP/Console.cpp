@@ -335,32 +335,89 @@ static void Key_Return(void)
     strEditingLine.RemovePrefix(CHEAT_PREFIX);
     strEditingLine.RemovePrefix("/ " CHEAT_PREFIX );
     strEditingLine.TrimSpacesLeft();
-    if (strEditingLine=="god") {
+
+    if (strEditingLine == "god") {
       DoCheat(strEditingLine, "cht_bGod");
     
-    } else if (strEditingLine=="giveall") {
-      DoCheat(strEditingLine, "cht_bGiveAll");
-    
-    } else if (strEditingLine=="killall") {
+    } else if (strEditingLine == "giveall") {
+      DoCheat(strEditingLine, "cht_bGiveAll");  
+
+    } else if (strEditingLine == "killall") {
       DoCheat(strEditingLine, "cht_bKillAll");
     
-    } else if (strEditingLine=="open") {
+    } else if (strEditingLine == "open") {
       DoCheat(strEditingLine, "cht_bOpen");
     
-    } else if (strEditingLine=="tellall") {
+    } else if (strEditingLine == "tellall") {
       DoCheat(strEditingLine, "cht_bAllMessages");
     
-    } else if (strEditingLine=="fly") {
+    } else if (strEditingLine == "fly") {
       DoCheat(strEditingLine, "cht_bFly");
 
-    } else if (strEditingLine=="ghost") {
+    } else if (strEditingLine == "ghost" || strEditingLine == "noclip") {
       DoCheat(strEditingLine, "cht_bGhost");
 
-    } else if (strEditingLine=="invisible") {
+    } else if (strEditingLine == "invisible") {
       DoCheat(strEditingLine, "cht_bInvisible");
 
-    } else if (strEditingLine=="refresh") {
+    } else if (strEditingLine == "refresh") {
       DoCheat(strEditingLine, "cht_bRefresh");
+
+    // [SSE] Gameplay - Cheats Expansion
+    } else if (strEditingLine == "autokill") {
+      DoCheat(strEditingLine, "cht_bAutoKill");
+
+    } else if (strEditingLine == "arsenal") {
+      DoCheat(strEditingLine, "cht_bArsenal");
+      
+    } else if (strEditingLine == "allkeys") {
+      DoCheat(strEditingLine, "cht_bAllKeys");
+      
+    } else if (strEditingLine == "noammo") {
+      DoCheat(strEditingLine, "cht_bInfiniteAmmo");
+      
+    } else if (strEditingLine == "ammo" || strEditingLine == "ammopack") {
+      DoCheat(strEditingLine, "cht_bAmmoPack");
+      
+    } else if (strEditingLine == "suicide") {
+      DoCheat(strEditingLine, "cht_bSuicide");
+    //
+    
+    // [SSE] Console Yokes
+    } else if (strEditingLine == "console") {
+      CPrintF("Damn son, it is already open. :/\n");
+      
+    } else if (strEditingLine == "hello") {
+      CPrintF("please goodbye\n");
+      
+    } else if (strEditingLine == "goodbye") {
+      CPrintF("Ok, then foku, little faggot!\n");
+
+    } else if (strEditingLine == "graphics") {
+      CPrintF("FOKU!\n");
+      
+    } else if (strEditingLine == "hl3") {
+      CPrintF("Nope! :3\n");
+      
+    } else if (strEditingLine == "money") {
+      CPrintF("Just do fisting for 300 bax.\n");
+      
+    } else if (strEditingLine == "dispenser") {
+      CPrintF("POOOOOT DISPENSER HERE!\n");
+      
+    } else if (strEditingLine == "invisibility") {
+      CPrintF("Heroes like Sam never hiding!\n");
+      
+    } else if (strEditingLine == "revolution") {
+      CPrintF("REVOLVE YOURSELF!\n");
+      
+    } else if (strEditingLine == "evolution") {
+      CPrintF("You already playing it!\n");
+      
+    } else if (strEditingLine == "shit") {
+      CPrintF("I don't have shit. I think all shit already in your head if you typed it.\n");
+    //
+
     } else {
       CPrintF("sorry?\n");
     }
