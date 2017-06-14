@@ -129,6 +129,8 @@ public:
   BOOL sp_bArmorInertiaDamping;            // [SSE] Armor Inertia Damping Toggle
   BOOL sp_bRocketJumpMode;                 // [SSE] RocketJump Mode
   
+  INDEX sp_iTeamKillPenalty; // [SSE] Gameplay - TeamKill Penalty
+  
   BOOL sp_bPickUpWeaponsOnce; // [SSE] Pick up weapons once.
   
   BOOL sp_bDropPowerUps; // [SSE] PowerUps Drop

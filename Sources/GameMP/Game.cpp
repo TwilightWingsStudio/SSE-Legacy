@@ -124,6 +124,8 @@ extern INDEX gam_bGibs  = TRUE;
 
 extern INDEX gam_bUseExtraEnemies = TRUE;
 
+extern INDEX gam_iTeamKillPenalty = 1; // [SSE] Gameplay - TeamKill Penalty
+
 extern INDEX gam_bPickUpWeaponsOnce = FALSE; // [SSE] Pick up weapons once.
 extern INDEX gam_bDropPowerUps = FALSE; // [SSE] PowerUps Drop
 extern INDEX gam_bDropWeapons = TRUE; // [SSE] Weapons Drop
@@ -148,6 +150,7 @@ extern INDEX gam_bArmorInertiaDamping = TRUE; // [SSE] Armor Inertia Damping Tog
 extern INDEX gam_bRocketJumpMode = FALSE; // [SSE] RocketJump Mode
 
 extern FLOAT gam_tmRespawnDelay = 0.0F; // [SSE] Respawn Delay
+
 
 static INDEX hud_iEnableStats = 1;
 static FLOAT hud_fEnableFPS   = 1;
@@ -995,6 +998,8 @@ void CGame::InitInternal( void)
 
   _pShell->DeclareSymbol("persistent user INDEX gam_bUseExtraEnemies;",  &gam_bUseExtraEnemies);
 
+  _pShell->DeclareSymbol("persistent user INDEX gam_iTeamKillPenalty;", &gam_iTeamKillPenalty); // [SSE] Gameplay - TeamKill Penalty
+  
   _pShell->DeclareSymbol("persistent user INDEX gam_bPickUpWeaponsOnce;", &gam_bPickUpWeaponsOnce); // [SSE] Pick up weapons once.
   _pShell->DeclareSymbol("persistent user INDEX gam_bDropPowerUps;", &gam_bDropPowerUps); // [SSE] PowerUps Drop
   _pShell->DeclareSymbol("persistent user INDEX gam_bDropWeapons;", &gam_bDropWeapons); // [SSE] Weapons Drop

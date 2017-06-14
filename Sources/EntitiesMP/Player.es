@@ -1843,12 +1843,22 @@ functions:
   }
   
   // [SSE]
-  void DecreaseTeamScore()
+  void IncreaseTeamScore(INDEX iAmount)
   {
     if (m_iTeamID == 1) {
-      ((CSessionProperties*)GetSP())->sp_iTeamScore1 -= 1;
-    } else {
-      ((CSessionProperties*)GetSP())->sp_iTeamScore2 -= 1;
+      ((CSessionProperties*)GetSP())->sp_iTeamScore1 += iAmount;
+    } else if (m_iTeamID == 2) {
+      ((CSessionProperties*)GetSP())->sp_iTeamScore2 += iAmount;
+    }
+  }
+  
+  // [SSE]
+  void DecreaseTeamScore(INDEX iAmount)
+  {
+    if (m_iTeamID == 1) {
+      ((CSessionProperties*)GetSP())->sp_iTeamScore1 -= iAmount;
+    } else if (m_iTeamID == 2) {
+      ((CSessionProperties*)GetSP())->sp_iTeamScore2 -= iAmount;
     }
   }
 
@@ -4194,7 +4204,7 @@ functions:
     DamageImpact(dmtType, GetSP()->sp_bArmorInertiaDamping ? fSubHealth : fDamageAmmount, vHitPoint, vDirection);
 
     // [SSE] RocketJump Mode
-    if (penInflictor != this || !GetSP()->sp_bRocketJumpMode) {
+    if (penInflictor != this || !GetSP()->sp_bRocketJumpMode || dmtType == DMT_BURNING) {
       CPlayerEntity::ReceiveDamage( penInflictor, dmtType, fSubHealth, vHitPoint, vDirection); // receive damage
     }
 
@@ -7320,7 +7330,7 @@ procedures:
       CPlayer *pplKillerPlayer = NULL;
 
       // if killed by some entity
-      if (penKiller!=NULL) {
+      if (penKiller != NULL) {
         // if killed by player
         if (IsOfClass(penKiller, "Player")) {
           pplKillerPlayer = static_cast<CPlayer*>(penKiller);
@@ -7331,28 +7341,25 @@ procedures:
             eScore.iPoints = m_iMana;
             
             // [SSE] Team DeathMatch
+            // If teamplay and players are from same team.
             if (GetSP()->sp_bTeamPlay && pplKillerPlayer->m_iTeamID == m_iTeamID) {
-              eDeath.eLastDamage.penInflictor->SendEvent(EKilledAlly());
+              EKilledAlly eKilledAlly;
+              eKilledAlly.iValue = GetSP()->sp_iTeamKillPenalty; // [SSE] Gameplay - TeamKill Penalty
+              
+              eDeath.eLastDamage.penInflictor->SendEvent(eKilledAlly);
               
               // Only actual player can work with CSessionProperties!
               if (!IsPredictor()) {
-                if (pplKillerPlayer->m_iTeamID == 1) {
-                  ((CSessionProperties*)GetSP())->sp_iTeamScore1 -= 1;
-                } else {
-                  ((CSessionProperties*)GetSP())->sp_iTeamScore2 -= 1;
-                }
+                DecreaseTeamScore(GetSP()->sp_iTeamKillPenalty); // [SSE] Gameplay - TeamKill Penalty
               }
+
             } else {
               eDeath.eLastDamage.penInflictor->SendEvent(eScore);
               eDeath.eLastDamage.penInflictor->SendEvent(EKilledEnemy());
               
               // Only actual player can work with CSessionProperties!
               if (!IsPredictor()) {
-                if (pplKillerPlayer->m_iTeamID == 1) {
-                  ((CSessionProperties*)GetSP())->sp_iTeamScore1 += 1;
-                } else {
-                  ((CSessionProperties*)GetSP())->sp_iTeamScore2 += 1;
-                }
+                IncreaseTeamScore(1);
               }
             }
             
@@ -7365,7 +7372,7 @@ procedures:
 
             // Only actual player can work with CSessionProperties!
             if (!IsPredictor()) {
-              DecreaseTeamScore();
+              DecreaseTeamScore(1);
             }
           }
 
@@ -7378,9 +7385,10 @@ procedures:
           
           // Only actual player can work with CSessionProperties!
           if (!IsPredictor()) {
-            DecreaseTeamScore();
+            DecreaseTeamScore(1);
           }
         }
+
       // if killed by NULL (shouldn't happen, but anyway)
       } else {
         m_psLevelStats.ps_iScore -= m_iMana;
@@ -7390,7 +7398,7 @@ procedures:
         
         // Only actual player can work with CSessionProperties!
         if (!IsPredictor()) {
-          DecreaseTeamScore();
+          DecreaseTeamScore(1);
         }
       }
 
@@ -8663,9 +8671,11 @@ procedures:
         resume;
       }
       
-      on (EKilledAlly) : {
-        m_psLevelStats.ps_iKills -= 1;
-        m_psGameStats.ps_iKills -= 1;
+      on (EKilledAlly eKilledAlly) : {
+        INDEX iNormValue = ClampDn(eKilledAlly.iValue, INDEX(0));
+        
+        m_psLevelStats.ps_iKills -= iNormValue;
+        m_psGameStats.ps_iKills -= iNormValue;
         resume;
       }
 

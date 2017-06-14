@@ -53,6 +53,8 @@ extern INDEX gam_bGibs;
 extern INDEX gam_bUseExtraEnemies;
 extern CTString gam_strGameAgentExtras;
 
+extern INDEX gam_iTeamKillPenalty; // [SSE] Gameplay - TeamKill Penalty
+
 extern INDEX gam_bPickUpWeaponsOnce; // [SSE] Pick up weapons once.
 extern INDEX gam_bDropPowerUps; // [SSE] PowerUps Drop
 extern INDEX gam_bDropWeapons; // [SSE] Weapons Drop
@@ -213,6 +215,8 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   sp.sp_fLiveCostMultiplier = 1.0F;
   //
   
+  sp.sp_iTeamKillPenalty = 0; // [SSE] Gameplay - TeamKill Penalty
+  
   sp.sp_bPickUpWeaponsOnce = FALSE; // [SSE] Pick up weapons once.
   sp.sp_bDropPowerUps = FALSE; // [SSE] PowerUps Drop
   sp.sp_bDropWeapons = FALSE; // [SSE] Weapons Drop
@@ -332,7 +336,9 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_iTimeLimit  = 0;
     sp.sp_bAllowHealth = TRUE;
     sp.sp_bAllowArmor  = TRUE;
-    
+
+    sp.sp_iTeamKillPenalty = 0; // [SSE] Gameplay - TeamKill Penalty
+
     sp.sp_bPickUpWeaponsOnce = FALSE; // [SSE] Pick up weapons once.
     sp.sp_bDropPowerUps = FALSE; // [SSE] PowerUps Drop
     sp.sp_bDropWeapons = FALSE; // [SSE] Weapons Drop
@@ -365,6 +371,8 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_bWeaponsStay = FALSE;
     sp.sp_bAmmoStays = FALSE;
     sp.sp_bHealthArmorStays = FALSE;
+    
+    sp.sp_iTeamKillPenalty = Clamp(gam_iTeamKillPenalty, 0L, 100L); // [SSE] Gameplay - TeamKill Penalty
     
     sp.sp_bPickUpWeaponsOnce = gam_bPickUpWeaponsOnce; // [SSE] Pick up weapons once.
     sp.sp_bDropPowerUps = gam_bDropPowerUps; // [SSE] PowerUps Drop
