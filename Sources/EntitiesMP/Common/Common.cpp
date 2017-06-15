@@ -936,6 +936,8 @@ BOOL SetPlayerAppearanceEx(CEntity *pen, CModelObject *pmo, CPlayerCharacter *pp
   DECLARE_CTFILENAME(fnmDefault, "ModelsMP\\Player\\SeriousSam.amc");
   DECLARE_CTFILENAME(fnmTeam1, "Models\\Player\\SeriousSamBlue.amc");
   DECLARE_CTFILENAME(fnmTeam2, "Models\\Player\\SeriousSamRed.amc");
+  DECLARE_CTFILENAME(fnmTeam3, "Models\\Player\\SeriousSamGreen.amc");
+  DECLARE_CTFILENAME(fnmTeam4, "Models\\Player\\SeriousSamYellow.amc");
 
   // if no character, or player models are disabled then set default appearance
   if (ppc == NULL)
@@ -952,21 +954,43 @@ BOOL SetPlayerAppearanceEx(CEntity *pen, CModelObject *pmo, CPlayerCharacter *pp
   if (pen && !bPreview && GetSP()->sp_bTeamPlay)
   {
     CPlayer *penPlayer = static_cast<CPlayer*>(pen);
+    
+    BOOL bSuccessfullySet = FALSE;
+    
+    switch (penPlayer->m_iTeamID)
+    {
+      case 1: {
+        if (SetPlayerAppearance_internal(pmo, fnmTeam1, strName, bPreview)) {
+          bSuccessfullySet = TRUE;
+        }
+      } break;
 
-    if (penPlayer->m_iTeamID == 0) {
-    } else if (penPlayer->m_iTeamID == 1) {
-      if (!SetPlayerAppearance_internal(pmo, fnmTeam1, strName, bPreview)) {
-        SetPlayerAppearance_internal(pmo, fnmDefault, strName, bPreview);
-      }
+      case 2: {
+        if (SetPlayerAppearance_internal(pmo, fnmTeam2, strName, bPreview)) {
+          bSuccessfullySet = TRUE;
+        }
+      } break;
 
-      return TRUE;
-    } else {
-      if (!SetPlayerAppearance_internal(pmo, fnmTeam2, strName, bPreview)) {
-        SetPlayerAppearance_internal(pmo, fnmDefault, strName, bPreview);
-      }
+      case 3: {
+        if (SetPlayerAppearance_internal(pmo, fnmTeam3, strName, bPreview)) {
+          bSuccessfullySet = TRUE;
+        }
+      } break;
+
+      case 4: {
+        if (SetPlayerAppearance_internal(pmo, fnmTeam4, strName, bPreview)) {
+          bSuccessfullySet = TRUE;
+        }
+      } break;
       
-      return TRUE;
+      default: break;
     }
+
+    if (!bSuccessfullySet) {
+      SetPlayerAppearance_internal(pmo, fnmDefault, strName, bPreview);
+    }
+    
+    return TRUE;
   }
 
   // get filename from the settings
