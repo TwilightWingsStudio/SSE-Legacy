@@ -990,6 +990,8 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   const BOOL bSharedLives = GetSP()->sp_bSharedLives;
   const BOOL bSharedKeys = GetSP()->sp_bSharedKeys;
 
+  const INDEX ctTeams = GetSP()->sp_ctTeams;
+
   _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
 
   // draw sniper mask (original mask even if snooping)
@@ -1324,44 +1326,89 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   }
 
   // TeamPlay Frags
-  if (bTeamDeathMatch) {
-    CTString strTeam1, strTeam2;
+  if (bTeamDeathMatch)
+  {
+    CTString astrTeamScore[4];
+    const COLOR aColTeams[] = { C_lBLUE, C_lRED, C_lGREEN, C_lYELLOW };
+    INDEX aiTeamOrder[] = { 1, 2, 3, 4 };
 
     COLOR col = _colHUD;
     COLOR colIcon = C_WHITE;
     
-    COLOR colLeft = C_lGRAY;
-    COLOR colRight = C_lGRAY;
+    const INDEX iTeamID = _penPlayer->m_iTeamID;
     
-    if (_penPlayer->m_iTeamID == 1) {
-      colIcon = C_lBLUE;
-      colLeft = C_lBLUE;
-      colRight = C_lRED;
-      
-      strTeam1.PrintF( "%d", GetSP()->sp_iTeamScore1);
-      strTeam2.PrintF( "%d", GetSP()->sp_iTeamScore2);
-    } else {
-      colIcon = C_lRED;
-      colLeft = C_lRED;
-      colRight = C_lBLUE;
-      
-      strTeam1.PrintF( "%d", GetSP()->sp_iTeamScore2);
-      strTeam2.PrintF( "%d", GetSP()->sp_iTeamScore1);
+    // If team id is in range 1-4 then we can set the color.
+    if (iTeamID > 0 && iTeamID < 5) {
+      colIcon = aColTeams[iTeamID - 1];
     }
     
+    astrTeamScore[0].PrintF("%d", GetSP()->sp_iTeamScore1);
+    astrTeamScore[1].PrintF("%d", GetSP()->sp_iTeamScore2);
+    astrTeamScore[2].PrintF("%d", GetSP()->sp_iTeamScore3);
+    astrTeamScore[3].PrintF("%d", GetSP()->sp_iTeamScore4);
+    
+    switch (iTeamID)
+    {
+      case 2: {
+        aiTeamOrder[0] = 2;
+        aiTeamOrder[1] = 1;
+      } break;
+
+      case 3: {
+        aiTeamOrder[0] = 3;
+        aiTeamOrder[1] = 1;
+        aiTeamOrder[2] = 2;
+        aiTeamOrder[3] = 4;
+      } break;
+
+      case 4: {
+        aiTeamOrder[0] = 4;
+        aiTeamOrder[1] = 1;
+        aiTeamOrder[2] = 2;
+        aiTeamOrder[3] = 3;
+      } break;
+    }
+
+    PIX pixIconBoxShift = 0;
+    PIX pixThirdTeamPosX = -38;
+    
+    // If 3 teams then put box into the center.
+    if (ctTeams == 3) {
+      pixThirdTeamPosX = 0;
+    }
+    
+    // First Team
     HUD_DrawAnchoredRect (-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRectOutline(-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (FLOAT2D(-38, 8), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, strTeam1, colLeft|_ulAlphaHUD, 1.0F);
-      
-    HUD_DrawAnchoredRect ( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toSwords, colIcon|CT_OPAQUE, 0.0F, FALSE); // Icon
-    HUD_DrawAnchoredRectOutline(0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
-    
+    HUD_DrawAnchoredTextInRect (FLOAT2D(-38, 8), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, astrTeamScore[aiTeamOrder[0] - 1], aColTeams[aiTeamOrder[0] - 1]|_ulAlphaHUD, 1.0F);
+
+    // Second Team
     HUD_DrawAnchoredRect (38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRectOutline(38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (FLOAT2D(38, 8), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, strTeam2, colRight|_ulAlphaHUD, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(38, 8), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, astrTeamScore[aiTeamOrder[1] - 1], aColTeams[aiTeamOrder[1] - 1]|_ulAlphaHUD, 1.0F);
+    
+    // Third Team
+    if (ctTeams >= 3) {
+      HUD_DrawAnchoredRect (pixThirdTeamPosX, 28, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchoredRectOutline(pixThirdTeamPosX, 28, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
+      HUD_DrawAnchoredTextInRect (FLOAT2D(pixThirdTeamPosX, 28), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, astrTeamScore[aiTeamOrder[2] - 1], aColTeams[aiTeamOrder[2] - 1]|_ulAlphaHUD, 1.0F);
+    }
+
+    // Fourth Team
+    if (ctTeams >= 4) {
+      HUD_DrawAnchoredRect (38, 28, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchoredRectOutline(38, 28, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
+      HUD_DrawAnchoredTextInRect (FLOAT2D(38, 28), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, astrTeamScore[aiTeamOrder[3] - 1], aColTeams[aiTeamOrder[3] - 1]|_ulAlphaHUD, 1.0F);
+      
+      pixIconBoxShift += 10;
+    }
+
+    // Swords Icon Box
+    HUD_DrawAnchoredRect ( 0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchroredIcon( 0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toSwords, colIcon|CT_OPAQUE, 0.0F, FALSE); // Icon
+    HUD_DrawAnchoredRectOutline(0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
   }
-  
+
   // CSC Down
   //HUD_DrawAnchoredRect(-53, 28, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
   //HUD_DrawAnchoredRect(  9, 28, 104, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
@@ -1657,6 +1704,8 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
   const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
   const BOOL bSharedLives = GetSP()->sp_bSharedLives;
   const BOOL bSharedKeys = GetSP()->sp_bSharedKeys;
+  
+  const INDEX ctTeams = GetSP()->sp_ctTeams;
 
   // determine hud colorization;
   COLOR colMax = SE_COL_BLUEGREEN_LT;
@@ -1964,42 +2013,87 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
   }
   
   // TeamPlay Frags
-  if (bTeamDeathMatch) {
-    CTString strTeam1, strTeam2;
+  if (bTeamDeathMatch)
+  {
+    CTString astrTeamScore[4];
+    const COLOR aColTeams[] = { C_lBLUE, C_lRED, C_lGREEN, C_lYELLOW };
+    INDEX aiTeamOrder[] = { 1, 2, 3, 4 };
 
     COLOR col = _colHUD;
     COLOR colIcon = C_WHITE;
     
-    COLOR colLeft = C_lGRAY;
-    COLOR colRight = C_lGRAY;
+    const INDEX iTeamID = _penPlayer->m_iTeamID;
     
-    if (_penPlayer->m_iTeamID == 1) {
-      colIcon = C_lBLUE;
-      colLeft = C_lBLUE;
-      colRight = C_lRED;
-      
-      strTeam1.PrintF( "%d", GetSP()->sp_iTeamScore1);
-      strTeam2.PrintF( "%d", GetSP()->sp_iTeamScore2);
-    } else {
-      colIcon = C_lRED;
-      colLeft = C_lRED;
-      colRight = C_lBLUE;
-      
-      strTeam1.PrintF( "%d", GetSP()->sp_iTeamScore2);
-      strTeam2.PrintF( "%d", GetSP()->sp_iTeamScore1);
+    // If team id is in range 1-4 then we can set the color.
+    if (iTeamID > 0 && iTeamID < 5) {
+      colIcon = aColTeams[iTeamID - 1];
     }
     
+    astrTeamScore[0].PrintF("%d", GetSP()->sp_iTeamScore1);
+    astrTeamScore[1].PrintF("%d", GetSP()->sp_iTeamScore2);
+    astrTeamScore[2].PrintF("%d", GetSP()->sp_iTeamScore3);
+    astrTeamScore[3].PrintF("%d", GetSP()->sp_iTeamScore4);
+    
+    switch (iTeamID)
+    {
+      case 2: {
+        aiTeamOrder[0] = 2;
+        aiTeamOrder[1] = 1;
+      } break;
+
+      case 3: {
+        aiTeamOrder[0] = 3;
+        aiTeamOrder[1] = 1;
+        aiTeamOrder[2] = 2;
+        aiTeamOrder[3] = 4;
+      } break;
+
+      case 4: {
+        aiTeamOrder[0] = 4;
+        aiTeamOrder[1] = 1;
+        aiTeamOrder[2] = 2;
+        aiTeamOrder[3] = 3;
+      } break;
+    }
+
+    PIX pixIconBoxShift = 0;
+    PIX pixThirdTeamPosX = -38;
+    
+    // If 3 teams then put box into the center.
+    if (ctTeams == 3) {
+      pixThirdTeamPosX = 0;
+    }
+    
+    // First Team
     HUD_DrawAnchoredRect (-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRectOutline(-38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (FLOAT2D(-38, 8), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, strTeam1, colLeft|_ulAlphaHUD, 1.0F);
-      
-    HUD_DrawAnchoredRect ( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toSwords, colIcon|CT_OPAQUE, 0.0F, FALSE); // Icon
-    HUD_DrawAnchoredRectOutline(0, 8, 16, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
-    
+    HUD_DrawAnchoredTextInRect (FLOAT2D(-38, 8), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, astrTeamScore[aiTeamOrder[0] - 1], aColTeams[aiTeamOrder[0] - 1]|_ulAlphaHUD, 1.0F);
+
+    // Second Team
     HUD_DrawAnchoredRect (38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRectOutline(38, 8, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (FLOAT2D(38, 8), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, strTeam2, colRight|_ulAlphaHUD, 1.0F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(38, 8), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, astrTeamScore[aiTeamOrder[1] - 1], aColTeams[aiTeamOrder[1] - 1]|_ulAlphaHUD, 1.0F);
+    
+    // Third Team
+    if (ctTeams >= 3) {
+      HUD_DrawAnchoredRect (pixThirdTeamPosX, 28, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchoredRectOutline(pixThirdTeamPosX, 28, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
+      HUD_DrawAnchoredTextInRect (FLOAT2D(pixThirdTeamPosX, 28), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, astrTeamScore[aiTeamOrder[2] - 1], aColTeams[aiTeamOrder[2] - 1]|_ulAlphaHUD, 1.0F);
+    }
+
+    // Fourth Team
+    if (ctTeams >= 4) {
+      HUD_DrawAnchoredRect (38, 28, 52, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchoredRectOutline(38, 28, 52, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
+      HUD_DrawAnchoredTextInRect (FLOAT2D(38, 28), FLOAT2D(52, 16), EHHAT_CENTER, EHVAT_TOP, astrTeamScore[aiTeamOrder[3] - 1], aColTeams[aiTeamOrder[3] - 1]|_ulAlphaHUD, 1.0F);
+      
+      pixIconBoxShift += 10;
+    }
+
+    // Swords Icon Box
+    HUD_DrawAnchoredRect ( 0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchroredIcon( 0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toSwords, colIcon|CT_OPAQUE, 0.0F, FALSE); // Icon
+    HUD_DrawAnchoredRectOutline(0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
   }
   
   // BossBar
@@ -2199,13 +2293,16 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
           if (bTeamDeathMatch) {
             INDEX iTeamID = penPlayer->m_iTeamID;
             
-            if (iTeamID == 0) {
-              strNameString.PrintF("^cAAAAAA> ^r%s", strName);
-            } else if (iTeamID == 1) {
-              strNameString.PrintF("^c7F7FFF> ^r%s", strName);
-            } else {
-              strNameString.PrintF("^cFF7F7F> ^r%s", strName);
+            switch (iTeamID)
+            {
+              case 1: strNameString.PrintF("^c7F7FFF> ^r%s", strName); break; // Blue
+              case 2: strNameString.PrintF("^cFF7F7F> ^r%s", strName); break; // Red
+              case 3: strNameString.PrintF("^c7FFF7F> ^r%s", strName); break; // Green
+              case 4: strNameString.PrintF("^cFFFF7F> ^r%s", strName); break; // Blue
+              
+              default: strNameString.PrintF("^cAAAAAA> ^r%s", strName); break; // Unassigned - Gray
             }
+
           } else {
             strNameString = strName;
           }
@@ -2241,12 +2338,12 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       }}
 
       // [SSE] TeamDeathmatch
-      if (bTeamDeathMatch) {
-        if (GetSP()->sp_iTeamScore1 > GetSP()->sp_iTeamScore2) {
-          iMaxFrags = GetSP()->sp_iTeamScore1;
-        } else {
-          iMaxFrags = GetSP()->sp_iTeamScore2;
-        }
+      if (bTeamDeathMatch)
+      {
+        iMaxFrags = Max(GetSP()->sp_iTeamScore1, GetSP()->sp_iTeamScore2);
+        
+        if (ctTeams >= 3) iMaxFrags = Max(iMaxFrags, GetSP()->sp_iTeamScore3);
+        if (ctTeams >= 4) iMaxFrags = Max(iMaxFrags, GetSP()->sp_iTeamScore4);
       }
 
       if (GetSP()->sp_iFragLimit>0) {
@@ -2918,6 +3015,9 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   const BOOL bScoreMatch  = !GetSP()->sp_bCooperative && !GetSP()->sp_bUseFrags;
   const BOOL bFragMatch   = !GetSP()->sp_bCooperative &&  GetSP()->sp_bUseFrags;
   const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
+  
+  const INDEX ctTeams = GetSP()->sp_ctTeams;
+  
   COLOR colMana, colFrags, colDeaths, colHealth, colArmor, colPing;
   COLOR colScore  = _colHUD;
   INDEX iScoreSum = 0;
@@ -3047,12 +3147,14 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
           if (bTeamDeathMatch) {
             INDEX iTeamID = penPlayer->m_iTeamID;
             
-            if (iTeamID == 0) {
-              strNameString.PrintF("^cAAAAAA> ^r%s", strName);
-            } else if (iTeamID == 1) {
-              strNameString.PrintF("^c7F7FFF> ^r%s", strName);
-            } else {
-              strNameString.PrintF("^cFF7F7F> ^r%s", strName);
+            switch (iTeamID)
+            {
+              case 1: strNameString.PrintF("^c7F7FFF> ^r%s", strName); break; // Blue
+              case 2: strNameString.PrintF("^cFF7F7F> ^r%s", strName); break; // Red
+              case 3: strNameString.PrintF("^c7FFF7F> ^r%s", strName); break; // Green
+              case 4: strNameString.PrintF("^cFFFF7F> ^r%s", strName); break; // Blue
+              
+              default: strNameString.PrintF("^cAAAAAA> ^r%s", strName); break; // Unassigned - Gray
             }
           } else {
             strNameString = strName;
@@ -3094,12 +3196,12 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
       }}
 
       // [SSE] TeamDeathmatch
-      if (bTeamDeathMatch) {
-        if (GetSP()->sp_iTeamScore1 > GetSP()->sp_iTeamScore2) {
-          iMaxFrags = GetSP()->sp_iTeamScore1;
-        } else {
-          iMaxFrags = GetSP()->sp_iTeamScore2;
-        }
+      if (bTeamDeathMatch)
+      {        
+        iMaxFrags = Max(GetSP()->sp_iTeamScore1, GetSP()->sp_iTeamScore2);
+        
+        if (ctTeams >= 3) iMaxFrags = Max(iMaxFrags, GetSP()->sp_iTeamScore3);
+        if (ctTeams >= 4) iMaxFrags = Max(iMaxFrags, GetSP()->sp_iTeamScore4);
       }
 
       if (GetSP()->sp_iFragLimit>0) {
