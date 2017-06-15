@@ -1324,7 +1324,7 @@ properties:
  // [SSE] Respawn Delay
  220 FLOAT m_tmKilled = -1.0f,
  
- // [SSE] Team DeathMatch
+ // [SSE] GameModes - Team DeathMatch
  250 INDEX m_iTeamID = 0,
  251 INDEX m_iTeamSelection = 0,
  
@@ -1669,11 +1669,15 @@ functions:
         pen->StopCamera();
       }
     } else {
+      
+      // If selection menu not hiden.
       if (m_iTeamSelection != -1)
       {
+        INDEX ctTeams = GetSP()->sp_ctTeams;
+        
         if (ulNewButtons & PLACT_WEAPON_NEXT) {
           m_iTeamSelection += 1;
-          if (m_iTeamSelection > 2) {
+          if (m_iTeamSelection > ctTeams) {
             m_iTeamSelection = 0;
           }
         }
@@ -1681,7 +1685,7 @@ functions:
         if (ulNewButtons & PLACT_WEAPON_PREV) {
           m_iTeamSelection -= 1;
           if (m_iTeamSelection < 0) {
-            m_iTeamSelection = 2;
+            m_iTeamSelection = ctTeams;
           }
         }
         
@@ -1842,23 +1846,31 @@ functions:
       m_penSpectatorCamera = pen;
   }
   
-  // [SSE]
+  // [SSE] GameModes - Team DeathMatch
   void IncreaseTeamScore(INDEX iAmount)
   {
-    if (m_iTeamID == 1) {
-      ((CSessionProperties*)GetSP())->sp_iTeamScore1 += iAmount;
-    } else if (m_iTeamID == 2) {
-      ((CSessionProperties*)GetSP())->sp_iTeamScore2 += iAmount;
+    switch (m_iTeamID)
+    {
+      case 1: ((CSessionProperties*)GetSP())->sp_iTeamScore1 += iAmount; break;
+      case 2: ((CSessionProperties*)GetSP())->sp_iTeamScore2 += iAmount; break;
+      case 3: ((CSessionProperties*)GetSP())->sp_iTeamScore3 += iAmount; break;
+      case 4: ((CSessionProperties*)GetSP())->sp_iTeamScore4 += iAmount; break;
+      
+      default: break;
     }
   }
   
-  // [SSE]
+  // [SSE] GameModes - Team DeathMatch
   void DecreaseTeamScore(INDEX iAmount)
   {
-    if (m_iTeamID == 1) {
-      ((CSessionProperties*)GetSP())->sp_iTeamScore1 -= iAmount;
-    } else if (m_iTeamID == 2) {
-      ((CSessionProperties*)GetSP())->sp_iTeamScore2 -= iAmount;
+    switch (m_iTeamID)
+    {
+      case 1: ((CSessionProperties*)GetSP())->sp_iTeamScore1 -= iAmount; break;
+      case 2: ((CSessionProperties*)GetSP())->sp_iTeamScore2 -= iAmount; break;
+      case 3: ((CSessionProperties*)GetSP())->sp_iTeamScore3 -= iAmount; break;
+      case 4: ((CSessionProperties*)GetSP())->sp_iTeamScore4 -= iAmount; break;
+      
+      default: break;
     }
   }
 
@@ -3381,10 +3393,13 @@ functions:
       fMul = pixDPWidth / 640.0F;
     }
     
-    // [SSE] Team DeathMatch
+    // [SSE] GameModes - Team DeathMatch
     if (GetSP()->sp_bTeamPlay && m_iTeamSelection != -1) {
       INDEX ctTeam1 = 0;
       INDEX ctTeam2 = 0;
+      INDEX ctTeam3 = 0;
+      INDEX ctTeam4 = 0;
+
       INDEX ctUnassigned = 0;
       
       for (INDEX iPlayer = 0; iPlayer < CEntity::GetMaxPlayers(); iPlayer++)
@@ -3396,16 +3411,34 @@ functions:
           switch (penPlayer->m_iTeamID)
           {
             case 0: ctUnassigned++; break;
+
             case 1: ctTeam1++; break;
-            default: ctTeam2++; break;
+            case 2: ctTeam2++; break;
+            case 3: ctTeam3++; break;
+            case 4: ctTeam4++; break;
+
+            default: break;
           }
         }
       }
       
+      INDEX ctTeams = GetSP()->sp_ctTeams;
+      
       CTString strMessage;
       strMessage.PrintF("Camera Speed: %.2f\n\n", ((CSpectatorCamera*)&*m_penSpectatorCamera)->m_fSpeedMul);
       strMessage.PrintF("%s%s ^c7F7FFFBLU Team ^r(%d players)\n", strMessage, m_iTeamSelection == 1 ? "->" : "", ctTeam1);
-      strMessage.PrintF("%s%s ^cFF7F7FRED Team ^r(%d players)\n\n", strMessage, m_iTeamSelection == 2 ? "->" : "", ctTeam2);
+      strMessage.PrintF("%s%s ^cFF7F7FRED Team ^r(%d players)\n", strMessage, m_iTeamSelection == 2 ? "->" : "", ctTeam2);
+      
+      if (ctTeams >= 3) {
+        strMessage.PrintF("%s%s ^c7FFF7FGRN Team ^r(%d players)\n", strMessage, m_iTeamSelection == 3 ? "->" : "", ctTeam3);
+      }
+      
+      if (ctTeams >= 4) {
+        strMessage.PrintF("%s%s ^cFFFF7FYEL Team ^r(%d players)\n", strMessage, m_iTeamSelection == 4 ? "->" : "", ctTeam4);
+      }
+      
+      strMessage += "\n";
+      
       strMessage.PrintF("%s%s ^cBFBFBFUnassigned ^r(%d players)\n", strMessage, m_iTeamSelection == 0 ? "->" : "", ctUnassigned);
 
       pdp->SetFont( _pfdDisplayFont);
@@ -3417,7 +3450,7 @@ functions:
       
       CTString strTmp;
       strTmp.PrintF("%s", TRANS("Use NEXT / PREV WEAPON buttons to switch.\nPress USE to confirm selection!"));
-      pdp->PutText(strTmp, 16, pixDPHeight*0.2f, C_WHITE|255);
+      pdp->PutText(strTmp, 16, pixDPHeight*0.3f, C_WHITE|255);
     } else {
       CTString strMessage;
       strMessage.PrintF("Camera Speed: %.2f\n", ((CSpectatorCamera*)&*m_penSpectatorCamera)->m_fSpeedMul);
@@ -4067,7 +4100,7 @@ functions:
       return;
     }
     
-    // [SSE] Team DeathMatch
+    // [SSE] GameModes - Team DeathMatch
     // If have no team selected then nobody can harm you!
     if (GetSP()->sp_bTeamPlay && m_iTeamID == 0) {
       return;
@@ -4102,7 +4135,7 @@ functions:
           return;
         }
 
-      // [SSE] Team DeathMatch
+      // [SSE] GameModes - Team DeathMatch
       } else if (GetSP()->sp_bTeamPlay) {
         if (IsOfClass(penInflictor, "Player") && penInflictor != this) {
           
@@ -4896,30 +4929,31 @@ functions:
   {
     BOOL bFinished = FALSE;
 
+    const INDEX iTimeLimit = GetSP()->sp_iTimeLimit;
+    const INDEX iFragLimit = GetSP()->sp_iFragLimit;
+    const INDEX iScoreLimit = GetSP()->sp_iScoreLimit;
+
     // if time limit is out
-    INDEX iTimeLimit = GetSP()->sp_iTimeLimit;
     if (iTimeLimit>0 && _pTimer->CurrentTick()>=iTimeLimit*60.0f) {
       bFinished = TRUE;
     }
-
-    // if frag limit is out
-    INDEX iFragLimit = GetSP()->sp_iFragLimit;
     
-    // [SSE] Team DeathMatch
+    // [SSE] GameModes - Team DeathMatch
+    // if frag limit is out
     if (GetSP()->sp_bTeamPlay && iFragLimit > 0) {
-      if (GetSP()->sp_iTeamScore1 >= iFragLimit || GetSP()->sp_iTeamScore2 >= iFragLimit) {
+      if (GetSP()->sp_iTeamScore1 >= iFragLimit || GetSP()->sp_iTeamScore2 >= iFragLimit || GetSP()->sp_iTeamScore3 >= iFragLimit || GetSP()->sp_iTeamScore4 >= iFragLimit) {
         bFinished = TRUE;
       }
       
     } else {
-      if (iFragLimit > 0 && m_psLevelStats.ps_iKills>=iFragLimit) {
+      if (iFragLimit > 0 && m_psLevelStats.ps_iKills >= iFragLimit) {
         bFinished = TRUE;
       }
     }
 
+
     // if score limit is out
-    INDEX iScoreLimit = GetSP()->sp_iScoreLimit;
-    if (iScoreLimit>0 && m_psLevelStats.ps_iScore>=iScoreLimit) {
+    if (iScoreLimit > 0 && m_psLevelStats.ps_iScore>=iScoreLimit) {
       bFinished = TRUE;
     }
 
@@ -7012,7 +7046,7 @@ functions:
 
     en_tmLastBreathed = _pTimer->CurrentTick()+0.1f;  // do not take breath when spawned in air
    
-    // [SSE] Team DeathMatch
+    // [SSE] GameModes - Team DeathMatch
     // If not teamplay or have team selected.
     if (!GetSP()->sp_bTeamPlay || m_iTeamID != 0) {
       SpawnTeleport(); // spawn teleport effect
@@ -7340,7 +7374,7 @@ procedures:
             EReceiveScore eScore;
             eScore.iPoints = m_iMana;
             
-            // [SSE] Team DeathMatch
+            // [SSE] GameModes - Team DeathMatch
             // If teamplay and players are from same team.
             if (GetSP()->sp_bTeamPlay && pplKillerPlayer->m_iTeamID == m_iTeamID) {
               EKilledAlly eKilledAlly;

@@ -137,6 +137,8 @@ public:
   BOOL sp_bDropWeapons;  // [SSE] Weapons Drop
   
   // [SSE] GameModes - Team DeathMatch
+  INDEX sp_ctTeams;
+  
   INDEX sp_iTeamScore1;
   INDEX sp_iTeamScore2;
   INDEX sp_iTeamScore3;

@@ -53,6 +53,7 @@ extern INDEX gam_bGibs;
 extern INDEX gam_bUseExtraEnemies;
 extern CTString gam_strGameAgentExtras;
 
+extern INDEX gam_iTeamCount; // [SSE] GameModes - Team DeathMatch
 extern INDEX gam_iTeamKillPenalty; // [SSE] Gameplay - TeamKill Penalty
 
 extern INDEX gam_bPickUpWeaponsOnce; // [SSE] Pick up weapons once.
@@ -229,10 +230,13 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   sp.sp_bGibs  = gam_bGibs;
 
   // [SSE] Team DeathMatch
+  sp.sp_ctTeams = 0;
+  
   sp.sp_iTeamScore1 = 0;
   sp.sp_iTeamScore2 = 0;
   sp.sp_iTeamScore3 = 0;
   sp.sp_iTeamScore4 = 0;
+  //
 }
 
 // set properties for a quick start session
@@ -303,7 +307,9 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   
   sp.sp_bSafeFlamethrower = gam_bSafeFlamethrower; // [SSE] Gameplay - Safe Flamethrower
 
-  // [SSE] Team DeathMatch
+  // [SSE] GameModes - Team DeathMatch
+  sp.sp_ctTeams = 0;
+  
   sp.sp_iTeamScore1 = 0;
   sp.sp_iTeamScore2 = 0;
   sp.sp_iTeamScore3 = 0;
@@ -383,6 +389,11 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     } else {
       sp.sp_iFragLimit = 0;
     }
+  }
+  
+  // [SSE] GameModes - Team DeathMatch
+  if (sp.sp_bTeamPlay) {
+    sp.sp_ctTeams = Clamp(gam_iTeamCount, 2L, 4L);
   }
 }
 

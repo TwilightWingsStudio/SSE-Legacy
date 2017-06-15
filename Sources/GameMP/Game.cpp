@@ -124,6 +124,7 @@ extern INDEX gam_bGibs  = TRUE;
 
 extern INDEX gam_bUseExtraEnemies = TRUE;
 
+extern INDEX gam_iTeamCount = 2; // [SSE] GameModes - Team DeathMatch
 extern INDEX gam_iTeamKillPenalty = 1; // [SSE] Gameplay - TeamKill Penalty
 
 extern INDEX gam_bPickUpWeaponsOnce = FALSE; // [SSE] Pick up weapons once.
@@ -998,6 +999,7 @@ void CGame::InitInternal( void)
 
   _pShell->DeclareSymbol("persistent user INDEX gam_bUseExtraEnemies;",  &gam_bUseExtraEnemies);
 
+  _pShell->DeclareSymbol("persistent user INDEX gam_iTeamCount;", &gam_iTeamCount); // [SSE] GameModes - Team DeathMatch
   _pShell->DeclareSymbol("persistent user INDEX gam_iTeamKillPenalty;", &gam_iTeamKillPenalty); // [SSE] Gameplay - TeamKill Penalty
   
   _pShell->DeclareSymbol("persistent user INDEX gam_bPickUpWeaponsOnce;", &gam_bPickUpWeaponsOnce); // [SSE] Pick up weapons once.
