@@ -1699,6 +1699,8 @@ functions:
             
             SetPhysicsFlags(EPF_MODEL_WALKING|EPF_HASLUNGS);
             SetCollisionFlags(ECF_MODEL|((ECBI_PLAYER)<<ECB_IS));
+            
+            en_tmLastBreathed = _pTimer->CurrentTick() + 0.1f;
 
             CTString strDummy;
             SetPlayerAppearanceEx(this, &m_moRender, &en_pcCharacter, strDummy, /*bPreview=*/FALSE);
@@ -1846,7 +1848,10 @@ functions:
       m_penSpectatorCamera = pen;
   }
   
+  // --------------------------------------------------------------------------------------
   // [SSE] GameModes - Team DeathMatch
+  // Increases current team score.
+  // --------------------------------------------------------------------------------------
   void IncreaseTeamScore(INDEX iAmount)
   {
     switch (m_iTeamID)
@@ -1860,7 +1865,10 @@ functions:
     }
   }
   
+  // --------------------------------------------------------------------------------------
   // [SSE] GameModes - Team DeathMatch
+  // Decreases current team score.
+  // --------------------------------------------------------------------------------------
   void DecreaseTeamScore(INDEX iAmount)
   {
     switch (m_iTeamID)
@@ -1875,12 +1883,16 @@ functions:
   }
 
   // --------------------------------------------------------------------------------------
+  // Returns pointer to linked CPlayerWeapons entity.
+  // --------------------------------------------------------------------------------------
   class CPlayerWeapons *GetPlayerWeapons(void)
   {
     ASSERT(m_penWeapons!=NULL);
     return (CPlayerWeapons *)&*m_penWeapons;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Returns pointer to linked CPlayerAnimator entity.
   // --------------------------------------------------------------------------------------
   class CPlayerAnimator *GetPlayerAnimator(void)
   {
@@ -3815,6 +3827,11 @@ functions:
       // means we are not connected
       SetUnconnected();
     }
+    
+    // [SSE]
+    //if (m_ulFlags&PLF_NOTCONNECTED && ((CPlayerWeapons&)*m_penWeapons).m_bFireWeapon) {
+    //  ((CPlayerWeapons&)*m_penWeapons).SendEvent(EReleaseWeapon());
+    //}
 
     // clear action indicator
     m_ulFlags&=~PLF_APPLIEDACTION;
@@ -4643,20 +4660,21 @@ functions:
         return TRUE;
       }
 
-      // if key is already in inventory
+      // If key is already in inventory then ignore it.
       if (m_ulKeys&ulKey) {
-        // ignore it
         return FALSE;
-      // if key is not in inventory
+
+      // If key is not in inventory then pick it up.
       } else {
-        // pick it up
         m_ulKeys |= ulKey;
         CTString strKey = GetKeyName(((EKey&)ee).kitType);
         ItemPicked(strKey, 0);
+
         // if in cooperative
         if (GetSP()->sp_bCooperative && !GetSP()->sp_bSinglePlayer) {
           CPrintF(TRANS("^cFFFFFF%s - %s^r\n"), GetPlayerName(), strKey);
         }
+
         return TRUE;
       }
     }
