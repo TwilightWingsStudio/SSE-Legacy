@@ -1680,6 +1680,9 @@ functions:
   // --------------------------------------------------------------------------------------
   void RenderCrosshair2( CProjection3D &prProjection, CDrawPort *pdp, CPlacement3D &plViewSource)
   {
+    // If we have fixed crosshair then hide second one!
+    if (hud_bCrosshairFixed) return;
+    
     INDEX iCrossHair = GetPlayer()->GetSettings()->ps_iCrossHairType+1;
 
     // adjust crosshair type
