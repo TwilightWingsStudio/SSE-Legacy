@@ -1694,6 +1694,15 @@ functions:
             m_iTeamSelection = -1;
           } else {
             m_iTeamID = m_iTeamSelection;
+            
+            switch (m_iTeamID)
+            {
+              case 1: CPrintF(TRANS("%s joined BLU team.\n"), GetPlayerName()); break;
+              case 2: CPrintF(TRANS("%s joined RED team.\n"), GetPlayerName()); break;
+              case 3: CPrintF(TRANS("%s joined GRN team.\n"), GetPlayerName()); break;
+              case 4: CPrintF(TRANS("%s joined YEL team.\n"), GetPlayerName()); break;
+            }
+            
             m_iTeamSelection = -1; // Reset selection.
             ToggleSpectatorCamera();
             
