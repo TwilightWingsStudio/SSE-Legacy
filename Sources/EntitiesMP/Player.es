@@ -4448,6 +4448,8 @@ functions:
       pwi->m_bDropped = TRUE;
       pwi->CEntity::Initialize();
       
+      ptmPowerups[puit] = 0.0F; // Remove powerup time from player.
+      
       const FLOATmatrix3D &m = GetRotationMatrix();
       FLOAT3D vSpeed = FLOAT3D( 5.0f, 10.0f, -7.5f);
       pwi->GiveImpulseTranslationAbsolute(vSpeed*m);
