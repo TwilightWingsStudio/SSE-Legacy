@@ -99,7 +99,7 @@ components:
 
 functions:                                        
 
-virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const EDeath &eDeath)
+  virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const EDeath &eDeath)
   {
     CTString str;
     str.PrintF(TRANS("A Cannon killed %s"), strPlayerName);
@@ -116,7 +116,8 @@ virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const E
     return fnmCannon;
   };
 
-  void Precache(void) {
+  void Precache(void)
+  {
     CEnemyBase::Precache();
     PrecacheModel(MODEL_DEBRIS_MUZZLE);
     PrecacheModel(MODEL_DEBRIS_ROTATOR);
@@ -130,18 +131,18 @@ virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const E
     PrecacheClass(CLASS_CANNONBALL);
   };
 
-
+  // --------------------------------------------------------------------------------------
+  // Receive damage.
+  // --------------------------------------------------------------------------------------
   void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
     FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection) 
   {
     // take less damage from heavy bullets (e.g. sniper)
-    if(dmtType==DMT_BULLET && fDamageAmmount>100.0f)
-    {
-      fDamageAmmount*=0.5f;
+    if (dmtType == DMT_BULLET && fDamageAmmount > 100.0f) {
+      fDamageAmmount *= 0.5f;
     }
 
-    CEnemyBase::ReceiveDamage(penInflictor, dmtType, fDamageAmmount,
-                              vHitPoint, vDirection);    
+    CEnemyBase::ReceiveDamage(penInflictor, dmtType, fDamageAmmount, vHitPoint, vDirection);    
   };
 
   // damage anim
@@ -154,7 +155,9 @@ virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const E
     return 0;
   };
 
-  // cast a ray to entity checking only for brushes
+  // --------------------------------------------------------------------------------------
+  // Cast a ray to entity checking only for brushes.
+  // --------------------------------------------------------------------------------------
   BOOL IsVisible(CEntity *penEntity) 
   {
     ASSERT(penEntity!=NULL);
@@ -193,7 +196,7 @@ virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const E
     fCosAngle = vToPlayer%vSide;
     
     // if on the firing plane
-    if (Abs(fCosAngle)<CosFast(90.0f-fAngle)) {
+    if (Abs(fCosAngle) < CosFast(90.0f-fAngle)) {
       // if in front
       if ((vToPlayer%vFront)>0.0f) {
        return TRUE;
@@ -202,14 +205,18 @@ virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const E
     return FALSE;    
   }
 
-  CPlayer *AcquireTarget() {
+  CPlayer *AcquireTarget()
+  {
     // find actual number of players
     INDEX ctMaxPlayers = GetMaxPlayers();
     CEntity *penPlayer;
 
-    for(INDEX i=0; i<ctMaxPlayers; i++) {
-      penPlayer=GetPlayerEntity(i);
-      if (penPlayer!=NULL && DistanceTo(this, penPlayer)<m_fFiringRangeFar) {
+    for (INDEX i = 0; i < ctMaxPlayers; i++)
+    {
+      penPlayer = GetPlayerEntity(i);
+
+      if (penPlayer != NULL && DistanceTo(this, penPlayer) < m_fFiringRangeFar)
+      {
         // if this player is more or less directly in front of the shooter
         if (IsInTheLineOfFire(penPlayer, m_fViewAngle)) {
           // see if something blocks the path to the player
@@ -222,7 +229,9 @@ virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const E
     return NULL;
   };
 
-  // spawn body parts
+  // --------------------------------------------------------------------------------------
+  // Spawn body parts.
+  // --------------------------------------------------------------------------------------
   void CannonBlowUp(void)
   {
     FLOAT3D vNormalizedDamage = m_vDamage-m_vDamage*(m_fBlowUpAmount/m_vDamage.Length());
@@ -286,7 +295,8 @@ virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const E
   }
 
   // rotate to between-tick position
-  BOOL AdjustShadingParameters(FLOAT3D &vLightDirection, COLOR &colLight, COLOR &colAmbient) {
+  BOOL AdjustShadingParameters(FLOAT3D &vLightDirection, COLOR &colLight, COLOR &colAmbient)
+  {
     // rotator
     CAttachmentModelObject &amo0 = *GetModelObject()->GetAttachmentModel(TURRET_ATTACHMENT_ROTATORHEADING);
     amo0.amo_plRelative.pl_OrientationAngle = Lerp(m_aBeginRotatorRotation, m_aEndRotatorRotation, _pTimer->GetLerpFactor());
@@ -308,7 +318,8 @@ virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const E
     m_aEndMuzzleRotation += m_fRotSpeedMuzzle*_pTimer->TickQuantum;
   }
 
-  void UpdateFiringPos() {
+  void UpdateFiringPos()
+  {
     FLOATmatrix3D m;
     // initial position
     m_vFiringPos = FIRING_POSITION_MUZZLE*m_fSize;
@@ -329,24 +340,30 @@ virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const E
 
 procedures:
   
-  MainLoop() {
-    wait() {
+  MainLoop()
+  {
+    wait()
+    {
       on (EBegin) : {
         call Scan();
         resume;
       }
+
       on (EDeactivate) : {
         jump Inactive();
       }
+
       on (EDeath eDeath) : {
         // die
         jump Die(eDeath);
       }
     };
+
     return;
   };
 
-  Scan() {
+  Scan()
+  {
     // this is a kind of 'sleep' mode - check to see if any player entered
     // the attack radius every once in a while, and change rotation when needed
     while(TRUE) {
@@ -393,40 +410,70 @@ procedures:
     }
   }
   
-  Die(EDeath eDeath) {
+  Die(EDeath eDeath)
+  {
     // not alive anymore
     SetFlags(GetFlags()&~ENF_ALIVE);
 
     // find the one who killed, or other best suitable player
     CEntityPointer penKiller = eDeath.eLastDamage.penInflictor;
-    if (penKiller==NULL || !IsOfClass(penKiller, "Player")) {
+
+    if (penKiller == NULL || !IsOfClass(penKiller, "Player")) {
       penKiller = m_penEnemy;
     }
 
-    if (penKiller==NULL || !IsOfClass(penKiller, "Player")) {
+    if (penKiller == NULL || !IsOfClass(penKiller, "Player")) {
       penKiller = FixupCausedToPlayer(this, penKiller, /*bWarning=*/FALSE);
     }
 
-    // if killed by someone
-    if (penKiller!=NULL) {
-      // give him score
-      EReceiveScore eScore;
-      eScore.iPoints = m_iScore;
-      penKiller->SendEvent(eScore);
-      if( CountAsKill())
+    // If killed by someone...
+    if (penKiller != NULL)
+    {
+      INDEX iScore = -1;
+      BOOL bReceiveMessage = TRUE;
+      BOOL bCountAsKill = CountAsKill();
+      
+      // [SSE] Enemy Settings Entity
+      if (m_penSettings && m_penSettings->IsActive())
       {
+        CEnemySettingsEntity *penSettings = static_cast<CEnemySettingsEntity*>(&*m_penSettings);
+
+        iScore = penSettings->m_iScore;
+        bReceiveMessage = penSettings->m_bReceiveMessage;
+        bCountAsKill = penSettings->m_bCountAsKill;
+      }
+      //
+
+      if (iScore < 0) {
+        iScore = m_iScore;
+      }
+      
+      // If we have any score which we should give then do it!
+      if (iScore > 0) {
+        EReceiveScore eScore;
+        eScore.iPoints = iScore;
+        penKiller->SendEvent(eScore);
+      }
+
+      if (bCountAsKill) {
         penKiller->SendEvent(EKilledEnemy());
       }
-      // send computer message
-      EComputerMessage eMsg;
-      eMsg.fnmMessage = GetComputerMessageName();
-      if (eMsg.fnmMessage!="") {
-        penKiller->SendEvent(eMsg);
+
+      // Send computer message if in coop.
+      if (GetSP()->sp_bCooperative && bReceiveMessage)
+      {
+        EComputerMessage eMsg;
+        eMsg.fnmMessage = GetComputerMessageName();
+
+        if (eMsg.fnmMessage != "") {
+          penKiller->SendEvent(eMsg);
+        }
       }
     }
 
     // send event to death target
     SendToTarget(m_penDeathTarget, m_eetDeathType, penKiller);
+
     // send event to spawner if any
     // NOTE: trigger's penCaused has been changed from penKiller to THIS;
     if (m_penSpawnerTarget) {
@@ -439,23 +486,25 @@ procedures:
     return;
   };
 
-  RotateMuzzle() {
-       
+  RotateMuzzle()
+  {
     FLOAT fDeltaP = m_fDesiredMuzzlePitch - m_aBeginMuzzleRotation(2);
 
-    // if close enough to desired rotation, don't rotate
-    if (Abs(fDeltaP)<5.0f) { return EReturn(); }
+    // If close enough to desired rotation then don't rotate.
+    if (Abs(fDeltaP) < 5.0f) {
+      return EReturn();
+    }
 
     m_fRotSpeedMuzzle = ANGLE3D(0.0f, MUZZLE_ROTATION_SPEED*Sgn(fDeltaP), 0.0f);
-//CPrintF("wait %f; beg:%f, end:%f at %f\n", Abs(fDeltaP/MUZZLE_ROTATION_SPEED), m_aBeginMuzzleRotation, m_aEndMuzzleRotation, _pTimer->CurrentTick());
+    //CPrintF("wait %f; beg:%f, end:%f at %f\n", Abs(fDeltaP/MUZZLE_ROTATION_SPEED), m_aBeginMuzzleRotation, m_aEndMuzzleRotation, _pTimer->CurrentTick());
     autowait(Abs(fDeltaP/MUZZLE_ROTATION_SPEED));
     m_fRotSpeedMuzzle = ANGLE3D(0.0f, 0.0f, 0.0f);
     
     return EReturn();
   };
 
-  FireCannon() {
-
+  FireCannon()
+  {
     UpdateFiringPos();
     FLOAT3D vToTarget = m_penEnemy->GetPlacement().pl_PositionVector -
                         GetPlacement().pl_PositionVector + m_vFiringPos;
@@ -525,19 +574,28 @@ procedures:
   {
     m_fRotSpeedMuzzle  = ANGLE3D(0.0f, 0.0f, 0.0f);
     m_fRotSpeedRotator = ANGLE3D(0.0f, 0.0f, 0.0f);
-    wait() {
+
+    wait()
+    {
       on (EBegin) : { resume; }
+
       on (EActivate) : {
         jump MainLoop();
       }
+
       on (EDeath eDeath) : {
         jump Die(eDeath);
       }
+
       otherwise (): { resume; }
     }
   }
 
-  Main(EVoid) {
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
+  Main(EVoid)
+  {
     // declare yourself as a model
     InitAsModel();
     SetPhysicsFlags(EPF_MODEL_WALKING|EPF_HASLUNGS);

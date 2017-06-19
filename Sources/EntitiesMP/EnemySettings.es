@@ -55,6 +55,8 @@ properties:
   
   20 BOOL m_bTouchSenseless      "Touch Senseless" = FALSE,
   
+  25 BOOL m_bReceiveMessage      "Receive Message" = TRUE,
+  
   //30 FLOAT m_fInitialHealth      "Health Initial" = -1.0F,
   //31 FLOAT m_fMaxHealth          "Health Max" = -1.0F,
   

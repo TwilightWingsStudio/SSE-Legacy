@@ -359,12 +359,6 @@ functions:
   // --------------------------------------------------------------------------------------
   virtual BOOL CountAsKill(void)
   {
-    // [SSE] Enemy Settings Entity
-    if (m_penSettings && m_penSettings->IsActive()) {
-      return static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_bCountAsKill;
-    }
-    //
-    
     return TRUE;
   }
 
@@ -3341,10 +3335,17 @@ procedures:
     if (penKiller != NULL)
     {
       INDEX iScore = -1;
+      BOOL bReceiveMessage = TRUE;
+      BOOL bCountAsKill = CountAsKill();
       
       // [SSE] Enemy Settings Entity
-      if (m_penSettings && m_penSettings->IsActive()) {
-        iScore = static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_iScore;
+      if (m_penSettings && m_penSettings->IsActive())
+      {
+        CEnemySettingsEntity *penSettings = static_cast<CEnemySettingsEntity*>(&*m_penSettings);
+
+        iScore = penSettings->m_iScore;
+        bReceiveMessage = penSettings->m_bReceiveMessage;
+        bCountAsKill = penSettings->m_bCountAsKill;
       }
       //
       
@@ -3359,21 +3360,21 @@ procedures:
         penKiller->SendEvent(eScore);
       }
 
-      if (CountAsKill())
-      {
+      if (bCountAsKill) {
         penKiller->SendEvent(EKilledEnemy());
       }
 
-      // send computer message if in coop
-      if (GetSP()->sp_bCooperative) {
+      // Send computer message if in coop.
+      if (GetSP()->sp_bCooperative && bReceiveMessage)
+      {
         EComputerMessage eMsg;
         eMsg.fnmMessage = GetComputerMessageName();
-        if (eMsg.fnmMessage!="") {
+
+        if (eMsg.fnmMessage != "") {
           penKiller->SendEvent(eMsg);
         }
       }
     }
-
 
     // destroy watcher class
     GetWatcher()->SendEvent(EStop());
@@ -3381,6 +3382,7 @@ procedures:
 
     // send event to death target
     SendToTarget(m_penDeathTarget, m_eetDeathType, penKiller);
+
     // send event to spawner if any
     // NOTE: trigger's penCaused has been changed from penKiller to THIS;
     if (m_penSpawnerTarget) {
@@ -3388,7 +3390,8 @@ procedures:
     }
 
     // wait
-    wait() {
+    wait()
+    {
       // initially
       on (EBegin) : {
         // if should already blow up
@@ -3403,21 +3406,22 @@ procedures:
           call DeathSequence();
         }
       }
+
       // if damaged
       on (EDamage) : {
         // if should already blow up
         if (ShouldBlowUp()) {
           // blow up now
           BlowUpBase();
-          // stop waiting
-          stop;
+          stop; // stop waiting
         }
+
         // otherwise, ignore the damage
         resume;
       }
-      // if death sequence is over
+
+      // If death sequence is over then stop waiting.
       on (EEnd) : { 
-        // stop waiting
         stop; 
       }
     }
