@@ -881,9 +881,19 @@ void CGame::GameHandleTimer(void)
   }
 }
 
-/*
- * Global game object (in our case Flesh) initialization function
- */
+// --------------------------------------------------------------------------------------
+// [SSE] TSEXAR
+// --------------------------------------------------------------------------------------
+static void JoinGameSS(void *pArgs)
+{
+  CTString strJoinAddress = *NEXTARGUMENT(CTString*);
+  
+  _pGame->JoinGame(CNetworkSession(strJoinAddress));
+}
+
+// --------------------------------------------------------------------------------------
+// Global game object (in our case Flesh) initialization function
+// --------------------------------------------------------------------------------------
 void CGame::InitInternal( void)
 {
   gam_strCustomLevel = ""; // filename of custom level chosen
@@ -1016,6 +1026,10 @@ void CGame::InitInternal( void)
   // [SSE] Gameplay - Better Keys
   _pShell->DeclareSymbol("persistent user INDEX gam_bSharedKeys;", &gam_bSharedKeys);
   _pShell->DeclareSymbol("persistent user INDEX gam_bSaveKeysWhenServerEmpty;", &gam_bSaveKeysWhenServerEmpty);
+  //
+  
+  // [SSE] TSEXAR
+  _pShell->DeclareSymbol("user void JoinGame(CTString);", &JoinGameSS);
   //
 
   _pShell->DeclareSymbol("persistent user INDEX gam_bSniperFullDamageInNoScope;",  &gam_bSniperFullDamageInNoScope); // [SSE] Gameplay - Sniper No Scope
