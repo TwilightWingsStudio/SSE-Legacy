@@ -888,7 +888,15 @@ static void JoinGameSS(void *pArgs)
 {
   CTString strJoinAddress = *NEXTARGUMENT(CTString*);
   
-  _pGame->JoinGame(CNetworkSession(strJoinAddress));
+  int iPort;
+  char strAddress[256];
+  
+  if (strJoinAddress.ScanF("%200[^:]:%d", &strAddress, &iPort) < 2) {
+    iPort = 25600;
+  }
+
+  _pShell->SetINDEX("net_iPort", iPort);
+  _pGame->JoinGame(CNetworkSession(strAddress));
 }
 
 // --------------------------------------------------------------------------------------

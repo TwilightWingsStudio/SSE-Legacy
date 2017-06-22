@@ -18,7 +18,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 /*
  * Class responsible for describing game session
  */
-class CSessionProperties {
+class CSessionProperties
+{
 public:
   enum GameMode {
     GM_FLYOVER = -1,

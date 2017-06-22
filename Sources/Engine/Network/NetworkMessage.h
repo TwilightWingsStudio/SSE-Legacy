@@ -89,6 +89,7 @@ typedef enum NetworkMessageType {
   MSG_SEQ_ENTITYRPC,    // [SSE] Netcode Update - instruction for calling special hook in entity.
   
   MSG_S2C_ATTACHPLAYER, // [SSE] Netcode Update - instructions for certain client to take control on specified player.
+  MSG_S2C_CHANGESERVER, // [SSE] Netcode Update - instructions for certain client to change server to another.
 
   MSG_GAMESTREAMBLOCKS,         // packet with one or more game stream messages
   MSG_REQUESTGAMESTREAMRESEND,  // request for resend of a game stream message

@@ -1342,7 +1342,7 @@ void CServer::Handle(INDEX iClient, CNetworkMessage &nmMessage)
     } break;
   // if remote server asks for data
   case MSG_REQ_STATEDELTA: {
-    CPrintF(TRANS("Sending statedelta response\n"));
+    CPrintF(TRANS("Server: Sending statedelta response\n")); // [SSE] Better Log
     SendSessionStateData(iClient);
     } break;
   // if player asks for registration
@@ -1676,7 +1676,7 @@ void CServer::Handle(INDEX iClient, CNetworkMessage &nmMessage)
   } break;
   // if a crc response is received
     case MSG_REQ_CRCLIST: {
-      CPrintF(TRANS("Sending CRC response\n"));
+      CPrintF(TRANS("Server: Sending CRC response\n")); // [SSE] Better Log
     // create CRC challenge
     CTMemoryStream strmCRC;
     strmCRC<<INDEX(MSG_REQ_CRCCHECK);

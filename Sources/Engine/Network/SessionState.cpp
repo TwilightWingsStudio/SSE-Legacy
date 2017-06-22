@@ -2228,6 +2228,7 @@ void CSessionState::SessionStateLoop(void)
         CPrintF(TRANS("Disconnected: %s\n"), strReason);
         // disconnect
         _cmiComm.Client_Close();
+
       // [SSE] Netcode Update - Attaching player to client (phase 2)
       } else if (nmReliable.GetType() == MSG_S2C_ATTACHPLAYER) {
         INDEX iNewPlayer;
@@ -2258,6 +2259,13 @@ void CSessionState::SessionStateLoop(void)
           }
           ppls->pls_Active = TRUE;
         }
+        
+      // [SSE] Netcode Update - instructions for certain client to change server to another.
+      } else if (nmReliable.GetType() == MSG_S2C_CHANGESERVER) {
+        CTString strAddress;
+        nmReliable >> strAddress;
+        
+        _pShell->Execute("JoinGame(\"" + strAddress + "\");");
         
       // if this is recon response
       } else if (nmReliable.GetType() == MSG_ADMIN_RESPONSE) {

@@ -852,6 +852,28 @@ static void BroadcastS2STest(void *pArgs)
   }
 }
 
+// [SSE] Netcode Update
+static void NET_ChangeServerForClient(void* pArgs)
+{
+  INDEX iClient = NEXTARGUMENT(INDEX);
+  CTString strJoinAddress = *NEXTARGUMENT(CTString*);
+
+  CPrintF("NET_ChangeServerForClient:\n");
+  if (!_pNetwork->ga_srvServer.srv_bActive) {
+    CPrintF("  <not a server>\n");
+    return;
+  }
+  
+  if (!_pNetwork->ga_srvServer.srv_assoSessions[iClient].IsActive()) {
+    CPrintF(TRANS("  <invalid client>\n"));
+    return;
+  }
+  
+  CNetworkMessage nmChangeServer(MSG_S2C_CHANGESERVER);
+  nmChangeServer << strJoinAddress;
+  _pNetwork->SendToClientReliable(iClient, nmChangeServer);
+}
+
 static void NET_AttachPlayer(void* pArgs)
 {
   INDEX iClient = NEXTARGUMENT(INDEX);
@@ -1057,6 +1079,7 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   CMessageDispatcher::Init(strGameID);
   
   // [SSE] Netcode Update - Testing functions for player Attaching/Detaching/Swapping
+  _pShell->DeclareSymbol("user void NET_ChangeServerForClient(INDEX, CTString);", &NET_ChangeServerForClient);
   _pShell->DeclareSymbol("user void NET_AttachPlayer(INDEX, INDEX);", &NET_AttachPlayer);
   _pShell->DeclareSymbol("user void NET_DetachPlayer(INDEX);", &NET_DetachPlayer);
   _pShell->DeclareSymbol("user void NET_SwapPlayers(INDEX, INDEX);", &NET_SwapPlayers);
