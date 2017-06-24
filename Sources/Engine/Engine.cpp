@@ -46,6 +46,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <Engine/revision.h>
 
+#include <Engine/Scripts/ScriptEngine.h>
+
 // this version string can be referenced from outside the engine
 ENGINE_API CTString _strEngineBuild  = "";
 ENGINE_API ULONG _ulEngineBuildMajor = _SE_BUILD_MAJOR;
@@ -489,6 +491,11 @@ ENGINE_API void SE_InitEngine(CTString strGameID)
     }
     CPrintF("\n");
   }
+  
+  // [SSE] SCRIPT ENGINE
+  CPrintF("Initializing script engine...\n");
+  _pScriptEngine = new CScriptEngine;
+  CPrintF("  done.\n");
 }
 
 

@@ -435,6 +435,7 @@ copy Release\$(TargetName).lib $(SolutionDir)..\Bin\ &gt;nul</Command>
     </ClCompile>
     <ClCompile Include="Models\ModelData.cpp" />
     <ClCompile Include="Models\ModelDataIO.cpp" />
+    <ClCompile Include="Scripts\ScriptEngine.cpp" />
     <ClCompile Include="Ska\AnimSetIO.cpp" />
     <ClCompile Include="Ska\MeshIO.cpp" />
     <ClCompile Include="Ska\SkeletonIO.cpp" />
@@ -787,6 +788,7 @@ copy Release\$(TargetName).lib $(SolutionDir)..\Bin\ &gt;nul</Command>
     <ClInclude Include="Graphics\TextureEffects.h" />
     <ClInclude Include="Graphics\Vertex.h" />
     <ClInclude Include="Graphics\ViewPort.h" />
+    <ClInclude Include="Scripts\ScriptEngine.h" />
     <ClInclude Include="Sound\al_functions.h" />
     <ClInclude Include="Sound\DSound.h" />
     <ClInclude Include="Sound\eax.h" />

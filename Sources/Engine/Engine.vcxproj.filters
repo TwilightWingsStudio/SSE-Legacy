@@ -119,6 +119,12 @@
     <Filter Include="Header Files\GameAgent Headers">
       <UniqueIdentifier>{213d6870-6a86-43c8-b4be-01096c1ccddf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Scripts">
+      <UniqueIdentifier>{9809fd4b-4e3f-4234-bbbf-50a18cdb4e79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scripts Headers">
+      <UniqueIdentifier>{dcecef5f-db4a-4b59-a276-3f0eaccbaae2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Base\Anim.cpp">
@@ -769,6 +775,9 @@
     <ClCompile Include="Models\ModelDataIO.cpp">
       <Filter>Source Files\Models</Filter>
     </ClCompile>
+    <ClCompile Include="Scripts\ScriptEngine.cpp">
+      <Filter>Source Files\Scripts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base\Anim.h">
@@ -1385,6 +1394,9 @@
     </ClInclude>
     <ClInclude Include="Sound\ov_functions.h">
       <Filter>Header Files\Sound Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\ScriptEngine.h">
+      <Filter>Header Files\Scripts Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
