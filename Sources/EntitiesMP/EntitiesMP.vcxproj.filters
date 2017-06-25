@@ -649,6 +649,9 @@
     <ClCompile Include="EnemySettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ScriptHolder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1788,6 +1791,12 @@
     <ClInclude Include="EnemySettings_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ScriptHolder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptHolder_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2758,6 +2767,9 @@
     </CustomBuild>
     <CustomBuild Include="EnemySettings.es">
       <Filter>Class Files\Enemies</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ScriptHolder.es">
+      <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
