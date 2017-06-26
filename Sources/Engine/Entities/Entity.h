@@ -693,7 +693,13 @@ public:
     return FALSE;
   }
   
-  // [SSE] Network Update
+  // [SSE] Extended Engine API
+  virtual BOOL IsMovableEntity()
+  {
+    return FALSE;
+  }
+  
+  // [SSE] Network Update - Entity RPC
   virtual void ReceiveRPC(CNetworkMessage &nmMessage) {};
   
   // [SSE] Extended Engine API

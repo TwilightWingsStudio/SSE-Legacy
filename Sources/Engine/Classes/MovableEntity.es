@@ -328,6 +328,13 @@ components:
 
 functions:
 
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsMovableEntity()
+  {
+    return TRUE;
+  }
 
   void ResetPredictionFilter(void)
   {

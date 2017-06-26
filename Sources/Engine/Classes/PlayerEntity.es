@@ -37,17 +37,21 @@ properties:
 }
 components:
 functions:
+
   /* Get name of this player. */
   export CTString GetPlayerName(void)
   {
     return en_pcCharacter.GetNameForPrinting();
   }
+
   export const CTString &GetName(void) const
   {
     return en_pcCharacter.GetName();
   }
   
+  // --------------------------------------------------------------------------------------
   // [SSE] Extended Engine API
+  // --------------------------------------------------------------------------------------
   virtual BOOL IsPlayerEntity()
   {
     return TRUE;
