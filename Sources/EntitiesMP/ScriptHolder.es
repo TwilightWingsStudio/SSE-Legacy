@@ -28,9 +28,11 @@ properties:
    1 CTString m_strName "Name" 'N'      = "Script Holder",
    3 CTString m_strDescription = "",
    
-   4 BOOL m_bActive           "Active" 'A' = TRUE,
-   5 BOOL m_bDebugMessage     "Debug Messages" = FALSE,
+   4 BOOL m_bActive           "Active" 'A'         = TRUE,
+   5 BOOL m_bDebugMessage     "Debug Messages"     = FALSE,
    6 CTFileName m_fnScript    "Script File"    'S' = CTFILENAME(""),
+   
+  10 CEntityPointer m_penTarget "Target" 'T',
 
 components:
   1 model   MODEL_SCRIPTHOLDER   "Models\\Editor\\ScriptHolder.mdl",
@@ -54,6 +56,8 @@ functions:
     if (m_fnScript != "" && FileExists(m_fnScript)) {
       _pScriptEngine->ExecEntityScript(this, m_fnScript, eTrigger.penCaused, aiPins);
     }
+    
+    SendToTarget(m_penTarget, EET_TRIGGER, eTrigger.penCaused);
   }
 
 procedures:
