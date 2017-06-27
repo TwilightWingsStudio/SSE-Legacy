@@ -19,46 +19,20 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Base/FileName.h>
 #include <Engine/Base/Stream.h>
 
-#include <Engine/Scripts/ScriptEngine.h>
+#include <Engine/Network/Network.h>
 
 #include <Engine/Entities/Entity.h>
-
-CScriptEngine *_pScriptEngine = NULL;
 
 #include <luajit/src/lua.hpp>
 #include <luajit/src/lualib.h>
 #include <luajit/src/lauxlib.h>
 
+#include <Engine/Scripts/ScriptEngine.h>
+#include <Engine/Scripts/ScriptEngine_internal.h>
+
 #pragma comment(lib, "lua51.lib")
 
-static int l_my_print(lua_State* L)
-{
-  int ctArgs = lua_gettop(L);
-  
-  CTString strResult;
-
-  for (int i = 1; i <= ctArgs; i++) {
-    strResult.PrintF("%s%s", strResult, lua_tostring(L, i));
-  }
-  
-  //CPrintF("print() redefinition!\n");
-  CPrintF("[LUA] %s\n", strResult);
-
-  return 0;
-}
-
-static const struct luaL_Reg printlib [] = {
-  {"print", l_my_print},
-  {NULL, NULL} /* end of array */
-};
-
-
-static void luaopen_luamylib(lua_State *L)
-{
-  lua_getglobal(L, "_G");
-  luaL_register(L, NULL, printlib);
-  lua_pop(L, 1);
-}
+CScriptEngine *_pScriptEngine = NULL;
 
 static lua_State *CreateSafeState()
 {
@@ -71,10 +45,13 @@ static lua_State *CreateSafeState()
       lua_pushcfunction(L, luaopen_base);
       lua_pushstring(L, "");
       lua_call(L, 1, 0);
+
       lua_pushcfunction(L, luaopen_package);
       lua_pushstring(L, LUA_LOADLIBNAME);
       lua_call(L, 1, 0);
-      luaopen_luamylib(L);
+
+      luaopen_luasebaselib(L);
+      luaopen_luaentitieslib(L);
   }
 
   return L;
@@ -85,17 +62,17 @@ extern void LUAJitTest(void *pArgs)
   lua_State *state = CreateSafeState();
 
   if (!state) {
-    CPrintF("[LUA] Error! Failed to initialize Lua VM!\n");
+    CPrintF("[LUA][ERR] Failed to initialize Lua VM!\n");
     return;
   }
 
   int result;
   
-  CPrintF("[LUA] Running script sukablyad.lua...\n");
+  CPrintF("[LUA][INF] Running script sukablyad.lua...\n");
   result = luaL_loadfile(state, "sukablyad.lua");
   if (result != 0)
   {
-    CPrintF("[LUA] Error: %s\n", lua_tostring(state, -1));
+    CPrintF("[LUA][ERR] %s\n", lua_tostring(state, -1));
     lua_pop(state, 1);
     return;
   }
@@ -104,7 +81,7 @@ extern void LUAJitTest(void *pArgs)
 
   if (result != 0)
   {
-    CPrintF("[LUA] Error: %s\n", lua_tostring(state, -1));
+    CPrintF("[LUA][ERR] %s\n", lua_tostring(state, -1));
     lua_pop(state, 1);
     return;
   }
@@ -117,7 +94,7 @@ void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScr
   lua_State *state = CreateSafeState();
 
   if (!state) {
-    CPrintF("[LUA] Error: Failed to initialize Lua VM!\n");
+    CPrintF("[LUA][ERR] Failed to initialize Lua VM!\n");
     return;
   }
 
@@ -126,32 +103,41 @@ void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScr
   CTFileName fnmFullPath;
   INDEX iFile = ExpandFilePath(EFP_READ, fnmScript, fnmFullPath);
   
-  CPrintF("[LUA] Running script '%s'...\n", fnmScript);
+  CPrintF("[LUA][INF] Running script '%s'...\n", fnmScript);
 
   if (iFile != EFP_FILE) {
-    CPrintF("[LUA] Error: Unable to run script! Path points to not a file!\n");
+    CPrintF("[LUA][ERR] Unable to run script! Path points to not a file!\n");
     return;
   }
   
   result = luaL_loadfile(state, (const char*)fnmFullPath);
+  
+  // If error occured during the script file loading then print it!
   if (result != 0)
   {
-    CPrintF("[LUA] Error: %s\n", lua_tostring(state, -1));
+    CPrintF("[LUA][ERR] %s\n", lua_tostring(state, -1));
     lua_pop(state, 1);
     return;
   }
   
-  lua_pushinteger(state, penOwner->en_ulID);
-  lua_setglobal(state, "_entityID");
+  // Prepare globals.
+  {
+    lua_pushinteger(state, penOwner->en_ulID);
+    lua_setglobal(state, SCRIPT_THIS_ENTITYID);
 
-  lua_pushinteger(state, penCaused ? penCaused->en_ulID : -1);
-  lua_setglobal(state, "_penCausedID");
+    lua_pushinteger(state, penCaused ? penCaused->en_ulID : -1);
+    lua_setglobal(state, SCRIPT_PENCAUSED_ENTITYID);
+  }
   
+  // Execute the script.
   result = lua_pcall(state, 0, 0, 0);
 
+  // If error occured during the script execution then print it!
   if (result != 0)
   {
-    CPrintF("[LUA] Error: %s\n", lua_tostring(state, -1));
+    CTString strError(lua_tostring(state, -1));
+    strError.RemovePrefix(_fnmApplicationPath);
+    CPrintF("[LUA][ERR] %s\n", strError);
     lua_pop(state, 1);
     return;
   }

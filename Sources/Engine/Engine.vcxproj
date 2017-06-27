@@ -438,6 +438,8 @@ $(SolutionDir)\prebuild_engine.bat</Command>
     <ClCompile Include="Models\ModelData.cpp" />
     <ClCompile Include="Models\ModelDataIO.cpp" />
     <ClCompile Include="Scripts\ScriptEngine.cpp" />
+    <ClCompile Include="Scripts\ScriptLib_Base.cpp" />
+    <ClCompile Include="Scripts\ScriptLib_Entities.cpp" />
     <ClCompile Include="Ska\AnimSetIO.cpp" />
     <ClCompile Include="Ska\MeshIO.cpp" />
     <ClCompile Include="Ska\SkeletonIO.cpp" />

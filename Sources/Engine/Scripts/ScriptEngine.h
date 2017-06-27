@@ -19,6 +19,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #pragma once
 #endif
 
+#define SCRIPT_THIS_ENTITYID "_entityID"
+#define SCRIPT_PENCAUSED_ENTITYID "_penCausedID"
+
 class ENGINE_API CScriptEngine
 {
   public:
