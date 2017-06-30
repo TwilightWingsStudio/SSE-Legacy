@@ -52,6 +52,7 @@ static lua_State *CreateSafeState()
 
       luaopen_luasebaselib(L);
       luaopen_luaentitieslib(L);
+      luaopen_luaentitiesedlib(L);
   }
 
   return L;

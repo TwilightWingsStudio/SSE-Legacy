@@ -29,29 +29,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <Engine/Scripts/ScriptEngine_internal.h>
 
-#define DEFENTBYID(varname, entityid) \
-  CEntity* varname = _pNetwork->ga_World.EntityFromID(entityid);
+#define SCRIPTLIBPREFIX entities
 
-#define ONLYREQARGCT(gotarg, reqarg, name) \
-  if (gotarg != reqarg) \
-    return luaL_error(L, "%s() got %d/%d arguments!", name, gotarg, reqarg)
+#pragma warning (disable: 4005)
 
-#define ONLYVALIDENTITY(entity, name) \
-  if (!entity) \
-    return luaL_error(L, "%s() got invalid entity!", name)
-
-#define ONLYLIVEENTITY(entity, name) \
-  if (!entity->IsLiveEntity()) \
-    return luaL_error(L, "%s() got not live entity!", name)
-    
-#define ONLYPLAYERENTITY(entity, name) \
-  if (!entity->IsPlayerEntity()) \
-    return luaL_error(L, "%s() got not player entity!", name)
-    
-#define ONLYVALIDPROPERTY(property, name) \
-  if (!property) \
-    return luaL_error(L, "%s() got invalid property!", name)
-    
 static inline BOOL IsIndexEPT(CEntityProperty::PropertyType eptProperty)
 {
   switch (eptProperty)
@@ -71,9 +52,10 @@ static inline BOOL IsIndexEPT(CEntityProperty::PropertyType eptProperty)
 // --------------------------------------------------------------------------------------
 // Checks if entity valid.
 // --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsEntityValid"
 static int l_entities_IsEntityValid(lua_State* L)
-{
-  ONLYREQARGCT(lua_gettop(L), 1, "IsEntityValid");
+{  
+  ONLYREQARGCT(lua_gettop(L), 1);
   
   ULONG ulEntityID = luaL_checkinteger (L, 1);
 
@@ -87,15 +69,16 @@ static int l_entities_IsEntityValid(lua_State* L)
 // --------------------------------------------------------------------------------------
 // Checks if entity is live entity.
 // --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsLiveEntity"
 static int l_entities_IsLiveEntity(lua_State* L)
 {
-  ONLYREQARGCT(lua_gettop(L), 1, "IsLiveEntity");
+  ONLYREQARGCT(lua_gettop(L), 1);
   
   ULONG ulEntityID = luaL_checkinteger (L, 1);
 
   DEFENTBYID(penEntity, ulEntityID);
   
-  ONLYVALIDENTITY(penEntity, "IsLiveEntity");
+  ONLYVALIDENTITY(penEntity);
 
   lua_pushinteger(L, penEntity->IsLiveEntity());
 
@@ -105,15 +88,16 @@ static int l_entities_IsLiveEntity(lua_State* L)
 // --------------------------------------------------------------------------------------
 // Checks if entity is alive
 // --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsEntityAlive"
 static int l_entities_IsEntityAlive(lua_State* L)
 {
-  ONLYREQARGCT(lua_gettop(L), 1, "IsEntityAlive");
+  ONLYREQARGCT(lua_gettop(L), 1);
   
   ULONG ulEntityID = luaL_checkinteger (L, 1);
 
   DEFENTBYID(penEntity, ulEntityID);
   
-  ONLYVALIDENTITY(penEntity, "IsEntityAlive");
+  ONLYVALIDENTITY(penEntity);
 
   lua_pushinteger(L, penEntity->IsAlive());
 
@@ -123,15 +107,16 @@ static int l_entities_IsEntityAlive(lua_State* L)
 // --------------------------------------------------------------------------------------
 // Checks if entity is alive
 // --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsEntityDead"
 static int l_entities_IsEntityDead(lua_State* L)
 {
-  ONLYREQARGCT(lua_gettop(L), 1, "IsEntityDead");
+  ONLYREQARGCT(lua_gettop(L), 1);
   
   ULONG ulEntityID = luaL_checkinteger (L, 1);
 
   DEFENTBYID(penEntity, ulEntityID);
   
-  ONLYVALIDENTITY(penEntity, "IsEntityDead");
+  ONLYVALIDENTITY(penEntity);
 
   lua_pushinteger(L, penEntity->IsDead());
 
@@ -141,15 +126,16 @@ static int l_entities_IsEntityDead(lua_State* L)
 // --------------------------------------------------------------------------------------
 // Checks if entity is rational entity.
 // --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsRationalEntity"
 static int l_entities_IsRationalEntity(lua_State* L)
 {
-  ONLYREQARGCT(lua_gettop(L), 1, "IsRationalEntity");
+  ONLYREQARGCT(lua_gettop(L), 1);
   
   ULONG ulEntityID = luaL_checkinteger (L, 1);
 
   DEFENTBYID(penEntity, ulEntityID);
   
-  ONLYVALIDENTITY(penEntity, "IsRationalEntity");
+  ONLYVALIDENTITY(penEntity);
 
   lua_pushinteger(L, penEntity->IsRationalEntity());
 
@@ -159,15 +145,16 @@ static int l_entities_IsRationalEntity(lua_State* L)
 // --------------------------------------------------------------------------------------
 // Checks if entity is player entity.
 // --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsMovableEntity"
 static int l_entities_IsMovableEntity(lua_State* L)
 {
-  ONLYREQARGCT(lua_gettop(L), 1, "IsMovableEntity");
+  ONLYREQARGCT(lua_gettop(L), 1);
   
   ULONG ulEntityID = luaL_checkinteger (L, 1);
 
   DEFENTBYID(penEntity, ulEntityID);
   
-  ONLYVALIDENTITY(penEntity, "IsMovableEntity");
+  ONLYVALIDENTITY(penEntity);
 
   lua_pushinteger(L, penEntity->IsMovableEntity());
 
@@ -177,15 +164,16 @@ static int l_entities_IsMovableEntity(lua_State* L)
 // --------------------------------------------------------------------------------------
 // Checks if entity is player entity.
 // --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsPlayerEntity"
 static int l_entities_IsPlayerEntity(lua_State* L)
 {
-  ONLYREQARGCT(lua_gettop(L), 1, "IsPlayerEntity");
+  ONLYREQARGCT(lua_gettop(L), 1);
   
   ULONG ulEntityID = luaL_checkinteger (L, 1);
 
   DEFENTBYID(penEntity, ulEntityID);
   
-  ONLYVALIDENTITY(penEntity, "IsPlayerEntity");
+  ONLYVALIDENTITY(penEntity);
 
   lua_pushinteger(L, penEntity->IsPlayerEntity());
 
@@ -193,11 +181,170 @@ static int l_entities_IsPlayerEntity(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
+// Checks if entity is interaction provider.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsInteractionProvider"
+static int l_entities_IsInteractionProvider(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  lua_pushinteger(L, penEntity->IsInteractionProvider());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Checks if entity is interaction relay.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsInteractionRelay"
+static int l_entities_IsInteractionRelay(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  lua_pushinteger(L, penEntity->IsInteractionRelay());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets entity position on X axis.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityPosX"
+static int l_entities_GetEntityPosX(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+  
+  lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetPlacement().pl_PositionVector(1));
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets entity position on Y axis.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityPosY"
+static int l_entities_GetEntityPosY(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+  
+  lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetPlacement().pl_PositionVector(2));
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets entity position on Z axis.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityPosZ"
+static int l_entities_GetEntityPosZ(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+  
+  lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetPlacement().pl_PositionVector(3));
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets entity heading rotation.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityRotH"
+static int l_entities_GetEntityRotH(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+  
+  lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetPlacement().pl_OrientationAngle(1));
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets entity pitch rotation.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityRotP"
+static int l_entities_GetEntityRotP(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+  
+  lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetPlacement().pl_OrientationAngle(2));
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets entity banking rotation.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityRotB"
+static int l_entities_GetEntityRotB(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+  
+  lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetPlacement().pl_OrientationAngle(3));
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
 // Returns distance between two specified entities.
 // --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "DistanceBetweenEntities"
 static int l_entities_DistanceBetweenEntities(lua_State* L)
 {
-  ONLYREQARGCT(lua_gettop(L), 2, "DistanceBetweenEntities");
+  ONLYREQARGCT(lua_gettop(L), 2);
   
   ULONG ulEntityID = luaL_checkinteger (L, 1);
   ULONG ulSecondEntityID = luaL_checkinteger (L, 2);
@@ -205,8 +352,8 @@ static int l_entities_DistanceBetweenEntities(lua_State* L)
   DEFENTBYID(penEntity, ulEntityID);
   DEFENTBYID(penSecondEntity, ulSecondEntityID);
   
-  ONLYVALIDENTITY(penEntity, "DistanceBetweenEntities");
-  ONLYVALIDENTITY(penSecondEntity, "DistanceBetweenEntities");
+  ONLYVALIDENTITY(penEntity);
+  ONLYVALIDENTITY(penSecondEntity);
 
   lua_pushnumber(L, (penEntity->GetPlacement().pl_PositionVector - penSecondEntity->GetPlacement().pl_PositionVector).Length());
 
@@ -214,38 +361,42 @@ static int l_entities_DistanceBetweenEntities(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
-// Sets entity health to given value.
+// Returns distance between two specified points.
 // --------------------------------------------------------------------------------------
-static int l_entities_SetEntityHealth(lua_State* L)
+#define SCRIPTFUNCNAME "DistanceBetweenPoints"
+static int l_entities_DistanceBetweenPoints(lua_State* L)
 {
-  ONLYREQARGCT(lua_gettop(L), 2, "SetEntityHealth");
+  ONLYREQARGCT(lua_gettop(L), 6);
+
+  FLOAT3D vFirstPoint(0.0F, 0.0F, 0.0F);
+  vFirstPoint(1) = luaL_checknumber (L, 1);
+  vFirstPoint(2) = luaL_checknumber (L, 2);
+  vFirstPoint(3) = luaL_checknumber (L, 3);
   
-  ULONG ulEntityID = luaL_checkinteger (L, 1);
-  FLOAT fValue = luaL_checknumber (L, 2);
+  FLOAT3D vSecondPoint(0.0F, 0.0F, 0.0F);
+  vSecondPoint(1) = luaL_checknumber (L, 4);
+  vSecondPoint(2) = luaL_checknumber (L, 5);
+  vSecondPoint(3) = luaL_checknumber (L, 6); 
 
-  DEFENTBYID(penEntity, ulEntityID);
-  
-  ONLYVALIDENTITY(penEntity, "SetEntityHealth");
-  ONLYLIVEENTITY(penEntity, "SetEntityHealth");
+  lua_pushnumber(L, (vFirstPoint - vSecondPoint).Length());
 
-  static_cast<CLiveEntity*>(penEntity)->SetHealth(fValue);
-
-  return 0;
+  return 1;
 }
 
 // --------------------------------------------------------------------------------------
 // Gets entity health.
 // --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityHealth"
 static int l_entities_GetEntityHealth(lua_State* L)
 {
-  ONLYREQARGCT(lua_gettop(L), 1, "GetEntityHealth");
+  ONLYREQARGCT(lua_gettop(L), 1);
   
   ULONG ulEntityID = luaL_checkinteger (L, 1);
   
   DEFENTBYID(penEntity, ulEntityID);
   
-  ONLYVALIDENTITY(penEntity, "GetEntityHealth");
-  ONLYLIVEENTITY(penEntity, "GetEntityHealth");
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
   
   lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetHealth());
 
@@ -255,16 +406,17 @@ static int l_entities_GetEntityHealth(lua_State* L)
 // --------------------------------------------------------------------------------------
 // Gets entity armor.
 // --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityArmor"
 static int l_entities_GetEntityArmor(lua_State* L)
 {
-  ONLYREQARGCT(lua_gettop(L), 1, "GetEntityArmor");
+  ONLYREQARGCT(lua_gettop(L), 1);
   
   ULONG ulEntityID = luaL_checkinteger (L, 1);
   
   DEFENTBYID(penEntity, ulEntityID);
   
-  ONLYVALIDENTITY(penEntity, "GetEntityArmor");
-  ONLYLIVEENTITY(penEntity, "GetEntityArmor");
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
   
   lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetArmor());
 
@@ -272,22 +424,63 @@ static int l_entities_GetEntityArmor(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
+// Gets entity shields.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityShields"
+static int l_entities_GetEntityShields(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+  
+  lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetShields());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets entity level.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityLevel"
+static int l_entities_GetEntityLevel(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+  
+  lua_pushinteger(L, static_cast<CLiveEntity*>(penEntity)->GetLevel());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
 // Gets entity property value by its name.
 // --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityPropByName"
 static int l_entities_GetEntityPropByName(lua_State* L)
 {
-  ONLYREQARGCT(lua_gettop(L), 2, "GetEntityPropByName");
+  ONLYREQARGCT(lua_gettop(L), 2);
   
   ULONG ulEntityID = luaL_checkinteger (L, 1);
   CTString strPropertyName = lua_tostring(L, 2);
   
   DEFENTBYID(penEntity, ulEntityID);
   
-  ONLYVALIDENTITY(penEntity, "GetEntityPropByName");
+  ONLYVALIDENTITY(penEntity);
   
   CEntityProperty *pTargetProperty = penEntity->PropertyForName(strPropertyName);
   
-  ONLYVALIDPROPERTY(pTargetProperty, "GetEntityPropByName");
+  ONLYVALIDPROPERTY(pTargetProperty);
   
   CEntityProperty::PropertyType eptTargetProperty = pTargetProperty->ep_eptType;
   SLONG offset = pTargetProperty->ep_slOffset; 
@@ -299,6 +492,19 @@ static int l_entities_GetEntityPropByName(lua_State* L)
   } else if (eptTargetProperty == CEntityProperty::EPT_FLOAT || eptTargetProperty == CEntityProperty::EPT_ANGLE || eptTargetProperty == CEntityProperty::EPT_RANGE) {
     FLOAT fValue = *((FLOAT *)(((UBYTE *)penEntity) + offset)); 
     lua_pushnumber(L, fValue);
+    
+  } else if (eptTargetProperty == CEntityProperty::EPT_ENTITYPTR) {
+    CEntityPointer penPointer = *((CEntityPointer *)(((UBYTE *)penEntity) + offset));
+    
+    if (penPointer) {
+      lua_pushinteger(L, penPointer->en_ulID);
+    } else {
+      lua_pushinteger(L, -1);
+    }
+    
+  } else if (eptTargetProperty == CEntityProperty::EPT_STRING || eptTargetProperty == CEntityProperty::EPT_FILENAME || eptTargetProperty == CEntityProperty::EPT_STRINGTRANS) {
+    CTString strValue = *((CTString *)(((UBYTE *)penEntity) + offset));
+    lua_pushstring(L, strValue);
 
   } else {
     lua_pushinteger(L, -1);
@@ -307,82 +513,59 @@ static int l_entities_GetEntityPropByName(lua_State* L)
   return 1;
 }
 
-// --------------------------------------------------------------------------------------
-// Teleports entity to given coords.
-// --------------------------------------------------------------------------------------
-static int l_entities_TeleportEntityToXYZ(lua_State* L)
-{
-  const INDEX REQUIRED_ARGS = 4;
-
-  INDEX ctArgs = lua_gettop(L);
-  
-  ONLYREQARGCT(ctArgs, REQUIRED_ARGS, "TeleportEntityToXYZ");
-  
-  ULONG ulEntityID = luaL_checkinteger (L, 1);
-
-  FLOAT3D vNewPos(0.0F, 0.0F, 0.0F);
-  vNewPos(1) = luaL_checknumber (L, 2);
-  vNewPos(2) = luaL_checknumber (L, 3);
-  vNewPos(3) = luaL_checknumber (L, 4);
-  
-  DEFENTBYID(penEntity, ulEntityID);
-  
-  ONLYVALIDENTITY(penEntity, "TeleportEntityToXYZ");
-
-  penEntity->Teleport(CPlacement3D(vNewPos, penEntity->GetPlacement().pl_OrientationAngle));
-
-  return 0;
-}
-
-// --------------------------------------------------------------------------------------
-// Teleports entity to given coords.
-// --------------------------------------------------------------------------------------
-static int l_entities_TeleportEntityToEntity(lua_State* L)
-{
-  const INDEX REQUIRED_ARGS = 2;
-
-  INDEX ctArgs = lua_gettop(L);
-  
-  ONLYREQARGCT(ctArgs, REQUIRED_ARGS, "TeleportEntityToEntity");
-  
-  ULONG ulEntityID = luaL_checkinteger (L, 1);
-  ULONG ulSecondEntityID = luaL_checkinteger (L, 2);
-  
-  DEFENTBYID(penEntity, ulEntityID);
-  DEFENTBYID(penSecondEntity, ulSecondEntityID);
-  
-  ONLYVALIDENTITY(penEntity, "TeleportEntityToEntity");
-
-  penEntity->Teleport(penSecondEntity->GetPlacement());
-
-  return 0;
-}
-
 static const struct luaL_Reg entitiesLib [] = {
-  // Common entity checks.
+  //////// Common entity checks ////////
   {"IsEntityValid", l_entities_IsEntityValid},
   {"IsLiveEntity", l_entities_IsLiveEntity},
   {"IsRationalEntity", l_entities_IsRationalEntity},
   {"IsMovableEntity", l_entities_IsMovableEntity},
   {"IsPlayerEntity", l_entities_IsPlayerEntity},
 
+  {"IsInteractionProvider", l_entities_IsInteractionProvider},
+  {"IsInteractionRelay", l_entities_IsInteractionRelay},
+
   {"IsEntityAlive", l_entities_IsEntityAlive},
   {"IsEntityDead", l_entities_IsEntityDead},
 
-  // Getters for CLiveEntity stuff.
+  //////// Getters for CLiveEntity ////////
   {"GetEntityArmor", l_entities_GetEntityArmor},
   {"GetEntityHealth", l_entities_GetEntityHealth},
+  {"GetEntityShields", l_entities_GetEntityShields},
+  {"GetEntityLevel", l_entities_GetEntityLevel},
 
-  // Setters for CLiveEntity stuff.
-  {"SetEntityHealth", l_entities_SetEntityHealth},
-
-  // Working with properties.
+  //////// Working with properties ////////
   {"GetEntityPropByName", l_entities_GetEntityPropByName},
+  // <multitype> GetEntityPropByID(EID, PROPID)
   
-  // Utils.
+  //////// Getters for position and Orientation ////////
+  {"GetEntityPosX", l_entities_GetEntityPosX},
+  {"GetEntityPosY", l_entities_GetEntityPosY},
+  {"GetEntityPosZ", l_entities_GetEntityPosZ},
+  
+  {"GetEntityRotH", l_entities_GetEntityRotH},
+  {"GetEntityRotP", l_entities_GetEntityRotP},
+  {"GetEntityRotB", l_entities_GetEntityRotB},
+  
+  //////// Utils ////////
   {"DistanceBetweenEntities", l_entities_DistanceBetweenEntities},
-  {"TeleportEntityToXYZ", l_entities_TeleportEntityToXYZ},
-  {"TeleportEntityToEntity", l_entities_TeleportEntityToEntity},
+  {"DistanceBetweenPoints", l_entities_DistanceBetweenPoints},
+  
+  //////// Raycasting ////////
+  /*
+  enum CCastRay::TestType {
+    TT_NONE,            // do not test at all
+    TT_SIMPLE,          // do approximate testing
+    TT_COLLISIONBOX,    // do testing by collision box
+    TT_FULL,            // do full testing
+    TT_FULLSEETHROUGH,  // do full testing without entities marked as see through
+  };
+  */
+
+  // EID CastRayFromEntityToEntity(EID, EID, CCastRay::TestType)
+  // EID CastRayFromPosToPos(X1, Y1, Z1, X2, Y2, Z2, CCastRay::TestType)
+  // EID CastRayFromPosToEntity(EID, X, Y, Z, CCastRay::TestType)
+  // EID CastRayFromEntityToPos(EID, X, Y, Z, CCastRay::TestType)
+  
   {NULL, NULL} /* end of array */
 };
 

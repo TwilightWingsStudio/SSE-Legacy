@@ -784,6 +784,9 @@
     <ClCompile Include="Scripts\ScriptLib_Entities.cpp">
       <Filter>Source Files\Scripts</Filter>
     </ClCompile>
+    <ClCompile Include="Scripts\ScriptLib_EntitiesEdit.cpp">
+      <Filter>Source Files\Scripts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base\Anim.h">
