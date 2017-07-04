@@ -50,7 +50,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Called every time when entity receiving ETrigger entity event.
   // --------------------------------------------------------------------------------------
-  void DoExecution() {
+  void DoExecution()
+  {
     if (m_bDontIfNoEntity && m_penEnityToTrick == NULL) {
       return;
     }
@@ -60,7 +61,10 @@ functions:
       return;
     }
 
-    CPrintF("%s : Sending event from %s.\n", GetName(), m_penEnityToTrick->GetName());
+    if (m_bDebugMessages) {
+      CPrintF("%s : Sending event from %s.\n", GetName(), m_penEnityToTrick ? m_penEnityToTrick->GetName() : "NULL");
+    }
+
     SendToTarget(m_penTarget, EET_TRIGGER, m_penEnityToTrick);
   }
 
@@ -105,4 +109,3 @@ procedures:
     }
   }
 };
-
