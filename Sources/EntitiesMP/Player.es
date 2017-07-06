@@ -595,7 +595,7 @@ DECL_DLL void ctl_ComposeActionPacket(INDEX iPlayer/*const CPlayerCharacter &pc*
   paAction.pa_ulButtons = 0;
 
   // set weapon selection bits
-  for(INDEX i=1; i<MAX_WEAPONS; i++) {
+  for (INDEX i=1; i<MAX_WEAPONS; i++) {
     if (pctlCurrent.bSelectWeapon[i]) {
       paAction.pa_ulButtons = i<<PLACT_SELECT_WEAPON_SHIFT;
       break;
@@ -1167,10 +1167,11 @@ properties:
   1 CTString m_strName "Name" = "<unnamed player>",
   2 COLOR m_ulLastButtons = 0x0,              // buttons last pressed
   3 FLOAT m_fArmor = 0.0f,                    // armor
-  4 CTString m_strGroup = "",                 // group name for world change
-  5 INDEX m_ulKeys = 0,                       // mask for all picked-up keys
-  6 FLOAT m_fMaxHealth = 1,                 // default health supply player can have
-  7 INDEX m_ulFlags = 0,                      // various flags
+  4 FLOAT m_fShields = 0.0f,                  // shields
+  5 CTString m_strGroup = "",                 // group name for world change
+  6 INDEX m_ulKeys = 0,                       // mask for all picked-up keys
+  7 FLOAT m_fMaxHealth = 1,                   // default health supply player can have
+  8 INDEX m_ulFlags = 0,                      // various flags
   
   9 CEntityPointer m_penCurrentInteractable,
  10 CEntityPointer m_penSpectatorCamera,      // [SSE] Spectator Camera
@@ -1313,22 +1314,22 @@ properties:
  191 INDEX m_iLastSeriousBombCount = 0,  // ammount of serious bombs player had before firing
  192 FLOAT m_tmSeriousBombFired = -10.0f,  // when the bomb was last fired
  
- 199 INDEX m_iCheatFlags = 0,
+ 199 INDEX m_ulCheatFlags = 0,
  
- // [SSE] Personal/Shared Extra Lives
+ // [SSE] Gameplay - Personal/Shared Extra Lives
  200 INDEX m_iLives = 0,
  201 INDEX m_iMoney = 0,
  202 INDEX m_iScoreAccumulated = 0,
  203 FLOAT m_fLiveCostMultiplier = 1.0F,
  
- // [SSE] Respawn Delay
+ // [SSE] Gameplay - Respawn Delay
  220 FLOAT m_tmKilled = -1.0f,
  
  // [SSE] GameModes - Team DeathMatch
  250 INDEX m_iTeamID = 0,
  251 INDEX m_iTeamSelection = 0,
  
- // [SSE] Weapon Inertia Effect
+ // [SSE] Gameplay - Weapon Inertia Effect
  350 ANGLE3D m_aWeaponSway = ANGLE3D(0, 0, 0),
  351 ANGLE3D m_aWeaponSwayOld = ANGLE3D(0, 0, 0),
 
@@ -1492,10 +1493,37 @@ functions:
   // [SSE] Extended Engine API
   // Returns current armor value.
   // --------------------------------------------------------------------------------------
-  virtual FLOAT GetArmor(void)
+  virtual FLOAT GetArmor(void) const
   {
     return m_fArmor;
   }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Returns current shields value.
+  // --------------------------------------------------------------------------------------
+  virtual FLOAT GetShields(void) const
+  {
+    return m_fShields;
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Sets the new armor value.
+  // --------------------------------------------------------------------------------------
+  virtual void SetArmor(FLOAT fArmor)
+  {
+    m_fArmor = fArmor;
+  };
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Sets the new shields value.
+  // --------------------------------------------------------------------------------------
+  virtual void SetShields(FLOAT fShields)
+  {
+    m_fShields = fShields;
+  };
   
   // --------------------------------------------------------------------------------------
   // [SSE] Extended Engine API
@@ -1523,6 +1551,8 @@ functions:
   };
   
   // --------------------------------------------------------------------------------------
+  // [SSE] ProgressiveSwitch
+  // --------------------------------------------------------------------------------------
   void StartInteractionWith(CEntity *pen)
   {
     m_penCurrentInteractable = pen;
@@ -1533,6 +1563,8 @@ functions:
     pen->SendEvent(eStartInteraction);
   };
   
+  // --------------------------------------------------------------------------------------
+  // [SSE] ProgressiveSwitch
   // --------------------------------------------------------------------------------------
   void StopInteraction()
   {
@@ -1549,6 +1581,8 @@ functions:
     return iSound+m_iGender*GENDEROFFSET;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Spawns bouble particle near player.
   // --------------------------------------------------------------------------------------
   void AddBouble( FLOAT3D vPos, FLOAT3D vSpeedRelative)
   {
@@ -1570,7 +1604,7 @@ functions:
     // clear flying shells data array
     m_iFirstEmptySLD = 0;
 
-    for( INDEX iShell = 0; iShell<MAX_FLYING_SHELLS; iShell++)
+    for (INDEX iShell = 0; iShell<MAX_FLYING_SHELLS; iShell++)
     {
       m_asldData[iShell].sld_tmLaunch = -100.0f;
     }
@@ -1594,7 +1628,7 @@ functions:
   void ClearBulletSprayLaunchData( void)
   {
     m_iFirstEmptyBSLD = 0;
-    for( INDEX iBulletSpray=0; iBulletSpray<MAX_BULLET_SPRAYS; iBulletSpray++)
+    for (INDEX iBulletSpray=0; iBulletSpray<MAX_BULLET_SPRAYS; iBulletSpray++)
     {
       m_absldData[iBulletSpray].bsld_tmLaunch = -100.0f;
     }
@@ -1623,7 +1657,7 @@ functions:
   void ClearGoreSprayLaunchData( void)
   {
     m_iFirstEmptyGSLD = 0;
-    for( INDEX iGoreSpray=0; iGoreSpray<MAX_GORE_SPRAYS; iGoreSpray++)
+    for (INDEX iGoreSpray=0; iGoreSpray<MAX_GORE_SPRAYS; iGoreSpray++)
     {
       m_agsldData[iGoreSpray].gsld_tmLaunch = -100.0f;
     }
@@ -2050,7 +2084,7 @@ functions:
     ostr->WriteID_t("MSGS");
     INDEX ctMsg = m_acmiMessages.Count();
     (*ostr)<<ctMsg;
-    for(INDEX iMsg=0; iMsg<ctMsg; iMsg++) {
+    for (INDEX iMsg=0; iMsg<ctMsg; iMsg++) {
       m_acmiMessages[iMsg].Write_t(*ostr);
     }
     ostr->Write_t(&m_psLevelStats, sizeof(m_psLevelStats));
@@ -2077,7 +2111,7 @@ functions:
     m_ctUnreadMessages = 0;
     if (ctMsg>0) {
       m_acmiMessages.Push(ctMsg);
-      for(INDEX iMsg=0; iMsg<ctMsg; iMsg++) {
+      for (INDEX iMsg=0; iMsg<ctMsg; iMsg++) {
         m_acmiMessages[iMsg].Read_t(*istr);
         if (!m_acmiMessages[iMsg].cmi_bRead) {
           m_ctUnreadMessages++;
@@ -2255,7 +2289,7 @@ functions:
     // find maximum frags/score that one player has
     INDEX iMaxFrags = LowerLimit(INDEX(0));
     INDEX iMaxScore = LowerLimit(INDEX(0));
-    {for(INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
+    {for (INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
       CPlayer *penPlayer = _apenPlayers[iPlayer];
       iMaxFrags = Max(iMaxFrags, penPlayer->m_psLevelStats.ps_iKills);
       iMaxScore = Max(iMaxScore, penPlayer->m_psLevelStats.ps_iScore);
@@ -2298,7 +2332,7 @@ functions:
     strStats += "^r";
     strStats += "\n\n";
 
-    {for(INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
+    {for (INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
       CTString strLine;
       CPlayer *penPlayer = _apenPlayers[iPlayer];
       INDEX iPing = ceil(penPlayer->en_tmPing*1000.0f);
@@ -2336,7 +2370,7 @@ functions:
     // for each player
     PlayerStats psSquadLevel = PlayerStats();
     PlayerStats psSquadGame  = PlayerStats();
-    {for( INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
+    {for (INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
       CPlayer *penPlayer = _apenPlayers[iPlayer];
       // add values to squad stats
       ASSERT( penPlayer!=NULL);
@@ -2384,7 +2418,7 @@ functions:
     strStats+="\n";
 
     // for each player
-    {for(INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
+    {for (INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
       CPlayer *penPlayer = _apenPlayers[iPlayer];
       // if this one
       if (penPlayer==this) {
@@ -2495,7 +2529,9 @@ functions:
   {
     CTString strPlayerName = GetPlayerName();
     INDEX iLen = strlen(strPlayerName);
-    for(INDEX i=0; i<iLen; i++) {
+
+    for (INDEX i=0; i<iLen; i++)
+    {
       if (strPlayerName[i] == '\r' || strPlayerName[i] == '\n') {
         // newline in name!
         strPlayerName = "\x11";
@@ -2550,7 +2586,7 @@ functions:
   {
     ULONG ulHash = fnmMessage.GetHash();
     INDEX ctMsg = m_acmiMessages.Count();
-    for(INDEX iMsg=0; iMsg<ctMsg; iMsg++) {
+    for (INDEX iMsg=0; iMsg<ctMsg; iMsg++) {
       if (m_acmiMessages[iMsg].cmi_ulHash      == ulHash &&
           m_acmiMessages[iMsg].cmi_fnmFileName == fnmMessage) {
         return TRUE;
@@ -4132,7 +4168,7 @@ functions:
       return;
     }
 
-    // god mode -> no one can harm you
+    // God mode -> no one can harm you.
     if (cht_bGod && CheatsEnabled()) {
       return;
     }
@@ -4154,16 +4190,16 @@ functions:
     }
 
     // check for friendly fire
-    if (!GetSP()->sp_bFriendlyFire)
+    if (!GetSP()->sp_bFriendlyFire && penInflictor != this)
     {
       if (GetSP()->sp_bCooperative) {
-        if (IsOfClass(penInflictor, "Player") && penInflictor != this) {
+        if (IsOfClass(penInflictor, "Player")) {
           return;
         }
 
       // [SSE] GameModes - Team DeathMatch
       } else if (GetSP()->sp_bTeamPlay) {
-        if (IsOfClass(penInflictor, "Player") && penInflictor != this) {
+        if (IsOfClass(penInflictor, "Player")) {
           
           CPlayer *penPlayer = static_cast<CPlayer*>(penInflictor);
 
@@ -4187,7 +4223,9 @@ functions:
 
     // [SSE] Player Settings Entity
     CPlayerSettingsEntity *penSettings = NULL;
-    if (m_penSettings && m_penSettings->IsActive()) {
+
+    if (m_penSettings && m_penSettings->IsActive())
+    {
       penSettings = (CPlayerSettingsEntity *)&*m_penSettings;
       
       fDamageAmmount *= penSettings->m_fDamageReceiveMul;
@@ -4203,9 +4241,10 @@ functions:
     }
 
     FLOAT fSubHealth, fSubArmor;
-    if (dmtType == DMT_DROWNING) {
-      // drowning
+ 
+    if (dmtType == DMT_DROWNING) { // drowning
       fSubHealth = fDamageAmmount;
+
     } else {
       // damage and armor
       if (penSettings) {
@@ -4223,15 +4262,16 @@ functions:
       }
     }
 
-    // if any damage
-    if (fSubHealth > 0) { 
-      // if camera is active
-      if (m_penCamera != NULL) {
+    // If any damage.
+    if (fSubHealth > 0)
+    {
+      // If camera is active.
+      if (m_penCamera != NULL)
+      {
         CEntity *penOnBreak = ((CCamera&)*m_penCamera).m_penOnBreak;
 
-        // if the camera has onbreak
+        // If the camera has onbreak then trigger it.
         if (penOnBreak != NULL) {
-          // trigger it
           SendToTarget(penOnBreak, EET_TRIGGER, this);
         // If it doesn't then just deactivate camera.
         } else {
@@ -4240,7 +4280,7 @@ functions:
       }
     }
 
-    // if the player is doing autoactions then ignore all damage
+    // If the player is doing autoactions then ignore all damage.
     if (m_penActionMarker != NULL) {
       return;
     }
@@ -4941,7 +4981,7 @@ functions:
   {
     _pNetwork->SetGameFinished();
     // start console for first player possible
-    for(INDEX iPlayer=0; iPlayer<GetMaxPlayers(); iPlayer++) {
+    for (INDEX iPlayer=0; iPlayer<GetMaxPlayers(); iPlayer++) {
       CEntity *pen = GetPlayerEntity(iPlayer);
       if (pen!=NULL) {
         if (cmp_ppenPlayer==NULL && _pNetwork->IsPlayerLocal(pen)) {
@@ -5443,7 +5483,7 @@ functions:
   // --------------------------------------------------------------------------------------
   void SpawnBubbles(INDEX ctBubbles)
   {
-    for( INDEX iBouble=0; iBouble<ctBubbles; iBouble++)
+    for (INDEX iBouble=0; iBouble<ctBubbles; iBouble++)
     {
       FLOAT3D vRndRel = FLOAT3D( (FRnd()-0.5f)*0.25f, -0.25f, -0.5f+FRnd()/10.0f);
       ANGLE3D aDummy = ANGLE3D(0,0,0);
@@ -6473,7 +6513,7 @@ functions:
     }
     // render chainsaw cutting brush particles
     FLOAT tmNow = _pTimer->GetLerpedCurrentTick();
-    for( INDEX iSpray=0; iSpray<MAX_BULLET_SPRAYS; iSpray++)
+    for (INDEX iSpray=0; iSpray<MAX_BULLET_SPRAYS; iSpray++)
     {
       BulletSprayLaunchData &bsld = m_absldData[iSpray];
       FLOAT fLife=1.25f;
@@ -6483,7 +6523,7 @@ functions:
     }
 
     // render chainsaw cutting model particles
-    for( INDEX iGore=0; iGore<MAX_GORE_SPRAYS; iGore++)
+    for (INDEX iGore=0; iGore<MAX_GORE_SPRAYS; iGore++)
     {
       GoreSprayLaunchData &gsld = m_agsldData[iGore];
       FLOAT fLife=2.0f;
@@ -6653,7 +6693,7 @@ functions:
     CStaticArray<MarkerDistance> amdMarkers;
     amdMarkers.New(ctMarkers);
     // for each marker
-    {for(INDEX iMarker=0; iMarker<ctMarkers; iMarker++) {
+    {for (INDEX iMarker=0; iMarker<ctMarkers; iMarker++) {
       amdMarkers[iMarker].md_ppm = (CPlayerMarker*)_pNetwork->GetEntityWithName(strPlayerStart, iMarker);
       if (amdMarkers[iMarker].md_ppm==NULL) {
         return NULL;  // (if there is any invalidity, fail completely)
@@ -7203,7 +7243,7 @@ functions:
     // if we are in coop
     if (GetSP()->sp_bCooperative && !GetSP()->sp_bSinglePlayer) {
       // for each player
-      for(INDEX iPlayer=0; iPlayer<GetMaxPlayers(); iPlayer++) {
+      for (INDEX iPlayer=0; iPlayer<GetMaxPlayers(); iPlayer++) {
         CPlayer *ppl = (CPlayer*)GetPlayerEntity(iPlayer);
         if (ppl!=NULL) {
           // put it at marker
