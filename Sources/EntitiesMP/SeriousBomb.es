@@ -122,6 +122,7 @@ functions:
     }
 
     // [SSE] Better Serious Bomb
+    // If coop and friendly fire or not coop then kill players.
     if ((GetSP()->sp_bCooperative && GetSP()->sp_bFriendlyFire) || !GetSP()->sp_bCooperative)
     {
       INDEX ctMaxPlayers = GetMaxPlayers();

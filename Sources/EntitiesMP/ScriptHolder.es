@@ -33,6 +33,12 @@ properties:
    6 CTFileName m_fnScript    "Script File"    'S' = CTFILENAME(""),
    
   10 CEntityPointer m_penTarget "Target" 'T',
+  
+  20 CEntityPointer m_penPin1 "Pin 1",
+  21 CEntityPointer m_penPin2 "Pin 2",
+  22 CEntityPointer m_penPin3 "Pin 3",
+  23 CEntityPointer m_penPin4 "Pin 4",
+  24 CEntityPointer m_penPin5 "Pin 5",
 
 components:
   1 model   MODEL_SCRIPTHOLDER   "Models\\Editor\\ScriptHolder.mdl",
@@ -51,7 +57,20 @@ functions:
   // --------------------------------------------------------------------------------------
   void DoExecution(const ETrigger &eTrigger)
   {
+    const CEntityPointer* apenPins = &m_penPin1;
+    
     INDEX aiPins[5];
+    
+    for (INDEX i = 0; i < 5; i++)
+    {
+      CEntity* pen = (CEntity*)&*apenPins[i];
+      
+      if (pen) {
+        aiPins[i] = pen->en_ulID;
+      } else {
+        aiPins[i] = -1;
+      }
+    }
     
     if (m_fnScript != "" && FileExists(m_fnScript)) {
       _pScriptEngine->ExecEntityScript(this, m_fnScript, eTrigger.penCaused, aiPins);
