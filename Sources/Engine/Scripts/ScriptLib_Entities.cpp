@@ -19,9 +19,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Base/Shell.h>
 
 #include <Engine/Network/Network.h>
+#include <Engine/Network/SessionState.h>
 
 #include <Engine/Entities/Entity.h>
 #include <Engine/Entities/EntityProperties.h>
+#include <Engine/Entities/InternalClasses.h>
 
 #include <luajit/src/lua.hpp>
 #include <luajit/src/lualib.h>
@@ -214,6 +216,25 @@ static int l_entities_IsInteractionRelay(lua_State* L)
   ONLYVALIDENTITY(penEntity);
 
   lua_pushinteger(L, penEntity->IsInteractionRelay());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets the parent entity.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityParent"
+static int l_entities_GetEntityParent(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  lua_pushinteger(L, penEntity->GetParent() ? penEntity->GetParent()->en_ulID : INDEX(-1));
 
   return 1;
 }
@@ -513,6 +534,60 @@ static int l_entities_GetEntityPropByName(lua_State* L)
   return 1;
 }
 
+// --------------------------------------------------------------------------------------
+// Gets player entity id by its PLID.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetPlayerEntityByPLID"
+static int l_entities_GetPlayerEntityByPLID(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  INDEX iPlayerID = luaL_checkinteger (L, 1);
+  
+  if (iPlayerID < 0 || (iPlayerID-1) > CEntity::GetMaxPlayers()) {
+    return luaL_error(L, "%s() wrongly specified PLID!", SCRIPTFUNCNAME);
+  }  
+  
+  CEntity *pen = CEntity::GetPlayerEntity(iPlayerID);
+  
+  lua_pushinteger(L, pen ? pen->en_ulID : -1);
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets active players count.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetPlayersCount"
+static int l_entities_GetPlayersCount(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 0);
+  
+  lua_pushinteger(L, _pNetwork->ga_sesSessionState.GetPlayersCount());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets PLID from entity.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetPlayerID"
+static int l_entities_GetPlayerID(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  INDEX ulEntityID = luaL_checkinteger (L, 1);
+
+  DEFENTBYID(penEntity, ulEntityID);
+
+  ONLYVALIDENTITY(penEntity);
+  ONLYPLAYERENTITY(penEntity);
+
+  lua_pushinteger(L, static_cast<CPlayerEntity*>(penEntity)->GetMyPlayerIndex());
+
+  return 1;
+}
+
 static const struct luaL_Reg entitiesLib [] = {
   //////// Common entity checks ////////
   {"IsEntityValid", l_entities_IsEntityValid},
@@ -526,6 +601,12 @@ static const struct luaL_Reg entitiesLib [] = {
 
   {"IsEntityAlive", l_entities_IsEntityAlive},
   {"IsEntityDead", l_entities_IsEntityDead},
+  
+  // IsEntityOfClass
+  // IsEntityDerivedFromClass
+  
+  //////// CEntity Utils ////////
+  {"GetEntityParent", l_entities_GetEntityParent},
 
   //////// Getters for CLiveEntity ////////
   {"GetEntityArmor", l_entities_GetEntityArmor},
@@ -549,6 +630,12 @@ static const struct luaL_Reg entitiesLib [] = {
   //////// Utils ////////
   {"DistanceBetweenEntities", l_entities_DistanceBetweenEntities},
   {"DistanceBetweenPoints", l_entities_DistanceBetweenPoints},
+  // FLOAT DistanceBetweenEntityAndPoint(EntityID, X, Y, Z)
+  
+  //////// Players ////////
+  {"GetPlayerEntityByPLID", l_entities_GetPlayerEntityByPLID},
+  {"GetPlayerID", l_entities_GetPlayerID},
+  {"GetPlayersCount", l_entities_GetPlayersCount},
   
   //////// Raycasting ////////
   /*

@@ -27,11 +27,49 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <luajit/src/lualib.h>
 #include <luajit/src/lauxlib.h>
 
+#include <Engine/Scripts/ScriptEngine.h>
 #include <Engine/Scripts/ScriptEngine_internal.h>
 
 #define SCRIPTLIBPREFIX entitiesed
 
 #pragma warning (disable: 4005)
+
+static inline BOOL IsIndexEPT(CEntityProperty::PropertyType eptProperty)
+{
+  switch (eptProperty)
+  {
+    case CEntityProperty::EPT_BOOL: return TRUE;
+    case CEntityProperty::EPT_INDEX: return TRUE;
+    case CEntityProperty::EPT_ENUM: return TRUE;
+    case CEntityProperty::EPT_FLAGS: return TRUE;
+    case CEntityProperty::EPT_ANIMATION: return TRUE;
+    case CEntityProperty::EPT_ILLUMINATIONTYPE: return TRUE;
+    case CEntityProperty::EPT_COLOR: return TRUE;
+  }
+  
+  return FALSE;
+}
+
+// --------------------------------------------------------------------------------------
+// Sets entity health to given value.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "SetEntityParent"
+static int l_entitiesed_SetEntityParent(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 2);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  INDEX iParentID = luaL_checkinteger (L, 2);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  DEFENTBYID(penSecondEntity, iParentID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  penEntity->SetParent(penSecondEntity);
+
+  return 0;
+}
 
 // --------------------------------------------------------------------------------------
 // Sets entity health to given value.
@@ -55,29 +93,131 @@ static int l_entitiesed_SetEntityHealth(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
-// Teleports entity to given coords.
+// Sets entity armor to given value.
 // --------------------------------------------------------------------------------------
-#define SCRIPTFUNCNAME "TeleportEntityToXYZ"
-static int l_entitiesed_TeleportEntityToXYZ(lua_State* L)
+#define SCRIPTFUNCNAME "SetEntityArmor"
+static int l_entitiesed_SetEntityArmor(lua_State* L)
 {
-  const INDEX REQUIRED_ARGS = 4;
-
-  INDEX ctArgs = lua_gettop(L);
-  
-  ONLYREQARGCT(ctArgs, REQUIRED_ARGS);
+  ONLYREQARGCT(lua_gettop(L), 2);
   
   ULONG ulEntityID = luaL_checkinteger (L, 1);
+  FLOAT fValue = luaL_checknumber (L, 2);
 
-  FLOAT3D vNewPos(0.0F, 0.0F, 0.0F);
-  vNewPos(1) = luaL_checknumber (L, 2);
-  vNewPos(2) = luaL_checknumber (L, 3);
-  vNewPos(3) = luaL_checknumber (L, 4);
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+
+  static_cast<CLiveEntity*>(penEntity)->SetArmor(fValue);
+
+  return 0;
+}
+
+// --------------------------------------------------------------------------------------
+// Sets entity shields to given value.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "SetEntityShields"
+static int l_entitiesed_SetEntityShields(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 2);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  FLOAT fValue = luaL_checknumber (L, 2);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+
+  static_cast<CLiveEntity*>(penEntity)->SetShields(fValue);
+
+  return 0;
+}
+
+// --------------------------------------------------------------------------------------
+// Sets entity level to given value.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "SetEntityLevel"
+static int l_entitiesed_SetEntityLevel(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 2);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  INDEX iLevel = ClampDn(luaL_checkinteger (L, 2), 0);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+
+  static_cast<CLiveEntity*>(penEntity)->SetLevel(iLevel);
+
+  return 0;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets entity property value by its name.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "SetEntityPropByName"
+static int l_entitiesed_SetEntityPropByName(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 3);
+  
+  ULONG ulEntityID = luaL_checkinteger(L, 1);
+  CTString strPropertyName = lua_tostring(L, 2);
   
   DEFENTBYID(penEntity, ulEntityID);
   
   ONLYVALIDENTITY(penEntity);
+  
+  CEntityProperty *pTargetProperty = penEntity->PropertyForName(strPropertyName);
+  
+  ONLYVALIDPROPERTY(pTargetProperty);
+  
+  CEntityProperty::PropertyType eptTargetProperty = pTargetProperty->ep_eptType;
+  SLONG offset = pTargetProperty->ep_slOffset; 
+  
+  if (IsIndexEPT(eptTargetProperty)) {
+    // If not number and not boolean
+    if (!lua_isnumber(L, 3) && !lua_isboolean(L, 3)) {
+      return luaL_error(L, "%s() value is not number or boolean!", SCRIPTFUNCNAME);
+    }
+    
+    INDEX *iValue = (INDEX *)(((UBYTE *)penEntity) + offset); 
+    INDEX iNewValue = luaL_checkinteger(L, 3);
+    
+    *iValue = iNewValue;
 
-  penEntity->Teleport(CPlacement3D(vNewPos, penEntity->GetPlacement().pl_OrientationAngle));
+  } else if (eptTargetProperty == CEntityProperty::EPT_FLOAT || eptTargetProperty == CEntityProperty::EPT_ANGLE || eptTargetProperty == CEntityProperty::EPT_RANGE) {
+    if (!lua_isnumber(L, 3)) {
+      return luaL_error(L, "%s() value is not number!", SCRIPTFUNCNAME);
+    }
+
+    FLOAT *fValue = (FLOAT *)(((UBYTE *)penEntity) + offset); 
+    FLOAT fNewValue = luaL_checknumber (L, 3);
+    
+    *fValue = fNewValue;
+
+  } else if (eptTargetProperty == CEntityProperty::EPT_ENTITYPTR) {
+    if (!lua_isnumber(L, 3)) {
+      return luaL_error(L, "%s() value is not number!", SCRIPTFUNCNAME);
+    }
+    
+    CEntityPointer *penPointer = (CEntityPointer *)(((UBYTE *)penEntity) + offset);
+    INDEX iNewValue = luaL_checkinteger(L, 3);
+    DEFENTBYID(penNewEntity, iNewValue);
+    
+    *penPointer = penNewEntity;
+
+  } else if (eptTargetProperty == CEntityProperty::EPT_STRING || eptTargetProperty == CEntityProperty::EPT_FILENAME || eptTargetProperty == CEntityProperty::EPT_STRINGTRANS) {
+    CTString *strValue = (CTString *)(((UBYTE *)penEntity) + offset);
+    
+    if (!lua_isstring(L, 3)) {
+      return luaL_error(L, "%s() value is not string!", SCRIPTFUNCNAME);
+    }
+    
+    *strValue = lua_tostring(L, 3);
+  }
 
   return 0;
 }
@@ -114,24 +254,27 @@ static int l_entitiesed_SetEntityRotation(lua_State* L)
 // --------------------------------------------------------------------------------------
 // Teleports entity to given coords.
 // --------------------------------------------------------------------------------------
-#define SCRIPTFUNCNAME "TeleportEntityToEntity"
-static int l_entitiesed_TeleportEntityToEntity(lua_State* L)
+#define SCRIPTFUNCNAME "TeleportEntityToPosition"
+static int l_entitiesed_TeleportEntityToPosition(lua_State* L)
 {
-  const INDEX REQUIRED_ARGS = 2;
+  const INDEX REQUIRED_ARGS = 4;
 
   INDEX ctArgs = lua_gettop(L);
   
   ONLYREQARGCT(ctArgs, REQUIRED_ARGS);
-
+  
   ULONG ulEntityID = luaL_checkinteger (L, 1);
-  ULONG ulSecondEntityID = luaL_checkinteger (L, 2);
+
+  FLOAT3D vNewPos(0.0F, 0.0F, 0.0F);
+  vNewPos(1) = luaL_checknumber (L, 2);
+  vNewPos(2) = luaL_checknumber (L, 3);
+  vNewPos(3) = luaL_checknumber (L, 4);
   
   DEFENTBYID(penEntity, ulEntityID);
-  DEFENTBYID(penSecondEntity, ulSecondEntityID);
   
   ONLYVALIDENTITY(penEntity);
 
-  penEntity->Teleport(penSecondEntity->GetPlacement());
+  penEntity->Teleport(CPlacement3D(vNewPos, penEntity->GetPlacement().pl_OrientationAngle));
 
   return 0;
 }
@@ -170,22 +313,98 @@ static int l_entitiesed_TeleportEntityToPlacement(lua_State* L)
   return 0;
 }
 
+// --------------------------------------------------------------------------------------
+// Teleports entity to given coords.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "TeleportEntityToEntity"
+static int l_entitiesed_TeleportEntityToEntity(lua_State* L)
+{
+  const INDEX REQUIRED_ARGS = 2;
+
+  INDEX ctArgs = lua_gettop(L);
+  
+  ONLYREQARGCT(ctArgs, REQUIRED_ARGS);
+
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  ULONG ulSecondEntityID = luaL_checkinteger (L, 2);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  DEFENTBYID(penSecondEntity, ulSecondEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  penEntity->Teleport(penSecondEntity->GetPlacement());
+
+  return 0;
+}
+
+// --------------------------------------------------------------------------------------
+// Generates sync-safe random integer.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GenerateSyncSafeInt"
+static int l_entitiesed_GenerateSyncSafeInt(lua_State* L)
+{
+  lua_getglobal(L, SCRIPT_THIS_ENTITYID);
+  
+  if (!lua_isnumber(L, -1)) {
+    return luaL_error(L, "%s() entityID is not integer!", SCRIPTFUNCNAME);
+  }
+  
+  ULONG ulEntityID = lua_tointeger(L, -1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  ONLYVALIDENTITY(penEntity);
+  
+  lua_pushinteger(L, penEntity->IRnd());
+  
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Generates sync-safe random float.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GenerateSyncSafeFloat"
+static int l_entitiesed_GenerateSyncSafeFloat(lua_State* L)
+{
+  lua_getglobal(L, SCRIPT_THIS_ENTITYID);
+  
+  if (!lua_isnumber(L, -1)) {
+    return luaL_error(L, "%s() entityID is not integer!", SCRIPTFUNCNAME);
+  }
+  
+  ULONG ulEntityID = lua_tointeger(L, -1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  ONLYVALIDENTITY(penEntity);
+  
+  lua_pushnumber(L, penEntity->FRnd());
+  
+  return 1;
+}
+
 static const struct luaL_Reg entitiesedLib [] = {
+  {"SetEntityParent", l_entitiesed_SetEntityParent},
+
   //////// Setters for CLiveEntity ////////
   {"SetEntityHealth", l_entitiesed_SetEntityHealth},
-  // void SetEntityArmor(EID, FLOAT)
-  // void SetEntityShields(EID, FLOAT)
+  {"SetEntityArmor", l_entitiesed_SetEntityArmor},
+  {"SetEntityShields", l_entitiesed_SetEntityShields},
+  {"SetEntityLevel", l_entitiesed_SetEntityLevel},
   
-  // void SetEntityPropByName(EID, String, Value)
+  //////// Working with properties ////////
+  {"SetEntityPropByName", l_entitiesed_SetEntityPropByName},
   // void SetEntityPropByID(EID, PROPID, Value)
   
+  //////// Setters for position and Orientation ////////
   {"SetEntityRotation", l_entitiesed_SetEntityRotation},
-  {"TeleportEntityToXYZ", l_entitiesed_TeleportEntityToXYZ},
+  {"TeleportEntityToPosition", l_entitiesed_TeleportEntityToPosition},
   {"TeleportEntityToPlacement", l_entitiesed_TeleportEntityToPlacement},
   {"TeleportEntityToEntity", l_entitiesed_TeleportEntityToEntity},
   
-  // IRnd
-  // FRnd
+  // TeleportEntityToEntityWithOffset
+  
+  {"GenerateSyncSafeInt", l_entitiesed_GenerateSyncSafeInt},
+  {"GenerateSyncSafeFloat", l_entitiesed_GenerateSyncSafeFloat},
   
   // Weapon and Ammo
 
