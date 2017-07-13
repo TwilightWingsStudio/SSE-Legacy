@@ -19,51 +19,51 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 enum EFHIndex {
-   0 EFHI_00 "Faction 00",
-   1 EFHI_01 "Faction 01",
-   2 EFHI_02 "Faction 02",
-   3 EFHI_03 "Faction 03",
-   4 EFHI_04 "Faction 04",
-   5 EFHI_05 "Faction 05",
-   6 EFHI_06 "Faction 06",
-   7 EFHI_07 "Faction 07",
-   8 EFHI_08 "Faction 08",
-   9 EFHI_09 "Faction 09",
+   0 EFHI_00 "Faction [00]",
+   1 EFHI_01 "Faction [01]",
+   2 EFHI_02 "Faction [02]",
+   3 EFHI_03 "Faction [03]",
+   4 EFHI_04 "Faction [04]",
+   5 EFHI_05 "Faction [05]",
+   6 EFHI_06 "Faction [06]",
+   7 EFHI_07 "Faction [07]",
+   8 EFHI_08 "Faction [08]",
+   9 EFHI_09 "Faction [09]",
  
-  10 EFHI_10 "Faction 10",
-  11 EFHI_11 "Faction 11",
-  12 EFHI_12 "Faction 12",
-  13 EFHI_13 "Faction 13",
-  14 EFHI_14 "Faction 14",
-  15 EFHI_15 "Faction 15",
-  16 EFHI_16 "Faction 16",
-  17 EFHI_17 "Faction 17",
-  18 EFHI_18 "Faction 18",
-  19 EFHI_19 "Faction 19",
+  10 EFHI_10 "Faction [10]",
+  11 EFHI_11 "Faction [11]",
+  12 EFHI_12 "Faction [12]",
+  13 EFHI_13 "Faction [13]",
+  14 EFHI_14 "Faction [14]",
+  15 EFHI_15 "Faction [15]",
+  16 EFHI_16 "Faction [16]",
+  17 EFHI_17 "Faction [17]",
+  18 EFHI_18 "Faction [18]",
+  19 EFHI_19 "Faction [19]",
 
-  20 EFHI_20 "Faction 20",
-  21 EFHI_21 "Faction 21",
-  22 EFHI_22 "Faction 22",
-  23 EFHI_23 "Faction 23",
-  24 EFHI_24 "Faction 24",
-  25 EFHI_25 "Faction 25",
-  26 EFHI_26 "Faction 26",
-  27 EFHI_27 "Faction 27",
-  28 EFHI_28 "Faction 28",
-  29 EFHI_29 "Faction 29",
+  20 EFHI_20 "Faction [20]",
+  21 EFHI_21 "Faction [21]",
+  22 EFHI_22 "Faction [22]",
+  23 EFHI_23 "Faction [23]",
+  24 EFHI_24 "Faction [24]",
+  25 EFHI_25 "Faction [25]",
+  26 EFHI_26 "Faction [26]",
+  27 EFHI_27 "Faction [27]",
+  28 EFHI_28 "Faction [28]",
+  29 EFHI_29 "Faction [29]",
 
-  30 EFHI_30 "Faction 30",
-  31 EFHI_31 "Faction 31",
+  30 EFHI_30 "Faction [30]",
+  31 EFHI_31 "Faction [31]",
 };
 
 enum EFRelationToPlayers {
-  0 FRT_ENEMY   "Enemy",
-  1 FRT_NEUTRAL "Neutral",
-  2 FRT_ALLY    "Ally",
+  0 FRT_ENEMY   "Enemy [0]",
+  1 FRT_NEUTRAL "Neutral [1]",
+  2 FRT_ALLY    "Ally [2]",
 };
 
 class CEnemyFactionHolder : CEntity {
-name      "EnemyFactionHolder";
+name      "CEnemyFactionHolder";
 thumbnail "Thumbnails\\EnemyFactionHolder.tbn";
 features  "HasName", "IsTargetable";
 
@@ -78,31 +78,35 @@ properties:
  11 INDEX m_ulEnemiesMask "Enemies Mask" = 0,
 
  15 BOOL m_bDamageFromAllies   "Damage From Allies"  = FALSE,
- //16 BOOL m_bDamageToAllies   "Damage To Allies"    = FALSE,
  17 BOOL m_bDamageFromMembers  "Damage From Members" = FALSE,
- //18 BOOL m_bDamageToMembers  "Damage To Members"   = FALSE,
  19 BOOL m_bDamageFromPlayers  "Damage From Players" = TRUE,
  
  30 enum EFRelationToPlayers m_efrtRelationToPlayers "Relation To Player(s)" = FRT_NEUTRAL,
  
  40 BOOL m_bCode          "Output as Script" = FALSE,
 
-
 components:
 
   1 model   MODEL_FACTION_HOLDER     "Models\\Editor\\EnemyFactionHolder.mdl",
   2 texture TEXTURE_FACTION_HOLDER   "Models\\Editor\\EnemyFactionHolder.tex"
 
-
 functions:
 
+  // --------------------------------------------------------------------------------------
+  // Returns short entity description to show it in SED.
+  // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const
   {
     ((CTString&)m_strDescription).PrintF("Faction Index = %d", m_iFactionIndex);
+
     return m_strDescription;
   }
 
-  BOOL IsIndexValid() {
+  // --------------------------------------------------------------------------------------
+  // Returns TRUE if current faction index is valid.
+  // --------------------------------------------------------------------------------------
+  BOOL IsIndexValid()
+  {
     if (m_iFactionIndex < 0 || m_iFactionIndex > 31) {
       return FALSE;
     }
@@ -110,7 +114,11 @@ functions:
     return TRUE;
   }
   
-  EFRelationToPlayers GetRelationToFaction(INDEX iFactionIndex) {
+  // --------------------------------------------------------------------------------------
+  // Returns relation to specified faction.
+  // --------------------------------------------------------------------------------------
+  EFRelationToPlayers GetRelationToFaction(INDEX iFactionIndex)
+  {
     ULONG ulFaction = (1<<INDEX(iFactionIndex));
 
     BOOL bAlly = (m_ulAlliesMask&ulFaction);
@@ -132,21 +140,27 @@ functions:
     return FRT_NEUTRAL;
   }
 
-  // returns bytes of memory used by this object
+  // --------------------------------------------------------------------------------------
+  // Returns bytes of memory used by this object.
+  // --------------------------------------------------------------------------------------
   SLONG GetUsedMemory(void)
   {
-    // initial
+    // Initial.
     SLONG slUsedMemory = sizeof(CEnemyFactionHolder) - sizeof(CEntity) + CEntity::GetUsedMemory();
-    // add some more
+    
+    // Add some more.
     slUsedMemory += m_strName.Length();
     slUsedMemory += m_strDescription.Length();
+
     return slUsedMemory;
   }
 
 
 procedures:
 
-
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     if (m_iFactionIndex < EFHI_00) { m_iFactionIndex = EFHI_00; }
