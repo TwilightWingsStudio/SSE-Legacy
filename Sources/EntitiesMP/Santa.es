@@ -49,7 +49,7 @@ properties:
   12 CEntityPointer m_penTemplate2 "Item template 2",
   13 CEntityPointer m_penTemplate3 "Item template 3",
   14 CEntityPointer m_penTemplate4 "Item template 4",
-  
+
 components:
   0 class   CLASS_BASE        "Classes\\EnemyBase.ecl",
 
@@ -58,12 +58,16 @@ components:
  51 sound   SOUND_WOUND     "ModelsMP\\CutSequences\\Santa\\Sounds\\Wound.wav",
  52 sound   SOUND_DEATH     "ModelsMP\\CutSequences\\Santa\\Sounds\\Death.wav",
 
+ 60 sound   SOUND_BLOWUP      "SoundsMP\\Player\\BlowUp.wav",
+ 
 functions:
   void Precache(void) {
     CEnemyBase::Precache();
     PrecacheSound(SOUND_RUN  );
     PrecacheSound(SOUND_WOUND);
     PrecacheSound(SOUND_DEATH);
+
+    PrecacheSound(SOUND_BLOWUP);
   };
 
   virtual const CTFileName &GetComputerMessageName(void) const {
@@ -92,7 +96,9 @@ functions:
     m_bRunSoundPlaying = FALSE;
   }
 
+  // --------------------------------------------------------------------------------------
   /* Handle an event, return false if the event is not handled. */
+  // --------------------------------------------------------------------------------------
   BOOL HandleEvent(const CEntityEvent &ee)
   {
     //if (ee.ee_slEvent == EVENTCODE_EDamage && GetFlags()&ENF_ALIVE) {
@@ -110,8 +116,21 @@ functions:
   virtual BOOL ShouldSelectTargetOnDamage() {
     return FALSE;
   }
+  
+  // --------------------------------------------------------------------------------------
+  // Spawns body parts and drops kamikaze.
+  // --------------------------------------------------------------------------------------
+  void BlowUp(void)
+  {
+    m_soSound.Set3DParameters(25.0f, 5.0f, 1.0f, 1.0f);
+    PlaySound(m_soSound, SOUND_BLOWUP, SOF_3D);
+    
+    CEnemyBase::BlowUp();
+  }
 
+  // --------------------------------------------------------------------------------------
   /* Receive damage */
+  // --------------------------------------------------------------------------------------
   void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
     FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection) 
   {
@@ -123,9 +142,8 @@ functions:
       return;
     }
 
-    // if not enough time passed since lst item spawning
+    // if not enough time passed since lst item spawning then do nothing
     if (_pTimer->CurrentTick()-m_tmLastSpawnTime<m_tmMinSpawnInterval) {
-      // do nothing
       return;
     }
 
@@ -253,11 +271,11 @@ procedures:
     return EReturn();
   };
 
-/************************************************************
- *                       M  A  I  N                         *
- ************************************************************/
-  Main(EVoid) {
-
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
+  Main(EVoid)
+  {
     // declare yourself as a model
     InitAsModel();
     SetPhysicsFlags(EPF_MODEL_WALKING|EPF_HASLUNGS);
@@ -299,11 +317,103 @@ procedures:
 
     // set stretch factors for height and width
     CEnemyBase::SizeModel();
-    m_soRunning.Set3DParameters(500.0f, 50.0f, 1.0f, 1.0f);
+    m_soRunning.Set3DParameters(300.0f, 50.0f, 1.0f, 1.0f);
     m_bRunSoundPlaying = FALSE;
 
     // continue behavior in base class
     jump CEnemyBase::MainLoop();
-
   };
+  
+  Die(EDeath eDeath) : CEnemyBase::Die
+  {
+    // not alive anymore
+    SetFlags(GetFlags()&~ENF_ALIVE);
+
+    // find the one who killed, or other best suitable player
+    CEntityPointer penKiller = eDeath.eLastDamage.penInflictor;
+
+    if (penKiller==NULL || !IsOfClass(penKiller, "Player")) {
+      penKiller = m_penEnemy;
+    }
+
+    if (penKiller==NULL || !IsOfClass(penKiller, "Player")) {
+      penKiller = FixupCausedToPlayer(this, penKiller, /*bWarning=*/FALSE);
+    }
+
+    BOOL bCountAsKill = CountAsKill();
+    
+    // [SSE] Enemy Settings Entity
+    if (m_penSettings && m_penSettings->IsActive())
+    {
+      CEnemySettingsEntity *penSettings = static_cast<CEnemySettingsEntity*>(&*m_penSettings);
+
+      bCountAsKill = penSettings->m_bCountAsKill;
+      
+      if (penSettings->m_penDeathTarget) {
+        SendToTarget(penSettings->m_penDeathTarget, EET_TRIGGER, penKiller);
+      }
+    }
+    //
+
+    // destroy watcher class
+    GetWatcher()->SendEvent(EStop());
+    GetWatcher()->SendEvent(EEnd());
+
+    // send event to death target
+    SendToTarget(m_penDeathTarget, m_eetDeathType, penKiller);
+
+    // send event to spawner if any
+    // NOTE: trigger's penCaused has been changed from penKiller to THIS;
+    if (m_penSpawnerTarget) {
+      SendToTarget(m_penSpawnerTarget, EET_TRIGGER, this);
+    }
+
+    // wait
+    wait()
+    {
+      // initially
+      on (EBegin) : {
+        // if should already blow up
+        if (ShouldBlowUp()) {
+          // blow up now
+          BlowUpBase();
+          // stop waiting
+          stop;
+        // if shouldn't blow up yet
+        } else {
+          // invoke death animation sequence
+          call CEnemyBase::DeathSequence();
+        }
+      }
+
+      // if damaged
+      on (EDamage) : {
+        // if should already blow up
+        if (ShouldBlowUp()) {
+          // blow up now
+          BlowUpBase();
+          stop; // stop waiting
+        }
+
+        // otherwise, ignore the damage
+        resume;
+      }
+
+      // If death sequence is over then stop waiting.
+      on (EEnd) : { 
+        stop; 
+      }
+    }
+
+    // stop making fuss
+    RemoveFromFuss();
+    
+    autowait(1.0F);
+
+    // cease to exist
+    Destroy();
+
+    // all is over now, entity will be deleted
+    return;
+  }
 };
