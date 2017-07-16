@@ -165,15 +165,6 @@ procedures:
             // do it
             m_penCaused = ePass.penOther;
             TriggerDoor();
-              
-            // this is a very ugly fix for cooperative not finishing in the demo level
-            // remove this when not needed any more!!!!
-            if(_SE_DEMO && GetSP()->sp_bCooperative && !GetSP()->sp_bSinglePlayer) {
-              if (m_strName=="Appear gold amon") {
-                CPlayer *penPlayer = (CPlayer*)&*ePass.penOther;
-                penPlayer->SetGameEnd();
-              }
-            }
 
             resume;
           }
