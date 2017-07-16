@@ -29,11 +29,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 enum ETType {
-  0 TT_NORMAL     "0 Normal",
-  1 TT_DELAYED    "1 Delayed",
-  2 TT_PROCEDURAL "2 Procedural",
-  3 TT_RANDOM     "3 Random",
-  4 TT_DELRAND    "4 Delayed randomly",
+  0 TT_NORMAL     "Normal [0]",
+  1 TT_DELAYED    "Delayed [1]",
+  2 TT_PROCEDURAL "Procedural [2]",
+  3 TT_RANDOM     "Random [3]",
+  4 TT_DELRAND    "Delayed randomly [4]",
 };
 
 class CTrigger: CRationalEntity {
@@ -193,7 +193,8 @@ functions:
     return slUsedMemory;
   }
 
-  BOOL AdjustShadingParameters(FLOAT3D &vLightDirection, COLOR &colLight, COLOR &colAmbient) {
+  BOOL AdjustShadingParameters(FLOAT3D &vLightDirection, COLOR &colLight, COLOR &colAmbient)
+  {
     colAmbient = m_colColor;
     return true;
   }
@@ -272,10 +273,11 @@ functions:
   void UpdateCurrentPos(void)
   {
     CEntityPointer penCurrent;
+
     do {
       if (m_iPos < 10) {
         m_iPos++;
-      }else{
+      } else {
         m_iPos = 1;
       }
 
@@ -291,13 +293,14 @@ functions:
         case 9: penCurrent = m_penTarget9; break;
         case 10: penCurrent = m_penTarget10; break;
       }
-    } while(!penCurrent);
+    } while (!penCurrent);
+
     return;
   }
 
   void SendToSpecifiedTarget(void)
   {
-    switch(m_iPos)
+    switch (m_iPos)
     {
       case 1: SendToTargetM(m_penTarget1, m_eetEvent1, m_penCaused); break;
       case 2: SendToTargetM(m_penTarget2, m_eetEvent2, m_penCaused); break;
@@ -315,7 +318,8 @@ functions:
   }
 
 procedures:
-  SendEventToTargets() {
+  SendEventToTargets()
+  {
     // if needed wait some time before event is send
     if (m_fWaitTime > 0.0f)
     {
@@ -358,16 +362,23 @@ procedures:
     return;
   };
 
-  Active() {
+  Active()
+  {
     ASSERT(m_bActive);
     // store count start value
     m_iCountTmp = m_iCount;
 
     //main loop
-    wait() {
+    wait()
+    {
       on (EBegin) : {
         // if auto start send event on init
-        if (m_bAutoStart) {
+        if (m_bAutoStart)
+        {
+          if (m_bDebugMessages) {
+            CPrintF(TRANS("[%s] Autostarted!\n"), m_strName);
+          }
+          
           if (m_eTType == TT_NORMAL) {
             call SendEventToTargets();
           } else if (m_eTType == TT_DELAYED) {
@@ -380,6 +391,7 @@ procedures:
             call DelayedRandomly();
           }
         }
+
         resume;
       }
 
@@ -479,7 +491,8 @@ procedures:
     }
   };
 
-  Inactive() {
+  Inactive()
+  {
     ASSERT(!m_bActive);
     while (TRUE) {
       // wait
@@ -500,7 +513,11 @@ procedures:
     }
   }
 
-  Main() {
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
+  Main()
+  {
     InitAsEditorModel();
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
     SetCollisionFlags(ECF_IMMATERIAL);
@@ -528,7 +545,8 @@ procedures:
     return;
   };
 
-  Delayed() {
+  Delayed()
+  {
     if (m_bDebugMessages) {
       CPrintF(TRANS("  Type=Delayed\n"));
     }
@@ -639,7 +657,8 @@ procedures:
     return;
   };
 
-  DelayedRandomly() {
+  DelayedRandomly()
+  {
     if (m_bDebugMessages) {
       CPrintF(TRANS("  Type=DelayedRandomly\n"));
     }
@@ -779,7 +798,8 @@ procedures:
     return;
   };
 
-  Procedural() {
+  Procedural()
+  {
     UpdateCurrentPos();
 
     if (m_fWaitTime > 0.0f) {
@@ -788,6 +808,10 @@ procedures:
         on (ETimer) : { stop; }
         on (EDeactivate) : { pass; }
         otherwise(): { resume; }
+      }
+      
+      if (m_bDebugMessages) {
+        CPrintF(TRANS("[%s] Finished Awaiting!\n"), m_strName);
       }
     }
 
@@ -801,17 +825,22 @@ procedures:
     return;
   }
 
-  Random() {
+  Random()
+  {
     if (m_fWaitTime > 0.0f) {
       wait (m_fWaitTime) {
-      on (EBegin) : { resume; }
-      on (ETimer) : { stop; }
-      on (EDeactivate) : { pass; }
-      otherwise(): { resume; }
+        on (EBegin) : { resume; }
+        on (ETimer) : { stop; }
+        on (EDeactivate) : { pass; }
+        otherwise(): { resume; }
+      }
+      
+      if (m_bDebugMessages) {
+        CPrintF(TRANS("[%s] Finished Awaiting!\n"), m_strName);
       }
     }
 
-    m_iPos = FRnd()*9+1;
+    m_iPos = IRnd() % 10 + 1;
 
     if (m_bDebugMessages) {
       CPrintF(TRANS("  Type=Random\n"));
