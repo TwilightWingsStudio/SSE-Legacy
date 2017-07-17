@@ -19,9 +19,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 enum ESeqType {
-  0 ESEQT_NORMAL      "0 Sequence from First",
-  1 ESEQT_RANDOM      "1 Sequence from Random",
-  2 ESEQT_RANDOM_ONE  "2 Random (only one)",
+  0 ESEQT_NORMAL      "All from 1st [0]",
+  1 ESEQT_RANDOM      "All from Random [1]",
+  2 ESEQT_RANDOM_ONE  "Random One [2]",
 };
 
 class CSequencer : CRationalEntity {
@@ -116,19 +116,16 @@ functions:
   // --------------------------------------------------------------------------------------
   // Sends event to target by its index.
   // --------------------------------------------------------------------------------------
-  void SendToSpecifiedTarget(void) {
-    switch (m_iPos) {
-      case  1: SendToTargetM(m_penTarget01, m_eetEvent01, m_penCaused); break;
-      case  2: SendToTargetM(m_penTarget02, m_eetEvent02, m_penCaused); break;
-      case  3: SendToTargetM(m_penTarget03, m_eetEvent03, m_penCaused); break;
-      case  4: SendToTargetM(m_penTarget04, m_eetEvent04, m_penCaused); break;
-      case  5: SendToTargetM(m_penTarget05, m_eetEvent05, m_penCaused); break;
-      case  6: SendToTargetM(m_penTarget06, m_eetEvent06, m_penCaused); break;
-      case  7: SendToTargetM(m_penTarget07, m_eetEvent07, m_penCaused); break;
-      case  8: SendToTargetM(m_penTarget08, m_eetEvent08, m_penCaused); break;
-      case  9: SendToTargetM(m_penTarget09, m_eetEvent09, m_penCaused); break;
-      case 10: SendToTargetM(m_penTarget10, m_eetEvent10, m_penCaused); break;
+  void SendToSpecifiedTarget(void)
+  {
+    const CEntityPointer* apenTargets = &m_penTarget01;
+    const EventEType* aeetEvents = &m_eetEvent01;
+    
+    if (m_iPos < 0 || m_iPos > 9) {
+      return;
     }
+    
+    SendToTargetM(apenTargets[m_iPos], aeetEvents[m_iPos], m_penCaused);
   }
   
   // --------------------------------------------------------------------------------------
@@ -279,7 +276,7 @@ procedures:
     m_iPos = 0;
 
     if (m_bDebugMessages) {
-      CPrintF(TRANS("  Type=SequenceFromFirst\n"));
+      CPrintF(TRANS("  Type=AllFromFirst\n"));
       CPrintF(TRANS("  Starting sequence from Target %d\n"), 1);
     }
 
@@ -315,7 +312,7 @@ procedures:
     m_iPos = IRnd()%10;
 
     if (m_bDebugMessages) {
-      CPrintF(TRANS("  Type=SequenceFromRandom\n"));
+      CPrintF(TRANS("  Type=AllFromRandom\n"));
       CPrintF(TRANS("  Starting sequence from Target %d\n"), m_iPos + 1);
     }
 
@@ -354,7 +351,7 @@ procedures:
     
     if (m_bDebugMessages) {
       CPrintF(TRANS("  Type=RandomOne\n"));
-      CPrintF(TRANS("  SelectedTarget=%d\n"), m_iPos + 1);
+      CPrintF(TRANS("  Selected Target=%d\n"), m_iPos + 1);
     }
 
     // If we have delay for specified target then delay this shit.
