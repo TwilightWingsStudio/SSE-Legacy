@@ -21,9 +21,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 enum ECoderModeType {
-  0 ECMT_IDECODER  "0 Decoder Index",
-  1 ECMT_FDECODER  "1 Decoder Float",
-  2 ECMT_ETENCODER "2 Encoder Event Type",
+  0 ECMT_IDECODER  "Decoder Index [0]",
+  1 ECMT_FDECODER  "Decoder Float [1]",
+  2 ECMT_ETENCODER "Encoder Event [2] Type",
   
   //3 ECMT_TENCODER  "3 Encoder Target",
 };
@@ -160,25 +160,25 @@ functions:
   INDEX GetIDByEventType(EventEType eet)
   {
     if (eet == m_eetEvent01) {
-      return 1;
+      return 0;
     } else if (eet == m_eetEvent02) {
-      return 2;
+      return 1;
     } else if (eet == m_eetEvent03) {
-      return 3;
+      return 2;
     } else if (eet == m_eetEvent04) {
-      return 4;
+      return 3;
     } else if (eet == m_eetEvent05) {
-      return 5;
+      return 4;
     } else if (eet == m_eetEvent06) {
-      return 6;
+      return 5;
     } else if (eet == m_eetEvent07) {
-      return 7;
+      return 6;
     } else if (eet == m_eetEvent08) {
-      return 8;
+      return 7;
     } else if (eet == m_eetEvent09) {
-      return 9;
+      return 8;
     } else if (eet == m_eetEvent10) {
-      return 10;
+      return 9;
     }
 
     return -1;
@@ -278,9 +278,9 @@ functions:
 
     if (m_bDebugMessages) {
       if (i > 0 && i < 11) {
-        CPrintF("[%s] (ETEncoder) : Ouputing I=%d F=%f taken from input %d.\n", GetName(), m_iIOIndex, m_fIOFloat, i);
+        CPrintF("[%s] (ETEncoder) : Ouputing I=Index[%d]=%d F=Float[%d]=%f taken from In %d.\n", GetName(), i, m_iIOIndex, i, m_fIOFloat, i + 1);
       } else {
-        CPrintF("[%s] (ETEncoder) : Ouputing I=%d F=%f taken from default input.\n", GetName(), m_iIOIndex, m_fIOFloat);
+        CPrintF("[%s] (ETEncoder) : Ouputing I=%d F=%f taken from default In.\n", GetName(), m_iIOIndex, m_fIOFloat);
       }
     }
   }
