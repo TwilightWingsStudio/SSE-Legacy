@@ -22,6 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/SessionState.h>
 
 #include <Engine/Entities/Entity.h>
+#include <Engine/Entities/EntityClass.h>
 #include <Engine/Entities/EntityProperties.h>
 #include <Engine/Entities/InternalClasses.h>
 
@@ -88,44 +89,6 @@ static int l_entities_IsLiveEntity(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
-// Checks if entity is alive
-// --------------------------------------------------------------------------------------
-#define SCRIPTFUNCNAME "IsEntityAlive"
-static int l_entities_IsEntityAlive(lua_State* L)
-{
-  ONLYREQARGCT(lua_gettop(L), 1);
-  
-  ULONG ulEntityID = luaL_checkinteger (L, 1);
-
-  DEFENTBYID(penEntity, ulEntityID);
-  
-  ONLYVALIDENTITY(penEntity);
-
-  lua_pushinteger(L, penEntity->IsAlive());
-
-  return 1;
-}
-
-// --------------------------------------------------------------------------------------
-// Checks if entity is alive
-// --------------------------------------------------------------------------------------
-#define SCRIPTFUNCNAME "IsEntityDead"
-static int l_entities_IsEntityDead(lua_State* L)
-{
-  ONLYREQARGCT(lua_gettop(L), 1);
-  
-  ULONG ulEntityID = luaL_checkinteger (L, 1);
-
-  DEFENTBYID(penEntity, ulEntityID);
-  
-  ONLYVALIDENTITY(penEntity);
-
-  lua_pushinteger(L, penEntity->IsDead());
-
-  return 1;
-}
-
-// --------------------------------------------------------------------------------------
 // Checks if entity is rational entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsRationalEntity"
@@ -183,6 +146,25 @@ static int l_entities_IsPlayerEntity(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
+// Checks if entity is marker entity.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsMarkerEntity"
+static int l_entities_IsMarkerEntity(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  lua_pushinteger(L, penEntity->IsMarker());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
 // Checks if entity is interaction provider.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsInteractionProvider"
@@ -221,6 +203,63 @@ static int l_entities_IsInteractionRelay(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
+// Checks if entity is alive
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsEntityAlive"
+static int l_entities_IsEntityAlive(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  lua_pushinteger(L, penEntity->IsAlive());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Checks if entity is alive
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsEntityDead"
+static int l_entities_IsEntityDead(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  lua_pushinteger(L, penEntity->IsDead());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Checks if entity is active.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsEntityActive"
+static int l_entities_IsEntityActive(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  lua_pushinteger(L, penEntity->IsActive());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
 // Gets the parent entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityParent"
@@ -235,6 +274,63 @@ static int l_entities_GetEntityParent(lua_State* L)
   ONLYVALIDENTITY(penEntity);
 
   lua_pushinteger(L, penEntity->GetParent() ? penEntity->GetParent()->en_ulID : INDEX(-1));
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets the child count of entity.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityChildCount"
+static int l_entities_GetEntityChildCount(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  lua_pushinteger(L, penEntity->GetChildCount());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets the entity name.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityName"
+static int l_entities_GetEntityName(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  lua_pushstring(L, penEntity->GetName());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets the entity class name.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityClassName"
+static int l_entities_GetEntityClassName(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  lua_pushstring(L, penEntity->GetClass()->ec_pdecDLLClass->dec_strName);
 
   return 1;
 }
@@ -485,6 +581,46 @@ static int l_entities_GetEntityLevel(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
+// Gets entity money.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityMoney"
+static int l_entities_GetEntityMoney(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+  
+  lua_pushinteger(L, static_cast<CLiveEntity*>(penEntity)->GetMoney());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Gets entity supplies.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntitySupplies"
+static int l_entities_GetEntitySupplies(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+  
+  lua_pushinteger(L, static_cast<CLiveEntity*>(penEntity)->GetSupplies());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
 // Gets entity property value by its name.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityPropByName"
@@ -569,6 +705,19 @@ static int l_entities_GetPlayersCount(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
+// Gets max players count.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetMaxPlayers"
+static int l_entities_GetMaxPlayers(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 0);
+  
+  lua_pushinteger(L, CEntity::GetMaxPlayers());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
 // Gets PLID from entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetPlayerID"
@@ -596,23 +745,31 @@ static const struct luaL_Reg entitiesLib [] = {
   {"IsMovableEntity", l_entities_IsMovableEntity},
   {"IsPlayerEntity", l_entities_IsPlayerEntity},
 
+  {"IsMarkerEntity", l_entities_IsMarkerEntity},
   {"IsInteractionProvider", l_entities_IsInteractionProvider},
   {"IsInteractionRelay", l_entities_IsInteractionRelay},
 
   {"IsEntityAlive", l_entities_IsEntityAlive},
   {"IsEntityDead", l_entities_IsEntityDead},
   
+  {"IsEntityActive", l_entities_IsEntityActive},
+  
   // IsEntityOfClass
   // IsEntityDerivedFromClass
   
   //////// CEntity Utils ////////
   {"GetEntityParent", l_entities_GetEntityParent},
+  {"GetEntityChildCount", l_entities_GetEntityChildCount},
+  {"GetEntityName", l_entities_GetEntityName},
+  {"GetEntityClassName", l_entities_GetEntityClassName},
 
   //////// Getters for CLiveEntity ////////
   {"GetEntityArmor", l_entities_GetEntityArmor},
   {"GetEntityHealth", l_entities_GetEntityHealth},
   {"GetEntityShields", l_entities_GetEntityShields},
   {"GetEntityLevel", l_entities_GetEntityLevel},
+  {"GetEntityMoney", l_entities_GetEntityMoney},
+  {"GetEntitySupplies", l_entities_GetEntitySupplies},
 
   //////// Working with properties ////////
   {"GetEntityPropByName", l_entities_GetEntityPropByName},
@@ -636,6 +793,7 @@ static const struct luaL_Reg entitiesLib [] = {
   {"GetPlayerEntityByPLID", l_entities_GetPlayerEntityByPLID},
   {"GetPlayerID", l_entities_GetPlayerID},
   {"GetPlayersCount", l_entities_GetPlayersCount},
+  {"GetMaxPlayers", l_entities_GetMaxPlayers},
   
   //////// Raycasting ////////
   /*
