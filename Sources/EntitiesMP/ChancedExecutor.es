@@ -19,7 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 class CChancedExecutor : CRationalEntity {
-name      "ChancedExecutor";
+name      "CChancedExecutor";
 thumbnail "Thumbnails\\ChancedExecutor.tbn";
 features  "HasName", "IsTargetable";
 
@@ -28,7 +28,7 @@ properties:
    3 CTString m_strDescription = "",
    
    4 BOOL m_bActive               "Active" 'A' = TRUE,
-   5 BOOL m_bDebugMessage "Debug Messages" = FALSE,
+   5 BOOL m_bDebugMessages "Debug Messages" = FALSE,
    
    6 FLOAT m_fChance "Chance (0-1)" = 0.0F,
    
@@ -43,9 +43,21 @@ components:
 
 functions:
   // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Returns TRUE if main entity logic is active.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsActive(void) const
+  {
+    return m_bActive;
+  }
+
+  // --------------------------------------------------------------------------------------
   // Returns short entity description to show it in SED.
   // --------------------------------------------------------------------------------------
-  const CTString &GetDescription(void) const {
+  const CTString &GetDescription(void) const
+  {
+    ((CTString&)m_strDescription).PrintF("%.4f <=", m_fChance);
+    
     return m_strDescription;
   }
 
@@ -57,7 +69,7 @@ functions:
     FLOAT fGenFloat = FRnd();
     
     if (fGenFloat <= m_fChance) {
-      if (m_bDebugMessage) {
+      if (m_bDebugMessages) {
         CPrintF("%s : Success! (%.2f <= %.2f)\n", GetName(), fGenFloat, m_fChance);
         
         if (m_penSuccessTarget) {
@@ -71,7 +83,7 @@ functions:
         SendToTarget(m_penSuccessTarget, m_eetSuccess, eTrigger.penCaused);
       }
     } else {
-      if (m_bDebugMessage) {
+      if (m_bDebugMessages) {
         CPrintF("%s : Fail! (%.2f > %.2f)\n", GetName(), fGenFloat, m_fChance);
         
         if (m_penSuccessTarget) {
@@ -120,7 +132,7 @@ procedures:
       }
 
       on (EActivate) : {
-        if (m_bDebugMessage) {
+        if (m_bDebugMessages) {
           CPrintF("%s : Activated!\n", GetName());
         }
         
@@ -129,7 +141,7 @@ procedures:
       }
 
       on (EDeactivate) : {
-        if (m_bDebugMessage) {
+        if (m_bDebugMessages) {
           CPrintF("%s : Deactivated!\n", GetName());
         }
 
