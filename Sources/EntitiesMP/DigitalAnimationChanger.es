@@ -215,7 +215,7 @@ functions:
       iValue = Abs(iValue);
       
       if (m_bDebugMessages) {
-        CPrintF("  Absolute Value: %d", iValue);
+        CPrintF("  Absolute Value: %d\n", iValue);
       }
     }
     
@@ -263,7 +263,7 @@ functions:
       fValue = Abs(fValue);
       
       if (m_bDebugMessages) {
-        CPrintF("  Absolute Value: %f", fValue);
+        CPrintF("  Absolute Value: %f\n", fValue);
       }
     }
 
