@@ -131,27 +131,40 @@ functions:
   {
     m_ctEnemiesInWorld = 0;
     m_ctSecretsInWorld = 0;
+
     // for each entity in the world
     {FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten) {
       CEntity *pen = iten;
 
-      // if enemybase
+      // If enemybase
       if (IsDerivedFromClass(pen, "Enemy Base")) {
         CEnemyBase *penEnemy = (CEnemyBase *)pen;
 
-        // if not template
-        if (!penEnemy->m_bTemplate) {
-
-          // if has flag count as enemy
-          if (penEnemy->m_bCountEnemyInStatistics) {
+        // If not template
+        if (!penEnemy->m_bTemplate)
+        {
+          // [SSE] Enemy Settings Entity
+          if (penEnemy->m_penSettings) {
+            CEnemySettingsEntity *penSettings = static_cast<CEnemySettingsEntity*>(&*penEnemy->m_penSettings);
+            
+            if (penSettings) {
+              if (penSettings->m_bCountAsEnemy) {
+                m_ctEnemiesInWorld++;
+              }
+            } else {
+              m_ctEnemiesInWorld++;
+            }
+          } else {
             m_ctEnemiesInWorld++;
           }
+          //
 
           // if this is a woman kamikaze carrier, add another one to count
           if (IsOfClass(pen, "Woman")) {
               if (((CWoman *)&*pen)->m_bKamikazeCarrier) { m_ctEnemiesInWorld++; }
           }
         }
+
       // if spawner
       } else if (IsDerivedFromClass(pen, "Enemy Spawner")) {
         CEnemySpawner *penSpawner = (CEnemySpawner *)pen;
