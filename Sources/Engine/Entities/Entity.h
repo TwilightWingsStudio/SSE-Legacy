@@ -793,11 +793,13 @@ public:
   virtual FLOAT GetShields(void) const { return 0.0F; };
   virtual INDEX GetLevel(void) const { return 0; };
   virtual INDEX GetMoney(void) const { return 0; };
+  virtual INDEX GetSupplies(void) const { return 0; };
   
   virtual void SetArmor(FLOAT fArmor) {};
   virtual void SetShields(FLOAT fShields) {};
   virtual void SetLevel(INDEX iLevel) {};
   virtual void SetMoney(INDEX iMoney) {};
+  virtual void SetSupplies(INDEX iSupllies) {};
   
   // [SSE] Extended Engine API
   virtual BOOL IsLiveEntity()
