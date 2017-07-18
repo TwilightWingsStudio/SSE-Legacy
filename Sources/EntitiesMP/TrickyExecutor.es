@@ -20,7 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 class CTrickyExecutor: CRationalEntity {
-name      "TrickyExecutor";
+name      "CTrickyExecutor";
 thumbnail "Thumbnails\\TrickyExecutor.tbn";
 features  "HasName", "IsTargetable";
 
@@ -41,9 +41,25 @@ components:
 
 functions:
   // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Returns TRUE if main entity logic is active.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsActive(void) const
+  {
+    return m_bActive;
+  }
+
+  // --------------------------------------------------------------------------------------
   // Returns short entity description to show it in SED.
   // --------------------------------------------------------------------------------------
-  const CTString &GetDescription(void) const {
+  const CTString &GetDescription(void) const
+  {
+    ((CTString&)m_strDescription).PrintF("-><none>");
+
+    if (m_penTarget != NULL) {
+      ((CTString&)m_strDescription).PrintF("->%s", m_penTarget->GetName());
+    }
+    
     return m_strDescription;
   }
 
@@ -84,7 +100,8 @@ procedures:
   
     autowait(0.1f);
   
-    wait() {
+    wait()
+    {
       on (EBegin) : { 
         resume;
       }
