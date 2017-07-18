@@ -114,6 +114,9 @@ extern void HUD_DrawDebugMonitor()
     strReport.PrintF("%s^cCCCCCCHave Keys: %d\n", strReport, ctHaveKeys);
   }
 
+  strReport.PrintF("%s^cCCCCCCMoney: %d\n", strReport, _penPlayer->m_iMoney);
+  strReport.PrintF("%s^cCCCCCCSupplies: %d\n", strReport, _penPlayer->m_iSupplies);
+
   strReport += "\n\n";
   strReport += "^r[Mode Flags]^cCCCCCC\n";
   if (GetSP()->sp_bCooperative) {
