@@ -1260,6 +1260,20 @@ void CEntity::SetParent(CEntity *penNewParent)
   }
 }
 
+// --------------------------------------------------------------------------------------
+// [SSE] Extended Engine API
+// Get child entities count
+// --------------------------------------------------------------------------------------
+INDEX CEntity::GetChildCount(void)
+{
+  INDEX ctChild = 0;
+
+  {FOREACHINLIST(CEntity, en_lnInParent, en_lhChildren, itenChild) {
+    ctChild++;
+  }}
+  
+  return ctChild;
+}
 
 // find first child of given class
 CEntity *CEntity::GetChildOfClass(const char *strClass)

@@ -509,6 +509,9 @@ public:
   inline CTerrain *GetTerrain(void) { return en_ptrTerrain; };
   inline CEntity *GetParent(void) { return en_penParent; };
   void SetParent(CEntity *penNewParent);
+  
+  // [SSE] Extended Engine API
+  INDEX GetChildCount(void);
 
   // find first child of given class
   CEntity *GetChildOfClass(const char *strClass);
