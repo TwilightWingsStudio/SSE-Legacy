@@ -86,6 +86,36 @@ functions:
   {
     return m_bActive;
   }
+  
+  // --------------------------------------------------------------------------------------
+  // The entity event handler.
+  // --------------------------------------------------------------------------------------
+  BOOL HandleEvent(const CEntityEvent &ee)
+  {
+    if (ee.ee_slEvent== EVENTCODE_EActivate) {
+      if (!m_bActive)
+      {
+        m_bActive = TRUE;
+        
+        if (m_bDebugMessages) {
+          CPrintF(TRANS("[%s] Activated!\n"), m_strName);
+        }
+      }
+    }
+
+    if (ee.ee_slEvent == EVENTCODE_EDeactivate) {
+      if (m_bActive)
+      {
+        m_bActive = FALSE;
+
+        if (m_bDebugMessages) {
+          CPrintF(TRANS("[%s] Deactivated!\n"), m_strName);
+        }
+      }
+    }
+
+    return CRationalEntity::HandleEvent(ee);
+  }
 
   // --------------------------------------------------------------------------------------
   // Returns short entity description to show it in SED.
@@ -277,14 +307,12 @@ procedures:
 
   Active()
   {
-    ASSERT(m_bActive);
-
     //main loop
     wait()
     {
       on (EBegin) : {
         // if auto start send event on init
-        if (m_bAutoStart) {
+        if (m_bActive && m_bAutoStart) {
           if (m_eTType == STT_NORMAL) {
             call SendEventToTargets();
           } else if (m_eTType == STT_PROCEDURAL) {
@@ -303,12 +331,17 @@ procedures:
       }
 
       // cascade trigger
-      on (ETrigger eTrigger) : {
+      on (ETrigger eTrigger) :
+      {
+        if (!m_bActive) {
+          resume;
+        }
+        
         if (m_bDebugMessages) {
           if (eTrigger.penCaused != NULL) {
             CPrintF(TRANS("[%s] : triggered through %s\n"), m_strName, eTrigger.penCaused->GetName());
           } else {
-            CPrintF(TRANS("[%s] : triggered through unknown entity\n"), m_strName);
+            CPrintF(TRANS("[%s] : triggered through NULL entity\n"), m_strName);
           }
         }
 
@@ -326,39 +359,8 @@ procedures:
 
         resume;
       }
-
-      // if deactivated then go to inactive state
-      on (EDeactivate) : {
-        m_bActive = FALSE;
-        jump Inactive();
-      }
     }
   };
-
-  Inactive()
-  {
-    ASSERT(!m_bActive);
-
-    while (TRUE)
-    {
-      // wait
-      wait()
-      {
-        // if activated then go to active state
-        on (EActivate) : {
-          m_bActive = TRUE;
-          jump Active();
-        }
-
-        otherwise() : {
-          resume;
-        };
-      };
-
-      // wait a bit to recover
-      autowait(0.1f);
-    }
-  }
 
   // --------------------------------------------------------------------------------------
   // The entry point.
@@ -376,12 +378,7 @@ procedures:
     // spawn in world editor
     autowait(0.1F);
 
-    // go into active or inactive state
-    if (m_bActive) {
-      jump Active();
-    } else {
-      jump Inactive();
-    }
+    jump Active();
 
     // cease to exist
     Destroy();
