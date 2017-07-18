@@ -1319,8 +1319,9 @@ properties:
  // [SSE] Gameplay - Personal/Shared Extra Lives
  200 INDEX m_iLives = 0,
  201 INDEX m_iMoney = 0,
- 202 INDEX m_iScoreAccumulated = 0,
- 203 FLOAT m_fLiveCostMultiplier = 1.0F,
+ 202 INDEX m_iSupplies = 0,
+ 203 INDEX m_iScoreAccumulated = 0,
+ 204 FLOAT m_fLiveCostMultiplier = 1.0F,
  
  // [SSE] Gameplay - Respawn Delay
  220 FLOAT m_tmKilled = -1.0f,
@@ -1482,7 +1483,7 @@ functions:
 
   // --------------------------------------------------------------------------------------
   // [SSE] Interaction API
-  // Return true if this entity can act act like interaction provider.
+  // Return true if this entity can act like interaction provider.
   // --------------------------------------------------------------------------------------
   virtual BOOL IsInteractionProvider(void)
   {
@@ -1509,6 +1510,24 @@ functions:
   
   // --------------------------------------------------------------------------------------
   // [SSE] Extended Engine API
+  // Returns current money value.
+  // --------------------------------------------------------------------------------------
+  virtual INDEX GetMoney(void) const
+  {
+    return m_iMoney;
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Returns current supplies value.
+  // --------------------------------------------------------------------------------------
+  virtual INDEX GetSupplies(void) const
+  {
+    return m_iSupplies;
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
   // Sets the new armor value.
   // --------------------------------------------------------------------------------------
   virtual void SetArmor(FLOAT fArmor)
@@ -1523,6 +1542,24 @@ functions:
   virtual void SetShields(FLOAT fShields)
   {
     m_fShields = fShields;
+  };
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Sets the new money value.
+  // --------------------------------------------------------------------------------------
+  virtual void SetMoney(INDEX iMoney)
+  {
+    m_iMoney = iMoney;
+  };
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Sets the new supplies value.
+  // --------------------------------------------------------------------------------------
+  virtual void SetSupplies(INDEX iSupplies)
+  {
+    m_iSupplies = iSupplies;
   };
   
   // --------------------------------------------------------------------------------------
@@ -4768,7 +4805,9 @@ functions:
           return TRUE;
 
         case PUIT_BOMB:
+          //((CPlayerWeapons&)*m_penWeapons).ReceiveSeriousBomb();
           m_iSeriousBombCount++;
+
           ItemPicked(TRANS("^cFF0000Serious Bomb!"), 0);
           //ItemPicked(TRANS("^cFF0000S^cFFFF00e^cFF0000r^cFFFF00i^cFF0000o^cFFFF00u^cFF0000s ^cFF0000B^cFFFF00o^cFF0000m^cFFFF00b!"), 0);
           // send computer message
@@ -4779,7 +4818,7 @@ functions:
           }
 
           return TRUE;              
-        }
+      }
     }
 
     // nothing picked
@@ -5593,8 +5632,13 @@ functions:
     if (!GetSP()->sp_bCooperative) {
       // enable faster moving if holding knife in DM
       INDEX iCurrentWeapon = ((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon;
+
       if (iCurrentWeapon == WEAPON_NONE || iCurrentWeapon == WEAPON_FISTS || iCurrentWeapon == WEAPON_KNIFE) {
         vTranslation *= 1.3f;
+      
+      // [SSE]
+      } else if (iCurrentWeapon == WEAPON_CHAINSAW) {
+        vTranslation *= 1.15f;
       }
 
       // Player running faster in DM
@@ -6182,6 +6226,7 @@ functions:
     if (ulReleasedButtons&PLACT_RELOAD) {
       ((CPlayerWeapons&)*m_penWeapons).SendEvent(EReloadWeapon());
     }
+
     // if fire bomb is pressed
     if (ulNewButtons&PLACT_FIREBOMB) {
       if (m_iSeriousBombCount>0 && m_tmSeriousBombFired+4.0f<_pTimer->CurrentTick()) {
@@ -6284,7 +6329,7 @@ functions:
   BOOL CheatsEnabled(void)
   {
     return TRUE;
-    return (GetSP()->sp_ctMaxPlayers == 1 || GetSP()->sp_bQuickTest) && m_penActionMarker == NULL && !_SE_DEMO;
+    return (GetSP()->sp_ctMaxPlayers == 1 || GetSP()->sp_bQuickTest) && m_penActionMarker == NULL;
   }
 
   // --------------------------------------------------------------------------------------
