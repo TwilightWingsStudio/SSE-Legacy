@@ -45,7 +45,7 @@ properties:
 
   10 INDEX m_iScore              "Stat. Reward Score" = -1,
   11 BOOL m_bCountAsKill         "Stat. Reward Kill" = TRUE,
-  //12 BOOL m_bCountAsEnemy        "Stat. Count Enemy" = TRUE,
+  12 BOOL m_bCountAsEnemy        "Stat. Count Enemy" = TRUE,
   13 CEntityPointer m_penSwitch  "Switch",
   14 FLOAT m_fDamageTakeMul      "Take Damage Mul" = 1.0F,
   
@@ -59,10 +59,10 @@ properties:
   
   //30 FLOAT m_fInitialHealth      "Health Initial" = -1.0F,
   //31 FLOAT m_fMaxHealth          "Health Max" = -1.0F,
-  
+
   //40 FLOAT m_fDensity            "Density" = 1000.0F,
   
-  //50 CEntityPointer m_penDeathTarget  "On Death target" 'D',
+  50 CEntityPointer m_penDeathTarget  "On Death target" 'D',
   //51 CEntityPointer m_penDamageTarget "On Damage target",
   //52 CEntityPointer m_penSightTarget  "On Sight target",
   //53 CEntityPointer m_penWoundTarget  "On Wound target",

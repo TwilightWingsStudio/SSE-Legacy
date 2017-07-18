@@ -191,9 +191,6 @@ properties:
 186 FLOAT m_tmMaxChargeHitLength = 5.0F,
 190 INDEX m_iLastReminderValue = 0,
 
-200 BOOL m_bCountEnemyInStatistics "Count As Enemy (statistics)" = TRUE,
-//201 BOOL m_bCountKillInStatistcs   "Count As Kill (statistics)" = TRUE,
-
 //213 CEntityPointer m_penFriend,
 //214 BOOL m_bRunningToFriend = FALSE,
 
@@ -3331,24 +3328,28 @@ procedures:
       penKiller = FixupCausedToPlayer(this, penKiller, /*bWarning=*/FALSE);
     }
 
+    INDEX iScore = -1;
+    BOOL bReceiveMessage = TRUE;
+    BOOL bCountAsKill = CountAsKill();
+    
+    // [SSE] Enemy Settings Entity
+    if (m_penSettings && m_penSettings->IsActive())
+    {
+      CEnemySettingsEntity *penSettings = static_cast<CEnemySettingsEntity*>(&*m_penSettings);
+
+      iScore = penSettings->m_iScore;
+      bReceiveMessage = penSettings->m_bReceiveMessage;
+      bCountAsKill = penSettings->m_bCountAsKill;
+      
+      if (penSettings->m_penDeathTarget) {
+        SendToTarget(penSettings->m_penDeathTarget, EET_TRIGGER, penKiller);
+      }
+    }
+    //
+
     // if killed by someone
     if (penKiller != NULL)
     {
-      INDEX iScore = -1;
-      BOOL bReceiveMessage = TRUE;
-      BOOL bCountAsKill = CountAsKill();
-      
-      // [SSE] Enemy Settings Entity
-      if (m_penSettings && m_penSettings->IsActive())
-      {
-        CEnemySettingsEntity *penSettings = static_cast<CEnemySettingsEntity*>(&*m_penSettings);
-
-        iScore = penSettings->m_iScore;
-        bReceiveMessage = penSettings->m_bReceiveMessage;
-        bCountAsKill = penSettings->m_bCountAsKill;
-      }
-      //
-      
       if (iScore < 0) {
         iScore = m_iScore;
       }
