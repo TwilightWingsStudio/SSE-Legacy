@@ -25,7 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class ENGINE_API CScriptEngine
 {
   public:
-    void ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScript, CEntity* penCaused, INDEX aiSlots[5]);
+    void ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScript, CEntity* penCaused, INDEX aiSlots[5], BOOL bDebugMessages);
 };
 
 ENGINE_API extern CScriptEngine *_pScriptEngine;

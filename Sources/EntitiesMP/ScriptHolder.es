@@ -29,7 +29,7 @@ properties:
    3 CTString m_strDescription = "",
    
    4 BOOL m_bActive           "Active" 'A'         = TRUE,
-   5 BOOL m_bDebugMessage     "Debug Messages"     = FALSE,
+   5 BOOL m_bDebugMessages    "Debug Messages"     = FALSE,
    6 CTFileName m_fnScript    "Script File"    'S' = CTFILENAME(""),
    
   10 CEntityPointer m_penTarget "Target" 'T',
@@ -73,7 +73,7 @@ functions:
     }
     
     if (m_fnScript != "" && FileExists(m_fnScript)) {
-      _pScriptEngine->ExecEntityScript(this, m_fnScript, eTrigger.penCaused, aiSlots);
+      _pScriptEngine->ExecEntityScript(this, m_fnScript, eTrigger.penCaused, aiSlots, m_bDebugMessages);
     }
     
     SendToTarget(m_penTarget, EET_TRIGGER, eTrigger.penCaused);

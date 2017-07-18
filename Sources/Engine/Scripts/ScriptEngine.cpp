@@ -90,7 +90,7 @@ extern void LUAJitTest(void *pArgs)
   lua_settop(state, 0); // Cleanup the stack.
 }
 
-void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScript, CEntity* penCaused, INDEX aiSlots[5])
+void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScript, CEntity* penCaused, INDEX aiSlots[5], BOOL bDebugMessages)
 {
   lua_State *state = CreateSafeState();
 
@@ -104,7 +104,9 @@ void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScr
   CTFileName fnmFullPath;
   INDEX iFile = ExpandFilePath(EFP_READ, fnmScript, fnmFullPath);
   
-  CPrintF("[LUA][INF] Running script '%s'...\n", fnmScript);
+  if (bDebugMessages) {
+    CPrintF("[LUA][INF] Running script '%s'...\n", fnmScript);
+  }
 
   if (iFile != EFP_FILE) {
     CPrintF("[LUA][ERR] Unable to run script! Path points to not a file!\n");
@@ -146,6 +148,8 @@ void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScr
     lua_setglobal(state, "_slot5");
   }
   
+  CTimerValue tv0 = _pTimer->GetHighPrecisionTimer();
+  
   // Execute the script.
   result = lua_pcall(state, 0, 0, 0);
 
@@ -160,4 +164,10 @@ void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScr
   }
   
   lua_close(state);
+  
+  CTimerValue tv1 = _pTimer->GetHighPrecisionTimer();
+  
+  if (bDebugMessages) {
+    CPrintF("[LUA][INF] Script executed in %.4f s\n", (tv1-tv0).GetSeconds());
+  }
 }
