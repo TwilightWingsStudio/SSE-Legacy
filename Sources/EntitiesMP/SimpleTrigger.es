@@ -79,6 +79,15 @@ components:
 
 functions:
   // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Returns TRUE if main entity logic is active.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsActive(void) const
+  {
+    return m_bActive;
+  }
+
+  // --------------------------------------------------------------------------------------
   // Returns short entity description to show it in SED.
   // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const
@@ -249,8 +258,12 @@ procedures:
         otherwise(): { resume; }
       }
     }
+    
+    if (m_bDebugMessages) {
+      CPrintF(TRANS("[%s] Finished Awaiting!\n"), m_strName);
+    }
 
-    m_iPos = FRnd()*4+1;
+    m_iPos = IRnd() % 5 + 1;
 
     if (m_bDebugMessages) {
       CPrintF(TRANS("  Type=Random\n"));

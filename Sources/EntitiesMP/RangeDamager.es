@@ -48,7 +48,20 @@ components:
   2 texture TEXTURE_TELEPORT   "Models\\Editor\\RangeDamager.tex",
 
 functions:
-  const CTString &GetDescription(void) const {
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Returns TRUE if main entity logic is active.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsActive(void) const
+  {
+    return m_bActive;
+  }
+
+  // --------------------------------------------------------------------------------------
+  // Returns short entity description to show it in SED.
+  // --------------------------------------------------------------------------------------
+  const CTString &GetDescription(void) const
+  {
     ((CTString&)m_strDescription).PrintF("%s:%g", DamageType_enum.NameForValue(INDEX(m_dmtType)), m_fAmmount);
     return m_strDescription;
   }

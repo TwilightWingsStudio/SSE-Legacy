@@ -56,6 +56,14 @@ components:
   2 texture TEXTURE_SIMPLESWITCH  "Models\\Editor\\SimpleSwitch.tex"
 
 functions:
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Returns TRUE if main entity logic is active.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsActive(void) const
+  {
+    return m_bActive;
+  }
 
   // --------------------------------------------------------------------------------------
   // [SSE] Interaction API
