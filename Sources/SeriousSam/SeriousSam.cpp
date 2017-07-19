@@ -88,6 +88,7 @@ extern INDEX sam_bMenuLoad     = FALSE;
 extern INDEX sam_bMenuControls = FALSE;
 extern INDEX sam_bMenuHiScore  = FALSE;
 extern INDEX sam_bToggleConsole = FALSE;
+extern INDEX sam_bToggleOverlay = FALSE; // [SSE] Overlay
 extern INDEX sam_iStartCredits = FALSE;
 
 // for mod re-loading
@@ -395,7 +396,7 @@ void InitializeGame(void)
     FatalError("%s", strError);
   }
   // init game - this will load persistent symbols
-  _pGame->Initialize(CTString("Data\\SeriousSam.gms"));
+  _pGame->Initialize(CTString("UserData\\SeriousSam.gms"));
 }
 
 BOOL Init( HINSTANCE hInstance, int nCmdShow, CTString strCmdLine)
@@ -476,7 +477,8 @@ BOOL Init( HINSTANCE hInstance, int nCmdShow, CTString strCmdLine)
   _pShell->DeclareSymbol("user INDEX sam_bMenuLoad;",     &sam_bMenuLoad);
   _pShell->DeclareSymbol("user INDEX sam_bMenuControls;", &sam_bMenuControls);
   _pShell->DeclareSymbol("user INDEX sam_bMenuHiScore;",  &sam_bMenuHiScore);
-  _pShell->DeclareSymbol("user INDEX sam_bToggleConsole;",&sam_bToggleConsole);
+  _pShell->DeclareSymbol("user INDEX sam_bToggleConsole;", &sam_bToggleConsole);
+  _pShell->DeclareSymbol("user INDEX sam_bToggleOverlay;", &sam_bToggleOverlay); // [SSE] Overlay
   _pShell->DeclareSymbol("INDEX sam_iStartCredits;", &sam_iStartCredits);
 
   InitializeGame();
@@ -1072,6 +1074,14 @@ int SubMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int 
           MenuOnChar(msg);
         }
       }
+      
+      // [SSE] Overlay
+      //BOOL bShift = GetKeyState(VK_SHIFT) & 0x8000;
+      //BOOL bOverlayKey = sam_bToggleOverlay || (bShift && msg.message == WM_KEYDOWN && msg.wParam == VK_TAB);
+      //if (bOverlayKey && !_bDefiningKey) {
+      //  sam_bToggleOverlay = FALSE;
+      //  CPrintF("Overlay!\n");
+      //}
 
       // if toggling console
       BOOL bConsoleKey = sam_bToggleConsole || msg.message==WM_KEYDOWN && 

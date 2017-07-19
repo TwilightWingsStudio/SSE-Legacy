@@ -79,7 +79,7 @@ void InitializeGame(void)
     FatalError("%s", strError);
   }
   // init game - this will load persistent symbols
-  _pGame->Initialize(CTString("Data\\DedicatedServer.gms"));
+  _pGame->Initialize(CTString("UserData\\DedicatedServer.gms"));
 }
 
 static void QuitGame(void)

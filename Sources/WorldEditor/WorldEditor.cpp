@@ -108,7 +108,7 @@ void InitializeGame(void)
   } catch (char *strError) {
     FatalError("%s", strError);
   }
-  _pGameGUI->Initialize(CTString("Data\\WorldEditor.gms"));
+  _pGameGUI->Initialize(CTString("UserData\\WorldEditor.gms"));
 }
 
 /////////////////////////////////////////////////////////////////////////////
