@@ -26,6 +26,14 @@ enum PSGiveTakeMode {
   1 PSGTM_FULL "1 Control All Weapons",
 };
 
+enum EPSTeam {
+  0 EPST_ALLTEAMS "All Teams [0]",
+  1 EPST_TEAM_01  "Team 1 [1]",
+  2 EPST_TEAM_02  "Team 2 [2]",
+  3 EPST_TEAM_03  "Team 3 [3]",
+  4 EPST_TEAM_04  "Team 4 [4]",
+};
+
 %{
   extern void CPlayerWeapons_Precache(ULONG ulAvailable);
 %}
@@ -37,7 +45,7 @@ features "IsImportant";
 
 properties:
   1 FLOAT m_fHealth          "Health" 'H' = 100.0f,
-  2 FLOAT m_fShield          "Shield" 'S' = 0.0f,
+  2 FLOAT m_fShield          "Armor" 'S' = 0.0f,
   3 INDEX m_iGiveWeapons     "Give Weapons" 'W' = 0x1,
   4 INDEX m_iTakeWeapons     "Take Weapons"  = 0x0,
   5 CTString m_strGroup      "Group" 'G' = "",
@@ -49,8 +57,9 @@ properties:
  11 INDEX m_iTakeAmmo        "Take Ammo"  = 0x0,
  12 BOOL m_bNoRespawnInPlace "No Respawn In Place" 'R'  = FALSE,
 
- // SSE
- 20 enum PSGiveTakeMode m_psgtmGiveTakeMod "Give/Take Wpns Mode" = PSGTM_OLD,
+ // [SSE]
+ 20 enum PSGiveTakeMode m_psgtmGiveTakeMod "Give/Take Guns Mode" = PSGTM_OLD,
+ 25 enum EPSTeam m_eTeam "Team" = EPST_ALLTEAMS,
  
 components:
   1 model   MODEL_MARKER     "Models\\Editor\\PlayerStart.mdl",

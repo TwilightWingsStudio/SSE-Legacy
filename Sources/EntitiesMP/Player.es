@@ -2311,10 +2311,14 @@ functions:
   // --------------------------------------------------------------------------------------
   void GetDetailStatsDM(CTString &strStats)
   {
+    const CSessionProperties &sp = *GetSP();
+    const BOOL bFragMatch = sp.sp_bUseFrags;
+    const BOOL bTeamPlay = sp.sp_bTeamPlay;
+    const INDEX ctTeams = sp.sp_ctTeams;
+
     extern INDEX SetAllPlayersStats( INDEX iSortKey);
     extern CPlayer *_apenPlayers[NET_MAXGAMEPLAYERS];
     // determine type of game
-    const BOOL bFragMatch = GetSP()->sp_bUseFrags;
 
     // fill players table
     const INDEX ctPlayers = SetAllPlayersStats(bFragMatch?5:3); // sort by frags or by score
@@ -2331,9 +2335,9 @@ functions:
       iMaxFrags = Max(iMaxFrags, penPlayer->m_psLevelStats.ps_iKills);
       iMaxScore = Max(iMaxScore, penPlayer->m_psLevelStats.ps_iScore);
     }}
+    
 
     // print game limits
-    const CSessionProperties &sp = *GetSP();
     if (sp.sp_iTimeLimit>0) {
       FLOAT fTimeLeft = ClampDn(sp.sp_iTimeLimit*60.0f - _pNetwork->GetGameTime(), 0.0f);
       strStats+=AlignString(CTString(0, "^cFFFFFF%s:^r\n%s", TRANS("TIME LEFT"), TimeToString(fTimeLeft)));
@@ -2349,7 +2353,27 @@ functions:
       strStats+=AlignString(CTString(0, "^cFFFFFF%s:^r\n%d", TRANS("SCORE LEFT"), iScoreLeft));
       strStats+="\n";
     }
+
     strStats += "\n";
+    
+    if (bTeamPlay) {
+      strStats+=AlignString(CTString(0, "^cFFFFFF%s:^r\n%d", TRANS("TEAM BLU"), sp.sp_iTeamScore1));
+      strStats+="\n";
+      strStats+=AlignString(CTString(0, "^cFFFFFF%s:^r\n%d", TRANS("TEAM RED"), sp.sp_iTeamScore2));
+      strStats+="\n";
+
+      if (ctTeams >= 3) {
+        strStats+=AlignString(CTString(0, "^cFFFFFF%s:^r\n%d", TRANS("TEAM YEL"), sp.sp_iTeamScore3));
+        strStats+="\n";
+      }
+
+      if (ctTeams >= 4) {
+        strStats+=AlignString(CTString(0, "^cFFFFFF%s:^r\n%d", TRANS("TEAM GRN"), sp.sp_iTeamScore4));
+        strStats+="\n";
+      }
+
+      strStats += "\n";
+    }
 
     CTString strRank = TRANS("NO.");
     CTString strFrag = bFragMatch ? TRANS("FRAGS"):TRANS("SCORE");
@@ -4805,8 +4829,8 @@ functions:
           return TRUE;
 
         case PUIT_BOMB:
-          //((CPlayerWeapons&)*m_penWeapons).ReceiveSeriousBomb();
-          m_iSeriousBombCount++;
+          ((CPlayerWeapons&)*m_penWeapons).ReceiveSeriousBomb();
+          //m_iSeriousBombCount++;
 
           ItemPicked(TRANS("^cFF0000Serious Bomb!"), 0);
           //ItemPicked(TRANS("^cFF0000S^cFFFF00e^cFF0000r^cFFFF00i^cFF0000o^cFFFF00u^cFF0000s ^cFF0000B^cFFFF00o^cFF0000m^cFFFF00b!"), 0);
@@ -6228,6 +6252,7 @@ functions:
     }
 
     // if fire bomb is pressed
+    /*
     if (ulNewButtons&PLACT_FIREBOMB) {
       if (m_iSeriousBombCount>0 && m_tmSeriousBombFired+4.0f<_pTimer->CurrentTick()) {
         m_iLastSeriousBombCount = m_iSeriousBombCount;
@@ -6240,6 +6265,7 @@ functions:
         penBomb->Initialize(esb);
       }
     }
+    */
     
     // if use is pressed
     if (ulNewButtons&PLACT_USE) {
@@ -6328,7 +6354,7 @@ functions:
   // --------------------------------------------------------------------------------------
   BOOL CheatsEnabled(void)
   {
-    return TRUE;
+    //return TRUE;
     return (GetSP()->sp_ctMaxPlayers == 1 || GetSP()->sp_bQuickTest) && m_penActionMarker == NULL;
   }
 
@@ -6719,67 +6745,138 @@ functions:
   // --------------------------------------------------------------------------------------
   CEntity *GetDeathmatchStartMarker(void)
   {
-    // get number of markers
-    CTString strPlayerStart = "Player Start - ";
-    INDEX ctMarkers = _pNetwork->GetNumberOfEntitiesWithName(strPlayerStart);
-    // if none
-    if (ctMarkers==0) {
-      // fail
+    const CTString strPlayerStart = "Player Marker";
+    
+    // Get needed session properties.
+    const BOOL bTeamPlay = GetSP()->sp_bTeamPlay;
+    const BOOL bPrefferSpawnOnBases = GetSP()->sp_bTeamPlayPrefferBases;
+    const BOOL bOnlyBasesSpawn = GetSP()->sp_bTeamPlayBaseOnlySpawn;
+    const INDEX ctTeams = GetSP()->sp_ctTeams;
+    
+    static CStaticStackArray<CEntity*> apenMarkers;
+    apenMarkers.PopAll(); // Cleanup the array!
+    
+    INDEX ctMarkers = 0;
+    INDEX ctMarkersNoTeam = 0;
+    INDEX actMarkersTeam[4];
+    actMarkersTeam[0] = 0;
+    actMarkersTeam[1] = 0;
+    actMarkersTeam[2] = 0;
+    actMarkersTeam[3] = 0;
+
+    // Search for all markers.
+    FOREACHINDYNAMICCONTAINER(_pNetwork->ga_World.wo_cenEntities, CEntity, iten)
+    {
+      if (IsOfClass(iten, strPlayerStart)) {
+        apenMarkers.Push() = iten;
+        
+        if (bTeamPlay && (bPrefferSpawnOnBases || bOnlyBasesSpawn)) {
+          CPlayerMarker *penMarker = (CPlayerMarker*)(CEntity*)iten;
+          
+          INDEX iMarkerTeamID = penMarker->m_eTeam;
+          
+          // If zero or any custom value.
+          if (iMarkerTeamID <= 0 || iMarkerTeamID > 4) {
+            ctMarkersNoTeam++;
+            continue;
+          }
+          
+          actMarkersTeam[iMarkerTeamID - 1]++;
+        }
+      }
+    }
+    
+    ctMarkers = apenMarkers.Count();
+    
+    // if none then fail
+    if (ctMarkers == 0) {
       return NULL;
     }
-    // if only one
-    if (ctMarkers==1) {
-      // get that one
-      return _pNetwork->GetEntityWithName(strPlayerStart, 0);
+
+    // If only one then get that one.
+    // If we play Teamplay gamemode then no matter which team this marker belongs.
+    if (ctMarkers == 1) {
+      return apenMarkers[0];
     }
+
     // if at least two markers found...
+    
+    
+    // If not teamplay
+    // or not preffer spawn on bases
+    // or team markers is zero.
+    if (!bTeamPlay || !bPrefferSpawnOnBases || ((ctMarkers - ctMarkersNoTeam) <= 0))
+    {
+      // create tables of markers and their distances from players
+      CStaticArray<MarkerDistance> amdMarkers;
+      amdMarkers.New(ctMarkers);
 
-    // create tables of markers and their distances from players
-    CStaticArray<MarkerDistance> amdMarkers;
-    amdMarkers.New(ctMarkers);
-    // for each marker
-    {for (INDEX iMarker=0; iMarker<ctMarkers; iMarker++) {
-      amdMarkers[iMarker].md_ppm = (CPlayerMarker*)_pNetwork->GetEntityWithName(strPlayerStart, iMarker);
-      if (amdMarkers[iMarker].md_ppm==NULL) {
-        return NULL;  // (if there is any invalidity, fail completely)
-      }
-      // get min distance from any player
-      FLOAT fMinD = UpperLimit(0.0f);
-      for (INDEX iPlayer=0; iPlayer<GetMaxPlayers(); iPlayer++) {
-        CPlayer *ppl = (CPlayer *)&*GetPlayerEntity(iPlayer);
-        if (ppl==NULL) { 
-          continue;
-        }
-        FLOAT fD = 
-          (amdMarkers[iMarker].md_ppm->GetPlacement().pl_PositionVector-
-           ppl->GetPlacement().pl_PositionVector).Length();
-        if (fD<fMinD) {
-          fMinD = fD;
-        }
-      }
-      amdMarkers[iMarker].md_fMinD = fMinD;
-    }}
+      // for each marker
+      for (INDEX iMarker = 0; iMarker < ctMarkers; iMarker++)
+      {
+        amdMarkers[iMarker].md_ppm = (CPlayerMarker*)apenMarkers[iMarker];
 
-    // now sort the list
-    qsort(&amdMarkers[0], ctMarkers, sizeof(amdMarkers[0]), &qsort_CompareMarkerDistance);
-    ASSERT(amdMarkers[0].md_fMinD>=amdMarkers[ctMarkers-1].md_fMinD);
-    // choose marker among one of the 50% farthest
-    INDEX ctFarMarkers = ctMarkers/2;
-    ASSERT(ctFarMarkers>0);
-    INDEX iStartMarker = IRnd()%ctFarMarkers;
-    // find first next marker that was not used lately
-    INDEX iMarker=iStartMarker;
-    FOREVER{
-      if (_pTimer->CurrentTick()>amdMarkers[iMarker].md_ppm->m_tmLastSpawned+1.0f) {
-        break;
+        if (amdMarkers[iMarker].md_ppm == NULL) {
+          return NULL;  // (if there is any invalidity, fail completely)
+        }
+
+        // get min distance from any player
+        FLOAT fMinD = UpperLimit(0.0f);
+        
+        for (INDEX iPlayer = 0; iPlayer < GetMaxPlayers(); iPlayer++)
+        {
+          CPlayer *ppl = (CPlayer *)&*GetPlayerEntity(iPlayer);
+        
+          if (ppl == NULL) { 
+            continue;
+          }
+          
+          FLOAT fD = 
+            (amdMarkers[iMarker].md_ppm->GetPlacement().pl_PositionVector-
+             ppl->GetPlacement().pl_PositionVector).Length();
+          
+          if (fD < fMinD) {
+            fMinD = fD;
+          }
+        }
+
+        amdMarkers[iMarker].md_fMinD = fMinD;
       }
-      iMarker = (iMarker+1)%ctMarkers;
-      if (iMarker==iStartMarker) {
-        break;
+
+      // now sort the list
+      qsort(&amdMarkers[0], ctMarkers, sizeof(amdMarkers[0]), &qsort_CompareMarkerDistance);
+      ASSERT(amdMarkers[0].md_fMinD>=amdMarkers[ctMarkers-1].md_fMinD);
+
+      // choose marker among one of the 50% farthest
+      INDEX ctFarMarkers = ctMarkers / 2;
+      ASSERT(ctFarMarkers > 0);
+      INDEX iStartMarker = IRnd() % ctFarMarkers;
+
+      // find first next marker that was not used lately
+      INDEX iMarker=iStartMarker;
+
+      FOREVER
+      {
+        if (_pTimer->CurrentTick() > amdMarkers[iMarker].md_ppm->m_tmLastSpawned + 1.0f) {
+          break;
+        }
+
+        iMarker = (iMarker + 1) % ctMarkers;
+
+        if (iMarker == iStartMarker) {
+          break;
+        }
       }
+
+      // return that
+      return amdMarkers[iMarker].md_ppm;
+
+    } else {
+    
+    
     }
-    // return that
-    return amdMarkers[iMarker].md_ppm;
+    
+    return NULL;
   }
 
 /************************************************************
@@ -7507,7 +7604,7 @@ procedures:
               
               // Only actual player can work with CSessionProperties!
               if (!IsPredictor()) {
-                IncreaseTeamScore(1);
+                pplKillerPlayer->IncreaseTeamScore(1);
               }
             }
             
