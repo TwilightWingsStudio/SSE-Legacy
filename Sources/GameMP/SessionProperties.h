@@ -36,6 +36,8 @@ public:
     GM_HOLDTHEOBJECT,    // [SSE] GameModes - HTO
     GM_KINGOFTHEHILL,    // [SSE] GameModes - KotH
     GM_DOMINATION,       // [SSE] GameModes - Domination
+    
+    // Cooperative
     GM_SURVIVAL,         // [SSE] GameModes - Survival
     GM_DEFEND,           // [SSE] GameModes - Defend
   };
@@ -66,6 +68,7 @@ public:
   INDEX sp_iTimeLimit;        // stop game after given number of minutes elapses
   
   // TODO: [ZCaliptium] Move gamemode-related booleans like sp_bTeamPlay into gamemode flags mask variable.
+  BOOL sp_bTeamPlayBaseOnlySpawn;
 
   BOOL sp_bTeamPlay;          // players are divided in teams
   BOOL sp_bFriendlyFire;      // can harm player of same team
@@ -130,6 +133,7 @@ public:
   BOOL sp_bArmorInertiaDamping;            // [SSE] Armor Inertia Damping Toggle
   BOOL sp_bRocketJumpMode;                 // [SSE] RocketJump Mode
   
+  BOOL sp_bTeamPlayPrefferBases;
   INDEX sp_iTeamKillPenalty; // [SSE] Gameplay - TeamKill Penalty
   
   BOOL sp_bPickUpWeaponsOnce; // [SSE] Pick up weapons once.
