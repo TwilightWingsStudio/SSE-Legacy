@@ -3513,74 +3513,74 @@ static void HUD_RegisterTextures()
   // initialize tile texture
   HUD_RegisterTexture(&_toTile, CTFILENAME("Textures\\Interface\\Tile.tex"));
   
-  HUD_RegisterTexture(&_toHealth,  CTFILENAME("TexturesMP\\Interface\\HSuper.tex"));
-  HUD_RegisterTexture(&_toOxygen,  CTFILENAME("TexturesMP\\Interface\\Oxygen-2.tex"));
-  HUD_RegisterTexture(&_toFrags,   CTFILENAME("TexturesMP\\Interface\\IBead.tex"));
-  HUD_RegisterTexture(&_toDeaths,  CTFILENAME("TexturesMP\\Interface\\ISkull.tex"));
-  HUD_RegisterTexture(&_toScore,   CTFILENAME("TexturesMP\\Interface\\IScore.tex"));
-  HUD_RegisterTexture(&_toHiScore, CTFILENAME("TexturesMP\\Interface\\IHiScore.tex"));
-  HUD_RegisterTexture(&_toMessage, CTFILENAME("TexturesMP\\Interface\\IMessage.tex"));
-  HUD_RegisterTexture(&_toMana,    CTFILENAME("TexturesMP\\Interface\\IValue.tex"));
+  HUD_RegisterTexture(&_toHealth,  CTFILENAME("Textures\\Interface\\HSuper.tex"));
+  HUD_RegisterTexture(&_toOxygen,  CTFILENAME("Textures\\Interface\\Oxygen-2.tex"));
+  HUD_RegisterTexture(&_toFrags,   CTFILENAME("Textures\\Interface\\IBead.tex"));
+  HUD_RegisterTexture(&_toDeaths,  CTFILENAME("Textures\\Interface\\ISkull.tex"));
+  HUD_RegisterTexture(&_toScore,   CTFILENAME("Textures\\Interface\\IScore.tex"));
+  HUD_RegisterTexture(&_toHiScore, CTFILENAME("Textures\\Interface\\IHiScore.tex"));
+  HUD_RegisterTexture(&_toMessage, CTFILENAME("Textures\\Interface\\IMessage.tex"));
+  HUD_RegisterTexture(&_toMana,    CTFILENAME("Textures\\Interface\\IValue.tex"));
 
-  HUD_RegisterTexture(&_toArmorSmall,  CTFILENAME("TexturesMP\\Interface\\ArSmall.tex"));
-  HUD_RegisterTexture(&_toArmorMedium, CTFILENAME("TexturesMP\\Interface\\ArMedium.tex"));
-  HUD_RegisterTexture(&_toArmorLarge,  CTFILENAME("TexturesMP\\Interface\\ArStrong.tex"));
+  HUD_RegisterTexture(&_toArmorSmall,  CTFILENAME("Textures\\Interface\\ArSmall.tex"));
+  HUD_RegisterTexture(&_toArmorMedium, CTFILENAME("Textures\\Interface\\ArMedium.tex"));
+  HUD_RegisterTexture(&_toArmorLarge,  CTFILENAME("Textures\\Interface\\ArStrong.tex"));
   
-  HUD_RegisterTexture(&_toExtraLive,  CTFILENAME("TexturesMP\\Interface\\IExtraLive.tex"));
-  HUD_RegisterTexture(&_toSwords,     CTFILENAME("TexturesMP\\Interface\\ISwords.tex"));
-  HUD_RegisterTexture(&_toKey,        CTFILENAME("TexturesMP\\Interface\\IKey.tex")); // [SSE] Better Keys
-  HUD_RegisterTexture(&_toClock,        CTFILENAME("TexturesMP\\Interface\\IClock.tex"));
+  HUD_RegisterTexture(&_toExtraLive,  CTFILENAME("Textures\\Interface\\IExtraLive.tex"));
+  HUD_RegisterTexture(&_toSwords,     CTFILENAME("Textures\\Interface\\ISwords.tex"));
+  HUD_RegisterTexture(&_toKey,        CTFILENAME("Textures\\Interface\\IKey.tex")); // [SSE] Better Keys
+  HUD_RegisterTexture(&_toClock,      CTFILENAME("Textures\\Interface\\IClock.tex"));
 
   // [SSE] Radar
-  HUD_RegisterTexture(&_toRadarCircle,  CTFILENAME("TexturesMP\\Interface\\RadarCircle.tex"));
-  HUD_RegisterTexture(&_toRadarMask,    CTFILENAME("TexturesMP\\Interface\\RadarMask.tex"));
-  HUD_RegisterTexture(&_toRadarBorder,  CTFILENAME("TexturesMP\\Interface\\RadarBorder.tex"));
-  HUD_RegisterTexture(&_toRadarDot,     CTFILENAME("TexturesMP\\Interface\\RadarDot.tex"));
-  HUD_RegisterTexture(&_toRadarDotUp,   CTFILENAME("TexturesMP\\Interface\\RadarDotUp.tex"));
-  HUD_RegisterTexture(&_toRadarDotDown, CTFILENAME("TexturesMP\\Interface\\RadarDotDown.tex"));
+  HUD_RegisterTexture(&_toRadarCircle,  CTFILENAME("Textures\\Interface\\RadarCircle.tex"));
+  HUD_RegisterTexture(&_toRadarMask,    CTFILENAME("Textures\\Interface\\RadarMask.tex"));
+  HUD_RegisterTexture(&_toRadarBorder,  CTFILENAME("Textures\\Interface\\RadarBorder.tex"));
+  HUD_RegisterTexture(&_toRadarDot,     CTFILENAME("Textures\\Interface\\RadarDot.tex"));
+  HUD_RegisterTexture(&_toRadarDotUp,   CTFILENAME("Textures\\Interface\\RadarDotUp.tex"));
+  HUD_RegisterTexture(&_toRadarDotDown, CTFILENAME("Textures\\Interface\\RadarDotDown.tex"));
   //
 
   // initialize ammo textures
-  HUD_RegisterTexture(&_toAColt,          CTFILENAME("TexturesMP\\Interface\\AmColt.tex"));
-  HUD_RegisterTexture(&_toAShells,        CTFILENAME("TexturesMP\\Interface\\AmShells.tex"));
-  HUD_RegisterTexture(&_toABullets,       CTFILENAME("TexturesMP\\Interface\\AmBullets.tex"));
-  HUD_RegisterTexture(&_toARockets,       CTFILENAME("TexturesMP\\Interface\\AmRockets.tex"));
-  HUD_RegisterTexture(&_toAGrenades,      CTFILENAME("TexturesMP\\Interface\\AmGrenades.tex"));
-  HUD_RegisterTexture(&_toANapalm,        CTFILENAME("TexturesMP\\Interface\\AmFuelReservoir.tex"));
-  HUD_RegisterTexture(&_toAElectricity,   CTFILENAME("TexturesMP\\Interface\\AmElectricity.tex"));
-  HUD_RegisterTexture(&_toAIronBall,      CTFILENAME("TexturesMP\\Interface\\AmCannonBall.tex"));
-  HUD_RegisterTexture(&_toASniperBullets, CTFILENAME("TexturesMP\\Interface\\AmSniperBullets.tex"));
-  HUD_RegisterTexture(&_toASeriousBomb,   CTFILENAME("TexturesMP\\Interface\\AmSeriousBomb.tex"));
+  HUD_RegisterTexture(&_toAColt,          CTFILENAME("Textures\\Interface\\AmColt.tex"));
+  HUD_RegisterTexture(&_toAShells,        CTFILENAME("Textures\\Interface\\AmShells.tex"));
+  HUD_RegisterTexture(&_toABullets,       CTFILENAME("Textures\\Interface\\AmBullets.tex"));
+  HUD_RegisterTexture(&_toARockets,       CTFILENAME("Textures\\Interface\\AmRockets.tex"));
+  HUD_RegisterTexture(&_toAGrenades,      CTFILENAME("Textures\\Interface\\AmGrenades.tex"));
+  HUD_RegisterTexture(&_toANapalm,        CTFILENAME("Textures\\Interface\\AmFuelReservoir.tex"));
+  HUD_RegisterTexture(&_toAElectricity,   CTFILENAME("Textures\\Interface\\AmElectricity.tex"));
+  HUD_RegisterTexture(&_toAIronBall,      CTFILENAME("Textures\\Interface\\AmCannonBall.tex"));
+  HUD_RegisterTexture(&_toASniperBullets, CTFILENAME("Textures\\Interface\\AmSniperBullets.tex"));
+  HUD_RegisterTexture(&_toASeriousBomb,   CTFILENAME("Textures\\Interface\\AmSeriousBomb.tex"));
 
   // initialize weapon textures
-  HUD_RegisterTexture(&_toWFists,           CTFILENAME("TexturesMP\\Interface\\WFists.tex")); // [SSE] Fists Weapon
-  HUD_RegisterTexture(&_toWKnife,           CTFILENAME("TexturesMP\\Interface\\WKnife.tex"));
-  HUD_RegisterTexture(&_toWColt,            CTFILENAME("TexturesMP\\Interface\\WColt.tex"));
-  HUD_RegisterTexture(&_toWSingleShotgun,   CTFILENAME("TexturesMP\\Interface\\WSingleShotgun.tex"));
-  HUD_RegisterTexture(&_toWDoubleShotgun,   CTFILENAME("TexturesMP\\Interface\\WDoubleShotgun.tex"));
-  HUD_RegisterTexture(&_toWTommygun,        CTFILENAME("TexturesMP\\Interface\\WTommygun.tex"));
-  HUD_RegisterTexture(&_toWMinigun,         CTFILENAME("TexturesMP\\Interface\\WMinigun.tex"));
-  HUD_RegisterTexture(&_toWRocketLauncher,  CTFILENAME("TexturesMP\\Interface\\WRocketLauncher.tex"));
-  HUD_RegisterTexture(&_toWGrenadeLauncher, CTFILENAME("TexturesMP\\Interface\\WGrenadeLauncher.tex"));
-  HUD_RegisterTexture(&_toWLaser,           CTFILENAME("TexturesMP\\Interface\\WLaser.tex"));
-  HUD_RegisterTexture(&_toWIronCannon,      CTFILENAME("TexturesMP\\Interface\\WCannon.tex"));
-  HUD_RegisterTexture(&_toWChainsaw,        CTFILENAME("TexturesMP\\Interface\\WChainsaw.tex"));
-  HUD_RegisterTexture(&_toWSniper,          CTFILENAME("TexturesMP\\Interface\\WSniper.tex"));
-  HUD_RegisterTexture(&_toWFlamer,          CTFILENAME("TexturesMP\\Interface\\WFlamer.tex"));
-  HUD_RegisterTexture(&_toWSeriousBomb,     CTFILENAME("TexturesMP\\Interface\\WSeriousBomb.tex")); // [SSE] Gameplay - Serious Bomb Weapon
+  HUD_RegisterTexture(&_toWFists,           CTFILENAME("Textures\\Interface\\WFists.tex")); // [SSE] Fists Weapon
+  HUD_RegisterTexture(&_toWKnife,           CTFILENAME("Textures\\Interface\\WKnife.tex"));
+  HUD_RegisterTexture(&_toWColt,            CTFILENAME("Textures\\Interface\\WColt.tex"));
+  HUD_RegisterTexture(&_toWSingleShotgun,   CTFILENAME("Textures\\Interface\\WSingleShotgun.tex"));
+  HUD_RegisterTexture(&_toWDoubleShotgun,   CTFILENAME("Textures\\Interface\\WDoubleShotgun.tex"));
+  HUD_RegisterTexture(&_toWTommygun,        CTFILENAME("Textures\\Interface\\WTommygun.tex"));
+  HUD_RegisterTexture(&_toWMinigun,         CTFILENAME("Textures\\Interface\\WMinigun.tex"));
+  HUD_RegisterTexture(&_toWRocketLauncher,  CTFILENAME("Textures\\Interface\\WRocketLauncher.tex"));
+  HUD_RegisterTexture(&_toWGrenadeLauncher, CTFILENAME("Textures\\Interface\\WGrenadeLauncher.tex"));
+  HUD_RegisterTexture(&_toWLaser,           CTFILENAME("Textures\\Interface\\WLaser.tex"));
+  HUD_RegisterTexture(&_toWIronCannon,      CTFILENAME("Textures\\Interface\\WCannon.tex"));
+  HUD_RegisterTexture(&_toWChainsaw,        CTFILENAME("Textures\\Interface\\WChainsaw.tex"));
+  HUD_RegisterTexture(&_toWSniper,          CTFILENAME("Textures\\Interface\\WSniper.tex"));
+  HUD_RegisterTexture(&_toWFlamer,          CTFILENAME("Textures\\Interface\\WFlamer.tex"));
+  HUD_RegisterTexture(&_toWSeriousBomb,     CTFILENAME("Textures\\Interface\\WSeriousBomb.tex")); // [SSE] Gameplay - Serious Bomb Weapon
 
   // initialize powerup textures (DO NOT CHANGE ORDER!)
-  HUD_RegisterTexture(&_atoPowerups[0],    CTFILENAME("TexturesMP\\Interface\\PInvisibility.tex"));
-  HUD_RegisterTexture(&_atoPowerups[1],    CTFILENAME("TexturesMP\\Interface\\PInvulnerability.tex"));
-  HUD_RegisterTexture(&_atoPowerups[2],    CTFILENAME("TexturesMP\\Interface\\PSeriousDamage.tex"));
-  HUD_RegisterTexture(&_atoPowerups[3],    CTFILENAME("TexturesMP\\Interface\\PSeriousSpeed.tex"));
+  HUD_RegisterTexture(&_atoPowerups[0],    CTFILENAME("Textures\\Interface\\PInvisibility.tex"));
+  HUD_RegisterTexture(&_atoPowerups[1],    CTFILENAME("Textures\\Interface\\PInvulnerability.tex"));
+  HUD_RegisterTexture(&_atoPowerups[2],    CTFILENAME("Textures\\Interface\\PSeriousDamage.tex"));
+  HUD_RegisterTexture(&_atoPowerups[3],    CTFILENAME("Textures\\Interface\\PSeriousSpeed.tex"));
 
   // initialize sniper mask texture
-  HUD_RegisterTexture(&_toSniperMask,   CTFILENAME("TexturesMP\\Interface\\SniperMask.tex"));
-  HUD_RegisterTexture(&_toSniperWheel,  CTFILENAME("TexturesMP\\Interface\\SniperWheel.tex"));
-  HUD_RegisterTexture(&_toSniperArrow,  CTFILENAME("TexturesMP\\Interface\\SniperArrow.tex"));
-  HUD_RegisterTexture(&_toSniperEye,    CTFILENAME("TexturesMP\\Interface\\SniperEye.tex"));
-  HUD_RegisterTexture(&_toSniperLed,    CTFILENAME("TexturesMP\\Interface\\SniperLed.tex"));
+  HUD_RegisterTexture(&_toSniperMask,   CTFILENAME("Textures\\Interface\\SniperMask.tex"));
+  HUD_RegisterTexture(&_toSniperWheel,  CTFILENAME("Textures\\Interface\\SniperWheel.tex"));
+  HUD_RegisterTexture(&_toSniperArrow,  CTFILENAME("Textures\\Interface\\SniperArrow.tex"));
+  HUD_RegisterTexture(&_toSniperEye,    CTFILENAME("Textures\\Interface\\SniperEye.tex"));
+  HUD_RegisterTexture(&_toSniperLed,    CTFILENAME("Textures\\Interface\\SniperLed.tex"));
   
   _bTexturesRegistered = TRUE;
 }
