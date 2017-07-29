@@ -37,7 +37,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 // Heading
 wpn_fH[0]=(FLOAT)10;
-wpn_fH[1]=(FLOAT)-1; // [SSE] Fists Weapon
+wpn_fH[1]=(FLOAT)-1; // [SSE] Gameplay - Fists Weapon
 wpn_fH[2]=(FLOAT)-1; // Knife
 wpn_fH[3]=(FLOAT)-1;
 wpn_fH[4]=(FLOAT)-1;
@@ -53,7 +53,7 @@ wpn_fH[13]=(FLOAT)1;
 wpn_fH[14]=(FLOAT)4;
 wpn_fH[15]=(FLOAT)2.5;
 //wpn_fH[15]=(FLOAT)4; // Old
-wpn_fH[16]=(FLOAT)2.5;
+wpn_fH[16]=(FLOAT)180; // [SSE] Gameplay - Serious Bomb Weapon
 wpn_fH[17]=(FLOAT)0;
 wpn_fH[18]=(FLOAT)0;
 wpn_fH[19]=(FLOAT)0;
@@ -71,7 +71,7 @@ wpn_fH[30]=(FLOAT)0;
 
 // Pitch
 wpn_fP[0]=(FLOAT)0;
-wpn_fP[1]=(FLOAT)10; // [SSE] Fists Weapon
+wpn_fP[1]=(FLOAT)10; // [SSE] Gameplay - Fists Weapon
 wpn_fP[2]=(FLOAT)10; // Knife
 wpn_fP[3]=(FLOAT)0;
 wpn_fP[4]=(FLOAT)0;
@@ -87,7 +87,8 @@ wpn_fP[13]=(FLOAT)3;
 wpn_fP[14]=(FLOAT)2.5;
 wpn_fP[15]=(FLOAT)6;
 //wpn_fP[15]=(FLOAT)0; // Old
-wpn_fP[16]=(FLOAT)6;
+//wpn_fP[16]=(FLOAT)6; // Old
+wpn_fP[16]=(FLOAT)-20; // [SSE] Gameplay - Serious Bomb Weapon
 wpn_fP[17]=(FLOAT)0;
 wpn_fP[18]=(FLOAT)0;
 wpn_fP[19]=(FLOAT)0;
@@ -105,7 +106,7 @@ wpn_fP[30]=(FLOAT)0;
 
 // Banking
 wpn_fB[0]=(FLOAT)0;
-wpn_fB[1]=(FLOAT)6; // [SSE] Fists Weapon
+wpn_fB[1]=(FLOAT)6; // [SSE] Gameplay - Fists Weapon
 wpn_fB[2]=(FLOAT)6; // Knife
 wpn_fB[3]=(FLOAT)0;
 wpn_fB[4]=(FLOAT)0;
@@ -121,7 +122,8 @@ wpn_fB[13]=(FLOAT)0;
 wpn_fB[14]=(FLOAT)-0.5;
 wpn_fB[15]=(FLOAT)0;
 //wpn_fB[15]=(FLOAT)0; // Old
-wpn_fB[16]=(FLOAT)0;
+//wpn_fB[16]=(FLOAT)0; // Old
+wpn_fB[16]=(FLOAT)6; // [SSE] Gameplay - Serious Bomb Weapon
 wpn_fB[17]=(FLOAT)0;
 wpn_fB[18]=(FLOAT)0;
 wpn_fB[19]=(FLOAT)0;
@@ -139,7 +141,7 @@ wpn_fB[30]=(FLOAT)0;
 
 // X
 wpn_fX[0]=(FLOAT)0.08;
-wpn_fX[1]=(FLOAT)0.23; // [SSE] Fists Weapon
+wpn_fX[1]=(FLOAT)0.23; // [SSE] Gameplay - Fists Weapon
 wpn_fX[2]=(FLOAT)0.23; // Knife
 wpn_fX[3]=(FLOAT)0.19;
 wpn_fX[4]=(FLOAT)0.19;
@@ -155,7 +157,8 @@ wpn_fX[13]=(FLOAT)0.141;
 wpn_fX[14]=(FLOAT)0.095;
 wpn_fX[15]=(FLOAT)0.17;
 //wpn_fX[15]=(FLOAT)0.169; // Old
-wpn_fX[16]=(FLOAT)0.225;
+//wpn_fX[16]=(FLOAT)0.225; // Old
+wpn_fX[16]=(FLOAT)0; // [SSE] Gameplay - Serious Bomb Weapon
 wpn_fX[17]=(FLOAT)0;
 wpn_fX[18]=(FLOAT)0;
 wpn_fX[19]=(FLOAT)0;
@@ -173,7 +176,7 @@ wpn_fX[30]=(FLOAT)0;
 
 // Y
 wpn_fY[0]=(FLOAT)0;
-wpn_fY[1]=(FLOAT)-0.28; // [SSE] Fists Weapon
+wpn_fY[1]=(FLOAT)-0.28; // [SSE] Gameplay - Fists Weapon
 wpn_fY[2]=(FLOAT)-0.28;
 wpn_fY[3]=(FLOAT)-0.21;
 wpn_fY[4]=(FLOAT)-0.21;
@@ -189,7 +192,8 @@ wpn_fY[13]=(FLOAT)-0.174;
 wpn_fY[14]=(FLOAT)-0.26;
 wpn_fY[15]=(FLOAT)-0.3;
 //wpn_fY[15]=(FLOAT)-0.102; // Old
-wpn_fY[16]=(FLOAT)-0.345;
+//wpn_fY[16]=(FLOAT)-0.345; // Old
+wpn_fY[16]=(FLOAT)-0.28; // [SSE] Gameplay - Serious Bomb Weapon
 wpn_fY[17]=(FLOAT)0;
 wpn_fY[18]=(FLOAT)0;
 wpn_fY[19]=(FLOAT)0;
@@ -207,7 +211,7 @@ wpn_fY[30]=(FLOAT)0;
 
 // Z
 wpn_fZ[0]=(FLOAT)0;
-wpn_fZ[1]=(FLOAT)-0.44; // [SSE] Fists Weapon
+wpn_fZ[1]=(FLOAT)-0.44; // [SSE] Gameplay - Fists Weapon
 wpn_fZ[2]=(FLOAT)-0.44; // Knife
 wpn_fZ[3]=(FLOAT)-0.1;
 wpn_fZ[4]=(FLOAT)-0.1;
@@ -222,8 +226,9 @@ wpn_fZ[12]=(FLOAT)-0.57;
 wpn_fZ[13]=(FLOAT)-0.175;
 wpn_fZ[14]=(FLOAT)-0.85;
 wpn_fZ[15]=(FLOAT)-0.625;
-//wpn_fZ[15]=(FLOAT)0;
-wpn_fZ[16]=(FLOAT)-0.57;
+//wpn_fZ[15]=(FLOAT)0; // Old
+//wpn_fZ[16]=(FLOAT)-0.57; // Old
+wpn_fZ[16]=(FLOAT)-0.5; // [SSE] Gameplay - Serious Bomb Weapon
 wpn_fZ[17]=(FLOAT)0;
 wpn_fZ[18]=(FLOAT)0;
 wpn_fZ[19]=(FLOAT)0;
@@ -241,7 +246,7 @@ wpn_fZ[30]=(FLOAT)0;
 
 // FOV
 wpn_fFOV[0]=(FLOAT)2;
-wpn_fFOV[1]=(FLOAT)41.5; // [SSE] Fists Weapon
+wpn_fFOV[1]=(FLOAT)41.5; // [SSE] Gameplay - Fists Weapon
 wpn_fFOV[2]=(FLOAT)41.5;
 wpn_fFOV[3]=(FLOAT)57;
 wpn_fFOV[4]=(FLOAT)57;
@@ -257,7 +262,8 @@ wpn_fFOV[13]=(FLOAT)70.5;
 wpn_fFOV[14]=(FLOAT)23;
 wpn_fFOV[15]=(FLOAT)50;
 //wpn_fFOV[15]=(FLOAT)52.5; // Old
-wpn_fFOV[16]=(FLOAT)57;
+wpn_fFOV[16]=(FLOAT)41.5; // [SSE] Gameplay - Serious Bomb Weapon
+//wpn_fFOV[16]=(FLOAT)57;
 wpn_fFOV[17]=(FLOAT)0;
 wpn_fFOV[18]=(FLOAT)0;
 wpn_fFOV[19]=(FLOAT)0;
@@ -275,7 +281,7 @@ wpn_fFOV[30]=(FLOAT)0;
 
 // Clip
 wpn_fClip[0]=(FLOAT)0;
-wpn_fClip[1]=(FLOAT)0.1; // [SSE] Fists Weapon
+wpn_fClip[1]=(FLOAT)0.1; // [SSE] Gameplay - Fists Weapon
 wpn_fClip[2]=(FLOAT)0.1;
 wpn_fClip[3]=(FLOAT)0.1;
 wpn_fClip[4]=(FLOAT)0.1;
@@ -291,7 +297,8 @@ wpn_fClip[13]=(FLOAT)0.1;
 wpn_fClip[14]=(FLOAT)0.1;
 wpn_fClip[15]=(FLOAT)0.1;
 //wpn_fClip[15]=(FLOAT)0; // Old
-wpn_fClip[16]=(FLOAT)0.1;
+//wpn_fClip[16]=(FLOAT)0.1; // Old
+wpn_fClip[16]=(FLOAT)0.1; // [SSE] Gameplay - Serious Bomb Weapon
 wpn_fClip[17]=(FLOAT)0;
 wpn_fClip[18]=(FLOAT)0;
 wpn_fClip[19]=(FLOAT)0;
@@ -309,7 +316,7 @@ wpn_fClip[30]=(FLOAT)0;
 
 // FX
 wpn_fFX[0]=(FLOAT)0;
-wpn_fFX[1]=(FLOAT)0; // [SSE] Fists Weapon
+wpn_fFX[1]=(FLOAT)0; // [SSE] Gameplay - Fists Weapon
 wpn_fFX[2]=(FLOAT)0;
 wpn_fFX[3]=(FLOAT)0;
 wpn_fFX[4]=(FLOAT)0;
@@ -325,7 +332,8 @@ wpn_fFX[13]=(FLOAT)-0.1;
 wpn_fFX[14]=(FLOAT)0;
 wpn_fFX[15]=(FLOAT)0.25;
 //wpn_fFX[15]=(FLOAT)0; // Old
-wpn_fFX[16]=(FLOAT)0.25;
+//wpn_fFX[16]=(FLOAT)0.25; // Old
+wpn_fFX[16]=(FLOAT)0; // [SSE] Gameplay - Serious Bomb Weapon
 wpn_fFX[17]=(FLOAT)0;
 wpn_fFX[18]=(FLOAT)0;
 wpn_fFX[19]=(FLOAT)0;
@@ -343,7 +351,7 @@ wpn_fFX[30]=(FLOAT)0;
 
 // FY
 wpn_fFY[0]=(FLOAT)0;
-wpn_fFY[1]=(FLOAT)0; // [SSE] Fists Weapon
+wpn_fFY[1]=(FLOAT)0; // [SSE] Gameplay - Fists Weapon
 wpn_fFY[2]=(FLOAT)0;
 wpn_fFY[3]=(FLOAT)0;
 wpn_fFY[4]=(FLOAT)0;
@@ -359,7 +367,8 @@ wpn_fFY[13]=(FLOAT)-0.4;
 wpn_fFY[14]=(FLOAT)0;
 wpn_fFY[15]=(FLOAT)-0.5;
 //wpn_fFY[15]=(FLOAT)0; // Old
-wpn_fFY[16]=(FLOAT)-0.5;
+//wpn_fFY[16]=(FLOAT)-0.5;
+wpn_fFY[16]=(FLOAT)0; // [SSE] Gameplay - Serious Bomb Weapon
 wpn_fFY[17]=(FLOAT)0;
 wpn_fFY[18]=(FLOAT)0;
 wpn_fFY[19]=(FLOAT)0;

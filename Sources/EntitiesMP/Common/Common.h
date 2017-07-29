@@ -36,6 +36,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 //#define MAX_NUKEBALLS INDEX(3)
 #define MAX_SNIPERBULLETS INDEX(50)
 
+#define MAX_SERIOUSBOMBS INDEX(3)
+
 // Bit shifters for ammo
 #define AMMO_BULLETS       0
 #define AMMO_SHELLS        1

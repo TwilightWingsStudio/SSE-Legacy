@@ -177,7 +177,7 @@ static CTextureObject _toASniperBullets;
 static CTextureObject _toASeriousBomb;
 
 // weapon textures
-static CTextureObject _toWFists; // [SSE] Fists Weapon
+static CTextureObject _toWFists; // [SSE] Gameplay - Fists Weapon
 static CTextureObject _toWKnife;
 static CTextureObject _toWColt;
 static CTextureObject _toWSingleShotgun;
@@ -191,6 +191,7 @@ static CTextureObject _toWGrenadeLauncher;
 static CTextureObject _toWFlamer;
 static CTextureObject _toWLaser;
 static CTextureObject _toWIronCannon;
+static CTextureObject _toWSeriousBomb; // [SSE] Gameplay - Serious Bomb Weapon
 
 // powerup textures (ORDER IS THE SAME AS IN PLAYER.ES!)
 #define MAX_POWERUPS 4
@@ -231,7 +232,7 @@ struct WeaponInfo {
 };
 
 extern struct WeaponInfo _awiWeapons[18];
-static struct AmmoInfo _aaiAmmo[8] = {
+static struct AmmoInfo _aaiAmmo[9] = {
   { &_toAShells,        &_awiWeapons[5],  &_awiWeapons[6],  0, 0, 0, -9, FALSE }, //  0
   { &_toABullets,       &_awiWeapons[7],  &_awiWeapons[8],  0, 0, 0, -9, FALSE }, //  1
   { &_toARockets,       &_awiWeapons[9],  NULL,             0, 0, 0, -9, FALSE }, //  2
@@ -240,6 +241,8 @@ static struct AmmoInfo _aaiAmmo[8] = {
   { &_toAElectricity,   &_awiWeapons[13], NULL,             0, 0, 0, -9, FALSE }, //  5
   { &_toAIronBall,      &_awiWeapons[15], NULL,             0, 0, 0, -9, FALSE }, //  6
   { &_toASniperBullets, &_awiWeapons[14], NULL,             0, 0, 0, -9, FALSE }, //  7
+
+  { &_toASeriousBomb,   &_awiWeapons[16], NULL,             0, 0, 0, -9, FALSE }, //  8
 };
 
 static const INDEX aiAmmoRemap[8] = { 0, 1, 2, 3, 4, 7, 5, 6 };
@@ -261,11 +264,12 @@ struct WeaponInfo _awiWeapons[18] = {
   { WEAPON_LASER,           &_toWLaser,           &_aaiAmmo[5], FALSE },   // 13
   { WEAPON_SNIPER,          &_toWSniper,          &_aaiAmmo[7], FALSE },   // 14
   { WEAPON_IRONCANNON,      &_toWIronCannon,      &_aaiAmmo[6], FALSE },   // 15
+  { WEAPON_SERIOUSBOMB,     &_toWSeriousBomb,     &_aaiAmmo[8], FALSE },   // 16
+  { WEAPON_NONE,            NULL,                 NULL,         FALSE },   // 17
+
 //{ WEAPON_PIPEBOMB,        &_toWPipeBomb,        &_aaiAmmo[3], FALSE },   // 15
 //{ WEAPON_GHOSTBUSTER,     &_toWGhostBuster,     &_aaiAmmo[5], FALSE },   // 16
 //{ WEAPON_NUKECANNON,      &_toWNukeCannon,      &_aaiAmmo[7], FALSE },   // 17
-  { WEAPON_NONE,            NULL,                 NULL,         FALSE },   // 16
-  { WEAPON_NONE,            NULL,                 NULL,         FALSE },   // 17
 };
 
 // --------------------------------------------------------------------------------------
@@ -339,17 +343,16 @@ static int qsort_CompareLatencies( const void *ppPEN0, const void *ppPEN1) {
   else              return  0;
 }
 
-static INDEX bit_count(INDEX num)
+static INDEX bit_count(INDEX iValue)
 {
-    INDEX count = 0;
+    INDEX ctSet = 0;
 
-    while(num)
-    {
-        num = (num) & (num - 1);
-        count++;
+    while (iValue) {
+        iValue = (iValue) & (iValue - 1);
+        ctSet++;
     }
 
-    return count;
+    return ctSet;
 }
 
 // --------------------------------------------------------------------------------------
@@ -416,6 +419,7 @@ extern COLOR GetCurrentColor( FLOAT fNormalizedValue)
   if (fNormalizedValue > 1.0f) return( _cttHUD.ctt_colFine & 0xFFFFFF00);
 
   COLOR col;
+
   // should blend colors?
   if (_cttHUD.ctt_bSmooth)
   { // lets do some interpolations
@@ -445,12 +449,12 @@ extern COLOR GetCurrentColor( FLOAT fNormalizedValue)
     ubV = (UBYTE)(ubV*fd + ubV2*(1.0f-fd));
     // convert HSV back to COLOR
     col = HSVToColor( ubH, ubS, ubV);
-  }
-  else
-  { // simple color picker
+
+  } else { // simple color picker
     col = _cttHUD.ctt_colMedium;
     if (fNormalizedValue > _cttHUD.ctt_fMediumHigh) col = _cttHUD.ctt_colHigh;
   }
+
   // all done
   return( col & 0xFFFFFF00);
 }
@@ -890,6 +894,9 @@ static void FillWeaponAmmoTables(void)
   _aaiAmmo[6].ai_iMaxAmmoAmmount = _penWeapons->m_iMaxIronBalls;
   _aaiAmmo[7].ai_iAmmoAmmount    = _penWeapons->m_iSniperBullets;
   _aaiAmmo[7].ai_iMaxAmmoAmmount = _penWeapons->m_iMaxSniperBullets;
+  
+  _aaiAmmo[8].ai_iAmmoAmmount    = _penWeapons->m_iSeriousBombs;
+  _aaiAmmo[8].ai_iMaxAmmoAmmount = _penWeapons->m_iMaxSeriousBombs;
 
   // prepare ammo table for weapon possesion
   INDEX i, iAvailableWeapons = _penWeapons->m_iAvailableWeapons;
@@ -1627,7 +1634,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
         ptoAmmo = _aaiAmmo[i].ai_ptoAmmo;
 
       } else {
-        INDEX iBombCount = penPlayerCurrent->m_iSeriousBombCount;
+        INDEX iBombCount = _penWeapons->m_iSeriousBombs;
         
         #define BOMB_FIRE_TIME 1.5f
         BOOL  bBombFiring = penPlayerCurrent->m_tmSeriousBombFired + BOMB_FIRE_TIME > _pTimer->GetLerpedCurrentTick();
@@ -1822,11 +1829,12 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
     
     BOOL bAnyColt = iCurrentWeapon == WEAPON_COLT || iCurrentWeapon == WEAPON_DOUBLECOLT;
+    BOOL bSeriousBomb = iCurrentWeapon == WEAPON_SERIOUSBOMB;
 
     AmmoInfo *paiCurrent = _awiWeapons[iCurrentWeapon].wi_paiAmmo;
     if (paiCurrent != NULL) ptoCurrentAmmo = paiCurrent->ai_ptoAmmo;
 
-    if (bAnyColt || (ptoCurrentAmmo != NULL && !GetSP()->sp_bInfiniteAmmo))
+    if (bAnyColt || bSeriousBomb || (ptoCurrentAmmo != NULL && !GetSP()->sp_bInfiniteAmmo))
     {
       FLOAT fMaxValue = _penWeapons->GetMaxAmmo();
       fValue = _penWeapons->GetAmmo();
@@ -1834,7 +1842,8 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       CTString strCurrentAmmo;
       strCurrentAmmo.PrintF( "%d", (SLONG)ceil(fValue));
       PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.30f, 0.15f, FALSE);
-        
+      
+      // [SSE] Colt Bullets
       if (bAnyColt) {
         ptoCurrentAmmo = &_toAColt;
       }
@@ -1893,7 +1902,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
         ptoAmmo = _aaiAmmo[i].ai_ptoAmmo;
 
       } else {
-        INDEX iBombCount = penPlayerCurrent->m_iSeriousBombCount;
+        INDEX iBombCount = _penWeapons->m_iSeriousBombs;
         
         #define BOMB_FIRE_TIME 1.5f
         BOOL  bBombFiring = penPlayerCurrent->m_tmSeriousBombFired + BOMB_FIRE_TIME > _pTimer->GetLerpedCurrentTick();
@@ -2814,13 +2823,13 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   const FLOAT fBarPos = fHalfUnitS * 0.7f;
   FillWeaponAmmoTables();
 
-  FLOAT fBombCount = penPlayerCurrent->m_iSeriousBombCount;
+  FLOAT fBombCount = _penWeapons->m_iSeriousBombs;
   BOOL  bBombFiring = FALSE;
   // draw serious bomb
 #define BOMB_FIRE_TIME 1.5f
   if (penPlayerCurrent->m_tmSeriousBombFired+BOMB_FIRE_TIME>_pTimer->GetLerpedCurrentTick()) {
     fBombCount++;
-    if (fBombCount>3) { fBombCount = 3; }
+    if (fBombCount > 3) { fBombCount = 3; }
     bBombFiring = TRUE;
   }
 
@@ -2851,7 +2860,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   // loop thru all ammo types
   if (!GetSP()->sp_bInfiniteAmmo)
   {
-    for (INDEX ii = 7; ii>=0; ii--)
+    for (INDEX ii = 7; ii >= 0; ii--)
     {
       i = aiAmmoRemap[ii];
       
@@ -3134,21 +3143,21 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
           _pDP->PutTextR( strName+":", _pixDPWidth - 12 *fCharWidth, fCharHeight*i+fOneUnit*2, colScore |_ulAlphaHUD);
           
           if (penPlayer->GetFlags()&ENF_ALIVE) {
-            _pDP->PutText(  "/",         _pixDPWidth-8*fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD  |_ulAlphaHUD);
-            _pDP->PutTextC( strHealth,   _pixDPWidth-10*fCharWidth, fCharHeight*i+fOneUnit*2, colHealth|_ulAlphaHUD);
-            _pDP->PutTextC( strArmor,    _pixDPWidth-6*fCharWidth, fCharHeight*i+fOneUnit*2, colArmor |_ulAlphaHUD);
+            _pDP->PutText(  "/",         _pixDPWidth - 8*fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD  |_ulAlphaHUD);
+            _pDP->PutTextC( strHealth,   _pixDPWidth - 10*fCharWidth, fCharHeight*i+fOneUnit*2, colHealth|_ulAlphaHUD);
+            _pDP->PutTextC( strArmor,    _pixDPWidth - 6*fCharWidth, fCharHeight*i+fOneUnit*2, colArmor |_ulAlphaHUD);
           } else {
             _pDP->PutTextC(  TRANS("DEAD"), _pixDPWidth-8*fCharWidth, fCharHeight*i+fOneUnit*2, C_RED|_ulAlphaHUD); // [SSE] No Stupid Zeros If Player Dead
           }
           
-          _pDP->PutTextC( strPing,     _pixDPWidth- 2 * fCharWidth, fCharHeight * i + fOneUnit * 2, colPing|_ulAlphaHUD);
+          _pDP->PutTextC( strPing,     _pixDPWidth - 2 * fCharWidth, fCharHeight * i + fOneUnit * 2, colPing|_ulAlphaHUD);
 
         } else if (bScoreMatch) {
           _pDP->PutTextR( strName+":", _pixDPWidth - 14 * fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD |_ulAlphaHUD);
-          _pDP->PutText(  "/",         _pixDPWidth- 9 * fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD |_ulAlphaHUD);
-          _pDP->PutTextC( strScore,    _pixDPWidth- 12 * fCharWidth, fCharHeight*i+fOneUnit*2, colScore|_ulAlphaHUD);
-          _pDP->PutTextC( strMana,     _pixDPWidth- 6 * fCharWidth, fCharHeight*i+fOneUnit*2, colMana |_ulAlphaHUD);
-          _pDP->PutTextC( strPing,     _pixDPWidth- 2 * fCharWidth, fCharHeight * i + fOneUnit * 2, colPing|_ulAlphaHUD);
+          _pDP->PutText(  "/",         _pixDPWidth - 9 * fCharWidth, fCharHeight*i+fOneUnit*2, _colHUD |_ulAlphaHUD);
+          _pDP->PutTextC( strScore,    _pixDPWidth - 12 * fCharWidth, fCharHeight*i+fOneUnit*2, colScore|_ulAlphaHUD);
+          _pDP->PutTextC( strMana,     _pixDPWidth - 6 * fCharWidth, fCharHeight*i+fOneUnit*2, colMana |_ulAlphaHUD);
+          _pDP->PutTextC( strPing,     _pixDPWidth - 2 * fCharWidth, fCharHeight * i + fOneUnit * 2, colPing|_ulAlphaHUD);
 
         } else { // fragmatch!
           CTString strNameString;
@@ -3558,6 +3567,7 @@ static void HUD_RegisterTextures()
   HUD_RegisterTexture(&_toWChainsaw,        CTFILENAME("TexturesMP\\Interface\\WChainsaw.tex"));
   HUD_RegisterTexture(&_toWSniper,          CTFILENAME("TexturesMP\\Interface\\WSniper.tex"));
   HUD_RegisterTexture(&_toWFlamer,          CTFILENAME("TexturesMP\\Interface\\WFlamer.tex"));
+  HUD_RegisterTexture(&_toWSeriousBomb,     CTFILENAME("TexturesMP\\Interface\\WSeriousBomb.tex")); // [SSE] Gameplay - Serious Bomb Weapon
 
   // initialize powerup textures (DO NOT CHANGE ORDER!)
   HUD_RegisterTexture(&_atoPowerups[0],    CTFILENAME("TexturesMP\\Interface\\PInvisibility.tex"));

@@ -67,6 +67,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "EntitiesMP/EnemyBase.h"
   
   // [SSE]
+  #include "EntitiesMP/SeriousBomb.h"
   #include "EntitiesMP/SimpleSwitch.h"
   #include "EntitiesMP/ProgressiveSwitch.h"
   //
@@ -137,12 +138,13 @@ enum WeaponType {
  13 WEAPON_LASER              "",
  14 WEAPON_SNIPER             "",
  15 WEAPON_IRONCANNON         "",
- 16 WEAPON_LAST               "",
+ 16 WEAPON_SERIOUSBOMB        "", // [SSE] Gameplay - Serious Bomb Weapon
+ 17 WEAPON_LAST               "",
 }; // see 'WEAPONS_ALLAVAILABLEMASK' -> (11111111111111 == 0x3FFF)
 
 %{
 // AVAILABLE WEAPON MASK
-#define WEAPONS_ALLAVAILABLEMASK 0x3FFF // 0x3FFF
+#define WEAPONS_ALLAVAILABLEMASK 0x7FFF // 0x3FFF
 
 /*
 #if BUILD_TEST
@@ -516,6 +518,31 @@ void CPlayerWeapons_Precache(ULONG ulAvailable)
     pdec->PrecacheSound(SOUND_CANNON_PREPARE);
     pdec->PrecacheClass(CLASS_CANNONBALL);
   }
+  
+  {
+    pdec->PrecacheModel(MODEL_SERIOUSBOMB);
+    pdec->PrecacheModel(MODEL_SB_BOMB);
+    pdec->PrecacheModel(MODEL_SB_BOMB_CRACK);
+    pdec->PrecacheModel(MODEL_SB_BOMB_EXPLOSION);
+    pdec->PrecacheModel(MODEL_SB_BOMB_PIECE);
+    pdec->PrecacheModel(MODEL_SB_LIGHTER);
+
+    pdec->PrecacheModel(MODEL_SB_FUSE_FLARE);
+    pdec->PrecacheModel(MODEL_SB_LIGHTER_FIRE);
+    
+    // Textures
+    pdec->PrecacheTexture(TEXTURE_SB_BOMB);
+    pdec->PrecacheTexture(TEXTURE_SB_BOMB_CRACK);
+    pdec->PrecacheTexture(TEXTURE_SB_FIRE);
+    pdec->PrecacheTexture(TEXTURE_SB_DETAIL);
+    pdec->PrecacheTexture(TEXTURE_SB_LIGHTER);
+    pdec->PrecacheTexture(TEXTURE_SB_SPECULAR);
+    
+    // Sounds
+    pdec->PrecacheSound(SOUND_SB_FUSE);
+    pdec->PrecacheSound(SOUND_SB_LIGHTER_OPEN);
+    pdec->PrecacheSound(SOUND_SB_LIGHTER_CLOSE);
+  }
 
   // precache animator too
   extern void CPlayerAnimator_Precache(ULONG ulAvailable);
@@ -674,6 +701,9 @@ properties:
 // 55 INDEX m_iMaxNukeBalls   = MAX_NUKEBALLS,
  54 INDEX m_iSniperBullets    = 0,
  55 INDEX m_iMaxSniperBullets = MAX_SNIPERBULLETS,
+ 
+ 56 INDEX m_iSeriousBombs = 0,
+ 57 INDEX m_iMaxSeriousBombs = MAX_SERIOUSBOMBS,
 
 // weapons specific
 // knife
@@ -718,6 +748,8 @@ properties:
 271 FLOAT m_tmFlamerStop=1e9,
 272 FLOAT m_tmLastChainsawSpray = 0.0f,
 
+337 BOOL m_bBombHidden = FALSE,
+
 {
   CEntity *penBullet;
   CPlacement3D plBullet;
@@ -733,6 +765,8 @@ components:
   6 class   CLASS_CANNONBALL        "Classes\\CannonBall.ecl",
   7 class   CLASS_WEAPONITEM        "Classes\\WeaponItem.ecl",
   8 class   CLASS_BASIC_EFFECT      "Classes\\BasicEffect.ecl",
+  
+  9 class   CLASS_SERIOUSBOMB     "Classes\\SeriousBomb.ecl",
 
 // ************** HAND **************
  10 texture TEXTURE_HAND                "Models\\Weapons\\Hand.tex",
@@ -920,12 +954,35 @@ components:
 
 280 sound   SOUND_SILENCE               "Sounds\\Misc\\Silence.wav",
 
+// ************** FISTS **************
 302 model   MODEL_FISTS                 "Models\\Weapons\\Fists\\Fists.mdl",
 303 sound   SOUND_FISTS_BACK            "Models\\Weapons\\Fists\\Sounds\\Back.wav",
 304 sound   SOUND_FISTS_HIGH            "Models\\Weapons\\Fists\\Sounds\\High.wav",
 305 sound   SOUND_FISTS_LONG            "Models\\Weapons\\Fists\\Sounds\\Long.wav",
 306 sound   SOUND_FISTS_LOW             "Models\\Weapons\\Fists\\Sounds\\Low.wav",
 
+// ************** SERIOUS BOMB **************
+320 model   MODEL_SERIOUSBOMB           "Models\\Weapons\\SeriousBomb\\SeriousBomb.mdl",
+321 model   MODEL_SB_BOMB               "Models\\Weapons\\SeriousBomb\\Bomb.mdl",
+322 model   MODEL_SB_LIGHTER            "Models\\Weapons\\SeriousBomb\\Zajigalka.mdl",
+323 model   MODEL_SB_BOMB_PIECE         "Models\\Weapons\\SeriousBomb\\OSKOLOK.mdl",
+
+325 model   MODEL_SB_FUSE_FLARE         "Models\\Weapons\\SeriousBomb\\FITILISKRA.mdl",
+326 model   MODEL_SB_LIGHTER_FIRE       "Models\\Weapons\\SeriousBomb\\pLANKA.mdl",
+327 model   MODEL_SB_BOMB_CRACK         "Models\\Weapons\\SeriousBomb\\Razlom\\Object002-Frame_0.mdl",
+328 model   MODEL_SB_BOMB_EXPLOSION     "Models\\Weapons\\SeriousBomb\\Vzriv\\0.mdl",
+
+330 texture TEXTURE_SB_BOMB             "Models\\Weapons\\SeriousBomb\\SeriousBomb.tex",
+331 texture TEXTURE_SB_DETAIL           "Models\\Weapons\\SeriousBomb\\norm.tex",
+332 texture TEXTURE_SB_SPECULAR         "Models\\Weapons\\SeriousBomb\\123.tex",
+
+333 texture TEXTURE_SB_LIGHTER          "Models\\Weapons\\SeriousBomb\\Zajigalka.tex",
+334 texture TEXTURE_SB_FIRE             "Models\\Weapons\\SeriousBomb\\OG\\OG.tex",
+335 texture TEXTURE_SB_BOMB_CRACK       "Models\\Weapons\\SeriousBomb\\Razlom.tex",
+
+340 sound   SOUND_SB_FUSE               "Models\\Weapons\\SeriousBomb\\Sounds\\Fuse.wav",
+341 sound   SOUND_SB_LIGHTER_OPEN       "Models\\Weapons\\SeriousBomb\\Sounds\\LighterOpen.wav",
+342 sound   SOUND_SB_LIGHTER_CLOSE      "Models\\Weapons\\SeriousBomb\\Sounds\\LighterClose.wav",
 
 functions:
    
@@ -1923,11 +1980,51 @@ functions:
       case WEAPON_NONE:
         break;
 
-      // [SSE] Fists Weapon
+      // [SSE] Gameplay - Fists Weapon
       case WEAPON_FISTS: 
         SetComponents(this, m_moWeapon, MODEL_FISTS, TEXTURE_HAND, 0, 0, 0);
         m_moWeapon.PlayAnim(KNIFE_ANIM_WAIT1, 0); // TODO: Redone it.
         break;
+        
+      // [SSE] Gameplay - Serious Bomb Weapon
+      case WEAPON_SERIOUSBOMB: {
+        SetComponents(this, m_moWeapon, MODEL_SERIOUSBOMB, TEXTURE_HAND, 0, 0, 0);
+        AddAttachmentToModel(this, m_moWeapon, 0, MODEL_SB_LIGHTER, TEXTURE_SB_LIGHTER, 0, 0, 0);
+        AddAttachmentToModel(this, m_moWeapon, 1, MODEL_SB_BOMB, TEXTURE_SB_BOMB, 0, TEXTURE_SB_SPECULAR, TEXTURE_SB_DETAIL);
+        AddAttachmentToModel(this, m_moWeapon, 2, MODEL_SB_BOMB_CRACK, TEXTURE_SB_BOMB_CRACK, 0, 0, 0);
+        AddAttachmentToModel(this, m_moWeapon, 3, MODEL_SB_BOMB_EXPLOSION, TEXTURE_SB_BOMB, 0, 0, 0);
+        AddAttachmentToModel(this, m_moWeapon, 4, MODEL_SB_BOMB_PIECE, TEXTURE_SB_BOMB, 0, TEXTURE_SB_SPECULAR, TEXTURE_SB_DETAIL);
+        
+        {
+          CModelObject &mo = m_moWeapon.GetAttachmentModel(0)->amo_moModelObject; // Get the lighter model.
+          AddAttachmentToModel(this, mo, 0, MODEL_SB_LIGHTER_FIRE, TEXTURE_SB_FIRE, 0, 0, 0);
+        }
+        
+        {
+          CModelObject &mo = m_moWeapon.GetAttachmentModel(1)->amo_moModelObject; // Get the bomb model.
+          AddAttachmentToModel(this, mo, 0, MODEL_SB_FUSE_FLARE, TEXTURE_SB_FIRE, 0, 0, 0);
+          
+          CModelObject &mo1 = mo.GetAttachmentModel(0)->amo_moModelObject; // Get the fire model.
+          mo1.StretchModel(FLOAT3D(0, 0, 0));
+        }
+        
+        {
+          CModelObject &moCrack = m_moWeapon.GetAttachmentModel(2)->amo_moModelObject; // Get the bomb crack model.
+          moCrack.StretchModel(FLOAT3D(0, 0, 0));
+        }
+        
+        {
+          CModelObject &moBombExplosion = m_moWeapon.GetAttachmentModel(3)->amo_moModelObject; // Get the bomb explosion model.
+          moBombExplosion.StretchModel(FLOAT3D(0, 0, 0));
+        }
+        
+        {
+          CModelObject &mo = m_moWeapon.GetAttachmentModel(4)->amo_moModelObject;
+          mo.StretchModel(FLOAT3D(0, 0, 0));
+        }
+        
+        m_moWeapon.PlayAnim(0, 0); // TODO: Redone it.
+      } break;
 
       // knife
       case WEAPON_KNIFE:
@@ -2528,7 +2625,7 @@ functions:
       }
 
       const FLOAT fDamageMul = GetSeriousDamageMultiplier(m_penPlayer);
-      InflictDirectDamage(penClosest, m_penPlayer, DMT_CLOSERANGE, fDamage * fDamageMul, vHit, vDir);
+      InflictDirectDamage(penClosest, m_penPlayer, DMT_CHAINSAW, fDamage * fDamageMul, vHit, vDir);
 
       return TRUE;
     }
@@ -2966,6 +3063,8 @@ functions:
     m_aMiniGun = 0;
     m_aMiniGunLast = 0;
     m_aMiniGunSpeed = 0;
+    
+    m_bBombHidden = TRUE;
 
     // [SSE] If haven't any weapons - select dummy weapon.
     if (m_iAvailableWeapons == 0) {
@@ -3011,6 +3110,8 @@ functions:
       case WEAPON_CHAINSAW:        return 0;
       case WEAPON_LASER:           return m_iElectricity;
       case WEAPON_IRONCANNON:      return m_iIronBalls;
+      
+      case WEAPON_SERIOUSBOMB:     return m_iSeriousBombs; // [SSE] Gameplay - Serious Bomb Weapon
     }
 
     return 0;
@@ -3038,6 +3139,8 @@ functions:
       case WEAPON_CHAINSAW:        return m_iMaxNapalm;
       case WEAPON_LASER:           return m_iMaxElectricity;
       case WEAPON_IRONCANNON:      return m_iMaxIronBalls;
+      
+      case WEAPON_SERIOUSBOMB:     return m_iMaxSeriousBombs; // [SSE] Gameplay - Serious Bomb Weapon
     }
 
     return 0;
@@ -3077,6 +3180,7 @@ functions:
       //m_iNukeBalls = m_iMaxNukeBalls;
       // precache eventual new weapons
       m_iSniperBullets = m_iMaxSniperBullets;
+      m_iSeriousBombs = m_iMaxSeriousBombs;
     }
 
     Precache();
@@ -3156,7 +3260,7 @@ functions:
         break;
       // rockets
       case WEAPON_ROCKETLAUNCHER:
-        iAmmoPicked = Max(5.0f, m_iMaxRockets*fMaxAmmoRatio);
+        iAmmoPicked = Max(4.0f, m_iMaxRockets*fMaxAmmoRatio);
         m_iRockets += iAmmoPicked;
         AddManaToPlayer( iAmmoPicked*150.0f*MANA_AMMO);
         break;
@@ -3288,6 +3392,18 @@ functions:
     }
     
     return FALSE;
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // Receive serious bomb.
+  // --------------------------------------------------------------------------------------
+  void ReceiveSeriousBomb(void)
+  {
+    m_iAvailableWeapons |= 1 << (WEAPON_SERIOUSBOMB - 2);
+    
+    if (m_iSeriousBombs < m_iMaxSeriousBombs) {
+      m_iSeriousBombs += 1;
+    }
   }
 
   // --------------------------------------------------------------------------------------
@@ -3706,6 +3822,7 @@ functions:
       case WEAPON_SNIPER: return WEAPON_FLAMER;
       case WEAPON_LASER: return WEAPON_LASER;
       case WEAPON_IRONCANNON: return WEAPON_IRONCANNON;
+      case WEAPON_SERIOUSBOMB: return WEAPON_SERIOUSBOMB; // [SSE] Gameplay - Serious Bomb Weapon.
     }
 
     return WEAPON_NONE;
@@ -3746,14 +3863,14 @@ functions:
       case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: 
       case WEAPON_SINGLESHOTGUN: case WEAPON_DOUBLESHOTGUN:
       case WEAPON_TOMMYGUN: case WEAPON_MINIGUN: case WEAPON_SNIPER:
-        WeaponSelectOk(WEAPON_IRONCANNON) ||
-        WeaponSelectOk(WEAPON_ROCKETLAUNCHER) ||
-        WeaponSelectOk(WEAPON_GRENADELAUNCHER) ||
         WeaponSelectOk(WEAPON_LASER) ||
         WeaponSelectOk(WEAPON_FLAMER) ||
         WeaponSelectOk(WEAPON_MINIGUN) ||
-        WeaponSelectOk(WEAPON_SNIPER) ||
         WeaponSelectOk(WEAPON_TOMMYGUN) ||
+        WeaponSelectOk(WEAPON_SNIPER) ||
+        WeaponSelectOk(WEAPON_ROCKETLAUNCHER) ||
+        WeaponSelectOk(WEAPON_GRENADELAUNCHER) ||
+        WeaponSelectOk(WEAPON_IRONCANNON) ||
         WeaponSelectOk(WEAPON_DOUBLESHOTGUN) ||
         WeaponSelectOk(WEAPON_SINGLESHOTGUN) ||
         WeaponSelectOk(WEAPON_DOUBLECOLT) ||
@@ -3762,9 +3879,10 @@ functions:
         WeaponSelectOk(WEAPON_KNIFE);
         break;
       case WEAPON_IRONCANNON:
-        WeaponSelectOk(WEAPON_IRONCANNON) ||
+      case WEAPON_SERIOUSBOMB:
         WeaponSelectOk(WEAPON_ROCKETLAUNCHER) ||
         WeaponSelectOk(WEAPON_GRENADELAUNCHER) ||
+        WeaponSelectOk(WEAPON_IRONCANNON) ||
         WeaponSelectOk(WEAPON_LASER) ||
         WeaponSelectOk(WEAPON_FLAMER) ||
         WeaponSelectOk(WEAPON_MINIGUN) ||
@@ -3779,9 +3897,9 @@ functions:
         break;
       case WEAPON_ROCKETLAUNCHER:
       case WEAPON_GRENADELAUNCHER:
-        WeaponSelectOk(WEAPON_IRONCANNON) ||
         WeaponSelectOk(WEAPON_ROCKETLAUNCHER) ||
         WeaponSelectOk(WEAPON_GRENADELAUNCHER) ||
+        WeaponSelectOk(WEAPON_IRONCANNON) ||
         WeaponSelectOk(WEAPON_LASER) ||
         WeaponSelectOk(WEAPON_FLAMER) ||
         WeaponSelectOk(WEAPON_MINIGUN) ||
@@ -3795,14 +3913,14 @@ functions:
         WeaponSelectOk(WEAPON_KNIFE);
         break;
       case WEAPON_LASER:  case WEAPON_FLAMER:  case WEAPON_CHAINSAW:
-        WeaponSelectOk(WEAPON_IRONCANNON) ||
-        WeaponSelectOk(WEAPON_ROCKETLAUNCHER) ||
-        WeaponSelectOk(WEAPON_GRENADELAUNCHER) ||
         WeaponSelectOk(WEAPON_LASER) ||
         WeaponSelectOk(WEAPON_FLAMER) ||
         WeaponSelectOk(WEAPON_MINIGUN) ||
-        WeaponSelectOk(WEAPON_SNIPER) ||
         WeaponSelectOk(WEAPON_TOMMYGUN) ||
+        WeaponSelectOk(WEAPON_ROCKETLAUNCHER) ||
+        WeaponSelectOk(WEAPON_GRENADELAUNCHER) ||
+        WeaponSelectOk(WEAPON_IRONCANNON) ||
+        WeaponSelectOk(WEAPON_SNIPER) ||
         WeaponSelectOk(WEAPON_DOUBLESHOTGUN) ||
         WeaponSelectOk(WEAPON_SINGLESHOTGUN) ||
         WeaponSelectOk(WEAPON_DOUBLECOLT) ||
@@ -3824,7 +3942,7 @@ functions:
     if (EwtWeapon < WEAPON_KNIFE) {
       return TRUE; // We always have WEAPON_NONE and WEAPON_FISTS.
     }
-    
+
     if (m_iAvailableWeapons&(1 << (EwtWeapon - 2))) {
       return TRUE;
     }
@@ -3840,7 +3958,7 @@ functions:
     switch (EwtWeapon)
     {
       case WEAPON_NONE :  return TRUE; // Dummy weapon has infinite ammo.
-      case WEAPON_FISTS : return TRUE; // [SSE] Fists Weapon
+      case WEAPON_FISTS : return TRUE; // [SSE] Gameplay - Fists Weapon
       case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: return TRUE; // Knife / Colt / Double Colt have infinite ammo.
       case WEAPON_CHAINSAW:        return TRUE; // Chainsaw have infinite ammo.
 
@@ -3855,6 +3973,8 @@ functions:
       case WEAPON_LASER:           return (m_iElectricity > 0);
       case WEAPON_SNIPER:          return (m_iSniperBullets > 0);
       case WEAPON_IRONCANNON:      return (m_iIronBalls > 0);
+      
+      case WEAPON_SERIOUSBOMB:     return (m_iSeriousBombs > 0); // [SSE] Gameplay - Serious Bomb Weapon
     }
 
     return FALSE;
@@ -4325,10 +4445,10 @@ functions:
       (INDEX&)wti += iDir;
 
       if (wti < 1) {
-        wti = WEAPON_IRONCANNON;
+        wti = WEAPON_SERIOUSBOMB;
       }
 
-      if (wti > 15) {//14) { [SSE] Fists Weapon
+      if (wti > 16) {//15) {//14) { [SSE] Gameplay - Serious Bomb Weapon
         wti = WEAPON_FISTS;
       }
 
@@ -4566,9 +4686,13 @@ procedures:
       case WEAPON_NONE:
         break;
         
-      case WEAPON_FISTS: // [SSE] Fists Weapon
+      case WEAPON_FISTS: // [SSE] Gameplay - Fists Weapon
         m_iAnim = KNIFE_ANIM_PULLOUT;
         break;
+        
+      case WEAPON_SERIOUSBOMB: {// [SSE] Gameplay - Serious Bomb Weapon
+        m_iAnim = 7;
+      } break;
         
       // knife have different stands
       case WEAPON_KNIFE: 
@@ -4646,6 +4770,16 @@ procedures:
     if (m_iCurrentWeapon==WEAPON_DOUBLECOLT) {
       m_moWeaponSecond.PlayAnim(m_iAnim, 0);
     }
+    
+    // [SSE] Gameplay - Serious Bomb Weapon.
+    if (!m_bBombHidden && m_iCurrentWeapon == WEAPON_SERIOUSBOMB) {
+      CModelObject &mo = m_moWeapon.GetAttachmentModel(0)->amo_moModelObject;
+      mo.PlayAnim(7, 0);
+      
+      CPlayer &pl = (CPlayer&)*m_penPlayer;
+      pl.m_soWeaponAmbient.Set3DParameters(30.0f, 3.0f, 1.0f, 1.0f);
+      PlaySound(pl.m_soWeaponAmbient, SOUND_SB_LIGHTER_CLOSE, SOF_3D|SOF_VOLUMETRIC|SOF_SMOOTHCHANGE); 
+    }
 
     // --->>>  DOUBLE COLT -> COLT SPECIFIC  <<<---
     if (m_iCurrentWeapon==WEAPON_DOUBLECOLT && m_iWantedWeapon==WEAPON_COLT) {
@@ -4670,8 +4804,12 @@ procedures:
       m_iColtBullets = COLT_MAG_SIZE;
     }
 
-    m_moWeapon.PlayAnim(m_iAnim, 0);
-    autowait(m_moWeapon.GetAnimLength(m_iAnim)); // TODO: Huyna
+    // If not Serious Bomb or bomb is not hidden.
+    if (m_iCurrentWeapon != WEAPON_SERIOUSBOMB || !m_bBombHidden) {
+      m_moWeapon.PlayAnim(m_iAnim, 0);
+      autowait(m_moWeapon.GetAnimLength(m_iAnim)); // TODO: Huyna    
+    }
+
     return EEnd();
   };
 
@@ -4691,9 +4829,19 @@ procedures:
         m_iAnim = KNIFE_ANIM_PULL;
         m_iKnifeStand = 1;
         break;
-      case WEAPON_FISTS: // [SSE] Fists Weapon
+
+      case WEAPON_FISTS: // [SSE] Gameplay - Fists Weapon
         m_iAnim = KNIFE_ANIM_PULL; // TODO: Remake it
         break;
+        
+      case WEAPON_SERIOUSBOMB: {// [SSE] Gameplay - Serious Bomb Weapon
+        m_iAnim = 5; // TODO: Remake it
+        
+        CPlayer &pl = (CPlayer&)*m_penPlayer;
+        pl.m_soWeaponAmbient.Set3DParameters(30.0f, 3.0f, 1.0f, 1.0f);
+        PlaySound(pl.m_soWeaponAmbient, SOUND_SB_LIGHTER_OPEN, SOF_3D|SOF_VOLUMETRIC|SOF_SMOOTHCHANGE); 
+      } break;
+
       case WEAPON_COLT: case WEAPON_DOUBLECOLT:
         m_iAnim = COLT_ANIM_ACTIVATE;
         SetFlare(0, FLARE_REMOVE);
@@ -4770,6 +4918,12 @@ procedures:
     if (m_iCurrentWeapon==WEAPON_DOUBLECOLT) {
       m_moWeaponSecond.PlayAnim(m_iAnim, 0);
     }
+    
+    // [SSE] Gameplay - Serious Bomb Weapon.
+    if (m_iCurrentWeapon == WEAPON_SERIOUSBOMB) {
+      CModelObject &moLighter = m_moWeapon.GetAttachmentModel(0)->amo_moModelObject;
+      moLighter.PlayAnim(5, 0);
+    }
 
     // --->>>  COLT -> COLT DOUBLE SPECIFIC  <<<---
     if (m_iPreviousWeapon == WEAPON_COLT && m_iCurrentWeapon == WEAPON_DOUBLECOLT) {
@@ -4794,7 +4948,11 @@ procedures:
 
     m_moWeapon.PlayAnim(m_iAnim, 0);
     autowait(m_moWeapon.GetAnimLength(m_iAnim)); // TODO: Huyna
-
+    
+    // [SSE] Gameplay - Serious Bomb Weapon.
+    if (m_iCurrentWeapon == WEAPON_SERIOUSBOMB) {
+      m_bBombHidden = FALSE;
+    }
 /*
     if (m_iCurrentWeapon == WEAPON_NUKECANNON)
     {
@@ -4885,6 +5043,8 @@ procedures:
             case WEAPON_ROCKETLAUNCHER: call FireRocketLauncher(); break;
             case WEAPON_GRENADELAUNCHER: call FireGrenadeLauncher(); break;
             case WEAPON_LASER: call FireLaser(); break;
+
+            case WEAPON_SERIOUSBOMB: call FireSeriousBomb(); break; // [SSE] Gameplay - Serious Bomb Weapon
 
             default: ASSERTALWAYS("Unknown weapon.");
           }
@@ -6321,6 +6481,96 @@ procedures:
     return EEnd();
   };
 
+  // ***************** FIRE SERIOUS BOMB *****************
+  FireSeriousBomb()
+  {
+    if (GetAmmo() <= 0) {
+      m_bFireWeapon = m_bHasAmmo = FALSE;
+      return EEnd();
+    }
+    
+    m_moWeapon.PlayAnim(6, 0);
+  
+    CModelObject &moLighter = m_moWeapon.GetAttachmentModel(0)->amo_moModelObject;
+    CModelObject &moCrack = m_moWeapon.GetAttachmentModel(2)->amo_moModelObject; // Get the bomb crack model.
+    moCrack.SetAnim(6);
+    moCrack.FirstFrame();
+    moCrack.StretchModel(FLOAT3D(1.0F, 1.0F, 1.0F));
+    moLighter.PlayAnim(6, 0);
+    moCrack.PlayAnim(6, 0); // Play fire anim
+    
+    //CPrintF("LEN: %f\n", m_moWeapon.GetAnimLength(6));
+    
+    autowait(0.4F);
+    
+    CPlayer &pl = (CPlayer&)*m_penPlayer;
+    PlaySound(pl.m_soWeapon1, SOUND_SB_FUSE, SOF_3D|SOF_VOLUMETRIC);
+    
+    CModelObject &moBomb = m_moWeapon.GetAttachmentModel(1)->amo_moModelObject; // Get the bomb model.
+    CModelObject &moBombFire = moBomb.GetAttachmentModel(0)->amo_moModelObject; // Get the fire model.
+    moBombFire.StretchModel(FLOAT3D(1.0F, 1.0F, 1.0F));
+    
+    moBomb.PlayAnim(6, 0); // Play fire anim
+    
+    autowait(0.3F);
+    CPlayer &pl = (CPlayer&)*m_penPlayer;
+    PlaySound(pl.m_soWeapon0, SOUND_SB_LIGHTER_CLOSE, SOF_3D|SOF_VOLUMETRIC);
+    
+    DecAmmo(m_iSeriousBombs, 1);
+    
+    ESeriousBomb esb;
+    esb.penOwner = m_penPlayer;
+    CEntityPointer penBomb = CreateEntity(m_penPlayer->GetPlacement(), CLASS_SERIOUSBOMB);
+    penBomb->Initialize(esb);
+
+    //CPrintF("LEN: %f\n", moCrack.GetAnimLength(6));
+
+    autowait(1.5F);
+
+    CModelObject &moBomb = m_moWeapon.GetAttachmentModel(1)->amo_moModelObject; // Get the bomb model.
+    CModelObject &moCrack = m_moWeapon.GetAttachmentModel(2)->amo_moModelObject; // Get the bomb crack model.
+    CModelObject &moBombExplosion = m_moWeapon.GetAttachmentModel(3)->amo_moModelObject; // Get the bomb explosion model.
+    CModelObject &moBombPiece = m_moWeapon.GetAttachmentModel(4)->amo_moModelObject; // Get the bomb piece model.
+    moBomb.StretchModel(FLOAT3D(0.0F, 0.0F, 0.0F));
+    moCrack.StretchModel(FLOAT3D(0.0F, 0.0F, 0.0F));
+    moBombPiece.StretchModel(FLOAT3D(1.0F, 1.0F, 1.0F));
+    moBombExplosion.StretchModel(FLOAT3D(1.0F, 1.0F, 1.0F));
+    moBombExplosion.PlayAnim(1, 0); // Play fire anim
+
+    autowait(0.1F);
+    //CPrintF("LEN: %f\n", moBombPiece.GetAnimLength(1));
+    CModelObject &moBombExplosion = m_moWeapon.GetAttachmentModel(3)->amo_moModelObject; // Get the bomb explosion model.
+    moBombExplosion.StretchModel(FLOAT3D(0.0F, 0.0F, 0.0F));
+
+    autowait(1.1F);
+
+    CModelObject &moBomb = m_moWeapon.GetAttachmentModel(1)->amo_moModelObject; // Get the bomb model.
+    CModelObject &moBombFire = moBomb.GetAttachmentModel(0)->amo_moModelObject; // Get the fire model.
+    CModelObject &moBombPiece = m_moWeapon.GetAttachmentModel(4)->amo_moModelObject; // Get the bomb piece model.
+    moBomb.StretchModel(FLOAT3D(1.0F, 1.0F, 1.0F));
+    moBombPiece.StretchModel(FLOAT3D(0.0F, 0.0F, 0.0F));
+    moBombFire.StretchModel(FLOAT3D(0.0F, 0.0F, 0.0F));
+    moBomb.PlayAnim(0, 0);
+    
+    if (GetAmmo() <= 0) {
+      m_bBombHidden = TRUE;
+      m_moWeapon.PauseAnim();
+      SelectNewWeapon();
+      return EEnd();
+    }
+    
+    CPlayer &pl = (CPlayer&)*m_penPlayer;
+    PlaySound(pl.m_soWeapon0, SOUND_SB_LIGHTER_OPEN, SOF_3D|SOF_VOLUMETRIC);
+    
+    autowait(1.0F);
+
+    if (GetAmmo() <= 0) {
+      SelectNewWeapon();
+    }
+
+    return EEnd();
+  };
+  
   /*
   // ***************** FIRE GHOSTBUSTER *****************
   GhostBusterStart() {
@@ -6656,6 +6906,29 @@ procedures:
     if (m_iCurrentWeapon == WEAPON_ROCKETLAUNCHER) {
       CModelObject *pmo = &(m_moWeapon.GetAttachmentModel(ROCKETLAUNCHER_ATTACHMENT_ROCKET1)->amo_moModelObject);
       if (pmo) { pmo->StretchModel(FLOAT3D(1, 1, 1)); }
+    }
+    
+    // [SSE] Gameplay - Serious Bomb Weapon
+    if (m_iCurrentWeapon == WEAPON_SERIOUSBOMB)
+    {
+      CModelObject &moLighter = m_moWeapon.GetAttachmentModel(0)->amo_moModelObject;
+      CModelObject &moBomb = m_moWeapon.GetAttachmentModel(1)->amo_moModelObject; // Get the bomb model.
+      CModelObject &moCrack = m_moWeapon.GetAttachmentModel(2)->amo_moModelObject; // Get the bomb crack model.
+      CModelObject &moBombExplosion = m_moWeapon.GetAttachmentModel(3)->amo_moModelObject; // Get the bomb explosion model.
+      CModelObject &moBombPiece = m_moWeapon.GetAttachmentModel(4)->amo_moModelObject; // Get the bomb piece model.
+
+      CModelObject &moBombFire = moBomb.GetAttachmentModel(0)->amo_moModelObject; // Get the fire model.
+
+      m_moWeapon.PlayAnim(0, 0);
+      moLighter.PlayAnim(0, 0);
+
+      moBomb.StretchModel(FLOAT3D(1.0F, 1.0F, 1.0F));
+      moBomb.PlayAnim(0, 0);
+      moBombFire.StretchModel(FLOAT3D(0.0F, 0.0F, 0.0F));
+
+      moCrack.StretchModel(FLOAT3D(0.0F, 0.0F, 0.0F));
+      moBombExplosion.StretchModel(FLOAT3D(0.0F, 0.0F, 0.0F));
+      moBombPiece.StretchModel(FLOAT3D(0.0F, 0.0F, 0.0F));
     }
     
     /*if (m_iCurrentWeapon == WEAPON_FLAMER) {

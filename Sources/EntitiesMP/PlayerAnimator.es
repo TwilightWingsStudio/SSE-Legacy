@@ -576,7 +576,9 @@ functions:
     // *********** NONE ***********
       case WEAPON_NONE: break;
       
-      case WEAPON_FISTS: break; // [SSE] Fists Weapon
+      case WEAPON_FISTS: break; // [SSE] Gameplay - Fists Weapon
+      
+      case WEAPON_SERIOUSBOMB: break; // [SSE] Gameplay - Serious Bomb Weapon
 
     // *********** KNIFE ***********
       case WEAPON_KNIFE:
@@ -1275,7 +1277,7 @@ functions:
       switch (iWeapon) {
         case WEAPON_NONE:
           break;
-        case WEAPON_FISTS: case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: //case WEAPON_PIPEBOMB:
+        case WEAPON_FISTS: case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: case WEAPON_SERIOUSBOMB: //case WEAPON_PIPEBOMB:
           iAnim += BODY_ANIM_COLT_SWIM_STAND-BODY_ANIM_COLT_STAND;
           break;
         case WEAPON_SINGLESHOTGUN: case WEAPON_DOUBLESHOTGUN: case WEAPON_TOMMYGUN:
@@ -1313,7 +1315,7 @@ functions:
     INDEX iWeapon = ((CPlayerWeapons&)*(((CPlayer&)*m_penPlayer).m_penWeapons)).m_iCurrentWeapon;
     switch (iWeapon) {
       case WEAPON_NONE: //SetBodyAnimation(iNone, ulFlags); break;
-      case WEAPON_FISTS: case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: // case WEAPON_PIPEBOMB:
+      case WEAPON_FISTS: case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: case WEAPON_SERIOUSBOMB: // case WEAPON_PIPEBOMB:
         if (m_bSwim) { iColt += BODY_ANIM_COLT_SWIM_STAND-BODY_ANIM_COLT_STAND; }
         SetBodyAnimation(iColt, ulFlags);
         break;
@@ -1367,8 +1369,15 @@ functions:
     {
       case WEAPON_NONE:
         break;
+
+      // [SSE] Gameplay - Fists Weapon
       case WEAPON_FISTS:
         break;
+        
+      // [SSE] Gameplay - Serious Bomb Weapon
+      case WEAPON_SERIOUSBOMB:
+        break;
+
       case WEAPON_KNIFE:
         pmoModel->RemoveAttachmentModel(BODY_ATTACHMENT_KNIFE);
         break;
