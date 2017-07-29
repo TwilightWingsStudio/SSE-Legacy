@@ -2933,7 +2933,7 @@ functions:
       {
         CPlayer *pen = (CPlayer*)&*GetPlayerEntity(iPlayer);
 
-        if (pen != NULL && pen != this && (pen->GetFlags()&ENF_ALIVE) && !(pen->GetFlags()&ENF_DELETED) ) {
+        if (pen != NULL && pen != this && pen->IsAlive() && !(pen->GetFlags()&ENF_DELETED) ) {
           penNextPlayer = pen;
         }
       }
@@ -2967,7 +2967,7 @@ functions:
       {
         CPlayer *pen = (CPlayer*)&*GetPlayerEntity(iPlayer);
 
-        if (pen != NULL && pen != this && (pen->GetFlags()&ENF_ALIVE) && !(pen->GetFlags()&ENF_DELETED) ) {
+        if (pen != NULL && pen != this && pen->IsAlive() && !(pen->GetFlags()&ENF_DELETED) ) {
           if (penNextPlayer == NULL) {
             penNextPlayer = pen;
           } else {
@@ -3332,11 +3332,13 @@ functions:
         // let the player entity render its interface
         CPlacement3D plLight(_vViewerLightDirection, ANGLE3D(0,0,0));
         plLight.AbsoluteToRelative(plViewer);
+
         RenderHUD( *(CPerspectiveProjection3D *)(CProjection3D *)apr, pdp, 
           plLight.pl_PositionVector, _colViewerLight, _colViewerAmbient, 
-          penViewer==this && (GetFlags()&ENF_ALIVE), iEye);
+          penViewer == this && IsAlive(), iEye);
       }
     }
+
     Stereo_SetBuffer(STEREO_BOTH);
 
     // determine and cache main drawport, size and relative scale
@@ -3400,7 +3402,7 @@ functions:
     }
     
     // [SSE] Respawn Sign
-    if (!(GetFlags() & ENF_ALIVE) && !GetSP()->sp_bSinglePlayer) // If player dead and in MP.
+    if (IsDead() && !GetSP()->sp_bSinglePlayer) // If player dead and in MP.
     {
       pdp->SetFont( _pfdDisplayFont);
       pdp->SetTextScaling( fScale);
@@ -3634,7 +3636,7 @@ functions:
         plLight.AbsoluteToRelative(plViewer);
         RenderHUD( *(CPerspectiveProjection3D *)(CProjection3D *)apr, pdp, 
           plLight.pl_PositionVector, _colViewerLight, _colViewerAmbient, 
-          penViewer==this && (GetFlags()&ENF_ALIVE), iEye);
+          penViewer==this && IsAlive(), iEye);
       }
     }
 
@@ -3905,7 +3907,7 @@ functions:
     //((CPlayerAnimator&)*m_penAnimator).AnimateRecoilPitch();
 
     // slowly increase mana with time, faster if player is not moving; (only if alive)
-    if (GetFlags()&ENF_ALIVE)
+    if (IsAlive())
     {
       m_fManaFraction += 
         ClampDn( 1.0f-en_vCurrentTranslationAbsolute.Length()/20.0f, 0.0f) * 20.0f
@@ -4099,6 +4101,7 @@ functions:
     if (tmDelta>=_pTimer->TickQuantum*3) {
       m_vDamage=FLOAT3D(0,0,0);
     }
+
     // add new damage
     FLOAT3D vDirectionFixed;
     if (vDirection.ManhattanNorm()>0.5f) {
@@ -4116,7 +4119,7 @@ functions:
 
     FLOAT fMassFactor = 200.0f/((EntityInfo*)GetEntityInfo())->fMass;
     
-    if (!(en_ulFlags & ENF_ALIVE))
+    if (IsDead())
     {
       fMassFactor /= 3;
     }
@@ -4272,7 +4275,7 @@ functions:
     }
 
     // ignore heat damage if dead
-    if (dmtType == DMT_HEAT && !(GetFlags()&ENF_ALIVE)) {
+    if (dmtType == DMT_HEAT && IsDead()) {
       return;
     }
 
@@ -4376,7 +4379,8 @@ functions:
 //        GiveImpulseTranslationAbsolute( vDirection*(fDamageAmmount/7.5f)
 //                                        -en_vGravityDir*(fDamageAmmount/15.0f));
       }
-      if (GetFlags()&ENF_ALIVE) {
+
+      if (IsAlive()) {
         m_fDamageAmmount += fDamageAmmount;
         m_tmWoundedTime   = _pTimer->CurrentTick();
       }
@@ -4403,7 +4407,7 @@ functions:
 
     } else if (m_fDamageAmmount>1.0f) {
       // if not dead
-      if (GetFlags()&ENF_ALIVE) {
+      if (IsAlive()) {
         // determine corresponding sound
         INDEX iSound;
         char *strIFeel = NULL;
@@ -4987,7 +4991,7 @@ functions:
       {
         CPlayer *penTarget = (CPlayer*)pen;
         
-        if (!(penTarget->GetFlags()&ENF_ALIVE) && penTarget->m_iLives <= 0 && m_iLives > 0) {
+        if (penTarget->IsDead() && penTarget->m_iLives <= 0 && m_iLives > 0) {
           CPrintF(TRANS("%s was revived by %s\n"), penTarget->GetPlayerName(), GetPlayerName());
           penTarget->SendEvent(EEnd());
           m_iLives--;
@@ -5248,7 +5252,7 @@ functions:
 
       SpectatorControl();
 
-      if (GetFlags() & ENF_ALIVE) {
+      if (IsAlive()) {
         AliveActions(paAction);
       }
     } else {
@@ -5259,7 +5263,7 @@ functions:
       }
       
       // if alive
-      if (GetFlags() & ENF_ALIVE) {
+      if (IsAlive()) {
         // If not in auto-action mode then apply actions.
         if (m_penActionMarker == NULL) {
           AliveActions(paAction);
@@ -5303,7 +5307,7 @@ functions:
     }
     
     // if teleporting to marker (this cheat is enabled in all versions)
-    if (cht_iGoToMarker>0 && (GetFlags()&ENF_ALIVE)) {
+    if (cht_iGoToMarker>0 && IsAlive()) {
       // rebirth player, and it will teleport
       m_iLastViewState = m_iViewState;
       SendEvent(ERebirth());
@@ -6663,7 +6667,7 @@ functions:
     // Sniper rifle has it's own scope!
     if (!bSniping)
     {
-      if (GetFlags()&ENF_ALIVE) // [SSE] Hide Crosshair If Dead
+      if (IsAlive()) // [SSE] Hide Crosshair If Dead
       {
         ((CPlayerWeapons&)*m_penWeapons).RenderCrosshair(prProjection, pdp, plView);
         // [SSE] Second Crosshair
@@ -7346,8 +7350,9 @@ functions:
     {
       // if is not first person
       RenderChainsawParticles(TRUE);
+
       // glowing powerups
-      if (GetFlags()&ENF_ALIVE){
+      if (IsAlive()){
         if (m_tmSeriousDamage>tmNow && m_tmInvulnerability>tmNow) {
           Particles_ModelGlow(this, Max(m_tmSeriousDamage,m_tmInvulnerability),PT_STAR08, 0.15f, 2, 0.03f, 0xff00ff00);
         } else if (m_tmInvulnerability>tmNow) {
