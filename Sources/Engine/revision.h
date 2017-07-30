@@ -1,9 +1,7 @@
-#ifndef SE_INCL_REVISION_H
-#define SE_INCL_REVISION_H
-#ifdef PRAGMA_ONCE
-  #pragma once
-#endif
-
-#define REVISION_ID 666
-
-#endif
+#ifndef __REVISION_H__
+#define __REVISION_H__
+#define REVISION_ID 700
+#define REVISION_BUILD_YEAR 2000
+#define REVISION_BUILD_MONTH 1
+#define REVISION_BUILD_DAY 1
+#endif // __REVISION_H__
