@@ -26,6 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class CMainMenu : public CGameMenu {
 public:
   CMGButton gm_mgVersionLabel;
+  CMGButton gm_mgBuildDateLabel;
   CMGButton gm_mgModLabel;
   CMGButton gm_mgSingle;
   CMGButton gm_mgNetwork;

@@ -44,14 +44,34 @@ void CLevelInfo::operator=(const CLevelInfo &li)
   li_ulSpawnFlags = li.li_ulSpawnFlags;
 }
 
+enum ELevelInfoResult {
+  LIR_FAILED = 0,
+  LIR_SUCCESS,
+  LIR_SE2PLUS,
+  LIR_SE2PLUS_SIGNED,
+};
+
 // get level info for given filename
-BOOL GetLevelInfo(CLevelInfo &li, const CTFileName &fnm)
+ELevelInfoResult GetLevelInfo(CLevelInfo &li, const CTFileName &fnm)
 {
   // try to
   try {
     // open the world file
     CTFileStream strm;
     strm.Open_t(fnm);
+    
+    CChunkID cidFirst = strm.PeekID_t();
+    
+    if (cidFirst == CChunkID("CTSE")) {
+      li = CLevelInfo();
+      return LIR_SE2PLUS;
+    }
+    
+    if (cidFirst == CChunkID("SIGS") || cidFirst == CChunkID("WRKS")) {
+      li = CLevelInfo();
+      return LIR_SE2PLUS_SIGNED;
+    }
+    
     // skip initial chunk ids
     strm.ExpectID_t("BUIV"); // 'build version'
     INDEX iDummy;
@@ -89,7 +109,7 @@ BOOL GetLevelInfo(CLevelInfo &li, const CTFileName &fnm)
     li.li_fnLevel = fnm;
 
     // succeed
-    return TRUE;
+    return LIR_SUCCESS;
 
   // if failed
   } catch (char *strError) {
@@ -98,7 +118,7 @@ BOOL GetLevelInfo(CLevelInfo &li, const CTFileName &fnm)
     // set dummy info
     li = CLevelInfo();
     // fail
-    return FALSE;
+    return LIR_FAILED;
   }
 }
 
@@ -123,9 +143,14 @@ void LoadLevelsList(void)
     CTFileName fnm = afnmDir[i];
 
     CPrintF(TRANS("  file '%s' : "), (const char *)fnm);
+
     // try to load its info, and if valid
     CLevelInfo li;
-    if (GetLevelInfo(li, fnm)) {
+    
+    
+    ELevelInfoResult eResult = GetLevelInfo(li, fnm);
+    
+    if (eResult == LIR_SUCCESS) {
       CPrintF(TRANS("'%s' spawn=0x%08x\n"), li.li_strName, li.li_ulSpawnFlags);
 
       // create new info for that file
@@ -133,6 +158,10 @@ void LoadLevelsList(void)
       *pliNew = li;
       // add it to list of all levels
       _lhAllLevels.AddTail(pliNew->li_lnNode);
+    } else if (eResult == LIR_SE2PLUS) {
+      CPrintF(TRANS("SE2+ Level!\n"));
+    } else if (eResult == LIR_SE2PLUS_SIGNED) {
+      CPrintF(TRANS("SE2+ Signed Level!\n"));
     } else {
       CPrintF(TRANS("invalid level\n"));
     }

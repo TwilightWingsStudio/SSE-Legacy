@@ -20,6 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "MMain.h"
 
 extern CTString sam_strVersion;
+extern CTString sam_strBuildDate;
 extern CTString sam_strModName;
 
 // --------------------------------------------------------------------------------------
@@ -36,11 +37,19 @@ void CMainMenu::Initialize_t(void)
 
   // Initialize version label.
   gm_mgVersionLabel.mg_strText = sam_strVersion;
-  gm_mgVersionLabel.mg_boxOnScreen = BoxVersion();
+  gm_mgVersionLabel.mg_boxOnScreen = BoxVersion(-5.5F);
   gm_mgVersionLabel.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgVersionLabel.mg_iCenterI = +1;
   gm_mgVersionLabel.mg_bEnabled = FALSE;
   gm_mgVersionLabel.mg_bLabel = TRUE;
+  
+  // Initialize build date label.
+  gm_mgBuildDateLabel.mg_strText = sam_strBuildDate;
+  gm_mgBuildDateLabel.mg_boxOnScreen = BoxVersion(-4.5F);
+  gm_mgBuildDateLabel.mg_bfsFontSize = BFS_MEDIUM;
+  gm_mgBuildDateLabel.mg_iCenterI = +1;
+  gm_mgBuildDateLabel.mg_bEnabled = FALSE;
+  gm_mgBuildDateLabel.mg_bLabel = TRUE;
 
   // Initialize mod name label.
   gm_mgModLabel.mg_strText = sam_strModName;
@@ -126,6 +135,7 @@ void CMainMenu::Initialize_t(void)
 
   // Add components.
   AddChild(&gm_mgVersionLabel);
+  AddChild(&gm_mgBuildDateLabel);
   AddChild(&gm_mgModLabel);
   AddChild(&gm_mgSingle);
   AddChild(&gm_mgNetwork);

@@ -113,6 +113,7 @@ extern CTextureObject *_ptoLogoODI = NULL;
 extern CTextureObject *_ptoLogoEAX = NULL;
 
 extern CTString sam_strVersion = "1.10";
+extern CTString sam_strBuildDate = "";
 extern CTString sam_strModName = TRANS("-   E V O L U T I O N   -");
 
 extern CTString sam_strFirstLevel = "Levels\\LevelsMP\\1_0_InTheLastEpisode.wld";
@@ -515,6 +516,7 @@ BOOL Init( HINSTANCE hInstance, int nCmdShow, CTString strCmdLine)
   LoadAndForceTexture(_toLogoEAX,  _ptoLogoEAX,  CTFILENAME("Textures\\Logo\\LogoEAX.tex"));
 
   sam_strVersion.PrintF("%s-R%d", sam_strVersion, _ulEngineRevision);
+  sam_strBuildDate.PrintF("%lu-%02lu-%02lu", _ulEngineBuildYear, _ulEngineBuildMonth, _ulEngineBuildDay);
   
   // !! NOTE !! Re-enable these to allow mod support.
   LoadStringVar(CTString("Data\\Var\\Sam_Version.var"), sam_strVersion);

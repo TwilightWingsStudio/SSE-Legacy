@@ -51,6 +51,11 @@ extern CTString astrSoundAPIRadioTexts[3];
 
 extern CTString astrDisplayAspectRatioTexts[5];
 extern PIX apixWidths[23][2];
+extern PIX apixWidths4x3[13][2];
+extern PIX apixWidths5x4[1][2];
+extern PIX apixWidths16x9[9][2];
+extern PIX apixWidths16x10[4][2];
+
 
 ULONG GetSpawnFlagsForGameType(INDEX iGameType);
 BOOL IsMenuEnabled(const CTString &strMenuName);

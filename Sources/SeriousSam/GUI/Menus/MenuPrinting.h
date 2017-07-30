@@ -20,7 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #endif
 
 FLOATaabbox2D BoxTitle(void);
-FLOATaabbox2D BoxVersion(void);
+FLOATaabbox2D BoxVersion(FLOAT fRow);
 FLOATaabbox2D BoxBigRow(FLOAT fRow);
 FLOATaabbox2D BoxBigLeft(FLOAT fRow);
 FLOATaabbox2D BoxBigRight(FLOAT fRow);

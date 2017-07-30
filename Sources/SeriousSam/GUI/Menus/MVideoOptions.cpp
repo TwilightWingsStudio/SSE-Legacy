@@ -69,6 +69,7 @@ void CVideoOptionsMenu::Initialize_t(void)
   gm_mgDisplayPrefsTrigger.mg_pOnTriggerChange = NULL;
   gm_mgDisplayAPITrigger.mg_pOnTriggerChange = NULL;
   gm_mgDisplayAdaptersTrigger.mg_pOnTriggerChange = NULL;
+  gm_mgAspectRatioTrigger.mg_pOnTriggerChange = NULL;
   gm_mgResolutionsTrigger.mg_pOnTriggerChange = NULL;
   gm_mgBitsPerPixelTrigger.mg_pOnTriggerChange = NULL;
 
