@@ -1381,11 +1381,14 @@ void CNetworkLibrary::AutoAdjustSettings(void)
 // [SSE] Network Update - Better Random
 static void BetterRandom()
 {
+  const ULONG ulDefaultSeed = 0x87654321;
+
   CSessionState &ses = _pNetwork->ga_sesSessionState;
   
   BOOL bOldAllow = ses.ses_bAllowRandom;
+
   ses.ses_bAllowRandom = TRUE;
-  ses.ses_ulRandomSeed = 0x87654321; // random must start at a number different than zero!
+  ses.ses_ulRandomSeed = ulDefaultSeed; // random must start at a number different than zero!
 
   INDEX iV = 32;
 
@@ -1395,9 +1398,12 @@ static void BetterRandom()
   CPrintF("Random IV %d\n", iV);
   
   // run rnd a few times to make it go random
-  for(INDEX i=0; i < iV; i++) {
+  for (INDEX i = 0; i < iV; i++) {
     ses.Rnd();
   }
+  
+  CPrintF("Default Seed: %lu\n", ulDefaultSeed);
+  CPrintF("New     Seed: %lu\n", ses.ses_ulRandomSeed);
 
   ses.ses_bAllowRandom = bOldAllow;
 }
@@ -1416,6 +1422,7 @@ void CNetworkLibrary::StartPeerToPeer_t(const CTString &strSessionName,
   _pSound->Mute();
 
   // go on
+  CPrintF("------------------------------------------------------------\n");
   CPrintF( TRANS("Starting session: '%s'\n"), strSessionName);
   CPrintF( TRANS("  level: '%s'\n"), (const char*) fnmWorld);
   CPrintF( TRANS("  spawnflags: %08x\n"), ulSpawnFlags);
@@ -1432,11 +1439,6 @@ void CNetworkLibrary::StartPeerToPeer_t(const CTString &strSessionName,
 
     // make default state data for creating deltas
     MakeDefaultState(fnmWorld, ulSpawnFlags, pvSessionProperties);
-    
-    // [SSE] Network Update - Better Random
-    if (ser_bBetterRandomOnStart) {
-      BetterRandom();
-    }
   } else {
     CPrintF( TRANS("  network is off\n"));
   }
@@ -1504,6 +1506,12 @@ void CNetworkLibrary::StartPeerToPeer_t(const CTString &strSessionName,
     ga_World.Clear();
     throw;
   }
+  
+  // [SSE] Network Update - Better Random
+  if (ser_bBetterRandomOnStart) {
+    BetterRandom();
+  }
+  
   CallProgressHook_t(1.0f);
 
   // remember maximum number of players
@@ -1572,9 +1580,8 @@ void CNetworkLibrary::Load_t(const CTFileName &fnmGame) // throw char *
   CTFileStream strmFile;
   strmFile.Open_t(fnmGame);
 
-  // if starting in network
+  // if starting in network then start gathering CRCs.
   if (_cmiComm.IsNetworkEnabled()) {
-    // start gathering CRCs
     InitCRCGather();
   }
 
@@ -1604,16 +1611,16 @@ void CNetworkLibrary::Load_t(const CTFileName &fnmGame) // throw char *
     ga_sesSessionState.ses_apltPlayers.New(NET_MAXGAMEPLAYERS);
     strmFile.ExpectID_t("GEND");   // game end
     
-    // [SSE] Network Update - Better Random
-    if (ser_bBetterRandomOnLoad) {
-      BetterRandom();
-    }
-    
   } catch(char *) {
     RemoveTimerHandler();
     ga_srvServer.Stop();
     ga_IsServer = FALSE;
     throw;
+  }
+  
+  // [SSE] Network Update - Better Random
+  if (ser_bBetterRandomOnLoad) {
+    BetterRandom();
   }
 
   // set time and pause for server from the saved game
