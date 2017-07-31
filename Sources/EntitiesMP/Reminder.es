@@ -48,6 +48,8 @@ procedures:
     InitAsVoid();
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
     SetCollisionFlags(ECF_IMMATERIAL);
+    
+    //CPrintF("Spawned Reminder(%d) for %s\n", m_iValue, m_penOwner->GetName());
 
     // wait
     if (m_fWaitTime > 0.0f) {

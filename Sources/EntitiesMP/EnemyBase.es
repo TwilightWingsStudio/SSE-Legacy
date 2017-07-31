@@ -246,14 +246,6 @@ functions:
   }
   
   // --------------------------------------------------------------------------------------
-  // It's obvious.
-  // --------------------------------------------------------------------------------------
-  virtual void ReminderEventProcessor(void)
-  {
-    return;
-  }
-  
-  // --------------------------------------------------------------------------------------
   // Returns pointer to faction holder.
   // --------------------------------------------------------------------------------------
   class CEnemyFactionHolder *GetFactionHolder(BOOL bClassCheck)
@@ -3979,12 +3971,7 @@ procedures:
           call Inactive();
         }
       };
-      // if reminder event recieved
-      on (EReminder eReminder) : {
-        m_iLastReminderValue = eReminder.iValue;
-        ReminderEventProcessor();
-        resume;
-      }
+
       // if dead
       on (EDeath eDeath) : {
         // die

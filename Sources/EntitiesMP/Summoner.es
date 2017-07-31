@@ -204,7 +204,7 @@ functions:
     CEnemyBase::Write_t(istr);
     m_emEmiter.Write_t(*istr);
   }
- 
+
   BOOL IsTargetValid(SLONG slPropertyOffset, CEntity *penTarget)
   {
     if ( slPropertyOffset >= offsetof(CSummoner, m_penGroup01Template01) &&
@@ -822,10 +822,13 @@ procedures:
     jump Immaterial();
   }
   
-  Fire(EVoid) : CEnemyBase::Fire {
+  Fire(EVoid) : CEnemyBase::Fire
+  {
+    //CPrintF("Summoner::Fire()\n");
     
     // if not allready fired
-    if (!m_bFiredThisTurn) {
+    if (!m_bFiredThisTurn)
+    {
       // if not too much fuss, we can really fire
       if (m_bFireOK) {
                 
@@ -852,7 +855,8 @@ procedures:
         FLOAT fTmpFuss = 0.0f;
         
         // for each group in current spawn scheme
-        for (i=0; i<3; i++) {
+        for (i=0; i < 3; i++)
+        {
           INDEX iMin = aiSpawnScheme[m_iSpawnScheme][i*2+1];
           INDEX iMax = aiSpawnScheme[m_iSpawnScheme][i*2+2];
           ASSERT(iMin<=iMax);
@@ -889,6 +893,7 @@ procedures:
         ESummonerTeleport est;
         est.fWait = FRnd()*1.0f+3.0f;
         SendEvent(est);
+
       // if too much fuss, just laugh and initiate teleport
       } else if (TRUE) {
       
@@ -910,6 +915,7 @@ procedures:
         FLOAT fToSpawn;
 
         INDEX iScheme;
+
         // find last active scheme
         for (INDEX i=0; i<3; i++) {
           if (aiSpawnScheme[m_iSpawnScheme][i*2+2]>0) {
@@ -926,25 +932,30 @@ procedures:
         } else {
           fToSpawn = 1.0f;
         }
+
         INDEX iToSpawn = ceilf(fToSpawn);
         
         CMusicHolder *penMusicHolder = GetMusicHolder();
+
 //CPrintF("spawning %d from %d group\n", iToSpawn, iScheme);
         // spawn
-        for (INDEX j=0; j<iToSpawn; j++) {
+        for (INDEX j = 0; j < iToSpawn; j++)
+        {
           CEnemyBase *penTemplate = GetRandomTemplate(iScheme);
           FLOAT3D vTarget = AcquireTarget();
           LaunchMonster(vTarget, penTemplate);
+
           // increase the number of spawned enemies in music holder
           if (penMusicHolder!=NULL) {
             penMusicHolder->m_ctEnemiesInWorld++;
           }
+
           ChangeEnemyNumberForAllPlayers(+1);
         }
 
         // teleport by sending an event to ourselves
         ESummonerTeleport est;
-        est.fWait = FRnd()*1.0f+3.0f;
+        est.fWait = FRnd() * 1.0f + 3.0f;
         SendEvent(est);
         // laugh
         autowait(1.0f);
@@ -956,7 +967,7 @@ procedures:
 
     return EReturn();
   };
-      
+
   Hit(EVoid) : CEnemyBase::Hit {
     jump Fire();
     return EReturn();
@@ -1237,21 +1248,29 @@ procedures:
 
   }
 
-  SummonerLoop() {
+  SummonerLoop()
+  {
+    //CPrintF("Summoner : SummonerLoop()\n");
+    
     // spawn a 1sec reminder
     SpawnReminder(this, 1.0f, 128);
-    wait () {
+
+    wait ()
+    {
       on (EBegin) :
       {
         call CEnemyBase::MainLoop();
       }
+
       on (EReminder er) :
       {
+        //CPrintF("Summoner : Received EReminder(%d)\n", er.iValue);
+        
         // pass all reminders but the 128 one
-        if (er.iValue==128) {
+        if (er.iValue == 128) {
           RecalculateFuss();
           // see if we have to teleport
-          if (_pTimer->CurrentTick()>m_tmMaterializationTime+m_fCorporealDuration) {
+          if (_pTimer->CurrentTick() > m_tmMaterializationTime + m_fCorporealDuration) {
             m_bShouldTeleport = TRUE;
           }
           // spawn the reminder again so that we return here
@@ -1262,14 +1281,17 @@ procedures:
           pass;
         }
         resume;
-      }      
+      }
+
       // we want to teleport in near future
       on (ESummonerTeleport est) :
       {
+        //CPrintF("Summoner : Received ESummonerTeleport(%f)\n", est.fWait);
         //m_fTeleportWaitTime = est.fWait;
         SpawnReminder(this, est.fWait, 129);
         resume;
       }
+
       otherwise () : {
         resume;
       }
