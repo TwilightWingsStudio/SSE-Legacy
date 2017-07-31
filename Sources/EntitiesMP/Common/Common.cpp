@@ -1249,10 +1249,17 @@ CEntityPointer Debris_Spawn_Template(
   FLOAT fDustStretch,
   COLOR colBurning)
 {
-  if(penmhTemplate==NULL || penmhTemplate->GetModelObject()==NULL)
+  // [SSE] Safety Check
+  if (penmhDestroyed == NULL)
   {
     return NULL;
   }
+  
+  if (penmhTemplate == NULL || penmhTemplate->GetModelObject() == NULL)
+  {
+    return NULL;
+  }
+  
   // create debris at same world as spawner
   CEntityPointer penDebris = penmhDestroyed->GetWorld()->CreateEntity_t(
     plAbsolutePlacement, CTFILENAME("Classes\\Debris.ecl"));
@@ -1275,7 +1282,8 @@ CEntityPointer Debris_Spawn_Template(
   eSpawn.vStretch = vStretch;
   eSpawn.bCustomShading=FALSE;
   eSpawn.penFallFXPapa=penmhTemplate;
-  if( penmhDestroyed->m_cstCustomShading==CST_FULL_CUSTOMIZED)
+
+  if (penmhDestroyed->m_cstCustomShading == CST_FULL_CUSTOMIZED)
   {
     eSpawn.bCustomShading=TRUE;
     eSpawn.aShadingDirection=penmhDestroyed->m_aShadingDirection;
