@@ -23,8 +23,8 @@ uses "EntitiesMP/EnemyBase";
 uses "EntitiesMP/BasicEffects";
 
 enum GruntType {
-  0 GT_SOLDIER    "0 Grunt soldier",
-  1 GT_COMMANDER  "1 Grunt commander",
+  0 GT_SOLDIER    "Grunt Soldier [0]",
+  1 GT_COMMANDER  "Grunt Commander [1]",
 };
 
 %{
@@ -91,6 +91,24 @@ functions:
     str.PrintF(TRANS("A Grunt sent %s into the halls of Valhalla"), strPlayerName);
     return str;
   }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE]
+  // Returns amount of damage which should be received for performing wound state.
+  // --------------------------------------------------------------------------------------
+  virtual FLOAT GetDamageWounded(void)
+  { 
+    return 5.0F;
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE]
+  // Returns TRUE when enemy can be wound, otherwise returns FALSE.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL CanBeWound(void)
+  {
+    return GetHealth() < (m_fMaxHealth / 2);
+  }
 
   /* Entity info */
   void *GetEntityInfo(void)
@@ -110,7 +128,8 @@ functions:
     static DECLARE_CTFILENAME(fnmSoldier,     "DataMP\\Messages\\Enemies\\GruntSoldier.txt");
     static DECLARE_CTFILENAME(fnmCommander,   "DataMP\\Messages\\Enemies\\GruntCommander.txt");
 
-    switch(m_gtType) {
+    switch (m_gtType)
+    {
       default: ASSERT(FALSE);
       case GT_SOLDIER:  return fnmSoldier;
       case GT_COMMANDER: return fnmCommander;

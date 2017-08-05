@@ -258,6 +258,24 @@ functions:
   }
   
   // --------------------------------------------------------------------------------------
+  // [SSE]
+  // Returns amount of damage which should be received for performing wound state.
+  // --------------------------------------------------------------------------------------
+  virtual FLOAT GetDamageWounded(void)
+  {
+    return m_fDamageWounded;
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE]
+  // Returns TRUE when enemy can be wound, otherwise returns FALSE.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL CanBeWound(void)
+  {
+    return TRUE;
+  }
+  
+  // --------------------------------------------------------------------------------------
   // [SSE] Enemy Settings Entity
   // --------------------------------------------------------------------------------------
   BOOL IsSilent()
@@ -2896,7 +2914,8 @@ procedures:
     } else {
       m_fShootTime = _pTimer->CurrentTick() + FRnd();
     }
-    m_fDamageConfused = m_fDamageWounded;
+
+    m_fDamageConfused = GetDamageWounded();
 
     return EReturn();
   };
@@ -3650,12 +3669,16 @@ procedures:
           // eventually set new hard target
           SetTargetHard(eDamage.penInflictor);
         }
+        
+        if (!CanBeWound()) {
+          resume;
+        }
 
         // if confused
         m_fDamageConfused -= eDamage.fAmount;
         if (m_fDamageConfused < 0.001f)
         {
-          m_fDamageConfused = m_fDamageWounded;
+          m_fDamageConfused = GetDamageWounded();
           // notify wounding to others
           WoundedNotify(eDamage);
           
