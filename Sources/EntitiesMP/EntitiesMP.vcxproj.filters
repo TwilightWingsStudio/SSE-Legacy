@@ -652,6 +652,9 @@
     <ClCompile Include="ScriptHolder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HudPicDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1797,6 +1800,12 @@
     <ClInclude Include="ScriptHolder_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HudPicDisplay_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HudPicDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2769,6 +2778,9 @@
       <Filter>Class Files\Enemies</Filter>
     </CustomBuild>
     <CustomBuild Include="ScriptHolder.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="HudPicDisplay.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>

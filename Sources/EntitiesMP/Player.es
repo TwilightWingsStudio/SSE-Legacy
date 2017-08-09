@@ -57,6 +57,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "EntitiesMP/CreditsHolder.h"
 #include "EntitiesMP/HudPicHolder.h"
 
+#include "EntitiesMP/HudPicDisplay.h"
+
 #include "EntitiesMP/ProgressiveSwitch.h"
 #include "EntitiesMP/SimpleSwitch.h"
 #include "EntitiesMP/SpectatorCamera.h"
@@ -1333,6 +1335,8 @@ properties:
  // [SSE] Gameplay - Weapon Inertia Effect
  350 ANGLE3D m_aWeaponSway = ANGLE3D(0, 0, 0),
  351 ANGLE3D m_aWeaponSwayOld = ANGLE3D(0, 0, 0),
+ 
+ 370 INDEX m_ulExtraFlags "Extra Flags" = 0,
 
 {
   ShellLaunchData ShellLaunchData_array;  // array of data describing flying empty shells
@@ -1583,7 +1587,11 @@ functions:
     nmMessage >> iCommandID;
     nmMessage >> fValue;
     
-    SetHealth(fValue);
+    if (iCommandID == 1) {
+      SetHealth(fValue);
+    } else {
+      SetArmor(fValue);
+    }
     //CPrintF("PLID %d received direct RPC!\n", GetMyPlayerIndex());
   };
   
@@ -3134,6 +3142,21 @@ functions:
       hpfx.HudPic_Render(&hpfx, pdp);
     }
   }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Hud Pic Display
+  // --------------------------------------------------------------------------------------
+  void RenderHudPicDisplay(CDrawPort *pdp)
+  {
+    CWorldSettingsController *pwsc = GetWSC(this);
+
+    if (pwsc != NULL && pwsc->m_penHudPicDisplay != NULL)
+    {
+      CHudPicDisplay &hpd = (CHudPicDisplay &) *pwsc->m_penHudPicDisplay;
+      hpd.HudPic_Render(pdp);
+    }
+  }
+  
 
 /************************************************************
  *                    RENDER GAME VIEW                      *
@@ -3302,6 +3325,8 @@ functions:
     CPlacement3D plViewer;
     COLOR colBlend;
 
+    CWorldSettingsController *pwsc = GetWSC(this);
+
     // for each eye
     for (INDEX iEye=STEREO_LEFT; iEye<=(Stereo_IsEnabled()?STEREO_RIGHT:STEREO_LEFT); iEye++) {
 
@@ -3328,6 +3353,20 @@ functions:
       RenderCredits(pdp);
       RenderHudPicFX(pdp);
 
+      BOOL bOverWeapon = FALSE;
+
+      // [SSE] Hud Pic Displa
+      if (pwsc != NULL && pwsc->m_penHudPicDisplay != NULL)
+      {
+        CHudPicDisplay &hpd = (CHudPicDisplay &) *pwsc->m_penHudPicDisplay;
+        bOverWeapon = hpd.m_bOverWeapon;
+        
+        if (!bOverWeapon) {
+          hpd.HudPic_Render(pdp);
+        }
+      }
+      //
+
       if (hud_bShowAll && bShowExtras) {
         // let the player entity render its interface
         CPlacement3D plLight(_vViewerLightDirection, ANGLE3D(0,0,0));
@@ -3335,7 +3374,11 @@ functions:
 
         RenderHUD( *(CPerspectiveProjection3D *)(CProjection3D *)apr, pdp, 
           plLight.pl_PositionVector, _colViewerLight, _colViewerAmbient, 
-          penViewer == this && IsAlive(), iEye);
+          penViewer == this && IsAlive(), iEye, bOverWeapon);
+      } else {
+        if (bOverWeapon) {
+          RenderHudPicDisplay(pdp);
+        }
       }
     }
 
@@ -3636,7 +3679,7 @@ functions:
         plLight.AbsoluteToRelative(plViewer);
         RenderHUD( *(CPerspectiveProjection3D *)(CProjection3D *)apr, pdp, 
           plLight.pl_PositionVector, _colViewerLight, _colViewerAmbient, 
-          penViewer==this && IsAlive(), iEye);
+          penViewer==this && IsAlive(), iEye, FALSE);
       }
     }
 
@@ -3646,6 +3689,7 @@ functions:
     RenderTextFX(pdpCamera);
     RenderCredits(pdpCamera);
     RenderHudPicFX(pdpCamera);
+    RenderHudPicDisplay(pdpCamera); // [SSE] Hud Pic Display
 
     // add world glaring
     {
@@ -6619,7 +6663,7 @@ functions:
   // --------------------------------------------------------------------------------------
   void RenderHUD( CPerspectiveProjection3D &prProjection, CDrawPort *pdp,
                   FLOAT3D vViewerLightDirection, COLOR colViewerLight, COLOR colViewerAmbient,
-                  BOOL bRenderWeapon, INDEX iEye)
+                  BOOL bRenderWeapon, INDEX iEye, BOOL bHudPicDisplay)
   {
     CPlacement3D plViewOld = prProjection.ViewerPlacementR();
     BOOL bSniping = ((CPlayerWeapons&)*m_penWeapons).m_bSniping;
@@ -6646,6 +6690,10 @@ functions:
       RenderChainsawParticles(FALSE);
       Particle_EndSystem();
     }
+    
+    if (bHudPicDisplay) {
+      RenderHudPicDisplay(pdp);
+    };
 
     // render crosshair if sniper zoom not active
     CPlacement3D plView;

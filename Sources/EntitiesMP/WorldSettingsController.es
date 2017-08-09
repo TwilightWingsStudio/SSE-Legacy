@@ -80,6 +80,7 @@ properties:
  71 CEntityPointer m_penTextFXHolder,
  72 CEntityPointer m_penCreditsHolder,
  73 CEntityPointer m_penHudPicFXHolder,
+ 74 CEntityPointer m_penHudPicDisplay,
 
 components:
   1 model   MODEL_WORLD_SETTINGS_CONTROLLER     "Models\\Editor\\WorldSettingsController.mdl",
@@ -89,7 +90,7 @@ functions:
   
   BOOL IsTargetValid(SLONG slPropertyOffset, CEntity *penTarget)
   {
-    if( slPropertyOffset == offsetof(CWorldSettingsController, m_penEnvPartHolder))
+    if (slPropertyOffset == offsetof(CWorldSettingsController, m_penEnvPartHolder))
     {
       if (IsOfClass(penTarget, "EnvironmentParticlesHolder")) { return TRUE; }
       else { return FALSE; }
@@ -102,15 +103,15 @@ functions:
     FLOAT fStormFactor = 0.0f;
     TIME tmNow = _pTimer->GetLerpedCurrentTick();
     // if we have storm
-    if( tmNow>m_tmStormStart && tmNow<m_tmStormEnd+m_tmStormDisappearTime)
+    if (tmNow>m_tmStormStart && tmNow<m_tmStormEnd+m_tmStormDisappearTime)
     {
       // storm is on
-      if( tmNow>m_tmStormStart+m_tmStormAppearTime && tmNow<m_tmStormEnd)
+      if (tmNow>m_tmStormStart+m_tmStormAppearTime && tmNow<m_tmStormEnd)
       {
         fStormFactor = 1.0f;
       }
       // storm is turning off
-      else if( tmNow>m_tmStormEnd)
+      else if (tmNow>m_tmStormEnd)
       {
         fStormFactor = 1.0f-(tmNow-m_tmStormEnd)/m_tmStormDisappearTime;
       }
@@ -126,64 +127,84 @@ functions:
   /* Handle an event, return false if the event is not handled. */
   BOOL HandleEvent(const CEntityEvent &ee)
   {
-    if( ee.ee_slEvent==EVENTCODE_EScroll)
+    if (ee.ee_slEvent==EVENTCODE_EScroll)
     {
       EScroll escr = ((EScroll &) ee);
-      if( escr.bStart)
+      if (escr.bStart)
       {
         m_penScrollHolder=escr.penSender;
       }
       else
       {
-        if( m_penScrollHolder==escr.penSender)
+        if (m_penScrollHolder==escr.penSender)
         {
           m_penScrollHolder=NULL;
         }
       }
       return TRUE;
     }
-    if( ee.ee_slEvent==EVENTCODE_ETextFX)
+    if (ee.ee_slEvent==EVENTCODE_ETextFX)
     {
       ETextFX etfx = ((ETextFX &) ee);
-      if( etfx.bStart)
+      if (etfx.bStart)
       {
         m_penTextFXHolder=etfx.penSender;
       }
       else
       {
-        if( m_penTextFXHolder==etfx.penSender)
+        if (m_penTextFXHolder==etfx.penSender)
         {
           m_penTextFXHolder=NULL;
         }
       }
       return TRUE;
     }
-    if( ee.ee_slEvent==EVENTCODE_EHudPicFX)
+
+    if (ee.ee_slEvent==EVENTCODE_EHudPicFX)
     {
       EHudPicFX ehpfx = ((EHudPicFX &) ee);
-      if( ehpfx.bStart)
+      if (ehpfx.bStart)
       {
         m_penHudPicFXHolder=ehpfx.penSender;
       }
       else
       {
-        if( m_penHudPicFXHolder==ehpfx.penSender)
+        if (m_penHudPicFXHolder==ehpfx.penSender)
         {
           m_penHudPicFXHolder=NULL;
         }
       }
       return TRUE;
     }
-    if( ee.ee_slEvent==EVENTCODE_ECredits)
+    
+    if (ee.ee_slEvent==EVENTCODE_EHudPicDisplay)
+    {
+      EHudPicDisplay ehpd = ((EHudPicDisplay &) ee);
+
+      if (ehpd.bStart)
+      {
+        m_penHudPicDisplay = ehpd.penSender;
+      }
+      else
+      {
+        if (m_penHudPicDisplay == ehpd.penSender) {
+          m_penHudPicDisplay = NULL;
+        }
+      }
+
+      return TRUE;
+    }
+
+    if (ee.ee_slEvent==EVENTCODE_ECredits)
     {
       ECredits ecr = ((ECredits &) ee);
-      if( ecr.bStart)
+      if (ecr.bStart)
       {
         m_penCreditsHolder=ecr.penSender;
       }
       else
       {
-        if( m_penCreditsHolder==ecr.penSender)
+        if (m_penCreditsHolder==ecr.penSender)
         {
           m_penCreditsHolder=NULL;
         }
