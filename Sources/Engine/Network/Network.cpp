@@ -1709,7 +1709,7 @@ void CNetworkLibrary::EnumSessions(BOOL bInternet)
   }
 
   // request enumeration
-  GameAgent_EnumTrigger(bInternet);
+  MS_EnumTrigger(bInternet);
 }
 
 /*
@@ -2992,7 +2992,7 @@ extern void NET_MakeDefaultState_t(
 // handle broadcast messages (server enumeration)
 void CNetworkLibrary::GameInactive(void)
 {
-  GameAgent_EnumUpdate();
+  MS_EnumUpdate();
 
   // if no network
   if (!_cmiComm.IsNetworkEnabled()) {

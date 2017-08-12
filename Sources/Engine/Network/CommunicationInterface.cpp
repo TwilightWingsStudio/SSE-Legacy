@@ -108,6 +108,9 @@ BOOL cm_bNetworkInitialized;
 // index 0 is the server's local client, this is an array used by server only
 CClientInterface cm_aciClients[SERVER_CLIENTS];
 
+// [SSE] S2S Communication
+CClientInterface cm_aciServers[SERVER_SERVERS];
+
 // Broadcast interface - i.e. interface for 'nonconnected' communication
 CClientInterface cm_ciBroadcast;
 
@@ -268,7 +271,7 @@ void CCommunicationInterface::PrepareForUse(BOOL bUseNetwork, BOOL bClient)
   }
 
   // make sure winsock is off (could be on if enumeration was triggered)
-  GameAgent_EnumCancel();
+  MS_EnumCancel();
   EndWinsock();
 
   if (bUseNetwork) {

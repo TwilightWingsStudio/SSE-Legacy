@@ -26,38 +26,31 @@ extern BOOL ga_bMSLegacy;
 extern void MS_OnServerStart(void);
 extern void MS_OnServerEnd(void);
 extern void MS_OnServerUpdate(void);
+extern void MS_OnServerStateChanged(void);
 
-/// GameAgent server update call which responds to enumeration pings and sends pings to masterserver.
-/// Notify GameAgent that the server state has changed.
-extern void GameAgent_ServerStateChanged(void);
+// Serverlist Enumeration
+extern void MS_EnumTrigger(BOOL bInternet);
+extern void MS_EnumUpdate(void);
+extern void MS_EnumCancel(void);
+//
 
-/// Request serverlist enumeration.
-extern void GameAgent_EnumTrigger(BOOL bInternet);
-
-/// GameAgent client update for enumeration.
-
-extern void GameAgent_EnumUpdate(void);
-/// Cancel the GameAgent serverlist enumeration.
-
-extern void GameAgent_EnumCancel(void);
-///
 DWORD WINAPI _MS_Thread(LPVOID lpParam);
-///
 DWORD WINAPI _LocalNet_Thread(LPVOID lpParam);
 
 /// Server request structure. Primarily used for getting server pings.
-class CServerRequest {
-public:
-  ULONG sr_ulAddress;
-  USHORT sr_iPort;
-  long long sr_tmRequestTime;
+class CServerRequest
+{
+  public:
+    ULONG sr_ulAddress;
+    USHORT sr_iPort;
+    long long sr_tmRequestTime;
 
-public:
-  CServerRequest(void);
-  ~CServerRequest(void);
+  public:
+    CServerRequest(void);
+    ~CServerRequest(void);
 
-  /* Destroy all objects, and reset the array to initial (empty) state. */
-  void Clear(void);
+    /* Destroy all objects, and reset the array to initial (empty) state. */
+    void Clear(void);
 };
 
 #endif // include once check

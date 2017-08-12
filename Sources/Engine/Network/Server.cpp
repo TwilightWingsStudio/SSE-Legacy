@@ -1402,8 +1402,8 @@ void CServer::Handle(INDEX iClient, CNetworkMessage &nmMessage)
       nmPlayerRegistered<<iNewPlayer;   // player index
       _pNetwork->SendToClientReliable(iClient, nmPlayerRegistered);
 
-      // notify gameagent
-      GameAgent_ServerStateChanged();
+      // notify masterserver
+      MS_OnServerStateChanged();
     // if refused
     } else {
       // send him refusal message
