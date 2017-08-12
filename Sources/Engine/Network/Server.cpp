@@ -223,7 +223,7 @@ CServer::~CServer()
 void CServer::Stop(void)
 {
   // stop gameagent
-  GameAgent_ServerEnd();
+  MS_OnServerEnd();
 
   // tell all clients to disconnect
   INDEX ctClients = srv_assoSessions.sa_Count;
@@ -295,7 +295,7 @@ void CServer::Start_t(void)
 
   // init gameagent
   if (_cmiComm.IsNetworkEnabled()) {
-    GameAgent_ServerInit();
+    MS_OnServerStart();
   }
 }
 

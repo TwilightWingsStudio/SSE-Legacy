@@ -305,8 +305,10 @@ void CServerRequest::Clear(void)
   sr_tmRequestTime = 0;
 }
 
-/// Initialize GameAgent.
-extern void GameAgent_ServerInit(void)
+// --------------------------------------------------------------------------------------
+// Called on every network server startup.
+// --------------------------------------------------------------------------------------
+extern void MS_OnServerStart(void)
 {
   // join
   _bServer = TRUE;
@@ -321,8 +323,10 @@ extern void GameAgent_ServerInit(void)
   }
 }
 
-/// Let GameAgent know that the server has stopped.
-extern void GameAgent_ServerEnd(void)
+// --------------------------------------------------------------------------------------
+// Called if server has been stopped.
+// --------------------------------------------------------------------------------------
+extern void MS_OnServerEnd(void)
 {
   if (!_bInitialized) {
     return;
@@ -338,192 +342,211 @@ extern void GameAgent_ServerEnd(void)
   _bInitialized = FALSE;
 }
 
-/// GameAgent server update call which responds to enumeration pings and sends pings to masterserver.
-extern void GameAgent_ServerUpdate(void)
+static void GameAgent_ProcessReceivedPacket()
+{
+  // check the received packet ID
+  switch (_szBuffer[0])
+  {
+    case 1: // server join response
+    {
+      int iChallenge = *(INDEX*)(_szBuffer + 1);
+      // send the challenge
+      _sendHeartbeat(iChallenge);
+      break;
+    }
+
+    case 2: // server status request
+    {
+      // send the status response
+      CTString strPacket;
+      strPacket.PrintF("0;players;%d;maxplayers;%d;level;%s;gametype;%s;version;%s;gamename;%s;sessionname;%s",
+        _pNetwork->ga_srvServer.GetPlayersCount(),
+        _pNetwork->ga_sesSessionState.ses_ctMaxPlayers,
+        _pNetwork->ga_World.wo_strName,
+        _getGameModeName(_getSP()->sp_gmGameMode),
+        _SE_VER_STRING,
+        _pShell->GetString("sam_strGameName"),
+        _pShell->GetString("gam_strSessionName"));
+      _sendPacketTo(strPacket, &_sinFrom);
+      break;
+    }
+
+    case 3: // player status request
+    {
+      // send the player status response
+      CTString strPacket;
+      strPacket.PrintF("\x01players\x02%d\x03", _pNetwork->ga_srvServer.GetPlayersCount());
+      for (INDEX i=0; i<_pNetwork->ga_srvServer.GetPlayersCount(); i++) {
+        CPlayerBuffer &plb = _pNetwork->ga_srvServer.srv_aplbPlayers[i];
+        CPlayerTarget &plt = _pNetwork->ga_sesSessionState.ses_apltPlayers[i];
+        if (plt.plt_bActive) {
+          CTString strPlayer;
+          plt.plt_penPlayerEntity->GetGameAgentPlayerInfo(plb.plb_Index, strPlayer);
+
+          // if we don't have enough space left for the next player
+          if (strlen(strPacket) + strlen(strPlayer) > 2048) {
+            // send the packet
+            _sendPacketTo(strPacket, &_sinFrom);
+            strPacket = "";
+          }
+
+          strPacket += strPlayer;
+        }
+      }
+
+      strPacket += "\x04";
+      _sendPacketTo(strPacket, &_sinFrom);
+      break;
+    }
+
+    case 4: // ping
+    {
+      // just send back 1 byte and the amount of players in the server (this could be useful in some cases for external scripts)
+      CTString strPacket;
+      strPacket.PrintF("\x04%d", _pNetwork->ga_srvServer.GetPlayersCount());
+      _sendPacketTo(strPacket, &_sinFrom);
+      break;
+    }
+  }
+}
+
+static void MSLegacy_ProcessReceivedPacket()
+{
+  char *sPch1 = NULL, *sPch2 = NULL, *sPch3 = NULL, *sPch4 = NULL;
+  sPch1 = strstr(_szBuffer, "\\status\\");
+  sPch2 = strstr(_szBuffer, "\\info\\");
+  sPch3 = strstr(_szBuffer, "\\basic\\");
+  sPch4 = strstr(_szBuffer, "\\players\\");
+
+  if (sPch1) {
+    CTString strPacket;
+    CTString strLocation;
+    strLocation = _pShell->GetString("net_strLocalHost");
+
+    if (strLocation == ""){
+      strLocation = "Heartland";
+    }
+
+    strPacket.PrintF( PCKQUERY,
+      _pShell->GetString("sam_strGameName"),
+      _SE_VER_STRING,
+      //_pShell->GetString("net_strLocalHost"),
+      strLocation,
+      _pShell->GetString("gam_strSessionName"),
+      _pShell->GetINDEX("net_iPort"),
+      _pNetwork->ga_World.wo_strName,
+      _getGameModeName(_getSP()->sp_gmGameMode),
+      _pNetwork->ga_srvServer.GetPlayersCount(),
+      _pNetwork->ga_sesSessionState.ses_ctMaxPlayers,
+      _pShell->GetINDEX("gam_bFriendlyFire"),
+      _pShell->GetINDEX("gam_bWeaponsStay"),
+      _pShell->GetINDEX("gam_bAmmoStays"),
+      _pShell->GetINDEX("gam_bHealthArmorStays"),
+      _pShell->GetINDEX("gam_bAllowHealth"),
+      _pShell->GetINDEX("gam_bAllowArmor"),
+      _pShell->GetINDEX("gam_bInfiniteAmmo"),
+      _pShell->GetINDEX("gam_bRespawnInPlace"));
+
+      for (INDEX i=0; i<_pNetwork->ga_srvServer.GetPlayersCount(); i++)
+      {
+        CPlayerBuffer &plb = _pNetwork->ga_srvServer.srv_aplbPlayers[i];
+        CPlayerTarget &plt = _pNetwork->ga_sesSessionState.ses_apltPlayers[i];
+        if (plt.plt_bActive) {
+          CTString strPlayer;
+          plt.plt_penPlayerEntity->GetMSLegacyPlayerInf(plb.plb_Index, strPlayer);
+
+          // if we don't have enough space left for the next player
+          if (strlen(strPacket) + strlen(strPlayer) > 2048) {
+            // send the packet
+            _sendPacketTo(strPacket, &_sinFrom);
+            strPacket = "";
+          }
+          strPacket += strPlayer;
+        }
+      }
+
+    strPacket += "\\final\\\\queryid\\333.1";
+    _sendPacketTo(strPacket, &_sinFrom);
+
+  } else if (sPch2){
+
+    CTString strPacket;
+    strPacket.PrintF( PCKINFO,
+      _pShell->GetString("gam_strSessionName"),
+      _pShell->GetINDEX("net_iPort"),
+      _pNetwork->ga_World.wo_strName,
+      _getGameModeName(_getSP()->sp_gmGameMode),
+      _pNetwork->ga_srvServer.GetPlayersCount(),
+      _pNetwork->ga_sesSessionState.ses_ctMaxPlayers);
+    _sendPacketTo(strPacket, &_sinFrom);
+
+  } else if (sPch3){
+
+    CTString strPacket;
+    CTString strLocation;
+    strLocation = _pShell->GetString("net_strLocalHost");
+    if (strLocation == ""){
+      strLocation = "Heartland";
+    }
+    strPacket.PrintF( PCKBASIC,
+      _pShell->GetString("sam_strGameName"),
+      _SE_VER_STRING,
+      //_pShell->GetString("net_strLocalHost"));
+      strLocation);
+    _sendPacketTo(strPacket, &_sinFrom);
+
+  } else if (sPch4){
+
+    // send the player status response
+    CTString strPacket;
+    strPacket = "";
+    for (INDEX i=0; i<_pNetwork->ga_srvServer.GetPlayersCount(); i++) {
+      CPlayerBuffer &plb = _pNetwork->ga_srvServer.srv_aplbPlayers[i];
+      CPlayerTarget &plt = _pNetwork->ga_sesSessionState.ses_apltPlayers[i];
+      if (plt.plt_bActive) {
+        CTString strPlayer;
+        plt.plt_penPlayerEntity->GetMSLegacyPlayerInf(plb.plb_Index, strPlayer);
+
+        // if we don't have enough space left for the next player
+        if (strlen(strPacket) + strlen(strPlayer) > 2048) {
+          // send the packet
+          _sendPacketTo(strPacket, &_sinFrom);
+          strPacket = "";
+        }
+
+        strPacket += strPlayer;
+      }
+    }
+
+    strPacket += "\\final\\\\queryid\\6.1";
+    _sendPacketTo(strPacket, &_sinFrom);
+
+  } else {
+    CPrintF("Unknown query server response!\n");
+    return;
+  }
+}
+
+// --------------------------------------------------------------------------------------
+// Regular network server update.
+// Responds to enumeration pings and sends pings to masterserver.
+// --------------------------------------------------------------------------------------
+extern void MS_OnServerUpdate(void)
 {
   if ((_socket == NULL) || (!_bInitialized)) {
     return;
   }
 
   int iLen = _recvPacket();
-  if (iLen > 0) {
+
+  if (iLen > 0)
+  {
     if (!ga_bMSLegacy) {
-    // check the received packet ID
-    switch(_szBuffer[0]) {
-    case 1: // server join response
-      {
-        int iChallenge = *(INDEX*)(_szBuffer + 1);
-        // send the challenge
-        _sendHeartbeat(iChallenge);
-        break;
-      }
-
-    case 2: // server status request
-      {
-        // send the status response
-        CTString strPacket;
-        strPacket.PrintF("0;players;%d;maxplayers;%d;level;%s;gametype;%s;version;%s;gamename;%s;sessionname;%s",
-          _pNetwork->ga_srvServer.GetPlayersCount(),
-          _pNetwork->ga_sesSessionState.ses_ctMaxPlayers,
-          _pNetwork->ga_World.wo_strName,
-          _getGameModeName(_getSP()->sp_gmGameMode),
-          _SE_VER_STRING,
-          _pShell->GetString("sam_strGameName"),
-          _pShell->GetString("gam_strSessionName"));
-        _sendPacketTo(strPacket, &_sinFrom);
-        break;
-      }
-
-    case 3: // player status request
-      {
-        // send the player status response
-        CTString strPacket;
-        strPacket.PrintF("\x01players\x02%d\x03", _pNetwork->ga_srvServer.GetPlayersCount());
-        for (INDEX i=0; i<_pNetwork->ga_srvServer.GetPlayersCount(); i++) {
-          CPlayerBuffer &plb = _pNetwork->ga_srvServer.srv_aplbPlayers[i];
-          CPlayerTarget &plt = _pNetwork->ga_sesSessionState.ses_apltPlayers[i];
-          if (plt.plt_bActive) {
-            CTString strPlayer;
-            plt.plt_penPlayerEntity->GetGameAgentPlayerInfo(plb.plb_Index, strPlayer);
-
-            // if we don't have enough space left for the next player
-            if (strlen(strPacket) + strlen(strPlayer) > 2048) {
-              // send the packet
-              _sendPacketTo(strPacket, &_sinFrom);
-              strPacket = "";
-            }
-
-            strPacket += strPlayer;
-          }
-        }
-
-        strPacket += "\x04";
-        _sendPacketTo(strPacket, &_sinFrom);
-        break;
-      }
-
-    case 4: // ping
-      {
-        // just send back 1 byte and the amount of players in the server (this could be useful in some cases for external scripts)
-        CTString strPacket;
-        strPacket.PrintF("\x04%d", _pNetwork->ga_srvServer.GetPlayersCount());
-        _sendPacketTo(strPacket, &_sinFrom);
-        break;
-      }
-     }
-   } else {
-
+      GameAgent_ProcessReceivedPacket();
+    } else {
       _szBuffer[iLen] = 0;
-      char *sPch1 = NULL, *sPch2 = NULL, *sPch3 = NULL, *sPch4 = NULL;
-      sPch1 = strstr(_szBuffer, "\\status\\");
-      sPch2 = strstr(_szBuffer, "\\info\\");
-      sPch3 = strstr(_szBuffer, "\\basic\\");
-      sPch4 = strstr(_szBuffer, "\\players\\");
-      if (sPch1) {
-        CTString strPacket;
-        CTString strLocation;
-        strLocation = _pShell->GetString("net_strLocalHost");
-        if ( strLocation == ""){
-          strLocation = "Heartland";
-        }
-        strPacket.PrintF( PCKQUERY,
-          _pShell->GetString("sam_strGameName"),
-          _SE_VER_STRING,
-          //_pShell->GetString("net_strLocalHost"),
-          strLocation,
-          _pShell->GetString("gam_strSessionName"),
-          _pShell->GetINDEX("net_iPort"),
-          _pNetwork->ga_World.wo_strName,
-          _getGameModeName(_getSP()->sp_gmGameMode),
-          _pNetwork->ga_srvServer.GetPlayersCount(),
-          _pNetwork->ga_sesSessionState.ses_ctMaxPlayers,
-          _pShell->GetINDEX("gam_bFriendlyFire"),
-          _pShell->GetINDEX("gam_bWeaponsStay"),
-          _pShell->GetINDEX("gam_bAmmoStays"),
-          _pShell->GetINDEX("gam_bHealthArmorStays"),
-          _pShell->GetINDEX("gam_bAllowHealth"),
-          _pShell->GetINDEX("gam_bAllowArmor"),
-          _pShell->GetINDEX("gam_bInfiniteAmmo"),
-          _pShell->GetINDEX("gam_bRespawnInPlace"));
-
-          for (INDEX i=0; i<_pNetwork->ga_srvServer.GetPlayersCount(); i++) {
-            CPlayerBuffer &plb = _pNetwork->ga_srvServer.srv_aplbPlayers[i];
-            CPlayerTarget &plt = _pNetwork->ga_sesSessionState.ses_apltPlayers[i];
-            if (plt.plt_bActive) {
-              CTString strPlayer;
-              plt.plt_penPlayerEntity->GetMSLegacyPlayerInf(plb.plb_Index, strPlayer);
-
-              // if we don't have enough space left for the next player
-              if (strlen(strPacket) + strlen(strPlayer) > 2048) {
-                // send the packet
-                _sendPacketTo(strPacket, &_sinFrom);
-                strPacket = "";
-              }
-              strPacket += strPlayer;
-            }
-          }
-
-        strPacket += "\\final\\\\queryid\\333.1";
-        _sendPacketTo(strPacket, &_sinFrom);
-
-      } else if (sPch2){
-
-        CTString strPacket;
-        strPacket.PrintF( PCKINFO,
-          _pShell->GetString("gam_strSessionName"),
-          _pShell->GetINDEX("net_iPort"),
-          _pNetwork->ga_World.wo_strName,
-          _getGameModeName(_getSP()->sp_gmGameMode),
-          _pNetwork->ga_srvServer.GetPlayersCount(),
-          _pNetwork->ga_sesSessionState.ses_ctMaxPlayers);
-        _sendPacketTo(strPacket, &_sinFrom);
-
-      } else if (sPch3){
-
-        CTString strPacket;
-        CTString strLocation;
-        strLocation = _pShell->GetString("net_strLocalHost");
-        if ( strLocation == ""){
-          strLocation = "Heartland";
-        }
-        strPacket.PrintF( PCKBASIC,
-          _pShell->GetString("sam_strGameName"),
-          _SE_VER_STRING,
-          //_pShell->GetString("net_strLocalHost"));
-          strLocation);
-        _sendPacketTo(strPacket, &_sinFrom);
-
-      } else if (sPch4){
-
-        // send the player status response
-        CTString strPacket;
-        strPacket = "";
-        for (INDEX i=0; i<_pNetwork->ga_srvServer.GetPlayersCount(); i++) {
-          CPlayerBuffer &plb = _pNetwork->ga_srvServer.srv_aplbPlayers[i];
-          CPlayerTarget &plt = _pNetwork->ga_sesSessionState.ses_apltPlayers[i];
-          if (plt.plt_bActive) {
-            CTString strPlayer;
-            plt.plt_penPlayerEntity->GetMSLegacyPlayerInf(plb.plb_Index, strPlayer);
-
-            // if we don't have enough space left for the next player
-            if (strlen(strPacket) + strlen(strPlayer) > 2048) {
-              // send the packet
-              _sendPacketTo(strPacket, &_sinFrom);
-              strPacket = "";
-            }
-
-            strPacket += strPlayer;
-          }
-        }
-
-        strPacket += "\\final\\\\queryid\\6.1";
-        _sendPacketTo(strPacket, &_sinFrom);
-
-      } else {
-        CPrintF("Unknown query server response!\n");
-        return;
-      }
-   }
+      MSLegacy_ProcessReceivedPacket();
+    }
  }
 
  // send a heartbeat every 150 seconds
@@ -552,11 +575,11 @@ extern void GameAgent_ServerStateChanged(void)
 extern void GameAgent_EnumTrigger(BOOL bInternet)
 {
 
-  if ( _pNetwork->ga_bEnumerationChange ) {
+  if (_pNetwork->ga_bEnumerationChange ) {
     return;
   }
   
-  if ( !bInternet && ga_bMSLegacy) {
+  if (!bInternet && ga_bMSLegacy) {
     // make sure that there are no requests still stuck in buffer
     ga_asrRequests.Clear();
     // we're not a server
@@ -581,7 +604,7 @@ extern void GameAgent_EnumTrigger(BOOL bInternet)
 	
 	// start WSA
 	_wsaRequested = MAKEWORD( 2, 2 );
-    if ( WSAStartup(_wsaRequested, &wsaData) != 0) {
+    if (WSAStartup(_wsaRequested, &wsaData) != 0) {
 		CPrintF("Error initializing winsock!\n");
 		if (_szIPPortBufferLocal != NULL) {
 			delete[] _szIPPortBufferLocal;
@@ -599,7 +622,7 @@ extern void GameAgent_EnumTrigger(BOOL bInternet)
 	_iLen = 0;
 	strcpy(_strFinal,"\\final\\");
 	
-    if ( gethostname ( _cName, sizeof(_cName)) == 0)
+    if (gethostname ( _cName, sizeof(_cName)) == 0)
 	{
 		if ((_phHostinfo = gethostbyname(_cName)) != NULL)
 		{
@@ -844,7 +867,7 @@ extern void GameAgent_EnumUpdate(void)
    if (iLen != -1) {
     // null terminate the buffer
     _szBuffer[iLen] = 0;
-    switch(_szBuffer[0]) {
+    switch (_szBuffer[0]) {
     case 's':
       {
         struct sIPPort {
@@ -899,7 +922,7 @@ extern void GameAgent_EnumUpdate(void)
         CTString strValue;
 
         while(*pszPacket != 0) {
-          switch(*pszPacket) {
+          switch (*pszPacket) {
           case ';':
             if (strKey != "sessionname") {
               if (bReadValue) {
@@ -1110,7 +1133,7 @@ DWORD WINAPI _MS_Thread(LPVOID lpParam)
                 CTString strValue;
 
                 while(*pszPacket != 0) {
-                switch(*pszPacket) {
+                switch (*pszPacket) {
                 case '\\':
                     if (strKey != "gamemode") {
                       if (bReadValue) {
@@ -1325,7 +1348,7 @@ DWORD WINAPI _LocalNet_Thread(LPVOID lpParam)
                 CTString strValue;
 
                 while(*pszPacket != 0) {
-                switch(*pszPacket) {
+                switch (*pszPacket) {
                 case '\\':
                     if (strKey != "gamemode") {
                       if (bReadValue) {

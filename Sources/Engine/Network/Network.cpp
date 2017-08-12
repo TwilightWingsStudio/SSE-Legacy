@@ -1070,6 +1070,40 @@ static void NET_SetEntityHealth(void *pArgs)
   CPrintF("  done! RPC sent!\n");
 }
 
+static void NET_SetEntityArmor(void *pArgs)
+{
+  CPrintF("NET_SetEntityHealth:\n");
+  if (!_pNetwork->ga_srvServer.srv_bActive) {
+    CPrintF("  <not a server>\n");
+    return;
+  }
+  
+  INDEX iEntity = NEXTARGUMENT(INDEX);
+  FLOAT fValue = NEXTARGUMENT(FLOAT);
+  
+  CEntity *penEntity = _pNetwork->ga_World.EntityFromID(iEntity);
+
+  if (penEntity == NULL) {
+    CPrintF("  <invalid entity>\n");
+    return;
+  }
+  
+  CServer &srvServer = _pNetwork->ga_srvServer;
+  
+  INDEX iCommandID = 2;
+  
+  // create message for destroying entity in all sessions
+  CNetworkStreamBlock nsbEntityRPC(MSG_SEQ_ENTITYRPC, ++srvServer.srv_iLastProcessedSequence);
+  nsbEntityRPC << iEntity;
+  nsbEntityRPC << iCommandID;
+  nsbEntityRPC << fValue;
+  
+  // put the message in buffer to be sent to all sessions
+  _pNetwork->ga_srvServer.AddBlockToAllSessions(nsbEntityRPC);
+  
+  CPrintF("  done! RPC sent!\n");
+}
+
 /*
  * Initialize game management.
  */
@@ -1086,6 +1120,7 @@ void CNetworkLibrary::Init(const CTString &strGameID)
 
   _pShell->DeclareSymbol("user void NET_DestroyEntity(INDEX);", &NET_DestroyEntity);
   _pShell->DeclareSymbol("user void NET_SetEntityHealth(INDEX, FLOAT);", &NET_SetEntityHealth);
+  _pShell->DeclareSymbol("user void NET_SetEntityArmor(INDEX, FLOAT);", &NET_SetEntityArmor);
 
   // Add shell symbols.
   _pShell->DeclareSymbol("user INDEX dbg_bBreak;", &dbg_bBreak);
@@ -2396,10 +2431,9 @@ void CNetworkLibrary::MainLoop(void)
   ga_tvDemoTimerLastTime = tvNow;
 
   // if network
-  if (_cmiComm.IsNetworkEnabled()) {
-
-    // do services for gameagent querying
-    GameAgent_ServerUpdate();
+  if (_cmiComm.IsNetworkEnabled())
+  {
+    MS_OnServerUpdate();
 
 //    _cmiComm.Broadcast_Update();
 

@@ -23,20 +23,22 @@ extern CTString ga_strServer;
 extern CTString ga_strMSLegacy;
 extern BOOL ga_bMSLegacy;
 
-/// Initialize GameAgent.
-extern void GameAgent_ServerInit(void);
-/// Let GameAgent know that the server has stopped.
-extern void GameAgent_ServerEnd(void);
+extern void MS_OnServerStart(void);
+extern void MS_OnServerEnd(void);
+extern void MS_OnServerUpdate(void);
+
 /// GameAgent server update call which responds to enumeration pings and sends pings to masterserver.
-extern void GameAgent_ServerUpdate(void);
 /// Notify GameAgent that the server state has changed.
 extern void GameAgent_ServerStateChanged(void);
 
 /// Request serverlist enumeration.
 extern void GameAgent_EnumTrigger(BOOL bInternet);
+
 /// GameAgent client update for enumeration.
+
 extern void GameAgent_EnumUpdate(void);
 /// Cancel the GameAgent serverlist enumeration.
+
 extern void GameAgent_EnumCancel(void);
 ///
 DWORD WINAPI _MS_Thread(LPVOID lpParam);
