@@ -67,7 +67,7 @@ properties:
  60 CEntityPointer m_penTacticsHolder  "Tactics Holder",
  61 BOOL m_bTacticsAutostart           "Tactics autostart" = TRUE,
 
- // SSE
+ // [SSE]
  65 BOOL m_bCountInStatistics "Count In Statistics" = TRUE,
 
 components:
@@ -172,6 +172,9 @@ functions:
         if (m_penPatrol!=NULL) {
           peb->m_penMarker = m_penPatrol;
         }
+        
+        peb->m_bCountKill = m_bCountInStatistics;
+        
         pen->Initialize();
       } else {
         pen = m_penTarget;
