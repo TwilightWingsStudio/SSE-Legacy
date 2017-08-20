@@ -191,6 +191,8 @@ properties:
 186 FLOAT m_tmMaxChargeHitLength = 5.0F,
 190 INDEX m_iLastReminderValue = 0,
 
+191 BOOL m_bCountKill = TRUE, // TODO: Move to flags-like variable.
+
 //213 CEntityPointer m_penFriend,
 //214 BOOL m_bRunningToFriend = FALSE,
 
@@ -366,7 +368,7 @@ functions:
   // --------------------------------------------------------------------------------------
   virtual BOOL CountAsKill(void)
   {
-    return TRUE;
+    return m_bCountKill;
   }
 
   // --------------------------------------------------------------------------------------
@@ -3071,11 +3073,13 @@ procedures:
 
           // set speeds for movement towards desired position
           FLOAT3D vPosDelta = m_vDesiredPosition-GetPlacement().pl_PositionVector;
+
           if (m_bCoward) {
             vPosDelta(1)=vPosDelta(1)*-1.0f;
             vPosDelta(2)=vPosDelta(2)*-1.0f;
             vPosDelta(3)=vPosDelta(3)*-1.0f;
           }
+
           FLOAT fPosDistance = vPosDelta.Length();
           
           SetSpeedsToDesiredPosition(vPosDelta, fPosDistance, m_dtDestination==DT_PLAYERCURRENT);
@@ -3972,7 +3976,7 @@ procedures:
     SetPredictable(TRUE);
 
     autocall PreMainLoop() EReturn;
-
+    
     jump StandardBehavior();
   }
 

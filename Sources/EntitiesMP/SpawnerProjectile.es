@@ -94,7 +94,10 @@ functions:
     // initialize tactics
     CEnemyBase &penMonster = (CEnemyBase &)*pen;
     
-    penMonster.m_iScore = 0; // [SSE] Mordekai Fix
+    // [SSE] Mordekai Fix
+    penMonster.m_iScore = 0;
+    penMonster.m_bCountKill = FALSE;
+    //
 
     if (penMonster.m_penTacticsHolder != NULL) {
       if (IsOfClass(penMonster.m_penTacticsHolder, "TacticsHolder")) {
