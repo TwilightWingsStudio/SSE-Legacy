@@ -1207,7 +1207,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   }
 
   // LSC Down - SP/Coop = Extra Lives
-  if ((bSinglePlay || bCooperative) && GetSP()->sp_ctCredits >= 0)
+  if (bCooperative && GetSP()->sp_ctCredits >= 0)
   {
     CTString strLives;
     strLives.PrintF( "%d", bSharedLives ? GetSP()->sp_ctCreditsLeft : _penPlayer->m_iLives);
@@ -2474,7 +2474,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
   }
 
   // LSC Down - SP/Coop = Extra Lives
-  if ((bSinglePlay || bCooperative) && GetSP()->sp_ctCredits >= 0)
+  if (bCooperative && GetSP()->sp_ctCredits >= 0)
   {
     CTString strLives;
     strLives.PrintF( "%d", bSharedLives ? GetSP()->sp_ctCreditsLeft : _penPlayer->m_iLives);
@@ -3350,7 +3350,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   HUD_DrawIcon(   fCol,      fRow, _toFrags, C_WHITE /*colScore*/, 1.0f, FALSE, 32, 32);
   
   // [SSE] Extra Lives System
-  if ((bSinglePlay || bCooperative) && GetSP()->sp_ctCredits >= 0)
+  if (bCooperative && GetSP()->sp_ctCredits >= 0)
   {
     strValue.PrintF( "%d", bSharedLives ? GetSP()->sp_ctCreditsLeft : _penPlayer->m_iLives);
     fRow = pixTopBound  + fNextUnit+fHalfUnit;
