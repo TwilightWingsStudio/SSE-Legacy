@@ -655,6 +655,9 @@
     <ClCompile Include="HudPicDisplay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HudBossBarDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1806,6 +1809,12 @@
     <ClInclude Include="HudPicDisplay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HudBossBarDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HudBossBarDisplay_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2783,5 +2792,10 @@
     <CustomBuild Include="HudPicDisplay.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HudBossBarDisplay.es">
+      <Filter>Class Files\Tools</Filter>
+    </None>
   </ItemGroup>
 </Project>

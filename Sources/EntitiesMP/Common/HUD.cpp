@@ -25,6 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <EntitiesMP/MusicHolder.h>
 #include <EntitiesMP/EnemyBase.h>
 #include <EntitiesMP/EnemyCounter.h>
+#include <EntitiesMP/HudBossBarDisplay.h>
 
 #define ENTITY_DEBUG
 
@@ -1439,21 +1440,40 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       fValue = eb.GetHealth();
       fNormValue = fValue/eb.m_fMaxHealth;
     }
+    
+    CTextureObject *ptoBossIcon = &_toHealth;
 
-    if (mh.m_penCounter != NULL) {
+    // Q6785
+    // [SSE] HudBosBarDisplay Entity
+    if (mh.m_penBossBarDisplay != NULL) {
+      CHudBossBarDisplay &bbd = (CHudBossBarDisplay&)*mh.m_penBossBarDisplay;
+      
+      if (bbd.m_iValueIO > 0) {
+        fValue = bbd.m_iValueIO;
+        fNormValue = fValue / bbd.m_iMaxValue;
+      }
+      
+      if (bbd.m_moTextureHolder.mo_toTexture.GetData() != NULL) {
+        ptoBossIcon = &bbd.m_moTextureHolder.mo_toTexture;
+      }
+      
+    } else if (mh.m_penCounter != NULL) {
       CEnemyCounter &ec = (CEnemyCounter&)*mh.m_penCounter;
-      if (ec.m_iCount>0) {
+
+      if (ec.m_iCount > 0) {
         fValue = ec.m_iCount;
-        fNormValue = fValue/ec.m_iCountFrom;
+        fNormValue = fValue / ec.m_iCountFrom;
       }
     }
+    
+    fNormValue = Clamp(fNormValue, 0.0F, 1.0F);
 
     if (fNormValue > 0)
     {
       PrepareColorTransitions( colMax, colMax, colTop, C_RED, 0.5f, 0.25f, FALSE); // prepare and draw boss energy info
 
       HUD_DrawAnchoredRect( -130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-      HUD_DrawAnchroredIcon(-130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toHealth, C_WHITE|CT_OPAQUE, 1.0F, FALSE);
+      HUD_DrawAnchroredIcon(-130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, *ptoBossIcon, C_WHITE|CT_OPAQUE, 1.0F, FALSE);
       HUD_DrawAnchoredRect(   10, 48, 256, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
       
       HUD_DrawAnchoredBar(10, 48, 256, 16, EHHAT_CENTER, EHVAT_TOP, BO_LEFT, NONE, fNormValue);
@@ -2129,21 +2149,40 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       fValue = eb.GetHealth();
       fNormValue = fValue/eb.m_fMaxHealth;
     }
+    
+    CTextureObject *ptoBossIcon = &_toHealth;
 
-    if (mh.m_penCounter != NULL) {
+    // Q6785
+    // [SSE] HudBosBarDisplay Entity
+    if (mh.m_penBossBarDisplay != NULL) {
+      CHudBossBarDisplay &bbd = (CHudBossBarDisplay&)*mh.m_penBossBarDisplay;
+      
+      if (bbd.m_iValueIO > 0) {
+        fValue = bbd.m_iValueIO;
+        fNormValue = fValue / bbd.m_iMaxValue;
+      }
+      
+      if (bbd.m_moTextureHolder.mo_toTexture.GetData() != NULL) {
+        ptoBossIcon = &bbd.m_moTextureHolder.mo_toTexture;
+      }
+      
+    } else if (mh.m_penCounter != NULL) {
       CEnemyCounter &ec = (CEnemyCounter&)*mh.m_penCounter;
-      if (ec.m_iCount>0) {
+
+      if (ec.m_iCount > 0) {
         fValue = ec.m_iCount;
-        fNormValue = fValue/ec.m_iCountFrom;
+        fNormValue = fValue / ec.m_iCountFrom;
       }
     }
+    
+    fNormValue = Clamp(fNormValue, 0.0F, 1.0F);
 
     if (fNormValue > 0)
     {
       PrepareColorTransitions( colMax, colMax, colTop, C_RED, 0.5f, 0.25f, FALSE); // prepare and draw boss energy info
 
       HUD_DrawAnchoredRect( -130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-      HUD_DrawAnchroredIcon(-130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toHealth, C_WHITE|CT_OPAQUE, 1.0F, FALSE);
+      HUD_DrawAnchroredIcon(-130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, *ptoBossIcon, C_WHITE|CT_OPAQUE, 1.0F, FALSE);
       HUD_DrawAnchoredRect(   10, 48, 256, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
       
       HUD_DrawAnchoredBar(10, 48, 256, 16, EHHAT_CENTER, EHVAT_TOP, BO_LEFT, NONE, fNormValue);
@@ -3003,14 +3042,36 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
       fValue = eb.GetHealth();
       fNormValue = fValue/eb.m_fMaxHealth;
     }
-    if (mh.m_penCounter!=NULL) {
+    
+    CTextureObject *ptoBossIcon = &_toHealth;
+    
+    // Q6785
+    // [SSE] HudBosBarDisplay Entity
+    if (mh.m_penBossBarDisplay != NULL) {
+      CHudBossBarDisplay &bbd = (CHudBossBarDisplay&)*mh.m_penBossBarDisplay;
+      
+      if (bbd.m_iValueIO > 0) {
+        fValue = bbd.m_iValueIO;
+        fNormValue = fValue / bbd.m_iMaxValue;
+      }
+      
+      if (bbd.m_moTextureHolder.mo_toTexture.GetData() != NULL) {
+        ptoBossIcon = &bbd.m_moTextureHolder.mo_toTexture;
+      }
+      
+    } else if (mh.m_penCounter != NULL) {
       CEnemyCounter &ec = (CEnemyCounter&)*mh.m_penCounter;
-      if (ec.m_iCount>0) {
+
+      if (ec.m_iCount > 0) {
         fValue = ec.m_iCount;
-        fNormValue = fValue/ec.m_iCountFrom;
+        fNormValue = fValue / ec.m_iCountFrom;
       }
     }
-    if (fNormValue>0) {
+    
+    fNormValue = Clamp(fNormValue, 0.0F, 1.0F);
+
+    if (fNormValue > 0)
+    {
       // prepare and draw boss energy info
       //PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
       PrepareColorTransitions( colMax, colMax, colTop, C_RED, 0.5f, 0.25f, FALSE);
@@ -3022,7 +3083,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
       HUD_DrawBorder( fCol,      fRow, fOneUnit,          fOneUnit, colBorder);
       HUD_DrawBorder( fCol+fAdv, fRow, fOneUnit*16,       fOneUnit, colBorder);
       HUD_DrawBar(    fCol+fAdv, fRow, fOneUnit*16*0.995, fOneUnit*0.9375, BO_LEFT, NONE, fNormValue);
-      HUD_DrawIcon(   fCol,      fRow, _toHealth, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
+      HUD_DrawIcon(   fCol,      fRow, *ptoBossIcon, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
     }
   }
 

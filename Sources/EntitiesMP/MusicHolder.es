@@ -84,6 +84,8 @@ properties:
 101 FLOAT m_tmFade = 1.0f,    // music cross-fade speed
 103 enum MusicType m_mtCurrentMusic = MT_LIGHT, // current active channel
 
+107 CEntityPointer m_penBossBarDisplay, // [SSE] HudBosBarDisplay Entity
+
 // for cross-fade purposes
 110 FLOAT m_fCurrentVolume0a  = 1.0f,
 210 FLOAT m_fCurrentVolume0b  = 1.0f,
@@ -200,6 +202,7 @@ functions:
     TIME tmNow = _pTimer->CurrentTick();
     TIME tmTooOld = tmNow-10.0f;
     CDynamicContainer<CEntity> cenOldFussMakers;
+
     // for each fussmaker
     {FOREACHINDYNAMICCONTAINER(m_cenFussMakers, CEntity, itenFussMaker) {
       CEnemyBase & enFussMaker = (CEnemyBase&)*itenFussMaker;
@@ -209,6 +212,7 @@ functions:
         cenOldFussMakers.Add(&enFussMaker);
       }
     }}
+
     // for each old fussmaker
     {FOREACHINDYNAMICCONTAINER(cenOldFussMakers, CEntity, itenOldFussMaker) {
       CEnemyBase &enOldFussMaker = (CEnemyBase&)*itenOldFussMaker;
@@ -218,12 +222,15 @@ functions:
   }
   
   // get total score of all active fuss makers
-  INDEX GetFussMakersScore(void) {
+  INDEX GetFussMakersScore(void)
+  {
     INDEX iScore = 0;
+
     {FOREACHINDYNAMICCONTAINER(m_cenFussMakers, CEntity, itenFussMaker) {
       CEnemyBase &enFussMaker = (CEnemyBase&)*itenFussMaker;
       iScore += enFussMaker.m_iScore;
     }}
+
     return iScore;
   }
 
@@ -231,10 +238,12 @@ functions:
   void ChangeMusicChannel(enum MusicType mtType, const CTFileName &fnNewMusic, FLOAT fNewVolume)
   {
     INDEX &iSubChannel = (&m_iSubChannel0)[mtType];
+
     // take next sub-channel if needed
     if (fnNewMusic!="") {
       iSubChannel = (iSubChannel+1)%2;
     }
+
     // find channel's variables
     FLOAT &fVolume = (&m_fVolume0)[mtType];
     CSoundObject &soMusic = (&m_soMusic0a)[mtType*2+iSubChannel];
@@ -300,11 +309,13 @@ functions:
     if( soMusic.IsPaused()) {
       soMusic.Resume();
     }
+
     // fade in music if needed
     if( fCurrentVolume<MUSIC_VOLUMEMAX) {
       fCurrentVolume *= FadeInFactor( m_tmFade);
       fCurrentVolume = ClampUp( fCurrentVolume, 1.0f);
     }
+
     soMusic.SetVolume( fCurrentVolume*fVolume, fCurrentVolume*fVolume);
   }
 
@@ -313,6 +324,7 @@ functions:
   {
     INDEX iSubChannelActive = (&m_iSubChannel0)[mtType];
     INDEX iSubChannelInactive = (iSubChannelActive+1)%2;
+
     // if it is current channel
     if (mtType==m_mtCurrentMusic) {
       // fade in active subchannel
@@ -329,8 +341,8 @@ functions:
   
 procedures:
   // initialize music
-  Main(EVoid) {
-
+  Main(EVoid)
+  {
     // init as model
     InitAsEditorModel();
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
@@ -364,12 +376,15 @@ procedures:
     CountEnemies();
 
     // main loop
-    while(TRUE) {
+    while(TRUE)
+    {
       // wait a bit
-      wait(0.1f) {
+      wait(0.1f)
+      {
         on (ETimer) : {
           stop;
         };
+
         // if music is to be changed
         on (EChangeMusic ecm) : { 
           // change parameters
@@ -383,10 +398,13 @@ procedures:
           stop;
         }
       }
+
       // check fuss
       CheckOldFussMakers();
+
       // get total score of all active fuss makers
       FLOAT fFussScore = GetFussMakersScore();
+
       // if event is on
       if (m_mtCurrentMusic==MT_EVENT) {
         // if event has ceased playing
@@ -395,6 +413,7 @@ procedures:
           m_mtCurrentMusic=MT_LIGHT;
         }
       }
+
       // if heavy fight is on
       if (m_mtCurrentMusic==MT_HEAVY) {
         // if no more fuss
@@ -402,6 +421,7 @@ procedures:
           // switch to no fight
           m_mtCurrentMusic=MT_LIGHT;
         }
+
       // if medium fight is on
       } else if (m_mtCurrentMusic==MT_MEDIUM) {
         // if no more fuss
@@ -413,27 +433,28 @@ procedures:
           // switch to heavy fight
           m_mtCurrentMusic=MT_HEAVY;
         }
+
       // if no fight is on
-      } else if (m_mtCurrentMusic==MT_LIGHT) {
+      } else if (m_mtCurrentMusic == MT_LIGHT) {
         // if heavy fuss
-        if (fFussScore>=m_fScoreHeavy) {
+        if (fFussScore >= m_fScoreHeavy) {
           // switch to heavy fight
-          m_mtCurrentMusic=MT_HEAVY;
+          m_mtCurrentMusic = MT_HEAVY;
         // if medium fuss
-        } else if (fFussScore>=m_fScoreMedium) {
+        } else if (fFussScore >= m_fScoreMedium) {
           // switch to medium fight
-          m_mtCurrentMusic=MT_MEDIUM;
+          m_mtCurrentMusic = MT_MEDIUM;
         }
       }
 
       // setup fade speed depending on music type
-      if (m_mtCurrentMusic==MT_LIGHT) {
+      if (m_mtCurrentMusic == MT_LIGHT) {
         m_tmFade = 2.0f;
-      } else if (m_mtCurrentMusic==MT_MEDIUM) {
+      } else if (m_mtCurrentMusic == MT_MEDIUM) {
         m_tmFade = 1.0f;
-      } else if (m_mtCurrentMusic==MT_HEAVY) {
+      } else if (m_mtCurrentMusic == MT_HEAVY) {
         m_tmFade = 1.0f;
-      } else if (m_mtCurrentMusic==MT_EVENT || m_mtCurrentMusic==MT_CONTINUOUS) {
+      } else if (m_mtCurrentMusic == MT_EVENT || m_mtCurrentMusic == MT_CONTINUOUS) {
         m_tmFade = 0.5f;
       }
 
