@@ -81,6 +81,12 @@ event EKilledAlly { // sent to player when ally is killed
 };
 //
 
+// [SSE] Hud Pic Display
+event EHudPicDisplay {
+  BOOL bStart,
+  CEntityPointer penSender,
+};
+
 event ESecretFound { // sent to player secret is found
 };
 
