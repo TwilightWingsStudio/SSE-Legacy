@@ -20,18 +20,35 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #endif
 
 // structure describing current state during loading, passed to loading hook
-class CProgressHookInfo {
-public:
-  CTString phi_strDescription;    // world/savegame/session that is loading/connecting, etc.
-  FLOAT phi_fCompleted;           // completed ratio [0..1]
+class CProgressHookInfo
+{
+  public:
+    enum EExtraDataType
+    {
+      EDT_NONE = 0,
+      EDT_VALUE,
+      EDT_SIZE,
+    };
+  
+    CTString phi_strDescription;    // world/savegame/session that is loading/connecting, etc.
+    FLOAT phi_fCompleted;           // completed ratio [0..1]
+    
+    // [SSE] Better Loading Progress
+    EExtraDataType phi_eExtraDataType;
+    ULONG phi_ulExtraCompleted;
+    ULONG phi_ulExtraExpected;    
 };
 
 // set hook for loading/connecting
 extern ENGINE_API void SetProgressHook(void (*pHook_t)(CProgressHookInfo *pgli));
 // call loading/connecting hook
 extern ENGINE_API void SetProgressDescription(const CTString &strDescription);
-extern ENGINE_API void CallProgressHook_t(FLOAT fCompleted);
 
+extern ENGINE_API void CallProgressHook_t(FLOAT fCompleted, enum CProgressHookInfo::EExtraDataType edt = CProgressHookInfo::EDT_NONE);
+
+// [SSE] Better Loading Progress
+extern ENGINE_API void SetProgressExtraCompleted(ULONG ulNewExtra);
+extern ENGINE_API void SetProgressExtraExpected(ULONG ulNewExtra);
 
 #endif  /* include-once check. */
 

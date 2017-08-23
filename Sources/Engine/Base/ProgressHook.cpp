@@ -37,29 +37,49 @@ void SetProgressDescription(const CTString &strDescription)
   _phiLoadingInfo.phi_strDescription = strDescription;
 }
 
-void CallProgressHook_t(FLOAT fCompleted)
+// --------------------------------------------------------------------------------------
+// [SSE] Better Loading Progress
+// --------------------------------------------------------------------------------------
+void SetProgressExtraCompleted(ULONG ulNewExtra)
 {
-  if (_pLoadingHook_t!=NULL) {
-    _phiLoadingInfo.phi_fCompleted = fCompleted;
-    _pLoadingHook_t(&_phiLoadingInfo);
+  _phiLoadingInfo.phi_ulExtraCompleted = ulNewExtra;
+}
 
- 
-    if (!bTimeInitialized) {
-      tvLastUpdate = _pTimer->GetHighPrecisionTimer();
-      bTimeInitialized = TRUE;
+// --------------------------------------------------------------------------------------
+// [SSE] Better Loading Progress
+// --------------------------------------------------------------------------------------
+void SetProgressExtraExpected(ULONG ulNewExtra)
+{
+  _phiLoadingInfo.phi_ulExtraExpected = ulNewExtra;
+}
+
+void CallProgressHook_t(FLOAT fCompleted, enum CProgressHookInfo::EExtraDataType edt)
+{
+  if (_pLoadingHook_t == NULL) {
+    return;
+  }
+
+  _phiLoadingInfo.phi_fCompleted = fCompleted;
+  _phiLoadingInfo.phi_eExtraDataType = edt;
+  _pLoadingHook_t(&_phiLoadingInfo);
+
+
+  if (!bTimeInitialized) {
+    tvLastUpdate = _pTimer->GetHighPrecisionTimer();
+    bTimeInitialized = TRUE;
+  }
+
+  CTimerValue tvNow = _pTimer->GetHighPrecisionTimer();
+
+  if ((tvNow-tvLastUpdate) > CTimerValue(net_fSendRetryWait*1.1)) {
+    if (_pNetwork->ga_IsServer) {
+      // handle server messages
+      _cmiComm.Server_Update();
+    } else {
+      // handle client messages
+      _cmiComm.Client_Update();
     }
-    CTimerValue tvNow = _pTimer->GetHighPrecisionTimer();
-    if ((tvNow-tvLastUpdate) > CTimerValue(net_fSendRetryWait*1.1)) {
-		  if (_pNetwork->ga_IsServer) {
-        // handle server messages
-        _cmiComm.Server_Update();
-		  } else {
-			  // handle client messages
-			  _cmiComm.Client_Update();
-		  }
-      tvLastUpdate = _pTimer->GetHighPrecisionTimer();
-    }    
-
+    tvLastUpdate = _pTimer->GetHighPrecisionTimer();
   }
 }
 
