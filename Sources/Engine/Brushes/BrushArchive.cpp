@@ -469,11 +469,15 @@ void CBrushArchive::Read_t( CTStream *istrFile) // throw char *
   if (ctBrushes!=0) {
     // create that much brushes
     CBrush3D *abrBrushes = ba_abrBrushes.New(ctBrushes);
+
     // for each of the new brushes
-    for (INDEX iBrush=0; iBrush<ctBrushes; iBrush++) {
-      // read it from stream
-      CallProgressHook_t(FLOAT(iBrush)/ctBrushes);
-      abrBrushes[iBrush].Read_t(istrFile);
+    for (INDEX iBrush=0; iBrush<ctBrushes; iBrush++)
+    {
+      SetProgressExtraCompleted(iBrush);
+      SetProgressExtraExpected(ctBrushes);
+      CallProgressHook_t(FLOAT(iBrush)/ctBrushes, CProgressHookInfo::EDT_VALUE);
+
+      abrBrushes[iBrush].Read_t(istrFile); // read it from stream
     }
   }
 

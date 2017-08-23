@@ -619,18 +619,27 @@ void CWorld::ReadState_new_t( CTStream *istr) // throw char *
       wo_ulNextEntityID--;
       penNew->en_ulID = ulID;
     }
-    CallProgressHook_t(FLOAT(iEntity)/ctEntities);
+    
+    SetProgressExtraCompleted(iEntity);
+    SetProgressExtraExpected(ctEntities);
+    CallProgressHook_t(FLOAT(iEntity)/ctEntities, CProgressHookInfo::EDT_VALUE);
   }}
+
   CallProgressHook_t(1.0f);
 
   SetProgressDescription(TRANS("loading entities"));
   CallProgressHook_t(0.0f);
+
   // for each entity
   {for(INDEX iEntity=0; iEntity<ctEntities; iEntity++) {
     // deserialize entity from stream
     wo_cenAllEntities[iEntity].Read_t(istr);
-    CallProgressHook_t(FLOAT(iEntity)/ctEntities);
+
+    SetProgressExtraCompleted(iEntity);
+    SetProgressExtraExpected(ctEntities);
+    CallProgressHook_t(FLOAT(iEntity)/ctEntities, CProgressHookInfo::EDT_VALUE);
   }}
+
   CallProgressHook_t(1.0f);
 
   // after all entities have been read, set the background viewer entity

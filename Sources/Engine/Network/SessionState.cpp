@@ -465,9 +465,12 @@ void CSessionState::WaitStream_t(CTMemoryStream &strmMessage, const CTString &st
         // reset timeout
         tmWait=0;
       }
+
       // progress with receiving
       SetProgressDescription(TRANS("receiving ") + strName + "  ");
-      CallProgressHook_t((float)slReceivedSize/slExpectedSize);
+      SetProgressExtraCompleted(slReceivedSize);
+      SetProgressExtraExpected(slExpectedSize);
+      CallProgressHook_t((float)slReceivedSize/slExpectedSize, CProgressHookInfo::EDT_SIZE);
     }
 
     // if not everything received yet
