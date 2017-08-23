@@ -78,7 +78,7 @@ void CSinglePlayerNewMenu::Initialize_t(void)
   gm_mgMental.mg_bBlinking = FALSE;
   
   // Initialize "Serious Mental" button.
-  gm_mgSeriousMental.mg_strText = TRANS("SERIOUS MENTAL");
+  gm_mgSeriousMental.mg_strText = TRANS("^cFF0000SERIOUS MENTAL");
   gm_mgSeriousMental.mg_bfsFontSize = BFS_LARGE;
   gm_mgSeriousMental.mg_boxOnScreen = BoxBigRow(6.0f);
   gm_mgSeriousMental.mg_strTip = TRANS("you are too serious!");
