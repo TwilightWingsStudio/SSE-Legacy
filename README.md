@@ -60,7 +60,9 @@ To build Serious Engine 1, you'll need Visual Studio 2013 or 2015, Professional 
 
 Do not use spaces, cyrillic letters or special symbols such as ()+/[]' in the path to the solution. If you use described before symbols you will have building errors because Visual Studio can not correctly operate with these symbols. But you can use dash - and underscore _ symbols!
 
-Once you've installed Visual Studio and (optionally) DirectX8 SDK, you can build the engine solution (`/Sources/All.sln`). Press F7 or Build -> Build solution. The libraries and executables will be put into `\Bin\` directory (or `\Bin\Debug\` if you are using the Debug configuration).
+Once you've installed Visual Studio and (optionally) DirectX8 SDK, you should open Visual Studio Developer Console and run msvcbuild.bat(located in `/Sources/luajit/src`) to build luajit library.
+
+After that you can build the engine solution (`/Sources/All.sln`). Press F7 or Build -> Build solution. The libraries and executables will be put into `\Bin\` directory (or `\Bin\Debug\` if you are using the Debug configuration).
 
 Optional features
 -----------------
@@ -106,3 +108,4 @@ Some of the code included with the engine sources is not licensed under the GNU 
 * zlib (located in `Sources/Engine/zlib`) by Jean-loup Gailly and Mark Adler
 * LightWave SDK (located in `Sources/LWSkaExporter/SDK`) by NewTek Inc.
 * libogg/libvorbis (located in `Sources/libogg` and `Sources/libvorbis`) by Xiph.Org Foundation
+* LuaJIT (located in `Sources/luajit`) by Mike Pall
