@@ -29,6 +29,10 @@ static CDrawPort *_pdpLoadingHook = NULL;  // drawport for loading hook
 extern BOOL _bUserBreakEnabled;
 extern BOOL map_bIsFirstEncounter;
 
+#define MAXLOADINGSCREENS 3
+
+static CTextureObject _atoGenericLoadingScreens[MAXLOADINGSCREENS];
+static INDEX _iGenericLoadingScreens = -1;
 
 #define REFRESHTIME (0.2f)
 
@@ -52,6 +56,26 @@ void RemapLevelNames(INDEX &iLevel)
   }
 }
 
+static void LoadGenericLoadingScreens()
+{
+  try
+  {
+    _atoGenericLoadingScreens[0].SetData_t( CTFILENAME("Textures\\LoadingScreens\\Generic\\Generic_01.tex"));
+    _iGenericLoadingScreens++;
+    
+    _atoGenericLoadingScreens[1].SetData_t( CTFILENAME("Textures\\LoadingScreens\\Generic\\Generic_02.tex"));
+    _iGenericLoadingScreens++;
+ 
+    _atoGenericLoadingScreens[2].SetData_t( CTFILENAME("Textures\\LoadingScreens\\Generic\\Generic_03.tex"));
+    _iGenericLoadingScreens++;
+    
+    ((CTextureData*)_atoGenericLoadingScreens[0].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)_atoGenericLoadingScreens[1].GetData())->Force(TEX_CONSTANT);
+    ((CTextureData*)_atoGenericLoadingScreens[2].GetData())->Force(TEX_CONSTANT);
+  } catch (char *strError) {
+    CPrintF("Warning! %s\n", strError);
+  }
+}
 
 static void LoadingHook_t(CProgressHookInfo *pphi)
 {
@@ -138,7 +162,7 @@ static void LoadingHook_t(CProgressHookInfo *pphi)
     }
   }
 
-  if (ulLevelMask!=0 && !_pNetwork->IsPlayingDemo()) {
+  if (ulLevelMask != 0 && !_pNetwork->IsPlayingDemo()) {
     // map hook
     extern void RenderMap( CDrawPort *pdp, ULONG ulLevelMask, CProgressHookInfo *pphi);
     RenderMap(&dpHook, ulLevelMask, pphi);
@@ -150,6 +174,14 @@ static void LoadingHook_t(CProgressHookInfo *pphi)
     // keep current time
     tvLast = _pTimer->GetHighPrecisionTimer();
     return;
+  }
+  
+  if (_iGenericLoadingScreens < 0) {
+    LoadGenericLoadingScreens();
+  }
+  
+  if (_iGenericLoadingScreens > 0 && !GetSP()->sp_bQuickTest) {
+    pdp->PutTexture(&_atoGenericLoadingScreens[1], PIXaabbox2D( PIX2D(0, 0), PIX2D(pdp->GetWidth(), pdp->GetHeight())), C_WHITE|255);
   }
   
   // Get sizes.
@@ -179,6 +211,24 @@ static void LoadingHook_t(CProgressHookInfo *pphi)
   setlocale(LC_ALL, "C");
   CTString strPerc(0, "%3.0f%%", pphi->phi_fCompleted*100);
   
+  CTString strExtra = "";
+  BOOL bExtraData = FALSE;
+  
+  switch (pphi->phi_eExtraDataType)
+  {
+    case CProgressHookInfo::EDT_VALUE: {
+      strExtra.PrintF("%lu / %lu", pphi->phi_ulExtraCompleted, pphi->phi_ulExtraExpected);
+      bExtraData = TRUE;
+    } break;
+ 
+    case CProgressHookInfo::EDT_SIZE: {
+      strExtra.PrintF("%.1f k / %.1f k", pphi->phi_ulExtraCompleted / 1024.0F, pphi->phi_ulExtraExpected / 1024.0F);
+      bExtraData = TRUE;
+    } break;
+    
+    default: break;
+  }
+
   //
   PIX pixCharSizeI = pfd->fd_pixCharWidth + pfd->fd_pixCharSpacing;
   PIX pixCharSizeJ = pfd->fd_pixCharHeight + pfd->fd_pixLineSpacing;
@@ -186,9 +236,30 @@ static void LoadingHook_t(CProgressHookInfo *pphi)
   // State
   dpHook.Fill(0, pixSizeJ-44, 256, 14, C_BLACK|128); 
   
+  dpHook.InitTexture( NULL);
+  dpHook.AddTriangle((PIX)256, (PIX)(pixSizeJ-30), 256, (PIX)(pixSizeJ-44), 264, (PIX)(pixSizeJ-30), C_BLACK|128);
+  dpHook.FlushRenderingQueue();
+  
+  if (bExtraData)
+  {
+    // Extra
+    dpHook.Fill(0, 0, 128, 20, C_BLACK|128); 
+    
+    dpHook.InitTexture( NULL);
+    dpHook.AddTriangle(128, 0, 128, 20, 136, 0, C_BLACK|128);
+    dpHook.FlushRenderingQueue();
+    
+    dpHook.PutText(strExtra, 8, 4, colOutline);
+  }
+
   // Percent
   PIX pixPercPanelSizeI = 48;
   PIX pixPercPanelOffsetI = -16; // e[-640; 0]
+ 
+  dpHook.InitTexture( NULL);
+  dpHook.AddTriangle((PIX)(pixSizeI-72), (PIX)(pixSizeJ-30), (PIX)(pixSizeI-64), (PIX)(pixSizeJ-30), (PIX)(pixSizeI-64), (PIX)(pixSizeJ-44), C_BLACK|128); 
+  dpHook.AddTriangle((PIX)(pixSizeI-16), (PIX)(pixSizeJ-30), (PIX)(pixSizeI-8), (PIX)(pixSizeJ-30), (PIX)(pixSizeI-16), (PIX)(pixSizeJ-44), C_BLACK|128);
+  dpHook.FlushRenderingQueue();
  
   dpHook.Fill(pixSizeI+pixPercPanelOffsetI-pixPercPanelSizeI, pixSizeJ-44, pixPercPanelSizeI, 14, C_BLACK|128); 
   
