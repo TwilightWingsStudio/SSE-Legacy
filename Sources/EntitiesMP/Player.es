@@ -2324,12 +2324,12 @@ functions:
     const BOOL bTeamPlay = sp.sp_bTeamPlay;
     const INDEX ctTeams = sp.sp_ctTeams;
 
-    extern INDEX SetAllPlayersStats( INDEX iSortKey);
+    extern INDEX HUD_SetAllPlayersStats( INDEX iSortKey);
     extern CPlayer *_apenPlayers[NET_MAXGAMEPLAYERS];
     // determine type of game
 
     // fill players table
-    const INDEX ctPlayers = SetAllPlayersStats(bFragMatch?5:3); // sort by frags or by score
+    const INDEX ctPlayers = HUD_SetAllPlayersStats(bFragMatch?5:3); // sort by frags or by score
 
     // get time elapsed since the game start
     strStats+=AlignString(CTString(0, "^cFFFFFF%s:^r\n%s", TRANS("TIME"), TimeToString(_pNetwork->GetGameTime())));
@@ -2432,9 +2432,9 @@ functions:
     GetDetailStatsSP(strStats, 1);
     
     // get stats from all players
-    extern INDEX SetAllPlayersStats( INDEX iSortKey);
+    extern INDEX HUD_SetAllPlayersStats( INDEX iSortKey);
     extern CPlayer *_apenPlayers[NET_MAXGAMEPLAYERS];
-    const INDEX ctPlayers = SetAllPlayersStats(3); // sort by score
+    const INDEX ctPlayers = HUD_SetAllPlayersStats(3); // sort by score
 
     // for each player
     PlayerStats psSquadLevel = PlayerStats();

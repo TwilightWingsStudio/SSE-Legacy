@@ -170,7 +170,7 @@ extern void HUD_DrawAnchoredBarEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT 
   // determine color
   COLOR col = colBar;
   if (col == NONE) {
-    col = GetCurrentColor( fNormValue);
+    col = HUD_GetCurrentColor( fNormValue);
   }
   
   switch (ehPos)
@@ -273,7 +273,7 @@ extern void HUD_DrawAnchroredIconEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOA
   
   // Determine color
   COLOR col = colDefault;
-  if (col == NONE) col = GetCurrentColor( fNormValue);
+  if (col == NONE) col = HUD_GetCurrentColor( fNormValue);
 
   // determine blinking state
   if (bBlink && fNormValue<=(_cttHUD.ctt_fLowMedium/2)) {
@@ -357,7 +357,7 @@ extern void HUD_DrawAnchoredTextEx( FLOAT fPosX, FLOAT fPosY, EHUDHorAnchorType 
   // determine color
   COLOR col = colDefault;
   if (col == NONE) {
-    col = GetCurrentColor( fNormValue);
+    col = HUD_GetCurrentColor( fNormValue);
   }
 
   FLOAT fOriginX = fPosX;
@@ -426,7 +426,7 @@ extern void HUD_DrawAnchoredTextInRectEx(FLOAT2D vPos, FLOAT2D vSize, EHUDHorAnc
   // determine color
   COLOR col = colDefault;
   if (col == NONE) {
-    col = GetCurrentColor( fNormValue);
+    col = HUD_GetCurrentColor( fNormValue);
   }
 
   FLOAT fOriginX = vPos(1);

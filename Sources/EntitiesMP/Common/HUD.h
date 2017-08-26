@@ -69,7 +69,7 @@ extern TIME _tmLast;
 
 extern struct ColorTransitionTable &_cttHUD;
 
-extern COLOR GetCurrentColor( FLOAT fNormalizedValue);
+extern COLOR HUD_GetCurrentColor( FLOAT fNormalizedValue);
 
 extern void HUD_DrawAnchoredRectEx(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, COLOR colRect);
 extern void HUD_DrawAnchoredRect(FLOAT fPosX, FLOAT fPosY, FLOAT fSizeX, FLOAT fSizeY, EHUDHorAnchorType ehPos, EHUDVerAnchorType evPos, COLOR colRect);

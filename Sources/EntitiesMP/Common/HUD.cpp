@@ -359,7 +359,7 @@ static INDEX bit_count(INDEX iValue)
 // --------------------------------------------------------------------------------------
 // Prepare color transitions.
 // --------------------------------------------------------------------------------------
-static void PrepareColorTransitions( COLOR colFine, COLOR colHigh, COLOR colMedium, COLOR colLow,
+static void HUD_PrepareColorTransitions( COLOR colFine, COLOR colHigh, COLOR colMedium, COLOR colLow,
                                      FLOAT fMediumHigh, FLOAT fLowMedium, BOOL bSmooth)
 {
   _cttHUD.ctt_colFine     = colFine;
@@ -375,7 +375,7 @@ static void PrepareColorTransitions( COLOR colFine, COLOR colHigh, COLOR colMedi
 // Calculates shake ammount and color value depanding on value change.
 // --------------------------------------------------------------------------------------
 #define SHAKE_TIME (2.0f)
-static COLOR AddShaker( PIX const pixAmmount, INDEX const iCurrentValue, INDEX &iLastValue,
+static COLOR HUD_AddShaker( PIX const pixAmmount, INDEX const iCurrentValue, INDEX &iLastValue,
                         TIME &tmChanged, FLOAT &fMoverX, FLOAT &fMoverY)
 {
   // update shaking if needed
@@ -412,7 +412,7 @@ static COLOR AddShaker( PIX const pixAmmount, INDEX const iCurrentValue, INDEX &
 // --------------------------------------------------------------------------------------
 // Get current color from local color transitions table.
 // --------------------------------------------------------------------------------------
-extern COLOR GetCurrentColor( FLOAT fNormalizedValue)
+extern COLOR HUD_GetCurrentColor( FLOAT fNormalizedValue)
 {
   // if value is in 'low' zone just return plain 'low' alert color
   if (fNormalizedValue < _cttHUD.ctt_fLowMedium) return( _cttHUD.ctt_colLow & 0xFFFFFF00);
@@ -463,7 +463,7 @@ extern COLOR GetCurrentColor( FLOAT fNormalizedValue)
 // --------------------------------------------------------------------------------------
 // Fill array with players' statistics (returns current number of players in game).
 // --------------------------------------------------------------------------------------
-extern INDEX SetAllPlayersStats( INDEX iSortKey)
+extern INDEX HUD_SetAllPlayersStats( INDEX iSortKey)
 {
   // determine maximum number of players for this session
   INDEX iPlayers    = 0;
@@ -555,7 +555,7 @@ static void HUD_DrawIcon( FLOAT fCenterX, FLOAT fCenterY, CTextureObject &toIcon
   
   // determine color
   COLOR col = colDefault;
-  if (col==NONE) col = GetCurrentColor( fNormValue);
+  if (col==NONE) col = HUD_GetCurrentColor( fNormValue);
   // determine blinking state
   if (bBlink && fNormValue<=(_cttHUD.ctt_fLowMedium/2)) {
     // activate blinking only if value is <= half the low edge
@@ -597,7 +597,7 @@ static void HUD_DrawText( FLOAT fCenterX, FLOAT fCenterY, const CTString &strTex
   // determine color
   COLOR col = colDefault;
   if (col == NONE) {
-    col = GetCurrentColor( fNormValue);
+    col = HUD_GetCurrentColor( fNormValue);
   }
 
   // determine location
@@ -617,7 +617,7 @@ static void HUD_DrawBar( FLOAT fCenterX, FLOAT fCenterY, PIX pixSizeX, PIX pixSi
 {
   // determine color
   COLOR col = colDefault;
-  if (col==NONE) col = GetCurrentColor( fNormValue);
+  if (col==NONE) col = HUD_GetCurrentColor( fNormValue);
 
   // determine location and size
   PIX pixCenterI = (PIX)(fCenterX*_pixDPWidth  / 640.0f);
@@ -651,7 +651,7 @@ static void HUD_DrawBar( FLOAT fCenterX, FLOAT fCenterY, PIX pixSizeX, PIX pixSi
 }
 
 // --------------------------------------------------------------------------------------
-static void DrawRotatedQuad( class CTextureObject *_pTO, FLOAT fX, FLOAT fY, FLOAT fSize, ANGLE aAngle, COLOR col)
+static void HUD_DrawRotatedQuad( class CTextureObject *_pTO, FLOAT fX, FLOAT fY, FLOAT fSize, ANGLE aAngle, COLOR col)
 {
   if (_pTO->GetData() == NULL) return;
   if (_pTO->GetData()->ad_Anims == NULL) return;
@@ -675,7 +675,7 @@ static void DrawRotatedQuad( class CTextureObject *_pTO, FLOAT fX, FLOAT fY, FLO
 }
 
 // --------------------------------------------------------------------------------------
-static void DrawAspectCorrectTextureCentered( class CTextureObject *_pTO, FLOAT fX, FLOAT fY, FLOAT fWidth, COLOR col)
+static void HUD_DrawAspectCorrectTextureCentered( class CTextureObject *_pTO, FLOAT fX, FLOAT fY, FLOAT fWidth, COLOR col)
 {
   if (_pTO->GetData() == NULL) return;
   if (_pTO->GetData()->ad_Anims == NULL) return;
@@ -778,7 +778,7 @@ static void HUD_DrawSniperMask( void )
       }
     }
     
-    DrawRotatedQuad(&_toSniperWheel, fCenterI, fCenterJ, 40.0f*_fYResolutionScaling, aAngle, colWhell|ulSniperScopeWheelOpacity);
+    HUD_DrawRotatedQuad(&_toSniperWheel, fCenterI, fCenterJ, 40.0f*_fYResolutionScaling, aAngle, colWhell|ulSniperScopeWheelOpacity);
   }
 
   FLOAT fTM = _pTimer->GetLerpedCurrentTick();
@@ -795,7 +795,7 @@ static void HUD_DrawSniperMask( void )
       colLED = 0xFF442200;
     }
     
-    DrawAspectCorrectTextureCentered(&_toSniperLed, fCenterI-37.0f*_fYResolutionScaling,
+    HUD_DrawAspectCorrectTextureCentered(&_toSniperLed, fCenterI-37.0f*_fYResolutionScaling,
       fCenterJ+36.0f*_fYResolutionScaling, 15.0f*_fYResolutionScaling, colLED|ulSniperScopeLedOpacity);
   }
 
@@ -833,7 +833,7 @@ static void HUD_DrawSniperMask( void )
     if (hud_fSniperScopeRangeIconOpacity > 0.0F) {
       ULONG ulSniperScopeRangeIconOpacity = NormFloatToByte(hud_fSniperScopeRangeIconOpacity);
 
-      DrawAspectCorrectTextureCentered(&_toSniperArrow, fCenterI-_fLeftX*_fYResolutionScaling,
+      HUD_DrawAspectCorrectTextureCentered(&_toSniperArrow, fCenterI-_fLeftX*_fYResolutionScaling,
         fCenterJ-_fLeftYU*_fYResolutionScaling, _fIconSize*_fYResolutionScaling, 0xFFCC3300|ulSniperScopeRangeIconOpacity );
     }
 
@@ -855,7 +855,7 @@ static void HUD_DrawSniperMask( void )
     if (hud_fSniperScopeZoomIconOpacity > 0.0F) {
       ULONG ulSniperScopeZoomIconOpacity = NormFloatToByte(hud_fSniperScopeZoomIconOpacity);
 
-      DrawAspectCorrectTextureCentered(&_toSniperEye,   fCenterI+_fRightX*_fYResolutionScaling,
+      HUD_DrawAspectCorrectTextureCentered(&_toSniperEye,   fCenterI+_fRightX*_fYResolutionScaling,
         fCenterJ-_fRightYU*_fYResolutionScaling, _fIconSize*_fYResolutionScaling, 0xFFCC3300|ulSniperScopeZoomIconOpacity ); //SE_COL_ORANGE_L
     }
 
@@ -876,7 +876,7 @@ static void HUD_DrawSniperMask( void )
 // --------------------------------------------------------------------------------------
 // Fill weapon and ammo table with current state.
 // --------------------------------------------------------------------------------------
-static void FillWeaponAmmoTables(void)
+static void HUD_FillWeaponAmmoTables(void)
 {
   // ammo quantities
   _aaiAmmo[0].ai_iAmmoAmmount    = _penWeapons->m_iShells;
@@ -1021,8 +1021,8 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   {
     fValue = Clamp(ceil(_penPlayer->GetHealth()), 0.0f, 999.0F);
     
-    PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
-    colDefault = AddShaker( 5, fValue, penLast->m_iLastHealth, penLast->m_tmHealthChanged, fMoverX, fMoverY);
+    HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+    colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastHealth, penLast->m_tmHealthChanged, fMoverX, fMoverY);
 
     HUD_DrawAnchoredRect(8, 8, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
@@ -1049,8 +1049,8 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       ptoCurrentArmor = &_toArmorLarge;
     }
     
-    PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
-    colDefault = AddShaker( 5, fValue, penLast->m_iLastArmor, penLast->m_tmArmorChanged, fMoverX, fMoverY);
+    HUD_PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
+    colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastArmor, penLast->m_tmArmorChanged, fMoverX, fMoverY);
 
     HUD_DrawAnchoredRect( 8, 48, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect(44, 48, 80, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
@@ -1089,7 +1089,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
       CTString strCurrentAmmo;
       strCurrentAmmo.PrintF( "%d", (SLONG)ceil(fValue));
-      PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.30f, 0.15f, FALSE);
+      HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.30f, 0.15f, FALSE);
         
       if (bAnyColt) {
         ptoCurrentAmmo = &_toAColt;
@@ -1108,7 +1108,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     }
   }
   
-  FillWeaponAmmoTables();
+  HUD_FillWeaponAmmoTables();
   
   // if weapon change is in progress
   hud_tmWeaponsOnScreen = Clamp( hud_tmWeaponsOnScreen, 0.0f, 10.0f);
@@ -1470,7 +1470,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
     if (fNormValue > 0)
     {
-      PrepareColorTransitions( colMax, colMax, colTop, C_RED, 0.5f, 0.25f, FALSE); // prepare and draw boss energy info
+      HUD_PrepareColorTransitions( colMax, colMax, colTop, C_RED, 0.5f, 0.25f, FALSE); // prepare and draw boss energy info
 
       HUD_DrawAnchoredRect( -130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
       HUD_DrawAnchroredIcon(-130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, *ptoBossIcon, C_WHITE|CT_OPAQUE, 1.0F, FALSE);
@@ -1492,7 +1492,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
     if (_penPlayer->IsConnected() && (_penPlayer->GetFlags()&ENF_ALIVE) && fValue < (tmMaxHoldBreath - 1.0F))
     {
-      PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+      HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
       FLOAT fNormValue = fValue / tmMaxHoldBreath;
       fNormValue = ClampDn(fNormValue, 0.0f);
       
@@ -1579,7 +1579,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   
   // PowerUps dock.
   {
-    PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.66f, 0.33f, FALSE);
+    HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.66f, 0.33f, FALSE);
     
     TIME *ptmPowerups = (TIME*)&_penPlayer->m_tmInvisibility;
     TIME *ptmPowerupsMax = (TIME*)&_penPlayer->m_tmInvisibilityMax;
@@ -1621,7 +1621,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   // Ammo dock.
   if (!GetSP()->sp_bInfiniteAmmo)
   {
-    PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+    HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
     
     FLOAT fNormValue = 0.0F;
     
@@ -1788,8 +1788,8 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
   {
     fValue = Clamp(ceil(_penPlayer->GetHealth()), 0.0f, 999.0F);
     
-    PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
-    colDefault = AddShaker( 5, fValue, penLast->m_iLastHealth, penLast->m_tmHealthChanged, fMoverX, fMoverY);
+    HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+    colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastHealth, penLast->m_tmHealthChanged, fMoverX, fMoverY);
 
     HUD_DrawAnchoredRect(8, 8, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
@@ -1818,8 +1818,8 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       ptoCurrentArmor = &_toArmorLarge;
     }
     
-    PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
-    colDefault = AddShaker( 5, fValue, penLast->m_iLastArmor, penLast->m_tmArmorChanged, fMoverX, fMoverY);
+    HUD_PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
+    colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastArmor, penLast->m_tmArmorChanged, fMoverX, fMoverY);
     
     HUD_DrawAnchoredRect( 8, 48, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect(44, 48, 80, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
@@ -1861,7 +1861,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
       CTString strCurrentAmmo;
       strCurrentAmmo.PrintF( "%d", (SLONG)ceil(fValue));
-      PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.30f, 0.15f, FALSE);
+      HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.30f, 0.15f, FALSE);
       
       // [SSE] Colt Bullets
       if (bAnyColt) {
@@ -1884,12 +1884,12 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
   CTextureObject *ptoWantedWeapon = NULL;
   ptoWantedWeapon  = _awiWeapons[iWantedWeapon].wi_ptoWeapon;
   
-  FillWeaponAmmoTables();
+  HUD_FillWeaponAmmoTables();
 
   // Ammo dock.
   if (!GetSP()->sp_bInfiniteAmmo)
   {
-    PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+    HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
     
     FLOAT fNormValue = 0.0F;
     
@@ -1957,7 +1957,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
   // PowerUps dock.
   {
-    PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.66f, 0.33f, FALSE);
+    HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.66f, 0.33f, FALSE);
     
     TIME *ptmPowerups = (TIME*)&_penPlayer->m_tmInvisibility;
     TIME *ptmPowerupsMax = (TIME*)&_penPlayer->m_tmInvisibilityMax;
@@ -2179,7 +2179,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
     if (fNormValue > 0)
     {
-      PrepareColorTransitions( colMax, colMax, colTop, C_RED, 0.5f, 0.25f, FALSE); // prepare and draw boss energy info
+      HUD_PrepareColorTransitions( colMax, colMax, colTop, C_RED, 0.5f, 0.25f, FALSE); // prepare and draw boss energy info
 
       HUD_DrawAnchoredRect( -130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
       HUD_DrawAnchroredIcon(-130, 48, 16, 16, EHHAT_CENTER, EHVAT_TOP, *ptoBossIcon, C_WHITE|CT_OPAQUE, 1.0F, FALSE);
@@ -2201,7 +2201,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
     if (_penPlayer->IsConnected() && (_penPlayer->GetFlags()&ENF_ALIVE) && fValue < (tmMaxHoldBreath - 1.0F))
     {
-      PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+      HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
       FLOAT fNormValue = fValue / tmMaxHoldBreath;
       fNormValue = ClampDn(fNormValue, 0.0f);
       
@@ -2246,7 +2246,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     }
     if (bCooperative) eKey = (SortKeys)Clamp( (INDEX)eKey, 0L, 3L);
     if (eKey==PSK_HEALTH && (bScoreMatch || bFragMatch)) { eKey = PSK_NAME; }; // prevent health snooping in deathmatch
-    INDEX iPlayers = SetAllPlayersStats(eKey);
+    INDEX iPlayers = HUD_SetAllPlayersStats(eKey);
 
     // loop thru players
     for (INDEX i=0; i<iPlayers; i++)
@@ -2382,9 +2382,9 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     {
       CTString strLimitsInfo = "";
 
-      extern INDEX SetAllPlayersStats( INDEX iSortKey);
+      extern INDEX HUD_SetAllPlayersStats( INDEX iSortKey);
       // fill players table
-      const INDEX ctPlayers = SetAllPlayersStats(bFragMatch?5:3); // sort by frags or by score
+      const INDEX ctPlayers = HUD_SetAllPlayersStats(bFragMatch?5:3); // sort by frags or by score
       // find maximum frags/score that one player has
       INDEX iMaxFrags = LowerLimit(INDEX(0));
       INDEX iMaxScore = LowerLimit(INDEX(0));
@@ -2754,10 +2754,10 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   fValue = ClampDn( _penPlayer->GetHealth(), 0.0f);  // never show negative health
   fNormValue = fValue / TOP_HEALTH;
   strValue.PrintF( "%d", (SLONG)ceil(fValue));
-  PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+  HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
   fRow = pixBottomBound-fHalfUnit;
   fCol = pixLeftBound+fHalfUnit;
-  colDefault = AddShaker( 5, fValue, penLast->m_iLastHealth, penLast->m_tmHealthChanged, fMoverX, fMoverY);
+  colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastHealth, penLast->m_tmHealthChanged, fMoverX, fMoverY);
   HUD_DrawBorder( fCol+fMoverX, fRow+fMoverY, fOneUnit, fOneUnit, colBorder);
   fCol += fAdvUnit+fChrUnit*3/2 -fHalfUnit;
   HUD_DrawBorder( fCol, fRow, fChrUnit*3, fOneUnit, colBorder);
@@ -2770,10 +2770,10 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   if (fValue > 0.0f) {
     fNormValue = fValue/TOP_ARMOR;
     strValue.PrintF( "%d", (SLONG)ceil(fValue));
-    PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
+    HUD_PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
     fRow = pixBottomBound- (fNextUnit+fHalfUnit);//*_pDP->dp_fWideAdjustment;
     fCol = pixLeftBound+    fHalfUnit;
-    colDefault = AddShaker( 3, fValue, penLast->m_iLastArmor, penLast->m_tmArmorChanged, fMoverX, fMoverY);
+    colDefault = HUD_AddShaker( 3, fValue, penLast->m_iLastArmor, penLast->m_tmArmorChanged, fMoverX, fMoverY);
     HUD_DrawBorder( fCol+fMoverX, fRow+fMoverY, fOneUnit, fOneUnit, colBorder);
     fCol += fAdvUnit+fChrUnit*3/2 -fHalfUnit;
     HUD_DrawBorder( fCol, fRow, fChrUnit*3, fOneUnit, colBorder);
@@ -2808,7 +2808,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
     fValue = _penWeapons->GetAmmo();
     fNormValue = fValue / fMaxValue;
     strValue.PrintF( "%d", (SLONG)ceil(fValue));
-    PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.30f, 0.15f, FALSE);
+    HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.30f, 0.15f, FALSE);
     BOOL bDrawAmmoIcon = _fCustomScaling<=1.0f;
 
     // [SSE] Colt Bullets
@@ -2819,7 +2819,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
     // draw ammo, value and weapon
     fRow = pixBottomBound-fHalfUnit;
     fCol = 175 + fHalfUnit;
-    colDefault = AddShaker( 4, fValue, penLast->m_iLastAmmo, penLast->m_tmAmmoChanged, fMoverX, fMoverY);
+    colDefault = HUD_AddShaker( 4, fValue, penLast->m_iLastAmmo, penLast->m_tmAmmoChanged, fMoverX, fMoverY);
     HUD_DrawBorder( fCol+fMoverX, fRow+fMoverY, fOneUnit, fOneUnit, colBorder);
     fCol += fAdvUnit+fChrUnit*3/2 -fHalfUnit;
     HUD_DrawBorder( fCol, fRow, fChrUnit*3, fOneUnit, colBorder);
@@ -2848,7 +2848,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   INDEX i;
   FLOAT fAdv;
   COLOR colIcon, colBar;
-  PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+  HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
   // reduce the size of icon slightly
   _fCustomScaling = ClampDn( _fCustomScaling*0.8f, 0.5f);
   const FLOAT fOneUnitS  = fOneUnit  * 0.8f;
@@ -2860,7 +2860,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   fRow = pixBottomBound-fHalfUnitS;
   fCol = pixRightBound -fHalfUnitS;
   const FLOAT fBarPos = fHalfUnitS * 0.7f;
-  FillWeaponAmmoTables();
+  HUD_FillWeaponAmmoTables();
 
   FLOAT fBombCount = _penWeapons->m_iSeriousBombs;
   BOOL  bBombFiring = FALSE;
@@ -2914,7 +2914,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
       if (ai.ai_iAmmoAmmount <= 0) colIcon = C_mdGRAY;
 
       fNormValue = (FLOAT)ai.ai_iAmmoAmmount / ai.ai_iMaxAmmoAmmount;
-      colBar = AddShaker( 4, ai.ai_iAmmoAmmount, ai.ai_iLastAmmoAmmount, ai.ai_tmAmmoChanged, fMoverX, fMoverY);
+      colBar = HUD_AddShaker( 4, ai.ai_iAmmoAmmount, ai.ai_iLastAmmoAmmount, ai.ai_tmAmmoChanged, fMoverX, fMoverY);
       HUD_DrawBorder( fCol,         fRow+fMoverY, fOneUnitS, fOneUnitS, colBorder);
       HUD_DrawIcon(   fCol,         fRow+fMoverY, *_aaiAmmo[i].ai_ptoAmmo, colIcon, fNormValue, FALSE, 32, 32);
       HUD_DrawBar(    fCol+fBarPos, fRow+fMoverY, fOneUnitS/5, fOneUnitS-2, BO_DOWN, colBar, fNormValue);
@@ -2924,7 +2924,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   }
 
   // draw powerup(s) if needed
-  PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.66f, 0.33f, FALSE);
+  HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.66f, 0.33f, FALSE);
   TIME *ptmPowerups = (TIME*)&_penPlayer->m_tmInvisibility;
   TIME *ptmPowerupsMax = (TIME*)&_penPlayer->m_tmInvisibilityMax;
   fRow = pixBottomBound-fOneUnitS-fAdvUnitS;
@@ -3019,7 +3019,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
       fRow = pixTopBound + fOneUnit + fNextUnit;
       fCol = 280.0f;
       fAdv = fAdvUnit + fOneUnit*4/2 - fHalfUnit;
-      PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+      HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
       fNormValue = fValue / tmMaxHoldBreath;
       fNormValue = ClampDn(fNormValue, 0.0f);
 
@@ -3073,8 +3073,8 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
     if (fNormValue > 0)
     {
       // prepare and draw boss energy info
-      //PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
-      PrepareColorTransitions( colMax, colMax, colTop, C_RED, 0.5f, 0.25f, FALSE);
+      //HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
+      HUD_PrepareColorTransitions( colMax, colMax, colTop, C_RED, 0.5f, 0.25f, FALSE);
 
       fRow = pixTopBound + fOneUnit + fNextUnit;
       fCol = 184.0f;
@@ -3122,7 +3122,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
     }
     if (bCooperative) eKey = (SortKeys)Clamp( (INDEX)eKey, 0L, 3L);
     if (eKey==PSK_HEALTH && (bScoreMatch || bFragMatch)) { eKey = PSK_NAME; }; // prevent health snooping in deathmatch
-    INDEX iPlayers = SetAllPlayersStats(eKey);
+    INDEX iPlayers = HUD_SetAllPlayersStats(eKey);
 
     // loop thru players
     for (INDEX i=0; i<iPlayers; i++)
@@ -3262,9 +3262,9 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
         strLimitsInfo.PrintF("%s^cFFFFFF%s: %s\n", strLimitsInfo, TRANS("TIME LEFT"), TimeToString(fTimeLeft));
       }
 
-      extern INDEX SetAllPlayersStats( INDEX iSortKey);
+      extern INDEX HUD_SetAllPlayersStats( INDEX iSortKey);
       // fill players table
-      const INDEX ctPlayers = SetAllPlayersStats(bFragMatch?5:3); // sort by frags or by score
+      const INDEX ctPlayers = HUD_SetAllPlayersStats(bFragMatch?5:3); // sort by frags or by score
       // find maximum frags/score that one player has
       INDEX iMaxFrags = LowerLimit(INDEX(0));
       INDEX iMaxScore = LowerLimit(INDEX(0));
