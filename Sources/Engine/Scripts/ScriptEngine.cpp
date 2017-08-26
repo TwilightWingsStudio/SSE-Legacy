@@ -26,6 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <luajit/src/lua.hpp>
 #include <luajit/src/lualib.h>
 #include <luajit/src/lauxlib.h>
+#include "luajit/src/lj_gc.h"
 
 #include <Engine/Scripts/ScriptEngine.h>
 #include <Engine/Scripts/ScriptEngine_internal.h>
@@ -163,11 +164,14 @@ void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScr
     return;
   }
   
+  FLOAT fMemoryUsed = G(state)->gc.total/1024.0;
+  
   lua_close(state);
   
   CTimerValue tv1 = _pTimer->GetHighPrecisionTimer();
   
   if (bDebugMessages) {
     CPrintF("[LUA][INF] Script executed in %.4f s\n", (tv1-tv0).GetSeconds());
+    CPrintF("[LUA][INF] Memory used: %.4f K\n", fMemoryUsed);
   }
 }

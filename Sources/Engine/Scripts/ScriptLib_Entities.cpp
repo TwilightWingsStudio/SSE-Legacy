@@ -222,7 +222,7 @@ static int l_entities_IsEntityAlive(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
-// Checks if entity is alive
+// Checks if entity is dead
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsEntityDead"
 static int l_entities_IsEntityDead(lua_State* L)

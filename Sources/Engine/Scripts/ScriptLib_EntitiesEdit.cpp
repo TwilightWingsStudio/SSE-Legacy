@@ -156,6 +156,48 @@ static int l_entitiesed_SetEntityLevel(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
+// Sets entity money to given value.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "SetEntityMoney"
+static int l_entitiesed_SetEntityMoney(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 2);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  INDEX iMoney = ClampDn(luaL_checkinteger (L, 2), 0);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+
+  static_cast<CLiveEntity*>(penEntity)->SetMoney(iMoney);
+
+  return 0;
+}
+
+// --------------------------------------------------------------------------------------
+// Sets entity supplies to given value.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "SetEntitySupplies"
+static int l_entitiesed_SetEntitySupplies(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 2);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  INDEX iSupplies = ClampDn(luaL_checkinteger (L, 2), 0);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+
+  static_cast<CLiveEntity*>(penEntity)->SetSupplies(iSupplies);
+
+  return 0;
+}
+
+// --------------------------------------------------------------------------------------
 // Gets entity property value by its name.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntityPropByName"
@@ -390,6 +432,8 @@ static const struct luaL_Reg entitiesedLib [] = {
   {"SetEntityArmor", l_entitiesed_SetEntityArmor},
   {"SetEntityShields", l_entitiesed_SetEntityShields},
   {"SetEntityLevel", l_entitiesed_SetEntityLevel},
+  {"SetEntityMoney", l_entitiesed_SetEntityMoney},
+  {"SetEntitySupplies", l_entitiesed_SetEntitySupplies},
   
   //////// Working with properties ////////
   {"SetEntityPropByName", l_entitiesed_SetEntityPropByName},

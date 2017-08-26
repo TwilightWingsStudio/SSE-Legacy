@@ -44,8 +44,25 @@ static int l_sebase_print(lua_State* L)
   return 0;
 }
 
+static int l_sebase_debug(lua_State* L)
+{
+  INDEX ctArgs = lua_gettop(L);
+  
+  CTString strResult;
+
+  for (int i = 1; i <= ctArgs; i++) {
+    strResult.PrintF("%s%s", strResult, lua_tostring(L, i));
+  }
+  
+  //CPrintF("print() redefinition!\n");
+  CPrintF("[LUA][DBG] %s\n", strResult);
+
+  return 0;
+}
+
 static const struct luaL_Reg sebaseLib [] = {
   {"print", l_sebase_print},
+  {"debug", l_sebase_debug},
   {NULL, NULL} /* end of array */
 };
 
