@@ -109,12 +109,29 @@ void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScr
     CPrintF("[LUA][INF] Running script '%s'...\n", fnmScript);
   }
 
-  if (iFile != EFP_FILE) {
+  if (iFile != EFP_FILE && iFile != EFP_BASEZIP && iFile != EFP_MODZIP) {
     CPrintF("[LUA][ERR] Unable to run script! Path points to not a file!\n");
     return;
   }
   
-  result = luaL_loadfile(state, (const char*)fnmFullPath);
+
+  CTString strBuffer;
+
+  CTFileStream strm;
+  try {
+    strm.Open_t(fnmScript);
+    strBuffer.ReadUntilEOF_t(strm);
+  } catch (char *strError) {
+    CPrintF("[LUA][ERR] %s\n", strError);
+    return;
+  }
+
+  if (bDebugMessages) {
+    CPrintF("[LUA][INF] Loaded: %lu byte(s)\n", strBuffer.Length());
+  }
+
+  //result = luaL_loadfile(state, (const char*)fnmFullPath);
+  result = luaL_loadbuffer(state, strBuffer.str_String, strBuffer.Length(), fnmScript);
   
   // If error occured during the script file loading then print it!
   if (result != 0)
