@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GameMP/SEColors.h"
 
 #include "HUD.h"
+#include "HUD_internal.h"
 
 #include <Engine/Graphics/DrawPort.h>
 
@@ -35,14 +36,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define TOP_HEALTH 100
 
 static CListHead _lhAllHUDTextures;
-
-class CHUDTextureEntry
-{
-  public:
-    CListNode he_lnNode;
-    CTFileName he_fnTexture;
-    CTextureObject *he_ptoTexture;
-};
 
 // Cheats
 extern INDEX cht_bEnable;
@@ -93,16 +86,6 @@ extern INDEX hud_iHUDType;
 extern BOOL hud_bRadarDraw;
 */
 //
-
-// player statistics sorting keys
-enum SortKeys {
-  PSK_NAME    = 1,
-  PSK_HEALTH  = 2,
-  PSK_SCORE   = 3,
-  PSK_MANA    = 4,
-  PSK_FRAGS   = 5,
-  PSK_DEATHS  = 6,
-};
 
 extern const INDEX aiWeaponsRemap[19];
 
@@ -211,26 +194,6 @@ static CTextureObject _toSniperLed;
 static BOOL _bHUDFontsLoaded = FALSE; // [SSE] HUD No Crash If No Assets
 
 extern struct ColorTransitionTable &_cttHUD = *(new ColorTransitionTable);
-
-// ammo's info structure
-struct AmmoInfo {
-  CTextureObject    *ai_ptoAmmo;
-  struct WeaponInfo *ai_pwiWeapon1;
-  struct WeaponInfo *ai_pwiWeapon2;
-  INDEX ai_iAmmoAmmount;
-  INDEX ai_iMaxAmmoAmmount;
-  INDEX ai_iLastAmmoAmmount;
-  TIME  ai_tmAmmoChanged;
-  BOOL  ai_bHasWeapon;
-};
-
-// weapons' info structure
-struct WeaponInfo {
-  enum WeaponType  wi_wtWeapon;
-  CTextureObject  *wi_ptoWeapon;
-  struct AmmoInfo *wi_paiAmmo;
-  BOOL wi_bHasWeapon;
-};
 
 extern struct WeaponInfo _awiWeapons[18];
 static struct AmmoInfo _aaiAmmo[9] = {
@@ -712,14 +675,16 @@ static void HUD_DrawSniperMask( void )
   const FLOAT fTexSizeJ = ptd->GetPixHeight();
   
   // [SSE] Sniper Scope
-  hud_fSniperScopeBaseOpacity = Clamp(hud_fSniperScopeBaseOpacity, 0.0f, 1.0f);
-  hud_fSniperScopeWheelOpacity = Clamp(hud_fSniperScopeWheelOpacity, 0.0f, 1.0f);
-  hud_fSniperScopeLedOpacity = Clamp(hud_fSniperScopeLedOpacity, 0.0f, 1.0f);
-  hud_fSniperScopeRangeTextOpacity = Clamp(hud_fSniperScopeRangeTextOpacity, 0.0f, 1.0f);
-  hud_fSniperScopeRangeIconOpacity = Clamp(hud_fSniperScopeRangeIconOpacity, 0.0f, 1.0f);
-  hud_fSniperScopeZoomTextOpacity = Clamp(hud_fSniperScopeZoomTextOpacity, 0.0f, 1.0f);
-  hud_fSniperScopeZoomIconOpacity = Clamp(hud_fSniperScopeZoomIconOpacity, 0.0f, 1.0f);
-
+  {
+    hud_fSniperScopeBaseOpacity = Clamp(hud_fSniperScopeBaseOpacity, 0.0f, 1.0f);
+    hud_fSniperScopeWheelOpacity = Clamp(hud_fSniperScopeWheelOpacity, 0.0f, 1.0f);
+    hud_fSniperScopeLedOpacity = Clamp(hud_fSniperScopeLedOpacity, 0.0f, 1.0f);
+    hud_fSniperScopeRangeTextOpacity = Clamp(hud_fSniperScopeRangeTextOpacity, 0.0f, 1.0f);
+    hud_fSniperScopeRangeIconOpacity = Clamp(hud_fSniperScopeRangeIconOpacity, 0.0f, 1.0f);
+    hud_fSniperScopeZoomTextOpacity = Clamp(hud_fSniperScopeZoomTextOpacity, 0.0f, 1.0f);
+    hud_fSniperScopeZoomIconOpacity = Clamp(hud_fSniperScopeZoomIconOpacity, 0.0f, 1.0f);
+  }
+  
   // main sniper mask
   if (hud_fSniperScopeBaseOpacity > 0.0F) {
     ULONG ulSniperScopeBaseOpacity = NormFloatToByte(hud_fSniperScopeBaseOpacity);
