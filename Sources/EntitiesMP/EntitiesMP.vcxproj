@@ -193,6 +193,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="EnemySettings.cpp" />
     <ClCompile Include="EntityParticles.cpp" />
     <ClCompile Include="FlameInflictor.cpp" />
+    <ClCompile Include="GenericKeyItem.cpp" />
     <ClCompile Include="HudBossBarDisplay.cpp" />
     <ClCompile Include="HudPicDisplay.cpp" />
     <ClCompile Include="MBTeleporter.cpp" />
@@ -442,6 +443,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="Common\Flags.h" />
     <ClInclude Include="Common\GameInterface.h" />
     <ClInclude Include="Common\HUD.h" />
+    <ClInclude Include="Common\HUD_internal.h" />
     <ClInclude Include="Common\Particles.h" />
     <ClInclude Include="Common\PathFinding.h" />
     <ClInclude Include="Condition.h" />
@@ -454,6 +456,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="EnemySettings_tables.h" />
     <ClInclude Include="EntityParticles.h" />
     <ClInclude Include="EntityParticles_tables.h" />
+    <ClInclude Include="GenericKeyItem.h" />
+    <ClInclude Include="GenericKeyItem_tables.h" />
     <ClInclude Include="HudBossBarDisplay.h" />
     <ClInclude Include="HudBossBarDisplay_tables.h" />
     <ClInclude Include="HudPicDisplay.h" />
@@ -3227,6 +3231,19 @@ ecc EntitiesMP/%(Filename).es </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="GenericKeyItem.es">
+      <FileType>Document</FileType>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
 ecc EntitiesMP/%(Filename).es </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)

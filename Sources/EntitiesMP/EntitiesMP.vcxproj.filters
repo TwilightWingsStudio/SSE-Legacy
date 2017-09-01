@@ -658,6 +658,9 @@
     <ClCompile Include="HudBossBarDisplay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GenericKeyItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1815,6 +1818,15 @@
     <ClInclude Include="HudBossBarDisplay_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Common\HUD_internal.h">
+      <Filter>Header Files\Common headers</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericKeyItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericKeyItem_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2792,10 +2804,11 @@
     <CustomBuild Include="HudPicDisplay.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="HudBossBarDisplay.es">
-      <Filter>Class Files\Tools</Filter>
-    </None>
+    <CustomBuild Include="HudBossBarDisplay.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GenericKeyItem.es">
+      <Filter>Class Files\Items</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

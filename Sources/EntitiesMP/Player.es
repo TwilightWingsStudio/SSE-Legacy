@@ -57,6 +57,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "EntitiesMP/CreditsHolder.h"
 #include "EntitiesMP/HudPicHolder.h"
 
+#include "EntitiesMP/GenericKeyItem.h"
 #include "EntitiesMP/HudPicDisplay.h"
 
 #include "EntitiesMP/ProgressiveSwitch.h"
@@ -4791,16 +4792,25 @@ functions:
           return FALSE;
         }
       }
+      
+      EKey &eKey = (EKey&)ee;
+      INDEX iKeyID = eKey.iKeyID;
+      BOOL bGenericKey = eKey.bGenericKey;
 
       // make key mask
-      ULONG ulKey = 1<<INDEX(((EKey&)ee).kitType);
-      EKey &eKey = (EKey&)ee;
-      if (eKey.kitType == KIT_HAWKWINGS01DUMMY || eKey.kitType == KIT_HAWKWINGS02DUMMY
-        || eKey.kitType == KIT_TABLESDUMMY || eKey.kitType == KIT_JAGUARGOLDDUMMY)
-      {
-        ulKey = 0;
-      }
+      ULONG ulKey = 1 << iKeyID;
       
+      CGenericKeyItem *penGenericKey = NULL;
+
+      if (bGenericKey) {
+        penGenericKey = static_cast<CGenericKeyItem*>(&*eKey.penItem);
+      } else {
+        // CKeyItem specific.
+        if (iKeyID == KIT_HAWKWINGS01DUMMY || iKeyID == KIT_HAWKWINGS02DUMMY || iKeyID == KIT_TABLESDUMMY || iKeyID == KIT_JAGUARGOLDDUMMY) {
+          ulKey = 0;
+        }
+      }
+
       // [SSE] Gameplay - Better Keys
       if (GetSP()->sp_bSharedKeys)
       {
@@ -4809,7 +4819,14 @@ functions:
           ((CSessionProperties*)GetSP())->sp_ulPickedKeys |= ulKey;
         }
         
-        CTString strKey = GetKeyName(((EKey&)ee).kitType);
+        CTString strKey;
+
+        if (bGenericKey) {
+          strKey = penGenericKey ? penGenericKey->m_strPickUpMessage : TRANS("Key");
+        } else {
+          strKey = GetKeyName((KeyItemType)iKeyID);
+        }
+
         ItemPicked(strKey, 0);
 
         // if in cooperative
@@ -4827,7 +4844,14 @@ functions:
       // If key is not in inventory then pick it up.
       } else {
         m_ulKeys |= ulKey;
-        CTString strKey = GetKeyName(((EKey&)ee).kitType);
+        CTString strKey;
+
+        if (bGenericKey) {
+          strKey = penGenericKey ? penGenericKey->m_strPickUpMessage : TRANS("Key");
+        } else {
+          strKey = GetKeyName((KeyItemType)iKeyID);
+        }
+
         ItemPicked(strKey, 0);
 
         // if in cooperative

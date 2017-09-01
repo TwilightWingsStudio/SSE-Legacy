@@ -43,7 +43,9 @@ enum KeyItemType {
 
 // event for sending through receive item
 event EKey {
-  enum KeyItemType kitType,
+  CEntityPointer penItem,
+  INDEX iKeyID,
+  BOOL bGenericKey,
 };
 
 %{
@@ -357,7 +359,9 @@ procedures:
 
      // Prepare key to send it to entity.
     EKey eKey;
-    eKey.kitType = m_kitType;
+    eKey.penItem = NULL;
+    eKey.iKeyID = (INDEX)m_kitType;
+    eKey.bGenericKey = FALSE;
 
     // If key is received...
     if (epass.penOther->ReceiveItem(eKey))
