@@ -6487,7 +6487,7 @@ functions:
     if (cht_bSuicide)
     {
       cht_bSuicide = FALSE;
-      InflictDirectDamage(this, this, DMT_EXPLOSION, 999999.0F, GetPlacement().pl_PositionVector, FLOAT3D(0, 1, 0));
+      InflictDirectDamage(this, NULL, DMT_EXPLOSION, 999999.0F, GetPlacement().pl_PositionVector, FLOAT3D(0, 1, 0));
     }
     
     // [SSE] Spectator Camera
