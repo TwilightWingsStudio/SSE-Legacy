@@ -998,7 +998,13 @@ void CPlayer_OnEndClass(void)
 
 CTString GetDifficultyString(void)
 {
-  if (GetSP()->sp_bMental) { return TRANS("Mental"); }
+  if (GetSP()->sp_bMental) {
+    if (GetSP()->sp_gdGameDifficulty == CSessionProperties::GD_EXTREME) {
+      return TRANS("Serious Mental");
+    } else {
+      return TRANS("Mental");
+    }
+  }
 
   switch (GetSP()->sp_gdGameDifficulty) {
     case CSessionProperties::GD_TOURIST:  return TRANS("Tourist");
