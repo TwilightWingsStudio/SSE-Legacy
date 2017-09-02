@@ -41,6 +41,10 @@ properties:
 
 components:
   0 class   CLASS_BASE        "Classes\\Item.ecl",
+  
+// ************** FLARE FOR EFFECT **************
+100 texture TEXTURE_FLARE  "Models\\Items\\Flares\\Flare.tex",
+101 model   MODEL_FLARE    "Models\\Items\\Flares\\Flare.mdl",
 
 functions:
   // --------------------------------------------------------------------------------------
