@@ -21,6 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <Engine/Build.h>
 #include <Engine/Network/Network.h>
+#include <Engine/Scripts/ScriptEngine.h>
 #include <locale.h>
 
 #include "ModelsMP/Player/SeriousSam/Player.h"
@@ -982,6 +983,8 @@ void CPlayer_OnInitClass(void)
   // call player weapons persistant variable initialization
   extern void CPlayerWeapons_Init(void);
   CPlayerWeapons_Init();
+  
+  _pSendEEvent = &SendToTargetScript; // [SSE] Script Engine
 
   // initialize HUD
   InitHUD();

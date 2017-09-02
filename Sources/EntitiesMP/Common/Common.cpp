@@ -130,6 +130,11 @@ void SetBoolFromBoolEType(BOOL &bSet, BoolEType bet) {
   }
 };
 
+void SendToTargetScript(CEntity *penSendEvent, INDEX iEventType, CEntity *penCaused)
+{
+  SendToTarget(penSendEvent, (EventEType)iEventType, penCaused);
+}
+
 // send event to target
 void SendToTarget(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused) {
   // if target is valid
