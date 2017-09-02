@@ -1,4 +1,5 @@
-/* Copyright (c) 2002-2012 Croteam Ltd. 
+/* Copyright (c) 2017 by ZCaliptium
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as published by
 the Free Software Foundation
@@ -34,6 +35,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma comment(lib, "lua51.lib")
 
 CScriptEngine *_pScriptEngine = NULL;
+void (*_pSendEEvent)(CEntity* penTarget, INDEX iType, CEntity* penCaused) = NULL;
 
 static lua_State *CreateSafeState()
 {
@@ -191,4 +193,25 @@ void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScr
     CPrintF("[LUA][INF] Script executed in %.4f s\n", (tv1-tv0).GetSeconds());
     CPrintF("[LUA][INF] Memory used: %.4f K\n", fMemoryUsed);
   }
+}
+
+
+BOOL luaut_CallVoid(lua_State *L, const char *pName)
+{
+  if (L == NULL) return FALSE;
+  if (pName == NULL) return FALSE;
+  
+  lua_getglobal(L, pName); // Put function to stack.
+  
+  if(!lua_isfunction(L,-1)) {
+    lua_pop(L, 1);
+    return FALSE;
+  }
+
+  if (lua_pcall(L, 0, 0, 0) != 0) {
+    printf("error running function '%s': %s\n", pName, lua_tostring(L, -1));
+    return FALSE;
+  }
+  
+  return TRUE;
 }

@@ -1,4 +1,5 @@
-/* Copyright (c) 2002-2012 Croteam Ltd. 
+/* Copyright (c) 2017 by ZCaliptium
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as published by
 the Free Software Foundation
@@ -28,6 +29,7 @@ class ENGINE_API CScriptEngine
     void ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScript, CEntity* penCaused, INDEX aiSlots[5], BOOL bDebugMessages);
 };
 
+ENGINE_API extern void (*_pSendEEvent)(CEntity* penTarget, INDEX iType, CEntity* penCaused);
 ENGINE_API extern CScriptEngine *_pScriptEngine;
 
 #endif  /* include-once check. */

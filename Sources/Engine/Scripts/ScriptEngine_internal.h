@@ -47,3 +47,5 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 void luaopen_luasebaselib(lua_State *L);
 void luaopen_luaentitieslib(lua_State *L);
 void luaopen_luaentitiesedlib(lua_State *L);
+
+BOOL luaut_CallVoid(lua_State *L, const char *pName);

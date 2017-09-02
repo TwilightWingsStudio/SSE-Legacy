@@ -1,4 +1,5 @@
-/* Copyright (c) 2002-2012 Croteam Ltd. 
+/* Copyright (c) 2017 by ZCaliptium
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as published by
 the Free Software Foundation
@@ -424,6 +425,40 @@ static int l_entitiesed_GenerateSyncSafeFloat(lua_State* L)
   return 1;
 }
 
+// --------------------------------------------------------------------------------------
+// Sends event of given EventEType to target with custom penCaused argument.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "SendEEventToEntity"
+static int l_entitiesed_SendEEventToEntity(lua_State* L)
+{
+  const INDEX REQUIRED_ARGS = 3;
+  
+  INDEX ctArgs = lua_gettop(L);
+  
+  ONLYREQARGCT(ctArgs, REQUIRED_ARGS);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  INDEX iTypeID = luaL_checkinteger (L, 2);
+  ULONG ulSecondEntityID = luaL_checkinteger (L, 3);
+  
+  if (_pSendEEvent == NULL) {
+    return luaL_error(L, "%s() _pSendEEvent is NULL! How it possible?", SCRIPTFUNCNAME);
+  }
+  
+  if (iTypeID < 0 || iTypeID > 12) {
+    return luaL_error(L, "%s() Got invalid EventEType!", SCRIPTFUNCNAME);
+  }
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  ONLYVALIDENTITY(penEntity);
+
+  DEFENTBYID(penSecondEntity, ulSecondEntityID);
+
+  (*_pSendEEvent)(penEntity, iTypeID, penSecondEntity);
+  
+  return 1;
+}
+
 static const struct luaL_Reg entitiesedLib [] = {
   {"SetEntityParent", l_entitiesed_SetEntityParent},
 
@@ -453,6 +488,7 @@ static const struct luaL_Reg entitiesedLib [] = {
   // Weapon and Ammo
 
   // SendEvent
+  {"SendEEventToEntity", l_entitiesed_SendEEventToEntity},
   
   {NULL, NULL} /* end of array */
 };
