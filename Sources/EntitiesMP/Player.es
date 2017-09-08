@@ -4364,6 +4364,18 @@ functions:
       fSubHealth = fDamageAmmount;
 
     } else {
+      // If we have any shields.
+      if (m_fShields > 0.0F)
+      {
+        if (m_fShields >= fDamageAmmount) {
+          m_fShields -= fDamageAmmount;
+          fDamageAmmount = 0.0F;
+        } else {
+          fDamageAmmount -= m_fShields;
+          m_fShields = 0.0F;
+        }
+      }
+      
       // damage and armor
       if (penSettings) {
         fSubArmor  = fDamageAmmount * penSettings->m_fArmorAbsorbtionMul;

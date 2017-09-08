@@ -116,6 +116,7 @@ extern void HUD_DrawDebugMonitor()
 
   strReport.PrintF("%s^cCCCCCCMoney: %d\n", strReport, _penPlayer->m_iMoney);
   strReport.PrintF("%s^cCCCCCCSupplies: %d\n", strReport, _penPlayer->m_iSupplies);
+  strReport.PrintF("%s^cCCCCCCShields: %.2f\n", strReport, _penPlayer->m_fShields);
 
   strReport += "\n\n";
   strReport += "^r[Mode Flags]^cCCCCCC\n";
