@@ -384,7 +384,7 @@ extern INDEX hud_bShowMatchInfo = TRUE;
 
 // [SSE] HUD
 extern BOOL hud_bSecondCrosshair = FALSE;
-extern BOOL hud_bRedScreenOnDamage = TRUE;
+extern FLOAT hud_fRedScreenOpacity = 0.85F; // Default is 1.0F, but I changed a little bit for better gameplay experience.
 extern BOOL hud_bShowEmptyAmmoInList = TRUE;
 
 extern BOOL hud_bSniperScopeDraw = TRUE;
@@ -882,7 +882,7 @@ void CPlayer_OnInitClass(void)
   
   // [SSE] HUD
   _pShell->DeclareSymbol("persistent user INDEX hud_bSecondCrosshair;",  &hud_bSecondCrosshair);
-  _pShell->DeclareSymbol("persistent user INDEX hud_bRedScreenOnDamage;",  &hud_bRedScreenOnDamage);
+  _pShell->DeclareSymbol("persistent user FLOAT hud_fRedScreenOpacity;",  &hud_fRedScreenOpacity);
   _pShell->DeclareSymbol("persistent user INDEX hud_bShowEmptyAmmoInList;",  &hud_bShowEmptyAmmoInList);
   
   _pShell->DeclareSymbol("persistent user INDEX hud_bSniperScopeDraw;",  &hud_bSniperScopeDraw);
@@ -6786,8 +6786,9 @@ functions:
     }
 
     // add rest of blend ammount
-    ulA = ClampUp( ulA, (ULONG)224);
-    if (hud_bRedScreenOnDamage && m_iViewState == PVT_PLAYEREYES) {
+    hud_fRedScreenOpacity = Clamp(hud_fRedScreenOpacity, 0.0F, 1.0F);
+    ulA = ClampUp( ulA, (ULONG)(224 * hud_fRedScreenOpacity));
+    if (hud_fRedScreenOpacity >= 0.0F && m_iViewState == PVT_PLAYEREYES) {
       pdp->dp_ulBlendingRA += ulR*ulA;
       pdp->dp_ulBlendingGA += ulG*ulA;
       pdp->dp_ulBlendingBA += ulB*ulA;
