@@ -114,6 +114,7 @@ extern void HUD_DrawDebugMonitor()
     strReport.PrintF("%s^cCCCCCCHave Keys: %d\n", strReport, ctHaveKeys);
   }
 
+  strReport.PrintF("%s^cCCCCCCLevel: %d\n", strReport, _penPlayer->m_iLevel);
   strReport.PrintF("%s^cCCCCCCMoney: %d\n", strReport, _penPlayer->m_iMoney);
   strReport.PrintF("%s^cCCCCCCSupplies: %d\n", strReport, _penPlayer->m_iSupplies);
   strReport.PrintF("%s^cCCCCCCShields: %.2f\n", strReport, _penPlayer->m_fShields);

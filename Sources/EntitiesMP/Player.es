@@ -1328,12 +1328,17 @@ properties:
  
  199 INDEX m_ulCheatFlags = 0,
  
- // [SSE] Gameplay - Personal/Shared Extra Lives
+ // [SSE] Gameplay - Personal/Shared Lives
  200 INDEX m_iLives = 0,
- 201 INDEX m_iMoney = 0,
- 202 INDEX m_iSupplies = 0,
- 203 INDEX m_iScoreAccumulated = 0,
- 204 FLOAT m_fLiveCostMultiplier = 1.0F,
+
+ 201 INDEX m_iLevel = 0,
+
+ // [SSE] Gameplay - Currencies
+ 202 INDEX m_iMoney = 0,
+ 203 INDEX m_iSupplies = 0,
+
+ 204 INDEX m_iScoreAccumulated = 0,
+ 205 FLOAT m_fLiveCostMultiplier = 1.0F,
  
  // [SSE] Gameplay - Respawn Delay
  220 FLOAT m_tmKilled = -1.0f,
@@ -1341,7 +1346,7 @@ properties:
  // [SSE] GameModes - Team DeathMatch
  250 INDEX m_iTeamID = 0,
  251 INDEX m_iTeamSelection = 0,
- 
+
  // [SSE] Gameplay - Weapon Inertia Effect
  350 ANGLE3D m_aWeaponSway = ANGLE3D(0, 0, 0),
  351 ANGLE3D m_aWeaponSwayOld = ANGLE3D(0, 0, 0),
@@ -1524,6 +1529,15 @@ functions:
   
   // --------------------------------------------------------------------------------------
   // [SSE] Extended Engine API
+  // Returns current level value.
+  // --------------------------------------------------------------------------------------
+  virtual INDEX GetLevel(void) const
+  {
+    return m_iLevel;
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
   // Returns current money value.
   // --------------------------------------------------------------------------------------
   virtual INDEX GetMoney(void) const
@@ -1556,6 +1570,15 @@ functions:
   virtual void SetShields(FLOAT fShields)
   {
     m_fShields = fShields;
+  };
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Extended Engine API
+  // Sets the new level value.
+  // --------------------------------------------------------------------------------------
+  virtual void SetLevel(INDEX iLevel)
+  {
+    m_iLevel = iLevel;
   };
   
   // --------------------------------------------------------------------------------------
