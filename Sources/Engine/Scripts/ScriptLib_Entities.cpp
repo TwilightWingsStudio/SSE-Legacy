@@ -261,6 +261,48 @@ static int l_entities_IsEntityActive(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
+// Checks if entity is instance of class.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsEntityOfClass"
+static int l_entities_IsEntityOfClass(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 2);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  CTString strClassName = lua_tostring(L, 2);
+
+  lua_pushinteger(L, IsOfClass(penEntity, strClassName));
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Checks if entity is instance of child class.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "IsEntityDerivedFromClass"
+static int l_entities_IsEntityDerivedFromClass(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 2);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+
+  CTString strClassName = lua_tostring(L, 2);
+
+  lua_pushinteger(L, IsDerivedFromClass(penEntity, strClassName));
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
 // Gets the parent entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityParent"
@@ -755,14 +797,16 @@ static const struct luaL_Reg entitiesLib [] = {
   
   {"IsEntityActive", l_entities_IsEntityActive},
   
-  // IsEntityOfClass
-  // IsEntityDerivedFromClass
-  
+  //////// Exact Class Checks ////////
+  {"IsEntityOfClass", l_entities_IsEntityOfClass},
+  {"IsEntityDerivedFromClass", l_entities_IsEntityDerivedFromClass},
+
   //////// CEntity Utils ////////
   {"GetEntityParent", l_entities_GetEntityParent},
   {"GetEntityChildCount", l_entities_GetEntityChildCount},
   {"GetEntityName", l_entities_GetEntityName},
   {"GetEntityClassName", l_entities_GetEntityClassName},
+  //{"GetEntityInteractionProvider", l_entities_GetEntityInteractionProvider},
 
   //////// Getters for CLiveEntity ////////
   {"GetEntityArmor", l_entities_GetEntityArmor},
