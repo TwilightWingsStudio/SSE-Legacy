@@ -59,6 +59,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "EntitiesMP/HudPicHolder.h"
 
 #include "EntitiesMP/GenericKeyItem.h"
+#include "EntitiesMP/GenericPowerUpItem.h"
 #include "EntitiesMP/HudPicDisplay.h"
 
 #include "EntitiesMP/ProgressiveSwitch.h"
@@ -4918,38 +4919,42 @@ functions:
         }
       }
       
-      EPowerUp &ePowerUp = (EPowerUp&)ee;
-
       const FLOAT tmNow = _pTimer->CurrentTick();
+
+      EPowerUp &ePowerUp = (EPowerUp&)ee;
+      BOOL bGenericPowerUp = ePowerUp.bGenericPowerUp;
+      FLOAT fValue = ePowerUp.fValue; 
+
+      CGenericPowerUpItem *penGenericPowerUp = NULL;
+
+      if (bGenericPowerUp) {
+        penGenericPowerUp = static_cast<CGenericPowerUpItem*>(&*ePowerUp.penItem);
+        ItemPicked(penGenericPowerUp ? penGenericPowerUp->m_strPickUpMessage : TRANS("Power Up"), 0);
+      } else {
+        ItemPicked(GetPowerUpPickMessage(ePowerUp.puitType), 0);
+      }
 
       switch (ePowerUp.puitType)
       {
         case PUIT_INVISIB:
-          m_tmInvisibility = tmNow + (ePowerUp.fValue > 0.0F ? ePowerUp.fValue : m_tmInvisibilityMax);
-          ItemPicked(TRANS("^cABE3FFInvisibility"), 0);
+          m_tmInvisibility = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmInvisibilityMax) : m_tmInvisibilityMax);
           return TRUE;
 
         case PUIT_INVULNER:
-          m_tmInvulnerability = tmNow + (ePowerUp.fValue > 0.0F ? ePowerUp.fValue : m_tmInvulnerabilityMax);
-          ItemPicked(TRANS("^c00B440Invulnerability"), 0);
+          m_tmInvulnerability = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmInvulnerabilityMax) : m_tmInvulnerabilityMax);
           return TRUE;
 
         case PUIT_DAMAGE:
-          m_tmSeriousDamage = tmNow + (ePowerUp.fValue > 0.0F ? ePowerUp.fValue : m_tmSeriousDamageMax);
-          ItemPicked(TRANS("^cFF0000Serious Damage!"), 0);
+          m_tmSeriousDamage = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmSeriousDamageMax) : m_tmSeriousDamageMax);
           return TRUE;
 
         case PUIT_SPEED:
-          m_tmSeriousSpeed = tmNow + (ePowerUp.fValue > 0.0F ? ePowerUp.fValue : m_tmSeriousSpeedMax);
-          ItemPicked(TRANS("^cFF9400Serious Speed"), 0);
+          m_tmSeriousSpeed = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmSeriousSpeedMax) : m_tmSeriousSpeedMax);
           return TRUE;
 
         case PUIT_BOMB:
           ((CPlayerWeapons&)*m_penWeapons).ReceiveSeriousBomb();
-          //m_iSeriousBombCount++;
 
-          ItemPicked(TRANS("^cFF0000Serious Bomb!"), 0);
-          //ItemPicked(TRANS("^cFF0000S^cFFFF00e^cFF0000r^cFFFF00i^cFF0000o^cFFFF00u^cFF0000s ^cFF0000B^cFFFF00o^cFF0000m^cFFFF00b!"), 0);
           // send computer message
           if (GetSP()->sp_bCooperative) {
             EComputerMessage eMsg;

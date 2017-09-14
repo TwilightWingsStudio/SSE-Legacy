@@ -661,6 +661,9 @@
     <ClCompile Include="GenericKeyItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GenericPowerUpItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1827,6 +1830,12 @@
     <ClInclude Include="GenericKeyItem_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GenericPowerUpItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericPowerUpItem_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2808,6 +2817,9 @@
       <Filter>Class Files\AI</Filter>
     </CustomBuild>
     <CustomBuild Include="GenericKeyItem.es">
+      <Filter>Class Files\Items</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GenericPowerUpItem.es">
       <Filter>Class Files\Items</Filter>
     </CustomBuild>
   </ItemGroup>

@@ -283,6 +283,7 @@ DECL_DLL void PrintCenterMessage(CEntity *penThis, CEntity *penTarget,
 
 // get name of a key item
 DECL_DLL const char *GetKeyName(enum KeyItemType kit);
+DECL_DLL const char *GetPowerUpPickMessage(enum PowerUpItemType kit); // [SSE]
 
 // get session properties
 DECL_DLL inline const CSessionProperties *GetSP(void)

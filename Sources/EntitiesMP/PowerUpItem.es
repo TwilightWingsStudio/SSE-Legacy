@@ -24,18 +24,38 @@ uses "EntitiesMP/Player";
 
 // PowerUp type. 
 enum PowerUpItemType {
-  0 PUIT_INVISIB  "0 Invisibility",
-  1 PUIT_INVULNER "1 Invulnerability",
-  2 PUIT_DAMAGE   "2 SeriousDamage",
-  3 PUIT_SPEED    "3 SeriousSpeed",
-  4 PUIT_BOMB     "4 SeriousBomb",
+  0 PUIT_INVISIB  "[0] Invisibility",
+  1 PUIT_INVULNER "[1] Invulnerability",
+  2 PUIT_DAMAGE   "[2] SeriousDamage",
+  3 PUIT_SPEED    "[3] SeriousSpeed",
+  4 PUIT_BOMB     "[4] SeriousBomb",
 };
 
 // Event for sending through receive item.
 event EPowerUp {
+  CEntityPointer penItem,
   enum PowerUpItemType puitType,
   FLOAT fValue, // [SSE] PowerUps Drop
+  BOOL bGenericPowerUp,
 };
+
+%{
+  
+const char *GetPowerUpPickMessage(enum PowerUpItemType puit)
+{
+  switch (puit)
+  {
+    case PUIT_INVISIB  : return TRANS("^cABE3FFInvisibility"); break;
+    case PUIT_INVULNER : return TRANS("^c00B440Invulnerability"); break;
+    case PUIT_DAMAGE   : return TRANS("^cFF0000Serious Damage!"); break;
+    case PUIT_SPEED    : return TRANS("^cFF9400Serious Speed"); break;
+    case PUIT_BOMB     : return TRANS("^cFF0000Serious Bomb!"); break;
+    
+    default: return TRANS("unknown item"); break;
+  };
+}
+
+%}
 
 class CPowerUpItem : CItem 
 {
@@ -79,11 +99,11 @@ components:
  56 model   MODEL_FLARE   "Models\\Items\\Flares\\Flare.mdl",
 
 // ************** SOUNDS **************
-//301 sound   SOUND_INVISIB  "SoundsMP\\Items\\Invisibility.wav",
-//302 sound   SOUND_INVULNER "SoundsMP\\Items\\Invulnerability.wav",
-//303 sound   SOUND_DAMAGE   "SoundsMP\\Items\\SeriousDamage.wav",
-//304 sound   SOUND_SPEED    "SoundsMP\\Items\\SeriousSpeed.wav",
-301 sound   SOUND_PICKUP   "SoundsMP\\Items\\PowerUp.wav",
+300 sound   SOUND_PICKUP   "SoundsMP\\Items\\PowerUp.wav",
+301 sound   SOUND_INVISIB  "SoundsMP\\Items\\Invisibility.wav",
+302 sound   SOUND_INVULNER "SoundsMP\\Items\\Invulnerability.wav",
+303 sound   SOUND_DAMAGE   "SoundsMP\\Items\\SeriousDamage.wav",
+304 sound   SOUND_SPEED    "SoundsMP\\Items\\SeriousSpeed.wav",
 305 sound   SOUND_BOMB     "SoundsMP\\Items\\SeriousBomb.wav",
 
 functions:
@@ -92,13 +112,15 @@ functions:
   // --------------------------------------------------------------------------------------
   void Precache(void)
   {
-    switch( m_puitType) {
-      case PUIT_INVISIB :  /*PrecacheSound(SOUND_INVISIB );  break;*/
-      case PUIT_INVULNER:  /*PrecacheSound(SOUND_INVULNER);  break; */                                    
-      case PUIT_DAMAGE  :  /*PrecacheSound(SOUND_DAMAGE  );  break;*/
-      case PUIT_SPEED   :  /*PrecacheSound(SOUND_SPEED   );  break;*/
-                           PrecacheSound(SOUND_PICKUP  );  break;
+    switch (m_puitType)
+    {
+      case PUIT_SPEED   :  PrecacheSound(SOUND_SPEED   );  break;
+      case PUIT_INVISIB :  PrecacheSound(SOUND_INVISIB );  break;
+      case PUIT_INVULNER:  PrecacheSound(SOUND_INVULNER);  break;
+      case PUIT_DAMAGE  :  PrecacheSound(SOUND_DAMAGE  );  break;
       case PUIT_BOMB    :  PrecacheSound(SOUND_BOMB    );  break;
+      
+      default: PrecacheSound(SOUND_PICKUP); break;
     }
   }
 
@@ -113,7 +135,8 @@ functions:
     pes->es_fValue = 0;     // !!!!
     pes->es_iScore = 0;//m_iScore;
     
-    switch (m_puitType) {
+    switch (m_puitType)
+    {
       case PUIT_INVISIB :  pes->es_strName += " invisibility";     break;
       case PUIT_INVULNER:  pes->es_strName += " invulnerability";  break;
       case PUIT_DAMAGE  :  pes->es_strName += " serious damage";   break;
@@ -262,8 +285,10 @@ procedures:
 
     // Prepare PowerUp to send it to entity.
     EPowerUp ePowerUp;
+    ePowerUp.penItem = NULL;
     ePowerUp.puitType = m_puitType;
     ePowerUp.fValue = m_fValue; // [SSE] PowerUps Drop
+    ePowerUp.bGenericPowerUp = FALSE;
 
     // If powerup is received...
     if (epass.penOther->ReceiveItem(ePowerUp))
@@ -286,6 +311,11 @@ procedures:
       if (m_puitType == PUIT_BOMB) {
         PlaySound(m_soPick, SOUND_BOMB, SOF_3D);
         m_fPickSoundLen = GetSoundLength(SOUND_BOMB);
+
+      } else if (m_puitType == PUIT_SPEED) {
+        PlaySound(m_soPick, SOUND_SPEED, SOF_3D);
+        m_fPickSoundLen = GetSoundLength(SOUND_SPEED);
+        
       } else if (TRUE) {
         PlaySound(m_soPick, SOUND_PICKUP, SOF_3D);
         m_fPickSoundLen = GetSoundLength(SOUND_PICKUP);
