@@ -31,25 +31,29 @@ For some reasons these features not added into Official repository. But I wish w
 ========================
 Here is Serious Engine v.1.10 source code, including the following projects:
 
-* `DedicatedServer`
-* `Ecc` The *Entity Class Compiler*, a custom build tool used to compile *.es files
-* `Engine` Serious Engine 1.10
-* `EngineGUI` Common GUI things for game tools
-* `EntitiesMP` All the entity logic
-* `GameGUIMP` Common GUI things for game tools
-* `GameMP` All the game logic
-* `Modeler` Serious Modeler
-* `RCon` Used to connect to servers using an admin password
-* `SeriousSam` The main game executable
-* `SeriousSkaStudio` Serious Ska Studio
-* `WorldEditor` Serious Editor
-* `DecodeReport` Used to decode crash *.rpt files
-* `Depend` Used to build a list of dependency files based on a list of root files
-* `LWSkaExporter` Exporter for use in LightWave
-* `MakeFONT` Used for generating *.fnt files
-* `Shaders` Compiled shaders
-* `GameAgent` The serverlist masterserver written in Python
-* `libogg`, `libvorbis` Third party libraries used for playing OGG-encoded ingame music (see http://www.vorbis.com/ for more information)
+* Commons
+  * `DedicatedServer`
+  * `Ecc` The *Entity Class Compiler*, a custom build tool used to compile *.es files
+  * `Engine` Serious Engine 1.10
+  * `EntitiesMP` All the entity logic
+  * `GameMP` All the game logic
+  * `RCon` Used to connect to servers using an admin password
+  * `Shaders` Compiled shaders
+  * `SeriousSam` The main game executable
+* Editors
+  * `GameGUIMP` Common GUI things for game tools
+  * `EngineGUI` Common GUI things for game tools
+  * `Modeler` Serious Modeler
+  * `SeriousSkaStudio` Serious Ska Studio
+  * `WorldEditor` Serious Editor
+* Tools
+  * `DecodeReport` Used to decode crash *.rpt files
+  * `Depend` Used to build a list of dependency files based on a list of root files
+  * `LWSkaExporter` Exporter for use in LightWave
+  * `MakeFONT` Used for generating *.fnt files
+* Other
+  * `GameAgent` The serverlist masterserver written in Python
+  * `libogg`, `libvorbis` Third party libraries used for playing OGG-encoded ingame music (see http://www.vorbis.com/ for more information)
 
 These have been modified to run correctly under the recent version of Windows. (Tested: Win7 x64, Win8 x64, Win8.1 x64)
 
