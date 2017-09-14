@@ -1559,7 +1559,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       const TIME tmDelta = ptmPowerups[ii] - _tmNow;
       if (tmDelta <= 0) continue;
 
-      FLOAT fNormValue = tmDelta / ptmPowerupsMax[ii];
+      FLOAT fNormValue = Clamp(tmDelta, 0.0F, ptmPowerupsMax[ii]) / ptmPowerupsMax[ii];
       HUD_DrawAnchoredRect (8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
       HUD_DrawAnchroredIcon(8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _atoPowerups[ii], C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
       
@@ -1937,7 +1937,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       const TIME tmDelta = ptmPowerups[ii] - _tmNow;
       if (tmDelta <= 0) continue;
 
-      FLOAT fNormValue = tmDelta / ptmPowerupsMax[ii];
+      FLOAT fNormValue = Clamp(tmDelta, 0.0F, ptmPowerupsMax[ii]) / ptmPowerupsMax[ii];
       HUD_DrawAnchoredRect (8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
       HUD_DrawAnchroredIcon(8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _atoPowerups[ii], C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
       
