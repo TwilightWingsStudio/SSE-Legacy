@@ -5646,6 +5646,10 @@ procedures:
     }
 
     m_iBulletsOnFireStart = m_iBullets;
+    CPlayer &pl = (CPlayer&)*m_penPlayer;
+    PlaySound(pl.m_soWeapon0, SOUND_SILENCE, SOF_3D|SOF_VOLUMETRIC);      // stop possible sounds
+    pl.m_soWeapon0.Set3DParameters(50.0f, 5.0f, 1.5f, 1.0f);      // fire
+    PlaySound(pl.m_soWeapon0, SOUND_TOMMYGUN_FIRE, SOF_LOOP|SOF_3D|SOF_VOLUMETRIC);
     PlayLightAnim(LIGHT_ANIM_TOMMYGUN, AOF_LOOPING);
     GetAnimator()->FireAnimation(BODY_ANIM_SHOTGUN_FIRESHORT, AOF_LOOPING);
 
@@ -5678,6 +5682,7 @@ procedures:
       }
     }
 
+    pl.m_soWeapon0.Set3DParameters(50.0f, 5.0f, 0.0f, 1.0f);      // mute fire
     PlayLightAnim(LIGHT_ANIM_NONE, 0);
     GetAnimator()->FireAnimationOff();
     jump Idle();
@@ -5701,10 +5706,6 @@ procedures:
     DecAmmo(m_iBullets, 1);
     SetFlare(0, FLARE_ADD);
     m_moWeapon.PlayAnim(TOMMYGUN_ANIM_FIRE, AOF_LOOPING|AOF_NORESTART);
-
-    // fire sound
-    CPlayer &pl = (CPlayer&)*m_penPlayer;
-    PlaySound(pl.m_soWeapon0, SOUND_TOMMYGUN_FIRE, SOF_3D|SOF_VOLUMETRIC);
 
     // firing FX
     CPlacement3D plShell;
@@ -5901,6 +5902,7 @@ procedures:
     // if firing
     if (HoldingFire() && m_iBullets > 0) {
       // play fire animation
+      PlaySound(pl.m_soWeapon0, SOUND_MINIGUN_FIRE, SOF_3D|SOF_LOOP|SOF_VOLUMETRIC);
       PlayLightAnim(LIGHT_ANIM_TOMMYGUN, AOF_LOOPING);
       GetAnimator()->FireAnimation(BODY_ANIM_MINIGUN_FIRESHORT, AOF_LOOPING);
     }
@@ -5910,6 +5912,9 @@ procedures:
     while (HoldingFire()) {
       // check for ammo pickup during empty spinning
       if (!m_bHasAmmo && m_iBullets>0) {
+          CPlayer &pl = (CPlayer&)*m_penPlayer;
+          PlaySound(pl.m_soWeapon0, SOUND_MINIGUN_FIRE, SOF_3D|SOF_LOOP|SOF_VOLUMETRIC);
+        
         if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Minigun_fire");}
         PlayLightAnim(LIGHT_ANIM_TOMMYGUN, AOF_LOOPING);
         GetAnimator()->FireAnimation(BODY_ANIM_MINIGUN_FIRESHORT, AOF_LOOPING);
@@ -5928,14 +5933,11 @@ procedures:
         DecAmmo(m_iBullets, 1);
         SetFlare(0, FLARE_ADD);
 
-        // fire sound
-        CPlayer &pl = (CPlayer&)*m_penPlayer;
-        PlaySound(pl.m_soWeapon0, SOUND_MINIGUN_FIRE, SOF_3D|SOF_VOLUMETRIC);
-
         /* add one empty bullet shell */
         CPlacement3D plShell;
 
         // if 1st person view
+        CPlayer &pl = (CPlayer&)*m_penPlayer;
         if (pl.m_penCamera == NULL && pl.m_pen3rdPersonView == NULL)
         {
           CalcWeaponPosition(FLOAT3D(afMinigunShellPos[0], afMinigunShellPos[1], afMinigunShellPos[2]), plShell, FALSE);
@@ -5987,6 +5989,8 @@ procedures:
 
         // stop fire
         m_bHasAmmo = FALSE;
+        CPlayer &pl = (CPlayer&)*m_penPlayer;
+        PlaySound(pl.m_soWeapon0, SOUND_SILENCE, SOF_3D|SOF_VOLUMETRIC);
         PlayLightAnim(LIGHT_ANIM_NONE, AOF_LOOPING);
         GetAnimator()->FireAnimationOff();
       }
@@ -6003,6 +6007,9 @@ procedures:
     }
 
     GetAnimator()->FireAnimationOff();
+    // stop fire sound
+    CPlayer &pl = (CPlayer&)*m_penPlayer;
+    pl.m_soWeapon0.Set3DParameters(50.0f, 5.0f, 0.0f, 1.0f);      // mute fire
     PlayLightAnim(LIGHT_ANIM_NONE, AOF_LOOPING);
     // start spin down
     jump MiniGunSpinDown();
