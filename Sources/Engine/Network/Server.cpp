@@ -900,29 +900,55 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
     return;
   }
 
-  // read version info
-  INDEX iTag, iMajor, iMinor;
-  nm>>iTag;
-  if (iTag=='VTAG') {
-    nm>>iMajor>>iMinor;
-  } else {
-    iMajor = 109;
-    iMinor = 1;
-  }
   
   // [SSE] Netcode Update
+  extern INDEX ser_bReportJoinAttemptsNotSSE;
   extern INDEX ser_bReportJoinAttemptsMod;
   extern INDEX ser_bReportJoinAttemptsVersion;
   //
+
+  // read version info
+  INDEX iTag, iMajor, iMinor;
+  INDEX iRevision, iBuildYear, iBuildMonth, iBuildDay;
+  nm >> iTag;
+
+  extern ULONG _ulEngineRevision;
+  extern ULONG _ulEngineBuildYear;
+  extern ULONG _ulEngineBuildMonth;
+  extern ULONG _ulEngineBuildDay;
   
-  // if wrong version then disconnect the client
-  if (iMajor != _SE_BUILD_MAJOR || iMinor != _SE_BUILD_MINOR)
+  // [SSE] Versionizing System
+  if (iTag == 'EVT0') {
+    nm >> iMajor >> iMinor >> iRevision >> iBuildYear >> iBuildMonth >> iBuildDay;
+    
+  } else {
+
+    if (iTag == 'VTAG') {
+      nm >> iMajor >> iMinor;
+    } else {
+      iMajor = 109;
+      iMinor = 1;
+    }
+    
+    CTString strExplanation;
+    strExplanation.PrintF(TRANS(
+      "This server runs version SSE-%d.%d-%d based game.\n"
+      "Your game is not Serious Sam Evolution!\n"
+      "Please visit https://github.com/zcaliptium/Serious-Engine for more information."), _SE_BUILD_MAJOR / 10000, _SE_BUILD_MINOR, _ulEngineRevision);
+
+    SendDisconnectMessage(iClient, strExplanation, /*bStream=*/TRUE, ser_bReportJoinAttemptsNotSSE);
+    return;
+  }
+
+  // if lesser version then disconnect the client
+  if (iRevision < _ulEngineRevision)
   {
     CTString strExplanation;
     strExplanation.PrintF(TRANS(
-      "This server runs version %d.%d, your version is %d.%d.\n"
-      "Please visit http://www.croteam.com for information on version updating."),
-      _SE_BUILD_MAJOR, _SE_BUILD_MINOR, iMajor, iMinor);
+      "This server runs version SSE-%d.%d-%d.\n"
+      "Your version is SSE-%d.%d-%d.\n"
+      "Please visit https://github.com/zcaliptium/Serious-Engine for more information."),
+      _SE_BUILD_MAJOR / 10000, _SE_BUILD_MINOR, _ulEngineRevision, iMajor, iMinor, iRevision);
 
     SendDisconnectMessage(iClient, strExplanation, /*bStream=*/TRUE, ser_bReportJoinAttemptsVersion);
     return;

@@ -131,6 +131,7 @@ extern INDEX ser_bReportMsgActionsWrongClient = FALSE;
 //
 
 // [SSE] Netcode Update
+extern INDEX ser_bReportJoinAttemptsNotSSE = FALSE;
 extern INDEX ser_bReportJoinAttemptsMod = FALSE;
 extern INDEX ser_bReportJoinAttemptsVersion = FALSE;
 //
@@ -1197,6 +1198,7 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   //
   
   // [SSE] Netcode Update
+  _pShell->DeclareSymbol("user INDEX ser_bReportJoinAttemptsNotSSE;", &ser_bReportJoinAttemptsNotSSE);
   _pShell->DeclareSymbol("user INDEX ser_bReportJoinAttemptsMod;", &ser_bReportJoinAttemptsMod);
   _pShell->DeclareSymbol("user INDEX ser_bReportJoinAttemptsVersion;", &ser_bReportJoinAttemptsVersion);
   //
