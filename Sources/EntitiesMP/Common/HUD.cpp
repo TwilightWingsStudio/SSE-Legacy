@@ -209,7 +209,7 @@ static struct AmmoInfo _aaiAmmo[9] = {
   { &_toASeriousBomb,   &_awiWeapons[16], NULL,             0, 0, 0, -9, FALSE }, //  8
 };
 
-static const INDEX aiAmmoRemap[8] = { 0, 1, 2, 3, 4, 7, 5, 6 };
+static const INDEX aiAmmoRemap[8] = { 0, 1, 2, 3, 4, 5, 7, 6 };
 
 struct WeaponInfo _awiWeapons[18] = {
   { WEAPON_NONE,            NULL,                 NULL,         FALSE },   //  0
@@ -1606,8 +1606,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       {
         ii = aiAmmoRemap[i];
         
-        
-        AmmoInfo &ai = _aaiAmmo[i];
+        AmmoInfo &ai = _aaiAmmo[ii];
         
         // if no ammo and hasn't got that weapon - just skip this ammo // [SSE] Or if you don't want to see empty ammo types.
         if (ai.ai_iAmmoAmmount <= 0 && (!ai.ai_bHasWeapon || !hud_bShowEmptyAmmoInList)) continue;
@@ -1616,7 +1615,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
         
         fNormValue = (FLOAT)ai.ai_iAmmoAmmount / ai.ai_iMaxAmmoAmmount;
         
-        ptoAmmo = _aaiAmmo[i].ai_ptoAmmo;
+        ptoAmmo = ai.ai_ptoAmmo;
 
       } else {
         INDEX iBombCount = _penWeapons->m_iSeriousBombs;
@@ -1873,9 +1872,8 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       if (i < 8)
       {
         ii = aiAmmoRemap[i];
-        
-        
-        AmmoInfo &ai = _aaiAmmo[i];
+
+        AmmoInfo &ai = _aaiAmmo[ii];
         
         // if no ammo and hasn't got that weapon - just skip this ammo // [SSE] Or if you don't want to see empty ammo types.
         if (ai.ai_iAmmoAmmount <= 0 && (!ai.ai_bHasWeapon || !hud_bShowEmptyAmmoInList)) continue;
@@ -1884,7 +1882,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
         
         fNormValue = (FLOAT)ai.ai_iAmmoAmmount / ai.ai_iMaxAmmoAmmount;
         
-        ptoAmmo = _aaiAmmo[i].ai_ptoAmmo;
+        ptoAmmo = ai.ai_ptoAmmo;
 
       } else {
         INDEX iBombCount = _penWeapons->m_iSeriousBombs;
