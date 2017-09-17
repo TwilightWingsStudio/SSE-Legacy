@@ -200,6 +200,7 @@ procedures:
   {
     m_tmFadeOutStart = _pTimer->CurrentTick();
     CWorldSettingsController *pwsc = GetWSC(this);
+
     if( pwsc!=NULL)
     {
       autowait(m_tmFadeOutLen);
@@ -209,6 +210,7 @@ procedures:
       etfx.penSender=this;
       pwsc->SendEvent(etfx);
     }
+
     return EReturn();
   }
 
@@ -231,11 +233,13 @@ procedures:
     }
     m_bDataError = FALSE;
 
-    wait() {
+    wait()
+    {
       on (EBegin): 
       {
         resume;
       }
+
       on (EStart eStart): 
       {
         CWorldSettingsController *pwsc = GetWSC(this);
@@ -253,16 +257,19 @@ procedures:
         }
         resume;
       }
+
       on (EStop eStop): 
       {
         call ApplyFadeOut();
         resume;
       }
+
       on (EReturn): 
       {
         resume;
       }
     }
+
     Text_Off();
     return;
   }
