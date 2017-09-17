@@ -81,22 +81,23 @@ extern INDEX gam_bRocketJumpMode; // [SSE] RocketJump Mode
 
 static void SetGameModeParameters(CSessionProperties &sp)
 {
-  sp.sp_gmGameMode = (CSessionProperties::GameMode) Clamp(INDEX(gam_iStartMode), -1L, 3L);
+  sp.sp_gmGameMode = (CSessionProperties::GameMode) Clamp(INDEX(gam_iStartMode), -1L, INDEX(CSessionProperties::GM_LASTGAMEMODE - 1L));
 
   switch (sp.sp_gmGameMode) {
-  default:
-    ASSERT(FALSE);
-  case CSessionProperties::GM_COOPERATIVE:
-    sp.sp_ulSpawnFlags |= SPF_SINGLEPLAYER|SPF_COOPERATIVE;
-    break;
-  case CSessionProperties::GM_FLYOVER:
-    sp.sp_ulSpawnFlags |= SPF_FLYOVER|SPF_MASK_DIFFICULTY;
-    break;
-  case CSessionProperties::GM_SCOREMATCH:
-  case CSessionProperties::GM_FRAGMATCH:
-  case CSessionProperties::GM_TEAMDEATHMATCH: // [SSE] Team DeathMatch
-    sp.sp_ulSpawnFlags |= SPF_DEATHMATCH;
-    break;
+    default:
+      ASSERT(FALSE);
+    case CSessionProperties::GM_COOPERATIVE:
+      sp.sp_ulSpawnFlags |= SPF_SINGLEPLAYER|SPF_COOPERATIVE;
+      break;
+    case CSessionProperties::GM_FLYOVER:
+      sp.sp_ulSpawnFlags |= SPF_FLYOVER|SPF_MASK_DIFFICULTY;
+      break;
+    case CSessionProperties::GM_SCOREMATCH:
+    case CSessionProperties::GM_FRAGMATCH:
+    case CSessionProperties::GM_TEAMDEATHMATCH: // [SSE] Team DeathMatch
+    case CSessionProperties::GM_LASTMANSTANDING: // [SSE] Team DeathMatch
+      sp.sp_ulSpawnFlags |= SPF_DEATHMATCH;
+      break;
   }
 }
 static void SetDifficultyParameters(CSessionProperties &sp)
@@ -272,8 +273,8 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_bCooperative = sp.sp_gmGameMode == CSessionProperties::GM_COOPERATIVE;
   sp.sp_bSinglePlayer = FALSE;
   sp.sp_bPlayEntireGame = gam_bPlayEntireGame;
-  sp.sp_bUseFrags = sp.sp_gmGameMode == CSessionProperties::GM_FRAGMATCH || sp.sp_gmGameMode == CSessionProperties::GM_TEAMDEATHMATCH; // [SSE] Team DeathMatch
-  sp.sp_bTeamPlay = sp.sp_gmGameMode == CSessionProperties::GM_TEAMDEATHMATCH; // [SSE] Team DeathMatch
+  sp.sp_bUseFrags = sp.sp_gmGameMode == CSessionProperties::GM_FRAGMATCH || sp.sp_gmGameMode == CSessionProperties::GM_TEAMDEATHMATCH || sp.sp_gmGameMode == CSessionProperties::GM_LASTMANSTANDING; // [SSE] Team DeathMatch
+  sp.sp_bTeamPlay = sp.sp_gmGameMode == CSessionProperties::GM_TEAMDEATHMATCH || sp.sp_gmGameMode == CSessionProperties::GM_LASTTEAMSTANDING; // [SSE] Team DeathMatch
   sp.sp_bWeaponsStay = gam_bWeaponsStay;
   sp.sp_bFriendlyFire = gam_bFriendlyFire;
   sp.sp_ctMaxPlayers = gam_ctMaxPlayers;
@@ -423,6 +424,10 @@ BOOL IsMenuEnabledCfunc(void* pArgs)
 
 CTString GetGameTypeName(INDEX iMode)
 {
+  if (iMode > CSessionProperties::GM_LASTGAMEMODE) {
+    return "";
+  }
+  
   switch (iMode)
   {
     default: {
@@ -455,12 +460,14 @@ CTString GetGameTypeName(INDEX iMode)
     case CSessionProperties::GM_CAPTURETHEFLAG: {
       return TRANS("CTF");
     } break;
-
+    */
+ 
     // [SSE] GameModes - LMS
     case CSessionProperties::GM_LASTMANSTANDING: {
       return TRANS("LMS");
     } break;
 
+    /*
     // [SSE] GameModes - LTS
     case CSessionProperties::GM_LASTTEAMSTANDING: {
       return TRANS("LTS");
@@ -599,6 +606,7 @@ ULONG GetSpawnFlagsForGameType(INDEX iGameType)
     case CSessionProperties::GM_FRAGMATCH:      return SPF_DEATHMATCH;
 
     case CSessionProperties::GM_TEAMDEATHMATCH: return SPF_DEATHMATCH; // [SSE] GameModes - Team DeathMatch
+    case CSessionProperties::GM_LASTMANSTANDING: return SPF_DEATHMATCH; // [SSE] GameModes - LMS
     case CSessionProperties::GM_CAPTURETHEFLAG: return SPF_DEATHMATCH; // [SSE] GameModes - CTF
   };
 }
