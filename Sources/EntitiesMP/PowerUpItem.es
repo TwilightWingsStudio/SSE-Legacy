@@ -316,6 +316,18 @@ procedures:
         PlaySound(m_soPick, SOUND_SPEED, SOF_3D);
         m_fPickSoundLen = GetSoundLength(SOUND_SPEED);
         
+      } else if (m_puitType == PUIT_INVISIB) {
+        PlaySound(m_soPick, SOUND_INVISIB, SOF_3D);
+        m_fPickSoundLen = GetSoundLength(SOUND_INVISIB);
+        
+      } else if (m_puitType == PUIT_INVULNER) {
+        PlaySound(m_soPick, SOUND_INVULNER, SOF_3D);
+        m_fPickSoundLen = GetSoundLength(SOUND_INVULNER);
+        
+      } else if (m_puitType == PUIT_DAMAGE) {
+        PlaySound(m_soPick, SOUND_DAMAGE, SOF_3D);
+        m_fPickSoundLen = GetSoundLength(SOUND_DAMAGE);
+        
       } else if (TRUE) {
         PlaySound(m_soPick, SOUND_PICKUP, SOF_3D);
         m_fPickSoundLen = GetSoundLength(SOUND_PICKUP);
