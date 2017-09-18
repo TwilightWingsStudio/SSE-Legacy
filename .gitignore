@@ -80,6 +80,9 @@ ModelsMP/*
 TexturesMP/*
 Thumbnails/*
 
+#TFE GROs
+1_00_*.gro
+
 #TSE GROs
 1_04_patch.gro
 1_07_tools.gro
