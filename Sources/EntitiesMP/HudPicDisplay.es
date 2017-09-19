@@ -148,6 +148,8 @@ procedures:
     SetModel(MODEL_MARKER);
     SetModelMainTexture(TEXTURE_MARKER);
     
+    m_tmAutoFadeOut = Clamp(m_tmAutoFadeOut, -1.0F, 3600.0F);
+    
     if (m_fnmPicture != CTString(""))
     {
       try {
