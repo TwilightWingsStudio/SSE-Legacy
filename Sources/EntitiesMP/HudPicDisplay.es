@@ -1,4 +1,5 @@
-/* Copyright (c) 2002-2012 Croteam Ltd. 
+/* Copyright (c) 2017 by ZCaliptium
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as published by
 the Free Software Foundation
@@ -83,7 +84,7 @@ functions:
 
     if (fNow > m_tmFadeOutStart)
     {
-      fRatio=CalculateRatio(fNow, m_tmFadeOutStart, m_tmFadeOutStart+m_tmFadeOutLen, 0, 1);
+      fRatio = CalculateRatio(fNow, m_tmFadeOutStart, m_tmFadeOutStart+m_tmFadeOutLen, 0, 1);
     }
 
     if (fNow < m_tmFadeInStart+m_tmFadeInLen)
@@ -165,6 +166,8 @@ procedures:
 
       on (EStart eStart): 
       {
+        m_tmFadeOutStart = 1e6; // Reset fade out time.
+        
         if (m_fnmPicture == "") { 
           CPrintF("%s : Texture path is empty!\n", m_strName);
           resume;
@@ -180,7 +183,7 @@ procedures:
           etfx.penSender = this;
           pwsc->SendEvent(etfx);
 
-          if (m_tmAutoFadeOut != -1) {
+          if (m_tmAutoFadeOut > 0.0F) {
             call WaitAndFadeOut();
           }
         }
