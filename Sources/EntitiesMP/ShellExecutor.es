@@ -69,7 +69,7 @@ functions:
         if (m_bDebugMessages) {
           CPrintF("[SE] %s : Executing command: %s\n", m_strName, m_strConsoleCmd);
         }
-        _pShell->Execute(m_strConsoleCmd);
+        _pShell->Execute(m_strConsoleCmd + ";");
       }
     } else {
       if (m_bDebugMessages) {
