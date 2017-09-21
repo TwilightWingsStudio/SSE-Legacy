@@ -1619,13 +1619,29 @@ functions:
     FLOAT fValue;
 
     nmMessage >> iCommandID;
-    nmMessage >> fValue;
     
-    if (iCommandID == 1) {
-      SetHealth(fValue);
-    } else {
-      SetArmor(fValue);
+    if (iCommandID == 1 || iCommandID == 2)
+    {
+      nmMessage >> fValue;
+
+      if (iCommandID == 1) {
+        SetHealth(fValue);
+      } else {
+        SetArmor(fValue);
+      }
+    } else if (iCommandID == 3) {
+      if (GetSP()->sp_bTeamPlay && m_iTeamID != 0) {
+        CPrintF(TRANS("%s joined as spectator.\n"), GetPlayerName());
+
+        SwitchToEditorModel();
+        StartSpectatorCameraFromOwner();
+        SetPhysicsFlags(EPF_MODEL_CORPSE);
+        SetCollisionFlags(ECF_CORPSE);
+        
+        m_iTeamID = 0;
+      }
     }
+
     //CPrintF("PLID %d received direct RPC!\n", GetMyPlayerIndex());
   };
   
