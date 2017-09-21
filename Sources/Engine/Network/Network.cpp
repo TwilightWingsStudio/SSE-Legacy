@@ -1105,6 +1105,41 @@ static void NET_SetEntityArmor(void *pArgs)
   CPrintF("  done! RPC sent!\n");
 }
 
+static void NET_MakePlayerSpectator(void *pArgs)
+{
+  CPrintF("NET_MakePlayerSpectator:\n");
+  if (!_pNetwork->ga_srvServer.srv_bActive) {
+    CPrintF("  <not a server>\n");
+    return;
+  }
+  
+  INDEX iPlayer = NEXTARGUMENT(INDEX);
+  iPlayer = Clamp(iPlayer, (INDEX)0, (INDEX)15);
+  
+  CPlayerTarget &plt = _pNetwork->ga_sesSessionState.ses_apltPlayers[iPlayer];
+  
+  if (!plt.IsActive() || !plt.plt_penPlayerEntity) {
+    CPrintF("  <invalid player>\n");
+    return;
+  }
+  
+  CEntity *penEntity = plt.plt_penPlayerEntity;
+
+  CServer &srvServer = _pNetwork->ga_srvServer;
+  
+  INDEX iCommandID = 3;
+  
+  // create message for destroying entity in all sessions
+  CNetworkStreamBlock nsbEntityRPC(MSG_SEQ_ENTITYRPC, ++srvServer.srv_iLastProcessedSequence);
+  nsbEntityRPC << penEntity->en_ulID;
+  nsbEntityRPC << iCommandID;
+  
+  // put the message in buffer to be sent to all sessions
+  _pNetwork->ga_srvServer.AddBlockToAllSessions(nsbEntityRPC);
+  
+  CPrintF("  done! RPC sent!\n");
+}
+
 /*
  * Initialize game management.
  */
@@ -1118,10 +1153,13 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("user void NET_AttachPlayer(INDEX, INDEX);", &NET_AttachPlayer);
   _pShell->DeclareSymbol("user void NET_DetachPlayer(INDEX);", &NET_DetachPlayer);
   _pShell->DeclareSymbol("user void NET_SwapPlayers(INDEX, INDEX);", &NET_SwapPlayers);
+  
 
   _pShell->DeclareSymbol("user void NET_DestroyEntity(INDEX);", &NET_DestroyEntity);
   _pShell->DeclareSymbol("user void NET_SetEntityHealth(INDEX, FLOAT);", &NET_SetEntityHealth);
   _pShell->DeclareSymbol("user void NET_SetEntityArmor(INDEX, FLOAT);", &NET_SetEntityArmor);
+
+  _pShell->DeclareSymbol("user void NET_MakePlayerSpectator(INDEX);", &NET_MakePlayerSpectator);
 
   // Add shell symbols.
   _pShell->DeclareSymbol("user INDEX dbg_bBreak;", &dbg_bBreak);
