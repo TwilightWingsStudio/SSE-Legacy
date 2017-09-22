@@ -387,6 +387,7 @@ extern INDEX hud_bShowMatchInfo = TRUE;
 extern BOOL hud_bSecondCrosshair = FALSE;
 extern FLOAT hud_fRedScreenOpacity = 0.85F; // Default is 1.0F, but I changed a little bit for better gameplay experience.
 extern INDEX hud_bColorCustomization = FALSE;
+extern INDEX hud_bTeamColorBasedColor = TRUE;
 extern INDEX hud_colBorders = 0x4C80BB00;
 extern BOOL hud_bShowEmptyAmmoInList = TRUE;
 
@@ -888,6 +889,7 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("persistent user FLOAT hud_fRedScreenOpacity;",    &hud_fRedScreenOpacity);
   _pShell->DeclareSymbol("persistent user INDEX hud_bShowEmptyAmmoInList;", &hud_bShowEmptyAmmoInList);
   _pShell->DeclareSymbol("persistent user INDEX hud_bColorCustomization;",  &hud_bColorCustomization);
+  _pShell->DeclareSymbol("persistent user INDEX hud_bTeamColorBasedColor;", &hud_bTeamColorBasedColor);
   _pShell->DeclareSymbol("persistent user INDEX hud_colBorders;",           &hud_colBorders);
   
   _pShell->DeclareSymbol("persistent user INDEX hud_bSniperScopeDraw;",  &hud_bSniperScopeDraw);

@@ -60,6 +60,7 @@ extern INDEX hud_bShowMatchInfo;
 
 // [SSE] HUD - Tweaks
 extern INDEX hud_bColorCustomization;
+extern INDEX hud_bTeamColorBasedColor;
 extern INDEX hud_colBorders;
 
 extern BOOL hud_bShowEmptyAmmoInList;
@@ -320,6 +321,34 @@ static INDEX bit_count(INDEX iValue)
     }
 
     return ctSet;
+}
+
+static COLOR HUD_GetTeamColor(INDEX iTeamID)
+{
+  switch (iTeamID)
+  {
+    case 1: return C_lBLUE; break;
+    case 2: return C_lRED; break;
+    case 3: return C_lGREEN; break;
+    case 4: return C_lYELLOW; break;
+  }
+
+  return 0x80808000;
+}
+
+static COLOR HUD_GetInterfaceColor(const CPlayer *penPlayerOwner)
+{
+  if (hud_bColorCustomization) {
+    return hud_colBorders;
+  }
+  
+  const BOOL bTeamPlay = GetSP()->sp_bTeamPlay;
+  
+  if (hud_bTeamColorBasedColor && bTeamPlay) {
+    return HUD_GetTeamColor(penPlayerOwner->m_iTeamID);
+  }
+  
+  return 0x4C80BB00; // Default Blue.
 }
 
 // --------------------------------------------------------------------------------------
@@ -945,7 +974,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
   _fCustomScaling     = hud_fScaling;
   _fResolutionScaling = (FLOAT)_pixDPWidth / 640.0f;
-  _colHUD     = hud_bColorCustomization ? hud_colBorders : 0x4C80BB00;
+  _colHUD     = HUD_GetInterfaceColor(penPlayerOwner);
   _colHUDText = SE_COL_ORANGE_LIGHT;
   _ulAlphaHUD = NormFloatToByte(hud_fOpacity);
   _tmNow = _pTimer->CurrentTick();
@@ -1691,7 +1720,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
   _fCustomScaling     = hud_fScaling;
   _fResolutionScaling = (FLOAT)_pixDPWidth / 640.0f;
-  _colHUD     = hud_bColorCustomization ? hud_colBorders : 0x4C80BB00;
+  _colHUD     = HUD_GetInterfaceColor(penPlayerOwner);
   _colHUDText = SE_COL_ORANGE_LIGHT;
   _ulAlphaHUD = NormFloatToByte(hud_fOpacity);
   _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
@@ -2665,7 +2694,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
 
   _fCustomScaling     = hud_fScaling;
   _fResolutionScaling = (FLOAT)_pixDPWidth / 640.0f;
-  _colHUD     = hud_bColorCustomization ? hud_colBorders : 0x4C80BB00;
+  _colHUD     = HUD_GetInterfaceColor(penPlayerOwner);
   _colHUDText = SE_COL_ORANGE_LIGHT;
   _ulAlphaHUD = NormFloatToByte(hud_fOpacity);
   _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
