@@ -470,12 +470,8 @@ static void ListObservers(void)
 static void ListAllPlayers(void)
 {
   CPrintF("player list:\n");
-  if (!_pNetwork->ga_srvServer.srv_bActive) {
-    CPrintF("  <not a server>\n");
-    return;
-  }
   
-  CPrintF("  entityid# ip\n");
+  CPrintF("  entityid# name\n");
   CPrintF("  ----------------------------------------\n");
   
   INDEX ctPlayers = 0;
