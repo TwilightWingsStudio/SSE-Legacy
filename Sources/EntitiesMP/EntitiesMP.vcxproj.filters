@@ -664,6 +664,9 @@
     <ClCompile Include="GenericPowerUpItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerExecutor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1836,6 +1839,12 @@
     <ClInclude Include="GenericPowerUpItem_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerExecutor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerExecutor_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2822,5 +2831,10 @@
     <CustomBuild Include="GenericPowerUpItem.es">
       <Filter>Class Files\Items</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PlayerExecutor.es">
+      <Filter>Class Files\Tools</Filter>
+    </None>
   </ItemGroup>
 </Project>
