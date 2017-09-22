@@ -386,6 +386,8 @@ extern INDEX hud_bShowMatchInfo = TRUE;
 // [SSE] HUD
 extern BOOL hud_bSecondCrosshair = FALSE;
 extern FLOAT hud_fRedScreenOpacity = 0.85F; // Default is 1.0F, but I changed a little bit for better gameplay experience.
+extern INDEX hud_bColorCustomization = FALSE;
+extern INDEX hud_colBorders = 0x4C80BB00;
 extern BOOL hud_bShowEmptyAmmoInList = TRUE;
 
 extern BOOL hud_bSniperScopeDraw = TRUE;
@@ -882,9 +884,11 @@ void CPlayer_OnInitClass(void)
   _pShell->DeclareSymbol("persistent user FLOAT plr_fBreathingStrength;", &plr_fBreathingStrength);
   
   // [SSE] HUD
-  _pShell->DeclareSymbol("persistent user INDEX hud_bSecondCrosshair;",  &hud_bSecondCrosshair);
-  _pShell->DeclareSymbol("persistent user FLOAT hud_fRedScreenOpacity;",  &hud_fRedScreenOpacity);
-  _pShell->DeclareSymbol("persistent user INDEX hud_bShowEmptyAmmoInList;",  &hud_bShowEmptyAmmoInList);
+  _pShell->DeclareSymbol("persistent user INDEX hud_bSecondCrosshair;",     &hud_bSecondCrosshair);
+  _pShell->DeclareSymbol("persistent user FLOAT hud_fRedScreenOpacity;",    &hud_fRedScreenOpacity);
+  _pShell->DeclareSymbol("persistent user INDEX hud_bShowEmptyAmmoInList;", &hud_bShowEmptyAmmoInList);
+  _pShell->DeclareSymbol("persistent user INDEX hud_bColorCustomization;",  &hud_bColorCustomization);
+  _pShell->DeclareSymbol("persistent user INDEX hud_colBorders;",           &hud_colBorders);
   
   _pShell->DeclareSymbol("persistent user INDEX hud_bSniperScopeDraw;",  &hud_bSniperScopeDraw);
   _pShell->DeclareSymbol("persistent user INDEX hud_bSniperScopeRenderFromQuarter;",  &hud_bSniperScopeRenderFromQuarter);

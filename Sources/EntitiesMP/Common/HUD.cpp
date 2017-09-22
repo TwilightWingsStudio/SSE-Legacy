@@ -59,6 +59,9 @@ extern FLOAT hud_tmWeaponsOnScreen;
 extern INDEX hud_bShowMatchInfo;
 
 // [SSE] HUD - Tweaks
+extern INDEX hud_bColorCustomization;
+extern INDEX hud_colBorders;
+
 extern BOOL hud_bShowEmptyAmmoInList;
 
 // [SSE] HUD - Sniper Scope Settings
@@ -942,7 +945,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
   _fCustomScaling     = hud_fScaling;
   _fResolutionScaling = (FLOAT)_pixDPWidth / 640.0f;
-  _colHUD     = 0x4C80BB00;
+  _colHUD     = hud_bColorCustomization ? hud_colBorders : 0x4C80BB00;
   _colHUDText = SE_COL_ORANGE_LIGHT;
   _ulAlphaHUD = NormFloatToByte(hud_fOpacity);
   _tmNow = _pTimer->CurrentTick();
@@ -1688,7 +1691,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
   _fCustomScaling     = hud_fScaling;
   _fResolutionScaling = (FLOAT)_pixDPWidth / 640.0f;
-  _colHUD     = 0x4C80BB00;
+  _colHUD     = hud_bColorCustomization ? hud_colBorders : 0x4C80BB00;
   _colHUDText = SE_COL_ORANGE_LIGHT;
   _ulAlphaHUD = NormFloatToByte(hud_fOpacity);
   _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
@@ -2662,7 +2665,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
 
   _fCustomScaling     = hud_fScaling;
   _fResolutionScaling = (FLOAT)_pixDPWidth / 640.0f;
-  _colHUD     = 0x4C80BB00;
+  _colHUD     = hud_bColorCustomization ? hud_colBorders : 0x4C80BB00;
   _colHUDText = SE_COL_ORANGE_LIGHT;
   _ulAlphaHUD = NormFloatToByte(hud_fOpacity);
   _ulBrAlpha = NormFloatToByte(hud_fOpacity * 0.5F);
