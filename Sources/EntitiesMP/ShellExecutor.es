@@ -1,4 +1,5 @@
-/* Copyright (c) 2002-2012 Croteam Ltd. 
+/* Copyright (c) 2017 by ZCaliptium
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as published by
 the Free Software Foundation
@@ -19,6 +20,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "EntitiesMP/Player.h"
 %}
 
+enum EShellExecutorSide
+{
+  0 ESES_BOTH       "Client & Server [0]",
+  1 ESES_SERVERONLY "Server Only [1]",
+};
+
 class CShellExecutor : CRationalEntity {
 name      "ShellExecutor";
 thumbnail "Thumbnails\\ShellExecutor.tbn";
@@ -32,10 +39,11 @@ properties:
    5 BOOL m_bDebugMessages    "Debug Messages" = FALSE,
    6 CTString m_strConsoleCmd   "Console Command" = "",
    7 CTString m_strConsoleMsg   "Console Message" = "",
+   8 enum EShellExecutorSide m_eType "Type" = ESES_BOTH,
 
 components:
-  1 model   MODEL_TELEPORTER   "Models\\Editor\\ShellExecutor.mdl",
-  2 texture TEXTURE_TELEPORTER "Models\\Editor\\ShellExecutor.tex",
+  1 model   MODEL_EXECUTOR   "Models\\Editor\\ShellExecutor.mdl",
+  2 texture TEXTURE_EXECUTOR "Models\\Editor\\ShellExecutor.tex",
 
 functions:
   // --------------------------------------------------------------------------------------
@@ -61,15 +69,22 @@ functions:
   void DoExecution()
   {
     if (m_strConsoleCmd != "") {
-      if (m_strConsoleCmd.HasPrefix("net_") || m_strConsoleCmd.HasPrefix("ser_") || m_strConsoleCmd.HasPrefix("gam_") || m_strConsoleCmd.HasPrefix("cli_") || m_strConsoleCmd.HasPrefix("tex_") || m_strConsoleCmd.HasPrefix("Quit()")) {
+      if (m_strConsoleCmd.HasPrefix("net_") || m_strConsoleCmd.HasPrefix("ser_") || m_strConsoleCmd.HasPrefix("wld_")  || m_strConsoleCmd.HasPrefix("gam_") || m_strConsoleCmd.HasPrefix("cli_") || m_strConsoleCmd.HasPrefix("tex_") || m_strConsoleCmd.HasPrefix("Quit()")) {
         if (m_bDebugMessages) {
           CPrintF("[SE] %s : Error! Attempt to use not allowed shell command!\n", m_strName);
         }
       } else {
-        if (m_bDebugMessages) {
-          CPrintF("[SE] %s : Executing command: %s\n", m_strName, m_strConsoleCmd);
+        if (m_eType == ESES_BOTH || (m_eType == ESES_SERVERONLY && _pNetwork->IsServer())) {
+          if (m_bDebugMessages) {
+            CPrintF("[SE] %s : Executing command: %s\n", m_strName, m_strConsoleCmd);
+          }
+
+          _pShell->Execute(m_strConsoleCmd + ";");
+        } else {
+          if (m_bDebugMessages) {
+            CPrintF("[SE] %s : Command not executed! Not a server!\n", m_strName);
+          }
         }
-        _pShell->Execute(m_strConsoleCmd + ";");
       }
     } else {
       if (m_bDebugMessages) {
@@ -92,9 +107,9 @@ procedures:
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
     SetCollisionFlags(ECF_IMMATERIAL);
 
-    // set appearance
-    SetModel(MODEL_TELEPORTER);
-    SetModelMainTexture(TEXTURE_TELEPORTER);
+    // Set appearance.
+    SetModel(MODEL_EXECUTOR);
+    SetModelMainTexture(TEXTURE_EXECUTOR);
   
     autowait(0.1f);
   
@@ -104,7 +119,7 @@ procedures:
         resume;
       }
 
-      on(ETrigger) : {
+      on (ETrigger) : {
         if (m_bActive) {
           DoExecution();
         }
