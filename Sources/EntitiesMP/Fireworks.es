@@ -33,6 +33,8 @@ properties:
  12 FLOAT m_tmActivated = 0.0f,
 
  20 CTString m_strName        "Name" 'N' ="",
+ 
+ 25 INDEX m_ctSparks "Sparks Count" = 128, // [SSE]
 
  50 FLOAT m_tmLastAnimation=0.0f,
 
@@ -126,11 +128,10 @@ procedures:
 
     FLOAT tmNow = _pTimer->CurrentTick();
     m_tmActivated = tmNow;
-    INDEX ctSparks = 128;
 
-    for (INDEX iSpark = 0; iSpark < ctSparks; iSpark++)
+    for (INDEX iSpark = 0; iSpark < m_ctSparks; iSpark++)
     {
-      FLOAT tmBirth = tmNow + (iSpark + RAND_05) * _pTimer->TickQuantum / ctSparks*2.0f;
+      FLOAT tmBirth = tmNow + (iSpark + RAND_05) * _pTimer->TickQuantum / m_ctSparks * 2.0f;
       FLOAT fLife = 4.0f + RAND_05 * 2.0f;
       FLOAT fStretch = (1.0f + RAND_05 * 0.25f) * 2.5f;
       FLOAT3D vSpeed = FLOAT3D( RAND_05, RAND_05, RAND_05);
@@ -161,13 +162,15 @@ procedures:
     SetModel(MODEL_MARKER);
     SetModelMainTexture(TEXTURE_MARKER);
     GetModelObject()->StretchModel(FLOAT3D(4.0f, 4.0f, 4.0f));
+    
+    m_ctSparks = Clamp(m_ctSparks, INDEX(1), INDEX(2048));
 
     autowait(_pTimer->TickQuantum);
 
     m_emEmiter.Initialize(this);
     m_emEmiter.em_etType=ET_FIREWORKS01;
 
-    // wait to be triggered
+    // Wait to be triggered.
     wait()
     {
       on (EBegin) : {
