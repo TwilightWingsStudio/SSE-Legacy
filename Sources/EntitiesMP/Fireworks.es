@@ -53,6 +53,15 @@ components:
  4 sound   SOUND_EXPLODE     "SoundsMP\\Misc\\Firecrackers.wav",
  
 functions:
+  // --------------------------------------------------------------------------------------
+  // No comments.
+  // --------------------------------------------------------------------------------------
+  void Precache(void)
+  {
+    PrecacheSound(SOUND_FLY);
+    PrecacheSound(SOUND_EXPLODE);
+  }
+
   void Read_t( CTStream *istr) // throw char *
   { 
     CRationalEntity::Read_t(istr);
