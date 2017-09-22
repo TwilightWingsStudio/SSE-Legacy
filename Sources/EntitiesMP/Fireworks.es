@@ -34,7 +34,10 @@ properties:
 
  20 CTString m_strName        "Name" 'N' ="",
  
- 25 INDEX m_ctSparks "Sparks Count" = 128, // [SSE]
+ // [SSE]
+ 25 INDEX m_ctSparks "Sparks Count" = 128,
+ 26 BOOL m_bFlySound "Fly Sound" = TRUE,
+ 27 BOOL m_bExplosionSound "Explosion Sound" = TRUE,
 
  50 FLOAT m_tmLastAnimation=0.0f,
 
@@ -109,9 +112,15 @@ functions:
 procedures:
   SpawnFireworks()
   {
-    PlaySound(m_soFly, SOUND_FLY, 0);
+    if (m_bFlySound) {
+      PlaySound(m_soFly, SOUND_FLY, 0);
+    }
+
     autowait(GetSoundLength(SOUND_FLY));
-    PlaySound(m_soExplosion, SOUND_EXPLODE, 0);
+    
+    if (m_bExplosionSound) {
+      PlaySound(m_soExplosion, SOUND_EXPLODE, 0);
+    }
 
     // Add emited firework sparks
     FLOAT3D vRndPos = FLOAT3D( RAND_05, RAND_05, RAND_05)*m_rRndRadius;
