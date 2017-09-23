@@ -21,7 +21,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 extern CTString ga_strServer;
 extern CTString ga_strMSLegacy;
+extern CTString ga_strDarkPlacesMS;
 extern BOOL ga_bMSLegacy;
+extern BOOL ga_bDarkPlacesMS;
 
 extern void MS_OnServerStart(void);
 extern void MS_OnServerEnd(void);

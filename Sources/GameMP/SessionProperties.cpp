@@ -422,6 +422,31 @@ BOOL IsMenuEnabledCfunc(void* pArgs)
   return IsMenuEnabled(strMenuName);
 }
 
+// [SSE]
+CTString GetGameTypeShortName(INDEX iMode)
+{
+  if (iMode > CSessionProperties::GM_LASTGAMEMODE) {
+    return "";
+  }
+  
+  switch (iMode)
+  {
+    default: return "";
+    
+    case CSessionProperties::GM_COOPERATIVE: return "coop";
+    case CSessionProperties::GM_FRAGMATCH: return "dm";
+    case CSessionProperties::GM_TEAMDEATHMATCH: return "tdm";
+    case CSessionProperties::GM_SCOREMATCH: return "sm";
+  }
+}
+
+// [SSE]
+CTString GetGameTypeShortNameCfunc(void* pArgs)
+{
+  INDEX iMode = NEXTARGUMENT(INDEX);
+  return GetGameTypeShortName(iMode);
+}
+
 CTString GetGameTypeName(INDEX iMode)
 {
   if (iMode > CSessionProperties::GM_LASTGAMEMODE) {
@@ -505,11 +530,13 @@ CTString GetGameTypeName(INDEX iMode)
     */
   }
 }
+
 CTString GetGameTypeNameCfunc(void* pArgs)
 {
   INDEX iMode = NEXTARGUMENT(INDEX);
   return GetGameTypeName(iMode);
 }
+
 CTString GetCurrentGameTypeName()
 {
   const CSessionProperties &sp = *GetSP();

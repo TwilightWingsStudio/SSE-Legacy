@@ -24,7 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/Server.h>
 #include <Engine/Network/Network.h>
 #include <Engine/Network/SessionState.h>
-#include <GameMP/SessionProperties.h>
+#include <GameMP/SessionProperties.h> // TODO: GET RID OF THIS!
 #include <Engine/GameAgent/GameAgent.h>
 
 #include <Engine/GameAgent/MSLegacy.h>
@@ -32,6 +32,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define MSPORT      28900
 #define BUFFSZ      8192
 #define BUFFSZSTR   4096
+
+#define DP_NET_PROTOCOL_VERSION 3
+#define DP_GAME_NAME "Xonotic"
 
 #define PCK         "\\gamename\\%s" \
                     "\\enctype\\%d" \
@@ -187,6 +190,7 @@ void _initializeWinsock(void)
   _sin->sin_family = AF_INET;
   _sin->sin_addr.s_addr = *(ULONG*)phe->h_addr_list[0];
   
+  // [SSE]
   if (ga_bDarkPlacesMS) {
     _sin->sin_port = htons(27950);
   } else if (!ga_bMSLegacy) {
@@ -261,6 +265,19 @@ CTString _getGameModeName(INDEX iGameMode)
 {
   // get function that will provide us the info about gametype
   CShellSymbol *pss = _pShell->GetSymbol("GetGameTypeNameSS", /*bDeclaredOnly=*/ TRUE);
+
+  if (pss == NULL) {
+    return "";
+  }
+
+  CTString (*pFunc)(INDEX) = (CTString (*)(INDEX))pss->ss_pvValue;
+  return pFunc(iGameMode);
+}
+
+CTString _getGameModeShortName(INDEX iGameMode)
+{
+  // get function that will provide us the info about gametype
+  CShellSymbol *pss = _pShell->GetSymbol("GetGameTypeShortNameSS", /*bDeclaredOnly=*/ TRUE);
 
   if (pss == NULL) {
     return "";
@@ -478,6 +495,7 @@ static void MSLegacy_ProcessReceivedPacket()
   sPch3 = strstr(_szBuffer, "\\basic\\");
   sPch4 = strstr(_szBuffer, "\\players\\");
 
+  // status request
   if (sPch1) {
     CTString strPacket;
     CTString strLocation;
@@ -528,6 +546,7 @@ static void MSLegacy_ProcessReceivedPacket()
     strPacket += "\\final\\\\queryid\\333.1";
     _sendPacketTo(strPacket, &_sinFrom);
 
+  // info request
   } else if (sPch2){
 
     CTString strPacket;
@@ -540,6 +559,7 @@ static void MSLegacy_ProcessReceivedPacket()
       _pNetwork->ga_sesSessionState.ses_ctMaxPlayers);
     _sendPacketTo(strPacket, &_sinFrom);
 
+  // basis request
   } else if (sPch3){
 
     CTString strPacket;
@@ -555,11 +575,13 @@ static void MSLegacy_ProcessReceivedPacket()
       strLocation);
     _sendPacketTo(strPacket, &_sinFrom);
 
+  // players request
   } else if (sPch4){
 
     // send the player status response
     CTString strPacket;
     strPacket = "";
+
     for (INDEX i=0; i<_pNetwork->ga_srvServer.GetPlayersCount(); i++) {
       CPlayerBuffer &plb = _pNetwork->ga_srvServer.srv_aplbPlayers[i];
       CPlayerTarget &plt = _pNetwork->ga_sesSessionState.ses_apltPlayers[i];
@@ -587,8 +609,21 @@ static void MSLegacy_ProcessReceivedPacket()
   }
 }
 
+// --------------------------------------------------------------------------------------
+// Builds game status string.
+// --------------------------------------------------------------------------------------
+void DarkPlaces_BuildQCStatus(CTString &strStatus)
+{
+  INDEX ctFreeSlots = _pNetwork->ga_sesSessionState.ses_ctMaxPlayers - _pNetwork->ga_srvServer.GetClientsCount();
+  
+  strStatus.PrintF("%s:%s:P%d:S%d:F%d:M%s::score!!", _getGameModeShortName(_getSP()->sp_gmGameMode), "0.8.2", 0, ctFreeSlots, 0, DP_GAME_NAME);
+}
+
 void DarkPlaces_BuildStatusResponse(const char* challenge, CTString &strPacket, BOOL bFullStatus)
 {
+  CTString strStatus;
+  DarkPlaces_BuildQCStatus(strStatus);
+  
   strPacket.PrintF("\xFF\xFF\xFF\xFF%s\x0A"
             "\\gamename\\%s\\modname\\%s\\gameversion\\%d\\sv_maxclients\\%d"
             "\\clients\\%d\\bots\\%d\\mapname\\%s\\hostname\\%s\\protocol\\%d"
@@ -597,9 +632,9 @@ void DarkPlaces_BuildStatusResponse(const char* challenge, CTString &strPacket, 
             "%s%s"
             "%s",
             bFullStatus ? "statusResponse" : "infoResponse",
-            "Xonotic", "", 802, _pNetwork->ga_sesSessionState.ses_ctMaxPlayers,
-            _pNetwork->ga_srvServer.GetClientsCount(), 0, _pNetwork->ga_World.wo_strName, _pShell->GetString("gam_strSessionName"), 3,
-            "\\qcstatus\\", "coop:0.8.2:P0:S15:F5:MXonotic::score!!",
+            DP_GAME_NAME, "", _ulEngineRevision, _pNetwork->ga_sesSessionState.ses_ctMaxPlayers,
+            _pNetwork->ga_srvServer.GetClientsCount(), 0, _pNetwork->ga_World.wo_strName, _pShell->GetString("gam_strSessionName"), DP_NET_PROTOCOL_VERSION,
+            "\\qcstatus\\", strStatus,
             challenge ? "\\challenge\\" : "", challenge ? challenge : "",
             "", "", "");
 }
@@ -617,8 +652,11 @@ void DarkPlaces_ServerParsePacket(INDEX iLength)
     
     //CPrintF("Received DarkPlaces text command!\n");
     
+    // Short info.
     if (iLength >= 7 && !memcmp(data, "getinfo", 7))
     {
+      CPrintF("Received 'getinfo' text command!\n");
+
       const char *challenge = NULL;
       
 			if (iLength > 8 && string[7] == ' ')
@@ -633,10 +671,12 @@ void DarkPlaces_ServerParsePacket(INDEX iLength)
       _sendPacket(strPacket);
       return;
     }
-    
-    
+
+    // Full status.
     if (iLength >= 9 && !memcmp(string, "getstatus", 9))
     {
+      CPrintF("Received 'getstatus' text command!\n");
+
       const char *challenge = NULL;
       
 			if (iLength > 10 && string[9] == ' ')
@@ -665,9 +705,210 @@ void DarkPlaces_ServerParsePacket(INDEX iLength)
     }
     
     CPrintF("Received unknown text command!\n");
-    CPrintF("Data: %s\n", data);    
+    CPrintF("Data[%d]: %s\n", iLength, data);    
   }
   //CPrintF("Received: %s\n", &_szBuffer[0]);
+}
+
+void DarkPlaces_ParseServerList(unsigned char *data, INDEX iLength, BOOL bExtended)
+{
+  CPrintF("Data Length: %d\n", iLength);
+  
+  while (iLength >= 7)
+	{
+    // IPV4 Address.
+    if (data[0] == '\\') {
+      
+      unsigned short uPort = data[5] * 256 + data[6];
+      
+      if (uPort != 0 && (data[1] != 0xFF || data[2] != 0xFF || data[3] != 0xFF || data[4] != 0xFF))
+      {
+        CTString strIP;
+        strIP.PrintF("%u.%u.%u.%u", data[1], data[2], data[3], data[4]);
+        
+        CPrintF("%s:%hu\n", strIP, uPort);
+        
+        sockaddr_in sinServer;
+        sinServer.sin_family = AF_INET;
+        sinServer.sin_addr.s_addr = inet_addr(strIP);
+        sinServer.sin_port = htons(uPort);
+  
+        // insert server status request into container
+        CServerRequest &sreq = ga_asrRequests.Push();
+        sreq.sr_ulAddress = sinServer.sin_addr.s_addr;
+        sreq.sr_iPort = sinServer.sin_port;
+        sreq.sr_tmRequestTime = _pTimer->GetHighPrecisionTimer().GetMilliseconds();
+  
+        // send packet to server
+        _sendPacketTo("\xFF\xFF\xFF\xFFgetstatus", &sinServer);
+      }
+      
+			data += 7;
+			iLength -= 7;
+
+    // IPV6 Address.
+    } else if (iLength >= 19 && data[0] == '/' && bExtended) {
+      
+      // Just skip it. Because our game don't have IPV6 support.
+			data += 19;
+			iLength -= 19;
+      
+    // Unknown Data.
+    } else {
+      CPrintF("Error! Unknown data while parsing server list!\n");
+      break;
+    }
+  }
+}
+
+void DarkPlaces_ClientParsePacket(INDEX iLength)
+{
+  char *string = &_szBuffer[0];
+  unsigned char *data = (unsigned char*)&_szBuffer[0];
+  
+  if (iLength >= 5 && data[0] == 0xFF && data[1] == 0xFF && data[2] == 0xFF && data[3] == 0xFF)
+  {
+    data += 4;
+    string += 4;
+    iLength -= 4;
+    
+    // Regular Servers Response.
+    if (iLength >= 19 && !memcmp(string, "getserversResponse\\", 19))
+    {
+      CPrintF("Received 'getserversResponse\\'!\n");
+      data += 18;
+      string += 18;
+      iLength -= 18;
+
+      DarkPlaces_ParseServerList(data, iLength, FALSE);
+
+      return;
+    }
+    
+    // Extended Servers Response.
+    if (iLength >= 21 && !memcmp(string, "getserversExtResponse", 21))
+    {
+      CPrintF("Received 'getserversExtResponse'!\n");
+      data += 21;
+      string += 21;
+      iLength -= 21;
+
+      DarkPlaces_ParseServerList(data, iLength, TRUE);
+
+      return;
+    }
+    
+    // Status Response from one of servers from Server List
+    if (iLength >= 15 && !memcmp(string, "statusResponse\x0A", 15))
+    {
+      CPrintF("Received 'statusResponse'!\n");
+      
+      data += 15;
+      string += 15;
+      iLength -= 15;
+      
+      CPrintF("Data: %s\n", data);
+
+      CNetworkSession &ns = *new CNetworkSession;
+      _pNetwork->ga_lhEnumeratedSessions.AddTail(ns.ns_lnNode);
+      
+      BOOL bReadValue = FALSE;
+      CTString strKey;
+      CTString strValue;
+      
+      CTString strPlayers;
+      CTString strMaxPlayers;
+      CTString strLevel;
+      CTString strGameType;
+      CTString strVersion;
+      CTString strGameName;
+      CTString strSessionName;
+
+      CTString strGamePort;
+      CTString strServerLocation;
+      CTString strGameMode;
+      CTString strActiveMod;
+      
+      // Skip first separator!
+      if (*data == '\\') {
+        data += 1;
+        string += 1;
+        iLength -= 1;
+      }
+
+      while (*data != 0)
+      {
+        switch (data[0])
+        {
+          case '\\': {
+            //if (strKey != "gamemode") {
+              if (bReadValue) {
+                // we're done reading the value, check which key it was
+                if (strKey == "gamename") {
+                    strGameName = strValue;
+                } else if (strKey == "gameversion") {
+                    strVersion = strValue;
+                } else if (strKey == "location") {
+                    strServerLocation = strValue;
+                } else if (strKey == "hostname") {
+                    strSessionName = strValue;
+                } else if (strKey == "hostport") {
+                    strGamePort = strValue;
+                } else if (strKey == "mapname") {
+                    strLevel = strValue;
+                } else if (strKey == "gametype") {
+                    strGameType = strValue;
+                } else if (strKey == "modname") {
+                    strActiveMod = strValue;
+                } else if (strKey == "clients") {
+                    strPlayers = strValue;
+                } else if (strKey == "bots") {
+                } else if (strKey == "protocol") {
+                } else if (strKey == "sv_maxclients") {
+                    strMaxPlayers = strValue;
+                } else {
+                   CPrintF("Unknown DarkPlaces parameter key '%s'!\n", strKey);
+                }
+                // reset temporary holders
+                strKey = "";
+                strValue = "";
+              }
+            //}
+
+            bReadValue = !bReadValue;
+          } break;
+          
+          default: {
+            // read into the value or into the key, depending where we are
+            if (bReadValue) {
+              strValue.InsertChar(strlen(strValue), *data);
+            } else {
+              strKey.InsertChar(strlen(strKey), *data);
+            }
+          }
+        }
+        
+        data += 1;
+        iLength -= 1;
+      }
+
+      // add the server to the serverlist
+      ns.ns_strSession = strSessionName;
+      ns.ns_strAddress = inet_ntoa(_sinFrom.sin_addr) + CTString(":") + CTString(0, "%d", htons(_sinFrom.sin_port) - 1);
+      ns.ns_tmPing = (10000.0F / 1000.0f);
+      ns.ns_strWorld = strLevel;
+      ns.ns_ctPlayers = atoi(strPlayers);
+      ns.ns_ctMaxPlayers = atoi(strMaxPlayers);
+      ns.ns_strGameType = strGameType;
+      ns.ns_strMod = strGameName;
+      ns.ns_strVer = strVersion;
+      
+      return;
+    }
+
+    CPrintF("Received unknown text command!\n");
+    CPrintF("Data[%d]: %s\n", iLength, data);   
+  }
 }
 
 // --------------------------------------------------------------------------------------
@@ -722,14 +963,50 @@ extern void MS_OnServerStateChanged(void)
   }
 }
 
+void GameAgent_EnumTrigger(BOOL bInternet)
+{
+  // Make sure that there are no requests still stuck in buffer.
+  ga_asrRequests.Clear();
+
+  // We're not a server.
+  _bServer = FALSE;
+  // Initialization.
+  _bInitialized = TRUE;
+  // Send enumeration packet to masterserver.
+  _sendPacket("e");
+  _setStatus(".");
+}
+
+void DarkPlaces_EnumTrigger(BOOL bInternet)
+{
+  // Make sure that there are no requests still stuck in buffer.
+  ga_asrRequests.Clear();
+  
+  // We're not a server.
+  _bServer = FALSE;
+  // Initialization.
+  _bInitialized = TRUE;
+  
+  CTString strPacket;
+  strPacket.PrintF("\xFF\xFF\xFF\xFFgetservers %s %u empty full", DP_GAME_NAME, DP_NET_PROTOCOL_VERSION);
+  _sendPacket(strPacket); // Send enumeration packet to masterserver.
+
+  _setStatus(".");
+}
+
 // --------------------------------------------------------------------------------------
-// Request serverlist enumeration.
+// Request serverlist enumeration. Sends request packet.
 // --------------------------------------------------------------------------------------
 extern void MS_EnumTrigger(BOOL bInternet)
 {
 
-  if (_pNetwork->ga_bEnumerationChange ) {
+  if (_pNetwork->ga_bEnumerationChange) {
     return;
+  }
+  
+  if (ga_bDarkPlacesMS) {
+    DarkPlaces_EnumTrigger(bInternet);
+    return; 
   }
   
   // Local Search with Legacy Protocol
@@ -813,22 +1090,15 @@ extern void MS_EnumTrigger(BOOL bInternet)
     _initializeWinsock();	
     return;
 	
+  // Internet Search
   } else {
 
     // GameAgent
     if (!ga_bMSLegacy) {
-      // make sure that there are no requests still stuck in buffer
-      ga_asrRequests.Clear();
-      // we're not a server
-      _bServer = FALSE;
-      // Initialization
-      _bInitialized = TRUE;
-      // send enumeration packet to masterserver
-      _sendPacket("e");
-      _setStatus(".");
-    }
-    else
-    { /* MSLegacy */
+      GameAgent_EnumTrigger(bInternet);
+
+    // MSLegacy
+    } else { 
       // make sure that there are no requests still stuck in buffer
       ga_asrRequests.Clear();
       // we're not a server
@@ -1012,189 +1282,218 @@ extern void MS_EnumTrigger(BOOL bInternet)
   }
 }
 
+void GameAgent_EnumUpdate(void)
+{
+  int iLen = _recvPacket();
+
+  if (iLen == -1) {
+    return;
+  }
+
+  // null terminate the buffer
+  _szBuffer[iLen] = 0;
+
+  switch (_szBuffer[0])
+  {
+    case 's':
+    {
+      struct sIPPort {
+        UBYTE bFirst;
+        UBYTE bSecond;
+        UBYTE bThird;
+        UBYTE bFourth;
+        USHORT iPort;
+      };
+
+      _pNetwork->ga_strEnumerationStatus = "";
+  
+      sIPPort* pServers = (sIPPort*)(_szBuffer + 1);
+      while(iLen - ((CHAR*)pServers - _szBuffer) >= sizeof(sIPPort)) {
+        sIPPort ip = *pServers;
+  
+        CTString strIP;
+        strIP.PrintF("%d.%d.%d.%d", ip.bFirst, ip.bSecond, ip.bThird, ip.bFourth);
+  
+        sockaddr_in sinServer;
+        sinServer.sin_family = AF_INET;
+        sinServer.sin_addr.s_addr = inet_addr(strIP);
+        sinServer.sin_port = htons(ip.iPort + 1);
+  
+        // insert server status request into container
+        CServerRequest &sreq = ga_asrRequests.Push();
+        sreq.sr_ulAddress = sinServer.sin_addr.s_addr;
+        sreq.sr_iPort = sinServer.sin_port;
+        sreq.sr_tmRequestTime = _pTimer->GetHighPrecisionTimer().GetMilliseconds();
+  
+        // send packet to server
+        _sendPacketTo("\x02", &sinServer);
+  
+        pServers++;
+      }
+    } break;
+    
+    case '0':
+    {
+      CTString strPlayers;
+      CTString strMaxPlayers;
+      CTString strLevel;
+      CTString strGameType;
+      CTString strVersion;
+      CTString strGameName;
+      CTString strSessionName;
+  
+      CHAR* pszPacket = _szBuffer + 2; // we do +2 because the first character is always ';', which we don't care about.
+  
+      BOOL bReadValue = FALSE;
+      CTString strKey;
+      CTString strValue;
+  
+      while(*pszPacket != 0) {
+        switch (*pszPacket) {
+        case ';':
+          if (strKey != "sessionname") {
+            if (bReadValue) {
+              // we're done reading the value, check which key it was
+              if (strKey == "players") {
+                strPlayers = strValue;
+              } else if (strKey == "maxplayers") {
+                strMaxPlayers = strValue;
+              } else if (strKey == "level") {
+                strLevel = strValue;
+              } else if (strKey == "gametype") {
+                strGameType = strValue;
+              } else if (strKey == "version") {
+                strVersion = strValue;
+              } else if (strKey == "gamename") {
+                strGameName = strValue;
+              } else {
+                CPrintF("Unknown GameAgent parameter key '%s'!", strKey);
+              }
+  
+              // reset temporary holders
+              strKey = "";
+              strValue = "";
+            }
+          }
+          bReadValue = !bReadValue;
+          break;
+  
+        default:
+          // read into the value or into the key, depending where we are
+          if (bReadValue) {
+            strValue.InsertChar(strlen(strValue), *pszPacket);
+          } else {
+            strKey.InsertChar(strlen(strKey), *pszPacket);
+          }
+          break;
+        }
+  
+        // move to next character
+        pszPacket++;
+      }
+  
+      // check if we still have a sessionname to back up
+      if (strKey == "sessionname") {
+        strSessionName = strValue;
+      }
+  
+      // insert the server into the serverlist
+      CNetworkSession &ns = *new CNetworkSession;
+      _pNetwork->ga_lhEnumeratedSessions.AddTail(ns.ns_lnNode);
+  
+      long long tmPing = -1;
+      // find the request in the request array
+      for (INDEX i=0; i<ga_asrRequests.Count(); i++) {
+        CServerRequest &req = ga_asrRequests[i];
+        if (req.sr_ulAddress == _sinFrom.sin_addr.s_addr && req.sr_iPort == _sinFrom.sin_port) {
+          tmPing = _pTimer->GetHighPrecisionTimer().GetMilliseconds() - req.sr_tmRequestTime;
+          ga_asrRequests.Delete(&req);
+          break;
+        }
+      }
+  
+      if (tmPing == -1) {
+        // server status was never requested
+        break;
+      }
+  
+      // add the server to the serverlist
+      ns.ns_strSession = strSessionName;
+      ns.ns_strAddress = inet_ntoa(_sinFrom.sin_addr) + CTString(":") + CTString(0, "%d", htons(_sinFrom.sin_port) - 1);
+      ns.ns_tmPing = (tmPing / 1000.0f);
+      ns.ns_strWorld = strLevel;
+      ns.ns_ctPlayers = atoi(strPlayers);
+      ns.ns_ctMaxPlayers = atoi(strMaxPlayers);
+      ns.ns_strGameType = strGameType;
+      ns.ns_strMod = strGameName;
+      ns.ns_strVer = strVersion;
+    } break;
+    
+    default:
+      CPrintF("Unknown enum packet ID %x!\n", _szBuffer[0]);
+      break;
+    }
+}
+
+void MSLegacy_EnumUpdate(void)
+{
+  if (_bActivated)
+  {
+    HANDLE  _hThread;
+    DWORD   _dwThreadId;
+
+    _hThread = CreateThread(NULL, 0, _MS_Thread, 0, 0, &_dwThreadId);
+    if (_hThread != NULL) {
+      CloseHandle(_hThread);
+    }
+    _bActivated = FALSE;		
+  }
+
+  if (_bActivatedLocal)
+  {
+    HANDLE  _hThread;
+    DWORD   _dwThreadId;
+
+    _hThread = CreateThread(NULL, 0, _LocalNet_Thread, 0, 0, &_dwThreadId);
+    if (_hThread != NULL) {
+      CloseHandle(_hThread);
+    }
+
+    _bActivatedLocal = FALSE;		
+  }	
+}
+
+void DarkPlaces_EnumUpdate(void)
+{
+  int iLength = _recvPacket();
+
+  if (iLength == -1) {
+    return;
+  }
+  
+  DarkPlaces_ClientParsePacket(iLength);
+}
+
 // --------------------------------------------------------------------------------------
 // Client update for enumerations.
 // --------------------------------------------------------------------------------------
 extern void MS_EnumUpdate(void)
 {
-
   if ((_socket == NULL) || (!_bInitialized)) {
     return;
   }
 
+  // [SSE]
+  if (ga_bDarkPlacesMS) {
+    DarkPlaces_EnumUpdate();
+  
   // GameAgent
-  if (!ga_bMSLegacy)
-  {
-    int iLen = _recvPacket();
-    if (iLen != -1) {
-    // null terminate the buffer
-    _szBuffer[iLen] = 0;
+  } else if (!ga_bMSLegacy) {
+    GameAgent_EnumUpdate();
 
-    switch (_szBuffer[0])
-    {
-      case 's':
-      {
-        struct sIPPort {
-          UBYTE bFirst;
-          UBYTE bSecond;
-          UBYTE bThird;
-          UBYTE bFourth;
-          USHORT iPort;
-        };
-        _pNetwork->ga_strEnumerationStatus = "";
-    
-        sIPPort* pServers = (sIPPort*)(_szBuffer + 1);
-        while(iLen - ((CHAR*)pServers - _szBuffer) >= sizeof(sIPPort)) {
-          sIPPort ip = *pServers;
-    
-          CTString strIP;
-          strIP.PrintF("%d.%d.%d.%d", ip.bFirst, ip.bSecond, ip.bThird, ip.bFourth);
-    
-          sockaddr_in sinServer;
-          sinServer.sin_family = AF_INET;
-          sinServer.sin_addr.s_addr = inet_addr(strIP);
-          sinServer.sin_port = htons(ip.iPort + 1);
-    
-          // insert server status request into container
-          CServerRequest &sreq = ga_asrRequests.Push();
-          sreq.sr_ulAddress = sinServer.sin_addr.s_addr;
-          sreq.sr_iPort = sinServer.sin_port;
-          sreq.sr_tmRequestTime = _pTimer->GetHighPrecisionTimer().GetMilliseconds();
-    
-          // send packet to server
-          _sendPacketTo("\x02", &sinServer);
-    
-          pServers++;
-        }
-      }
-      break;
-      
-      case '0':
-        {
-          CTString strPlayers;
-          CTString strMaxPlayers;
-          CTString strLevel;
-          CTString strGameType;
-          CTString strVersion;
-          CTString strGameName;
-          CTString strSessionName;
-      
-          CHAR* pszPacket = _szBuffer + 2; // we do +2 because the first character is always ';', which we don't care about.
-      
-          BOOL bReadValue = FALSE;
-          CTString strKey;
-          CTString strValue;
-      
-          while(*pszPacket != 0) {
-            switch (*pszPacket) {
-            case ';':
-              if (strKey != "sessionname") {
-                if (bReadValue) {
-                  // we're done reading the value, check which key it was
-                  if (strKey == "players") {
-                    strPlayers = strValue;
-                  } else if (strKey == "maxplayers") {
-                    strMaxPlayers = strValue;
-                  } else if (strKey == "level") {
-                    strLevel = strValue;
-                  } else if (strKey == "gametype") {
-                    strGameType = strValue;
-                  } else if (strKey == "version") {
-                    strVersion = strValue;
-                  } else if (strKey == "gamename") {
-                    strGameName = strValue;
-                  } else {
-                    CPrintF("Unknown GameAgent parameter key '%s'!", strKey);
-                  }
-      
-                  // reset temporary holders
-                  strKey = "";
-                  strValue = "";
-                }
-              }
-              bReadValue = !bReadValue;
-              break;
-      
-            default:
-              // read into the value or into the key, depending where we are
-              if (bReadValue) {
-                strValue.InsertChar(strlen(strValue), *pszPacket);
-              } else {
-                strKey.InsertChar(strlen(strKey), *pszPacket);
-              }
-              break;
-            }
-      
-            // move to next character
-            pszPacket++;
-          }
-      
-          // check if we still have a sessionname to back up
-          if (strKey == "sessionname") {
-            strSessionName = strValue;
-          }
-      
-          // insert the server into the serverlist
-          CNetworkSession &ns = *new CNetworkSession;
-          _pNetwork->ga_lhEnumeratedSessions.AddTail(ns.ns_lnNode);
-      
-          long long tmPing = -1;
-          // find the request in the request array
-          for (INDEX i=0; i<ga_asrRequests.Count(); i++) {
-            CServerRequest &req = ga_asrRequests[i];
-            if (req.sr_ulAddress == _sinFrom.sin_addr.s_addr && req.sr_iPort == _sinFrom.sin_port) {
-              tmPing = _pTimer->GetHighPrecisionTimer().GetMilliseconds() - req.sr_tmRequestTime;
-              ga_asrRequests.Delete(&req);
-              break;
-            }
-          }
-      
-          if (tmPing == -1) {
-            // server status was never requested
-            break;
-          }
-      
-          // add the server to the serverlist
-          ns.ns_strSession = strSessionName;
-          ns.ns_strAddress = inet_ntoa(_sinFrom.sin_addr) + CTString(":") + CTString(0, "%d", htons(_sinFrom.sin_port) - 1);
-          ns.ns_tmPing = (tmPing / 1000.0f);
-          ns.ns_strWorld = strLevel;
-          ns.ns_ctPlayers = atoi(strPlayers);
-          ns.ns_ctMaxPlayers = atoi(strMaxPlayers);
-          ns.ns_strGameType = strGameType;
-          ns.ns_strMod = strGameName;
-          ns.ns_strVer = strVersion;
-        }
-        break;
-      
-      default:
-        CPrintF("Unknown enum packet ID %x!\n", _szBuffer[0]);
-        break;
-      }
-    }
+  // MSLegacy
   } else {
-    /* MSLegacy */
-    if (_bActivated) {
-        HANDLE  _hThread;
-        DWORD   _dwThreadId;
-
-        _hThread = CreateThread(NULL, 0, _MS_Thread, 0, 0, &_dwThreadId);
-        if (_hThread != NULL) {
-            CloseHandle(_hThread);
-        }
-        _bActivated = FALSE;		
-    }
-
-    if (_bActivatedLocal) {
-        HANDLE  _hThread;
-        DWORD   _dwThreadId;
-
-        _hThread = CreateThread(NULL, 0, _LocalNet_Thread, 0, 0, &_dwThreadId);
-        if (_hThread != NULL) {
-            CloseHandle(_hThread);
-        }
-        _bActivatedLocal = FALSE;		
-    }	
+    MSLegacy_EnumUpdate();
   }
 }
 
