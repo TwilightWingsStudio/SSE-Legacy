@@ -5227,6 +5227,36 @@ functions:
       bFinished = TRUE;
     }
     
+    // [SSE] GameModes - Last Man Standing
+    if (GetSP()->sp_gmGameMode == CSessionProperties::GM_LASTMANSTANDING)
+    {
+      INDEX ctPlayers = 0;
+      INDEX ctAlivePlayers = 0;
+      
+      for (INDEX iPlayer = 0; iPlayer < GetMaxPlayers(); iPlayer++)
+      {
+        CEntity *pen = GetPlayerEntity(iPlayer);
+
+        if (pen == NULL) {
+          continue;
+        }
+        
+        CPlayer *penPlayer = static_cast<CPlayer*>(&*pen);
+        
+        if (penPlayer->m_ulFlags & PLF_INITIALIZED) {
+          ctPlayers++;
+        }
+        
+        if (pen->IsAlive()) {
+          ctAlivePlayers++;
+        }
+      }
+      
+      if (ctPlayers > 1 && ctAlivePlayers <= 1) {
+        bFinished = TRUE;
+      }
+    }
+    
     // [SSE] GameModes - Team DeathMatch
     // if frag limit is out
     if (GetSP()->sp_bTeamPlay && iFragLimit > 0) {
@@ -5239,7 +5269,6 @@ functions:
         bFinished = TRUE;
       }
     }
-
 
     // if score limit is out
     if (iScoreLimit > 0 && m_psLevelStats.ps_iScore>=iScoreLimit) {
@@ -6294,6 +6323,7 @@ functions:
         // [SSE] Respawn Delay
         FLOAT tmRespawnDelay = GetSP()->sp_tmRespawnDelay;
         BOOL bRespawnDelayPassed = FALSE;
+        BOOL bRespawnAllowed = TRUE;
         
         if (tmRespawnDelay > 0.0F) {
           bRespawnDelayPassed = (m_tmKilled + tmRespawnDelay) <= _pTimer->CurrentTick();
@@ -6302,13 +6332,18 @@ functions:
         }
         //
         
+        // [SSE] GameModes - Last Man Standing
+        if (GetSP()->sp_gmGameMode == CSessionProperties::GM_LASTMANSTANDING) {
+          bRespawnAllowed = FALSE;
+        }
+        
         // If holding down reload button then forbid respawning in-place.
         if (m_ulLastButtons&PLACT_RELOAD) {
           m_ulFlags &= ~PLF_RESPAWNINPLACE;
         }
 
         // If playing with respawn with limited (> 0) credits or infinite credits (<= -1).
-        if (bRespawnDelayPassed && GetSP()->sp_ctCredits != 0)
+        if (bRespawnAllowed && bRespawnDelayPassed && GetSP()->sp_ctCredits != 0)
         {
           BOOL bSharedLives = GetSP()->sp_bSharedLives;
           

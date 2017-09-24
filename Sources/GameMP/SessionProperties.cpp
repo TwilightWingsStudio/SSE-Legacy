@@ -405,6 +405,11 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_bInfiniteAmmo = TRUE;
     sp.sp_bAllowWeapons = FALSE;
   }
+  
+  // [SSE] GameModes - Team DeathMatch
+  if (sp.sp_gmGameMode == CSessionProperties::GM_LASTMANSTANDING) {
+    sp.sp_iFragLimit = 0;
+  }
 }
 
 BOOL IsMenuEnabled(const CTString &strMenuName)
@@ -489,19 +494,16 @@ CTString GetGameTypeName(INDEX iMode)
       return TRANS("TDM");
     } break;
     
-    /*
     // [SSE] GameModes - CTF
     case CSessionProperties::GM_CAPTURETHEFLAG: {
       return TRANS("CTF");
     } break;
-    */
  
     // [SSE] GameModes - LMS
     case CSessionProperties::GM_LASTMANSTANDING: {
       return TRANS("LMS");
     } break;
 
-    /*
     // [SSE] GameModes - LTS
     case CSessionProperties::GM_LASTTEAMSTANDING: {
       return TRANS("LTS");
@@ -536,7 +538,6 @@ CTString GetGameTypeName(INDEX iMode)
     case CSessionProperties::GM_DEFEND: {
       return TRANS("Defend");
     } break;
-    */
   }
 }
 

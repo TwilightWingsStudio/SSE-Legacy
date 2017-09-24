@@ -29,10 +29,10 @@ public:
     GM_FRAGMATCH,
 
     GM_TEAMDEATHMATCH,   // [SSE] GameModes - Team DeathMatch
-    
+    GM_LASTMANSTANDING,  // [SSE] GameModes - LMS
+
     GM_LASTGAMEMODE,     // Not actually gamemode. Just border.
     
-    GM_LASTMANSTANDING,  // [SSE] GameModes - LMS
     GM_CAPTURETHEFLAG,   // [SSE] GameModes - CTF
     GM_LASTTEAMSTANDING, // [SSE] GameModes - LTS
     GM_PAYLOAD,          // [SSE] GameModes - PD
