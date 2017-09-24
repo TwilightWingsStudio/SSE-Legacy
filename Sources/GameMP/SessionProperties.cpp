@@ -77,7 +77,9 @@ extern INDEX gam_bSafeFlamethrower; // [SSE] Gameplay - Safe Flamethrower
 
 extern INDEX gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
 extern INDEX gam_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
+
 extern INDEX gam_bRocketJumpMode; // [SSE] RocketJump Mode
+extern INDEX gam_bInstagib; // [SSE] Gameplay - Mutators - Instagib
 
 static void SetGameModeParameters(CSessionProperties &sp)
 {
@@ -395,6 +397,13 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   // [SSE] GameModes - Team DeathMatch
   if (sp.sp_bTeamPlay) {
     sp.sp_ctTeams = Clamp(gam_iTeamCount, 2L, 4L);
+  }
+
+  sp.sp_bInstagib = sp.sp_bUseFrags || sp.sp_gmGameMode == CSessionProperties::GM_SCOREMATCH ? gam_bInstagib : FALSE; // [SSE] Gameplay - Mutators - Instagib
+  
+  if (sp.sp_bInstagib) {
+    sp.sp_bInfiniteAmmo = TRUE;
+    sp.sp_bAllowWeapons = FALSE;
   }
 }
 

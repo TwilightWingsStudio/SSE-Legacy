@@ -13,7 +13,8 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
 
-#define GMF_TEAMPLAY
+#define GMF_TEAMPLAY      (1L << 0)
+#define GMF_BASEONLYSPAWN (1L << 1)
 
 /*
  * Class responsible for describing game session
@@ -94,6 +95,8 @@ public:
   INDEX sp_iInitialMana;        // life price (mana that each player'll have upon respawning)
   FLOAT sp_fExtraEnemyStrength;            // fixed adder for extra enemy power 
   FLOAT sp_fExtraEnemyStrengthPerPlayer;   // adder for extra enemy power per each player playing
+  // TODO: Extra Boss Strength
+  // TODO: Extra boss Strength PerPlayer
 
   INDEX sp_ctCredits;               // number of credits for this game
   INDEX sp_ctCreditsLeft;           // number of credits left on this level
@@ -134,7 +137,6 @@ public:
   
   BOOL sp_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
   BOOL sp_bArmorInertiaDamping;            // [SSE] Armor Inertia Damping Toggle
-  BOOL sp_bRocketJumpMode;                 // [SSE] RocketJump Mode
   
   BOOL sp_bTeamPlayPrefferBases;
   INDEX sp_iTeamKillPenalty; // [SSE] Gameplay - TeamKill Penalty
@@ -152,6 +154,9 @@ public:
   INDEX sp_iTeamScore3;
   INDEX sp_iTeamScore4;
   //
+
+  BOOL sp_bInstagib;       // [SSE] Gameplay - Mutators - Instagib
+  BOOL sp_bRocketJumpMode; // [SSE] RocketJump Mode
 };
 
 // NOTE: never instantiate CSessionProperties, as its size is not fixed to the size defined in engine

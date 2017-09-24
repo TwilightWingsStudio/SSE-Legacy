@@ -142,6 +142,13 @@ extern void HUD_DrawDebugMonitor()
   }
   
   strReport += "\n\n";
+  strReport += "^r[Mutators]^cCCCCCC\n";
+  
+  if (GetSP()->sp_bInstagib) {
+    strReport.PrintF("%s  Instagib\n", strReport);
+  }
+  
+  strReport += "\n\n";
   strReport += "^r[^cFFFFFFDDA System^r]^cCCCC00\n";
   strReport.PrintF("%sEES:   %.2f\n", strReport, fExtraEnemyStrength);
   strReport.PrintF("%sEESPP: %.2f\n", strReport, fExtraStrengthPerPlayer);

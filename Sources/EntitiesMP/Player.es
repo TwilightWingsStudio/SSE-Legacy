@@ -4479,9 +4479,19 @@ functions:
         }
       }
     }
+    
+    // [SSE] Gameplay - Mutators - Instagib
+    if (penInflictor != this && GetSP()->sp_bInstagib && penInflictor != NULL && penInflictor->IsPlayerEntity())
+    {
+      m_fShields = 0.0F;
+      m_fArmor = 0.0F;
+      SetHealth(1.0F);
+      fSubHealth = 100.0F;
+      fDamageAmmount = 100.0F;
+    }
 
     DamageImpact(dmtType, GetSP()->sp_bArmorInertiaDamping ? fSubHealth : fDamageAmmount, vHitPoint, vDirection);
-
+    
     // [SSE] RocketJump Mode
     if (penInflictor != this || !GetSP()->sp_bRocketJumpMode || dmtType == DMT_BURNING) {
       CPlayerEntity::ReceiveDamage( penInflictor, dmtType, fSubHealth, vHitPoint, vDirection); // receive damage
@@ -7322,6 +7332,7 @@ functions:
       // Initialize variables for taking shit.
       INDEX iTakeWeapons = 0;
       INDEX iTakeAmmo = 0;
+      INDEX iGiveWeapons = CpmStart.m_iGiveWeapons;
 
       BOOL bGiveKnifeAndColt = (CpmStart.m_psgtmGiveTakeMod == PSGTM_OLD);
 
@@ -7330,9 +7341,17 @@ functions:
         iTakeWeapons = CpmStart.m_iTakeWeapons;
         iTakeAmmo = GetSP()->sp_bInfiniteAmmo ? 0 : CpmStart.m_iTakeAmmo;
       }
+      
+      // [SSE] Gameplay - Mutators - Instagib
+      if (GetSP()->sp_bInstagib) {
+        iGiveWeapons = 0;
+        iGiveWeapons |= 1 << (WEAPON_SNIPER - 2);
+
+        bGiveKnifeAndColt = FALSE;
+      }
 
       // Give weapons.
-      ((CPlayerWeapons&)*m_penWeapons).InitializeWeapons(CpmStart.m_iGiveWeapons, iTakeWeapons, iTakeAmmo, CpmStart.m_fMaxAmmoRatio, bGiveKnifeAndColt);
+      ((CPlayerWeapons&)*m_penWeapons).InitializeWeapons(iGiveWeapons, iTakeWeapons, iTakeAmmo, CpmStart.m_fMaxAmmoRatio, bGiveKnifeAndColt);
 
       // start position relative to link
       if (EwltType == WLT_RELATIVE) {
@@ -7917,7 +7936,7 @@ procedures:
       eInit.bDeathFixed = eDeath.eLastDamage.dmtType==DMT_ABYSS;
       m_penView->Initialize(eInit);
     }
-                     
+
     if (ShouldBlowUp()) {
       BlowUp();
     } else {
