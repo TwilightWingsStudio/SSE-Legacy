@@ -68,9 +68,26 @@ void CheckPVS_t(CVarSetting *pvs)
   }
 }
 
+static CTString _strYes = "TTRS Yes";
+static CTString _strNo = "TTRS No";
+static BOOL _bYesNoTranslated = FALSE;
+
 void ParseCFG_t(CTStream &strm)
 {
   CVarSetting *pvs = NULL;
+  
+  // [SSE]
+  if (!_bYesNoTranslated) {
+    TranslateLine(_strYes);
+    _strYes.TrimSpacesLeft();
+    _strYes.TrimSpacesRight();
+
+    TranslateLine(_strNo);
+    _strNo.TrimSpacesLeft();
+    _strNo.TrimSpacesRight();
+    
+    _bYesNoTranslated = TRUE;
+  }
 
   // repeat
   FOREVER {
@@ -89,8 +106,20 @@ void ParseCFG_t(CTStream &strm)
       CheckPVS_t(pvs);
       strLine.TrimSpacesLeft();
       strLine.TrimSpacesRight();
+ 
       if (strLine=="Toggle") {
         pvs->vs_bSeparator = FALSE;
+        
+      // [SSE]
+      } else if (strLine=="ToggleYN") {
+        pvs->vs_bSeparator = FALSE;
+        pvs->vs_bToogleYN = TRUE;
+
+        pvs->vs_astrTexts.Push() = _strYes;
+        pvs->vs_astrTexts.Push() = _strNo;
+        pvs->vs_astrValues.Push() = "1";
+        pvs->vs_astrValues.Push() = "0";
+        
       } else if (strLine=="Separator") {
         pvs->vs_bSeparator = TRUE;
       }

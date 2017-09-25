@@ -23,6 +23,7 @@ class CVarSetting {
 public:
   CListNode vs_lnNode;
   BOOL  vs_bSeparator;
+  BOOL  vs_bToogleYN; // [SSE]
   BOOL  vs_bCanChangeInGame;
   INDEX vs_iSlider;
   CTString vs_strName;
