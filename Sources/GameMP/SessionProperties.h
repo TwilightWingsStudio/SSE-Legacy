@@ -157,6 +157,7 @@ public:
 
   BOOL sp_bInstagib;       // [SSE] Gameplay - Mutators - Instagib
   BOOL sp_bRocketJumpMode; // [SSE] RocketJump Mode
+  BOOL sp_bVampire;        // [SSE] Gameplay - Mutators - Vampire
 };
 
 // NOTE: never instantiate CSessionProperties, as its size is not fixed to the size defined in engine

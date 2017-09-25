@@ -80,6 +80,7 @@ extern INDEX gam_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
 
 extern INDEX gam_bRocketJumpMode; // [SSE] RocketJump Mode
 extern INDEX gam_bInstagib; // [SSE] Gameplay - Mutators - Instagib
+extern INDEX gam_bVampire;  // [SSE] Gameplay - Mutators - Vampire
 
 static void SetGameModeParameters(CSessionProperties &sp)
 {
@@ -405,6 +406,8 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_bInfiniteAmmo = TRUE;
     sp.sp_bAllowWeapons = FALSE;
   }
+
+  sp.sp_bVampire = sp.sp_bUseFrags || sp.sp_gmGameMode == CSessionProperties::GM_SCOREMATCH ? gam_bVampire : FALSE; // [SSE] Gameplay - Mutators - Vampire
   
   // [SSE] GameModes - Team DeathMatch
   if (sp.sp_gmGameMode == CSessionProperties::GM_LASTMANSTANDING) {

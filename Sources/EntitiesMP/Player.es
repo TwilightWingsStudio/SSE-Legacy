@@ -118,6 +118,11 @@ event EAutoAction {
   CEntityPointer penFirstMarker,
 };
 
+event EReceiveHealing {
+  FLOAT fValue,
+  BOOL bOverTopHealth,
+};
+
 %{
 extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner);
 extern void InitHUD(void);
@@ -4488,6 +4493,14 @@ functions:
       SetHealth(1.0F);
       fSubHealth = 100.0F;
       fDamageAmmount = 100.0F;
+    }
+    
+    // [SSE] Gameplay - Mutators - Vampire
+    if (penInflictor != this && GetSP()->sp_bVampire && penInflictor != NULL && penInflictor->IsPlayerEntity() && penInflictor->IsAlive()) {
+      EReceiveHealing eHealing;
+      eHealing.fValue = fSubHealth;
+      eHealing.bOverTopHealth = TRUE;
+      penInflictor->SendEvent(eHealing);
     }
 
     DamageImpact(dmtType, GetSP()->sp_bArmorInertiaDamping ? fSubHealth : fDamageAmmount, vHitPoint, vDirection);
@@ -8994,6 +9007,22 @@ procedures:
           m_penCurrentInteractable = NULL;
         }
         
+        resume;
+      }
+      
+      // [SSE]
+      on (EReceiveHealing eHealing) :
+      {
+        FLOAT fHealthNew = GetHealth() + eHealing.fValue;
+        
+        if (eHealing.bOverTopHealth) {
+          fHealthNew = ClampUp( fHealthNew, MaxHealth());
+        } else {
+          fHealthNew = ClampUp( fHealthNew, TopHealth());
+        }
+        
+        SetHealth(fHealthNew);
+      
         resume;
       }
 
