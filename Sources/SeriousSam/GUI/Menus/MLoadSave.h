@@ -62,6 +62,7 @@ public:
   CListHead gm_lhFileInfos;   // all file infos to list
   INDEX gm_iLastFile;         // index of last saved file in numbered format
 
+  // Components
   CMGTitle gm_mgTitle;
   CMGButton gm_mgNotes;
   CMGFileButton gm_amgButton[SAVELOAD_BUTTONS_CT];

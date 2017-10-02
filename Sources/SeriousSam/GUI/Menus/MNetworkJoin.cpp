@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
 #include "MenuStuff.h"
+#include "MenuStarters.h"
 #include "MNetworkJoin.h"
 
 // --------------------------------------------------------------------------------------
@@ -62,4 +63,23 @@ void CNetworkJoinMenu::Initialize_t(void)
   AddChild(&gm_mgLAN);
   AddChild(&gm_mgNET);
   AddChild(&gm_mgOpen);
+}
+
+// [SSE]
+BOOL CNetworkJoinMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgLAN) {
+      StartSelectServerLAN();
+
+    } else if (event.GuiEvent.Caller == &gm_mgNET) {
+      StartSelectServerNET();
+
+    } else if (event.GuiEvent.Caller == &gm_mgOpen) {
+      StartNetworkOpenMenu();
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

@@ -16,6 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
+#include "MenuManager.h"
 #include "MServers.h"
 
 CTString _strServerFilter[7];
@@ -93,11 +94,14 @@ void CServersMenu::Initialize_t(void)
   mgServerFilter[6].mg_strTip = TRANS("filter by version");
 }
 
+
+static void RefreshServerList(void)
+{
+  _pNetwork->EnumSessions(_pGUIM->gmServersMenu.m_bInternet);
+}
+
 void CServersMenu::StartMenu(void)
 {
-  extern void RefreshServerList(void);
-  RefreshServerList();
-
   CGameMenu::StartMenu();
 }
 
@@ -107,4 +111,17 @@ void CServersMenu::Think(void)
     return;
   }
   _pNetwork->ga_bEnumerationChange = FALSE;
+}
+
+// [SSE]
+BOOL CServersMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgRefresh) {
+      RefreshServerList();
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

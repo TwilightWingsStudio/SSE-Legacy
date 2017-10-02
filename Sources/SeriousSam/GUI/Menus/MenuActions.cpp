@@ -130,7 +130,7 @@ static void StopCurrentGame(void)
   StartMenus("");
 }
 
-static void StopConfirm(void)
+extern void StopConfirm(void)
 {
   CConfirmMenu &gmCurrent = _pGUIM->gmConfirmMenu;
 
@@ -275,33 +275,11 @@ void InitActionsForConfirmMenu() {
   gmCurrent.gm_pConfirmNo->mg_pActivatedFunction = &ConfirmNo;
 }
 
-// ------------------------ CInGameMenu implementation
-// start load/save menus depending on type of game running
-static void QuickSaveFromMenu()
-{
-  _pShell->SetINDEX("gam_bQuickSave", 2); // force save with reporting
-  StopMenus(TRUE);
-}
-
 static void StopRecordingDemo(void)
 {
   _pNetwork->StopDemoRec();
   void SetDemoStartStopRecText(void);
   SetDemoStartStopRecText();
-}
-
-void InitActionsForInGameMenu()
-{
-  CInGameMenu &gmCurrent = _pGUIM->gmInGameMenu;
-
-  gmCurrent.gm_mgQuickLoad.mg_pActivatedFunction = &StartCurrentQuickLoadMenu;
-  gmCurrent.gm_mgQuickSave.mg_pActivatedFunction = &QuickSaveFromMenu;
-  gmCurrent.gm_mgLoad.mg_pActivatedFunction = &StartCurrentLoadMenu;
-  gmCurrent.gm_mgSave.mg_pActivatedFunction = &StartCurrentSaveMenu;
-  gmCurrent.gm_mgHighScore.mg_pActivatedFunction = &StartHighScoreMenu;
-  gmCurrent.gm_mgOptions.mg_pActivatedFunction = &StartOptionsMenu;
-  gmCurrent.gm_mgStop.mg_pActivatedFunction = &StopConfirm;
-  gmCurrent.gm_mgQuit.mg_pActivatedFunction = &ExitConfirm;
 }
 
 extern void SetDemoStartStopRecText(void)
@@ -881,19 +859,13 @@ static void SortByGame(void)   { SortByColumn(4); }
 static void SortByMod(void)    { SortByColumn(5); }
 static void SortByVer(void)    { SortByColumn(6); }
 
-extern void RefreshServerList(void)
-{
-  _pNetwork->EnumSessions(_pGUIM->gmServersMenu.m_bInternet);
-}
-
 void RefreshServerListManually(void)
 {
   ChangeToMenu(&_pGUIM->gmServersMenu); // this refreshes the list and sets focuses
 }
 
-void InitActionsForServersMenu() {
-  _pGUIM->gmServersMenu.gm_mgRefresh.mg_pActivatedFunction = &RefreshServerList;
-
+void InitActionsForServersMenu()
+{
   mgServerColumn[0].mg_pActivatedFunction = SortByServer;
   mgServerColumn[1].mg_pActivatedFunction = SortByMap;
   mgServerColumn[2].mg_pActivatedFunction = SortByPing;
@@ -901,27 +873,6 @@ void InitActionsForServersMenu() {
   mgServerColumn[4].mg_pActivatedFunction = SortByGame;
   mgServerColumn[5].mg_pActivatedFunction = SortByMod;
   mgServerColumn[6].mg_pActivatedFunction = SortByVer;
-}
-
-// ------------------------ CNetworkMenu implementation
-void InitActionsForNetworkMenu()
-{
-  CNetworkMenu &gmCurrent = _pGUIM->gmNetworkMenu;
-
-  gmCurrent.gm_mgJoin.mg_pActivatedFunction = &StartNetworkJoinMenu;
-  gmCurrent.gm_mgStart.mg_pActivatedFunction = &StartNetworkStartMenu;
-  gmCurrent.gm_mgQuickLoad.mg_pActivatedFunction = &StartNetworkQuickLoadMenu;
-  gmCurrent.gm_mgLoad.mg_pActivatedFunction = &StartNetworkLoadMenu;
-}
-
-// ------------------------ CNetworkJoinMenu implementation
-void InitActionsForNetworkJoinMenu()
-{
-  CNetworkJoinMenu &gmCurrent = _pGUIM->gmNetworkJoinMenu;
-
-  gmCurrent.gm_mgLAN.mg_pActivatedFunction = &StartSelectServerLAN;
-  gmCurrent.gm_mgNET.mg_pActivatedFunction = &StartSelectServerNET;
-  gmCurrent.gm_mgOpen.mg_pActivatedFunction = &StartNetworkOpenMenu;
 }
 
 // ------------------------ CNetworkStartMenu implementation
@@ -1132,16 +1083,6 @@ void InitActionsForSelectPlayersMenu()
 void InitActionsForNetworkOpenMenu()
 {
   _pGUIM->gmNetworkOpenMenu.gm_mgJoin.mg_pActivatedFunction = &StartSelectPlayersMenuFromOpen;
-}
-
-// ------------------------ CSplitScreenMenu implementation
-void InitActionsForSplitScreenMenu()
-{
-  CSplitScreenMenu &gmCurrent = _pGUIM->gmSplitScreenMenu;
-
-  gmCurrent.gm_mgStart.mg_pActivatedFunction = &StartSplitStartMenu;
-  gmCurrent.gm_mgQuickLoad.mg_pActivatedFunction = &StartSplitScreenQuickLoadMenu;
-  gmCurrent.gm_mgLoad.mg_pActivatedFunction = &StartSplitScreenLoadMenu;
 }
 
 // ------------------------ CSplitStartMenu implementation

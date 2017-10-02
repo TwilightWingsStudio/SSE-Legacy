@@ -16,6 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
+#include "MenuStarters.h"
 #include "MNetwork.h"
 
 // --------------------------------------------------------------------------------------
@@ -76,4 +77,26 @@ void CNetworkMenu::Initialize_t(void)
 void CNetworkMenu::StartMenu(void)
 {
   CGameMenu::StartMenu();
+}
+
+// [SSE]
+BOOL CNetworkMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgJoin) {
+      StartNetworkJoinMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgStart) {
+      StartNetworkStartMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgQuickLoad) {
+      StartNetworkQuickLoadMenu();
+      
+    } else if (event.GuiEvent.Caller == &gm_mgLoad) {
+      StartNetworkLoadMenu();
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

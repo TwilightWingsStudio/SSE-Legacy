@@ -306,7 +306,6 @@ void InitializeMenus(void)
     _pGUIM->gmInGameMenu.gm_strName = "InGame";
     _pGUIM->gmInGameMenu.gm_pmgSelectedByDefault = &_pGUIM->gmInGameMenu.gm_mgQuickLoad;
     _pGUIM->gmInGameMenu.gm_pgmParentMenu = NULL;
-    InitActionsForInGameMenu();
 
     _pGUIM->gmSinglePlayerMenu.Initialize_t();
     _pGUIM->gmSinglePlayerMenu.gm_strName = "SinglePlayer";
@@ -392,7 +391,6 @@ void InitializeMenus(void)
     _pGUIM->gmNetworkMenu.gm_strName = "Network";
     _pGUIM->gmNetworkMenu.gm_pmgSelectedByDefault = &_pGUIM->gmNetworkMenu.gm_mgJoin;
     _pGUIM->gmNetworkMenu.gm_pgmParentMenu = &_pGUIM->gmMainMenu;
-    InitActionsForNetworkMenu();
 
     _pGUIM->gmNetworkStartMenu.Initialize_t();
     _pGUIM->gmNetworkStartMenu.gm_strName = "NetworkStart";
@@ -404,7 +402,6 @@ void InitializeMenus(void)
     _pGUIM->gmNetworkJoinMenu.gm_strName = "NetworkJoin";
     _pGUIM->gmNetworkJoinMenu.gm_pmgSelectedByDefault = &_pGUIM->gmNetworkJoinMenu.gm_mgLAN;
     _pGUIM->gmNetworkJoinMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkMenu;
-    InitActionsForNetworkJoinMenu();
 
     _pGUIM->gmSelectPlayersMenu.gm_bAllowDedicated = FALSE;
     _pGUIM->gmSelectPlayersMenu.gm_bAllowObserving = FALSE;
@@ -423,7 +420,6 @@ void InitializeMenus(void)
     _pGUIM->gmSplitScreenMenu.gm_strName = "SplitScreen";
     _pGUIM->gmSplitScreenMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSplitScreenMenu.gm_mgStart;
     _pGUIM->gmSplitScreenMenu.gm_pgmParentMenu = &_pGUIM->gmMainMenu;
-    InitActionsForSplitScreenMenu();
 
     _pGUIM->gmSplitStartMenu.Initialize_t();
     _pGUIM->gmSplitStartMenu.gm_strName = "SplitStart";

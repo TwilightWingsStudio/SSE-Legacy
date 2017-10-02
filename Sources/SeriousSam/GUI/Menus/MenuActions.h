@@ -19,20 +19,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #pragma once
 #endif
 
-
 void InitActionsForAudioOptionsMenu();
 void InitActionsForConfirmMenu();
 void InitActionsForControlsMenu();
 void InitActionsForCustomizeAxisMenu();
-void InitActionsForInGameMenu();
-void InitActionsForNetworkMenu();
-void InitActionsForNetworkJoinMenu();
 void InitActionsForNetworkOpenMenu();
 void InitActionsForNetworkStartMenu();
 void InitActionsForPlayerProfileMenu();
 void InitActionsForSelectPlayersMenu();
 void InitActionsForServersMenu();
-void InitActionsForSplitScreenMenu();
 void InitActionsForSplitStartMenu();
 void InitActionsForVideoOptionsMenu();
 void InitActionsForVarMenu();

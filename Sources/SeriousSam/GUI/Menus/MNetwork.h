@@ -25,15 +25,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 
 class CNetworkMenu : public CGameMenu {
-public:
-  CMGTitle  gm_mgTitle;
-  CMGButton gm_mgJoin;
-  CMGButton gm_mgStart;
-  CMGButton gm_mgQuickLoad;
-  CMGButton gm_mgLoad;
+  public:
+    CMGTitle  gm_mgTitle;
+    CMGButton gm_mgJoin;
+    CMGButton gm_mgStart;
+    CMGButton gm_mgQuickLoad;
+    CMGButton gm_mgLoad;
 
-  void Initialize_t(void);
-  void StartMenu(void);
+    void Initialize_t(void);
+    void StartMenu(void);
+    virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

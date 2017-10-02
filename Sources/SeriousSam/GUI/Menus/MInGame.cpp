@@ -16,6 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
+#include "MenuStarters.h"
 #include "MInGame.h"
 
 // --------------------------------------------------------------------------------------
@@ -174,4 +175,42 @@ void CInGameMenu::StartMenu(void)
   }
 
   CGameMenu::StartMenu();
+}
+
+extern void StopConfirm(void);
+extern void ExitConfirm(void);
+
+  // [SSE]
+BOOL CInGameMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgQuickLoad) {
+      StartCurrentQuickLoadMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgQuickSave) {
+      _pShell->SetINDEX("gam_bQuickSave", 2); // force save with reporting
+      StopMenus(TRUE);
+
+    } else if (event.GuiEvent.Caller == &gm_mgLoad) {
+      StartCurrentLoadMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgSave) {
+      StartCurrentSaveMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgHighScore) {
+      StartHighScoreMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgOptions) {
+      StartOptionsMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgStop) {
+      StopConfirm();
+
+    } else if (event.GuiEvent.Caller == &gm_mgQuit) {
+      ExitConfirm();
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

@@ -16,6 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
+#include "MenuStarters.h"
 #include "MSplitScreen.h"
 
 // --------------------------------------------------------------------------------------
@@ -64,4 +65,23 @@ void CSplitScreenMenu::Initialize_t(void)
 void CSplitScreenMenu::StartMenu(void)
 {
   CGameMenu::StartMenu();
+}
+
+// [SSE]
+BOOL CSplitScreenMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgStart) {
+      StartSplitStartMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgQuickLoad) {
+      StartSplitScreenQuickLoadMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgLoad) {
+      StartSplitScreenLoadMenu();
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }
