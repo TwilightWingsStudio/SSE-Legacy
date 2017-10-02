@@ -58,8 +58,22 @@ void CMGSlider::ApplyCurrentPosition(void)
   FLOAT fStretch = FLOAT(mg_iCurPos) / (mg_iMaxPos - mg_iMinPos);
   mg_fFactor = fStretch;
 
+  // Deprecated.
   if (mg_pOnSliderChange != NULL) {
     mg_pOnSliderChange(mg_iCurPos);
+  }
+  
+  // [SSE]
+  if (m_pParent != NULL)
+  {
+    SEvent newEvent;
+    newEvent.EventType = EET_GUI_EVENT;
+    newEvent.GuiEvent.Caller = this;
+    newEvent.GuiEvent.Target = NULL;
+    newEvent.GuiEvent.EventType = EGET_CHANGED;
+    newEvent.GuiEvent.IntValue = mg_iCurPos;
+    
+    m_pParent->OnEvent(newEvent);
   }
 }
 

@@ -31,6 +31,7 @@ enum EEventType
 enum EGuiEventType
 {
   EGET_TRIGGERED,
+  EGET_CHANGED,
 };
 
 class IGuiComponent;
@@ -56,6 +57,7 @@ struct SEvent
     IGuiComponent *Caller;
     IGuiComponent *Target;
     EGuiEventType EventType;
+    INDEX IntValue;
   };
   
   // Event type stored here.
