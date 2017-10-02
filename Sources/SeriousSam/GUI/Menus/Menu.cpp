@@ -330,7 +330,6 @@ void InitializeMenus(void)
     _pGUIM->gmControls.Initialize_t();
     _pGUIM->gmControls.gm_strName = "Controls";
     _pGUIM->gmControls.gm_pmgSelectedByDefault = &_pGUIM->gmControls.gm_mgButtons;
-    InitActionsForControlsMenu();
 
       // warning! parent menu has to be set inside button activate function from where
       // Load/Save menu is called
@@ -396,7 +395,6 @@ void InitializeMenus(void)
     _pGUIM->gmNetworkStartMenu.gm_strName = "NetworkStart";
     _pGUIM->gmNetworkStartMenu.gm_pmgSelectedByDefault = &_pGUIM->gmNetworkStartMenu.gm_mgStart;
     _pGUIM->gmNetworkStartMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkMenu;
-    InitActionsForNetworkStartMenu();
 
     _pGUIM->gmNetworkJoinMenu.Initialize_t();
     _pGUIM->gmNetworkJoinMenu.gm_strName = "NetworkJoin";
@@ -414,7 +412,6 @@ void InitializeMenus(void)
     _pGUIM->gmNetworkOpenMenu.gm_strName = "NetworkOpen";
     _pGUIM->gmNetworkOpenMenu.gm_pmgSelectedByDefault = &_pGUIM->gmNetworkOpenMenu.gm_mgJoin;
     _pGUIM->gmNetworkOpenMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkJoinMenu;
-    InitActionsForNetworkOpenMenu();
 
     _pGUIM->gmSplitScreenMenu.Initialize_t();
     _pGUIM->gmSplitScreenMenu.gm_strName = "SplitScreen";
@@ -425,7 +422,6 @@ void InitializeMenus(void)
     _pGUIM->gmSplitStartMenu.gm_strName = "SplitStart";
     _pGUIM->gmSplitStartMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSplitStartMenu.gm_mgStart;
     _pGUIM->gmSplitStartMenu.gm_pgmParentMenu = &_pGUIM->gmSplitScreenMenu;
-    InitActionsForSplitStartMenu();
   } catch( char *strError) {
     FatalError( strError);
   }

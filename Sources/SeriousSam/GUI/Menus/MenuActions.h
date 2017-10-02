@@ -21,14 +21,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 void InitActionsForAudioOptionsMenu();
 void InitActionsForConfirmMenu();
-void InitActionsForControlsMenu();
 void InitActionsForCustomizeAxisMenu();
-void InitActionsForNetworkOpenMenu();
-void InitActionsForNetworkStartMenu();
 void InitActionsForPlayerProfileMenu();
 void InitActionsForSelectPlayersMenu();
 void InitActionsForServersMenu();
-void InitActionsForSplitStartMenu();
 void InitActionsForVideoOptionsMenu();
 void InitActionsForVarMenu();
 

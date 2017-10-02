@@ -18,6 +18,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "MenuPrinting.h"
 #include "LevelInfo.h"
 #include "MenuStuff.h"
+#include "MenuStarters.h"
 #include "MSplitStart.h"
 
 extern void UpdateSplitLevel(INDEX iDummy);
@@ -104,4 +105,23 @@ void CSplitStartMenu::EndMenu(void)
   _pShell->SetINDEX("gam_iStartMode", gm_mgGameType.mg_iSelected);
 
   CGameMenu::EndMenu();
+}
+
+// [SSE]
+BOOL CSplitStartMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgLevel) {
+      StartSelectLevelFromSplit();
+
+    } else if (event.GuiEvent.Caller == &gm_mgOptions) {
+      StartGameOptionsFromSplitScreen();
+
+    } else if (event.GuiEvent.Caller == &gm_mgStart) {
+      StartSelectPlayersMenuFromSplit();
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

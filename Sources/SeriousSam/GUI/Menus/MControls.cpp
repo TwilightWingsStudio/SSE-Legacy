@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
 #include "MenuStuff.h"
+#include "MenuStarters.h"
 #include "MControls.h"
 
 extern CTFileName _fnmControlsToCustomize;
@@ -165,4 +166,23 @@ void CControlsMenu::ApplyActionSettings(void)
   _pShell->SetINDEX("inp_bAllowMouseAcceleration", bAccel);
   _pShell->SetFLOAT("inp_fIFeelGain", bIFeel ? 1.0f : 0.0f);
   ctrls.CalculateInfluencesForAllAxis();
+}
+
+// [SSE]
+BOOL CControlsMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgButtons) {
+      StartCustomizeKeyboardMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgAdvanced) {
+      StartCustomizeAxisMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgPredefined) {
+      StartControlsLoadMenu();
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

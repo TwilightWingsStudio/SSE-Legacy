@@ -18,6 +18,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "MenuPrinting.h"
 #include "LevelInfo.h"
 #include "MenuStuff.h"
+#include "MenuStarters.h"
 #include "MNetworkStart.h"
 
 extern INDEX sam_bMentalActivated;
@@ -153,4 +154,23 @@ void CNetworkStartMenu::EndMenu(void)
   _pShell->SetINDEX("ser_bEnumeration", gm_mgVisible.mg_iSelected);
 
   CGameMenu::EndMenu();
+}
+
+// [SSE]
+BOOL CNetworkStartMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgLevel) {
+      StartSelectLevelFromNetwork();
+
+    } else if (event.GuiEvent.Caller == &gm_mgGameOptions) {
+      StartGameOptionsFromNetwork();
+
+    } else if (event.GuiEvent.Caller == &gm_mgStart) {
+      StartSelectPlayersMenuFromNetwork();
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

@@ -23,7 +23,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "LevelInfo.h"
 #include "VarList.h"
 
-ENGINE_API extern INDEX snd_iFormat;
 extern BOOL _bMouseUsedLast;
 
 extern CMenuGadget *_pmgLastActivatedGadget;
@@ -34,9 +33,6 @@ static CTString     * _astrAdapterTexts = NULL;
 static INDEX         _ctResolutions = 0;
 static CTString     * _astrResolutionTexts = NULL;
 static CDisplayMode *_admResolutionModes = NULL;
-
-#define VOLUME_STEPS  50
-
 
 // make description for a given resolution
 static CTString GetResolutionDescription(CDisplayMode &dm)
@@ -438,16 +434,6 @@ void InitActionsForPlayerProfileMenu()
   gmCurrent.gm_mgModel.mg_pActivatedFunction = &StartPlayerModelLoadMenu;
 }
 
-// ------------------------ CControlsMenu implementation
-void InitActionsForControlsMenu()
-{
-  CControlsMenu &gmCurrent = _pGUIM->gmControls;
-
-  gmCurrent.gm_mgButtons.mg_pActivatedFunction = &StartCustomizeKeyboardMenu;
-  gmCurrent.gm_mgAdvanced.mg_pActivatedFunction = &StartCustomizeAxisMenu;
-  gmCurrent.gm_mgPredefined.mg_pActivatedFunction = &StartControlsLoadMenu;
-}
-
 // ------------------------ CCustomizeAxisMenu implementation
 void PreChangeAxis(INDEX iDummy)
 {
@@ -718,74 +704,6 @@ void InitActionsForVideoOptionsMenu()
 }
 
 // ------------------------ CAudioOptionsMenu implementation
-extern void RefreshSoundFormat(void)
-{
-  CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
-
-  switch (_pSound->GetFormat())
-  {
-    case CSoundLibrary::SF_NONE:     {gmCurrent.gm_pFrequencyTrigger->mg_iSelected = 0; break; }
-    case CSoundLibrary::SF_11025_16: {gmCurrent.gm_pFrequencyTrigger->mg_iSelected = 1; break; }
-    case CSoundLibrary::SF_22050_16: {gmCurrent.gm_pFrequencyTrigger->mg_iSelected = 2; break; }
-    case CSoundLibrary::SF_44100_16: {gmCurrent.gm_pFrequencyTrigger->mg_iSelected = 3; break; }
-    default:                          gmCurrent.gm_pFrequencyTrigger->mg_iSelected = 0;
-  }
-
-  gmCurrent.gm_pAudioAutoTrigger->mg_iSelected = Clamp(sam_bAutoAdjustAudio, 0, 1);
-  gmCurrent.gm_pAudioAPITrigger->mg_iSelected = Clamp(_pShell->GetINDEX("snd_iInterface"), 0L, 2L);
-
-  gmCurrent.gm_pWaveVolume->mg_iMinPos = 0;
-  gmCurrent.gm_pWaveVolume->mg_iMaxPos = VOLUME_STEPS;
-  gmCurrent.gm_pWaveVolume->mg_iCurPos = (INDEX)(_pShell->GetFLOAT("snd_fSoundVolume")*VOLUME_STEPS + 0.5f);
-  gmCurrent.gm_pWaveVolume->ApplyCurrentPosition();
-
-  gmCurrent.gm_pMPEGVolume->mg_iMinPos = 0;
-  gmCurrent.gm_pMPEGVolume->mg_iMaxPos = VOLUME_STEPS;
-  gmCurrent.gm_pMPEGVolume->mg_iCurPos = (INDEX)(_pShell->GetFLOAT("snd_fMusicVolume")*VOLUME_STEPS + 0.5f);
-  gmCurrent.gm_pMPEGVolume->ApplyCurrentPosition();
-
-  gmCurrent.gm_pAudioAutoTrigger->ApplyCurrentSelection();
-  gmCurrent.gm_pAudioAPITrigger->ApplyCurrentSelection();
-  gmCurrent.gm_pFrequencyTrigger->ApplyCurrentSelection();
-}
-
-static void ApplyAudioOptions(void)
-{
-  CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
-
-  sam_bAutoAdjustAudio = gmCurrent.gm_pAudioAutoTrigger->mg_iSelected;
-  if (sam_bAutoAdjustAudio) {
-    _pShell->Execute("include \"Scripts\\Addons\\SFX-AutoAdjust.ini\"");
-  } else {
-    _pShell->SetINDEX("snd_iInterface", gmCurrent.gm_pAudioAPITrigger->mg_iSelected);
-
-    switch (gmCurrent.gm_pFrequencyTrigger->mg_iSelected)
-    {
-      case 0: {_pSound->SetFormat(CSoundLibrary::SF_NONE); break; }
-      case 1: {_pSound->SetFormat(CSoundLibrary::SF_11025_16); break; }
-      case 2: {_pSound->SetFormat(CSoundLibrary::SF_22050_16); break; }
-      case 3: {_pSound->SetFormat(CSoundLibrary::SF_44100_16); break; }
-      default: _pSound->SetFormat(CSoundLibrary::SF_NONE);
-    }
-  }
-
-  RefreshSoundFormat();
-  snd_iFormat = _pSound->GetFormat();
-}
-
-static void OnWaveVolumeChange(INDEX iCurPos)
-{
-  _pShell->SetFLOAT("snd_fSoundVolume", iCurPos / FLOAT(VOLUME_STEPS));
-}
-
-static void WaveSliderChange(void)
-{
-  CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
-
-  gmCurrent.gm_pWaveVolume->mg_iCurPos -= 5;
-  gmCurrent.gm_pWaveVolume->ApplyCurrentPosition();
-}
-
 static void FrequencyTriggerChange(INDEX iDummy)
 {
   CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
@@ -795,29 +713,11 @@ static void FrequencyTriggerChange(INDEX iDummy)
   gmCurrent.gm_pAudioAutoTrigger->ApplyCurrentSelection();
 }
 
-static void MPEGSliderChange(void)
-{
-  CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
-
-  gmCurrent.gm_pMPEGVolume->mg_iCurPos -= 5;
-  gmCurrent.gm_pMPEGVolume->ApplyCurrentPosition();
-}
-
-static void OnMPEGVolumeChange(INDEX iCurPos)
-{
-  _pShell->SetFLOAT("snd_fMusicVolume", iCurPos / FLOAT(VOLUME_STEPS));
-}
-
 void InitActionsForAudioOptionsMenu()
 {
   CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
 
   gmCurrent.gm_pFrequencyTrigger->mg_pOnTriggerChange = FrequencyTriggerChange;
-  gmCurrent.gm_pWaveVolume->mg_pOnSliderChange = &OnWaveVolumeChange;
-  gmCurrent.gm_pWaveVolume->mg_pActivatedFunction = WaveSliderChange;
-  gmCurrent.gm_pMPEGVolume->mg_pOnSliderChange = &OnMPEGVolumeChange;
-  gmCurrent.gm_pMPEGVolume->mg_pActivatedFunction = MPEGSliderChange;
-  gmCurrent.gm_pApplyButton->mg_pActivatedFunction = &ApplyAudioOptions;
 }
 
 // ------------------------ CVarMenu implementation
@@ -881,15 +781,6 @@ extern void UpdateNetworkLevel(INDEX iDummy)
   ValidateLevelForFlags(_pGame->gam_strCustomLevel,
     GetSpawnFlagsForGameType(_pGUIM->gmNetworkStartMenu.gm_mgGameType.mg_iSelected));
   _pGUIM->gmNetworkStartMenu.gm_mgLevel.mg_strText = FindLevelByFileName(_pGame->gam_strCustomLevel).li_strName;
-}
-
-void InitActionsForNetworkStartMenu()
-{
-  CNetworkStartMenu &gmCurrent = _pGUIM->gmNetworkStartMenu;
-
-  gmCurrent.gm_mgLevel.mg_pActivatedFunction = &StartSelectLevelFromNetwork;
-  gmCurrent.gm_mgGameOptions.mg_pActivatedFunction = &StartGameOptionsFromNetwork;
-  gmCurrent.gm_mgStart.mg_pActivatedFunction = &StartSelectPlayersMenuFromNetwork;
 }
 
 // ------------------------ CSelectPlayersMenu implementation
@@ -1079,22 +970,7 @@ void InitActionsForSelectPlayersMenu()
   gmCurrent.gm_mgSplitScreenCfg.mg_pOnTriggerChange = UpdateSelectPlayers;
 }
 
-// ------------------------ CNetworkOpenMenu implementation
-void InitActionsForNetworkOpenMenu()
-{
-  _pGUIM->gmNetworkOpenMenu.gm_mgJoin.mg_pActivatedFunction = &StartSelectPlayersMenuFromOpen;
-}
-
 // ------------------------ CSplitStartMenu implementation
-void InitActionsForSplitStartMenu()
-{
-  CSplitStartMenu &gmCurrent = _pGUIM->gmSplitStartMenu;
-
-  gmCurrent.gm_mgLevel.mg_pActivatedFunction = &StartSelectLevelFromSplit;
-  gmCurrent.gm_mgOptions.mg_pActivatedFunction = &StartGameOptionsFromSplitScreen;
-  gmCurrent.gm_mgStart.mg_pActivatedFunction = &StartSelectPlayersMenuFromSplit;
-}
-
 extern void UpdateSplitLevel(INDEX iDummy)
 {
   CSplitStartMenu &gmCurrent = _pGUIM->gmSplitStartMenu;

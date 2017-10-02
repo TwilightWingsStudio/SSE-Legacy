@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
 #include "MenuStuff.h"
+#include "MenuStarters.h"
 #include "MNetworkOpen.h"
 
 // --------------------------------------------------------------------------------------
@@ -85,4 +86,17 @@ void CNetworkOpenMenu::StartMenu(void)
 void CNetworkOpenMenu::EndMenu(void)
 {
   _pShell->SetValue("net_iPort", gm_strPort);
+}
+
+// [SSE]
+BOOL CNetworkOpenMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgJoin) {
+      StartSelectPlayersMenuFromOpen();
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }
