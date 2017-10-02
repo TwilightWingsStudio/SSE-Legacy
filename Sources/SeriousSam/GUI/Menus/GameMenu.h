@@ -15,12 +15,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #ifndef SE_INCL_GAME_MENU_H
 #define SE_INCL_GAME_MENU_H
+
 #ifdef PRAGMA_ONCE
   #pragma once
 #endif
 
+#include <Engine/API/IGuiComponent.h>
 
-class CGameMenu {
+class CGameMenu : public IGuiComponent
+{
 public:
   CListHead gm_lhChildren;
   CGameMenu *gm_pgmParentMenu;

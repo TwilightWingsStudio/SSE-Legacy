@@ -52,6 +52,7 @@ void CGameMenu::Destroy(void)
 void CGameMenu::AddChild(CMenuGadget *pChild)
 {
   if (pChild) {
+    pChild->SetParent(this);
     gm_lhChildren.AddTail(pChild->mg_lnNode);
   }
 }

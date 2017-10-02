@@ -27,10 +27,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #define EMPTYSLOTSTRING TRANS("<save a new one>")
 
+#include <Engine/API/IGuiComponent.h>
+
 // --------------------------------------------------------------------------------------
 // Class that provides basic GUI component.
 // --------------------------------------------------------------------------------------
-class CMenuGadget
+class CMenuGadget : public IGuiComponent
 {
   public:
     CListNode mg_lnNode;

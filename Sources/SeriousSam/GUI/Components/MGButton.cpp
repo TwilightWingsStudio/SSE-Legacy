@@ -68,13 +68,35 @@ void CMGButton::SetText(CTString strNew)
 
 void CMGButton::OnActivate(void)
 {
-	if (mg_pActivatedFunction != NULL && mg_bEnabled)
-	{
+  // If disabled then ingnore.
+  if (!mg_bEnabled) {
+    return;
+  }
+  
+	if (mg_pActivatedFunction != NULL || m_pParent != NULL)
+  {
 		PlayMenuSound(_psdPress);
 		IFeel_PlayEffect("Menu_press");
 		_pmgLastActivatedGadget = this;
+  }
+  
+  // Deprecated way.
+	if (mg_pActivatedFunction != NULL)
+	{
 		(*mg_pActivatedFunction)();
 	}
+  
+  // [SSE]
+  if (m_pParent != NULL)
+  {
+    SEvent newEvent;
+    newEvent.EventType = EET_GUI_EVENT;
+    newEvent.GuiEvent.Caller = this;
+    newEvent.GuiEvent.Target = NULL;
+    newEvent.GuiEvent.EventType = EGET_TRIGGERED;
+    
+    m_pParent->OnEvent(newEvent);
+  }
 }
 
 // --------------------------------------------------------------------------------------
