@@ -18,6 +18,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "MenuPrinting.h"
 #include "MenuStuff.h"
 #include "MSinglePlayer.h"
+#include "MenuStarters.h"
+#include "MenuManager.h"
 
 // --------------------------------------------------------------------------------------
 // Intializes single player menu.
@@ -168,4 +170,60 @@ void CSinglePlayerMenu::StartMenu(void)
 
   CPlayerCharacter &pc = _pGame->gm_apcPlayers[_pGame->gm_iSinglePlayer];
   gm_mgPlayerLabel.mg_strText.PrintF(TRANS("Player: %s\n"), pc.GetNameForPrinting());
+}
+
+extern CTString sam_strTechTestLevel;
+extern CTString sam_strTrainingLevel;
+
+static void StartTechTest(void)
+{
+  _pGUIM->gmSinglePlayerNewMenu.gm_pgmParentMenu = &_pGUIM->gmSinglePlayerMenu;
+  _pGame->gam_strCustomLevel = sam_strTechTestLevel;
+
+  _pShell->SetINDEX("gam_iStartDifficulty", CSessionProperties::GD_NORMAL);
+  _pShell->SetINDEX("gam_iStartMode", CSessionProperties::GM_COOPERATIVE);
+
+  extern void StartSinglePlayerGame(void);
+  StartSinglePlayerGame();
+}
+
+static void StartTraining(void)
+{
+  _pGUIM->gmSinglePlayerNewMenu.gm_pgmParentMenu = &_pGUIM->gmSinglePlayerMenu;
+  _pGame->gam_strCustomLevel = sam_strTrainingLevel;
+  ChangeToMenu(&_pGUIM->gmSinglePlayerNewMenu);
+}
+
+// [SSE]
+BOOL CSinglePlayerMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgNewGame) {
+      StartSinglePlayerNewMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgCustom) {
+      StartSelectLevelFromSingle();
+
+    } else if (event.GuiEvent.Caller == &gm_mgQuickLoad) {
+      StartSinglePlayerQuickLoadMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgLoad) {
+      StartSinglePlayerLoadMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgTraining) {
+      StartTraining();
+
+    } else if (event.GuiEvent.Caller == &gm_mgTechTest) {
+      StartTechTest();
+
+    } else if (event.GuiEvent.Caller == &gm_mgPlayersAndControls) {
+      StartChangePlayerMenuFromSinglePlayer();
+
+    } else if (event.GuiEvent.Caller == &gm_mgOptions) {
+      StartSinglePlayerGameOptions();
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

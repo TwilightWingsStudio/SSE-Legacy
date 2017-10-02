@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
 #include "MenuStuff.h"
+#include "MenuStarters.h"
 #include "MMain.h"
 
 extern CTString sam_strVersion;
@@ -137,6 +138,7 @@ void CMainMenu::Initialize_t(void)
   AddChild(&gm_mgVersionLabel);
   AddChild(&gm_mgBuildDateLabel);
   AddChild(&gm_mgModLabel);
+
   AddChild(&gm_mgSingle);
   AddChild(&gm_mgNetwork);
   AddChild(&gm_mgSplitScreen);
@@ -154,4 +156,39 @@ void CMainMenu::StartMenu(void)
   gm_mgSplitScreen.mg_bEnabled = IsMenuEnabled("Split Screen");
   gm_mgHighScore.mg_bEnabled = IsMenuEnabled("High Score");
   CGameMenu::StartMenu();
+}
+
+// [SSE]
+BOOL CMainMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgSingle) {
+      StartSinglePlayerMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgNetwork) {
+      StartNetworkMenu();
+      
+    } else if (event.GuiEvent.Caller == &gm_mgSplitScreen) {
+      StartSplitScreenMenu();
+      
+    } else if (event.GuiEvent.Caller == &gm_mgDemo) {
+      StartDemoLoadMenu();
+      
+    } else if (event.GuiEvent.Caller == &gm_mgMods) {
+      StartModsLoadMenu();
+      
+    } else if (event.GuiEvent.Caller == &gm_mgHighScore) {
+      StartHighScoreMenu();
+      
+    } else if (event.GuiEvent.Caller == &gm_mgOptions) {
+      StartOptionsMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgQuit) {
+      extern void ExitConfirm(void);
+      ExitConfirm();
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

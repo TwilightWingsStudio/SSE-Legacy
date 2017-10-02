@@ -110,7 +110,7 @@ static void ExitGame(void)
   _bQuitScreen = TRUE;
 }
 
-static void ExitConfirm(void)
+extern void ExitConfirm(void)
 {
   CConfirmMenu &gmCurrent = _pGUIM->gmConfirmMenu;
 
@@ -275,20 +275,6 @@ void InitActionsForConfirmMenu() {
   gmCurrent.gm_pConfirmNo->mg_pActivatedFunction = &ConfirmNo;
 }
 
-// ------------------------ CMainMenu implementation
-void InitActionsForMainMenu() {
-  CMainMenu &gmCurrent = _pGUIM->gmMainMenu;
-
-  gmCurrent.gm_mgSingle.mg_pActivatedFunction = &StartSinglePlayerMenu;
-  gmCurrent.gm_mgNetwork.mg_pActivatedFunction = StartNetworkMenu;
-  gmCurrent.gm_mgSplitScreen.mg_pActivatedFunction = &StartSplitScreenMenu;
-  gmCurrent.gm_mgDemo.mg_pActivatedFunction = &StartDemoLoadMenu;
-  gmCurrent.gm_mgMods.mg_pActivatedFunction = &StartModsLoadMenu;
-  gmCurrent.gm_mgHighScore.mg_pActivatedFunction = &StartHighScoreMenu;
-  gmCurrent.gm_mgOptions.mg_pActivatedFunction = &StartOptionsMenu;
-  gmCurrent.gm_mgQuit.mg_pActivatedFunction = &ExitConfirm;
-}
-
 // ------------------------ CInGameMenu implementation
 // start load/save menus depending on type of game running
 static void QuickSaveFromMenu()
@@ -334,39 +320,6 @@ extern void SetDemoStartStopRecText(void)
   }
 }
 
-// ------------------------ CSinglePlayerMenu implementation
-extern CTString sam_strTechTestLevel;
-extern CTString sam_strTrainingLevel;
-
-static void StartSinglePlayerGame_Normal(void);
-static void StartTechTest(void)
-{
-  _pGUIM->gmSinglePlayerNewMenu.gm_pgmParentMenu = &_pGUIM->gmSinglePlayerMenu;
-  _pGame->gam_strCustomLevel = sam_strTechTestLevel;
-  StartSinglePlayerGame_Normal();
-}
-
-static void StartTraining(void)
-{
-  _pGUIM->gmSinglePlayerNewMenu.gm_pgmParentMenu = &_pGUIM->gmSinglePlayerMenu;
-  _pGame->gam_strCustomLevel = sam_strTrainingLevel;
-  ChangeToMenu(&_pGUIM->gmSinglePlayerNewMenu);
-}
-
-void InitActionsForSinglePlayerMenu()
-{
-  CSinglePlayerMenu &gmCurrent = _pGUIM->gmSinglePlayerMenu;
-
-  gmCurrent.gm_mgNewGame.mg_pActivatedFunction = &StartSinglePlayerNewMenu;
-  gmCurrent.gm_mgCustom.mg_pActivatedFunction = &StartSelectLevelFromSingle;
-  gmCurrent.gm_mgQuickLoad.mg_pActivatedFunction = &StartSinglePlayerQuickLoadMenu;
-  gmCurrent.gm_mgLoad.mg_pActivatedFunction = &StartSinglePlayerLoadMenu;
-  gmCurrent.gm_mgTraining.mg_pActivatedFunction = &StartTraining;
-  gmCurrent.gm_mgTechTest.mg_pActivatedFunction = &StartTechTest;
-  gmCurrent.gm_mgPlayersAndControls.mg_pActivatedFunction = &StartChangePlayerMenuFromSinglePlayer;
-  gmCurrent.gm_mgOptions.mg_pActivatedFunction = &StartSinglePlayerGameOptions;
-}
-
 // ------------------------ CSinglePlayerNewMenu implementation
 void StartSinglePlayerGame(void)
 {
@@ -388,69 +341,6 @@ void StartSinglePlayerGame(void)
   } else {
     _gmRunningGameMode = GM_NONE;
   }
-}
-
-static void StartSinglePlayerGame_Tourist(void)
-{
-  _pShell->SetINDEX("gam_iStartDifficulty", CSessionProperties::GD_TOURIST);
-  _pShell->SetINDEX("gam_iStartMode", CSessionProperties::GM_COOPERATIVE);
-  StartSinglePlayerGame();
-}
-
-static void StartSinglePlayerGame_Easy(void)
-{
-  _pShell->SetINDEX("gam_iStartDifficulty", CSessionProperties::GD_EASY);
-  _pShell->SetINDEX("gam_iStartMode", CSessionProperties::GM_COOPERATIVE);
-  StartSinglePlayerGame();
-}
-
-static void StartSinglePlayerGame_Normal(void)
-{
-  _pShell->SetINDEX("gam_iStartDifficulty", CSessionProperties::GD_NORMAL);
-  _pShell->SetINDEX("gam_iStartMode", CSessionProperties::GM_COOPERATIVE);
-  StartSinglePlayerGame();
-}
-
-static void StartSinglePlayerGame_Hard(void)
-{
-  _pShell->SetINDEX("gam_iStartDifficulty", CSessionProperties::GD_HARD);
-  _pShell->SetINDEX("gam_iStartMode", CSessionProperties::GM_COOPERATIVE);
-  StartSinglePlayerGame();
-}
-
-static void StartSinglePlayerGame_Serious(void)
-{
-  _pShell->SetINDEX("gam_iStartDifficulty", CSessionProperties::GD_EXTREME);
-  _pShell->SetINDEX("gam_iStartMode", CSessionProperties::GM_COOPERATIVE);
-  StartSinglePlayerGame();
-}
-
-static void StartSinglePlayerGame_Mental(void)
-{
-  _pShell->SetINDEX("gam_iStartDifficulty", CSessionProperties::GD_EXTREME + 1);
-  _pShell->SetINDEX("gam_iStartMode", CSessionProperties::GM_COOPERATIVE);
-  StartSinglePlayerGame();
-}
-
-// [SSE] Serious Mental
-static void StartSinglePlayerGame_SeriousMental(void)
-{
-  _pShell->SetINDEX("gam_iStartDifficulty", CSessionProperties::GD_EXTREME + 2);
-  _pShell->SetINDEX("gam_iStartMode", CSessionProperties::GM_COOPERATIVE);
-  StartSinglePlayerGame();
-}
-
-void InitActionsForSinglePlayerNewMenu()
-{
-  CSinglePlayerNewMenu &gmCurrent = _pGUIM->gmSinglePlayerNewMenu;
-
-  gmCurrent.gm_mgTourist.mg_pActivatedFunction = &StartSinglePlayerGame_Tourist;
-  gmCurrent.gm_mgEasy.mg_pActivatedFunction = &StartSinglePlayerGame_Easy;
-  gmCurrent.gm_mgMedium.mg_pActivatedFunction = &StartSinglePlayerGame_Normal;
-  gmCurrent.gm_mgHard.mg_pActivatedFunction = &StartSinglePlayerGame_Hard;
-  gmCurrent.gm_mgSerious.mg_pActivatedFunction = &StartSinglePlayerGame_Serious;
-  gmCurrent.gm_mgMental.mg_pActivatedFunction = &StartSinglePlayerGame_Mental;
-  gmCurrent.gm_mgSeriousMental.mg_pActivatedFunction = &StartSinglePlayerGame_SeriousMental;
 }
 
 // ------------------------ CPlayerProfileMenu implementation
@@ -599,19 +489,6 @@ void InitActionsForCustomizeAxisMenu()
   gmCurrent.gm_mgActionTrigger.mg_pOnTriggerChange = PostChangeAxis;
 }
 
-// ------------------------ COptionsMenu implementation
-void InitActionsForOptionsMenu()
-{
-  COptionsMenu &gmCurrent = _pGUIM->gmOptionsMenu;
-
-  gmCurrent.gm_mgVideoOptions.mg_pActivatedFunction = &StartVideoOptionsMenu;
-  gmCurrent.gm_mgAudioOptions.mg_pActivatedFunction = &StartAudioOptionsMenu;
-  gmCurrent.gm_mgPlayerProfileOptions.mg_pActivatedFunction = &StartChangePlayerMenuFromOptions;
-  gmCurrent.gm_mgNetworkOptions.mg_pActivatedFunction = &StartNetworkSettingsMenu;
-  gmCurrent.gm_mgCustomOptions.mg_pActivatedFunction = &StartCustomLoadMenu;
-  gmCurrent.gm_mgAddonOptions.mg_pActivatedFunction = &StartAddonsLoadMenu;
-}
-
 // ------------------------ CVideoOptionsMenu implementation
 static INDEX sam_old_bFullScreenActive;
 static INDEX sam_old_iScreenSizeI;
@@ -620,6 +497,7 @@ static INDEX sam_old_iDisplayDepth;
 static INDEX sam_old_iDisplayAdapter;
 static INDEX sam_old_iGfxAPI;
 static INDEX sam_old_iVideoSetup;  // 0==speed, 1==normal, 2==quality, 3==custom
+static INDEX sam_old_iVideoAspectRatio;
 
 static void FillResolutionsList(void)
 {
@@ -629,18 +507,22 @@ static void FillResolutionsList(void)
   if (_astrResolutionTexts != NULL) {
     delete[] _astrResolutionTexts;
   }
+
   if (_admResolutionModes != NULL) {
     delete[] _admResolutionModes;
   }
+
   _ctResolutions = 0;
+  
+  BOOL bFullScreen = gmCurrent.gm_mgFullScreenCheckBox.mg_bValue;
 
   // if window
-  if (gmCurrent.gm_mgFullScreenCheckBox.mg_bValue == 0) {
+  if (bFullScreen == 0) {
     // always has fixed resolutions, but not greater than desktop
-
     _ctResolutions = ARRAYCOUNT(apixWidths);
     _astrResolutionTexts = new CTString[_ctResolutions];
     _admResolutionModes = new CDisplayMode[_ctResolutions];
+
     extern PIX _pixDesktopWidth;
     INDEX iRes = 0;
     for (; iRes<_ctResolutions; iRes++) {
@@ -654,12 +536,13 @@ static void FillResolutionsList(void)
     // get resolutions list from engine
     CDisplayMode *pdm = _pGfx->EnumDisplayModes(_ctResolutions,
       SwitchToAPI(gmCurrent.gm_mgDisplayAPITrigger.mg_iSelected), gmCurrent.gm_mgDisplayAdaptersTrigger.mg_iSelected);
+
     // allocate that much
     _astrResolutionTexts = new CTString[_ctResolutions];
     _admResolutionModes = new CDisplayMode[_ctResolutions];
-    // for each resolution
+
+    // For each resolution add it to list
     for (INDEX iRes = 0; iRes<_ctResolutions; iRes++) {
-      // add it to list
       SetResolutionInList(iRes, pdm[iRes].dm_pixSizeI, pdm[iRes].dm_pixSizeJ);
     }
   }
@@ -849,6 +732,7 @@ void InitActionsForVideoOptionsMenu()
   gmCurrent.gm_mgDisplayAPITrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
   gmCurrent.gm_mgDisplayAdaptersTrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
   gmCurrent.gm_mgFullScreenCheckBox.mg_pOnStateChange = (void (__cdecl *)(BOOL))&UpdateVideoOptionsButtons;
+  gmCurrent.gm_mgAspectRatioTrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
   gmCurrent.gm_mgResolutionsTrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
   gmCurrent.gm_mgBitsPerPixelTrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
   gmCurrent.gm_mgVideoRendering.mg_pActivatedFunction = &StartRenderingOptionsMenu;

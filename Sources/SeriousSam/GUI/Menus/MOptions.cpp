@@ -16,6 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
+#include "MenuStarters.h"
 #include "MOptions.h"
 
 // --------------------------------------------------------------------------------------
@@ -91,4 +92,32 @@ void COptionsMenu::Initialize_t(void)
   AddChild(&gm_mgNetworkOptions);
   AddChild(&gm_mgCustomOptions);
   AddChild(&gm_mgAddonOptions);
+}
+
+BOOL COptionsMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgVideoOptions) {
+      StartVideoOptionsMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgAudioOptions) {
+      StartAudioOptionsMenu();
+
+    } else if (event.GuiEvent.Caller == &gm_mgPlayerProfileOptions) {
+      StartChangePlayerMenuFromOptions();
+      
+    } else if (event.GuiEvent.Caller == &gm_mgNetworkOptions) {
+      StartNetworkSettingsMenu();
+      
+    } else if (event.GuiEvent.Caller == &gm_mgCustomOptions) {
+      StartCustomLoadMenu();
+      
+    } else if (event.GuiEvent.Caller == &gm_mgAddonOptions) {
+      StartAddonsLoadMenu();
+      
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

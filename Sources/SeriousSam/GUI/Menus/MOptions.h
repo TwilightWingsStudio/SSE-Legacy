@@ -35,6 +35,7 @@ public:
   CMGButton gm_mgAddonOptions;
 
 	void Initialize_t(void);
+  BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

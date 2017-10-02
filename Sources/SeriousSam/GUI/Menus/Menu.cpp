@@ -301,7 +301,6 @@ void InitializeMenus(void)
     _pGUIM->gmMainMenu.gm_strName = "Main";
     _pGUIM->gmMainMenu.gm_pmgSelectedByDefault = &_pGUIM->gmMainMenu.gm_mgSingle;
     _pGUIM->gmMainMenu.gm_pgmParentMenu = NULL;
-    InitActionsForMainMenu();
 
     _pGUIM->gmInGameMenu.Initialize_t();
     _pGUIM->gmInGameMenu.gm_strName = "InGame";
@@ -313,13 +312,11 @@ void InitializeMenus(void)
     _pGUIM->gmSinglePlayerMenu.gm_strName = "SinglePlayer";
     _pGUIM->gmSinglePlayerMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSinglePlayerMenu.gm_mgNewGame;
     _pGUIM->gmSinglePlayerMenu.gm_pgmParentMenu = &_pGUIM->gmMainMenu;
-    InitActionsForSinglePlayerMenu();
 
     _pGUIM->gmSinglePlayerNewMenu.Initialize_t();
     _pGUIM->gmSinglePlayerNewMenu.gm_strName = "SinglePlayerNew";
     _pGUIM->gmSinglePlayerNewMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSinglePlayerNewMenu.gm_mgMedium;
     _pGUIM->gmSinglePlayerNewMenu.gm_pgmParentMenu = &_pGUIM->gmSinglePlayerMenu;
-    InitActionsForSinglePlayerNewMenu();
 
     _pGUIM->gmDisabledFunction.Initialize_t();
     _pGUIM->gmDisabledFunction.gm_strName = "DisabledFunction";
@@ -361,7 +358,6 @@ void InitializeMenus(void)
     _pGUIM->gmOptionsMenu.gm_strName = "Options";
     _pGUIM->gmOptionsMenu.gm_pmgSelectedByDefault = &_pGUIM->gmOptionsMenu.gm_mgVideoOptions;
     _pGUIM->gmOptionsMenu.gm_pgmParentMenu = &_pGUIM->gmMainMenu;
-    InitActionsForOptionsMenu();
 
     _pGUIM->gmVideoOptionsMenu.Initialize_t();
     _pGUIM->gmVideoOptionsMenu.gm_strName = "VideoOptions";

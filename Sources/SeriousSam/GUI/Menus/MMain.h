@@ -39,6 +39,7 @@ public:
 
   void Initialize_t(void);
   void StartMenu(void);
+  BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

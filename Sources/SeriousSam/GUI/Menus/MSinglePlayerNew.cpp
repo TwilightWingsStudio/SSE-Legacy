@@ -129,3 +129,44 @@ void CSinglePlayerNewMenu::StartMenu(void)
     gm_mgTourist.mg_pmgUp = &gm_mgSerious;
   }
 }
+
+// [SSE]
+BOOL CSinglePlayerNewMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    INDEX iDifficulty = -666;
+    
+    if (event.GuiEvent.Caller == &gm_mgTourist) {
+      iDifficulty = CSessionProperties::GD_TOURIST;
+
+    } else if (event.GuiEvent.Caller == &gm_mgEasy) {
+      iDifficulty = CSessionProperties::GD_EASY;
+
+    } else if (event.GuiEvent.Caller == &gm_mgMedium) {
+      iDifficulty = CSessionProperties::GD_NORMAL;
+
+    } else if (event.GuiEvent.Caller == &gm_mgHard) {
+      iDifficulty = CSessionProperties::GD_HARD;
+
+    } else if (event.GuiEvent.Caller == &gm_mgSerious) {
+      iDifficulty = CSessionProperties::GD_EXTREME;
+    
+    } else if (event.GuiEvent.Caller == &gm_mgMental) {
+      iDifficulty = CSessionProperties::GD_EXTREME + 1;
+
+    } else if (event.GuiEvent.Caller == &gm_mgSeriousMental) {
+      iDifficulty = CSessionProperties::GD_EXTREME + 2;
+    }
+
+    if (iDifficulty >= CSessionProperties::GD_TOURIST) {
+      _pShell->SetINDEX("gam_iStartDifficulty", iDifficulty);
+      _pShell->SetINDEX("gam_iStartMode", CSessionProperties::GM_COOPERATIVE);
+      
+      extern void StartSinglePlayerGame(void);
+      StartSinglePlayerGame();
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
+}
