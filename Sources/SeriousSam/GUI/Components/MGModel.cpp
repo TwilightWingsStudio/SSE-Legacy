@@ -57,7 +57,17 @@ void CMGModel::Render(CDrawPort *pdp)
   // prepare projection
   CRenderModel rmRenderModel;
   CPerspectiveProjection3D pr;
-  pr.FOVL() = sam_bWideScreen ? AngleDeg(45.0f) : AngleDeg(30.0f);
+  
+  FLOAT fFOVMul = 1.0F;
+  
+  // [SSE] Shitty Widescreen Fix
+  if (pdp->GetWidth() > pdp->GetHeight()) {
+    fFOVMul = (FLOAT(pdp->GetWidth()) / pdp->GetHeight()) / 1.33F;
+    fFOVMul = Clamp(fFOVMul, 1.0F, 1.75F);
+  }
+  
+  pr.FOVL() = 30.0F * fFOVMul;
+
   pr.ScreenBBoxL() = FLOATaabbox2D(
     FLOAT2D(0.0f, 0.0f),
     FLOAT2D((float)dpModel.GetWidth(), (float)dpModel.GetHeight())
