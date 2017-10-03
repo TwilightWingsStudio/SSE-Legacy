@@ -158,35 +158,46 @@ void CMainMenu::StartMenu(void)
   CGameMenu::StartMenu();
 }
 
+// --------------------------------------------------------------------------------------
 // [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
 BOOL CMainMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
     if (event.GuiEvent.Caller == &gm_mgSingle) {
       StartSinglePlayerMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgNetwork) {
       StartNetworkMenu();
+      return TRUE;
       
     } else if (event.GuiEvent.Caller == &gm_mgSplitScreen) {
       StartSplitScreenMenu();
+      return TRUE;
       
     } else if (event.GuiEvent.Caller == &gm_mgDemo) {
       StartDemoLoadMenu();
+      return TRUE;
       
     } else if (event.GuiEvent.Caller == &gm_mgMods) {
       StartModsLoadMenu();
+      return TRUE;
       
     } else if (event.GuiEvent.Caller == &gm_mgHighScore) {
       StartHighScoreMenu();
+      return TRUE;
       
     } else if (event.GuiEvent.Caller == &gm_mgOptions) {
       StartOptionsMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgQuit) {
       extern void ExitConfirm(void);
       ExitConfirm();
+      return TRUE;
     }
   }
   

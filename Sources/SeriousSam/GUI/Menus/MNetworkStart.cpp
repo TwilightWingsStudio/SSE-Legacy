@@ -156,19 +156,25 @@ void CNetworkStartMenu::EndMenu(void)
   CGameMenu::EndMenu();
 }
 
+// --------------------------------------------------------------------------------------
 // [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
 BOOL CNetworkStartMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
     if (event.GuiEvent.Caller == &gm_mgLevel) {
       StartSelectLevelFromNetwork();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgGameOptions) {
       StartGameOptionsFromNetwork();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgStart) {
       StartSelectPlayersMenuFromNetwork();
+      return TRUE;
     }
   }
   

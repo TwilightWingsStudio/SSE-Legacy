@@ -180,35 +180,46 @@ void CInGameMenu::StartMenu(void)
 extern void StopConfirm(void);
 extern void ExitConfirm(void);
 
-  // [SSE]
+// --------------------------------------------------------------------------------------
+// [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
 BOOL CInGameMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
     if (event.GuiEvent.Caller == &gm_mgQuickLoad) {
       StartCurrentQuickLoadMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgQuickSave) {
       _pShell->SetINDEX("gam_bQuickSave", 2); // force save with reporting
       StopMenus(TRUE);
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgLoad) {
       StartCurrentLoadMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgSave) {
       StartCurrentSaveMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgHighScore) {
       StartHighScoreMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgOptions) {
       StartOptionsMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgStop) {
       StopConfirm();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgQuit) {
       ExitConfirm();
+      return TRUE;
     }
   }
   

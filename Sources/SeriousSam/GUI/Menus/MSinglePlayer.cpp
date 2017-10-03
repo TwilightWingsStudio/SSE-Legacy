@@ -201,27 +201,35 @@ BOOL CSinglePlayerMenu::OnEvent(const SEvent& event)
   {
     if (event.GuiEvent.Caller == &gm_mgNewGame) {
       StartSinglePlayerNewMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgCustom) {
       StartSelectLevelFromSingle();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgQuickLoad) {
       StartSinglePlayerQuickLoadMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgLoad) {
       StartSinglePlayerLoadMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgTraining) {
       StartTraining();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgTechTest) {
       StartTechTest();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgPlayersAndControls) {
       StartChangePlayerMenuFromSinglePlayer();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgOptions) {
       StartSinglePlayerGameOptions();
+      return TRUE;
     }
   }
   

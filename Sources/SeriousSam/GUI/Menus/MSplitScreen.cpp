@@ -67,19 +67,25 @@ void CSplitScreenMenu::StartMenu(void)
   CGameMenu::StartMenu();
 }
 
+// --------------------------------------------------------------------------------------
 // [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
 BOOL CSplitScreenMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
     if (event.GuiEvent.Caller == &gm_mgStart) {
       StartSplitStartMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgQuickLoad) {
       StartSplitScreenQuickLoadMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgLoad) {
       StartSplitScreenLoadMenu();
+      return TRUE;
     }
   }
   

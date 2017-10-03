@@ -165,6 +165,8 @@ BOOL CSinglePlayerNewMenu::OnEvent(const SEvent& event)
       
       extern void StartSinglePlayerGame(void);
       StartSinglePlayerGame();
+      
+      return TRUE;
     }
   }
   

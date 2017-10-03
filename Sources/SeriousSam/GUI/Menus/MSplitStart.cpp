@@ -107,19 +107,25 @@ void CSplitStartMenu::EndMenu(void)
   CGameMenu::EndMenu();
 }
 
+// --------------------------------------------------------------------------------------
 // [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
 BOOL CSplitStartMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
     if (event.GuiEvent.Caller == &gm_mgLevel) {
       StartSelectLevelFromSplit();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgOptions) {
       StartGameOptionsFromSplitScreen();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgStart) {
       StartSelectPlayersMenuFromSplit();
+      return TRUE;
     }
   }
   

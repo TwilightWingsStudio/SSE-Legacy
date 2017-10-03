@@ -65,19 +65,25 @@ void CNetworkJoinMenu::Initialize_t(void)
   AddChild(&gm_mgOpen);
 }
 
+// --------------------------------------------------------------------------------------
 // [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
 BOOL CNetworkJoinMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
     if (event.GuiEvent.Caller == &gm_mgLAN) {
       StartSelectServerLAN();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgNET) {
       StartSelectServerNET();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgOpen) {
       StartNetworkOpenMenu();
+      return TRUE;
     }
   }
   

@@ -168,7 +168,10 @@ void CControlsMenu::ApplyActionSettings(void)
   ctrls.CalculateInfluencesForAllAxis();
 }
 
+// --------------------------------------------------------------------------------------
 // [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
 BOOL CControlsMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)

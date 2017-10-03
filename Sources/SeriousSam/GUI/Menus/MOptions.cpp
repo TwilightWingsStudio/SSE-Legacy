@@ -94,27 +94,37 @@ void COptionsMenu::Initialize_t(void)
   AddChild(&gm_mgAddonOptions);
 }
 
+// --------------------------------------------------------------------------------------
+// [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
 BOOL COptionsMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
     if (event.GuiEvent.Caller == &gm_mgVideoOptions) {
       StartVideoOptionsMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgAudioOptions) {
       StartAudioOptionsMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgPlayerProfileOptions) {
       StartChangePlayerMenuFromOptions();
+      return TRUE;
       
     } else if (event.GuiEvent.Caller == &gm_mgNetworkOptions) {
       StartNetworkSettingsMenu();
+      return TRUE;
       
     } else if (event.GuiEvent.Caller == &gm_mgCustomOptions) {
       StartCustomLoadMenu();
+      return TRUE;
       
     } else if (event.GuiEvent.Caller == &gm_mgAddonOptions) {
       StartAddonsLoadMenu();
+      return TRUE;
       
     }
   }

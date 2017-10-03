@@ -79,22 +79,29 @@ void CNetworkMenu::StartMenu(void)
   CGameMenu::StartMenu();
 }
 
+// --------------------------------------------------------------------------------------
 // [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
 BOOL CNetworkMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
     if (event.GuiEvent.Caller == &gm_mgJoin) {
       StartNetworkJoinMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgStart) {
       StartNetworkStartMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgQuickLoad) {
       StartNetworkQuickLoadMenu();
+      return TRUE;
       
     } else if (event.GuiEvent.Caller == &gm_mgLoad) {
       StartNetworkLoadMenu();
+      return TRUE;
     }
   }
   

@@ -88,13 +88,17 @@ void CNetworkOpenMenu::EndMenu(void)
   _pShell->SetValue("net_iPort", gm_strPort);
 }
 
+// --------------------------------------------------------------------------------------
 // [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
 BOOL CNetworkOpenMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
     if (event.GuiEvent.Caller == &gm_mgJoin) {
       StartSelectPlayersMenuFromOpen();
+      return TRUE;
     }
   }
   
