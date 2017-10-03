@@ -180,5 +180,9 @@ BOOL CCustomizeAxisMenu::OnEvent(const SEvent& event)
     }
   }
   
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
+  }
+  
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

@@ -44,7 +44,6 @@ void CLoadSaveMenu::Initialize_t(void)
     gm_amgButton[iLabel].mg_pmgUp = &gm_amgButton[iPrev];
     gm_amgButton[iLabel].mg_pmgDown = &gm_amgButton[iNext];
     gm_amgButton[iLabel].mg_boxOnScreen = BoxSaveLoad(iLabel);
-    gm_amgButton[iLabel].mg_pActivatedFunction = NULL; // never called!
     gm_amgButton[iLabel].mg_iCenterI = -1;
     AddChild(&gm_amgButton[iLabel]);
   }

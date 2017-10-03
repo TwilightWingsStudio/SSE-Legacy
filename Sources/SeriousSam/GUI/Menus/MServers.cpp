@@ -23,6 +23,26 @@ CTString _strServerFilter[7];
 CMGButton mgServerColumn[7];
 CMGEdit mgServerFilter[7];
 
+static void SortByColumn(int i)
+{
+  CServersMenu &gmCurrent = _pGUIM->gmServersMenu;
+
+  if (gmCurrent.gm_mgList.mg_iSort == i) {
+    gmCurrent.gm_mgList.mg_bSortDown = !gmCurrent.gm_mgList.mg_bSortDown;
+  } else {
+    gmCurrent.gm_mgList.mg_bSortDown = FALSE;
+  }
+  gmCurrent.gm_mgList.mg_iSort = i;
+}
+
+static void SortByServer(void) { SortByColumn(0); }
+static void SortByMap(void)    { SortByColumn(1); }
+static void SortByPing(void)   { SortByColumn(2); }
+static void SortByPlayers(void){ SortByColumn(3); }
+static void SortByGame(void)   { SortByColumn(4); }
+static void SortByMod(void)    { SortByColumn(5); }
+static void SortByVer(void)    { SortByColumn(6); }
+
 void CServersMenu::Initialize_t(void)
 {
   gm_mgTitle.mg_boxOnScreen = BoxTitle();
@@ -60,7 +80,6 @@ void CServersMenu::Initialize_t(void)
   gm_mgRefresh.mg_bfsFontSize = BFS_SMALL;
   gm_mgRefresh.mg_iCenterI = -1;
   gm_mgRefresh.mg_pmgDown = &gm_mgList;
-  gm_mgRefresh.mg_pActivatedFunction = NULL;
   AddChild(&gm_mgRefresh);
 
   CTString astrColumns[7];
@@ -71,13 +90,6 @@ void CServersMenu::Initialize_t(void)
   mgServerColumn[4].mg_strText = TRANS("Game");
   mgServerColumn[5].mg_strText = TRANS("Mod");
   mgServerColumn[6].mg_strText = TRANS("Ver");
-  mgServerColumn[0].mg_pActivatedFunction = NULL;
-  mgServerColumn[1].mg_pActivatedFunction = NULL;
-  mgServerColumn[2].mg_pActivatedFunction = NULL;
-  mgServerColumn[3].mg_pActivatedFunction = NULL;
-  mgServerColumn[4].mg_pActivatedFunction = NULL;
-  mgServerColumn[5].mg_pActivatedFunction = NULL;
-  mgServerColumn[6].mg_pActivatedFunction = NULL;
   mgServerColumn[0].mg_strTip = TRANS("sort by server");
   mgServerColumn[1].mg_strTip = TRANS("sort by map");
   mgServerColumn[2].mg_strTip = TRANS("sort by ping");
@@ -118,9 +130,45 @@ BOOL CServersMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
-    if (event.GuiEvent.Caller == &gm_mgRefresh) {
-      RefreshServerList();
+    if (event.GuiEvent.EventType == EGET_TRIGGERED)
+    {
+      if (event.GuiEvent.Caller == &gm_mgRefresh) {
+        RefreshServerList();
+        return TRUE;
+      
+      } else if (event.GuiEvent.Caller == &mgServerFilter[0]) {
+        SortByServer();
+        return TRUE;
+      
+      } else if (event.GuiEvent.Caller == &mgServerFilter[1]) {
+        SortByMap();
+        return TRUE;
+      
+      } else if (event.GuiEvent.Caller == &mgServerFilter[2]) {
+        SortByPing();
+        return TRUE;
+      
+      } else if (event.GuiEvent.Caller == &mgServerFilter[3]) {
+        SortByPlayers();
+        return TRUE;
+      
+      } else if (event.GuiEvent.Caller == &mgServerFilter[4]) {
+        SortByGame();
+        return TRUE;
+      
+      } else if (event.GuiEvent.Caller == &mgServerFilter[5]) {
+        SortByMod();
+        return TRUE;
+      
+      } else if (event.GuiEvent.Caller == &mgServerFilter[6]) {
+        SortByVer();
+        return TRUE;
+      }
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

@@ -25,8 +25,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // --------------------------------------------------------------------------------------
 CMGCheckBox::CMGCheckBox(void)
 {
-  mg_pActivatedFunction = NULL;
-  
   mg_bValue = FALSE;
   
   mg_iIndex = 0;

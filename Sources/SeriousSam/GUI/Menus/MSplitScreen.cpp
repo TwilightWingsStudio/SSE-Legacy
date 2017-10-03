@@ -35,7 +35,6 @@ void CSplitScreenMenu::Initialize_t(void)
   gm_mgStart.mg_pmgDown = &gm_mgQuickLoad;
   gm_mgStart.mg_strText = TRANS("NEW GAME");
   gm_mgStart.mg_strTip = TRANS("start new split-screen game");
-  gm_mgStart.mg_pActivatedFunction = NULL;
 
   // Initialize "Quick Load" button.
   gm_mgQuickLoad.mg_bfsFontSize = BFS_LARGE;
@@ -44,7 +43,6 @@ void CSplitScreenMenu::Initialize_t(void)
   gm_mgQuickLoad.mg_pmgDown = &gm_mgLoad;
   gm_mgQuickLoad.mg_strText = TRANS("QUICK LOAD");
   gm_mgQuickLoad.mg_strTip = TRANS("load a quick-saved game (F9)");
-  gm_mgQuickLoad.mg_pActivatedFunction = NULL;
 
   // Initialize "Load" button.
   gm_mgLoad.mg_bfsFontSize = BFS_LARGE;
@@ -53,7 +51,6 @@ void CSplitScreenMenu::Initialize_t(void)
   gm_mgLoad.mg_pmgDown = &gm_mgStart;
   gm_mgLoad.mg_strText = TRANS("LOAD");
   gm_mgLoad.mg_strTip = TRANS("load a saved split-screen game");
-  gm_mgLoad.mg_pActivatedFunction = NULL;
 
   // Add components.
   AddChild(&gm_mgTitle);
@@ -87,6 +84,10 @@ BOOL CSplitScreenMenu::OnEvent(const SEvent& event)
       StartSplitScreenLoadMenu();
       return TRUE;
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

@@ -17,6 +17,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
 #include "MenuStuff.h"
+#include "MenuStarters.h"
+#include "MenuStartersAF.h"
 #include "MenuManager.h"
 #include "MSelectPlayers.h"
 
@@ -83,27 +85,6 @@ void CSelectPlayersMenu::Initialize_t(void)
   AddChild(&gm_mgPlayer3Change);
   AddChild(&gm_mgNotes);
 
-  /*  // options button
-  mgSplitOptions.mg_strText = TRANS("Game options");
-  mgSplitOptions.mg_boxOnScreen = BoxMediumRow(3);
-  mgSplitOptions.mg_bfsFontSize = BFS_MEDIUM;
-  mgSplitOptions.mg_iCenterI = 0;
-  mgSplitOptions.mg_pmgUp = &mgSplitLevel;
-  mgSplitOptions.mg_pmgDown = &mgSplitStartStart;
-  mgSplitOptions.mg_strTip = TRANS("adjust game rules");
-  mgSplitOptions.mg_pActivatedFunction = &StartGameOptionsFromSplitScreen;
-  AddChild(&mgSplitOptions);*/
-
-  /*  // start button
-  mgSplitStartStart.mg_bfsFontSize = BFS_LARGE;
-  mgSplitStartStart.mg_boxOnScreen = BoxBigRow(4);
-  mgSplitStartStart.mg_pmgUp = &mgSplitOptions;
-  mgSplitStartStart.mg_pmgDown = &mgSplitGameType;
-  mgSplitStartStart.mg_strText = TRANS("START");
-  mgSplitStartStart.mg_pActivatedFunction = &StartSelectPlayersMenuFromSplit;
-  AddChild(&mgSplitStartStart);
-  */
-
   ADD_GADGET(gm_mgStart, BoxMediumRow(11), &gm_mgSplitScreenCfg, &gm_mgPlayer0Change, NULL, NULL, TRANS("START"));
   gm_mgStart.mg_bfsFontSize = BFS_LARGE;
   gm_mgStart.mg_iCenterI = 0;
@@ -147,6 +128,10 @@ static void UpdateSelectPlayers(INDEX i)
   SelectPlayersFillMenu();
 }
 
+extern void StartSplitScreenGame(void);
+extern void StartNetworkGame(void);
+extern void JoinNetworkGame(void);
+
 // --------------------------------------------------------------------------------------
 // [SSE]
 // Returns TRUE if event was handled.
@@ -155,7 +140,31 @@ BOOL CSelectPlayersMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
-    if (event.GuiEvent.EventType == EGET_CHANGED) {
+    if (event.GuiEvent.EventType == EGET_TRIGGERED)
+    {
+      if (event.GuiEvent.Caller == &gm_mgStart)
+      {
+        if (gm_pgmParentMenu == &_pGUIM->gmSplitStartMenu) {
+          StartSplitScreenGame();
+
+        } else if (gm_pgmParentMenu == &_pGUIM->gmNetworkStartMenu) {
+          StartNetworkGame();
+
+        } else if (gm_pgmParentMenu == &_pGUIM->gmLoadSaveMenu) {
+          if (_pGUIM->gmLoadSaveMenu.gm_pgmParentMenu == &_pGUIM->gmSplitScreenMenu) {
+            StartSplitScreenGameLoad();
+          } else {
+            StartNetworkLoadGame();
+          }
+
+        } else if (gm_pgmParentMenu == &_pGUIM->gmNetworkOpenMenu || gm_pgmParentMenu == &_pGUIM->gmServersMenu) {
+          JoinNetworkGame();
+        }
+        
+        return TRUE;
+      }
+    
+    } else if (event.GuiEvent.EventType == EGET_CHANGED) {
 
       INDEX iNewValue = event.GuiEvent.IntValue;
       
@@ -172,6 +181,10 @@ BOOL CSelectPlayersMenu::OnEvent(const SEvent& event)
         return TRUE;
       }
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

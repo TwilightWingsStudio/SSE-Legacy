@@ -85,15 +85,6 @@ void CSinglePlayerNewMenu::Initialize_t(void)
   gm_mgSeriousMental.mg_pmgUp = &gm_mgMental;
   gm_mgSeriousMental.mg_pmgDown = &gm_mgTourist;
   gm_mgSeriousMental.mg_bBlinking = TRUE;
-
-  // Reset pointers.
-  gm_mgTourist.mg_pActivatedFunction = NULL;
-  gm_mgEasy.mg_pActivatedFunction = NULL;
-  gm_mgMedium.mg_pActivatedFunction = NULL;
-  gm_mgHard.mg_pActivatedFunction = NULL;
-  gm_mgSerious.mg_pActivatedFunction = NULL;
-  gm_mgMental.mg_pActivatedFunction = NULL;
-  gm_mgSeriousMental.mg_pActivatedFunction = NULL;
   
   // Add components.
   AddChild(&gm_mgTitle);
@@ -168,6 +159,10 @@ BOOL CSinglePlayerNewMenu::OnEvent(const SEvent& event)
       
       return TRUE;
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

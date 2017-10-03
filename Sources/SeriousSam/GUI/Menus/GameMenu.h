@@ -57,6 +57,7 @@ public:
   virtual BOOL OnKeyDown(int iVKey);
   virtual BOOL OnChar(MSG msg);
   virtual void Think(void);
+  virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

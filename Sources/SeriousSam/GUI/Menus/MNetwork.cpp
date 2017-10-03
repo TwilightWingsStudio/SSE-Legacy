@@ -60,12 +60,6 @@ void CNetworkMenu::Initialize_t(void)
   gm_mgLoad.mg_strText = TRANS("LOAD");
   gm_mgLoad.mg_strTip = TRANS("start server and load a network game (server only)");
 
-  // Reset pointers.
-  gm_mgJoin.mg_pActivatedFunction = NULL;
-  gm_mgStart.mg_pActivatedFunction = NULL;
-  gm_mgQuickLoad.mg_pActivatedFunction = NULL;
-  gm_mgLoad.mg_pActivatedFunction = NULL;
-
   // Add components.
   AddChild(&gm_mgTitle);
   AddChild(&gm_mgJoin);
@@ -103,6 +97,10 @@ BOOL CNetworkMenu::OnEvent(const SEvent& event)
       StartNetworkLoadMenu();
       return TRUE;
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

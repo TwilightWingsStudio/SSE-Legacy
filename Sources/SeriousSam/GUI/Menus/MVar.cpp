@@ -40,7 +40,6 @@ void CVarMenu::Initialize_t(void)
     gm_mgVar[iLabel].mg_pmgDown = &gm_mgVar[iNext];
     gm_mgVar[iLabel].mg_pmgLeft = &gm_mgApply;
     gm_mgVar[iLabel].mg_boxOnScreen = BoxMediumRow(iLabel);
-    gm_mgVar[iLabel].mg_pActivatedFunction = NULL; // never called!
     AddChild(&gm_mgVar[iLabel]);
   }
 
@@ -55,7 +54,6 @@ void CVarMenu::Initialize_t(void)
   gm_mgApply.mg_strText = TRANS("APPLY");
   gm_mgApply.mg_strTip = TRANS("apply changes");
   AddChild(&gm_mgApply);
-  gm_mgApply.mg_pActivatedFunction = NULL;
 
   AddChild(&gm_mgArrowUp);
   AddChild(&gm_mgArrowDn);
@@ -152,6 +150,10 @@ BOOL CVarMenu::OnEvent(const SEvent& event)
 
       return TRUE;
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

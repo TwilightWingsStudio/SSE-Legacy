@@ -53,11 +53,6 @@ void CNetworkJoinMenu::Initialize_t(void)
   gm_mgOpen.mg_strText = TRANS("SPECIFY SERVER");
   gm_mgOpen.mg_strTip = TRANS("type in server address to connect to");
 
-  // Reset pointers.
-  gm_mgLAN.mg_pActivatedFunction = NULL;
-  gm_mgNET.mg_pActivatedFunction = NULL;
-  gm_mgOpen.mg_pActivatedFunction = NULL;
-  
   // Add components.
   AddChild(&gm_mgTitle);
   AddChild(&gm_mgLAN);
@@ -85,6 +80,10 @@ BOOL CNetworkJoinMenu::OnEvent(const SEvent& event)
       StartNetworkOpenMenu();
       return TRUE;
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

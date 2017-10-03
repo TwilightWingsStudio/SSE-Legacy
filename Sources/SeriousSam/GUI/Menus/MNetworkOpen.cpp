@@ -66,7 +66,6 @@ void CNetworkOpenMenu::Initialize_t(void)
   gm_mgJoin.mg_pmgUp = &gm_mgPort;
   gm_mgJoin.mg_pmgDown = &gm_mgAddress;
   gm_mgJoin.mg_strText = TRANS("Join");
-  gm_mgJoin.mg_pActivatedFunction = NULL;
   
   // Add components.
   AddChild(&gm_mgTitle);
@@ -100,6 +99,10 @@ BOOL CNetworkOpenMenu::OnEvent(const SEvent& event)
       StartSelectPlayersMenuFromOpen();
       return TRUE;
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

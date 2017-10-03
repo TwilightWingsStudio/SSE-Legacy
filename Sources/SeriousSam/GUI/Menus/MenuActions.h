@@ -19,7 +19,4 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #pragma once
 #endif
 
-void InitActionsForServersMenu();
-void InitActionsForVideoOptionsMenu();
-
 #endif  /* include-once check. */

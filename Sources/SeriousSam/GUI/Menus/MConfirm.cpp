@@ -34,7 +34,6 @@ void CConfirmMenu::Initialize_t(void)
   // Initialize "Yes" button.
   gm_pConfirmYes = new CMGButton(TRANS("YES"));
   gm_pConfirmYes->mg_boxOnScreen = BoxPopupYesLarge();
-  gm_pConfirmYes->mg_pActivatedFunction = NULL;
   gm_pConfirmYes->mg_pmgLeft = gm_pConfirmYes->mg_pmgRight = gm_pConfirmNo;
   gm_pConfirmYes->mg_iCenterI = 1;
   gm_pConfirmYes->mg_bfsFontSize = BFS_LARGE;
@@ -42,7 +41,6 @@ void CConfirmMenu::Initialize_t(void)
   // Initialize "No" button.
   gm_pConfirmNo = new CMGButton(TRANS("NO"));
   gm_pConfirmNo->mg_boxOnScreen = BoxPopupNoLarge();
-  gm_pConfirmNo->mg_pActivatedFunction = NULL;
   gm_pConfirmNo->mg_pmgLeft = gm_pConfirmNo->mg_pmgRight = gm_pConfirmYes;
   gm_pConfirmNo->mg_iCenterI = -1;
   gm_pConfirmNo->mg_bfsFontSize = BFS_LARGE;
@@ -81,10 +79,11 @@ void CConfirmMenu::BeSmall(void)
 // return TRUE if handled
 BOOL CConfirmMenu::OnKeyDown(int iVKey)
 {
-  if ((iVKey == VK_ESCAPE || iVKey == VK_RBUTTON) && gm_pConfirmNo->mg_pActivatedFunction != NULL) {
+  if ((iVKey == VK_ESCAPE || iVKey == VK_RBUTTON) && gm_pConfirmNo->GetParent() != NULL) {
     gm_pConfirmNo->OnActivate();
     return TRUE;
   }
+
   return CGameMenu::OnKeyDown(iVKey);
 }
 
@@ -115,6 +114,10 @@ BOOL CConfirmMenu::OnEvent(const SEvent& event)
       MenuGoToParent();
       return TRUE;
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

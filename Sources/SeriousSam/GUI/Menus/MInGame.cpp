@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
 #include "MenuStarters.h"
+#include "MenuManager.h"
 #include "MInGame.h"
 
 // --------------------------------------------------------------------------------------
@@ -48,7 +49,6 @@ void CInGameMenu::Initialize_t(void)
   gm_mgQuickLoad.mg_strTip = TRANS("load a quick-saved game (F9)");
   gm_mgQuickLoad.mg_pmgUp = &gm_mgQuit;
   gm_mgQuickLoad.mg_pmgDown = &gm_mgQuickSave;
-  gm_mgQuickLoad.mg_pActivatedFunction = NULL;
 
   gm_mgQuickSave.mg_strText = TRANS("QUICK SAVE");
   gm_mgQuickSave.mg_bfsFontSize = BFS_LARGE;
@@ -56,7 +56,6 @@ void CInGameMenu::Initialize_t(void)
   gm_mgQuickSave.mg_strTip = TRANS("quick-save current game (F6)");
   gm_mgQuickSave.mg_pmgUp = &gm_mgQuickLoad;
   gm_mgQuickSave.mg_pmgDown = &gm_mgLoad;
-  gm_mgQuickSave.mg_pActivatedFunction = NULL;
 
   gm_mgLoad.mg_strText = TRANS("LOAD");
   gm_mgLoad.mg_bfsFontSize = BFS_LARGE;
@@ -64,7 +63,6 @@ void CInGameMenu::Initialize_t(void)
   gm_mgLoad.mg_strTip = TRANS("load a saved game");
   gm_mgLoad.mg_pmgUp = &gm_mgQuickSave;
   gm_mgLoad.mg_pmgDown = &gm_mgSave;
-  gm_mgLoad.mg_pActivatedFunction = NULL;
 
   gm_mgSave.mg_strText = TRANS("SAVE");
   gm_mgSave.mg_bfsFontSize = BFS_LARGE;
@@ -72,14 +70,12 @@ void CInGameMenu::Initialize_t(void)
   gm_mgSave.mg_strTip = TRANS("save current game (each player has own slots!)");
   gm_mgSave.mg_pmgUp = &gm_mgLoad;
   gm_mgSave.mg_pmgDown = &gm_mgDemoRec;
-  gm_mgSave.mg_pActivatedFunction = NULL;
 
   gm_mgDemoRec.mg_boxOnScreen = BoxBigRow(4.0f);
   gm_mgDemoRec.mg_bfsFontSize = BFS_LARGE;
   gm_mgDemoRec.mg_pmgUp = &gm_mgSave;
   gm_mgDemoRec.mg_pmgDown = &gm_mgHighScore;
   gm_mgDemoRec.mg_strText = "Text not set";
-  gm_mgDemoRec.mg_pActivatedFunction = NULL;
 
   gm_mgHighScore.mg_strText = TRANS("HIGH SCORES");
   gm_mgHighScore.mg_bfsFontSize = BFS_LARGE;
@@ -87,7 +83,6 @@ void CInGameMenu::Initialize_t(void)
   gm_mgHighScore.mg_strTip = TRANS("view list of top ten best scores");
   gm_mgHighScore.mg_pmgUp = &gm_mgDemoRec;
   gm_mgHighScore.mg_pmgDown = &gm_mgOptions;
-  gm_mgHighScore.mg_pActivatedFunction = NULL;
 
   gm_mgOptions.mg_strText = TRANS("OPTIONS");
   gm_mgOptions.mg_bfsFontSize = BFS_LARGE;
@@ -95,7 +90,6 @@ void CInGameMenu::Initialize_t(void)
   gm_mgOptions.mg_strTip = TRANS("adjust video, audio and input options");
   gm_mgOptions.mg_pmgUp = &gm_mgHighScore;
   gm_mgOptions.mg_pmgDown = &gm_mgStop;
-  gm_mgOptions.mg_pActivatedFunction = NULL;
 
   gm_mgStop.mg_strText = TRANS("STOP GAME");
   gm_mgStop.mg_bfsFontSize = BFS_LARGE;
@@ -103,7 +97,6 @@ void CInGameMenu::Initialize_t(void)
   gm_mgStop.mg_strTip = TRANS("stop currently running game");
   gm_mgStop.mg_pmgUp = &gm_mgOptions;
   gm_mgStop.mg_pmgDown = &gm_mgQuit;
-  gm_mgStop.mg_pActivatedFunction = NULL;
 
   gm_mgQuit.mg_strText = TRANS("QUIT");
   gm_mgQuit.mg_bfsFontSize = BFS_LARGE;
@@ -111,7 +104,6 @@ void CInGameMenu::Initialize_t(void)
   gm_mgQuit.mg_strTip = TRANS("exit game immediately");
   gm_mgQuit.mg_pmgUp = &gm_mgStop;
   gm_mgQuit.mg_pmgDown = &gm_mgQuickLoad;
-  gm_mgQuit.mg_pActivatedFunction = NULL;
 
   AddChild(&gm_mgTitle);
   AddChild(&gm_mgLabel1);
@@ -125,6 +117,20 @@ void CInGameMenu::Initialize_t(void)
   AddChild(&gm_mgOptions);
   AddChild(&gm_mgStop);
   AddChild(&gm_mgQuit);
+}
+
+static void SetDemoStartStopRecText(void)
+{
+  CInGameMenu &gmCurrent = _pGUIM->gmInGameMenu;
+
+  if (_pNetwork->IsRecordingDemo())
+  {
+    gmCurrent.gm_mgDemoRec.SetText(TRANS("STOP RECORDING"));
+    gmCurrent.gm_mgDemoRec.mg_strTip = TRANS("stop current recording");
+  } else {
+    gmCurrent.gm_mgDemoRec.SetText(TRANS("RECORD DEMO"));
+    gmCurrent.gm_mgDemoRec.mg_strTip = TRANS("start recording current game");
+  }
 }
 
 void CInGameMenu::StartMenu(void)
@@ -203,6 +209,15 @@ BOOL CInGameMenu::OnEvent(const SEvent& event)
 
     } else if (event.GuiEvent.Caller == &gm_mgSave) {
       StartCurrentSaveMenu();
+      
+    } else if (event.GuiEvent.Caller == &gm_mgDemoRec) {
+      if (_pNetwork->IsRecordingDemo()) {
+        _pNetwork->StopDemoRec();
+        SetDemoStartStopRecText();
+      } else {
+        StartDemoSaveMenu();
+      }
+
       return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgHighScore) {
@@ -221,6 +236,10 @@ BOOL CInGameMenu::OnEvent(const SEvent& event)
       ExitConfirm();
       return TRUE;
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

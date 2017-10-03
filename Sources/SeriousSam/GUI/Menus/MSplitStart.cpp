@@ -69,11 +69,6 @@ void CSplitStartMenu::Initialize_t(void)
   gm_mgStart.mg_pmgUp = &gm_mgOptions;
   gm_mgStart.mg_pmgDown = &gm_mgGameType;
   gm_mgStart.mg_strText = TRANS("START");
-
-  // Reset pointers.
-  gm_mgLevel.mg_pActivatedFunction = NULL;
-  gm_mgOptions.mg_pActivatedFunction = NULL;
-  gm_mgStart.mg_pActivatedFunction = NULL;
   
   // Add components.
   AddChild(&gm_mgLevel);
@@ -135,6 +130,10 @@ BOOL CSplitStartMenu::OnEvent(const SEvent& event)
         return TRUE; 
       }
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

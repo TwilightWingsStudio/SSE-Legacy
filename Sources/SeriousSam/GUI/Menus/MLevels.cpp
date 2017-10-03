@@ -36,7 +36,6 @@ void CLevelsMenu::Initialize_t(void)
     gm_mgManualLevel[iLabel].mg_pmgUp = &gm_mgManualLevel[iPrev];
     gm_mgManualLevel[iLabel].mg_pmgDown = &gm_mgManualLevel[iNext];
     gm_mgManualLevel[iLabel].mg_boxOnScreen = BoxMediumRow(iLabel);
-    gm_mgManualLevel[iLabel].mg_pActivatedFunction = NULL; // never called!
     AddChild(&gm_mgManualLevel[iLabel]);
   }
 

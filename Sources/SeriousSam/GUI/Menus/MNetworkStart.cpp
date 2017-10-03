@@ -70,7 +70,6 @@ void CNetworkStartMenu::Initialize_t(void)
   gm_mgLevel.mg_pmgUp = &gm_mgDifficulty;
   gm_mgLevel.mg_pmgDown = &gm_mgMaxPlayers;
   gm_mgLevel.mg_strTip = TRANS("choose the level to start");
-  gm_mgLevel.mg_pActivatedFunction = NULL;
   AddChild(&gm_mgLevel);
 
   // Initialize "Max players" trigger.
@@ -103,10 +102,6 @@ void CNetworkStartMenu::Initialize_t(void)
   gm_mgStart.mg_pmgUp = &gm_mgGameOptions;
   gm_mgStart.mg_pmgDown = &gm_mgSessionName;
   gm_mgStart.mg_strText = TRANS("START");
-  
-  // Reset pointers.
-  gm_mgGameOptions.mg_pActivatedFunction = NULL;
-  gm_mgStart.mg_pActivatedFunction = NULL;
   
   // Add components.
   AddChild(&gm_mgGameOptions);
@@ -184,6 +179,10 @@ BOOL CNetworkStartMenu::OnEvent(const SEvent& event)
         return TRUE; 
       }
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

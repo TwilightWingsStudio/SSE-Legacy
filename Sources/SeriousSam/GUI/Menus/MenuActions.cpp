@@ -242,29 +242,6 @@ void VideoConfirm(void)
   ChangeToMenu(&gmCurrent);
 }
 
-static void StopRecordingDemo(void)
-{
-  _pNetwork->StopDemoRec();
-  void SetDemoStartStopRecText(void);
-  SetDemoStartStopRecText();
-}
-
-extern void SetDemoStartStopRecText(void)
-{
-  CInGameMenu &gmCurrent = _pGUIM->gmInGameMenu;
-
-  if (_pNetwork->IsRecordingDemo())
-  {
-    gmCurrent.gm_mgDemoRec.SetText(TRANS("STOP RECORDING"));
-    gmCurrent.gm_mgDemoRec.mg_strTip = TRANS("stop current recording");
-    gmCurrent.gm_mgDemoRec.mg_pActivatedFunction = &StopRecordingDemo;
-  } else {
-    gmCurrent.gm_mgDemoRec.SetText(TRANS("RECORD DEMO"));
-    gmCurrent.gm_mgDemoRec.mg_strTip = TRANS("start recording current game");
-    gmCurrent.gm_mgDemoRec.mg_pActivatedFunction = &StartDemoSaveMenu;
-  }
-}
-
 // ------------------------ CSinglePlayerNewMenu implementation
 void StartSinglePlayerGame(void)
 {
@@ -285,15 +262,6 @@ void StartSinglePlayerGame(void)
     _gmRunningGameMode = GM_SINGLE_PLAYER;
   } else {
     _gmRunningGameMode = GM_NONE;
-  }
-}
-
-// ------------------------ CPlayerProfileMenu implementation
-extern void PPOnPlayerSelect(void)
-{
-  ASSERT(_pmgLastActivatedGadget != NULL);
-  if (_pmgLastActivatedGadget->mg_bEnabled) {
-    _pGUIM->gmPlayerProfile.SelectPlayer(((CMGButton *)_pmgLastActivatedGadget)->mg_iIndex);
   }
 }
 
@@ -532,52 +500,9 @@ static void RevertVideoSettings(void)
   UpdateVideoOptionsButtons(-1);
 }
 
-void InitActionsForVideoOptionsMenu()
-{
-  CVideoOptionsMenu &gmCurrent = _pGUIM->gmVideoOptionsMenu;
-
-  gmCurrent.gm_mgFullScreenCheckBox.mg_pOnStateChange = (void (__cdecl *)(BOOL))&UpdateVideoOptionsButtons;
-}
-
-// ------------------------ CServersMenu implementation
-
-extern CMGButton mgServerColumn[7];
-extern CMGEdit mgServerFilter[7];
-
-static void SortByColumn(int i)
-{
-  CServersMenu &gmCurrent = _pGUIM->gmServersMenu;
-
-  if (gmCurrent.gm_mgList.mg_iSort == i) {
-    gmCurrent.gm_mgList.mg_bSortDown = !gmCurrent.gm_mgList.mg_bSortDown;
-  } else {
-    gmCurrent.gm_mgList.mg_bSortDown = FALSE;
-  }
-  gmCurrent.gm_mgList.mg_iSort = i;
-}
-
-static void SortByServer(void) { SortByColumn(0); }
-static void SortByMap(void)    { SortByColumn(1); }
-static void SortByPing(void)   { SortByColumn(2); }
-static void SortByPlayers(void){ SortByColumn(3); }
-static void SortByGame(void)   { SortByColumn(4); }
-static void SortByMod(void)    { SortByColumn(5); }
-static void SortByVer(void)    { SortByColumn(6); }
-
 void RefreshServerListManually(void)
 {
   ChangeToMenu(&_pGUIM->gmServersMenu); // this refreshes the list and sets focuses
-}
-
-void InitActionsForServersMenu()
-{
-  mgServerColumn[0].mg_pActivatedFunction = SortByServer;
-  mgServerColumn[1].mg_pActivatedFunction = SortByMap;
-  mgServerColumn[2].mg_pActivatedFunction = SortByPing;
-  mgServerColumn[3].mg_pActivatedFunction = SortByPlayers;
-  mgServerColumn[4].mg_pActivatedFunction = SortByGame;
-  mgServerColumn[5].mg_pActivatedFunction = SortByMod;
-  mgServerColumn[6].mg_pActivatedFunction = SortByVer;
 }
 
 // ------------------------ CNetworkStartMenu implementation

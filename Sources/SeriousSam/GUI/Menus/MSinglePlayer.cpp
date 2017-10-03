@@ -101,16 +101,6 @@ void CSinglePlayerMenu::Initialize_t(void)
   gm_mgOptions.mg_strTip = TRANS("adjust miscellaneous game options");
   gm_mgOptions.mg_pmgUp = &gm_mgPlayersAndControls;
   gm_mgOptions.mg_pmgDown = &gm_mgNewGame;
-  
-  // Reset pointers.
-  gm_mgNewGame.mg_pActivatedFunction = NULL;
-  gm_mgCustom.mg_pActivatedFunction = NULL;
-  gm_mgQuickLoad.mg_pActivatedFunction = NULL;
-  gm_mgLoad.mg_pActivatedFunction = NULL;
-  gm_mgTraining.mg_pActivatedFunction = NULL;
-  gm_mgTechTest.mg_pActivatedFunction = NULL;
-  gm_mgPlayersAndControls.mg_pActivatedFunction = NULL;
-  gm_mgOptions.mg_pActivatedFunction = NULL;
 
   // Add components.
   AddChild(&gm_mgPlayerLabel);
@@ -231,6 +221,10 @@ BOOL CSinglePlayerMenu::OnEvent(const SEvent& event)
       StartSinglePlayerGameOptions();
       return TRUE;
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

@@ -52,7 +52,6 @@ void CVideoOptionsMenu::Initialize_t(void)
   gm_mgFullScreenCheckBox.mg_pmgUp = &gm_mgResolutionsTrigger;
   gm_mgFullScreenCheckBox.mg_pmgDown = &gm_mgBitsPerPixelTrigger;
   gm_mgFullScreenCheckBox.mg_strText = TRANS("FULLSCREEN");
-  gm_mgFullScreenCheckBox.mg_pActivatedFunction = NULL;
   
   AddChild(&gm_mgFullScreenCheckBox);
 
@@ -73,7 +72,6 @@ void CVideoOptionsMenu::Initialize_t(void)
   gm_mgVideoRendering.mg_pmgDown = &gm_mgApply;
   gm_mgVideoRendering.mg_strText = TRANS("RENDERING OPTIONS");
   gm_mgVideoRendering.mg_strTip = TRANS("manually adjust rendering settings");
-  gm_mgVideoRendering.mg_pActivatedFunction = NULL;
 
   // Initialize "Apply" button.
   gm_mgApply.mg_bfsFontSize = BFS_LARGE;
@@ -82,7 +80,6 @@ void CVideoOptionsMenu::Initialize_t(void)
   gm_mgApply.mg_pmgDown = &gm_mgDisplayAPITrigger;
   gm_mgApply.mg_strText = TRANS("APPLY");
   gm_mgApply.mg_strTip = TRANS("apply selected options");
-  gm_mgApply.mg_pActivatedFunction = NULL;
 
   // Add components.
   AddChild(&gm_mgVideoRendering);
@@ -121,7 +118,11 @@ BOOL CVideoOptionsMenu::OnEvent(const SEvent& event)
     
     } else if (event.GuiEvent.EventType == EGET_CHANGED) {
     
-      if (event.GuiEvent.Caller == &gm_mgDisplayPrefsTrigger) {
+      if (event.GuiEvent.Caller == &gm_mgFullScreenCheckBox) {
+        UpdateVideoOptionsButtons(-1);
+        return TRUE;
+        
+      } else if (event.GuiEvent.Caller == &gm_mgDisplayPrefsTrigger) {
         UpdateVideoOptionsButtons(-1);
         return TRUE;
         
@@ -146,6 +147,10 @@ BOOL CVideoOptionsMenu::OnEvent(const SEvent& event)
         return TRUE;
       }
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

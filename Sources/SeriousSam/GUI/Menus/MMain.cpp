@@ -123,16 +123,6 @@ void CMainMenu::Initialize_t(void)
   gm_mgQuit.mg_strTip = TRANS("exit game immediately");
   gm_mgQuit.mg_pmgUp = &gm_mgOptions;
   gm_mgQuit.mg_pmgDown = &gm_mgSingle;
-  
-  // Reset pointers.
-  gm_mgSingle.mg_pActivatedFunction = NULL;
-  gm_mgNetwork.mg_pActivatedFunction = NULL;
-  gm_mgSplitScreen.mg_pActivatedFunction = NULL;
-  gm_mgDemo.mg_pActivatedFunction = NULL;
-  gm_mgMods.mg_pActivatedFunction = NULL;
-  gm_mgHighScore.mg_pActivatedFunction = NULL;
-  gm_mgOptions.mg_pActivatedFunction = NULL;
-  gm_mgQuit.mg_pActivatedFunction = NULL;
 
   // Add components.
   AddChild(&gm_mgVersionLabel);
@@ -199,6 +189,10 @@ BOOL CMainMenu::OnEvent(const SEvent& event)
       ExitConfirm();
       return TRUE;
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

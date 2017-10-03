@@ -358,7 +358,6 @@ void InitializeMenus(void)
     _pGUIM->gmVideoOptionsMenu.gm_strName = "VideoOptions";
     _pGUIM->gmVideoOptionsMenu.gm_pmgSelectedByDefault = &_pGUIM->gmVideoOptionsMenu.gm_mgDisplayAPITrigger;
     _pGUIM->gmVideoOptionsMenu.gm_pgmParentMenu = &_pGUIM->gmOptionsMenu;
-    InitActionsForVideoOptionsMenu();
 
     _pGUIM->gmAudioOptionsMenu.Initialize_t();
     _pGUIM->gmAudioOptionsMenu.gm_strName = "AudioOptions";
@@ -379,7 +378,6 @@ void InitializeMenus(void)
     _pGUIM->gmServersMenu.gm_strName = "Servers";
     _pGUIM->gmServersMenu.gm_pmgSelectedByDefault = &_pGUIM->gmServersMenu.gm_mgList;
     _pGUIM->gmServersMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkOpenMenu;
-    InitActionsForServersMenu();
 
     _pGUIM->gmNetworkMenu.Initialize_t();
     _pGUIM->gmNetworkMenu.gm_strName = "Network";
@@ -866,11 +864,6 @@ BOOL DoMenu( CDrawPort *pdp)
   return bStilInMenus;
 }
 
-void MenuBack(void)
-{
-  MenuGoToParent();
-}
-
 extern void FixupBackButton(CGameMenu *pgm)
 {
   BOOL bResume = FALSE;
@@ -921,7 +914,7 @@ extern void FixupBackButton(CGameMenu *pgm)
   mgBack.mg_pmgUp = 
   mgBack.mg_pmgDown = pgm->gm_pmgSelectedByDefault;
 
-  mgBack.mg_pActivatedFunction = &MenuBack;
+  mgBack.SetID(-666);
 
   mgBack.Appear();
 }

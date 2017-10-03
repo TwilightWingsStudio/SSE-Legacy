@@ -365,3 +365,25 @@ void CGameMenu::EndMenu(void)
     itmg->Disappear();
   }
 }
+
+// --------------------------------------------------------------------------------------
+// [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
+BOOL CGameMenu::OnEvent(const SEvent& event)
+{
+  //CPrintF("CGameMenu::OnEvent\n");
+  
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.EventType == EGET_TRIGGERED)
+    {
+      if (event.GuiEvent.Caller->GetID() == -666) {
+        extern void MenuGoToParent(void);
+        MenuGoToParent();
+      }
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
+}

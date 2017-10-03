@@ -26,7 +26,6 @@ void CDisabledMenu::Initialize_t(void)
 
   gm_mgButton.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgButton.mg_boxOnScreen = BoxBigRow(0.0f);
-  gm_mgButton.mg_pActivatedFunction = NULL;
 
   // Add components.
   AddChild(&gm_mgButton);

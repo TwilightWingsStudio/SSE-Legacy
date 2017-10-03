@@ -76,14 +76,6 @@ void COptionsMenu::Initialize_t(void)
   gm_mgAddonOptions.mg_strText = TRANS("EXECUTE ADDON");
   gm_mgAddonOptions.mg_strTip = TRANS("choose from list of addons to execute");
   
-  // Reset pointers.
-  gm_mgVideoOptions.mg_pActivatedFunction = NULL;
-  gm_mgAudioOptions.mg_pActivatedFunction = NULL;
-  gm_mgPlayerProfileOptions.mg_pActivatedFunction = NULL;
-  gm_mgNetworkOptions.mg_pActivatedFunction = NULL;
-  gm_mgCustomOptions.mg_pActivatedFunction = NULL;
-  gm_mgAddonOptions.mg_pActivatedFunction = NULL;
-  
   // Add components.
   AddChild(&gm_mgTitle);
   AddChild(&gm_mgVideoOptions);
@@ -127,6 +119,10 @@ BOOL COptionsMenu::OnEvent(const SEvent& event)
       return TRUE;
       
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

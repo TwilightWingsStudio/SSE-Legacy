@@ -46,7 +46,6 @@ void CControlsMenu::Initialize_t(void)
   gm_mgButtons.mg_iCenterI = 0;
   gm_mgButtons.mg_pmgUp = &gm_mgPredefined;
   gm_mgButtons.mg_pmgDown = &gm_mgAdvanced;
-  gm_mgButtons.mg_pActivatedFunction = NULL;
   gm_mgButtons.mg_strTip = TRANS("customize buttons in current controls");
 
   // Initialize "Advanced Joysrick Setup" button.
@@ -56,7 +55,6 @@ void CControlsMenu::Initialize_t(void)
   gm_mgAdvanced.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgAdvanced.mg_pmgUp = &gm_mgButtons;
   gm_mgAdvanced.mg_pmgDown = &gm_mgSensitivity;
-  gm_mgAdvanced.mg_pActivatedFunction = NULL;
   gm_mgAdvanced.mg_strTip = TRANS("adjust advanced settings for joystick axis");
 
   // Initialize "Sensitivity" slider.
@@ -93,7 +91,6 @@ void CControlsMenu::Initialize_t(void)
   gm_mgPredefined.mg_pmgUp = &gm_mgIFeelTrigger;
   gm_mgPredefined.mg_pmgDown = &gm_mgButtons;
   gm_mgPredefined.mg_strTip = TRANS("load one of several predefined control settings");
-  gm_mgPredefined.mg_pActivatedFunction = NULL;
 
   AddChild(&gm_mgPredefined);
 }
@@ -178,13 +175,20 @@ BOOL CControlsMenu::OnEvent(const SEvent& event)
   {
     if (event.GuiEvent.Caller == &gm_mgButtons) {
       StartCustomizeKeyboardMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgAdvanced) {
       StartCustomizeAxisMenu();
+      return TRUE;
 
     } else if (event.GuiEvent.Caller == &gm_mgPredefined) {
       StartControlsLoadMenu();
+      return TRUE;
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;

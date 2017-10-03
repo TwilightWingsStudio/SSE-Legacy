@@ -248,7 +248,7 @@ void StartHighScoreMenu(void)
   ChangeToMenu(&_pGUIM->gmHighScoreMenu);
 }
 
-void StartSplitScreenGame(void)
+extern void StartSplitScreenGame(void)
 {
   //  _pGame->gm_MenuSplitScreenCfg = (enum CGame::SplitScreenCfg) mgSplitScreenCfg.mg_iSelected;
   _pGame->gm_StartSplitScreenCfg = _pGame->gm_MenuSplitScreenCfg;
@@ -272,7 +272,7 @@ void StartSplitScreenGame(void)
   }
 }
 
-void StartNetworkGame(void)
+extern void StartNetworkGame(void)
 {
   //  _pGame->gm_MenuSplitScreenCfg = (enum CGame::SplitScreenCfg) mgSplitScreenCfg.mg_iSelected;
   _pGame->gm_StartSplitScreenCfg = _pGame->gm_MenuSplitScreenCfg;
@@ -302,7 +302,7 @@ void StartNetworkGame(void)
   }
 }
 
-void JoinNetworkGame(void)
+extern void JoinNetworkGame(void)
 {
   //  _pGame->gm_MenuSplitScreenCfg = (enum CGame::SplitScreenCfg) mgSplitScreenCfg.mg_iSelected;
   _pGame->gm_StartSplitScreenCfg = _pGame->gm_MenuSplitScreenCfg;
@@ -396,7 +396,6 @@ void StartSelectPlayersMenuFromSplit(void)
 
   gmCurrent.gm_bAllowDedicated = FALSE;
   gmCurrent.gm_bAllowObserving = FALSE;
-  gmCurrent.gm_mgStart.mg_pActivatedFunction = &StartSplitScreenGame;
   gmCurrent.gm_pgmParentMenu = &_pGUIM->gmSplitStartMenu;
   ChangeToMenu(&gmCurrent);
 }
@@ -407,7 +406,6 @@ void StartSelectPlayersMenuFromNetwork(void)
 
   gmCurrent.gm_bAllowDedicated = TRUE;
   gmCurrent.gm_bAllowObserving = TRUE;
-  gmCurrent.gm_mgStart.mg_pActivatedFunction = &StartNetworkGame;
   gmCurrent.gm_pgmParentMenu = &_pGUIM->gmNetworkStartMenu;
   ChangeToMenu(&gmCurrent);
 }
@@ -418,7 +416,6 @@ void StartSelectPlayersMenuFromNetworkLoad(void)
 
   gmCurrent.gm_bAllowDedicated = FALSE;
   gmCurrent.gm_bAllowObserving = TRUE;
-  gmCurrent.gm_mgStart.mg_pActivatedFunction = &StartNetworkLoadGame;
   gmCurrent.gm_pgmParentMenu = &_pGUIM->gmLoadSaveMenu;
   ChangeToMenu(&gmCurrent);
 }
@@ -429,7 +426,6 @@ void StartSelectPlayersMenuFromSplitScreenLoad(void)
 
   gmCurrent.gm_bAllowDedicated = FALSE;
   gmCurrent.gm_bAllowObserving = FALSE;
-  gmCurrent.gm_mgStart.mg_pActivatedFunction = &StartSplitScreenGameLoad;
   gmCurrent.gm_pgmParentMenu = &_pGUIM->gmLoadSaveMenu;
   ChangeToMenu(&gmCurrent);
 }
@@ -440,7 +436,6 @@ void StartSelectPlayersMenuFromOpen(void)
 
   gmCurrent.gm_bAllowDedicated = FALSE;
   gmCurrent.gm_bAllowObserving = TRUE;
-  gmCurrent.gm_mgStart.mg_pActivatedFunction = &JoinNetworkGame;
   gmCurrent.gm_pgmParentMenu = &_pGUIM->gmNetworkOpenMenu;
   ChangeToMenu(&gmCurrent);
 
@@ -459,7 +454,6 @@ void StartSelectPlayersMenuFromServers(void)
 
   gmCurrent.gm_bAllowDedicated = FALSE;
   gmCurrent.gm_bAllowObserving = TRUE;
-  gmCurrent.gm_mgStart.mg_pActivatedFunction = &JoinNetworkGame;
   gmCurrent.gm_pgmParentMenu = &_pGUIM->gmServersMenu;
   ChangeToMenu(&gmCurrent);
 

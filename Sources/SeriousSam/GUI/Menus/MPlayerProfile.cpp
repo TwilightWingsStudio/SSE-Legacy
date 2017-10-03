@@ -21,6 +21,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "MPlayerProfile.h"
 #include "GUI/Menus/MenuManager.h"
 
+extern CMenuGadget *_pmgLastActivatedGadget;
+
+static void PPOnPlayerSelect(void)
+{
+  ASSERT(_pmgLastActivatedGadget != NULL);
+  if (_pmgLastActivatedGadget->mg_bEnabled) {
+    _pGUIM->gmPlayerProfile.SelectPlayer(((CMGButton *)_pmgLastActivatedGadget)->mg_iIndex);
+  }
+}
+
 #define ADD_SELECT_PLAYER_MG( index, mg, mgprev, mgnext, me)\
   mg.mg_iIndex = index; \
   mg.mg_bfsFontSize = BFS_MEDIUM; \
@@ -30,14 +40,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   mg.mg_pmgRight = &mgnext; \
   mg.mg_pmgUp = &gm_mgCustomizeControls; \
   mg.mg_pmgDown = &gm_mgNameField; \
-  mg.mg_pActivatedFunction = &PPOnPlayerSelect; \
   mg.mg_strText = #index; \
   mg.mg_strTip = TRANS("select new currently active player"); \
   AddChild(&mg);
 
 extern BOOL  _bPlayerMenuFromSinglePlayer;
 extern CTString _strLastPlayerAppearance;
-extern void PPOnPlayerSelect(void);
 
 // --------------------------------------------------------------------------------------
 // Intializes player and controls menu.
@@ -162,10 +170,6 @@ void CPlayerProfileMenu::Initialize_t(void)
   gm_mgModel.mg_pmgDown = &gm_mgNameField;
   gm_mgModel.mg_pmgLeft = &gm_mgNameField;
   gm_mgModel.mg_strTip = TRANS("change model for this player");
-
-  // Reset pointers.
-  gm_mgCustomizeControls.mg_pActivatedFunction = NULL;
-  gm_mgModel.mg_pActivatedFunction = NULL;
   
   // Add components.
   AddChild(&gm_mgCustomizeControls);
@@ -419,6 +423,38 @@ BOOL CPlayerProfileMenu::OnEvent(const SEvent& event)
       } else if (event.GuiEvent.Caller == &gm_mgModel) {
         StartPlayerModelLoadMenu();
         return TRUE;
+      
+      } else if (event.GuiEvent.Caller == &gm_mgNumber[0]) {
+        PPOnPlayerSelect();
+        return TRUE;
+        
+      } else if (event.GuiEvent.Caller == &gm_mgNumber[1]) {
+        PPOnPlayerSelect();
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgNumber[2]) {
+        PPOnPlayerSelect();
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgNumber[3]) {
+        PPOnPlayerSelect();
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgNumber[4]) {
+        PPOnPlayerSelect();
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgNumber[5]) {
+        PPOnPlayerSelect();
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgNumber[6]) {
+        PPOnPlayerSelect();
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgNumber[7]) {
+        PPOnPlayerSelect();
+        return TRUE;
       }
 
     } else if (event.GuiEvent.EventType == EGET_CHANGED) {
@@ -461,6 +497,10 @@ BOOL CPlayerProfileMenu::OnEvent(const SEvent& event)
         return TRUE;
       }
     }
+  }
+  
+  if (CGameMenu::OnEvent(event)) {
+    return TRUE;
   }
   
   return m_pParent ? m_pParent->OnEvent(event) : FALSE;
