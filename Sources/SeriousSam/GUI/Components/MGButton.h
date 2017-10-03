@@ -39,8 +39,6 @@ class CMGButton : public CMenuGadget
     INDEX mg_iCursorPos;
     INDEX mg_iIndex;
 
-    void (*mg_pActivatedFunction)(void);
-
     // Default constructor. Constructs component without text.
     CMGButton(void);
     

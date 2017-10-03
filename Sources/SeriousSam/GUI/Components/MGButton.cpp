@@ -30,7 +30,6 @@ extern CMenuGadget *_pmgLastActivatedGadget;
 // --------------------------------------------------------------------------------------
 CMGButton::CMGButton(void)
 {
-  mg_pActivatedFunction = NULL;
   mg_iIndex = 0;
   mg_iCenterI = 0;
   mg_iTextMode = 1;
@@ -47,7 +46,6 @@ CMGButton::CMGButton(void)
 // --------------------------------------------------------------------------------------
 CMGButton::CMGButton(const CTString &strText)
 {
-  mg_pActivatedFunction = NULL;
   mg_iIndex = 0;
   mg_iCenterI = 0;
   mg_iTextMode = 1;
@@ -73,22 +71,13 @@ void CMGButton::OnActivate(void)
     return;
   }
   
-	if (mg_pActivatedFunction != NULL || m_pParent != NULL)
+  // [SSE]
+  if (m_pParent != NULL)
   {
 		PlayMenuSound(_psdPress);
 		IFeel_PlayEffect("Menu_press");
 		_pmgLastActivatedGadget = this;
-  }
-  
-  // TODO: Deprecated way. Will be removed when nothing will use it.
-	if (mg_pActivatedFunction != NULL)
-	{
-		(*mg_pActivatedFunction)();
-	}
-  
-  // [SSE]
-  if (m_pParent != NULL)
-  {
+    
     SEvent newEvent;
     newEvent.EventType = EET_GUI_EVENT;
     newEvent.GuiEvent.Caller = this;
