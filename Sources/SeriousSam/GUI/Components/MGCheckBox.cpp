@@ -26,7 +26,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 CMGCheckBox::CMGCheckBox(void)
 {
   mg_pActivatedFunction = NULL;
-  mg_pOnStateChange = NULL;
   
   mg_bValue = FALSE;
   
@@ -56,9 +55,18 @@ BOOL CMGCheckBox::OnKeyDown(int iVKey)
     {
       mg_bValue = !mg_bValue;
 
-      if (mg_pOnStateChange != NULL) {
-        (*mg_pOnStateChange)(mg_bValue);
-      } 
+      // [SSE]
+      if (m_pParent != NULL)
+      {
+        SEvent newEvent;
+        newEvent.EventType = EET_GUI_EVENT;
+        newEvent.GuiEvent.Caller = this;
+        newEvent.GuiEvent.Target = NULL;
+        newEvent.GuiEvent.EventType = EGET_CHANGED;
+        newEvent.GuiEvent.IntValue = mg_bValue;
+        
+        m_pParent->OnEvent(newEvent);
+      }
     }
 
     return TRUE;

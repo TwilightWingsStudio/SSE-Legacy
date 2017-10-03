@@ -34,8 +34,6 @@ class CMGCheckBox : public CMGButton
     BOOL OnKeyDown(int iVKey);
 
     BOOL mg_bValue;
-    
-    void(*mg_pOnStateChange)(BOOL bCurrentState);
 };
 
 #endif  /* include-once check. */
