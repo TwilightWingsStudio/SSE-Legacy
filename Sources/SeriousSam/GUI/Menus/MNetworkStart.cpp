@@ -55,7 +55,6 @@ void CNetworkStartMenu::Initialize_t(void)
     gm_mgSessionName, gm_mgDifficulty, TRANS("Game type:"), astrGameTypeRadioTexts);
   gm_mgGameType.mg_ctTexts = ctGameTypeRadioTexts;
   gm_mgGameType.mg_strTip = TRANS("choose type of multiplayer game");
-  gm_mgGameType.mg_pOnTriggerChange = NULL;
 
   // Initialize "Difficulty" trigger.
   TRIGGER_MG(gm_mgDifficulty, 3,

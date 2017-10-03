@@ -164,15 +164,6 @@ void CPlayerProfileMenu::Initialize_t(void)
   gm_mgModel.mg_strTip = TRANS("change model for this player");
 
   // Reset pointers.
-  gm_mgCrosshair.mg_pOnTriggerChange = NULL;
-  gm_mgWeaponSelect.mg_pOnTriggerChange = NULL;
-  gm_mgWeaponHide.mg_pOnTriggerChange = NULL;
-  gm_mg3rdPerson.mg_pOnTriggerChange = NULL;
-  gm_mgQuotes.mg_pOnTriggerChange = NULL;
-  gm_mgAutoSave.mg_pOnTriggerChange = NULL;
-  gm_mgCompDoubleClick.mg_pOnTriggerChange = NULL;
-  gm_mgSharpTurning.mg_pOnTriggerChange = NULL;
-  gm_mgViewBobbing.mg_pOnTriggerChange = NULL;
   gm_mgCustomizeControls.mg_pActivatedFunction = NULL;
   gm_mgModel.mg_pActivatedFunction = NULL;
   

@@ -55,11 +55,6 @@ void CSelectPlayersMenu::Initialize_t(void)
   // Initialize "Number of players" trigger.
   TRIGGER_MG(gm_mgSplitScreenCfg, 2, gm_mgObserver, gm_mgPlayer0Change, TRANS("Number of players:"), astrSplitScreenRadioTexts);
   gm_mgSplitScreenCfg.mg_strTip = TRANS("choose more than one player to play in split screen");
-  
-  // Reset pointers.
-  gm_mgDedicated.mg_pOnTriggerChange = NULL;
-  gm_mgObserver.mg_pOnTriggerChange = NULL;
-  gm_mgSplitScreenCfg.mg_pOnTriggerChange = NULL;
 
   // Initialize players selection buttons.
   gm_mgPlayer0Change.mg_iCenterI = -1;

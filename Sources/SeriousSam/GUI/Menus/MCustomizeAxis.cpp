@@ -40,9 +40,6 @@ void CCustomizeAxisMenu::Initialize_t(void)
   gm_mgActionTrigger.mg_astrTexts = new CTString[AXIS_ACTIONS_CT];
   gm_mgActionTrigger.mg_ctTexts = AXIS_ACTIONS_CT;
 
-  gm_mgActionTrigger.mg_pPreTriggerChange = NULL;
-  gm_mgActionTrigger.mg_pOnTriggerChange = NULL;
-
   // for all available axis type controlers
   for (INDEX iControler = 0; iControler<AXIS_ACTIONS_CT; iControler++) {
     gm_mgActionTrigger.mg_astrTexts[iControler] = TranslateConst(CTString(_pGame->gm_astrAxisNames[iControler]), 0);

@@ -44,8 +44,6 @@ static INDEX GetNewLoopValue(int iVKey, INDEX iCurrent, INDEX ctMembers)
 // --------------------------------------------------------------------------------------
 CMGTrigger::CMGTrigger(void)
 {
-  mg_pPreTriggerChange = NULL;
-  mg_pOnTriggerChange = NULL;
   mg_iCenterI = 0;
   mg_bVisual = FALSE;
   mg_iSelected = 0;
@@ -56,8 +54,6 @@ CMGTrigger::CMGTrigger(void)
 // --------------------------------------------------------------------------------------
 CMGTrigger::CMGTrigger(const CTString &strText)
 {
-  mg_pPreTriggerChange = NULL;
-  mg_pOnTriggerChange = NULL;
   mg_iCenterI = 0;
   mg_bVisual = FALSE;
   mg_iSelected = 0;
@@ -79,11 +75,6 @@ void CMGTrigger::ApplyCurrentSelection(void)
 // --------------------------------------------------------------------------------------
 void CMGTrigger::OnSetNextInList(int iVKey)
 {
-  // TODO: Deprecated way. Will be removed when nothing will use it.
-  if (mg_pPreTriggerChange != NULL) {
-    mg_pPreTriggerChange(mg_iSelected);
-  }
-  
   // [SSE]
   if (m_pParent != NULL)
   {
@@ -99,11 +90,6 @@ void CMGTrigger::OnSetNextInList(int iVKey)
 
   mg_iSelected = GetNewLoopValue(iVKey, mg_iSelected, mg_ctTexts);
   mg_strValue = mg_astrTexts[mg_iSelected];
-
-  // TODO: Deprecated way. Will be removed when nothing will use it.
-  if (mg_pOnTriggerChange != NULL) {
-    (*mg_pOnTriggerChange)(mg_iSelected);
-  }
   
   // [SSE]
   if (m_pParent != NULL)

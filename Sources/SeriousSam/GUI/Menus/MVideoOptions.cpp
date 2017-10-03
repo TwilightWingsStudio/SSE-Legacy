@@ -66,14 +66,6 @@ void CVideoOptionsMenu::Initialize_t(void)
   gm_mgFullScreenCheckBox.mg_strTip = TRANS("make game run in a window or in full screen");
   gm_mgBitsPerPixelTrigger.mg_strTip = TRANS("select number of colors used for display");
 
-  // Reset all pointers.
-  gm_mgDisplayPrefsTrigger.mg_pOnTriggerChange = NULL;
-  gm_mgDisplayAPITrigger.mg_pOnTriggerChange = NULL;
-  gm_mgDisplayAdaptersTrigger.mg_pOnTriggerChange = NULL;
-  gm_mgAspectRatioTrigger.mg_pOnTriggerChange = NULL;
-  gm_mgResolutionsTrigger.mg_pOnTriggerChange = NULL;
-  gm_mgBitsPerPixelTrigger.mg_pOnTriggerChange = NULL;
-
    // Initialize "Rendering Options" button.
   gm_mgVideoRendering.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgVideoRendering.mg_boxOnScreen = BoxMediumRow(8.0f);

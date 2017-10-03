@@ -43,8 +43,6 @@ class CMGTrigger : public CMenuGadget
 
     void ApplyCurrentSelection(void);
     void OnSetNextInList(int iVKey);
-    void(*mg_pPreTriggerChange)(INDEX iCurrentlySelected);
-    void(*mg_pOnTriggerChange)(INDEX iCurrentlySelected);
     BOOL OnKeyDown(int iVKey); // return TRUE if handled
     void Render(CDrawPort *pdp);
 };
