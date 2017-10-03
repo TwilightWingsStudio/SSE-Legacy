@@ -55,7 +55,7 @@ void CNetworkStartMenu::Initialize_t(void)
     gm_mgSessionName, gm_mgDifficulty, TRANS("Game type:"), astrGameTypeRadioTexts);
   gm_mgGameType.mg_ctTexts = ctGameTypeRadioTexts;
   gm_mgGameType.mg_strTip = TRANS("choose type of multiplayer game");
-  gm_mgGameType.mg_pOnTriggerChange = &UpdateNetworkLevel;
+  gm_mgGameType.mg_pOnTriggerChange = NULL;
 
   // Initialize "Difficulty" trigger.
   TRIGGER_MG(gm_mgDifficulty, 3,
@@ -164,17 +164,26 @@ BOOL CNetworkStartMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
-    if (event.GuiEvent.Caller == &gm_mgLevel) {
-      StartSelectLevelFromNetwork();
-      return TRUE;
+    if (event.GuiEvent.EventType == EGET_TRIGGERED) {
+      if (event.GuiEvent.Caller == &gm_mgLevel) {
+        StartSelectLevelFromNetwork();
+        return TRUE;
 
-    } else if (event.GuiEvent.Caller == &gm_mgGameOptions) {
-      StartGameOptionsFromNetwork();
-      return TRUE;
+      } else if (event.GuiEvent.Caller == &gm_mgGameOptions) {
+        StartGameOptionsFromNetwork();
+        return TRUE;
 
-    } else if (event.GuiEvent.Caller == &gm_mgStart) {
-      StartSelectPlayersMenuFromNetwork();
-      return TRUE;
+      } else if (event.GuiEvent.Caller == &gm_mgStart) {
+        StartSelectPlayersMenuFromNetwork();
+        return TRUE;
+      }
+      
+    } else if (event.GuiEvent.EventType == EGET_CHANGED) {
+
+      if (event.GuiEvent.Caller == &gm_mgGameType) {
+        UpdateNetworkLevel(-1);
+        return TRUE; 
+      }
     }
   }
   

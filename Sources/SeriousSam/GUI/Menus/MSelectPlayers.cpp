@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
 #include "MenuStuff.h"
+#include "MenuManager.h"
 #include "MSelectPlayers.h"
 
 #define ADD_GADGET( gd, box, up, dn, lf, rt, txt) \
@@ -113,6 +114,25 @@ void CSelectPlayersMenu::Initialize_t(void)
   gm_mgStart.mg_iCenterI = 0;
 }
 
+extern void SelectPlayersFillMenu(void);
+
+static void SelectPlayersApplyMenu(void)
+{
+  CSelectPlayersMenu &gmCurrent = _pGUIM->gmSelectPlayersMenu;
+
+  if (gmCurrent.gm_bAllowDedicated && gmCurrent.gm_mgDedicated.mg_iSelected) {
+    _pGame->gm_MenuSplitScreenCfg = CGame::SSC_DEDICATED;
+    return;
+  }
+
+  if (gmCurrent.gm_bAllowObserving && gmCurrent.gm_mgObserver.mg_iSelected) {
+    _pGame->gm_MenuSplitScreenCfg = CGame::SSC_OBSERVER;
+    return;
+  }
+
+  _pGame->gm_MenuSplitScreenCfg = (enum CGame::SplitScreenCfg) gmCurrent.gm_mgSplitScreenCfg.mg_iSelected;
+}
+
 void CSelectPlayersMenu::StartMenu(void)
 {
   CGameMenu::StartMenu();
@@ -124,4 +144,40 @@ void CSelectPlayersMenu::EndMenu(void)
 {
   SelectPlayersApplyMenu();
   CGameMenu::EndMenu();
+}
+
+static void UpdateSelectPlayers(INDEX i)
+{
+  SelectPlayersApplyMenu();
+  SelectPlayersFillMenu();
+}
+
+// --------------------------------------------------------------------------------------
+// [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
+BOOL CSelectPlayersMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.EventType == EGET_CHANGED) {
+
+      INDEX iNewValue = event.GuiEvent.IntValue;
+      
+      if (event.GuiEvent.Caller == &gm_mgDedicated) {
+        UpdateSelectPlayers(iNewValue);
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgObserver) {
+        UpdateSelectPlayers(iNewValue);
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgSplitScreenCfg) {
+        UpdateSelectPlayers(iNewValue);
+        return TRUE;
+      }
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

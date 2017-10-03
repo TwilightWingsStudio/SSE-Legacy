@@ -165,3 +165,23 @@ void CCustomizeAxisMenu::EndMenu(void)
   ApplyActionSettings();
   CGameMenu::EndMenu();
 }
+
+// --------------------------------------------------------------------------------------
+// [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
+BOOL CCustomizeAxisMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.EventType == EGET_CHANGED) {
+      ObtainActionSettings();
+      return TRUE;
+    } else if (event.GuiEvent.EventType == EGET_PRECHANGE) {
+      ApplyActionSettings();
+      return TRUE;
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
+}

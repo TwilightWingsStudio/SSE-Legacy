@@ -42,6 +42,7 @@ public:
   void EndMenu(void);
   void ObtainActionSettings(void);
   void ApplyActionSettings(void);
+  virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

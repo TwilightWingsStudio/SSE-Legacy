@@ -320,6 +320,97 @@ void CPlayerProfileMenu::EndMenu(void)
   CGameMenu::EndMenu();
 }
 
+static void ChangeCrosshair(INDEX iNew)
+{
+  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
+  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
+  pps->ps_iCrossHairType = iNew - 1;
+}
+
+static void ChangeWeaponSelect(INDEX iNew)
+{
+  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
+  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
+  pps->ps_iWeaponAutoSelect = iNew;
+}
+
+static void ChangeWeaponHide(INDEX iNew)
+{
+  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
+  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
+  if (iNew) {
+    pps->ps_ulFlags |= PSF_HIDEWEAPON;
+  } else {
+    pps->ps_ulFlags &= ~PSF_HIDEWEAPON;
+  }
+}
+
+static void Change3rdPerson(INDEX iNew)
+{
+  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
+  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
+  if (iNew) {
+    pps->ps_ulFlags |= PSF_PREFER3RDPERSON;
+  } else {
+    pps->ps_ulFlags &= ~PSF_PREFER3RDPERSON;
+  }
+}
+
+static void ChangeQuotes(INDEX iNew)
+{
+  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
+  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
+  if (iNew) {
+    pps->ps_ulFlags &= ~PSF_NOQUOTES;
+  } else {
+    pps->ps_ulFlags |= PSF_NOQUOTES;
+  }
+}
+
+static void ChangeAutoSave(INDEX iNew)
+{
+  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
+  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
+  if (iNew) {
+    pps->ps_ulFlags |= PSF_AUTOSAVE;
+  } else {
+    pps->ps_ulFlags &= ~PSF_AUTOSAVE;
+  }
+}
+
+static void ChangeCompDoubleClick(INDEX iNew)
+{
+  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
+  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
+  if (iNew) {
+    pps->ps_ulFlags &= ~PSF_COMPSINGLECLICK;
+  } else {
+    pps->ps_ulFlags |= PSF_COMPSINGLECLICK;
+  }
+}
+
+static void ChangeViewBobbing(INDEX iNew)
+{
+  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
+  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
+  if (iNew) {
+    pps->ps_ulFlags &= ~PSF_NOBOBBING;
+  } else {
+    pps->ps_ulFlags |= PSF_NOBOBBING;
+  }
+}
+
+static void ChangeSharpTurning(INDEX iNew)
+{
+  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
+  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
+  if (iNew) {
+    pps->ps_ulFlags |= PSF_SHARPTURNING;
+  } else {
+    pps->ps_ulFlags &= ~PSF_SHARPTURNING;
+  }
+}
+
 // --------------------------------------------------------------------------------------
 // [SSE]
 // Returns TRUE if event was handled.
@@ -328,13 +419,56 @@ BOOL CPlayerProfileMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
-    if (event.GuiEvent.Caller == &gm_mgCustomizeControls) {
-      StartControlsMenuFromPlayer();
-      return TRUE;
+    if (event.GuiEvent.EventType == EGET_TRIGGERED)
+    {
+      if (event.GuiEvent.Caller == &gm_mgCustomizeControls) {
+        StartControlsMenuFromPlayer();
+        return TRUE;
 
-    } else if (event.GuiEvent.Caller == &gm_mgModel) {
-      StartPlayerModelLoadMenu();
-      return TRUE;
+      } else if (event.GuiEvent.Caller == &gm_mgModel) {
+        StartPlayerModelLoadMenu();
+        return TRUE;
+      }
+
+    } else if (event.GuiEvent.EventType == EGET_CHANGED) {
+
+      INDEX iNewValue = event.GuiEvent.IntValue;
+      
+      if (event.GuiEvent.Caller == &gm_mgCrosshair) {
+        ChangeCrosshair(iNewValue);
+        return TRUE;
+      } else if (event.GuiEvent.Caller == &gm_mgWeaponSelect) {
+        ChangeWeaponSelect(iNewValue);
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgWeaponHide) {
+        ChangeWeaponHide(iNewValue);
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mg3rdPerson) {
+        Change3rdPerson(iNewValue);
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgQuotes) {
+        ChangeQuotes(iNewValue);
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgAutoSave) {
+        ChangeAutoSave(iNewValue);
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgCompDoubleClick) {
+        ChangeCompDoubleClick(iNewValue);
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgSharpTurning) {
+        ChangeSharpTurning(iNewValue);
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgViewBobbing) {
+        ChangeViewBobbing(iNewValue);
+        return TRUE;
+      }
     }
   }
   

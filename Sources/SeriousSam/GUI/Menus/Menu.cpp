@@ -324,7 +324,6 @@ void InitializeMenus(void)
     _pGUIM->gmPlayerProfile.Initialize_t();
     _pGUIM->gmPlayerProfile.gm_strName = "PlayerProfile";
     _pGUIM->gmPlayerProfile.gm_pmgSelectedByDefault = &_pGUIM->gmPlayerProfile.gm_mgNameField;
-    InitActionsForPlayerProfileMenu();
 
     _pGUIM->gmControls.Initialize_t();
     _pGUIM->gmControls.gm_strName = "Controls";
@@ -349,7 +348,6 @@ void InitializeMenus(void)
     _pGUIM->gmCustomizeAxisMenu.gm_strName = "CustomizeAxis";
     _pGUIM->gmCustomizeAxisMenu.gm_pmgSelectedByDefault = &_pGUIM->gmCustomizeAxisMenu.gm_mgActionTrigger;
     _pGUIM->gmCustomizeAxisMenu.gm_pgmParentMenu = &_pGUIM->gmControls;
-    InitActionsForCustomizeAxisMenu();
 
     _pGUIM->gmOptionsMenu.Initialize_t();
     _pGUIM->gmOptionsMenu.gm_strName = "Options";
@@ -366,7 +364,6 @@ void InitializeMenus(void)
     _pGUIM->gmAudioOptionsMenu.gm_strName = "AudioOptions";
     _pGUIM->gmAudioOptionsMenu.gm_pmgSelectedByDefault = _pGUIM->gmAudioOptionsMenu.gm_pFrequencyTrigger;
     _pGUIM->gmAudioOptionsMenu.gm_pgmParentMenu = &_pGUIM->gmOptionsMenu;
-    InitActionsForAudioOptionsMenu();
 
     _pGUIM->gmLevelsMenu.Initialize_t();
     _pGUIM->gmLevelsMenu.gm_strName = "Levels";
@@ -404,7 +401,6 @@ void InitializeMenus(void)
     _pGUIM->gmSelectPlayersMenu.Initialize_t();
     _pGUIM->gmSelectPlayersMenu.gm_strName = "SelectPlayers";
     _pGUIM->gmSelectPlayersMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSelectPlayersMenu.gm_mgStart;
-    InitActionsForSelectPlayersMenu();
 
     _pGUIM->gmNetworkOpenMenu.Initialize_t();
     _pGUIM->gmNetworkOpenMenu.gm_strName = "NetworkOpen";

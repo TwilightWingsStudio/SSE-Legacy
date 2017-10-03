@@ -116,13 +116,43 @@ BOOL CVideoOptionsMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
-    if (event.GuiEvent.Caller == &gm_mgVideoRendering) {
-      StartRenderingOptionsMenu();
-      return TRUE;
+    if (event.GuiEvent.EventType == EGET_TRIGGERED)
+    {
+      if (event.GuiEvent.Caller == &gm_mgVideoRendering) {
+        StartRenderingOptionsMenu();
+        return TRUE;
 
-    } else if (event.GuiEvent.Caller == &gm_mgApply) {
-      ApplyVideoOptions();
-      return TRUE;
+      } else if (event.GuiEvent.Caller == &gm_mgApply) {
+        ApplyVideoOptions();
+        return TRUE;
+      }
+    
+    } else if (event.GuiEvent.EventType == EGET_CHANGED) {
+    
+      if (event.GuiEvent.Caller == &gm_mgDisplayPrefsTrigger) {
+        UpdateVideoOptionsButtons(-1);
+        return TRUE;
+        
+      } else if (event.GuiEvent.Caller == &gm_mgDisplayAPITrigger) {
+        UpdateVideoOptionsButtons(-1);
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgDisplayAdaptersTrigger) {
+        UpdateVideoOptionsButtons(-1);
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgAspectRatioTrigger) {
+        UpdateVideoOptionsButtons(-1);
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgResolutionsTrigger) {
+        UpdateVideoOptionsButtons(-1);
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgBitsPerPixelTrigger) {
+        UpdateVideoOptionsButtons(-1);
+        return TRUE;
+      }
     }
   }
   

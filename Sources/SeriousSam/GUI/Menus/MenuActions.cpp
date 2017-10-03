@@ -289,137 +289,12 @@ void StartSinglePlayerGame(void)
 }
 
 // ------------------------ CPlayerProfileMenu implementation
-static void ChangeCrosshair(INDEX iNew)
-{
-  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
-  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
-  pps->ps_iCrossHairType = iNew - 1;
-}
-
-static void ChangeWeaponSelect(INDEX iNew)
-{
-  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
-  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
-  pps->ps_iWeaponAutoSelect = iNew;
-}
-
-static void ChangeWeaponHide(INDEX iNew)
-{
-  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
-  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
-  if (iNew) {
-    pps->ps_ulFlags |= PSF_HIDEWEAPON;
-  } else {
-    pps->ps_ulFlags &= ~PSF_HIDEWEAPON;
-  }
-}
-
-static void Change3rdPerson(INDEX iNew)
-{
-  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
-  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
-  if (iNew) {
-    pps->ps_ulFlags |= PSF_PREFER3RDPERSON;
-  } else {
-    pps->ps_ulFlags &= ~PSF_PREFER3RDPERSON;
-  }
-}
-
-static void ChangeQuotes(INDEX iNew)
-{
-  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
-  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
-  if (iNew) {
-    pps->ps_ulFlags &= ~PSF_NOQUOTES;
-  } else {
-    pps->ps_ulFlags |= PSF_NOQUOTES;
-  }
-}
-
-static void ChangeAutoSave(INDEX iNew)
-{
-  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
-  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
-  if (iNew) {
-    pps->ps_ulFlags |= PSF_AUTOSAVE;
-  } else {
-    pps->ps_ulFlags &= ~PSF_AUTOSAVE;
-  }
-}
-
-static void ChangeCompDoubleClick(INDEX iNew)
-{
-  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
-  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
-  if (iNew) {
-    pps->ps_ulFlags &= ~PSF_COMPSINGLECLICK;
-  } else {
-    pps->ps_ulFlags |= PSF_COMPSINGLECLICK;
-  }
-}
-
-static void ChangeViewBobbing(INDEX iNew)
-{
-  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
-  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
-  if (iNew) {
-    pps->ps_ulFlags &= ~PSF_NOBOBBING;
-  } else {
-    pps->ps_ulFlags |= PSF_NOBOBBING;
-  }
-}
-
-static void ChangeSharpTurning(INDEX iNew)
-{
-  INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
-  CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
-  if (iNew) {
-    pps->ps_ulFlags |= PSF_SHARPTURNING;
-  } else {
-    pps->ps_ulFlags &= ~PSF_SHARPTURNING;
-  }
-}
-
 extern void PPOnPlayerSelect(void)
 {
   ASSERT(_pmgLastActivatedGadget != NULL);
   if (_pmgLastActivatedGadget->mg_bEnabled) {
     _pGUIM->gmPlayerProfile.SelectPlayer(((CMGButton *)_pmgLastActivatedGadget)->mg_iIndex);
   }
-}
-
-void InitActionsForPlayerProfileMenu()
-{
-  CPlayerProfileMenu &gmCurrent = _pGUIM->gmPlayerProfile;
-
-  gmCurrent.gm_mgCrosshair.mg_pOnTriggerChange = ChangeCrosshair;
-  gmCurrent.gm_mgWeaponSelect.mg_pOnTriggerChange = ChangeWeaponSelect;
-  gmCurrent.gm_mgWeaponHide.mg_pOnTriggerChange = ChangeWeaponHide;
-  gmCurrent.gm_mg3rdPerson.mg_pOnTriggerChange = Change3rdPerson;
-  gmCurrent.gm_mgQuotes.mg_pOnTriggerChange = ChangeQuotes;
-  gmCurrent.gm_mgAutoSave.mg_pOnTriggerChange = ChangeAutoSave;
-  gmCurrent.gm_mgCompDoubleClick.mg_pOnTriggerChange = ChangeCompDoubleClick;
-  gmCurrent.gm_mgSharpTurning.mg_pOnTriggerChange = ChangeSharpTurning;
-  gmCurrent.gm_mgViewBobbing.mg_pOnTriggerChange = ChangeViewBobbing;
-}
-
-// ------------------------ CCustomizeAxisMenu implementation
-void PreChangeAxis(INDEX iDummy)
-{
-  _pGUIM->gmCustomizeAxisMenu.ApplyActionSettings();
-}
-
-void PostChangeAxis(INDEX iDummy)
-{
-  _pGUIM->gmCustomizeAxisMenu.ObtainActionSettings();
-}
-
-void InitActionsForCustomizeAxisMenu()
-{
-  CCustomizeAxisMenu &gmCurrent = _pGUIM->gmCustomizeAxisMenu;
-
-  gmCurrent.gm_mgActionTrigger.mg_pPreTriggerChange = PreChangeAxis;
-  gmCurrent.gm_mgActionTrigger.mg_pOnTriggerChange = PostChangeAxis;
 }
 
 // ------------------------ CVideoOptionsMenu implementation
@@ -661,30 +536,7 @@ void InitActionsForVideoOptionsMenu()
 {
   CVideoOptionsMenu &gmCurrent = _pGUIM->gmVideoOptionsMenu;
 
-  gmCurrent.gm_mgDisplayPrefsTrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
-  gmCurrent.gm_mgDisplayAPITrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
-  gmCurrent.gm_mgDisplayAdaptersTrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
   gmCurrent.gm_mgFullScreenCheckBox.mg_pOnStateChange = (void (__cdecl *)(BOOL))&UpdateVideoOptionsButtons;
-  gmCurrent.gm_mgAspectRatioTrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
-  gmCurrent.gm_mgResolutionsTrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
-  gmCurrent.gm_mgBitsPerPixelTrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
-}
-
-// ------------------------ CAudioOptionsMenu implementation
-static void FrequencyTriggerChange(INDEX iDummy)
-{
-  CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
-
-  sam_bAutoAdjustAudio = 0;
-  gmCurrent.gm_pAudioAutoTrigger->mg_iSelected = 0;
-  gmCurrent.gm_pAudioAutoTrigger->ApplyCurrentSelection();
-}
-
-void InitActionsForAudioOptionsMenu()
-{
-  CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
-
-  gmCurrent.gm_pFrequencyTrigger->mg_pOnTriggerChange = FrequencyTriggerChange;
 }
 
 // ------------------------ CServersMenu implementation
@@ -889,38 +741,6 @@ extern void SelectPlayersFillMenu(void)
   } else {
     gmCurrent.gm_mgNotes.mg_strText = "";
   }
-}
-
-extern void SelectPlayersApplyMenu(void)
-{
-  CSelectPlayersMenu &gmCurrent = _pGUIM->gmSelectPlayersMenu;
-
-  if (gmCurrent.gm_bAllowDedicated && gmCurrent.gm_mgDedicated.mg_iSelected) {
-    _pGame->gm_MenuSplitScreenCfg = CGame::SSC_DEDICATED;
-    return;
-  }
-
-  if (gmCurrent.gm_bAllowObserving && gmCurrent.gm_mgObserver.mg_iSelected) {
-    _pGame->gm_MenuSplitScreenCfg = CGame::SSC_OBSERVER;
-    return;
-  }
-
-  _pGame->gm_MenuSplitScreenCfg = (enum CGame::SplitScreenCfg) gmCurrent.gm_mgSplitScreenCfg.mg_iSelected;
-}
-
-static void UpdateSelectPlayers(INDEX i)
-{
-  SelectPlayersApplyMenu();
-  SelectPlayersFillMenu();
-}
-
-void InitActionsForSelectPlayersMenu()
-{
-  CSelectPlayersMenu &gmCurrent = _pGUIM->gmSelectPlayersMenu;
-
-  gmCurrent.gm_mgDedicated.mg_pOnTriggerChange = UpdateSelectPlayers;
-  gmCurrent.gm_mgObserver.mg_pOnTriggerChange = UpdateSelectPlayers;
-  gmCurrent.gm_mgSplitScreenCfg.mg_pOnTriggerChange = UpdateSelectPlayers;
 }
 
 // ------------------------ CSplitStartMenu implementation

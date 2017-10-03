@@ -139,11 +139,21 @@ BOOL CAudioOptionsMenu::OnEvent(const SEvent& event)
   {
     if (event.GuiEvent.EventType == EGET_CHANGED)
     {
+      INDEX iNewValue = event.GuiEvent.IntValue;
+      
       if (event.GuiEvent.Caller == gm_pWaveVolume) {
         _pShell->SetFLOAT("snd_fSoundVolume", event.GuiEvent.IntValue / FLOAT(VOLUME_STEPS));
+        return TRUE;
 
       } else if (event.GuiEvent.Caller == gm_pMPEGVolume) {
         _pShell->SetFLOAT("snd_fMusicVolume", event.GuiEvent.IntValue / FLOAT(VOLUME_STEPS));
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == gm_pFrequencyTrigger) {
+        sam_bAutoAdjustAudio = 0;
+        gm_pAudioAutoTrigger->mg_iSelected = 0;
+        gm_pAudioAutoTrigger->ApplyCurrentSelection();
+        return TRUE;
       }
 
     } else if (event.GuiEvent.EventType == EGET_TRIGGERED) {

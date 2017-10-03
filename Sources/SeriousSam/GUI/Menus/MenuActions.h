@@ -19,10 +19,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #pragma once
 #endif
 
-void InitActionsForAudioOptionsMenu();
-void InitActionsForCustomizeAxisMenu();
-void InitActionsForPlayerProfileMenu();
-void InitActionsForSelectPlayersMenu();
 void InitActionsForServersMenu();
 void InitActionsForVideoOptionsMenu();
 
