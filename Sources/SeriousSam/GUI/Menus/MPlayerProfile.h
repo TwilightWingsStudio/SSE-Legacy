@@ -57,6 +57,7 @@ public:
   void ApplyComboPlayer(INDEX iPlayer);
   void StartMenu(void);
   void EndMenu(void);
+  virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

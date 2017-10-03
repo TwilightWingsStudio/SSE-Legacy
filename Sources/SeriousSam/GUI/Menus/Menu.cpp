@@ -295,7 +295,6 @@ void InitializeMenus(void)
     _pGUIM->gmConfirmMenu.gm_strName = "Confirm";
     _pGUIM->gmConfirmMenu.gm_pmgSelectedByDefault = _pGUIM->gmConfirmMenu.gm_pConfirmYes;
     _pGUIM->gmConfirmMenu.gm_pgmParentMenu = NULL;
-    InitActionsForConfirmMenu();
 
     _pGUIM->gmMainMenu.Initialize_t();
     _pGUIM->gmMainMenu.gm_strName = "Main";
@@ -378,7 +377,6 @@ void InitializeMenus(void)
     _pGUIM->gmVarMenu.gm_strName = "Var";
     _pGUIM->gmVarMenu.gm_pmgSelectedByDefault = &_pGUIM->gmVarMenu.gm_mgVar[0];
     _pGUIM->gmVarMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkStartMenu;
-    InitActionsForVarMenu();
 
     _pGUIM->gmServersMenu.Initialize_t();
     _pGUIM->gmServersMenu.gm_strName = "Servers";

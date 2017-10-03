@@ -38,6 +38,7 @@ public:
 
   void BeLarge(void);
   void BeSmall(void);
+  virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

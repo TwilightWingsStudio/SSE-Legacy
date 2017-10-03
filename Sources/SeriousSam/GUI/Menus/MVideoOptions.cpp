@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
 #include "MenuStuff.h"
+#include "MenuStarters.h"
 #include "MVideoOptions.h"
 
 extern void InitVideoOptionsButtons();
@@ -103,4 +104,27 @@ void CVideoOptionsMenu::StartMenu(void)
   CGameMenu::StartMenu();
 
   UpdateVideoOptionsButtons(-1);
+}
+
+extern void ApplyVideoOptions(void);
+
+// --------------------------------------------------------------------------------------
+// [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
+BOOL CVideoOptionsMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgVideoRendering) {
+      StartRenderingOptionsMenu();
+      return TRUE;
+
+    } else if (event.GuiEvent.Caller == &gm_mgApply) {
+      ApplyVideoOptions();
+      return TRUE;
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

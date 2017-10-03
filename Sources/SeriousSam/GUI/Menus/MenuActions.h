@@ -20,12 +20,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #endif
 
 void InitActionsForAudioOptionsMenu();
-void InitActionsForConfirmMenu();
 void InitActionsForCustomizeAxisMenu();
 void InitActionsForPlayerProfileMenu();
 void InitActionsForSelectPlayersMenu();
 void InitActionsForServersMenu();
 void InitActionsForVideoOptionsMenu();
-void InitActionsForVarMenu();
 
 #endif  /* include-once check. */

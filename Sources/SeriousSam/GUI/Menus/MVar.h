@@ -41,6 +41,7 @@ public:
   void StartMenu(void);
   void EndMenu(void);
   void Think(void);
+  virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

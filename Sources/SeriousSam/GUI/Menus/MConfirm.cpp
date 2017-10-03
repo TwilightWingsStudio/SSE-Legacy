@@ -87,3 +87,35 @@ BOOL CConfirmMenu::OnKeyDown(int iVKey)
   }
   return CGameMenu::OnKeyDown(iVKey);
 }
+
+void MenuGoToParent(void);
+
+// --------------------------------------------------------------------------------------
+// [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
+BOOL CConfirmMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == gm_pConfirmYes) {
+      if (_pConfimedYes != NULL) {
+        _pConfimedYes();
+      }
+
+      void MenuGoToParent(void);
+      MenuGoToParent();
+      return TRUE;
+
+    } else if (event.GuiEvent.Caller == gm_pConfirmNo) {
+      if (_pConfimedNo != NULL) {
+        _pConfimedNo();
+      }
+
+      MenuGoToParent();
+      return TRUE;
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
+}

@@ -136,3 +136,23 @@ void CVarMenu::Think(void)
   extern void FixupBackButton(CGameMenu *pgm);
   FixupBackButton(this);
 }
+
+// --------------------------------------------------------------------------------------
+// [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
+BOOL CVarMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgApply) {
+      FlushVarSettings(TRUE);
+      EndMenu();
+      StartMenu();
+
+      return TRUE;
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
+}

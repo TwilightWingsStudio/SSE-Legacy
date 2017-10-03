@@ -37,6 +37,7 @@ class CVideoOptionsMenu : public CGameMenu {
 
     void StartMenu(void);
     void Initialize_t(void);
+    virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

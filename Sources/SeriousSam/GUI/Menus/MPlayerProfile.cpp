@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/CurrentVersion.h>
 #include "MenuPrinting.h"
 #include "MenuStuff.h"
+#include "MenuStarters.h"
 #include "MPlayerProfile.h"
 #include "GUI/Menus/MenuManager.h"
 
@@ -317,4 +318,25 @@ void CPlayerProfileMenu::EndMenu(void)
 {
   _pGame->SavePlayersAndControls();
   CGameMenu::EndMenu();
+}
+
+// --------------------------------------------------------------------------------------
+// [SSE]
+// Returns TRUE if event was handled.
+// --------------------------------------------------------------------------------------
+BOOL CPlayerProfileMenu::OnEvent(const SEvent& event)
+{
+  if (event.EventType == EET_GUI_EVENT)
+  {
+    if (event.GuiEvent.Caller == &gm_mgCustomizeControls) {
+      StartControlsMenuFromPlayer();
+      return TRUE;
+
+    } else if (event.GuiEvent.Caller == &gm_mgModel) {
+      StartPlayerModelLoadMenu();
+      return TRUE;
+    }
+  }
+  
+  return m_pParent ? m_pParent->OnEvent(event) : FALSE;
 }

@@ -242,35 +242,6 @@ void VideoConfirm(void)
   ChangeToMenu(&gmCurrent);
 }
 
-static void ConfirmYes(void)
-{
-  CConfirmMenu &gmCurrent = _pGUIM->gmConfirmMenu;
-
-  if (gmCurrent._pConfimedYes != NULL) {
-    gmCurrent._pConfimedYes();
-  }
-  void MenuGoToParent(void);
-  MenuGoToParent();
-}
-
-static void ConfirmNo(void)
-{
-  CConfirmMenu &gmCurrent = _pGUIM->gmConfirmMenu;
-
-  if (gmCurrent._pConfimedNo != NULL) {
-    gmCurrent._pConfimedNo();
-  }
-  void MenuGoToParent(void);
-  MenuGoToParent();
-}
-
-void InitActionsForConfirmMenu() {
-  CConfirmMenu &gmCurrent = _pGUIM->gmConfirmMenu;
-
-  gmCurrent.gm_pConfirmYes->mg_pActivatedFunction = &ConfirmYes;
-  gmCurrent.gm_pConfirmNo->mg_pActivatedFunction = &ConfirmNo;
-}
-
 static void StopRecordingDemo(void)
 {
   _pNetwork->StopDemoRec();
@@ -430,8 +401,6 @@ void InitActionsForPlayerProfileMenu()
   gmCurrent.gm_mgCompDoubleClick.mg_pOnTriggerChange = ChangeCompDoubleClick;
   gmCurrent.gm_mgSharpTurning.mg_pOnTriggerChange = ChangeSharpTurning;
   gmCurrent.gm_mgViewBobbing.mg_pOnTriggerChange = ChangeViewBobbing;
-  gmCurrent.gm_mgCustomizeControls.mg_pActivatedFunction = &StartControlsMenuFromPlayer;
-  gmCurrent.gm_mgModel.mg_pActivatedFunction = &StartPlayerModelLoadMenu;
 }
 
 // ------------------------ CCustomizeAxisMenu implementation
@@ -625,7 +594,7 @@ extern void InitVideoOptionsButtons(void)
   gmCurrent.gm_mgBitsPerPixelTrigger.ApplyCurrentSelection();
 }
 
-static void ApplyVideoOptions(void)
+extern void ApplyVideoOptions(void)
 {
   CVideoOptionsMenu &gmCurrent = _pGUIM->gmVideoOptionsMenu;
 
@@ -699,8 +668,6 @@ void InitActionsForVideoOptionsMenu()
   gmCurrent.gm_mgAspectRatioTrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
   gmCurrent.gm_mgResolutionsTrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
   gmCurrent.gm_mgBitsPerPixelTrigger.mg_pOnTriggerChange = &UpdateVideoOptionsButtons;
-  gmCurrent.gm_mgVideoRendering.mg_pActivatedFunction = &StartRenderingOptionsMenu;
-  gmCurrent.gm_mgApply.mg_pActivatedFunction = &ApplyVideoOptions;
 }
 
 // ------------------------ CAudioOptionsMenu implementation
@@ -718,20 +685,6 @@ void InitActionsForAudioOptionsMenu()
   CAudioOptionsMenu &gmCurrent = _pGUIM->gmAudioOptionsMenu;
 
   gmCurrent.gm_pFrequencyTrigger->mg_pOnTriggerChange = FrequencyTriggerChange;
-}
-
-// ------------------------ CVarMenu implementation
-static void VarApply(void)
-{
-  CVarMenu &gmCurrent = _pGUIM->gmVarMenu;
-
-  FlushVarSettings(TRUE);
-  gmCurrent.EndMenu();
-  gmCurrent.StartMenu();
-}
-
-void InitActionsForVarMenu() {
-  _pGUIM->gmVarMenu.gm_mgApply.mg_pActivatedFunction = &VarApply;
 }
 
 // ------------------------ CServersMenu implementation
