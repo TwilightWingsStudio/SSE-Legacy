@@ -79,15 +79,43 @@ void CMGTrigger::ApplyCurrentSelection(void)
 // --------------------------------------------------------------------------------------
 void CMGTrigger::OnSetNextInList(int iVKey)
 {
+  // TODO: Deprecated way. Will be removed when nothing will use it.
   if (mg_pPreTriggerChange != NULL) {
     mg_pPreTriggerChange(mg_iSelected);
+  }
+  
+  // [SSE]
+  if (m_pParent != NULL)
+  {
+    SEvent newEvent;
+    newEvent.EventType = EET_GUI_EVENT;
+    newEvent.GuiEvent.Caller = this;
+    newEvent.GuiEvent.Target = NULL;
+    newEvent.GuiEvent.EventType = EGET_PRECHANGE;
+    newEvent.GuiEvent.IntValue = mg_iSelected;
+    
+    m_pParent->OnEvent(newEvent);
   }
 
   mg_iSelected = GetNewLoopValue(iVKey, mg_iSelected, mg_ctTexts);
   mg_strValue = mg_astrTexts[mg_iSelected];
 
+  // TODO: Deprecated way. Will be removed when nothing will use it.
   if (mg_pOnTriggerChange != NULL) {
     (*mg_pOnTriggerChange)(mg_iSelected);
+  }
+  
+  // [SSE]
+  if (m_pParent != NULL)
+  {
+    SEvent newEvent;
+    newEvent.EventType = EET_GUI_EVENT;
+    newEvent.GuiEvent.Caller = this;
+    newEvent.GuiEvent.Target = NULL;
+    newEvent.GuiEvent.EventType = EGET_CHANGED;
+    newEvent.GuiEvent.IntValue = mg_iSelected;
+    
+    m_pParent->OnEvent(newEvent);
   }
 }
 

@@ -30,6 +30,7 @@ class IGuiComponent : public IEventListener
     IGuiComponent(void)
     {
       m_pParent = NULL;
+      m_ulID = 0;
     }
   
     virtual BOOL OnEvent(const SEvent& event)
@@ -50,6 +51,7 @@ class IGuiComponent : public IEventListener
     
   protected:
     IGuiComponent *m_pParent;
+    ULONG m_ulID;
 };
 
 #endif

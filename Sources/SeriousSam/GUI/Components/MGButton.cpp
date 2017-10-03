@@ -80,7 +80,7 @@ void CMGButton::OnActivate(void)
 		_pmgLastActivatedGadget = this;
   }
   
-  // Deprecated way.
+  // TODO: Deprecated way. Will be removed when nothing will use it.
 	if (mg_pActivatedFunction != NULL)
 	{
 		(*mg_pActivatedFunction)();

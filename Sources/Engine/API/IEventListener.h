@@ -31,6 +31,7 @@ enum EEventType
 enum EGuiEventType
 {
   EGET_TRIGGERED,
+  EGET_PRECHANGE,
   EGET_CHANGED,
 };
 
