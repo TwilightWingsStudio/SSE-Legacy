@@ -97,6 +97,21 @@ static void Key_BackDel(CTString &str, INDEX &iPos, BOOL bShift, BOOL bRight)
   }
 }
 
+// TODO: OS dependent code! Wrong place! Move it somewhere.
+static const char* GetTextFromClipboard()
+{
+	if (!OpenClipboard(NULL))
+		return 0;
+
+	char * buffer = 0;
+
+	HANDLE hData = GetClipboardData( CF_TEXT );
+	buffer = (char*)GlobalLock( hData );
+	GlobalUnlock( hData );
+	CloseClipboard();
+	return buffer;
+}
+
 // --------------------------------------------------------------------------------------
 // Called every time when user pressed a button while this component active.
 // --------------------------------------------------------------------------------------
@@ -109,12 +124,66 @@ BOOL CMGEdit::OnKeyDown(int iVKey)
 
   // finish editing?
   BOOL bShift = GetKeyState(VK_SHIFT) & 0x8000;
+  BOOL bControl = GetKeyState(VK_CONTROL) & 0x8000;
+  
+  //CPrintF("Key: %d\n", iVKey);
+
+  // [SSE] Ctrl + V
+  if (bControl && !bShift && iVKey == 86)
+  {
+    const char *pBuffer = GetTextFromClipboard();
+
+    // If nothing in clipboard then do nothing.
+    if (pBuffer == NULL) {
+      return TRUE;
+    }
+    
+    INDEX iBufferLen = strlen(pBuffer); // Get the buffer length.
+    
+    // Just for safety.
+    if (iBufferLen <= 0) {
+      return TRUE;
+    }
+    
+    const INDEX ctFullLen = mg_strText.Length();
+    mg_iCursorPos = Clamp(mg_iCursorPos, 0L, ctFullLen);
+    
+    CTString strPart1, strPart2;
+    mg_strText.Split(mg_iCursorPos, strPart1, strPart2);
+    
+    INDEX iLenPart1 = strPart1.Length();
+    INDEX iSumLen = iLenPart1 + iBufferLen;
+    
+    // If P1 + Buffer equal to max length
+    if (iSumLen >= mg_ctMaxStringLen) {
+      CTString strBuffer(pBuffer);
+      
+      // If P1 + Buffer longer than max length
+      if (iSumLen > mg_ctMaxStringLen) {
+        strBuffer.Split(mg_ctMaxStringLen - iLenPart1, strBuffer, strPart2);
+      }
+      
+      mg_strText.PrintF("%s%s", strPart1, strBuffer);
+
+    } else { // Otherwise.
+
+      INDEX ctFullNewLength = iLenPart1 + iBufferLen + strPart2.Length();
+      mg_strText.PrintF("%s%s%s", strPart1, pBuffer, strPart2);
+      
+      if (ctFullNewLength >= mg_ctMaxStringLen) {
+        mg_strText.Split(mg_ctMaxStringLen, mg_strText, strPart2);
+      }
+    }
+    
+    mg_iCursorPos = Clamp(mg_iCursorPos + iBufferLen, 0L, ctFullLen);
+    return TRUE;
+  }
 
   switch (iVKey)
   {
     case VK_UP: case VK_DOWN:
-    case VK_RETURN:  case VK_LBUTTON: *mg_pstrToChange = mg_strText;  Clear(); OnStringChanged();  break;
-    case VK_ESCAPE:  case VK_RBUTTON:  mg_strText = *mg_pstrToChange; Clear(); OnStringCanceled(); break;
+    case VK_RETURN:  case VK_LBUTTON: *mg_pstrToChange = mg_strText;  Clear(); OnStringChanged();  break; // Apply changes.
+    case VK_ESCAPE:  case VK_RBUTTON:  mg_strText = *mg_pstrToChange; Clear(); OnStringCanceled(); break; // Revert the string.
     case VK_LEFT:    if (mg_iCursorPos > 0)                  mg_iCursorPos--;  break;
     case VK_RIGHT:   if (mg_iCursorPos < strlen(mg_strText)) mg_iCursorPos++;  break;
     case VK_HOME:    mg_iCursorPos = 0;                   break;
@@ -128,7 +197,9 @@ BOOL CMGEdit::OnKeyDown(int iVKey)
   return TRUE;
 }
 
+// --------------------------------------------------------------------------------------
 // char typed
+// --------------------------------------------------------------------------------------
 BOOL CMGEdit::OnChar(MSG msg)
 {
   // if not in edit mode then behave like normal gadget.
@@ -142,7 +213,7 @@ BOOL CMGEdit::OnChar(MSG msg)
   mg_iCursorPos = Clamp(mg_iCursorPos, 0L, ctFullLen);
   int iVKey = msg.wParam;
 
-  if (isprint(iVKey) && ctNakedLen <= mg_ctMaxStringLen) {
+  if (isprint(iVKey) && ctFullLen <= mg_ctMaxStringLen) {
     mg_strText.InsertChar(mg_iCursorPos, (char)iVKey);
     mg_iCursorPos++;
   }
