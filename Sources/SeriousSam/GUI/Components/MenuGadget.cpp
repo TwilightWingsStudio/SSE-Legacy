@@ -37,7 +37,6 @@ CMenuGadget::CMenuGadget(void)
   mg_pmgUp = NULL;
   mg_pmgDown = NULL;
 
-  mg_bVisible = TRUE;
   mg_bLabel = FALSE;
   mg_bFocused = FALSE;
   mg_iInList = -1;    // not in list
@@ -85,12 +84,12 @@ void CMenuGadget::OnKillFocus(void)
 
 void CMenuGadget::Appear(void)
 {
-  mg_bVisible = TRUE;
+  SetVisible(TRUE);
 }
 
 void CMenuGadget::Disappear(void)
 {
-  mg_bVisible = FALSE;
+  SetVisible(FALSE);
   mg_bFocused = FALSE;
 }
 

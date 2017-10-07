@@ -246,7 +246,7 @@ BOOL CGameMenu::OnKeyDown(int iVKey)
       return TRUE;
     }
     // if we can go up
-    if (pmgActive->mg_pmgUp != NULL && pmgActive->mg_pmgUp->mg_bVisible) {
+    if (pmgActive->mg_pmgUp != NULL && pmgActive->mg_pmgUp->IsVisible()) {
       // call lose focus to still active gadget and
       pmgActive->OnKillFocus();
       // set focus to new one
@@ -265,7 +265,7 @@ BOOL CGameMenu::OnKeyDown(int iVKey)
       return TRUE;
     }
     // if we can go down
-    if (pmgActive->mg_pmgDown != NULL && pmgActive->mg_pmgDown->mg_bVisible) {
+    if (pmgActive->mg_pmgDown != NULL && pmgActive->mg_pmgDown->IsVisible()) {
       // call lose focus to still active gadget and
       pmgActive->OnKillFocus();
       // set focus to new one
@@ -281,7 +281,7 @@ BOOL CGameMenu::OnKeyDown(int iVKey)
       // call lose focus to still active gadget and
       pmgActive->OnKillFocus();
       // set focus to new one
-      if (!pmgActive->mg_pmgLeft->mg_bVisible && gm_pmgSelectedByDefault != NULL) {
+      if (!pmgActive->mg_pmgLeft->IsVisible() && gm_pmgSelectedByDefault != NULL) {
         pmgActive = gm_pmgSelectedByDefault;
       }
       else {
@@ -298,7 +298,7 @@ BOOL CGameMenu::OnKeyDown(int iVKey)
       // call lose focus to still active gadget and
       pmgActive->OnKillFocus();
       // set focus to new one
-      if (!pmgActive->mg_pmgRight->mg_bVisible && gm_pmgSelectedByDefault != NULL) {
+      if (!pmgActive->mg_pmgRight->IsVisible() && gm_pmgSelectedByDefault != NULL) {
         pmgActive = gm_pmgSelectedByDefault;
       }
       else {
@@ -340,11 +340,11 @@ void CGameMenu::StartMenu(void)
       // if in list, but disabled
       if (itmg->mg_iInList == -2) {
         // hide it
-        itmg->mg_bVisible = FALSE;
+        itmg->SetVisible(FALSE);
       // if in list
       } else if (itmg->mg_iInList >= 0) {
         // show it
-        itmg->mg_bVisible = TRUE;
+        itmg->SetVisible(TRUE);
       }
       // if wanted
       if (itmg->mg_iInList == gm_iListWantedItem) {

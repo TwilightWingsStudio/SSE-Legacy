@@ -74,7 +74,7 @@ void CCustomizeKeyboardMenu::Initialize_t(void)
     // initialize label gadgets
     gm_mgKey[iLabel].mg_pmgUp = &gm_mgKey[iPrev];
     gm_mgKey[iLabel].mg_pmgDown = &gm_mgKey[iNext];
-    gm_mgKey[iLabel].mg_bVisible = TRUE;
+    gm_mgKey[iLabel].SetVisible(TRUE);
     AddChild(&gm_mgKey[iLabel]);
   }
   // arrows just exist

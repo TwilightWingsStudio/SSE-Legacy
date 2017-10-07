@@ -37,7 +37,6 @@ class CMenuGadget : public IGuiComponent
   public:
     CListNode mg_lnNode; // Node in list.
     FLOATaabbox2D mg_boxOnScreen;
-    BOOL mg_bVisible;
     BOOL mg_bLabel;
     BOOL mg_bFocused;
     INDEX mg_iInList; // for scrollable gadget lists

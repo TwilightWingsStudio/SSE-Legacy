@@ -556,7 +556,7 @@ void MenuUpdateMouseFocus(void)
     }
 
     // if the one under cursor is not active and not disappearing
-    if (pmgActive!=_pmgUnderCursor && _pmgUnderCursor->mg_bVisible) {
+    if (pmgActive!=_pmgUnderCursor && _pmgUnderCursor->IsVisible()) {
       // change focus
       if (pmgActive!=NULL) {
         pmgActive->OnKillFocus();
@@ -771,7 +771,7 @@ BOOL DoMenu( CDrawPort *pdp)
     if (pgmCurrentMenu->gm_pgmParentMenu!=NULL) {
       _pGame->MenuPreRenderMenu(pgmCurrentMenu->gm_pgmParentMenu->gm_strName);
       FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_pgmParentMenu->gm_lhChildren, itmg) {
-        if( itmg->mg_bVisible) {
+        if (itmg->IsVisible()) {
           itmg->Render( &dpMenu);
         }
       }
@@ -804,7 +804,7 @@ BOOL DoMenu( CDrawPort *pdp)
   // for each menu gadget
   FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhChildren, itmg) {
     // if gadget is visible
-    if( itmg->mg_bVisible) {
+    if (itmg->IsVisible()) {
       bStilInMenus = TRUE;
       itmg->Render( &dpMenu);
       if (FloatBoxToPixBox(&dpMenu, itmg->mg_boxOnScreen)>=PIX2D(_pixCursorPosI, _pixCursorPosJ)) {
