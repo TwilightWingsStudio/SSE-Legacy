@@ -116,7 +116,7 @@ BOOL CMGTrigger::OnKeyDown(int iVKey)
     (iVKey == VK_RIGHT))
   {
     // key is handled
-    if (mg_bEnabled) OnSetNextInList(iVKey);
+    if (IsEnabled()) OnSetNextInList(iVKey);
     return TRUE;
   }
 

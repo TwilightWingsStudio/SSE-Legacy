@@ -35,7 +35,7 @@ void CSinglePlayerMenu::Initialize_t(void)
   gm_mgPlayerLabel.mg_boxOnScreen = BoxBigRow(-1.0f);
   gm_mgPlayerLabel.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgPlayerLabel.mg_iCenterI = -1;
-  gm_mgPlayerLabel.mg_bEnabled = FALSE;
+  gm_mgPlayerLabel.SetEnabled(FALSE);
   gm_mgPlayerLabel.mg_bLabel = TRUE;
 
   // Initialize "New Game" button.
@@ -116,10 +116,10 @@ void CSinglePlayerMenu::Initialize_t(void)
 
 void CSinglePlayerMenu::StartMenu(void)
 {
-  gm_mgTraining.mg_bEnabled = IsMenuEnabled("Training");
-  gm_mgTechTest.mg_bEnabled = IsMenuEnabled("Technology Test");
+  gm_mgTraining.SetEnabled(IsMenuEnabled("Training"));
+  gm_mgTechTest.SetEnabled(IsMenuEnabled("Technology Test"));
 
-  if (gm_mgTraining.mg_bEnabled) {
+  if (gm_mgTraining.IsEnabled()) {
     if (!gm_mgTraining.mg_lnNode.IsLinked()) {
       AddChild(&gm_mgTraining);
     }

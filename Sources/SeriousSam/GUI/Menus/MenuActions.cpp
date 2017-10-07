@@ -373,28 +373,28 @@ extern void UpdateVideoOptionsButtons(INDEX iSelected)
   FillAdaptersList();
 
   // show or hide buttons
-  gmCurrent.gm_mgDisplayAPITrigger.mg_bEnabled = bOGLEnabled
+  gmCurrent.gm_mgDisplayAPITrigger.SetEnabled(bOGLEnabled
 #ifdef SE1_D3D
     && bD3DEnabled
 #endif // SE1_D3D
-    ;
-  gmCurrent.gm_mgDisplayAdaptersTrigger.mg_bEnabled = _ctAdapters>1;
-  gmCurrent.gm_mgApply.mg_bEnabled = _bVideoOptionsChanged;
+    );
+  gmCurrent.gm_mgDisplayAdaptersTrigger.SetEnabled(_ctAdapters > 1);
+  gmCurrent.gm_mgApply.SetEnabled(_bVideoOptionsChanged);
   // determine which should be visible
 
-  gmCurrent.gm_mgFullScreenCheckBox.mg_bEnabled = TRUE;
+  gmCurrent.gm_mgFullScreenCheckBox.SetEnabled(TRUE);
   if (da.da_ulFlags&DAF_FULLSCREENONLY) {
-    gmCurrent.gm_mgFullScreenCheckBox.mg_bEnabled = FALSE;
+    gmCurrent.gm_mgFullScreenCheckBox.SetEnabled(FALSE);
     gmCurrent.gm_mgFullScreenCheckBox.mg_bValue = TRUE;
   }
 
-  gmCurrent.gm_mgBitsPerPixelTrigger.mg_bEnabled = TRUE;
+  gmCurrent.gm_mgBitsPerPixelTrigger.SetEnabled(TRUE);
   if (gmCurrent.gm_mgFullScreenCheckBox.mg_bValue == 0) {
-    gmCurrent.gm_mgBitsPerPixelTrigger.mg_bEnabled = FALSE;
+    gmCurrent.gm_mgBitsPerPixelTrigger.SetEnabled(FALSE);
     gmCurrent.gm_mgBitsPerPixelTrigger.mg_iSelected = DepthToSwitch(DD_DEFAULT);
     gmCurrent.gm_mgBitsPerPixelTrigger.ApplyCurrentSelection();
   } else if (da.da_ulFlags&DAF_16BITONLY) {
-    gmCurrent.gm_mgBitsPerPixelTrigger.mg_bEnabled = FALSE;
+    gmCurrent.gm_mgBitsPerPixelTrigger.SetEnabled(FALSE);
     gmCurrent.gm_mgBitsPerPixelTrigger.mg_iSelected = DepthToSwitch(DD_16BIT);
     gmCurrent.gm_mgBitsPerPixelTrigger.ApplyCurrentSelection();
   }

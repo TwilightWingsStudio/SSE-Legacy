@@ -33,14 +33,14 @@ void CInGameMenu::Initialize_t(void)
   gm_mgLabel1.mg_boxOnScreen = BoxMediumRow(-2.0);
   gm_mgLabel1.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgLabel1.mg_iCenterI = -1;
-  gm_mgLabel1.mg_bEnabled = FALSE;
+  gm_mgLabel1.SetEnabled(FALSE);
   gm_mgLabel1.mg_bLabel = TRUE;
 
   gm_mgLabel2.mg_strText = "";
   gm_mgLabel2.mg_boxOnScreen = BoxMediumRow(-1.0);
   gm_mgLabel2.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgLabel2.mg_iCenterI = -1;
-  gm_mgLabel2.mg_bEnabled = FALSE;
+  gm_mgLabel2.SetEnabled(FALSE);
   gm_mgLabel2.mg_bLabel = TRUE;
 
   gm_mgQuickLoad.mg_strText = TRANS("QUICK LOAD");
@@ -135,14 +135,17 @@ static void SetDemoStartStopRecText(void)
 
 void CInGameMenu::StartMenu(void)
 {
-  gm_mgQuickLoad.mg_bEnabled = _pNetwork->IsServer();
-  gm_mgQuickSave.mg_bEnabled = _pNetwork->IsServer();
-  gm_mgLoad.mg_bEnabled = _pNetwork->IsServer();
-  gm_mgSave.mg_bEnabled = _pNetwork->IsServer();
-  gm_mgDemoRec.mg_bEnabled = TRUE;//_pNetwork->IsServer();
+  BOOL bIsServer = _pNetwork->IsServer();
+  
+  // Only if we are server we can save and load game!
+  gm_mgQuickLoad.SetEnabled(bIsServer);
+  gm_mgQuickSave.SetEnabled(bIsServer);
+  gm_mgLoad.SetEnabled(bIsServer);
+  gm_mgSave.SetEnabled(bIsServer);
+
+  gm_mgDemoRec.SetEnabled(TRUE);//_pNetwork->IsServer();
   extern void SetDemoStartStopRecText();
   SetDemoStartStopRecText();
-
 
   if (_gmRunningGameMode == GM_SINGLE_PLAYER) {
     CPlayerCharacter &pc = _pGame->gm_apcPlayers[_pGame->gm_iSinglePlayer];

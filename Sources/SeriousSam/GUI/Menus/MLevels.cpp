@@ -62,7 +62,7 @@ void CLevelsMenu::FillListItems(void)
 {
   // disable all items first
   for (INDEX i = 0; i<LEVELS_ON_SCREEN; i++) {
-    gm_mgManualLevel[i].mg_bEnabled = FALSE;
+    gm_mgManualLevel[i].SetEnabled(FALSE);
     gm_mgManualLevel[i].mg_strText = TRANS("<empty>");
     gm_mgManualLevel[i].mg_iInList = -2;
   }
@@ -81,15 +81,15 @@ void CLevelsMenu::FillListItems(void)
       bHasLast |= (iLabel == ctLabels - 1);
       gm_mgManualLevel[iInMenu].mg_strText = li.li_strName;
       gm_mgManualLevel[iInMenu].mg_fnmLevel = li.li_fnLevel;
-      gm_mgManualLevel[iInMenu].mg_bEnabled = TRUE;
+      gm_mgManualLevel[iInMenu].SetEnabled(TRUE);
       gm_mgManualLevel[iInMenu].mg_iInList = iLabel;
     }
     iLabel++;
   }
 
-  // enable/disable up/down arrows
-  gm_mgArrowUp.mg_bEnabled = !bHasFirst && ctLabels>0;
-  gm_mgArrowDn.mg_bEnabled = !bHasLast  && ctLabels>0;
+  // Enable/disable up/down arrows.
+  gm_mgArrowUp.SetEnabled(!bHasFirst && ctLabels > 0);
+  gm_mgArrowDn.SetEnabled(!bHasLast  && ctLabels > 0);
 }
 
 void CLevelsMenu::StartMenu(void)

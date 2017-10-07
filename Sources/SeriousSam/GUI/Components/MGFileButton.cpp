@@ -184,7 +184,7 @@ void CMGFileButton::OnSetFocus(void)
 {
   mg_iState = FBS_NORMAL;
 
-  if (_pGUIM->gmLoadSaveMenu.gm_bAllowThumbnails && mg_bEnabled) {
+  if (_pGUIM->gmLoadSaveMenu.gm_bAllowThumbnails && IsEnabled()) {
     SetThumbnail(mg_fnm);
   } else {
     ClearThumbnail();
@@ -236,7 +236,7 @@ void CMGFileButton::Render(CDrawPort *pdp)
   CMGEdit::Render(pdp); // Render original component first.
 
   // If currently selected...
-  if (mg_bFocused && mg_bEnabled)
+  if (mg_bFocused && IsEnabled())
   {
     // add info at the bottom if screen
     SetFontMedium(pdp);

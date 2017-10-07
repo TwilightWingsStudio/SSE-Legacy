@@ -74,7 +74,7 @@ void CSelectPlayersMenu::Initialize_t(void)
   gm_mgNotes.mg_boxOnScreen = BoxMediumRow(9.0);
   gm_mgNotes.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgNotes.mg_iCenterI = -1;
-  gm_mgNotes.mg_bEnabled = FALSE;
+  gm_mgNotes.SetEnabled(FALSE);
   gm_mgNotes.mg_bLabel = TRUE;
   gm_mgNotes.mg_strText = "";
 

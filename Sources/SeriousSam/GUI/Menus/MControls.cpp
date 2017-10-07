@@ -36,7 +36,7 @@ void CControlsMenu::Initialize_t(void)
   gm_mgNameLabel.mg_boxOnScreen = BoxMediumRow(0.0);
   gm_mgNameLabel.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgNameLabel.mg_iCenterI = -1;
-  gm_mgNameLabel.mg_bEnabled = FALSE;
+  gm_mgNameLabel.SetEnabled(FALSE);
   gm_mgNameLabel.mg_bLabel = TRUE;
 
   // Initialize "Customize Controls" button.
@@ -133,7 +133,7 @@ void CControlsMenu::ObtainActionSettings(void)
   gm_mgInvertTrigger.mg_iSelected = ctrls.ctrl_bInvertLook ? 1 : 0;
   gm_mgSmoothTrigger.mg_iSelected = ctrls.ctrl_bSmoothAxes ? 1 : 0;
   gm_mgAccelTrigger.mg_iSelected = _pShell->GetINDEX("inp_bAllowMouseAcceleration") ? 1 : 0;
-  gm_mgIFeelTrigger.mg_bEnabled = _pShell->GetINDEX("sys_bIFeelEnabled") ? 1 : 0;
+  gm_mgIFeelTrigger.SetEnabled(_pShell->GetINDEX("sys_bIFeelEnabled") ? 1 : 0);
   gm_mgIFeelTrigger.mg_iSelected = _pShell->GetFLOAT("inp_fIFeelGain")>0 ? 1 : 0;
 
   gm_mgInvertTrigger.ApplyCurrentSelection();

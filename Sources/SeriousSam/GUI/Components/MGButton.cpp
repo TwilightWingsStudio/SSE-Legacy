@@ -67,7 +67,7 @@ void CMGButton::SetText(CTString strNew)
 void CMGButton::OnActivate(void)
 {
   // If disabled then ingnore.
-  if (!mg_bEnabled) {
+  if (!IsEnabled()) {
     return;
   }
   

@@ -58,7 +58,7 @@ extern BOOL _bVarChanged;
 // --------------------------------------------------------------------------------------
 BOOL CMGVarButton::OnKeyDown(int iVKey)
 {
-  if (mg_pvsVar == NULL || mg_pvsVar->vs_bSeparator || !mg_pvsVar->Validate() || !mg_bEnabled) {
+  if (mg_pvsVar == NULL || mg_pvsVar->vs_bSeparator || !mg_pvsVar->Validate() || !IsEnabled()) {
     return CMenuGadget::OnKeyDown(iVKey);
   }
 
@@ -160,14 +160,17 @@ void CMGVarButton::Render(CDrawPort *pdp)
 
   if (mg_pvsVar->vs_bSeparator)
   {
-    mg_bEnabled = FALSE;
+    SetEnabled(FALSE); // Disable the component.
+
     COLOR col = LCDGetColor(C_WHITE | 255, "separator");
     CTString strText = mg_pvsVar->vs_strName;
     pdp->PutTextC(strText, pixIC, pixJ, col);
 
   } else if (mg_pvsVar->Validate()) {
+
     // check whether the variable is disabled
-    if (mg_pvsVar->vs_strFilter != "") mg_bEnabled = _pShell->GetINDEX(mg_pvsVar->vs_strFilter);
+    if (mg_pvsVar->vs_strFilter != "") SetEnabled(_pShell->GetINDEX(mg_pvsVar->vs_strFilter));
+
     COLOR col = GetCurrentColor();
     pdp->PutTextR(mg_pvsVar->vs_strName, pixIL, pixJ, col);
     

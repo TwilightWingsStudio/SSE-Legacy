@@ -77,7 +77,7 @@ void CVarMenu::FillListItems(void)
 {
   // disable all items first
   for (INDEX i = 0; i<VARS_ON_SCREEN; i++) {
-    gm_mgVar[i].mg_bEnabled = FALSE;
+    gm_mgVar[i].SetEnabled(FALSE);
     gm_mgVar[i].mg_pvsVar = NULL;
     gm_mgVar[i].mg_iInList = -2;
   }
@@ -96,14 +96,14 @@ void CVarMenu::FillListItems(void)
       bHasLast |= (iLabel == ctLabels - 1);
       gm_mgVar[iInMenu].mg_pvsVar = &vs;
       gm_mgVar[iInMenu].mg_strTip = vs.vs_strTip;
-      gm_mgVar[iInMenu].mg_bEnabled = gm_mgVar[iInMenu].IsEnabled();
+      gm_mgVar[iInMenu].SetEnabled(gm_mgVar[iInMenu].IsEnabled());
       gm_mgVar[iInMenu].mg_iInList = iLabel;
     }
     iLabel++;
   }
   // enable/disable up/down arrows
-  gm_mgArrowUp.mg_bEnabled = !bHasFirst && ctLabels>0;
-  gm_mgArrowDn.mg_bEnabled = !bHasLast  && ctLabels>0;
+  gm_mgArrowUp.SetEnabled(!bHasFirst && ctLabels > 0);
+  gm_mgArrowDn.SetEnabled(!bHasLast  && ctLabels > 0);
 }
 
 void CVarMenu::StartMenu(void)
@@ -119,18 +119,21 @@ void CVarMenu::StartMenu(void)
 void CVarMenu::EndMenu(void)
 {
   // disable all items first
-  for (INDEX i = 0; i<VARS_ON_SCREEN; i++) {
-    gm_mgVar[i].mg_bEnabled = FALSE;
+  for (INDEX i = 0; i<VARS_ON_SCREEN; i++)
+  {
+    gm_mgVar[i].SetEnabled(FALSE);
     gm_mgVar[i].mg_pvsVar = NULL;
     gm_mgVar[i].mg_iInList = -2;
   }
+
   FlushVarSettings(FALSE);
   _bVarChanged = FALSE;
 }
 
 void CVarMenu::Think(void)
 {
-  gm_mgApply.mg_bEnabled = _bVarChanged;
+  gm_mgApply.SetEnabled(_bVarChanged);
+
   extern void FixupBackButton(CGameMenu *pgm);
   FixupBackButton(this);
 }

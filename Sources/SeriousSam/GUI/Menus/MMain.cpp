@@ -41,7 +41,7 @@ void CMainMenu::Initialize_t(void)
   gm_mgVersionLabel.mg_boxOnScreen = BoxVersion(-5.5F);
   gm_mgVersionLabel.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgVersionLabel.mg_iCenterI = +1;
-  gm_mgVersionLabel.mg_bEnabled = FALSE;
+  gm_mgVersionLabel.SetEnabled(FALSE);
   gm_mgVersionLabel.mg_bLabel = TRUE;
   
   // Initialize build date label.
@@ -49,7 +49,7 @@ void CMainMenu::Initialize_t(void)
   gm_mgBuildDateLabel.mg_boxOnScreen = BoxVersion(-4.5F);
   gm_mgBuildDateLabel.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgBuildDateLabel.mg_iCenterI = +1;
-  gm_mgBuildDateLabel.mg_bEnabled = FALSE;
+  gm_mgBuildDateLabel.SetEnabled(FALSE);
   gm_mgBuildDateLabel.mg_bLabel = TRUE;
 
   // Initialize mod name label.
@@ -57,7 +57,7 @@ void CMainMenu::Initialize_t(void)
   gm_mgModLabel.mg_boxOnScreen = BoxMediumRow(-2.0f);
   gm_mgModLabel.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgModLabel.mg_iCenterI = 0;
-  gm_mgModLabel.mg_bEnabled = FALSE;
+  gm_mgModLabel.SetEnabled(FALSE);
   gm_mgModLabel.mg_bLabel = TRUE;
 
   // Initialize "Single Player" button.
@@ -141,10 +141,11 @@ void CMainMenu::Initialize_t(void)
 
 void CMainMenu::StartMenu(void)
 {
-  gm_mgSingle.mg_bEnabled = IsMenuEnabled("Single Player");
-  gm_mgNetwork.mg_bEnabled = IsMenuEnabled("Network");
-  gm_mgSplitScreen.mg_bEnabled = IsMenuEnabled("Split Screen");
-  gm_mgHighScore.mg_bEnabled = IsMenuEnabled("High Score");
+  gm_mgSingle.SetEnabled(IsMenuEnabled("Single Player"));
+  gm_mgNetwork.SetEnabled(IsMenuEnabled("Network"));
+  gm_mgSplitScreen.SetEnabled(IsMenuEnabled("Split Screen"));
+  gm_mgHighScore.SetEnabled(IsMenuEnabled("High Score"));
+
   CGameMenu::StartMenu();
 }
 

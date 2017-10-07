@@ -24,7 +24,7 @@ void CCustomizeKeyboardMenu::FillListItems(void)
 {
   // disable all items first
   for (INDEX i = 0; i<KEYS_ON_SCREEN; i++) {
-    gm_mgKey[i].mg_bEnabled = FALSE;
+    gm_mgKey[i].SetEnabled(FALSE);
     gm_mgKey[i].mg_iInList = -2;
   }
 
@@ -45,15 +45,15 @@ void CCustomizeKeyboardMenu::FillListItems(void)
       gm_mgKey[iInMenu].mg_iControlNumber = iLabel;
       gm_mgKey[iInMenu].SetBindingNames(FALSE);
       gm_mgKey[iInMenu].mg_strTip = TRANS("Enter - change binding, Backspace - unbind");
-      gm_mgKey[iInMenu].mg_bEnabled = TRUE;
+      gm_mgKey[iInMenu].SetEnabled(TRUE);
       gm_mgKey[iInMenu].mg_iInList = iLabel;
     }
     iLabel++;
   }
 
   // enable/disable up/down arrows
-  gm_mgArrowUp.mg_bEnabled = !bHasFirst && ctLabels>0;
-  gm_mgArrowDn.mg_bEnabled = !bHasLast  && ctLabels>0;
+  gm_mgArrowUp.SetEnabled(!bHasFirst && ctLabels > 0);
+  gm_mgArrowDn.SetEnabled(!bHasLast  && ctLabels > 0);
 }
 
 void CCustomizeKeyboardMenu::Initialize_t(void)

@@ -42,7 +42,7 @@ void CMGEdit::Clear(void)
 
 void CMGEdit::OnActivate(void)
 {
-  if (!mg_bEnabled) {
+  if (!IsEnabled()) {
     return;
   }
 

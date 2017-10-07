@@ -38,7 +38,6 @@ CMenuGadget::CMenuGadget(void)
   mg_pmgDown = NULL;
 
   mg_bVisible = TRUE;
-  mg_bEnabled = TRUE;
   mg_bLabel = FALSE;
   mg_bFocused = FALSE;
   mg_iInList = -1;    // not in list
@@ -109,8 +108,9 @@ COLOR CMenuGadget::GetCurrentColor(void)
   // use normal colors
   COLOR colUnselected = LCDGetColor(C_GREEN, "unselected");
   COLOR colSelected = LCDGetColor(C_WHITE, "selected");
+
   // if disabled
-  if (!mg_bEnabled) {
+  if (!IsEnabled()) {
     // use a bit darker colors
     colUnselected = LCDGetColor(C_dGREEN, "disabled unselected");
     colSelected = LCDGetColor(C_GRAY, "disabled selected");

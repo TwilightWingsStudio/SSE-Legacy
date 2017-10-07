@@ -49,7 +49,7 @@ BOOL CMGCheckBox::OnKeyDown(int iVKey)
     (iVKey == VK_RIGHT))
   {
     // key is handled
-    if (mg_bEnabled)
+    if (IsEnabled())
     {
       mg_bValue = !mg_bValue;
 

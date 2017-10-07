@@ -32,7 +32,7 @@ void CLoadSaveMenu::Initialize_t(void)
   gm_mgNotes.mg_boxOnScreen = BoxMediumRow(10.0);
   gm_mgNotes.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgNotes.mg_iCenterI = -1;
-  gm_mgNotes.mg_bEnabled = FALSE;
+  gm_mgNotes.SetEnabled(FALSE);
   gm_mgNotes.mg_bLabel = TRUE;
   AddChild(&gm_mgNotes);
 
@@ -159,7 +159,7 @@ void CLoadSaveMenu::FillListItems(void)
 {
   // disable all items first
   for (INDEX i = 0; i<SAVELOAD_BUTTONS_CT; i++) {
-    gm_amgButton[i].mg_bEnabled = FALSE;
+    gm_amgButton[i].SetEnabled(FALSE);
     gm_amgButton[i].mg_strText = TRANS("<empty>");
     gm_amgButton[i].mg_strTip = "";
     gm_amgButton[i].mg_iInList = -2;
@@ -180,7 +180,7 @@ void CLoadSaveMenu::FillListItems(void)
       gm_amgButton[iInMenu].mg_iInList = iLabel;
       gm_amgButton[iInMenu].mg_strDes = fi.fi_strName;
       gm_amgButton[iInMenu].mg_fnm = fi.fi_fnFile;
-      gm_amgButton[iInMenu].mg_bEnabled = TRUE;
+      gm_amgButton[iInMenu].SetEnabled(TRUE);
       gm_amgButton[iInMenu].RefreshText();
       if (gm_bSave) {
         if (!FileExistsForWriting(gm_amgButton[iInMenu].mg_fnm)) {
@@ -201,8 +201,8 @@ void CLoadSaveMenu::FillListItems(void)
   }
 
   // enable/disable up/down arrows
-  gm_mgArrowUp.mg_bEnabled = !bHasFirst && ctLabels>0;
-  gm_mgArrowDn.mg_bEnabled = !bHasLast  && ctLabels>0;
+  gm_mgArrowUp.SetEnabled(!bHasFirst && ctLabels > 0);
+  gm_mgArrowDn.SetEnabled(!bHasLast  && ctLabels > 0);
 }
 
 // called to get info of a file from directory, or to skip it

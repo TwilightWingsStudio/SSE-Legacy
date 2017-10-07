@@ -119,31 +119,31 @@ BOOL CVideoOptionsMenu::OnEvent(const SEvent& event)
     } else if (event.GuiEvent.EventType == EGET_CHANGED) {
     
       if (event.GuiEvent.Caller == &gm_mgFullScreenCheckBox) {
-        UpdateVideoOptionsButtons(-1);
+        UpdateVideoOptionsButtons(0);
         return TRUE;
         
       } else if (event.GuiEvent.Caller == &gm_mgDisplayPrefsTrigger) {
-        UpdateVideoOptionsButtons(-1);
+        UpdateVideoOptionsButtons(0);
         return TRUE;
         
       } else if (event.GuiEvent.Caller == &gm_mgDisplayAPITrigger) {
-        UpdateVideoOptionsButtons(-1);
+        UpdateVideoOptionsButtons(0);
         return TRUE;
 
       } else if (event.GuiEvent.Caller == &gm_mgDisplayAdaptersTrigger) {
-        UpdateVideoOptionsButtons(-1);
+        UpdateVideoOptionsButtons(0);
         return TRUE;
 
       } else if (event.GuiEvent.Caller == &gm_mgAspectRatioTrigger) {
-        UpdateVideoOptionsButtons(-1);
+        UpdateVideoOptionsButtons(0);
         return TRUE;
 
       } else if (event.GuiEvent.Caller == &gm_mgResolutionsTrigger) {
-        UpdateVideoOptionsButtons(-1);
+        UpdateVideoOptionsButtons(0);
         return TRUE;
 
       } else if (event.GuiEvent.Caller == &gm_mgBitsPerPixelTrigger) {
-        UpdateVideoOptionsButtons(-1);
+        UpdateVideoOptionsButtons(0);
         return TRUE;
       }
     }

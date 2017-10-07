@@ -26,7 +26,8 @@ extern CMenuGadget *_pmgLastActivatedGadget;
 static void PPOnPlayerSelect(void)
 {
   ASSERT(_pmgLastActivatedGadget != NULL);
-  if (_pmgLastActivatedGadget->mg_bEnabled) {
+
+  if (_pmgLastActivatedGadget->IsEnabled()) {
     _pGUIM->gmPlayerProfile.SelectPlayer(((CMGButton *)_pmgLastActivatedGadget)->mg_iIndex);
   }
 }
@@ -254,13 +255,13 @@ void CPlayerProfileMenu::SelectPlayer(INDEX iPlayer)
     if (_gmRunningGameMode != GM_SINGLE_PLAYER && !_bPlayerMenuFromSinglePlayer) {
       bSet = pFunc(&gm_mgModel.mg_moModel, &pc, strName, TRUE);
       gm_mgModel.mg_strTip = TRANS("change model for this player");
-      gm_mgModel.mg_bEnabled = TRUE;
+      gm_mgModel.SetEnabled(TRUE);
     }
     else {
       // cannot change player appearance in single player mode
       bSet = pFunc(&gm_mgModel.mg_moModel, NULL, strName, TRUE);
       gm_mgModel.mg_strTip = TRANS("cannot change model for single-player game");
-      gm_mgModel.mg_bEnabled = FALSE;
+      gm_mgModel.SetEnabled(FALSE);
     }
     // ignore gender flags, if any
     strName.RemovePrefix("#female#");
@@ -285,24 +286,24 @@ void CPlayerProfileMenu::StartMenu(void)
 
   if (_gmRunningGameMode == GM_NONE || _gmRunningGameMode == GM_DEMO) {
     for (INDEX i = 0; i<8; i++) {
-      gm_mgNumber[i].mg_bEnabled = TRUE;
+      gm_mgNumber[i].SetEnabled(TRUE);
     }
   } else {
     for (INDEX i = 0; i<8; i++) {
-      gm_mgNumber[i].mg_bEnabled = FALSE;
+      gm_mgNumber[i].SetEnabled(FALSE);
     }
     INDEX iFirstEnabled = 0;
     {for (INDEX ilp = 0; ilp<4; ilp++) {
       CLocalPlayer &lp = _pGame->gm_lpLocalPlayers[ilp];
       if (lp.lp_bActive) {
-        gm_mgNumber[lp.lp_iPlayer].mg_bEnabled = TRUE;
+        gm_mgNumber[lp.lp_iPlayer].SetEnabled(TRUE);
         if (iFirstEnabled == 0) {
           iFirstEnabled = lp.lp_iPlayer;
         }
       }
     }}
     // backup to first player in case current player is disabled
-    if (!gm_mgNumber[*gm_piCurrentPlayer].mg_bEnabled) *gm_piCurrentPlayer = iFirstEnabled;
+    if (!gm_mgNumber[*gm_piCurrentPlayer].IsEnabled()) *gm_piCurrentPlayer = iFirstEnabled;
   }
   // done
   SelectPlayer(*gm_piCurrentPlayer);

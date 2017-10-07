@@ -51,7 +51,7 @@ void CServersMenu::Initialize_t(void)
 
   gm_mgList.mg_boxOnScreen = FLOATaabbox2D(FLOAT2D(0, 0), FLOAT2D(1, 1));
   gm_mgList.mg_pmgLeft = &gm_mgList;  // make sure it can get focus
-  gm_mgList.mg_bEnabled = TRUE;
+  gm_mgList.SetEnabled(TRUE);
   AddChild(&gm_mgList);
 
   ASSERT(ARRAYCOUNT(mgServerColumn) == ARRAYCOUNT(mgServerFilter));
