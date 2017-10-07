@@ -15,31 +15,48 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #ifndef SE_INCL_VARLIST_H
 #define SE_INCL_VARLIST_H
+
 #ifdef PRAGMA_ONCE
   #pragma once
 #endif
 
-class CVarSetting {
-public:
-  CListNode vs_lnNode;
-  BOOL  vs_bSeparator;
-  BOOL  vs_bToogleYN; // [SSE]
-  BOOL  vs_bCanChangeInGame;
-  INDEX vs_iSlider;
-  CTString vs_strName;
-  CTString vs_strTip;
-  CTString vs_strVar;
-  CTString vs_strFilter;
-  CTFileName vs_strSchedule;
-  INDEX vs_iValue;
-  INDEX vs_ctValues;
-  INDEX vs_iOrgValue;
-  BOOL  vs_bCustom;
-  CStaticStackArray<CTString> vs_astrTexts;
-  CStaticStackArray<CTString> vs_astrValues;
-  CVarSetting();
-  void Clear(void);
-  BOOL Validate(void);
+class CVarSetting
+{
+  public:
+    enum EVarSettingType
+    {
+      VST_SEPARATOR = 0,
+      VST_TOGGLE,
+      VST_SLIDER,
+    };
+  
+  public:
+    // Constructor.
+    CVarSetting();
+
+    void Clear(void);
+    BOOL Validate(void);
+  
+  public:
+    CListNode vs_lnNode;
+
+    EVarSettingType vs_eType; // [SSE]
+
+    BOOL  vs_bCanChangeInGame;
+    INDEX vs_iSlider;
+
+    // Settings
+    CTString vs_strName;
+    CTString vs_strTip;
+    CTString vs_strVar;
+    CTString vs_strFilter;
+    CTFileName vs_strSchedule;
+    INDEX vs_iValue;
+    INDEX vs_ctValues;
+    INDEX vs_iOrgValue;
+    BOOL  vs_bCustom;
+    CStaticStackArray<CTString> vs_astrTexts;
+    CStaticStackArray<CTString> vs_astrValues;
 };
 
 
@@ -48,6 +65,4 @@ extern CListHead _lhVarSettings;
 void LoadVarSettings(const CTFileName &fnmCfg);
 void FlushVarSettings(BOOL bApply);
 
-
 #endif  /* include-once check. */
-

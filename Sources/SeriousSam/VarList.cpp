@@ -63,7 +63,7 @@ void FixupFileName_t(CTString &strFnm)
 
 void CheckPVS_t(CVarSetting *pvs)
 {
-  if (pvs==NULL) {
+  if (pvs == NULL) {
     ThrowF_t("Gadget expected");
   }
 }
@@ -94,66 +94,81 @@ void ParseCFG_t(CTStream &strm)
     // read one line
     CTString strLine = GetNonEmptyLine_t(strm);
 
+    // If we should cancel parsing.
     if (strLine.RemovePrefix("MenuEnd")) {
       return;
+
+    // If we should define a new gadget.
     } else if (strLine.RemovePrefix("Gadget:")) {
       pvs = new CVarSetting;
       _lhVarSettings.AddTail(pvs->vs_lnNode);
       TranslateLine(strLine);
       strLine.TrimSpacesLeft();
       pvs->vs_strName = strLine;
+
+    // If we should define gadget type.
     } else if (strLine.RemovePrefix("Type:")) {
+
       CheckPVS_t(pvs);
       strLine.TrimSpacesLeft();
       strLine.TrimSpacesRight();
  
       if (strLine=="Toggle") {
-        pvs->vs_bSeparator = FALSE;
-        
+        pvs->vs_eType = CVarSetting::VST_TOGGLE;
+
       // [SSE]
       } else if (strLine=="ToggleYN") {
-        pvs->vs_bSeparator = FALSE;
-        pvs->vs_bToogleYN = TRUE;
+        pvs->vs_eType = CVarSetting::VST_TOGGLE;
 
         pvs->vs_astrTexts.Push() = _strYes;
         pvs->vs_astrTexts.Push() = _strNo;
         pvs->vs_astrValues.Push() = "1";
         pvs->vs_astrValues.Push() = "0";
-        
-      } else if (strLine=="Separator") {
-        pvs->vs_bSeparator = TRUE;
       }
+
     } else if (strLine.RemovePrefix("Schedule:")) {
       CheckPVS_t(pvs);
       FixupFileName_t(strLine);
       pvs->vs_strSchedule = strLine;
+
+    // If we should define tooltip.
     } else if (strLine.RemovePrefix("Tip:")) {
       CheckPVS_t(pvs);
       TranslateLine(strLine);
       strLine.TrimSpacesLeft();
       strLine.TrimSpacesRight();
       pvs->vs_strTip = strLine;
+
     } else if (strLine.RemovePrefix("Var:")) {
       CheckPVS_t(pvs);
       strLine.TrimSpacesLeft();
       strLine.TrimSpacesRight();
       pvs->vs_strVar = strLine;
+
     } else if (strLine.RemovePrefix("Filter:")) {
       CheckPVS_t(pvs);
       strLine.TrimSpacesLeft();
       strLine.TrimSpacesRight();
       pvs->vs_strFilter = strLine;
+
     } else if (strLine.RemovePrefix("Slider:")) {
       CheckPVS_t(pvs);
       strLine.TrimSpacesLeft();
       strLine.TrimSpacesRight();
-      if (strLine=="Fill") {
+
+      if (strLine == "Fill") {
+        pvs->vs_eType = CVarSetting::VST_SLIDER;
         pvs->vs_iSlider = 1;
       } else if (strLine=="Ratio") {
+        pvs->vs_eType = CVarSetting::VST_SLIDER;
         pvs->vs_iSlider = 2;
+        
+      // If unknown slider type then convert it to toggle.
       } else {
+        pvs->vs_eType = CVarSetting::VST_TOGGLE;
         pvs->vs_iSlider = 0;
       }
+
     } else if (strLine.RemovePrefix("InGame:")) {
       CheckPVS_t(pvs);
       strLine.TrimSpacesLeft();
@@ -199,9 +214,12 @@ void LoadVarSettings(const CTFileName &fnmCfg)
 
   FOREACHINLIST(CVarSetting, vs_lnNode, _lhVarSettings, itvs) {
     CVarSetting &vs = *itvs;
-    if (!vs.Validate() || vs.vs_bSeparator) {
+
+    // If not validated or separator then don't save value.
+    if (!vs.Validate() || vs.vs_eType == CVarSetting::VST_SEPARATOR) {
       continue;
     }
+
     INDEX ctValues = vs.vs_ctValues;
     CTString strValue = _pShell->GetValue(vs.vs_strVar);
     vs.vs_bCustom = TRUE;
@@ -254,6 +272,9 @@ void FlushVarSettings(BOOL bApply)
   }
 }
 
+// --------------------------------------------------------------------------------------
+// Constructor.
+// --------------------------------------------------------------------------------------
 CVarSetting::CVarSetting()
 {
   Clear();
@@ -264,7 +285,7 @@ void CVarSetting::Clear()
   vs_iOrgValue = 0;
   vs_iValue = 0;
   vs_ctValues = 0;
-  vs_bSeparator = FALSE;
+  vs_eType = VST_SEPARATOR;
   vs_bCanChangeInGame = TRUE;
   vs_iSlider = 0;
   vs_strName.Clear();
@@ -277,17 +298,20 @@ void CVarSetting::Clear()
 
 BOOL CVarSetting::Validate(void)
 {
-  if (vs_bSeparator) {
+  if (vs_eType == VST_SEPARATOR) {
     return TRUE;
   }
 
   vs_ctValues = Min(vs_astrValues.Count(), vs_astrTexts.Count());
-  if (vs_ctValues<=0) {
+
+  if (vs_ctValues <= 0) {
     ASSERT(FALSE);
     return FALSE;
   }
+
   if (!vs_bCustom) {
-    vs_iValue = Clamp(vs_iValue, 0L, vs_ctValues-1L);
+    vs_iValue = Clamp(vs_iValue, 0L, vs_ctValues - 1L);
   }
+
   return TRUE;
 }

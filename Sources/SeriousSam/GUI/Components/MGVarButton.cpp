@@ -27,7 +27,8 @@ extern PIX  _pixCursorPosJ;
 BOOL CMGVarButton::IsSeparator(void)
 {
   if (mg_pvsVar == NULL) return FALSE;
-  return mg_pvsVar->vs_bSeparator;
+
+  return mg_pvsVar->vs_eType == CVarSetting::VST_SEPARATOR;
 }
 
 BOOL CMGVarButton::IsEnabled(void)
@@ -58,12 +59,12 @@ extern BOOL _bVarChanged;
 // --------------------------------------------------------------------------------------
 BOOL CMGVarButton::OnKeyDown(int iVKey)
 {
-  if (mg_pvsVar == NULL || mg_pvsVar->vs_bSeparator || !mg_pvsVar->Validate() || !IsEnabled()) {
+  if (mg_pvsVar == NULL || mg_pvsVar->vs_eType == CVarSetting::VST_SEPARATOR || !mg_pvsVar->Validate() || !IsEnabled()) {
     return CMenuGadget::OnKeyDown(iVKey);
   }
 
   // handle slider
-  if (mg_pvsVar->vs_iSlider && !mg_pvsVar->vs_bCustom) {
+  if (mg_pvsVar->vs_eType == CVarSetting::VST_SLIDER && !mg_pvsVar->vs_bCustom) {
     // ignore RMB
     if (iVKey == VK_RBUTTON) return TRUE;
     // handle LMB
@@ -98,9 +99,13 @@ BOOL CMGVarButton::OnKeyDown(int iVKey)
       mg_pvsVar->vs_iValue++;
 
       if (mg_pvsVar->vs_iValue >= mg_pvsVar->vs_ctValues) {
+
         // wrap non-sliders, clamp sliders
-        if (mg_pvsVar->vs_iSlider) mg_pvsVar->vs_iValue = mg_pvsVar->vs_ctValues - 1L;
-        else mg_pvsVar->vs_iValue = 0;
+        if (mg_pvsVar->vs_eType == CVarSetting::VST_SLIDER) {
+          mg_pvsVar->vs_iValue = mg_pvsVar->vs_ctValues - 1L;
+        } else {
+          mg_pvsVar->vs_iValue = 0;
+        }
       }
 
       if (iOldValue != mg_pvsVar->vs_iValue) {
@@ -121,10 +126,13 @@ BOOL CMGVarButton::OnKeyDown(int iVKey)
       INDEX iOldValue = mg_pvsVar->vs_iValue;
       mg_pvsVar->vs_iValue--;
 
-      if (mg_pvsVar->vs_iValue<0) {
+      if (mg_pvsVar->vs_iValue < 0) {
         // wrap non-sliders, clamp sliders
-        if (mg_pvsVar->vs_iSlider) mg_pvsVar->vs_iValue = 0;
-        else mg_pvsVar->vs_iValue = mg_pvsVar->vs_ctValues - 1L;
+        if (mg_pvsVar->vs_eType == CVarSetting::VST_SLIDER) {
+          mg_pvsVar->vs_iValue = 0;
+        } else {
+          mg_pvsVar->vs_iValue = mg_pvsVar->vs_ctValues - 1L;
+        }
       }
 
       if (iOldValue != mg_pvsVar->vs_iValue) {
@@ -158,7 +166,7 @@ void CMGVarButton::Render(CDrawPort *pdp)
   PIX pixIC = box.Center()(1);
   PIX pixJ = box.Min()(2);
 
-  if (mg_pvsVar->vs_bSeparator)
+  if (mg_pvsVar->vs_eType == CVarSetting::VST_SEPARATOR)
   {
     SetEnabled(FALSE); // Disable the component.
 
@@ -182,7 +190,7 @@ void CMGVarButton::Render(CDrawPort *pdp)
       strText = mg_pvsVar->vs_astrTexts[mg_pvsVar->vs_iValue];
 
       // If we need slider then receive it.
-      if (mg_pvsVar->vs_iSlider > 0)
+      if (mg_pvsVar->vs_eType == CVarSetting::VST_SLIDER)
       {
         PIX pixISize = box.Size()(1)*0.13f;
         PIX pixJSize = box.Size()(2);
