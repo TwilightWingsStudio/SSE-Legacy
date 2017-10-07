@@ -23,6 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <Engine/API/IEventListener.h>
 
+// GUI Component Interface
 class IGuiComponent : public IEventListener
 {
   public:
@@ -41,6 +42,17 @@ class IGuiComponent : public IEventListener
     void SetParent(IGuiComponent* pParent)
     {
       m_pParent = pParent;
+    }
+    
+    // Returns element ID.
+    ULONG GetID(void)
+    {
+      return m_ulID;
+    }
+    
+    void SetID(ULONG ulID)
+    {
+      m_ulID = ulID;
     }
     
     // Returns parent of this component.
