@@ -32,6 +32,8 @@ class IGuiComponent : public IEventListener
     {
       m_pParent = NULL;
       m_ulID = 0;
+      m_bEnabled = TRUE;
+      m_bVisible = TRUE;
     }
   
     virtual BOOL OnEvent(const SEvent& event)
@@ -44,15 +46,40 @@ class IGuiComponent : public IEventListener
       m_pParent = pParent;
     }
     
-    // Returns element ID.
+    // Returns component ID.
     ULONG GetID(void)
     {
       return m_ulID;
     }
     
+    // Changes ID of this component.
     void SetID(ULONG ulID)
     {
       m_ulID = ulID;
+    }
+    
+    // Returns TRUE if this component visible.
+    virtual BOOL IsVisible() const 
+    {
+      return m_bVisible;
+    }
+    
+    // Enables/Disables visibility of this component.
+    virtual void SetVisible(BOOL bVisible)
+    {
+      m_bVisible = bVisible;
+    }
+    
+    // Returns TRUE if this component enabled.
+    virtual BOOL IsEnabled() const 
+    {
+      return m_bEnabled;
+    }
+    
+    // Enables/Disables this component.
+    virtual void SetEnabled(BOOL bEnabled)
+    {
+      m_bEnabled = bEnabled;
     }
     
     // Returns parent of this component.
@@ -64,6 +91,9 @@ class IGuiComponent : public IEventListener
   protected:
     IGuiComponent *m_pParent;
     ULONG m_ulID;
+    
+    BOOL m_bEnabled;
+    BOOL m_bVisible;
 };
 
 #endif
