@@ -43,7 +43,7 @@ extern CTString astrDisplayAspectRatioTexts[] = {
   CTString("5:4"),
   CTString("16:9"),
   CTString("16:10"),
-  CTString("21:9"),  
+  //CTString("21:9"),  
 };
 
 extern PIX apixWidths[][2] = {
@@ -88,6 +88,46 @@ extern PIX apixWidths4x3[][2] = {
   2048, 1536,
 };
 
+
+extern SScreenResolution asWidths4x3[] = {
+  SScreenResolution(320, 240),
+  SScreenResolution(400, 300),
+  SScreenResolution(512, 384),
+  SScreenResolution(640, 480),
+  SScreenResolution(720, 540),
+  SScreenResolution(800, 600),
+  SScreenResolution(960, 720),
+  SScreenResolution(1024, 768),
+  SScreenResolution(1152, 864),
+  SScreenResolution(1280, 960),
+  SScreenResolution(1600, 1200),
+  SScreenResolution(1920, 1440),
+  SScreenResolution(2048, 1536),
+};
+
+extern SScreenResolution asWidths5x4[] = {
+  SScreenResolution(1280, 1024),
+};
+
+extern SScreenResolution asWidths16x9[] = {
+  SScreenResolution(640, 360),
+  SScreenResolution(720, 405),
+  SScreenResolution(864, 486),
+  SScreenResolution(920, 540),
+  SScreenResolution(1024, 576),
+  SScreenResolution(1280, 720), // HD
+  SScreenResolution(1366, 768),
+  SScreenResolution(1600, 900),
+  SScreenResolution(1920, 1080)
+};
+
+extern SScreenResolution asWidths16x10[] = {
+  SScreenResolution(1280, 800),
+  SScreenResolution(1440, 900),
+  SScreenResolution(1680, 1050),
+  SScreenResolution(1920, 1200),
+};
+
 extern PIX apixWidths8x3[][2] = {
   640, 240,
   800, 300,
@@ -95,29 +135,6 @@ extern PIX apixWidths8x3[][2] = {
   1280, 480,
   1600, 600,
   1920, 720,
-};
-
-extern PIX apixWidths5x4[][2] = {
-  1280, 1024,
-};
-
-extern PIX apixWidths16x9[][2] = {
-  640, 360,
-  720, 405,
-  864, 486,
-  920, 540,
-  1024, 576,
-  1280, 720, // HD
-  1366, 768,
-  1600, 900,
-  1920, 1080, // FHD
-};
-
-extern PIX apixWidths16x10[][2] = {
-  1280, 800,
-  1440, 900,
-  1680, 1050,
-  1920, 1200,
 };
 
 extern CTString astrCrosshair[] = {

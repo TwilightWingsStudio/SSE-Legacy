@@ -49,13 +49,25 @@ extern CTString astrBitsPerPixelRadioTexts[3];
 extern CTString astrFrequencyRadioTexts[4];
 extern CTString astrSoundAPIRadioTexts[3];
 
+struct SScreenResolution
+{
+  PIX Width;
+  PIX Height;
+  
+  SScreenResolution(PIX pixWidth, PIX pixHeight)
+  {
+    Width = pixWidth;
+    Height = pixHeight;
+  }
+};
+
 extern CTString astrDisplayAspectRatioTexts[5];
 extern PIX apixWidths[23][2];
-extern PIX apixWidths4x3[13][2];
-extern PIX apixWidths5x4[1][2];
-extern PIX apixWidths16x9[9][2];
-extern PIX apixWidths16x10[4][2];
 
+extern SScreenResolution asWidths4x3[13];
+extern SScreenResolution asWidths5x4[1];
+extern SScreenResolution asWidths16x9[9];
+extern SScreenResolution asWidths16x10[4];
 
 ULONG GetSpawnFlagsForGameType(INDEX iGameType);
 BOOL IsMenuEnabled(const CTString &strMenuName);

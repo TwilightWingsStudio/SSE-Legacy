@@ -291,23 +291,53 @@ static void FillResolutionsList(void)
   _ctResolutions = 0;
   
   BOOL bFullScreen = gmCurrent.gm_mgFullScreenCheckBox.mg_bValue;
+  INDEX iAspectRatio = gmCurrent.gm_mgAspectRatioTrigger.mg_iSelected;
+  SScreenResolution *ppaWidths = NULL;
 
-  // if window
+  // If window
   if (bFullScreen == 0) {
     // always has fixed resolutions, but not greater than desktop
-    _ctResolutions = ARRAYCOUNT(apixWidths);
+    switch (iAspectRatio)
+    {
+      // 4:3 and others.
+      default: {
+        _ctResolutions = ARRAYCOUNT(asWidths4x3);
+        ppaWidths = (SScreenResolution*)&asWidths4x3;
+      } break;
+
+      // 5:4
+      case 1: {
+        _ctResolutions = ARRAYCOUNT(asWidths5x4);
+        ppaWidths = (SScreenResolution*)&asWidths5x4;
+      } break;
+      
+      // 16:9
+      case 2: {
+        _ctResolutions = ARRAYCOUNT(asWidths16x9);
+        ppaWidths = (SScreenResolution*)&asWidths16x9;
+      } break;
+      
+      // 16:10
+      case 3: {
+        _ctResolutions = ARRAYCOUNT(asWidths16x10);
+        ppaWidths = (SScreenResolution*)&asWidths16x10;
+      } break;
+    }
+    
     _astrResolutionTexts = new CTString[_ctResolutions];
     _admResolutionModes = new CDisplayMode[_ctResolutions];
 
     extern PIX _pixDesktopWidth;
     INDEX iRes = 0;
+
     for (; iRes<_ctResolutions; iRes++) {
-      if (apixWidths[iRes][0]>_pixDesktopWidth) break;
-      SetResolutionInList(iRes, apixWidths[iRes][0], apixWidths[iRes][1]);
+      if (ppaWidths[iRes].Width > _pixDesktopWidth) break;
+        SetResolutionInList(iRes, ppaWidths[iRes].Width, ppaWidths[iRes].Height);
     }
+
     _ctResolutions = iRes;
 
-    // if fullscreen
+  // if fullscreen
   } else {
     // get resolutions list from engine
     CDisplayMode *pdm = _pGfx->EnumDisplayModes(_ctResolutions,
@@ -389,10 +419,12 @@ extern void UpdateVideoOptionsButtons(INDEX iSelected)
   }
 
   gmCurrent.gm_mgBitsPerPixelTrigger.SetEnabled(TRUE);
+
   if (gmCurrent.gm_mgFullScreenCheckBox.mg_bValue == 0) {
     gmCurrent.gm_mgBitsPerPixelTrigger.SetEnabled(FALSE);
     gmCurrent.gm_mgBitsPerPixelTrigger.mg_iSelected = DepthToSwitch(DD_DEFAULT);
     gmCurrent.gm_mgBitsPerPixelTrigger.ApplyCurrentSelection();
+
   } else if (da.da_ulFlags&DAF_16BITONLY) {
     gmCurrent.gm_mgBitsPerPixelTrigger.SetEnabled(FALSE);
     gmCurrent.gm_mgBitsPerPixelTrigger.mg_iSelected = DepthToSwitch(DD_16BIT);
