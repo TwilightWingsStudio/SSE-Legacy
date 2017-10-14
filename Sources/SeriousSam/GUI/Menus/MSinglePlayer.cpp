@@ -120,7 +120,7 @@ void CSinglePlayerMenu::StartMenu(void)
   gm_mgTechTest.SetEnabled(IsMenuEnabled("Technology Test"));
 
   if (gm_mgTraining.IsEnabled()) {
-    if (!gm_mgTraining.mg_lnNode.IsLinked()) {
+    if (!gm_mgTraining.m_lnNode.IsLinked()) {
       AddChild(&gm_mgTraining);
     }
 
@@ -140,8 +140,8 @@ void CSinglePlayerMenu::StartMenu(void)
     gm_mgOptions.mg_boxOnScreen = BoxBigRow(7.0f);
 
   } else {
-    if (gm_mgTraining.mg_lnNode.IsLinked()) {
-      gm_mgTraining.mg_lnNode.Remove();
+    if (gm_mgTraining.m_lnNode.IsLinked()) {
+      gm_mgTraining.m_lnNode.Remove();
     }
 
     gm_mgLoad.mg_boxOnScreen = BoxBigRow(3.0f);

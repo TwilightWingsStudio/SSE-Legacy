@@ -35,7 +35,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class CMenuGadget : public IGuiComponent
 {
   public:
-    CListNode mg_lnNode; // Node in list.
     FLOATaabbox2D mg_boxOnScreen;
     BOOL mg_bLabel;
     BOOL mg_bFocused;

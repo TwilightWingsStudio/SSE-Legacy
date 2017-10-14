@@ -525,15 +525,15 @@ void MenuUpdateMouseFocus(void)
   _pixCursorExternPosI = pt.x;
   _pixCursorExternPosJ = pt.y;
 
-  // if mouse not used last
+  // If mouse not used last then do nothing.
   if (!_bMouseUsedLast||_bDefiningKey||_bEditingString) {
-    // do nothing
     return;
   }
 
   CMenuGadget *pmgActive = NULL;
+
   // for all gadgets in menu
-  FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhChildren, itmg) {
+  FOREACHINLIST( CMenuGadget, m_lnNode, pgmCurrentMenu->m_lhChildren, itmg) {
     CMenuGadget &mg = *itmg;
     // if focused
     if( itmg->mg_bFocused) {
@@ -543,7 +543,8 @@ void MenuUpdateMouseFocus(void)
   }
 
   // if there is some under cursor
-  if (_pmgUnderCursor!=NULL) {
+  if (_pmgUnderCursor != NULL)
+  {
     _pmgUnderCursor->OnMouseOver(_pixCursorPosI, _pixCursorPosJ);
     // if the one under cursor has no neighbours
     if (_pmgUnderCursor->mg_pmgLeft ==NULL 
@@ -651,7 +652,7 @@ BOOL DoMenu( CDrawPort *pdp)
   {
     _pTimer->SetCurrentTick(_tmMenuLastTickDone);
     // call think for all gadgets in menu
-    FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhChildren, itmg) {
+    FOREACHINLIST( CMenuGadget, m_lnNode, pgmCurrentMenu->m_lhChildren, itmg) {
       itmg->Think();
     }
     _tmMenuLastTickDone+=_pTimer->TickQuantum;
@@ -770,7 +771,7 @@ BOOL DoMenu( CDrawPort *pdp)
     // render parent menu first
     if (pgmCurrentMenu->gm_pgmParentMenu!=NULL) {
       _pGame->MenuPreRenderMenu(pgmCurrentMenu->gm_pgmParentMenu->gm_strName);
-      FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_pgmParentMenu->gm_lhChildren, itmg) {
+      FOREACHINLIST( CMenuGadget, m_lnNode, pgmCurrentMenu->gm_pgmParentMenu->m_lhChildren, itmg) {
         if (itmg->IsVisible()) {
           itmg->Render( &dpMenu);
         }
@@ -802,7 +803,7 @@ BOOL DoMenu( CDrawPort *pdp)
   BOOL bStilInMenus = FALSE;
   _pGame->MenuPreRenderMenu(pgmCurrentMenu->gm_strName);
   // for each menu gadget
-  FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhChildren, itmg) {
+  FOREACHINLIST( CMenuGadget, m_lnNode, pgmCurrentMenu->m_lhChildren, itmg) {
     // if gadget is visible
     if (itmg->IsVisible()) {
       bStilInMenus = TRUE;
@@ -819,7 +820,7 @@ BOOL DoMenu( CDrawPort *pdp)
   // if mouse was not active last
   if (!_bMouseUsedLast) {
     // find focused gadget
-    FOREACHINLIST( CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhChildren, itmg) {
+    FOREACHINLIST( CMenuGadget, m_lnNode, pgmCurrentMenu->m_lhChildren, itmg) {
       CMenuGadget &mg = *itmg;
       // if focused
       if( itmg->mg_bFocused) {
@@ -868,8 +869,8 @@ extern void FixupBackButton(CGameMenu *pgm)
 {
   BOOL bResume = FALSE;
 
-  if (mgBack.mg_lnNode.IsLinked()) {
-    mgBack.mg_lnNode.Remove();
+  if (mgBack.m_lnNode.IsLinked()) {
+    mgBack.m_lnNode.Remove();
   }
 
   BOOL bHasBack = TRUE;
@@ -928,7 +929,7 @@ void ChangeToMenu( CGameMenu *pgmNewMenu)
     if (!pgmNewMenu->gm_bPopup) {
       pgmCurrentMenu->EndMenu();
     } else {
-      FOREACHINLIST(CMenuGadget, mg_lnNode, pgmCurrentMenu->gm_lhChildren, itmg) {
+      FOREACHINLIST(CMenuGadget, m_lnNode, pgmCurrentMenu->m_lhChildren, itmg) {
         itmg->OnKillFocus();
       }
     }
