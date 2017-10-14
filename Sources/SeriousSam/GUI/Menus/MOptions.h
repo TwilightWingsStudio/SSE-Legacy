@@ -25,17 +25,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 
 class COptionsMenu : public CGameMenu {
-public:
-  CMGTitle gm_mgTitle;
-  CMGButton gm_mgVideoOptions;
-  CMGButton gm_mgAudioOptions;
-  CMGButton gm_mgPlayerProfileOptions;
-  CMGButton gm_mgNetworkOptions;
-  CMGButton gm_mgCustomOptions;
-  CMGButton gm_mgAddonOptions;
+  public:
+    CMGTitle gm_mgTitle;
+    CMGButton gm_mgVideoOptions;
+    CMGButton gm_mgAudioOptions;
+    CMGButton gm_mgPlayerProfileOptions;
+    CMGButton gm_mgNetworkOptions;
+    CMGButton gm_mgCustomOptions;
+    CMGButton gm_mgAddonOptions;
 
-	void Initialize_t(void);
-  BOOL OnEvent(const SEvent& event); // [SSE]
+  public:
+    void Initialize_t(void);
+    BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

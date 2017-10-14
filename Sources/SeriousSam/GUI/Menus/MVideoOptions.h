@@ -22,7 +22,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GameMenu.h"
 #include "GUI/Components/MGCheckBox.h"
 
-class CVideoOptionsMenu : public CGameMenu {
+class CVideoOptionsMenu : public CGameMenu
+{
   public:
     CMGTitle gm_mgTitle;
     CMGTrigger gm_mgDisplayAPITrigger;
@@ -35,6 +36,7 @@ class CVideoOptionsMenu : public CGameMenu {
     CMGTrigger gm_mgBitsPerPixelTrigger;
     CMGButton gm_mgApply;
 
+  public:
     void StartMenu(void);
     void Initialize_t(void);
     virtual BOOL OnEvent(const SEvent& event); // [SSE]

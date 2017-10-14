@@ -24,7 +24,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTitle.h"
 
 
-class CSinglePlayerMenu : public CGameMenu {
+class CSinglePlayerMenu : public CGameMenu
+{
   public:
     CMGTitle gm_mgTitle;
     CMGButton gm_mgPlayerLabel;
@@ -37,6 +38,7 @@ class CSinglePlayerMenu : public CGameMenu {
     CMGButton gm_mgPlayersAndControls;
     CMGButton gm_mgOptions;
 
+  public:
     void Initialize_t(void);
     void StartMenu(void);
     BOOL OnEvent(const SEvent& event); // [SSE]

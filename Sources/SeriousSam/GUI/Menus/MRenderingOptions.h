@@ -22,10 +22,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GameMenu.h"
 
 
-class CRenderingOptionsMenu : public CGameMenu {
-public:
-  void StartMenu(void);
-  void EndMenu(void);
-  void Initialize_t(void);
+class CRenderingOptionsMenu : public CGameMenu
+{
+  public:
+    void StartMenu(void);
+    void EndMenu(void);
+    void Initialize_t(void);
 };
+
 #endif  /* include-once check. */

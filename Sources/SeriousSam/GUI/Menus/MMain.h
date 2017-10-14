@@ -23,23 +23,25 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGButton.h"
 
 
-class CMainMenu : public CGameMenu {
-public:
-  CMGButton gm_mgVersionLabel;
-  CMGButton gm_mgBuildDateLabel;
-  CMGButton gm_mgModLabel;
-  CMGButton gm_mgSingle;
-  CMGButton gm_mgNetwork;
-  CMGButton gm_mgSplitScreen;
-  CMGButton gm_mgDemo;
-  CMGButton gm_mgMods;
-  CMGButton gm_mgHighScore;
-  CMGButton gm_mgOptions;
-  CMGButton gm_mgQuit;
+class CMainMenu : public CGameMenu
+{
+  public:
+    CMGButton gm_mgVersionLabel;
+    CMGButton gm_mgBuildDateLabel;
+    CMGButton gm_mgModLabel;
+    CMGButton gm_mgSingle;
+    CMGButton gm_mgNetwork;
+    CMGButton gm_mgSplitScreen;
+    CMGButton gm_mgDemo;
+    CMGButton gm_mgMods;
+    CMGButton gm_mgHighScore;
+    CMGButton gm_mgOptions;
+    CMGButton gm_mgQuit;
 
-  void Initialize_t(void);
-  void StartMenu(void);
-  BOOL OnEvent(const SEvent& event); // [SSE]
+  public:
+    void Initialize_t(void);
+    void StartMenu(void);
+    BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

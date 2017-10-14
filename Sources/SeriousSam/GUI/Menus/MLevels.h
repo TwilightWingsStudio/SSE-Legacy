@@ -25,16 +25,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTitle.h"
 
 
-class CLevelsMenu : public CGameMenu {
-public:
-  CMGTitle gm_mgTitle;
-  CMGLevelButton gm_mgManualLevel[LEVELS_ON_SCREEN];
-  CMGArrow gm_mgArrowUp;
-  CMGArrow gm_mgArrowDn;
+class CLevelsMenu : public CGameMenu
+{
+  public:
+    CMGTitle gm_mgTitle;
+    CMGLevelButton gm_mgManualLevel[LEVELS_ON_SCREEN];
+    CMGArrow gm_mgArrowUp;
+    CMGArrow gm_mgArrowDn;
 
-  void Initialize_t(void);
-  void FillListItems(void);
-  void StartMenu(void);
+  public:
+    void Initialize_t(void);
+    void FillListItems(void);
+    void StartMenu(void);
 };
 
 #endif  /* include-once check. */

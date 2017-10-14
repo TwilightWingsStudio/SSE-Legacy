@@ -26,7 +26,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTitle.h"
 
 
-class CAudioOptionsMenu : public CGameMenu {
+class CAudioOptionsMenu : public CGameMenu
+{
   public:
     CMGTitle *gm_pTitle;
     CMGTrigger *gm_pAudioAutoTrigger;
@@ -36,6 +37,7 @@ class CAudioOptionsMenu : public CGameMenu {
     CMGSlider *gm_pMPEGVolume;
     CMGButton *gm_pApplyButton;
 
+  public:
     void StartMenu(void);
     void Initialize_t(void);
     virtual BOOL OnEvent(const SEvent& event); // [SSE]

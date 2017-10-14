@@ -25,24 +25,26 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTrigger.h"
 
 
-class CCustomizeAxisMenu : public CGameMenu {
-public:
-  CMGTitle gm_mgTitle;
-  CMGTrigger gm_mgActionTrigger;
-  CMGTrigger gm_mgMountedTrigger;
-  CMGSlider gm_mgSensitivity;
-  CMGSlider gm_mgDeadzone;
-  CMGTrigger gm_mgInvertTrigger;
-  CMGTrigger gm_mgRelativeTrigger;
-  CMGTrigger gm_mgSmoothTrigger;
+class CCustomizeAxisMenu : public CGameMenu
+{
+  public:
+    CMGTitle gm_mgTitle;
+    CMGTrigger gm_mgActionTrigger;
+    CMGTrigger gm_mgMountedTrigger;
+    CMGSlider gm_mgSensitivity;
+    CMGSlider gm_mgDeadzone;
+    CMGTrigger gm_mgInvertTrigger;
+    CMGTrigger gm_mgRelativeTrigger;
+    CMGTrigger gm_mgSmoothTrigger;
 
-  ~CCustomizeAxisMenu(void);
-  void Initialize_t(void);
-  void StartMenu(void);
-  void EndMenu(void);
-  void ObtainActionSettings(void);
-  void ApplyActionSettings(void);
-  virtual BOOL OnEvent(const SEvent& event); // [SSE]
+  public:
+    ~CCustomizeAxisMenu(void);
+    void Initialize_t(void);
+    void StartMenu(void);
+    void EndMenu(void);
+    void ObtainActionSettings(void);
+    void ApplyActionSettings(void);
+    virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

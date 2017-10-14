@@ -26,22 +26,24 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGVarButton.h"
 
 
-class CVarMenu : public CGameMenu {
-public:
-  CTFileName gm_fnmMenuCFG;
+class CVarMenu : public CGameMenu
+{
+  public:
+    CTFileName gm_fnmMenuCFG;
 
-  CMGTitle gm_mgTitle;
-  CMGVarButton gm_mgVar[LEVELS_ON_SCREEN];
-  CMGButton gm_mgApply;
-  CMGArrow gm_mgArrowUp;
-  CMGArrow gm_mgArrowDn;
+    CMGTitle gm_mgTitle;
+    CMGVarButton gm_mgVar[LEVELS_ON_SCREEN];
+    CMGButton gm_mgApply;
+    CMGArrow gm_mgArrowUp;
+    CMGArrow gm_mgArrowDn;
 
-  void Initialize_t(void);
-  void FillListItems(void);
-  void StartMenu(void);
-  void EndMenu(void);
-  void Think(void);
-  virtual BOOL OnEvent(const SEvent& event); // [SSE]
+  public:
+    void Initialize_t(void);
+    void FillListItems(void);
+    void StartMenu(void);
+    void EndMenu(void);
+    void Think(void);
+    virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

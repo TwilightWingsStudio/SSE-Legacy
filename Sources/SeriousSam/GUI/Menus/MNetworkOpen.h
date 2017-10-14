@@ -25,21 +25,23 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTitle.h"
 
 
-class CNetworkOpenMenu : public CGameMenu {
-public:
-  CTString gm_strPort;
+class CNetworkOpenMenu : public CGameMenu
+{
+  public:
+    CTString gm_strPort;
 
-  CMGTitle gm_mgTitle;
-  CMGButton gm_mgAddressLabel;
-  CMGEdit gm_mgAddress;
-  CMGButton gm_mgPortLabel;
-  CMGEdit gm_mgPort;
-  CMGButton gm_mgJoin;
+    CMGTitle gm_mgTitle;
+    CMGButton gm_mgAddressLabel;
+    CMGEdit gm_mgAddress;
+    CMGButton gm_mgPortLabel;
+    CMGEdit gm_mgPort;
+    CMGButton gm_mgJoin;
 
-  void Initialize_t(void);
-  void StartMenu(void);
-  void EndMenu(void);
-  virtual BOOL OnEvent(const SEvent& event); // [SSE]
+  public:
+    void Initialize_t(void);
+    void StartMenu(void);
+    void EndMenu(void);
+    virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

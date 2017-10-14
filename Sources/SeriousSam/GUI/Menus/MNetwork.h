@@ -24,7 +24,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTitle.h"
 
 
-class CNetworkMenu : public CGameMenu {
+class CNetworkMenu : public CGameMenu
+{
   public:
     CMGTitle  gm_mgTitle;
     CMGButton gm_mgJoin;
@@ -32,6 +33,7 @@ class CNetworkMenu : public CGameMenu {
     CMGButton gm_mgQuickLoad;
     CMGButton gm_mgLoad;
 
+  public:
     void Initialize_t(void);
     void StartMenu(void);
     virtual BOOL OnEvent(const SEvent& event); // [SSE]

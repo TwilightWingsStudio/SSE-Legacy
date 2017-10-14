@@ -24,16 +24,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTitle.h"
 
 
-class CSplitScreenMenu : public CGameMenu {
-public:
-  CMGTitle gm_mgTitle;
-  CMGButton gm_mgStart;
-  CMGButton gm_mgQuickLoad;
-  CMGButton gm_mgLoad;
+class CSplitScreenMenu : public CGameMenu
+{
+  public:
+    CMGTitle gm_mgTitle;
+    CMGButton gm_mgStart;
+    CMGButton gm_mgQuickLoad;
+    CMGButton gm_mgLoad;
 
-  void Initialize_t(void);
-  void StartMenu(void);
-  virtual BOOL OnEvent(const SEvent& event); // [SSE]
+  public:
+    void Initialize_t(void);
+    void StartMenu(void);
+    virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

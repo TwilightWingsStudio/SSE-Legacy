@@ -24,40 +24,41 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class CGameMenu : public IGuiComponent
 {
-public:
-  CListHead gm_lhChildren;
-  CGameMenu *gm_pgmParentMenu;
-  BOOL gm_bPopup;
-  const char *gm_strName;   // menu name (for mod interface only)
-  class CMenuGadget *gm_pmgSelectedByDefault;
-  class CMenuGadget *gm_pmgArrowUp;
-  class CMenuGadget *gm_pmgArrowDn;
-  class CMenuGadget *gm_pmgListTop;
-  class CMenuGadget *gm_pmgListBottom;
-  INDEX gm_iListOffset;
-  INDEX gm_iListWantedItem;   // item you want to focus initially
-  INDEX gm_ctListVisible;
-  INDEX gm_ctListTotal;
-  
-  // Constructor.
-  CGameMenu(void);
-  
-  // Adds component as new child.
-  virtual void AddChild(CMenuGadget *pChild);
+  public:
+    CListHead gm_lhChildren;
+    CGameMenu *gm_pgmParentMenu;
+    BOOL gm_bPopup;
+    const char *gm_strName;   // menu name (for mod interface only)
+    class CMenuGadget *gm_pmgSelectedByDefault;
+    class CMenuGadget *gm_pmgArrowUp;
+    class CMenuGadget *gm_pmgArrowDn;
+    class CMenuGadget *gm_pmgListTop;
+    class CMenuGadget *gm_pmgListBottom;
+    INDEX gm_iListOffset;
+    INDEX gm_iListWantedItem;   // item you want to focus initially
+    INDEX gm_ctListVisible;
+    INDEX gm_ctListTotal;
+    
+  public:
+    // Constructor.
+    CGameMenu(void);
+    
+    // Adds component as new child.
+    virtual void AddChild(CMenuGadget *pChild);
 
-  // Working functions...
-  void ScrollList(INDEX iDir);
-  void KillAllFocuses(void);
-  virtual void Initialize_t(void);
-  virtual void Destroy(void);
-  virtual void StartMenu(void);
-  virtual void FillListItems(void);
-  virtual void EndMenu(void);
-  // return TRUE if handled
-  virtual BOOL OnKeyDown(int iVKey);
-  virtual BOOL OnChar(MSG msg);
-  virtual void Think(void);
-  virtual BOOL OnEvent(const SEvent& event); // [SSE]
+    // Working functions...
+    void ScrollList(INDEX iDir);
+    void KillAllFocuses(void);
+    virtual void Initialize_t(void);
+    virtual void Destroy(void);
+    virtual void StartMenu(void);
+    virtual void FillListItems(void);
+    virtual void EndMenu(void);
+    // return TRUE if handled
+    virtual BOOL OnKeyDown(int iVKey);
+    virtual BOOL OnChar(MSG msg);
+    virtual void Think(void);
+    virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

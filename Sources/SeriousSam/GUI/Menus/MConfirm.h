@@ -23,22 +23,24 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGButton.h"
 
 
-class CConfirmMenu : public CGameMenu {
-public:
-  CMGButton *gm_pConfirmLabel;
-  CMGButton *gm_pConfirmYes;
-  CMGButton *gm_pConfirmNo;
+class CConfirmMenu : public CGameMenu
+{
+  public:
+    CMGButton *gm_pConfirmLabel;
+    CMGButton *gm_pConfirmYes;
+    CMGButton *gm_pConfirmNo;
 
-  void(*_pConfimedYes)(void) = NULL;
-  void(*_pConfimedNo)(void) = NULL;
+    void(*_pConfimedYes)(void) = NULL;
+    void(*_pConfimedNo)(void) = NULL;
 
-  void Initialize_t(void);
-  // return TRUE if handled
-  BOOL OnKeyDown(int iVKey);
+  public:
+    void Initialize_t(void);
+    // return TRUE if handled
+    BOOL OnKeyDown(int iVKey);
 
-  void BeLarge(void);
-  void BeSmall(void);
-  virtual BOOL OnEvent(const SEvent& event); // [SSE]
+    void BeLarge(void);
+    void BeSmall(void);
+    virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

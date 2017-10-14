@@ -24,12 +24,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTitle.h"
 
 
-class CDisabledMenu : public CGameMenu {
-public:
-  CMGTitle gm_mgTitle;
-  CMGButton gm_mgButton;
+class CDisabledMenu : public CGameMenu
+{
+  public:
+    CMGTitle gm_mgTitle;
+    CMGButton gm_mgButton;
 
-  void Initialize_t(void);
+  public:
+    void Initialize_t(void);
 };
 
 #endif  /* include-once check. */

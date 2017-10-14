@@ -26,30 +26,32 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTrigger.h"
 
 
-class CSelectPlayersMenu : public CGameMenu {
-public:
-  BOOL gm_bAllowDedicated;
-  BOOL gm_bAllowObserving;
+class CSelectPlayersMenu : public CGameMenu
+{
+  public:
+    BOOL gm_bAllowDedicated;
+    BOOL gm_bAllowObserving;
 
-  CMGTitle gm_mgTitle;
+    CMGTitle gm_mgTitle;
 
-  CMGTrigger gm_mgDedicated;
-  CMGTrigger gm_mgObserver;
-  CMGTrigger gm_mgSplitScreenCfg;
+    CMGTrigger gm_mgDedicated;
+    CMGTrigger gm_mgObserver;
+    CMGTrigger gm_mgSplitScreenCfg;
 
-  CMGChangePlayer gm_mgPlayer0Change;
-  CMGChangePlayer gm_mgPlayer1Change;
-  CMGChangePlayer gm_mgPlayer2Change;
-  CMGChangePlayer gm_mgPlayer3Change;
+    CMGChangePlayer gm_mgPlayer0Change;
+    CMGChangePlayer gm_mgPlayer1Change;
+    CMGChangePlayer gm_mgPlayer2Change;
+    CMGChangePlayer gm_mgPlayer3Change;
 
-  CMGButton gm_mgNotes;
+    CMGButton gm_mgNotes;
 
-  CMGButton gm_mgStart;
+    CMGButton gm_mgStart;
 
-  void Initialize_t(void);
-  void StartMenu(void);
-  void EndMenu(void);
-  virtual BOOL OnEvent(const SEvent& event); // [SSE]
+  public:
+    void Initialize_t(void);
+    void StartMenu(void);
+    void EndMenu(void);
+    virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

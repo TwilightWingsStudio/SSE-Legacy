@@ -24,21 +24,23 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTitle.h"
 
 
-class CSinglePlayerNewMenu : public CGameMenu {
-public:
-  CMGTitle gm_mgTitle;
-  CMGButton gm_mgTourist;
-  CMGButton gm_mgEasy;
-  CMGButton gm_mgMedium;
-  CMGButton gm_mgHard;
-  CMGButton gm_mgSerious;
-  CMGButton gm_mgMental;
-  CMGButton gm_mgSeriousMental; // [SSE]
+class CSinglePlayerNewMenu : public CGameMenu
+{
+  public:
+    CMGTitle gm_mgTitle;
+    CMGButton gm_mgTourist;
+    CMGButton gm_mgEasy;
+    CMGButton gm_mgMedium;
+    CMGButton gm_mgHard;
+    CMGButton gm_mgSerious;
+    CMGButton gm_mgMental;
+    CMGButton gm_mgSeriousMental; // [SSE]
 
-  void Initialize_t(void);
-  void StartMenu(void);
+  public:
+    void Initialize_t(void);
+    void StartMenu(void);
 
-  virtual BOOL OnEvent(const SEvent& event); // [SSE]
+    virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

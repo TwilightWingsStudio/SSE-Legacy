@@ -24,15 +24,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTitle.h"
 
 
-class CNetworkJoinMenu : public CGameMenu {
-public:
-  CMGTitle  gm_mgTitle;
-  CMGButton gm_mgLAN;
-  CMGButton gm_mgNET;
-  CMGButton gm_mgOpen;
+class CNetworkJoinMenu : public CGameMenu
+{
+  public:
+    CMGTitle  gm_mgTitle;
+    CMGButton gm_mgLAN;
+    CMGButton gm_mgNET;
+    CMGButton gm_mgOpen;
 
-  void Initialize_t(void);
-  virtual BOOL OnEvent(const SEvent& event); // [SSE]
+  public:
+    void Initialize_t(void);
+    virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */

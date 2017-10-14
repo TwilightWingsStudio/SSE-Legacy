@@ -25,17 +25,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTitle.h"
 
 
-class CCustomizeKeyboardMenu : public CGameMenu {
-public:
-  CMGTitle gm_mgTitle;
-  CMGKeyDefinition gm_mgKey[KEYS_ON_SCREEN];
-  CMGArrow gm_mgArrowUp;
-  CMGArrow gm_mgArrowDn;
+class CCustomizeKeyboardMenu : public CGameMenu
+{
+  public:
+    CMGTitle gm_mgTitle;
+    CMGKeyDefinition gm_mgKey[KEYS_ON_SCREEN];
+    CMGArrow gm_mgArrowUp;
+    CMGArrow gm_mgArrowDn;
 
-  void Initialize_t(void);
-  void StartMenu(void);
-  void EndMenu(void);
-  void FillListItems(void);
+  public:
+    void Initialize_t(void);
+    void StartMenu(void);
+    void EndMenu(void);
+    void FillListItems(void);
 };
 
 #endif  /* include-once check. */

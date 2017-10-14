@@ -24,13 +24,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTitle.h"
 
 
-class CHighScoreMenu : public CGameMenu {
-public:
-  CMGTitle gm_mgTitle;
-  CMGHighScore gm_mgHScore;
+class CHighScoreMenu : public CGameMenu
+{
+  public:
+    CMGTitle gm_mgTitle;
+    CMGHighScore gm_mgHScore;
 
-  void Initialize_t(void);
-  void StartMenu(void);
+  public:
+    void Initialize_t(void);
+    void StartMenu(void);
 };
 
 #endif  /* include-once check. */

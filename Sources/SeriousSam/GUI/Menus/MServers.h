@@ -26,18 +26,20 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "GUI/Components/MGTitle.h"
 
 
-class CServersMenu : public CGameMenu {
-public:
-  BOOL m_bInternet;
+class CServersMenu : public CGameMenu
+{
+  public:
+    BOOL m_bInternet;
 
-  CMGTitle gm_mgTitle;
-  CMGServerList gm_mgList;
-  CMGButton gm_mgRefresh;
+    CMGTitle gm_mgTitle;
+    CMGServerList gm_mgList;
+    CMGButton gm_mgRefresh;
 
-  void Initialize_t(void);
-  void StartMenu(void);
-  void Think(void);
-  virtual BOOL OnEvent(const SEvent& event); // [SSE]
+  public:
+    void Initialize_t(void);
+    void StartMenu(void);
+    void Think(void);
+    virtual BOOL OnEvent(const SEvent& event); // [SSE]
 };
 
 #endif  /* include-once check. */
