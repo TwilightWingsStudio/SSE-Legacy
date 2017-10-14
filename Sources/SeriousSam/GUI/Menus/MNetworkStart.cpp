@@ -93,18 +93,28 @@ void CNetworkStartMenu::Initialize_t(void)
   gm_mgGameOptions.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgGameOptions.mg_iCenterI = 0;
   gm_mgGameOptions.mg_pmgUp = &gm_mgVisible;
-  gm_mgGameOptions.mg_pmgDown = &gm_mgStart;
+  gm_mgGameOptions.mg_pmgDown = &gm_mgGameMutators;
   gm_mgGameOptions.mg_strTip = TRANS("adjust game rules");
+  
+  // Initialize "Game mutators" button.
+  gm_mgGameMutators.mg_strText = TRANS("Game mutators");
+  gm_mgGameMutators.mg_boxOnScreen = BoxMediumRow(9);
+  gm_mgGameMutators.mg_bfsFontSize = BFS_MEDIUM;
+  gm_mgGameMutators.mg_iCenterI = 0;
+  gm_mgGameMutators.mg_pmgUp = &gm_mgGameOptions;
+  gm_mgGameMutators.mg_pmgDown = &gm_mgStart;
+  gm_mgGameMutators.mg_strTip = TRANS("adjust game rules");
 
   // Initialize "Start" button.
   gm_mgStart.mg_bfsFontSize = BFS_LARGE;
-  gm_mgStart.mg_boxOnScreen = BoxBigRow(7);
-  gm_mgStart.mg_pmgUp = &gm_mgGameOptions;
+  gm_mgStart.mg_boxOnScreen = BoxBigRow(7.5);
+  gm_mgStart.mg_pmgUp = &gm_mgGameMutators;
   gm_mgStart.mg_pmgDown = &gm_mgSessionName;
   gm_mgStart.mg_strText = TRANS("START");
   
   // Add components.
   AddChild(&gm_mgGameOptions);
+  AddChild(&gm_mgGameMutators);
   AddChild(&gm_mgStart);
 }
 
@@ -165,6 +175,10 @@ BOOL CNetworkStartMenu::OnEvent(const SEvent& event)
 
       } else if (event.GuiEvent.Caller == &gm_mgGameOptions) {
         StartGameOptionsFromNetwork();
+        return TRUE;
+
+      } else if (event.GuiEvent.Caller == &gm_mgGameMutators) {
+        // TODO: Write start here.
         return TRUE;
 
       } else if (event.GuiEvent.Caller == &gm_mgStart) {

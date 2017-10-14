@@ -51,28 +51,38 @@ void CSplitStartMenu::Initialize_t(void)
   gm_mgLevel.mg_bfsFontSize = BFS_MEDIUM;
   gm_mgLevel.mg_iCenterI = -1;
   gm_mgLevel.mg_pmgUp = &gm_mgDifficulty;
-  gm_mgLevel.mg_pmgDown = &gm_mgOptions;
+  gm_mgLevel.mg_pmgDown = &gm_mgGameOptions;
   gm_mgLevel.mg_strTip = TRANS("choose the level to start");
 
   // Initialize "Game Options" button
-  gm_mgOptions.mg_strText = TRANS("Game options");
-  gm_mgOptions.mg_boxOnScreen = BoxMediumRow(3);
-  gm_mgOptions.mg_bfsFontSize = BFS_MEDIUM;
-  gm_mgOptions.mg_iCenterI = 0;
-  gm_mgOptions.mg_pmgUp = &gm_mgLevel;
-  gm_mgOptions.mg_pmgDown = &gm_mgStart;
-  gm_mgOptions.mg_strTip = TRANS("adjust game rules");
+  gm_mgGameOptions.mg_strText = TRANS("Game options");
+  gm_mgGameOptions.mg_boxOnScreen = BoxMediumRow(3);
+  gm_mgGameOptions.mg_bfsFontSize = BFS_MEDIUM;
+  gm_mgGameOptions.mg_iCenterI = 0;
+  gm_mgGameOptions.mg_pmgUp = &gm_mgLevel;
+  gm_mgGameOptions.mg_pmgDown = &gm_mgGameMutators;
+  gm_mgGameOptions.mg_strTip = TRANS("adjust game rules");
+  
+  // Initialize "Game Mutators" button.
+  gm_mgGameMutators.mg_strText = TRANS("Game mutators");
+  gm_mgGameMutators.mg_boxOnScreen = BoxMediumRow(4);
+  gm_mgGameMutators.mg_bfsFontSize = BFS_MEDIUM;
+  gm_mgGameMutators.mg_iCenterI = 0;
+  gm_mgGameMutators.mg_pmgUp = &gm_mgGameOptions;
+  gm_mgGameMutators.mg_pmgDown = &gm_mgStart;
+  gm_mgGameMutators.mg_strTip = TRANS("adjust game rules");
 
   // Initialize "Start" button
   gm_mgStart.mg_bfsFontSize = BFS_LARGE;
-  gm_mgStart.mg_boxOnScreen = BoxBigRow(4);
-  gm_mgStart.mg_pmgUp = &gm_mgOptions;
+  gm_mgStart.mg_boxOnScreen = BoxBigRow(4.5);
+  gm_mgStart.mg_pmgUp = &gm_mgGameMutators;
   gm_mgStart.mg_pmgDown = &gm_mgGameType;
   gm_mgStart.mg_strText = TRANS("START");
   
   // Add components.
   AddChild(&gm_mgLevel);
-  AddChild(&gm_mgOptions);
+  AddChild(&gm_mgGameOptions);
+  AddChild(&gm_mgGameMutators);
   AddChild(&gm_mgStart);
 }
 
@@ -114,8 +124,12 @@ BOOL CSplitStartMenu::OnEvent(const SEvent& event)
         StartSelectLevelFromSplit();
         return TRUE;
 
-      } else if (event.GuiEvent.Caller == &gm_mgOptions) {
+      } else if (event.GuiEvent.Caller == &gm_mgGameOptions) {
         StartGameOptionsFromSplitScreen();
+        return TRUE;
+        
+      } else if (event.GuiEvent.Caller == &gm_mgGameMutators) {
+        // TODO: Write start here.
         return TRUE;
 
       } else if (event.GuiEvent.Caller == &gm_mgStart) {

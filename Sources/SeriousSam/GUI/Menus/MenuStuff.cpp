@@ -72,23 +72,6 @@ extern PIX apixWidths[][2] = {
   2048, 1536, // 4:3
 };
 
-extern PIX apixWidths4x3[][2] = {
-  320, 240,
-  400, 300,
-  512, 384,
-  640, 480,
-  720, 540,
-  800, 600,
-  960, 720,
-  1024, 768,
-  1152, 864,
-  1280, 960,
-  1600, 1200,
-  1920, 1440,
-  2048, 1536,
-};
-
-
 extern SScreenResolution asWidths4x3[] = {
   SScreenResolution(320, 240),
   SScreenResolution(400, 300),
