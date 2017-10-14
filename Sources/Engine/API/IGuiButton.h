@@ -23,7 +23,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <Engine/API/IGuiComponent.h>
 
+// --------------------------------------------------------------------------------------
 // GUI Button Interface
+// --------------------------------------------------------------------------------------
 class IGuiButton : public IGuiComponent
 {
   public:

@@ -21,9 +21,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #pragma once
 #endif
 
+#include <Engine/Base/Lists.h>
 #include <Engine/API/IEventListener.h>
 
+// --------------------------------------------------------------------------------------
 // GUI Component Interface
+// --------------------------------------------------------------------------------------
 class IGuiComponent : public IEventListener
 {
   public:
@@ -88,6 +91,9 @@ class IGuiComponent : public IEventListener
       return m_pParent;
     }
     
+  public:
+    CListNode m_lnNode; // for linking in list of avaliable components
+
   protected:
     IGuiComponent *m_pParent;
     ULONG m_ulID;

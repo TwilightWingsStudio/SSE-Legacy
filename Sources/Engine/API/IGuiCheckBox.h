@@ -23,7 +23,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <Engine/API/IGuiComponent.h>
 
+// --------------------------------------------------------------------------------------
 // GUI Check Box Interface
+// --------------------------------------------------------------------------------------
 class IGuiCheckBox : public IGuiComponent
 {
   public:
