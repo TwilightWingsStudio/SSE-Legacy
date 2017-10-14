@@ -33,6 +33,7 @@ class CMGKeyDefinition : public CMenuGadget
     CTString mg_strLabel;
     CTString mg_strBinding;
 
+  public:
     // Constructor.
     CMGKeyDefinition(void);
 

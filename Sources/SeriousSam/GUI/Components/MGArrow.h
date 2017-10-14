@@ -29,6 +29,8 @@ class CMGArrow : public CMGButton
 {
   public:
     enum ArrowDir mg_adDirection;
+    
+  public:
     void Render(CDrawPort *pdp);
     void OnActivate(void);
 };

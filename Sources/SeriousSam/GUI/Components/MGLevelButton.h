@@ -29,6 +29,7 @@ class CMGLevelButton : public CMGButton
   public:
     CTFileName mg_fnmLevel;
 
+  public:
     void OnActivate(void);
     void OnSetFocus(void);
 };

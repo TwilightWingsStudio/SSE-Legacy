@@ -30,6 +30,7 @@ class CMGChangePlayer : public CMGButton
   public:
     INDEX mg_iLocalPlayer;
 
+  public:
     void SetPlayerText(void);
     void OnActivate(void);
 };

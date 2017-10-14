@@ -35,6 +35,7 @@ class CMGTrigger : public CMenuGadget
     INDEX mg_iCenterI;
     BOOL mg_bVisual; // Used for togglable textures.
 
+  public:
     // Default constructor. Constructs component without text.
     CMGTrigger(void);
     

@@ -47,6 +47,7 @@ class CMenuGadget : public IGuiComponent
     CMenuGadget *mg_pmgUp;
     CMenuGadget *mg_pmgDown;
 
+  public:
     // Constructor.
     CMenuGadget(void);
 

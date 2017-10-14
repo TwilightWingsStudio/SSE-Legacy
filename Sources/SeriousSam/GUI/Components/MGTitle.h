@@ -29,6 +29,7 @@ class CMGTitle : public CMenuGadget
   public:
     CTString mg_strText;
     
+  public:
     // Default constructor. Constructs component without text.
     CMGTitle::CMGTitle(void);
     

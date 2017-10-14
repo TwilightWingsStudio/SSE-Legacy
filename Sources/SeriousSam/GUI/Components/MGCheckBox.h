@@ -28,12 +28,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class CMGCheckBox : public CMGButton
 {
   public:
+    BOOL mg_bValue;
+
+  public:
     CMGCheckBox(void);
     
     void Render(CDrawPort *pdp);
     BOOL OnKeyDown(int iVKey);
 
-    BOOL mg_bValue;
 };
 
 #endif  /* include-once check. */

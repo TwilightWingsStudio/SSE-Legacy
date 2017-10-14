@@ -30,6 +30,7 @@ class CMGEdit : public CMGButton
     INDEX mg_ctMaxStringLen;
     CTString *mg_pstrToChange;
 
+  public:
     // Constructor.
     CMGEdit(void);
 

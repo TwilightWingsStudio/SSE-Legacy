@@ -32,6 +32,7 @@ class CMGModel : public CMGButton
     CPlacement3D mg_plModel;
     BOOL mg_fFloorY;
 
+  public:
     // Constructor.
     CMGModel(void);
 

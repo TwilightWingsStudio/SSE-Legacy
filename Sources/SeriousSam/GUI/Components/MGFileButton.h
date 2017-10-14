@@ -38,6 +38,7 @@ class CMGFileButton : public CMGEdit
     CTString mg_strInfo;  // info part of text to print above the gadget tip
     INDEX mg_iState;
 
+  public:
     // Constructor.
     CMGFileButton(void);
     

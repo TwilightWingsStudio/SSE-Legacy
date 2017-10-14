@@ -32,6 +32,7 @@ class CMGSlider : public CMGButton
     INDEX mg_iMaxPos;
     INDEX mg_iCurPos;
     
+  public:
     // Default constructor. Constructs component without text.
     CMGSlider();
     

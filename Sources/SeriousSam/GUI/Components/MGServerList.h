@@ -56,6 +56,7 @@ class CMGServerList : public CMGButton
     INDEX mg_iSort;     // column to sort by
     BOOL mg_bSortDown;  // sort in reverse order
 
+  public:
     // Constructor.
     CMGServerList();
 
