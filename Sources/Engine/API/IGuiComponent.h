@@ -93,6 +93,7 @@ class IGuiComponent : public IEventListener
     
   public:
     CListNode m_lnNode; // for linking in list of avaliable components
+    CListHead m_lhChildren;
 
   protected:
     IGuiComponent *m_pParent;
