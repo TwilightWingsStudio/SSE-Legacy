@@ -1676,7 +1676,7 @@ void CNetworkLibrary::Load_t(const CTFileName &fnmGame) // throw char *
     ga_srvServer.Stop();
     ga_IsServer = FALSE;
 
-    ThrowF_t(TRANS("Saved games from classics are incompatable with SSE!"));
+    ThrowF_t(TRANS("Saved games from classics are incompatible with SSE!"));
   }
 
   strmFile.ExpectID_t("ESAV"); // [SSE] GAME tag changed to ESAV to have way detect which saved game you try to load.
@@ -1861,7 +1861,7 @@ void CNetworkLibrary::StartDemoPlay_t(const CTFileName &fnDemo)  // throw char *
 
     // [SSE]
     if (cidPeek == CChunkID("DEMO")) {
-      ThrowF_t(TRANS("Demos from classics are incompatable with SSE!"));
+      ThrowF_t(TRANS("Demos from classics are incompatible with SSE!"));
     }
     
     ga_strmDemoPlay.ExpectID_t("EDEM"); // [SSE] DEMO tag changed to EDEM to have way detect which demo you try to load.
