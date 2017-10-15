@@ -1625,8 +1625,10 @@ void CNetworkLibrary::Save_t(const CTFileName &fnmGame) // throw char *
   strmFile.Create_t(fnmGame);
 
   // write game to stream
-  strmFile.WriteID_t("GAME");
+  strmFile.WriteID_t("ESAV"); // [SSE] GAME tag changed to ESAV to have way detect which saved game you try to load.
+
   ga_sesSessionState.Write_t(&strmFile);
+
   strmFile.WriteID_t("GEND");   // game end
 }
 
@@ -1668,7 +1670,17 @@ void CNetworkLibrary::Load_t(const CTFileName &fnmGame) // throw char *
   // start the timer loop
   AddTimerHandler();
 
-  strmFile.ExpectID_t("GAME");
+  // [SSE]
+  if ( strmFile.PeekID_t() == CChunkID("GAME")) {
+    RemoveTimerHandler();
+    ga_srvServer.Stop();
+    ga_IsServer = FALSE;
+
+    ThrowF_t(TRANS("Saved games from classics are incompatable with SSE!"));
+  }
+
+  strmFile.ExpectID_t("ESAV"); // [SSE] GAME tag changed to ESAV to have way detect which saved game you try to load.
+
   // read session state
   try {
     ga_sesSessionState.Start_t(-1);
