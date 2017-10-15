@@ -1841,17 +1841,28 @@ void CNetworkLibrary::StartDemoPlay_t(const CTFileName &fnDemo)  // throw char *
   ga_IsServer = FALSE;
   // start the timer loop
   AddTimerHandler();
+
   // initialize server
   try {
-    // read initial info to stream
-    ga_strmDemoPlay.ExpectID_t("DEMO");
-    if (ga_strmDemoPlay.PeekID_t()==CChunkID("MVER")) {
+    // Read initial info to stream.
+    CChunkID cidPeek = ga_strmDemoPlay.PeekID_t();
+
+    // [SSE]
+    if (cidPeek == CChunkID("DEMO")) {
+      ThrowF_t(TRANS("Demos from classics are incompatable with SSE!"));
+    }
+    
+    ga_strmDemoPlay.ExpectID_t("EDEM"); // [SSE] DEMO tag changed to EDEM to have way detect which demo you try to load.
+
+    if (ga_strmDemoPlay.PeekID_t() == CChunkID("MVER")) {
       ga_strmDemoPlay.ExpectID_t("MVER");
-      ga_strmDemoPlay>>ga_ulDemoMinorVersion;
+      ga_strmDemoPlay >> ga_ulDemoMinorVersion;
     } else {
       ga_ulDemoMinorVersion = 2;
     }
+
     ga_sesSessionState.Read_t(&ga_strmDemoPlay);
+
   } catch(char *) {
     RemoveTimerHandler();
     ga_strmDemoPlay.Close();
@@ -2292,7 +2303,7 @@ void CNetworkLibrary::StartDemoRec_t(const CTFileName &fnDemo) // throw char *
   ga_strmDemoRec.Create_t(fnDemo);
 
   // write initial info to stream
-  ga_strmDemoRec.WriteID_t("DEMO");
+  ga_strmDemoRec.WriteID_t("EDEM"); // [SSE] DEMO tag changed to EDEM to have way detect which demo you try to load.
   ga_strmDemoRec.WriteID_t("MVER");
   ga_strmDemoRec<<ULONG(_SE_BUILD_MINOR);
   ga_sesSessionState.Write_t(&ga_strmDemoRec);
