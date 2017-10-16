@@ -34,8 +34,9 @@ class CNetworkStartMenu : public CGameMenu
     CMGTrigger gm_mgGameType;
     CMGTrigger gm_mgDifficulty;
     CMGButton gm_mgLevel;
+    CMGTrigger gm_mgMinPlayers;
     CMGTrigger gm_mgMaxPlayers;
-    CMGTrigger gm_mgWaitAllPlayers;
+    //CMGTrigger gm_mgWaitAllPlayers;
     CMGTrigger gm_mgVisible;
     CMGButton gm_mgGameOptions;
     CMGButton gm_mgGameMutators;

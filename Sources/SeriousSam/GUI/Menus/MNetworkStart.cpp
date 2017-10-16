@@ -71,16 +71,21 @@ void CNetworkStartMenu::Initialize_t(void)
   gm_mgLevel.mg_pmgDown = &gm_mgMaxPlayers;
   gm_mgLevel.mg_strTip = TRANS("choose the level to start");
   AddChild(&gm_mgLevel);
+  
+  // Initialize "Min players" trigger.
+  TRIGGER_MG(gm_mgMinPlayers, 5,
+    gm_mgLevel, gm_mgMaxPlayers, TRANS("Min players:"), astrMinPlayersRadioTexts);
+  gm_mgMinPlayers.mg_strTip = TRANS("choose minimum needed number of players");
 
   // Initialize "Max players" trigger.
-  TRIGGER_MG(gm_mgMaxPlayers, 5,
-    gm_mgLevel, gm_mgWaitAllPlayers, TRANS("Max players:"), astrMaxPlayersRadioTexts);
+  TRIGGER_MG(gm_mgMaxPlayers, 6,
+    gm_mgMinPlayers, gm_mgVisible, TRANS("Max players:"), astrMaxPlayersRadioTexts);
   gm_mgMaxPlayers.mg_strTip = TRANS("choose maximum allowed number of players");
 
   // Initialize "Wait all players" trigger.
-  TRIGGER_MG(gm_mgWaitAllPlayers, 6,
-    gm_mgMaxPlayers, gm_mgVisible, TRANS("Wait for all players:"), astrNoYes);
-  gm_mgWaitAllPlayers.mg_strTip = TRANS("if on, game won't start until all players have joined");
+  //TRIGGER_MG(gm_mgWaitAllPlayers, 6,
+  //  gm_mgMaxPlayers, gm_mgVisible, TRANS("Wait for all players:"), astrNoYes);
+  //gm_mgWaitAllPlayers.mg_strTip = TRANS("if on, game won't start until all players have joined");
 
   // Initialize "Server visible" trigger.
   TRIGGER_MG(gm_mgVisible, 7,
@@ -138,8 +143,8 @@ void CNetworkStartMenu::StartMenu(void)
   gm_mgMaxPlayers.mg_iSelected = ctMaxPlayers - 2;
   gm_mgMaxPlayers.ApplyCurrentSelection();
 
-  gm_mgWaitAllPlayers.mg_iSelected = Clamp(_pShell->GetINDEX("gam_bWaitAllPlayers"), 0L, 1L);
-  gm_mgWaitAllPlayers.ApplyCurrentSelection();
+  //gm_mgWaitAllPlayers.mg_iSelected = Clamp(_pShell->GetINDEX("gam_bWaitAllPlayers"), 0L, 1L);
+  //gm_mgWaitAllPlayers.ApplyCurrentSelection();
 
   gm_mgVisible.mg_iSelected = _pShell->GetINDEX("ser_bEnumeration");
   gm_mgVisible.ApplyCurrentSelection();
@@ -153,7 +158,7 @@ void CNetworkStartMenu::EndMenu(void)
 {
   _pShell->SetINDEX("gam_iStartDifficulty", gm_mgDifficulty.mg_iSelected - 1);
   _pShell->SetINDEX("gam_iStartMode", gm_mgGameType.mg_iSelected);
-  _pShell->SetINDEX("gam_bWaitAllPlayers", gm_mgWaitAllPlayers.mg_iSelected);
+  //_pShell->SetINDEX("gam_bWaitAllPlayers", gm_mgWaitAllPlayers.mg_iSelected);
   _pShell->SetINDEX("gam_ctMaxPlayers", gm_mgMaxPlayers.mg_iSelected + 2);
   _pShell->SetINDEX("ser_bEnumeration", gm_mgVisible.mg_iSelected);
 

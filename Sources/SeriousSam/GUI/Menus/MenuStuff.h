@@ -39,6 +39,7 @@ extern CTString astrNoYes[2];
 extern CTString astrWeapon[4];
 extern CTString astrComputerInvoke[2];
 extern CTString astrCrosshair[8];
+extern CTString astrMinPlayersRadioTexts[16]; // [SSE]
 extern CTString astrMaxPlayersRadioTexts[15];
 extern CTString astrGameTypeRadioTexts[20];
 extern CTString astrDifficultyRadioTexts[7];

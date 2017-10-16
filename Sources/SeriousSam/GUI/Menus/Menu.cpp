@@ -283,6 +283,7 @@ void InitializeMenus(void)
     TRANSLATERADIOARRAY(astrFrequencyRadioTexts);
     TRANSLATERADIOARRAY(astrSoundAPIRadioTexts);
     TRANSLATERADIOARRAY(astrDifficultyRadioTexts);
+    TRANSLATERADIOARRAY(astrMinPlayersRadioTexts); // [SSE]
     TRANSLATERADIOARRAY(astrMaxPlayersRadioTexts);
     TRANSLATERADIOARRAY(astrWeapon);
     TRANSLATERADIOARRAY(astrSplitScreenRadioTexts);
