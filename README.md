@@ -77,7 +77,7 @@ DirectX support is disabled by default. If you need DirectX support you'll have 
 * `/Tools.Win32/Libraries/DX8SDK/Include/..`
 * `/Tools.Win32/Libraries/DX8SDK/Lib/..`
 
-MP3 playback is disabled by default. If you need this feature, you will have to copy amp11lib.dll to the '\Bin\' directory (and '\Bin\Debug\' for MP3 support in debug mode). The amp11lib.dll is distributed with older versions of Serious Sam: The First Encounter.
+MP3 playback is disabled by default. If you need this feature, you will have to copy amp11lib.dll to the '/Bin/' directory (and '/Bin/Debug/' for MP3 support in debug mode). The amp11lib.dll is distributed with older versions of Serious Sam: The First Encounter.
 
 3D Exploration support is disabled in the open source version of Serious Engine 1 due to copyright issues. In case if you need to create new models you will have to either use editing tools from any of the original games, or write your own code for 3D object import/export.
 
@@ -92,11 +92,11 @@ WARNING: If you will try to run original The First Encounter levels or custom ma
 
 When running a selected project, make sure its project settings on Debugging is set to the right command:
 * For debug:
-    $(SolutionDir)..\Bin\Debug\$(TargetName).exe`
+    `$(SolutionDir)..\Bin\Debug\$(TargetName).exe`
 * For release:
-    $(SolutionDir)..\Bin\$(TargetName).exe`
+    `$(SolutionDir)..\Bin\$(TargetName).exe`
 And its working directory:
-    $(SolutionDir)..\
+    `$(SolutionDir)..\`
 
 Common problems
 ---------------
