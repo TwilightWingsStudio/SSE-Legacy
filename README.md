@@ -68,7 +68,7 @@ Do not use spaces, cyrillic letters or special symbols such as ()+/[]' in the pa
 
 Once you've installed Visual Studio and (optionally) DirectX8 SDK, you should open Visual Studio Developer Console and run msvcbuild.bat(located in `/Sources/luajit/src`) to build luajit library.
 
-After that you can build the engine solution (`/Sources/All.sln`). Press F7 or Build -> Build solution. The libraries and executables will be put into `\Bin\` directory (or `\Bin\Debug\` if you are using the Debug configuration).
+After that you can build the engine solution (`/Sources/All.sln`). Press F7 or Build -> Build solution. The libraries and executables will be put into `/Bin/` directory (or `/Bin/Debug/` if you are using the Debug configuration).
 
 Optional features
 -----------------
@@ -77,11 +77,11 @@ DirectX support is disabled by default. If you need DirectX support you'll have 
 * `/Tools.Win32/Libraries/DX8SDK/Include/..`
 * `/Tools.Win32/Libraries/DX8SDK/Lib/..`
 
-MP3 playback is disabled by default. If you need this feature, you will have to copy amp11lib.dll to the '/Bin/' directory (and '/Bin/Debug/' for MP3 support in debug mode). The amp11lib.dll is distributed with older versions of Serious Sam: The First Encounter.
+MP3 playback is disabled by default. If you need this feature, you will have to copy amp11lib.dll to the `/Bin/` directory (and `/Bin/Debug/` for MP3 support in debug mode). The amp11lib.dll is distributed with older versions of Serious Sam: The First Encounter.
 
 3D Exploration support is disabled in the open source version of Serious Engine 1 due to copyright issues. In case if you need to create new models you will have to either use editing tools from any of the original games, or write your own code for 3D object import/export.
 
-IFeel support is disabled in the open source version of Serious Engine 1 due to copyright issues. In case if you need IFeel support you will have to copy IFC22.dll and ImmWrapper.dll from the original game into the `\Bin\` folder.
+IFeel support is disabled in the open source version of Serious Engine 1 due to copyright issues. In case if you need IFeel support you will have to copy IFC22.dll and ImmWrapper.dll from the original game into the `/Bin/` folder.
 
 Running
 -------
