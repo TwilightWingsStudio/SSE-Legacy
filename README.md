@@ -29,6 +29,7 @@ This fork created for extra features which are focused on improving gameplay sta
 For some reasons these features not added into Official repository. But I wish what in some day my project will become superior than Official.
 
 ========================
+
 Here is Serious Engine v.1.10 source code, including the following projects:
 
 * Commons
@@ -52,7 +53,7 @@ Here is Serious Engine v.1.10 source code, including the following projects:
   * `LWSkaExporter` Exporter for use in LightWave
   * `MakeFONT` Used for generating *.fnt files
 * Other
-  * `GameAgent` The serverlist masterserver written in Python
+  * `GameAgent` The serverlist masterserver written in Python (requires version 2.X).
   * `libogg`, `libvorbis` Third party libraries used for playing OGG-encoded ingame music (see http://www.vorbis.com/ for more information)
 
 These have been modified to run correctly under the recent version of Windows. (Tested: Win7 x64, Win8 x64, Win8.1 x64)
@@ -66,7 +67,7 @@ WARNING: If you will use Visual Studio higher than 2013 then you can encounter b
 
 Do not use spaces, cyrillic letters or special symbols such as ()+/[]' in the path to the solution. If you use described before symbols you will have building errors because Visual Studio can not correctly operate with these symbols. But you can use dash - and underscore _ symbols!
 
-Once you've installed Visual Studio and (optionally) DirectX8 SDK, you should open Visual Studio Developer Console and run msvcbuild.bat(located in `/Sources/luajit/src`) to build luajit library.
+Once you've installed Visual Studio and (optionally) DirectX8 SDK, you should open Visual Studio Developer Console and run msvcbuild.bat (located in `/Sources/luajit/src`) to build luajit library.
 
 After that you can build the engine solution (`/Sources/All.sln`). Press F7 or Build -> Build solution. The libraries and executables will be put into `/Bin/` directory (or `/Bin/Debug/` if you are using the Debug configuration).
 
@@ -86,7 +87,7 @@ IFeel support is disabled in the open source version of Serious Engine 1 due to 
 Running
 -------
 
-This version of the engine comes with a set of resources (`\SE1_10.GRO`) that allow you to freely use the engine without any additional resources required. However if you want to open or modify levels from Serious Sam Classic: The First Encounter or The Second Encounter (including most user-made levels), you will have to copy the game's resources (.GRO files) into the engine folder. You can buy the original games on Steam, as a part of a bundle with Serious Sam Revolution ( http://store.steampowered.com/app/227780 )
+This version of the engine comes with a set of resources (`/SE1_10.GRO`) that allow you to freely use the engine without any additional resources required. However if you want to open or modify levels from Serious Sam Classic: The First Encounter or The Second Encounter (including most user-made levels), you will have to copy the game's resources (.GRO files) into the engine folder. You can buy the original games on Steam, as a part of a bundle with Serious Sam Revolution ( http://store.steampowered.com/app/227780 )
 
 WARNING: If you will try to run original The First Encounter levels or custom maps made for TFE then you need to resave them in the Serious Editor 1.07/1.10 or you will have not working scripts on levels.
 
@@ -95,7 +96,7 @@ When running a selected project, make sure its project settings on Debugging is 
     `$(SolutionDir)..\Bin\Debug\$(TargetName).exe`
 * For release:
     `$(SolutionDir)..\Bin\$(TargetName).exe`
-And its working directory:
+* And its working directory:
     `$(SolutionDir)..\`
 
 Common problems
