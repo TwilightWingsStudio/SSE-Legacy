@@ -1,1 +1,5 @@
+# Some stuff
+*.clw text
+
+# Syntax
 *.es linguist-language=C++
