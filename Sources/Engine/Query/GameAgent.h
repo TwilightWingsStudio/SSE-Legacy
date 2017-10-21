@@ -38,6 +38,7 @@ extern void MS_EnumCancel(void);
 
 extern void MSLegacy_BuildHearthbeatPacket(CTString &strPacket);
 extern void MSLegacy_ProcessReceivedPacket();
+extern void MSLegacy_EnumTrigger(BOOL bInternet);
 extern void MSLegacy_EnumUpdate(void);
 
 extern void DarkPlaces_BuildHearthbeatPacket(CTString &strPacket);

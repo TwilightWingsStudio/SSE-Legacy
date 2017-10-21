@@ -75,6 +75,7 @@ LICENSE
 */
 #ifndef SE_INCL_MSLEGACY_H
 #define SE_INCL_MSLEGACY_H
+
 #ifdef PRAGMA_ONCE
   #pragma once
 #endif
