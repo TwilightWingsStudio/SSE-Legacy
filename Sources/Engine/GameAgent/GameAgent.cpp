@@ -624,6 +624,8 @@ void DarkPlaces_BuildStatusResponse(const char* challenge, CTString &strPacket, 
   CTString strStatus;
   DarkPlaces_BuildQCStatus(strStatus);
   
+  INDEX ctMaxPlayers = _pNetwork->ga_sesSessionState.ses_ctMaxPlayers;
+  
   strPacket.PrintF("\xFF\xFF\xFF\xFF%s\x0A"
             "\\gamename\\%s\\modname\\%s\\gameversion\\%d\\sv_maxclients\\%d"
             "\\clients\\%d\\bots\\%d\\mapname\\%s\\hostname\\%s\\protocol\\%d"
@@ -632,11 +634,12 @@ void DarkPlaces_BuildStatusResponse(const char* challenge, CTString &strPacket, 
             "%s%s"
             "%s",
             bFullStatus ? "statusResponse" : "infoResponse",
-            DP_GAME_NAME, "", _ulEngineRevision, _pNetwork->ga_sesSessionState.ses_ctMaxPlayers,
+            DP_GAME_NAME, "", _ulEngineRevision, ctMaxPlayers,
             _pNetwork->ga_srvServer.GetClientsCount(), 0, _pNetwork->ga_World.wo_strName, _pShell->GetString("gam_strSessionName"), DP_NET_PROTOCOL_VERSION,
             "\\qcstatus\\", strStatus,
             challenge ? "\\challenge\\" : "", challenge ? challenge : "",
-            "", "", "");
+            "", "", // Crypto Key
+            "");
 }
 
 void DarkPlaces_ServerParsePacket(INDEX iLength)
@@ -807,7 +810,7 @@ void DarkPlaces_ClientParsePacket(INDEX iLength)
       string += 15;
       iLength -= 15;
       
-      CPrintF("Data: %s\n", data);
+      CPrintF("Data[%d]: %s\n", iLength, data);
 
       CNetworkSession &ns = *new CNetworkSession;
       _pNetwork->ga_lhEnumeratedSessions.AddTail(ns.ns_lnNode);
@@ -854,6 +857,8 @@ void DarkPlaces_ClientParsePacket(INDEX iLength)
                     strSessionName = strValue;
                 } else if (strKey == "hostport") {
                     strGamePort = strValue;
+                } else if (strKey == "qcstatus") {
+                    strGameMode = strValue;
                 } else if (strKey == "mapname") {
                     strLevel = strValue;
                 } else if (strKey == "gametype") {
@@ -879,6 +884,7 @@ void DarkPlaces_ClientParsePacket(INDEX iLength)
           } break;
           
           default: {
+            
             // read into the value or into the key, depending where we are
             if (bReadValue) {
               strValue.InsertChar(strlen(strValue), *data);
