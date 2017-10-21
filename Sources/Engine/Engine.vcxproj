@@ -438,6 +438,7 @@ $(SolutionDir)\prebuild_engine.bat</Command>
     </ClCompile>
     <ClCompile Include="Models\ModelData.cpp" />
     <ClCompile Include="Models\ModelDataIO.cpp" />
+    <ClCompile Include="Query\LegacyMasterServer.cpp" />
     <ClCompile Include="Scripts\ScriptEngine.cpp" />
     <ClCompile Include="Scripts\ScriptLib_Base.cpp" />
     <ClCompile Include="Scripts\ScriptLib_Entities.cpp">

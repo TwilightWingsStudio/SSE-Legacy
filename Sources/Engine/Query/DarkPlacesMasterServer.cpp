@@ -37,8 +37,11 @@ extern const CSessionProperties* _getSP();
 
 extern sockaddr_in _sinFrom;
 extern CHAR* _szBuffer;
-extern BOOL _bInitialized;
+
 extern BOOL _bServer;
+extern BOOL _bInitialized;
+extern BOOL _bActivated;
+extern BOOL _bActivatedLocal;
 
 extern void _sendPacket(const char* szBuffer);
 extern void _sendPacket(const char* pubBuffer, INDEX iLen);

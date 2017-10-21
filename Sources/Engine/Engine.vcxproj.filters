@@ -790,6 +790,9 @@
     <ClCompile Include="Query\DarkPlacesMasterServer.cpp">
       <Filter>Source Files\Query</Filter>
     </ClCompile>
+    <ClCompile Include="Query\LegacyMasterServer.cpp">
+      <Filter>Source Files\Query</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base\Anim.h">
