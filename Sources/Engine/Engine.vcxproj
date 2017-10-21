@@ -314,6 +314,7 @@ $(SolutionDir)\prebuild_engine.bat</Command>
     <ClCompile Include="Base\Translation.cpp" />
     <ClCompile Include="Base\Unzip.cpp" />
     <ClCompile Include="Base\Updateable.cpp" />
+    <ClCompile Include="Query\DarkPlacesMasterServer.cpp" />
     <ClCompile Include="Query\GameAgent.cpp" />
     <ClCompile Include="Graphics\TextureIO.cpp" />
     <ClCompile Include="Math\Float.cpp" />

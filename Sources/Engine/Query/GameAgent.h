@@ -36,6 +36,11 @@ extern void MS_EnumUpdate(void);
 extern void MS_EnumCancel(void);
 //
 
+extern void DarkPlaces_BuildHearthbeatPacket(CTString &strPacket);
+extern void DarkPlaces_EnumTrigger(BOOL bInternet);
+extern void DarkPlaces_EnumUpdate(void);
+extern void DarkPlaces_ServerParsePacket(INDEX iLength);
+
 DWORD WINAPI _MS_Thread(LPVOID lpParam);
 DWORD WINAPI _LocalNet_Thread(LPVOID lpParam);
 
