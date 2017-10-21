@@ -71,7 +71,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Templates/Stock_CShader.h>
 #include <Engine/Templates/Stock_CSkeleton.h>
 
-#include <Engine/GameAgent/GameAgent.h>
+#include <Engine/Query/GameAgent.h>
 
 
 // pointer to global instance of the only game object in the application

@@ -314,7 +314,7 @@ $(SolutionDir)\prebuild_engine.bat</Command>
     <ClCompile Include="Base\Translation.cpp" />
     <ClCompile Include="Base\Unzip.cpp" />
     <ClCompile Include="Base\Updateable.cpp" />
-    <ClCompile Include="GameAgent\GameAgent.cpp" />
+    <ClCompile Include="Query\GameAgent.cpp" />
     <ClCompile Include="Graphics\TextureIO.cpp" />
     <ClCompile Include="Math\Float.cpp" />
     <ClCompile Include="Math\Functions.cpp" />
@@ -753,8 +753,8 @@ $(SolutionDir)\prebuild_engine.bat</Command>
     <ClInclude Include="Base\Unzip.h" />
     <ClInclude Include="Base\Updateable.h" />
     <ClInclude Include="Base\UpdateableRT.h" />
-    <ClInclude Include="GameAgent\GameAgent.h" />
-    <ClInclude Include="GameAgent\MSLegacy.h" />
+    <ClInclude Include="Query\GameAgent.h" />
+    <ClInclude Include="Query\MSLegacy.h" />
     <ClInclude Include="Math\AABBox.h" />
     <ClInclude Include="Math\FixInt.h" />
     <ClInclude Include="Math\Float.h" />

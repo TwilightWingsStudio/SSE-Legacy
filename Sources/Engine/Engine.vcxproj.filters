@@ -113,17 +113,17 @@
       <UniqueIdentifier>{a16b8831-a69d-41ad-83ab-393fe06504f5}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
-    <Filter Include="Source Files\GameAgent">
-      <UniqueIdentifier>{3de7b00a-0b6d-478e-a6b7-e12806e1f7f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\GameAgent Headers">
-      <UniqueIdentifier>{213d6870-6a86-43c8-b4be-01096c1ccddf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Scripts">
       <UniqueIdentifier>{9809fd4b-4e3f-4234-bbbf-50a18cdb4e79}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Scripts Headers">
       <UniqueIdentifier>{dcecef5f-db4a-4b59-a276-3f0eaccbaae2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Query">
+      <UniqueIdentifier>{3de7b00a-0b6d-478e-a6b7-e12806e1f7f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Query Headers">
+      <UniqueIdentifier>{213d6870-6a86-43c8-b4be-01096c1ccddf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -754,9 +754,6 @@
     <ClCompile Include="Ska\Smcscan.cpp">
       <Filter>Generated Sources</Filter>
     </ClCompile>
-    <ClCompile Include="GameAgent\GameAgent.cpp">
-      <Filter>Source Files\GameAgent</Filter>
-    </ClCompile>
     <ClCompile Include="Ska\SkeletonIO.cpp">
       <Filter>Source Files\Ska</Filter>
     </ClCompile>
@@ -786,6 +783,9 @@
     </ClCompile>
     <ClCompile Include="Scripts\ScriptLib_EntitiesEdit.cpp">
       <Filter>Source Files\Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="Query\GameAgent.cpp">
+      <Filter>Source Files\Query</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1395,17 +1395,17 @@
     <ClInclude Include="StdH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameAgent\GameAgent.h">
-      <Filter>Header Files\GameAgent Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="GameAgent\MSLegacy.h">
-      <Filter>Header Files\GameAgent Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Sound\ov_functions.h">
       <Filter>Header Files\Sound Headers</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\ScriptEngine.h">
       <Filter>Header Files\Scripts Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Query\GameAgent.h">
+      <Filter>Header Files\Query Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Query\MSLegacy.h">
+      <Filter>Header Files\Query Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

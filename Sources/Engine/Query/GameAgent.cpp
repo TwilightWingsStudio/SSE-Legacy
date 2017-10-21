@@ -25,9 +25,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/Network.h>
 #include <Engine/Network/SessionState.h>
 #include <GameMP/SessionProperties.h> // TODO: GET RID OF THIS!
-#include <Engine/GameAgent/GameAgent.h>
 
-#include <Engine/GameAgent/MSLegacy.h>
+#include <Engine/Query/GameAgent.h>
+#include <Engine/Query/MSLegacy.h>
 
 #define MSPORT      28900
 #define BUFFSZ      8192
