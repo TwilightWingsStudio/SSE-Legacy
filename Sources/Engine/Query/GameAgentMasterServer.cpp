@@ -26,7 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/SessionState.h>
 #include <GameMP/SessionProperties.h> // TODO: GET RID OF THIS!
 
-#include <Engine/Query/GameAgent.h>
+#include <Engine/Query/MasterServerMgr.h>
 
 extern const CSessionProperties* _getSP();
 extern CTString _getGameModeName(INDEX iGameMode);

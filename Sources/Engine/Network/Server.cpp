@@ -35,7 +35,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Entities/InternalClasses.h>
 #include <Engine/Base/CRC.h>
 #include <Engine/Base/ErrorTable.h>
-#include <Engine/Query/GameAgent.h>
+#include <Engine/Query/MasterServerMgr.h>
 
 #include <Engine/Templates/StaticArray.cpp>
 

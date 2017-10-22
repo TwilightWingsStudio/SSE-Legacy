@@ -29,7 +29,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/Network.h>
 #include <Engine/Network/Server.h>
 
-#include <Engine/Query/GameAgent.h>
+#include <Engine/Query/MasterServerMgr.h>
 
 
 #pragma comment(lib, "wsock32.lib")

@@ -784,13 +784,16 @@
     <ClCompile Include="Scripts\ScriptLib_EntitiesEdit.cpp">
       <Filter>Source Files\Scripts</Filter>
     </ClCompile>
-    <ClCompile Include="Query\GameAgent.cpp">
-      <Filter>Source Files\Query</Filter>
-    </ClCompile>
     <ClCompile Include="Query\DarkPlacesMasterServer.cpp">
       <Filter>Source Files\Query</Filter>
     </ClCompile>
     <ClCompile Include="Query\LegacyMasterServer.cpp">
+      <Filter>Source Files\Query</Filter>
+    </ClCompile>
+    <ClCompile Include="Query\GameAgentMasterServer.cpp">
+      <Filter>Source Files\Query</Filter>
+    </ClCompile>
+    <ClCompile Include="Query\MasterServerMgr.cpp">
       <Filter>Source Files\Query</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1407,10 +1410,10 @@
     <ClInclude Include="Scripts\ScriptEngine.h">
       <Filter>Header Files\Scripts Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Query\GameAgent.h">
+    <ClInclude Include="Query\MSLegacy.h">
       <Filter>Header Files\Query Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Query\MSLegacy.h">
+    <ClInclude Include="Query\MasterServerMgr.h">
       <Filter>Header Files\Query Headers</Filter>
     </ClInclude>
   </ItemGroup>

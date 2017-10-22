@@ -27,7 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/SessionState.h>
 #include <GameMP/SessionProperties.h> // TODO: GET RID OF THIS!
 
-#include <Engine/Query/GameAgent.h>
+#include <Engine/Query/MasterServerMgr.h>
 
 #define DP_NET_PROTOCOL_VERSION 3
 #define DP_GAME_NAME "Xonotic"
