@@ -30,17 +30,27 @@ extern void MS_OnServerEnd(void);
 extern void MS_OnServerUpdate(void);
 extern void MS_OnServerStateChanged(void);
 
-// Serverlist Enumeration
+// Common Serverlist Enumeration
+extern void MS_SendHeartbeat(INDEX iChallenge);
+
 extern void MS_EnumTrigger(BOOL bInternet);
 extern void MS_EnumUpdate(void);
 extern void MS_EnumCancel(void);
 //
 
+// GameAgent Master Server
+extern void GameAgent_BuildHearthbeatPacket(CTString &strPacket, INDEX iChallenge);
+extern void GameAgent_ProcessReceivedPacket();
+extern void GameAgent_EnumTrigger(BOOL bInternet);
+extern void GameAgent_EnumUpdate(void);
+
+// Legacy Master Server
 extern void MSLegacy_BuildHearthbeatPacket(CTString &strPacket);
 extern void MSLegacy_ProcessReceivedPacket();
 extern void MSLegacy_EnumTrigger(BOOL bInternet);
 extern void MSLegacy_EnumUpdate(void);
 
+// DarkPlaces Master Server
 extern void DarkPlaces_BuildHearthbeatPacket(CTString &strPacket);
 extern void DarkPlaces_EnumTrigger(BOOL bInternet);
 extern void DarkPlaces_EnumUpdate(void);
