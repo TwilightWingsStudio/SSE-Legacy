@@ -26,7 +26,7 @@ uses "EntitiesMP/Light";
 enum EAnimType
 {
   0 AT_MODEL        "Model Animation [0]",
-  1 AT_TEXTURE      "Texure Animation [1]",
+  1 AT_TEXTURE      "Texture Animation [1]",
   2 AT_LIGHTDIFFUSE "Light Anim. [2]",
   3 AT_AMBIENTLIGHT "Amb. Light Anim. [3]"
 };
