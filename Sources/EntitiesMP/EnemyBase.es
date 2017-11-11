@@ -1338,15 +1338,13 @@ functions:
   // --------------------------------------------------------------------------------------
   BOOL SetTargetSoft(CEntity *penPlayer)
   {
-    // if invalid target
+    // if invalid target then do nothing
     if (!IsValidForEnemy(penPlayer)) {
-      // do nothing
       return FALSE;
     }
 
-    // if we already have any kind of target
+    // if we already have any kind of target then do nothing
     if (m_ttTarget != TT_NONE) {
-      // do nothing
       return FALSE;
     }
 
@@ -1363,15 +1361,13 @@ functions:
   // --------------------------------------------------------------------------------------
   BOOL SetTargetHard(CEntity *penNewTarget)
   {
-    // if invalid target
+    // if invalid target then do nothing
     if (!IsValidForEnemy(penNewTarget)) {
-      // do nothing
       return FALSE;
     }
 
-    // if we already have hard target
+    // if we already have hard target then do nothing
     if (m_ttTarget == TT_HARD) {
-      // do nothing
       return FALSE;
     }
 
@@ -3668,10 +3664,13 @@ procedures:
       }
 
       // if you get damaged by someone
-      on (EDamage eDamage) : {
+      on (EDamage eDamage) :
+      {
         if (ShouldSelectTargetOnDamage()) {
           // eventually set new hard target
-          SetTargetHard(eDamage.penInflictor);
+          if (SetTargetHard(eDamage.penInflictor)) {
+            SendEvent(EReconsiderBehavior());
+          }
         }
         
         if (!CanBeWound()) {
