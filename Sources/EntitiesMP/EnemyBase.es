@@ -252,7 +252,7 @@ functions:
   // --------------------------------------------------------------------------------------
   class CEnemyFactionHolder *GetFactionHolder(BOOL bClassCheck)
   {
-    if (bClassCheck && !IsOfClass(m_penFactionHolder, "EnemyFactionHolder")) {
+    if (bClassCheck && !IsOfClass(m_penFactionHolder, "CEnemyFactionHolder")) {
       return NULL;
     }
 
