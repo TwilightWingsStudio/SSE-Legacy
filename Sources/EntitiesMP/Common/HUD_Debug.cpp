@@ -148,6 +148,10 @@ extern void HUD_DrawDebugMonitor()
     strReport.PrintF("%s  Instagib\n", strReport);
   }
   
+  if (GetSP()->sp_bVampire) {
+    strReport.PrintF("%s  Vampire\n", strReport);
+  }
+  
   strReport += "\n\n";
   strReport += "^r[^cFFFFFFDDA System^r]^cCCCC00\n";
   strReport.PrintF("%sEES:   %.2f\n", strReport, fExtraEnemyStrength);
