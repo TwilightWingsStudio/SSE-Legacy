@@ -35,13 +35,13 @@ enum EPSRegenValueType {
 
 class CPlayerVitalitySettingsEntity : CEntity {
 name      "PlayerVitalitySettings";
-thumbnail "Thumbnails\\PlayerSettings.tbn";
+thumbnail "Thumbnails\\PlayerVitalitySettings.tbn";
 features  "HasName","IsTargetable";
 
 properties:
 
    1 CTString m_strName          "Name" 'N' = "Pl. Vitality Settings",
-   2 CTString m_strDescription = "Player Settings",
+   2 CTString m_strDescription = "Pl. Vitality Settings",
  
    3 BOOL m_bActive              "Active" 'A'       = TRUE, 
    4 BOOL m_bDebugMessages       "Debug Messages" = FALSE, 
@@ -93,8 +93,8 @@ properties:
 // C O M P O N E N T S
 // --------------------------------------------------------------------------------------
 components:
-  1 model   MODEL_PLAYERSETTINGS   "Models\\Editor\\PlayerSettings.mdl",
-  2 texture TEXTURE_PLAYERSETTINGS "Models\\Editor\\PlayerSettings.tex",
+  1 model   MODEL_PLAYERSETTINGS   "Models\\Editor\\PlayerVitalitySettings.mdl",
+  2 texture TEXTURE_PLAYERSETTINGS "Models\\Editor\\PlayerVitalitySettings.tex",
 
 // --------------------------------------------------------------------------------------
 // F U N C T I O N S
@@ -158,7 +158,7 @@ functions:
         // Target
         case EPVST_TARGETTED: {
           if (m_bDebugMessages) {
-            CPrintF("[PS] %s : Applying settings for Target...\n", GetName());
+            CPrintF("[PVS] %s : Applying settings for Target...\n", GetName());
           }
 
           if (IsOfClass(m_penTarget, "Player")) {
@@ -179,7 +179,7 @@ functions:
         // Target=penCaused
         case EPVST_PENCAUSED: {
           if (m_bDebugMessages) {
-            CPrintF("[PS] %s : Applying settings for Target=penCaused...\n", GetName());
+            CPrintF("[PVS] %s : Applying settings for Target=penCaused...\n", GetName());
           }
 
           ETrigger eTrigger = ((ETrigger &) ee);
@@ -202,7 +202,7 @@ functions:
         // All players
         case EPVST_ALLPLAYERS: {
           if (m_bDebugMessages) {
-            CPrintF("[PS] %s : Applying settings for all players...\n", GetName());
+            CPrintF("[PVS] %s : Applying settings for all players...\n", GetName());
           }
 
           INDEX ctPlayers = CEntity::GetMaxPlayers(); 
@@ -233,7 +233,7 @@ functions:
     if (ee.ee_slEvent == EVENTCODE_EActivate)
     {
       if (m_bDebugMessages) {
-        CPrintF("[PS] %s : Activated!\n", GetName());
+        CPrintF("[PVS] %s : Activated!\n", GetName());
       }
 
       m_bActive = TRUE;
@@ -244,7 +244,7 @@ functions:
     if (ee.ee_slEvent == EVENTCODE_EDeactivate)
     {
       if (m_bDebugMessages) {
-        CPrintF("[PS] %s : Deactivated!\n", GetName());
+        CPrintF("[PVS] %s : Deactivated!\n", GetName());
       }
       
       m_bActive = FALSE;
