@@ -205,6 +205,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="PlayerExecutor.cpp" />
     <ClCompile Include="PlayerInfo.cpp" />
     <ClCompile Include="PlayerSettings.cpp" />
+    <ClCompile Include="PlayerVitalitySettings.cpp" />
     <ClCompile Include="ProgressiveSwitch.cpp" />
     <ClCompile Include="PropertiesCloner.cpp" />
     <ClCompile Include="PropertyChanger.cpp" />
@@ -482,6 +483,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="PlayerInfo_tables.h" />
     <ClInclude Include="PlayerSettings.h" />
     <ClInclude Include="PlayerSettings_tables.h" />
+    <ClInclude Include="PlayerVitalitySettings.h" />
+    <ClInclude Include="PlayerVitalitySettings_tables.h" />
     <ClInclude Include="ProgressiveSwitch.h" />
     <ClInclude Include="ProgressiveSwitch_tables.h" />
     <ClInclude Include="PropertiesCloner.h" />
@@ -3271,6 +3274,19 @@ ecc EntitiesMP/%(Filename).es </Command>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="PlayerExecutor.es">
+      <FileType>Document</FileType>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc EntitiesMP/%(Filename).es </Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="PlayerVitalitySettings.es">
       <FileType>Document</FileType>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EntitiesMP/%(Filename).es</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EntitiesMP/%(Filename).es</Message>

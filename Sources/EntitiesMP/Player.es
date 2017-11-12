@@ -29,6 +29,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "ModelsMP/Player/SeriousSam/Head.h"
 
 #include "EntitiesMP/PlayerSettings.h"
+#include "EntitiesMP/PlayerVitalitySettings.h"
+
 #include "EntitiesMP/PlayerMarker.h"
 #include "EntitiesMP/PlayerWeapons.h"
 #include "EntitiesMP/PlayerAnimator.h"
@@ -1190,8 +1192,8 @@ features  "ImplementsOnInitClass", "ImplementsOnEndClass", "CanBePredictable";
 properties:
   1 CTString m_strName "Name" = "<unnamed player>",
   2 COLOR m_ulLastButtons = 0x0,              // buttons last pressed
-  3 FLOAT m_fArmor = 0.0f,                    // armor
-  4 FLOAT m_fShields = 0.0f,                  // shields
+  3 FLOAT m_fArmor = 0.0f,                    // Vitality Properties - Armor
+  4 FLOAT m_fShields = 0.0f,                  // Vitality Properties - Shields
   5 CTString m_strGroup = "",                 // group name for world change
   6 INDEX m_ulKeys = 0,                       // mask for all picked-up keys
   7 FLOAT m_fMaxHealth = 1,                   // default health supply player can have
@@ -1364,6 +1366,8 @@ properties:
  351 ANGLE3D m_aWeaponSwayOld = ANGLE3D(0, 0, 0),
  
  370 INDEX m_ulExtraFlags "Extra Flags" = 0,
+ 
+ 400 CEntityPointer m_penVitalitySettings,
 
 {
   ShellLaunchData ShellLaunchData_array;  // array of data describing flying empty shells
@@ -3906,100 +3910,123 @@ functions:
       ((CPlayerView&)*m_pen3rdPersonView).DoMoving();
     }
   };
+
+  // --------------------------------------------------------------------------------------
+  void TouristRegeneration(void)
+  {
+    // if in tourist mode
+    if (GetSP()->sp_gdGameDifficulty == CSessionProperties::GD_TOURIST) {
+      // slowly increase health with time
+      FLOAT fHealth = GetHealth();
+      FLOAT fTopHealth = TopHealth();
+      if (fHealth < fTopHealth) {
+        SetHealth(ClampUp(fHealth + _pTimer->TickQuantum, fTopHealth));  // one unit per second
+      }
+    }
+  }
+  
+  // --------------------------------------------------------------------------------------
+  void VitalityRegeneration(void)
+  {
+    CPlayerVitalitySettingsEntity &enSettings = ((CPlayerVitalitySettingsEntity&)*m_penVitalitySettings);
+    
+    const FLOAT tmLastDamageDelta = _pTimer->CurrentTick() - m_tmLastDamage;
+
+    FLOAT fValue = GetHealth();
+    FLOAT fTopValue = enSettings.m_fTopHealth;
+    FLOAT fMaxValue = enSettings.m_fMaxHealth;
+
+    FLOAT fRegenValue = enSettings.m_fHealthRegenValue;
+    FLOAT fMinRegenValue = enSettings.m_fHealthRegenMin;
+    FLOAT fMaxRegenValue = enSettings.m_fHealthRegenMax;
+
+    if (fRegenValue != 0.0F && tmLastDamageDelta > enSettings.m_fHealthRegenTimer)
+    {
+      // Value
+      switch (enSettings.m_etrvtHealthRegenValType) {
+        case PSRT_PERCENT_OF_CURVALUE: fRegenValue *= fValue; break;
+        case PSRT_PERCENT_OF_TOPVALUE: fRegenValue *= fTopValue; break;
+        case PSRT_PERCENT_OF_MAXVALUE: fRegenValue *= fMaxValue; break;
+      }
+      
+      // Min Value
+      switch (enSettings.m_etrvtHealthRegenMinType) {
+        case PSRT_PERCENT_OF_CURVALUE: fMinRegenValue *= fValue; break;
+        case PSRT_PERCENT_OF_TOPVALUE: fMinRegenValue *= fTopValue; break;
+        case PSRT_PERCENT_OF_MAXVALUE: fMinRegenValue *= fMaxValue; break;
+      }
+      
+      // Max Value
+      switch (enSettings.m_etrvtHealthRegenMaxType) {
+        case PSRT_PERCENT_OF_CURVALUE: fMaxRegenValue *= fValue; break;
+        case PSRT_PERCENT_OF_TOPVALUE: fMaxRegenValue *= fTopValue; break;
+        case PSRT_PERCENT_OF_MAXVALUE: fMaxRegenValue *= fMaxValue; break;
+      }
+
+      if (fRegenValue > 0) {
+        if (fValue >= fMinRegenValue && fValue < fMaxRegenValue) {
+          SetHealth(ClampUp(fValue + fRegenValue, fMaxRegenValue));
+        }
+      } else {
+        if (fValue >= fMinRegenValue && fValue <= fMaxRegenValue) {
+          SetHealth(ClampDn(fValue + fRegenValue, fMinRegenValue));
+        }
+      }
+    }
+
+    // ARMOR REGENERATION CODE NEXT
+    fRegenValue = enSettings.m_fArmorRegenValue;
+
+    if (fRegenValue != 0.0F && tmLastDamageDelta > enSettings.m_fArmorRegenTimer)
+    {
+      fValue = m_fArmor;
+      fTopValue = enSettings.m_fTopArmor;
+      fMaxValue = enSettings.m_fMaxArmor;
+      
+      fMinRegenValue = enSettings.m_fArmorRegenMin;
+      fMaxRegenValue = enSettings.m_fArmorRegenMax;
+      
+      // Value
+      switch (enSettings.m_etrvtArmorRegenValType) {
+        case PSRT_PERCENT_OF_CURVALUE: fRegenValue *= fValue; break;
+        case PSRT_PERCENT_OF_TOPVALUE: fRegenValue *= fTopValue; break;
+        case PSRT_PERCENT_OF_MAXVALUE: fRegenValue *= fMaxValue; break;
+      }
+      
+      // Min Value
+      switch (enSettings.m_etrvtArmorRegenMinType) {
+        case PSRT_PERCENT_OF_CURVALUE: fMinRegenValue *= fValue; break;
+        case PSRT_PERCENT_OF_TOPVALUE: fMinRegenValue *= fTopValue; break;
+        case PSRT_PERCENT_OF_MAXVALUE: fMinRegenValue *= fMaxValue; break;
+      }
+      
+      // Max Value
+      switch (enSettings.m_etrvtArmorRegenMaxType) {
+        case PSRT_PERCENT_OF_CURVALUE: fMaxRegenValue *= fValue; break;
+        case PSRT_PERCENT_OF_TOPVALUE: fMaxRegenValue *= fTopValue; break;
+        case PSRT_PERCENT_OF_MAXVALUE: fMaxRegenValue *= fMaxValue; break;
+      }
+
+      if (fRegenValue > 0) {
+        if (fValue >= fMinRegenValue && fValue < fMaxRegenValue) {
+          m_fArmor = ClampUp(fValue + fRegenValue, fMaxRegenValue);
+        }
+      } else {
+        if (fValue >= fMinRegenValue && fValue <= fMaxRegenValue) {
+          m_fArmor = ClampDn(fValue + fRegenValue, fMinRegenValue);
+        }
+      }
+    }
+  }
   
   // --------------------------------------------------------------------------------------
   void ProcessRegen(void)
   {
     // [SSE] Player Settings Entity
-    if (m_penSettings && m_penSettings->IsActive())
-    {
-      CPlayerSettingsEntity &enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
-      
-      const FLOAT tmLastDamageDelta = _pTimer->CurrentTick() - m_tmLastDamage;
-
-      FLOAT fValue = GetHealth();
-      FLOAT fTopValue = enSettings.m_fTopHealth;
-      FLOAT fMaxValue = enSettings.m_fMaxHealth;
-
-      FLOAT fRegenValue = enSettings.m_fHealthRegenValue;
-      FLOAT fMinRegenValue = enSettings.m_fHealthRegenMin;
-      FLOAT fMaxRegenValue = enSettings.m_fHealthRegenMax;
-
-      if (fRegenValue != 0.0F && tmLastDamageDelta > enSettings.m_fHealthRegenTimer)
-      {
-        // Value
-        switch (enSettings.m_etrvtHealthRegenValType) {
-          case PSHRT_PERCENT_OF_CURHEALTH: fRegenValue *= fValue; break;
-          case PSHRT_PERCENT_OF_TOPHEALTH: fRegenValue *= fTopValue; break;
-          case PSHRT_PERCENT_OF_MAXHEALTH: fRegenValue *= fMaxValue; break;
-        }
-        
-        // Min Value
-        switch (enSettings.m_etrvtHealthRegenMinType) {
-          case PSHRT_PERCENT_OF_CURHEALTH: fMinRegenValue *= fValue; break;
-          case PSHRT_PERCENT_OF_TOPHEALTH: fMinRegenValue *= fTopValue; break;
-          case PSHRT_PERCENT_OF_MAXHEALTH: fMinRegenValue *= fMaxValue; break;
-        }
-        
-        // Max Value
-        switch (enSettings.m_etrvtHealthRegenMaxType) {
-          case PSHRT_PERCENT_OF_CURHEALTH: fMaxRegenValue *= fValue; break;
-          case PSHRT_PERCENT_OF_TOPHEALTH: fMaxRegenValue *= fTopValue; break;
-          case PSHRT_PERCENT_OF_MAXHEALTH: fMaxRegenValue *= fMaxValue; break;
-        }
-        
-        if (fValue >= fMinRegenValue && fValue < fMaxRegenValue) {
-          SetHealth(ClampUp(fValue + fRegenValue, fMaxRegenValue));
-        } 
-      }
-
-      // ARMOR REGENERATION CODE NEXT
-      fRegenValue = enSettings.m_fArmorRegenValue;
-
-      if (fRegenValue != 0.0F && tmLastDamageDelta > enSettings.m_fArmorRegenTimer)
-      {
-        fValue = m_fArmor;
-        fTopValue = enSettings.m_fTopArmor;
-        fMaxValue = enSettings.m_fMaxArmor;
-        
-        fMinRegenValue = enSettings.m_fArmorRegenMin;
-        fMaxRegenValue = enSettings.m_fArmorRegenMax;
-        
-        // Value
-        switch (enSettings.m_etrvtArmorRegenValType) {
-          case PSART_PERCENT_OF_CURARMOR: fRegenValue *= fValue; break;
-          case PSART_PERCENT_OF_TOPARMOR: fRegenValue *= fTopValue; break;
-          case PSART_PERCENT_OF_MAXARMOR: fRegenValue *= fMaxValue; break;
-        }
-        
-        // Min Value
-        switch (enSettings.m_etrvtArmorRegenMinType) {
-          case PSART_PERCENT_OF_CURARMOR: fMinRegenValue *= fValue; break;
-          case PSART_PERCENT_OF_TOPARMOR: fMinRegenValue *= fTopValue; break;
-          case PSART_PERCENT_OF_MAXARMOR: fMinRegenValue *= fMaxValue; break;
-        }
-        
-        // Max Value
-        switch (enSettings.m_etrvtArmorRegenMaxType) {
-          case PSART_PERCENT_OF_CURARMOR: fMaxRegenValue *= fValue; break;
-          case PSART_PERCENT_OF_TOPARMOR: fMaxRegenValue *= fTopValue; break;
-          case PSART_PERCENT_OF_MAXARMOR: fMaxRegenValue *= fMaxValue; break;
-        }
-        
-        if (fValue >= fMinRegenValue && fValue < fMaxRegenValue) {
-          m_fArmor = ClampUp(fValue + fRegenValue, fMaxRegenValue);
-        }
-      }
+    if (m_penVitalitySettings && m_penVitalitySettings->IsActive()) {
+      VitalityRegeneration();
     } else {
-      // if in tourist mode
-      if (GetSP()->sp_gdGameDifficulty == CSessionProperties::GD_TOURIST) {
-        // slowly increase health with time
-        FLOAT fHealth = GetHealth();
-        FLOAT fTopHealth = TopHealth();
-        if (fHealth < fTopHealth) {
-          SetHealth(ClampUp(fHealth + _pTimer->TickQuantum, fTopHealth));  // one unit per second
-        }
-      }
+      TouristRegeneration();
     }
   }
 
@@ -4324,7 +4351,7 @@ functions:
                       FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection)
   {
     // don't harm yourself with knife or with rocket in easy/tourist mode
-    if (penInflictor == this && (dmtType==DMT_CLOSERANGE || dmtType==DMT_CHAINSAW ||
+    if (penInflictor == this && (dmtType == DMT_CLOSERANGE || dmtType == DMT_CHAINSAW ||
         ((dmtType==DMT_EXPLOSION||dmtType==DMT_CANNONBALL_EXPLOSION||dmtType==DMT_PROJECTILE) &&
           GetSP()->sp_gdGameDifficulty<=CSessionProperties::GD_EASY)) ) {
       return;
@@ -4395,16 +4422,16 @@ functions:
     }
 
     // [SSE] Player Settings Entity
-    CPlayerSettingsEntity *penSettings = NULL;
+    CPlayerVitalitySettingsEntity *penVitalitySettings = NULL;
 
-    if (m_penSettings && m_penSettings->IsActive())
+    if (m_penVitalitySettings && m_penVitalitySettings->IsActive())
     {
-      penSettings = (CPlayerSettingsEntity *)&*m_penSettings;
+      penVitalitySettings = (CPlayerVitalitySettingsEntity *)&*m_penVitalitySettings;
       
-      fDamageAmmount *= penSettings->m_fDamageReceiveMul;
+      fDamageAmmount *= penVitalitySettings->m_fDamageReceiveMul;
       
       if (penInflictor == this) {
-        fDamageAmmount *= penSettings->m_fSelfDamageMul;
+        fDamageAmmount *= penVitalitySettings->m_fSelfDamageMul;
       }
     }
 
@@ -4432,8 +4459,8 @@ functions:
       }
       
       // damage and armor
-      if (penSettings) {
-        fSubArmor  = fDamageAmmount * penSettings->m_fArmorAbsorbtionMul;
+      if (penVitalitySettings) {
+        fSubArmor  = fDamageAmmount * penVitalitySettings->m_fArmorAbsorbtionMul;
       } else {
         fSubArmor  = fDamageAmmount * 2.0f / 3.0f;      // 2/3 on armor damage
       }
@@ -4471,7 +4498,7 @@ functions:
     }
     
     // [SSE] Player Settings Entity
-    if (penSettings && !penSettings->m_bCanDie) {
+    if (penVitalitySettings && !penVitalitySettings->m_bCanDie) {
       if (en_fHealth <= 0.0F) {
         return;
       } else {
@@ -4484,9 +4511,9 @@ functions:
         }
       }
     }
-    
+
     // [SSE] Gameplay - Mutators - Instagib
-    if (penInflictor != this && GetSP()->sp_bInstagib && penInflictor != NULL && penInflictor->IsPlayerEntity())
+    if (penInflictor != this && penInflictor != NULL && GetSP()->sp_bInstagib && penInflictor->IsPlayerEntity())
     {
       m_fShields = 0.0F;
       m_fArmor = 0.0F;
@@ -4496,7 +4523,8 @@ functions:
     }
     
     // [SSE] Gameplay - Mutators - Vampire
-    if (penInflictor != this && GetSP()->sp_bVampire && penInflictor != NULL && penInflictor->IsPlayerEntity() && penInflictor->IsAlive()) {
+    if (penInflictor != this && penInflictor != NULL && GetSP()->sp_bVampire && penInflictor->IsPlayerEntity() && penInflictor->IsAlive())
+    {
       EReceiveHealing eHealing;
       eHealing.fValue = fSubHealth;
       eHealing.bOverTopHealth = TRUE;
@@ -4719,9 +4747,14 @@ functions:
   {
     // [SSE] Player Settings Entity
     CPlayerSettingsEntity *penPlayerSettings = NULL;
+    CPlayerVitalitySettingsEntity *penVitalitySettings = NULL;
 
     if (m_penSettings && m_penSettings->IsActive()) {
       penPlayerSettings = static_cast<CPlayerSettingsEntity*>(&*m_penSettings);
+    }
+	
+    if (m_penVitalitySettings && m_penVitalitySettings->IsActive()) {
+      penVitalitySettings = static_cast<CPlayerVitalitySettingsEntity*>(&*m_penVitalitySettings);
     }
 
     // *********** HEALTH ***********
@@ -4730,18 +4763,18 @@ functions:
       FLOAT fHealth = ((EHealth&)ee).fHealth;
       FLOAT fTopHealth = TopHealth();
       FLOAT fMaxHealth = MaxHealth();
+	  
+      // If health pickup not allowed then don't do it!
+      if (penPlayerSettings && !penPlayerSettings->m_bCanPickUpHealth) {
+        return FALSE;
+      }
 
-      // [SSE] Player Settings Entity
-      if (penPlayerSettings)
+      // [SSE] Player Vitality Settings Entity
+      if (penVitalitySettings)
       {
-        // If health pickup not allowed then don't do it!
-        if (!penPlayerSettings->m_bCanPickUpHealth) {
-          return FALSE;
-        }
-
-        fHealth *= penPlayerSettings->m_fHealthPickUpMul;
-        fTopHealth = penPlayerSettings->m_fTopHealth;
-        fMaxHealth = penPlayerSettings->m_fMaxHealth;
+        fHealth *= penVitalitySettings->m_fHealthPickUpMul;
+        fTopHealth = penVitalitySettings->m_fTopHealth;
+        fMaxHealth = penVitalitySettings->m_fMaxHealth;
       }
 
       // If item won't give any health then pickup it always.
@@ -4778,16 +4811,17 @@ functions:
       FLOAT fMaxArmor = MaxArmor();
 
       // [SSE] Player Settings Entity
-      if (penPlayerSettings)
+      // If armor pickup not allowed then don't do it!
+      if (penPlayerSettings && !penPlayerSettings->m_bCanPickUpArmor) {
+        return FALSE;
+      }
+      
+      // [SSE] Player Vitality Settings Entity
+      if (penVitalitySettings)
       {
-        // If armor pickup not allowed then don't do it!
-        if (!penPlayerSettings->m_bCanPickUpArmor) {
-          return FALSE;
-        }
-
-        fArmor *= penPlayerSettings->m_fArmorPickUpMul;
-        fTopArmor = penPlayerSettings->m_fTopArmor;
-        fMaxArmor = penPlayerSettings->m_fMaxArmor;
+        fArmor *= penVitalitySettings->m_fArmorPickUpMul;
+        fTopArmor = penVitalitySettings->m_fTopArmor;
+        fMaxArmor = penVitalitySettings->m_fMaxArmor;
       }
 
       // If item won't give any armor then pickup it always.
@@ -7315,8 +7349,8 @@ functions:
       m_ulFlags &= ~PLF_RESPAWNINPLACE;
       
       // [SSE] Player Settings Entity
-      if (m_penSettings && m_penSettings->IsActive()) {
-        SetHealth(((CPlayerSettingsEntity&)*m_penSettings).m_fTopHealth);
+      if (m_penVitalitySettings && m_penVitalitySettings->IsActive()) {
+        SetHealth(((CPlayerVitalitySettingsEntity&)*m_penVitalitySettings).m_fTopHealth);
       } else {
         SetHealth(TopHealth()); // set default params
       }
@@ -7740,6 +7774,11 @@ procedures:
     // [SSE] Player Settings Entity
     if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bUntilDeath) {
       m_penSettings = NULL;
+    }
+    
+    // [SSE] Player Vitality Settings Entity
+    if (m_penVitalitySettings && ((CPlayerVitalitySettingsEntity&)*m_penVitalitySettings).m_bUntilDeath) {
+      m_penVitalitySettings = NULL;
     }
 
     // stop all looping ifeel effects
