@@ -4452,6 +4452,7 @@ functions:
         if (m_fShields >= fDamageAmmount) {
           m_fShields -= fDamageAmmount;
           fDamageAmmount = 0.0F;
+          return;
         } else {
           fDamageAmmount -= m_fShields;
           m_fShields = 0.0F;

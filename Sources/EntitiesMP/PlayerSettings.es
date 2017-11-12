@@ -69,7 +69,7 @@ properties:
   35 FLOAT m_fSpeedUpMultiplier "Mul Speed Up" = 1.0F,
   36 FLOAT m_fSpeedDownMultiplier "Mul Speed Down" = 1.0F,
    
-  // Receive / Pickup Multipliers
+  // Receive & Pickup Multipliers
   44 FLOAT m_fScoreReceiveMul   "Mul Receive Score" = 1.0F,
 
   //59 FLOAT m_fMaxGravitySpeed   "Max Gravity Speed" = 70.0F,

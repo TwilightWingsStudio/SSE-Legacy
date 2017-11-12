@@ -50,7 +50,7 @@ properties:
    6 enum EPlayerVitalitySettingsType  m_epstType "Type" = EPVST_PENCAUSED,
    7 BOOL m_bUntilDeath          "Until Death" = FALSE,
 
-  // Receive / Pickup Multipliers
+  // Receive & Pickup Multipliers
   40 FLOAT m_fDamageReceiveMul  "Mul Damage All" = 1.0F,
   41 FLOAT m_fSelfDamageMul     "Mul Damage Self" = 1.0F,
 
@@ -58,8 +58,8 @@ properties:
   43 FLOAT m_fArmorPickUpMul    "Mul Armor PickUp" = 1.0F,
   
   50 FLOAT m_fArmorAbsorbtionMul "Mul Armor Absorbtion" = 0.66F,
- 
-  // Health and Armor
+
+  // Health, Armor & Shields
   70 FLOAT m_fTopHealth "Health Top" = 100.0F,
   71 FLOAT m_fMaxHealth "Health Max" = 200.0F,
 
