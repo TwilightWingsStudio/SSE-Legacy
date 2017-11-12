@@ -3704,21 +3704,28 @@ procedures:
       }
 
       // if you hear something
-      on (ESound eSound) : {
-        // if deaf
+      on (ESound eSound) :
+      {
+        // if deaf then ignore the sound
         if (m_bDeaf) {
-          // ignore the sound
           resume;
         }
-
+        
         // If player shooting.
-        if (IsOfClass(eSound.penTarget, "Player")) {
+        if (eSound.penTarget->IsPlayerEntity())
+        {
           CEnemyFactionHolder* penEFH = GetFactionHolder(TRUE);
           
           // if we have faction holder with valid faction index/
-          if (penEFH && penEFH->IsIndexValid()) {
+          if (penEFH && penEFH->IsIndexValid())
+          {
             // Skip if player not enemy.
-            if (penEFH->m_efrtRelationToPlayers != FRT_ENEMY) {
+            if (penEFH->m_efrtRelationToPlayers == FRT_ALLY) {
+              resume;
+            }
+            
+            // If it isn't shout and not yell then ignore it.
+            if (eSound.EsndtSound != SNDT_SHOUT && eSound.EsndtSound != SNDT_YELL) {
               resume;
             }
           }
@@ -3729,6 +3736,7 @@ procedures:
           // react to it
           call NewEnemySpotted();
         }
+
         resume;
       }
 
