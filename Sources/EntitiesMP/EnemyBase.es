@@ -3742,24 +3742,27 @@ procedures:
         //
 
         CEnemyFactionHolder* penEFH = GetFactionHolder(TRUE);
+        BOOL bTargetChanged = FALSE;
+        
+        // If we have EFH and toucher is player, and if player is enemy for faction then set him as target.
+        if (penEFH != NULL && eTouch.penOther->IsPlayerEntity() && penEFH->m_efrtRelationToPlayers == FRT_ENEMY) {
+          bTargetChanged = SetTargetHard(eTouch.penOther); // set the new target if needed
+        }
 
         // Use Default behavior when haven't faction holder.
         if (penEFH == NULL) {
-          // set the new target if needed
-          BOOL bTargetChanged = SetTargetHard(eTouch.penOther);
-
-          // if target changed
-          if (bTargetChanged)
-          {
-            // [SSE] Enemy Settings Entity
-            if (!IsSilent()) {
-              SightSound(); // make sound that you spotted the player
-            }
-
-            // start new behavior
-            SendEvent(EReconsiderBehavior());
+          bTargetChanged = SetTargetHard(eTouch.penOther); // set the new target if needed
+        }
+        
+        // if target changed
+        if (bTargetChanged)
+        {
+          // [SSE] Enemy Settings Entity
+          if (!IsSilent()) {
+            SightSound(); // make sound that you spotted the player
           }
-          pass;
+
+          SendEvent(EReconsiderBehavior()); // start new behavior
         }
 
           /*
