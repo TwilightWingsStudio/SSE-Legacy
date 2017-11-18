@@ -350,6 +350,14 @@ functions:
       
       return;
     }
+    
+    if (pTargetProperty->ep_ulFlags & EPROPF_READONLY) {
+      if (m_bDebugMessages) {
+        CPrintF(TRANS("[PC] %s : Error! Target Entity Property is a read-only property!\n"), m_strName);
+      }
+
+      return;
+    }
 
     if (m_bDebugMessages && pTargetProperty)
     {
