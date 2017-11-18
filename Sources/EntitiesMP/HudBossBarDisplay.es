@@ -32,7 +32,7 @@ properties:
   6 INDEX m_iMaxValue   "Max Value" = 100,
   7 INDEX m_iStep       "Step Value" = 1,
   
- 10 CTFileName m_fnmIcon "Icon File" 'P' = CTString(""),
+ 10 CTFileName m_fnmIcon "Icon File" 'P' = CTString("") features(EPROPF_READONLY),
  
  11 BOOL m_bStopOnZero  "Stop on Zero" = TRUE,
  12 BOOL m_bStopOnFull  "Stop on Full" = TRUE,

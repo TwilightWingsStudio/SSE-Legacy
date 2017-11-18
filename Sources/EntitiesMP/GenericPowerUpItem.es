@@ -31,8 +31,8 @@ features  "IsImportant";
 
 properties:
   1 enum PowerUpItemType m_puitType  "Type" 'Y' = PUIT_INVULNER,
-  2 CTFileName m_fnModel      "Model" 'M' =CTFILENAME("Models\\Editor\\Axis.mdl"),
-  3 CTFileName m_fnTexture    "Texture" 'T' =CTFILENAME("Models\\Editor\\Vector.tex"),
+  2 CTFileName m_fnModel      "Model" 'M'   = CTFILENAME("Models\\Editor\\Axis.mdl")   features(EPROPF_READONLY),
+  3 CTFileName m_fnTexture    "Texture" 'T' = CTFILENAME("Models\\Editor\\Vector.tex") features(EPROPF_READONLY),
   4 CEntityPointer m_penSoundPick "Sound Pick Up",
   5 CTStringTrans m_strPickUpMessage "Message" = "Power Up!",
   6 FLOAT m_fDuration "Duration" = 10.0F,

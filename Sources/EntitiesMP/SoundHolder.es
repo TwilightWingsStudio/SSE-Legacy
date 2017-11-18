@@ -34,7 +34,7 @@ features "HasName", "HasDescription", "IsTargetable";
 
 properties:
 
-  1 CTFileName m_fnSound   "Sound"    'S' = CTFILENAME("Sounds\\Default.wav"),    // sound
+  1 CTFileName m_fnSound   "Sound"    'S' = CTFILENAME("Sounds\\Default.wav") features(EPROPF_READONLY),    // sound
   2 RANGE m_rFallOffRange  "Fall-off" 'F' = 100.0f,
   3 RANGE m_rHotSpotRange  "Hot-spot" 'H' =  50.0f,
   4 FLOAT m_fVolume        "Volume"   'V' = 1.0f,

@@ -30,7 +30,7 @@ properties:
 
   1 CTString m_strName "Name" 'N' = "Hud Pic Display",
   2 CTString m_strDescription = "",
-  3 CTFileName m_fnmPicture "Picture File" 'P' = CTString(""),
+  3 CTFileName m_fnmPicture "Picture File" 'P' = CTString("") features(EPROPF_READONLY),
   4 FLOAT m_tmFadeInStart = 1e6,
   5 FLOAT m_tmFadeOutStart = 1e6,
   6 FLOAT m_tmFadeInLen "Fade in time" 'I' = 0.5f,

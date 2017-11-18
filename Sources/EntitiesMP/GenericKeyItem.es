@@ -31,8 +31,8 @@ features  "IsImportant";
 
 properties:
   1 INDEX m_iKeyID "Key ID" = 0,
-  2 CTFileName m_fnModel      "Model" 'M' =CTFILENAME("Models\\Editor\\Axis.mdl"),
-  3 CTFileName m_fnTexture    "Texture" 'T' =CTFILENAME("Models\\Editor\\Vector.tex"),
+  2 CTFileName m_fnModel      "Model" 'M'   = CTFILENAME("Models\\Editor\\Axis.mdl")   features(EPROPF_READONLY),
+  3 CTFileName m_fnTexture    "Texture" 'T' = CTFILENAME("Models\\Editor\\Vector.tex") features(EPROPF_READONLY),
   4 CEntityPointer m_penSoundPick "Sound Pick Up",
   5 CTStringTrans m_strPickUpMessage "Message" = "Key",
   
