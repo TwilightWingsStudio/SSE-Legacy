@@ -57,7 +57,11 @@ typedef CTString CTStringTrans;
 /////////////////////////////////////////////////////////////////////
 // Classes and macros for defining entity properties
 
-#define EPROPF_HIDEINPERSPECTIVE    (1UL<<0)  // not visualized in perspective view (for ranges)
+#define EPROPF_HIDEINPERSPECTIVE    (1UL << 0)  // not visualized in perspective view (for ranges)
+
+// [SSE] Read Only Entity Properties
+#define EPROPF_READONLY             (1UL << 10)
+//
 
 class ENGINE_API CEntityProperty {
 public:
