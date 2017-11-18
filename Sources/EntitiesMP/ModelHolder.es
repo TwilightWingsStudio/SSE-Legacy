@@ -24,12 +24,14 @@ thumbnail "";
 features "HasName", "HasDescription";
 
 properties:
-  1 CTFileName m_fnModel    "Model" 'M' =CTFILENAME("Models\\Editor\\Axis.mdl"),
-  2 CTFileName m_fnTexture  "Texture" 'T' =CTFILENAME("Models\\Editor\\Vector.tex"),
+  1 CTFileName m_fnModel    "Model" 'M'   = CTFILENAME("Models\\Editor\\Axis.mdl")   features(EPROPF_READONLY),
+  2 CTFileName m_fnTexture  "Texture" 'T' = CTFILENAME("Models\\Editor\\Vector.tex") features(EPROPF_READONLY),
+
   3 FLOAT m_fStretchAll     "StretchAll" 'S' = 1.0f,
   4 FLOAT m_fStretchX       "StretchX"   'X' = 1.0f,
   5 FLOAT m_fStretchY       "StretchY"   'Y' = 1.0f,
   6 FLOAT m_fStretchZ       "StretchZ"   'Z' = 1.0f,
+
   7 CTString m_strName      "Name" 'N' ="",
  12 CTString m_strDescription = "",
   8 BOOL m_bColliding       "Colliding" 'C' = FALSE,    // set if model is not immatierial

@@ -55,13 +55,13 @@ features "HasName", "HasDescription", "IsTargetable";
 
 properties:
    // Paths to common assets.
-   1 CTFileName m_fnModel      "Model" 'M'      = CTFILENAME("Models\\Editor\\Axis.mdl"),
-   2 CTFileName m_fnTexture    "Texture" 'T'    = CTFILENAME("Models\\Editor\\Vector.tex"),
+   1 CTFileName m_fnModel      "Model" 'M'      = CTFILENAME("Models\\Editor\\Axis.mdl")   features(EPROPF_READONLY),
+   2 CTFileName m_fnTexture    "Texture" 'T'    = CTFILENAME("Models\\Editor\\Vector.tex") features(EPROPF_READONLY),
   
   // Paths to additional textures.
-  22 CTFileName m_fnReflection "Reflection"     = CTString(""),
-  23 CTFileName m_fnSpecular   "Specular"       = CTString(""),
-  24 CTFileName m_fnBump       "Bump"           = CTString(""),
+  22 CTFileName m_fnReflection "Reflection"     = CTString("") features(EPROPF_READONLY),
+  23 CTFileName m_fnSpecular   "Specular"       = CTString("") features(EPROPF_READONLY),
+  24 CTFileName m_fnBump       "Bump"           = CTString("") features(EPROPF_READONLY),
  
    3 FLOAT m_fStretchAll       "StretchAll" 'S' = 1.0F,
    4 FLOAT m_fStretchX         "StretchX"   'X' = 1.0F,

@@ -45,16 +45,19 @@ thumbnail "Thumbnails\\ModelHolder3.tbn";
 features "HasName", "HasDescription";
 
 properties:
-  1 CTFileName m_fnModel      "Model file (.smc)" 'M' = CTFILENAME(""), //("Models\\Editor\\Axis.mdl"),
+  // Paths
+  1 CTFileName m_fnModel      "Model file (.smc)" 'M' = CTFILENAME("") features(EPROPF_READONLY), //("Models\\Editor\\Axis.mdl"),
 //  2 CTFileName m_fnTexture    "Texture" 'T' =CTFILENAME("Models\\Editor\\Vector.tex"),
 // 22 CTFileName m_fnReflection "Reflection" =CTString(""),
 // 23 CTFileName m_fnSpecular   "Specular" =CTString(""),
 // 24 CTFileName m_fnBump       "Bump" =CTString(""),
+
   3 FLOAT m_fStretchAll       "StretchAll" 'S' = 1.0f,
   4 ANGLE3D m_vStretchXYZ       "StretchXYZ" 'X' = FLOAT3D(1.0f, 1.0f, 1.0f),
 //  4 FLOAT m_vStretchXYZ(1)         "StretchX"   'X' = 1.0f,
 //  5 FLOAT m_vStretchXYZ(2)         "StretchY"   'Y' = 1.0f,
 //  6 FLOAT m_vStretchXYZ(3)         "StretchZ"   'Z' = 1.0f,
+
   7 CTString m_strName        "Name" 'N' ="",
  12 CTString m_strDescription = "",
   8 BOOL m_bColliding       "Collision" 'L' = FALSE,    // set if model is not immatierial

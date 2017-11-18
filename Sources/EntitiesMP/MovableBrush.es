@@ -78,26 +78,27 @@ functions:
     return m_penSwitch;
   }
 
-  // get visibility tweaking bits
+  // --------------------------------------------------------------------------------------
+  // Returns visibility tweaking bits.
+  // --------------------------------------------------------------------------------------
   ULONG GetVisTweaks(void)
   {
     return m_cbClassificationBits|m_vbVisibilityBits;
   }
 
+  // --------------------------------------------------------------------------------------
   /* Receive damage */
+  // --------------------------------------------------------------------------------------
   void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
     FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection) 
   {
-    // if not destroyable
-    if(m_fHealth < 0) {
-      // ignore damages
+    // If not destroyable then ignore damages.
+    if (m_fHealth < 0) {
       return;
     }
 
     // react only on explosions
-    if( (dmtType == DMT_EXPLOSION) ||
-        (dmtType == DMT_PROJECTILE) ||
-        (dmtType == DMT_CANNONBALL) )
+    if ( (dmtType == DMT_EXPLOSION) || (dmtType == DMT_PROJECTILE) || (dmtType == DMT_CANNONBALL) )
     {
       CMovableBrushEntity::ReceiveDamage(penInflictor, dmtType, fDamageAmmount, vHitPoint, vDirection);
     }
@@ -106,18 +107,23 @@ functions:
   void PreMoving()
   {
     // start moving
-    if(m_bActive){
+    if (m_bActive){
       SetDesiredTranslation(FLOAT3D(m_fTransX, m_fTransY, m_fTransZ));
       SetDesiredRotation(FLOAT3D(m_fRotH, m_fRotP, m_fRotB));
-    }else{
+    } else {
       SetDesiredTranslation(FLOAT3D(0.0F, 0.0F, 0.0F));
       SetDesiredRotation(FLOAT3D(0.0F, 0.0F, 0.0F));
     }
+
     CMovableBrushEntity::PreMoving();
   }
 
 procedures:
-  Main() {
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
+  Main()
+  {
     // declare yourself as a brush
     InitAsBrush();
     SetPhysicsFlags(EPF_ONBLOCK_PUSH|EPF_RT_SYNCHRONIZED|EPF_MOVABLE);
@@ -152,7 +158,8 @@ procedures:
 
     AddToMovers();
 
-    while (TRUE) {
+    while (TRUE)
+    {
       wait(_pTimer->TickQuantum) {
         on (EBegin) : {
           resume;

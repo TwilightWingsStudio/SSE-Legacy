@@ -30,7 +30,7 @@ properties:
    
    4 BOOL m_bActive           "Active" 'A'         = TRUE,
    5 BOOL m_bDebugMessages    "Debug Messages"     = FALSE,
-   6 CTFileName m_fnScript    "Script File"    'S' = CTFILENAME(""),
+   6 CTFileName m_fnScript    "Script File"    'S' = CTFILENAME("") features(EPROPF_READONLY),
    
   10 CEntityPointer m_penTarget "Target" 'T',
   
@@ -59,6 +59,8 @@ functions:
   // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const
   {
+    ((CTString&)m_strDescription).PrintF("%s", m_fnScript.FileName());
+    
     return m_strDescription;
   }
 
