@@ -770,54 +770,76 @@ inline void CEntity::RemReference(void) {
 /*
  * Entity that is alive (has health).
  */
-class ENGINE_API CLiveEntity : public CEntity {
-public:
-  FLOAT en_fHealth;            // health of the entity
+class ENGINE_API CLiveEntity : public CEntity
+{
+  public:
 
-  /* Copy entity from another entity of same class. */
-  virtual void Copy(CEntity &enOther, ULONG ulFlags);
-  /* Read from stream. */
-  virtual void Read_t( CTStream *istr);  // throw char *
-  /* Write to stream. */
-  virtual void Write_t( CTStream *ostr); // throw char *
-public:
-  /* Set health of the entity. (Use only for initialization!) */
-  void SetHealth(FLOAT fHealth) { en_fHealth = fHealth; };
+    /*
+       [ZCaliptium]
 
-public:
-  /* Constructor. */
-  CLiveEntity(void);
+       For different purposes you may need to use different health system.
+       Floating point variable not always satisfies needs because of low
+       precision with high positive or negative values.
+       
+       Union is my workaround to not add new variables into CLiveEntity and save
+       compatability with all old levels.
+    */
 
-  /* Get health of the entity. */
-  FLOAT GetHealth(void) const { return en_fHealth; };
-  
-  // [SSE] Extended Engine API
-  virtual FLOAT GetArmor(void) const { return 0.0F; };
-  virtual FLOAT GetShields(void) const { return 0.0F; };
-  virtual INDEX GetLevel(void) const { return 0; };
-  virtual INDEX GetMoney(void) const { return 0; };
-  virtual INDEX GetSupplies(void) const { return 0; };
-  
-  virtual void SetArmor(FLOAT fArmor) {};
-  virtual void SetShields(FLOAT fShields) {};
-  virtual void SetLevel(INDEX iLevel) {};
-  virtual void SetMoney(INDEX iMoney) {};
-  virtual void SetSupplies(INDEX iSupllies) {};
-  
-  // [SSE] Extended Engine API
-  virtual BOOL IsLiveEntity()
-  {
-    return TRUE;
-  }
+    // [SSE] Game Mechanics - Vitality System
+    union {
+      FLOAT en_fHealth; // health of the entity in a float-based system.
+      INDEX en_iHealth; // health of then entity in a integer-based system.
+    };
 
-  // apply some damage to the entity (see event EDamage for more info)
-  virtual void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
-    FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection);
+    /* Copy entity from another entity of same class. */
+    virtual void Copy(CEntity &enOther, ULONG ulFlags);
+    /* Read from stream. */
+    virtual void Read_t( CTStream *istr);  // throw char *
+    /* Write to stream. */
+    virtual void Write_t( CTStream *ostr); // throw char *
 
-  // returns bytes of memory used by this object
-  inline SLONG GetUsedMemory(void) {
-    return( sizeof(CLiveEntity) - sizeof(CEntity) + CEntity::GetUsedMemory());
-  };
+  public:
+    /* Set health of the entity. (Use only for initialization!) */
+    void SetHealth(FLOAT fHealth) { en_fHealth = fHealth; };
+
+  public:
+    /* Constructor. */
+    CLiveEntity(void);
+
+    /* Get health of the entity. */
+    FLOAT GetHealth(void) const { return en_fHealth; };
+    
+    // [SSE] Extended Engine API
+    virtual FLOAT GetArmor(void) const { return 0.0F; };
+    virtual FLOAT GetShields(void) const { return 0.0F; };
+    virtual INDEX GetLevel(void) const { return 0; };
+    
+    // Currencies
+    virtual INDEX GetMoney(void) const { return 0; };
+    virtual INDEX GetSupplies(void) const { return 0; };
+    
+    virtual void SetArmor(FLOAT fArmor) {};
+    virtual void SetShields(FLOAT fShields) {};
+    virtual void SetLevel(INDEX iLevel) {};
+    
+    // Currencies
+    virtual void SetMoney(INDEX iMoney) {};
+    virtual void SetSupplies(INDEX iSupllies) {};
+    
+    // [SSE] Extended Engine API
+    virtual BOOL IsLiveEntity()
+    {
+      return TRUE;
+    }
+
+    // apply some damage to the entity (see event EDamage for more info)
+    virtual void ReceiveDamage(CEntity *penInflictor, enum DamageType dmtType,
+      FLOAT fDamageAmmount, const FLOAT3D &vHitPoint, const FLOAT3D &vDirection);
+
+    // returns bytes of memory used by this object
+    inline SLONG GetUsedMemory(void) {
+      return( sizeof(CLiveEntity) - sizeof(CEntity) + CEntity::GetUsedMemory());
+    };
 };
 
 // flag for entities that are not waiting for thinking
