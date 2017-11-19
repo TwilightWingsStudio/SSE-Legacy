@@ -18,6 +18,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "HUD.h"
 #include "HUD_internal.h"
+#include "HudAssetsContainer.h"
 
 #include <Engine/Graphics/DrawPort.h>
 
@@ -36,6 +37,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define TOP_HEALTH 100
 
 static CListHead _lhAllHUDTextures;
+extern CHudAssetsContainer *_pHAC = NULL;
 
 // Cheats
 extern INDEX cht_bEnable;
@@ -123,122 +125,79 @@ static CImageInfo _iiDefault;
 static CTextureData *_tdDefault = NULL;
 //
 
-// status bar textures
-static CTextureObject _toHealth;
-static CTextureObject _toOxygen;
-static CTextureObject _toScore;
-static CTextureObject _toHiScore;
-static CTextureObject _toMessage;
-static CTextureObject _toMana;
-static CTextureObject _toFrags;
-static CTextureObject _toDeaths;
-static CTextureObject _toArmorSmall;
-static CTextureObject _toArmorMedium;
-static CTextureObject _toArmorLarge;
-
-static CTextureObject _toExtraLive; // [SSE]
-static CTextureObject _toSwords; // [SSE]
-static CTextureObject _toKey; // [SSE] Better Keys
-static CTextureObject _toClock; // [SSE]
-
-static CTextureObject _toTestIken; // [SSE]
-
-// [SSE] Radar
-static CTextureObject _toRadarCircle;
-static CTextureObject _toRadarMask;
-static CTextureObject _toRadarBorder;
-static CTextureObject _toRadarDot;
-static CTextureObject _toRadarDotUp;
-static CTextureObject _toRadarDotDown;
-//
-
-// ammo textures
-static CTextureObject _toAColt;
-static CTextureObject _toAShells;
-static CTextureObject _toABullets;
-static CTextureObject _toARockets;
-static CTextureObject _toAGrenades;
-static CTextureObject _toANapalm;
-static CTextureObject _toAElectricity;
-static CTextureObject _toAIronBall;
-static CTextureObject _toASniperBullets;
-static CTextureObject _toASeriousBomb;
-
-// weapon textures
-static CTextureObject _toWFists; // [SSE] Gameplay - Fists Weapon
-static CTextureObject _toWKnife;
-static CTextureObject _toWColt;
-static CTextureObject _toWSingleShotgun;
-static CTextureObject _toWDoubleShotgun;
-static CTextureObject _toWTommygun;
-static CTextureObject _toWSniper;
-static CTextureObject _toWChainsaw;
-static CTextureObject _toWMinigun;
-static CTextureObject _toWRocketLauncher;
-static CTextureObject _toWGrenadeLauncher;
-static CTextureObject _toWFlamer;
-static CTextureObject _toWLaser;
-static CTextureObject _toWIronCannon;
-static CTextureObject _toWSeriousBomb; // [SSE] Gameplay - Serious Bomb Weapon
-
-// powerup textures (ORDER IS THE SAME AS IN PLAYER.ES!)
-#define MAX_POWERUPS 4
-static CTextureObject _atoPowerups[MAX_POWERUPS];
-
-// tile texture (one has corners, edges and center)
-static CTextureObject _toTile;
-
-// sniper mask texture
-static CTextureObject _toSniperMask;
-static CTextureObject _toSniperWheel;
-static CTextureObject _toSniperArrow;
-static CTextureObject _toSniperEye;
-static CTextureObject _toSniperLed;
-
 static BOOL _bHUDFontsLoaded = FALSE; // [SSE] HUD No Crash If No Assets
 
 extern struct ColorTransitionTable &_cttHUD = *(new ColorTransitionTable);
 
 extern struct WeaponInfo _awiWeapons[18];
 static struct AmmoInfo _aaiAmmo[9] = {
-  { &_toAShells,        &_awiWeapons[5],  &_awiWeapons[6],  0, 0, 0, -9, FALSE }, //  0
-  { &_toABullets,       &_awiWeapons[7],  &_awiWeapons[8],  0, 0, 0, -9, FALSE }, //  1
-  { &_toARockets,       &_awiWeapons[9],  NULL,             0, 0, 0, -9, FALSE }, //  2
-  { &_toAGrenades,      &_awiWeapons[10],  NULL,             0, 0, 0, -9, FALSE }, //  3
-  { &_toANapalm,        &_awiWeapons[12], NULL,             0, 0, 0, -9, FALSE }, //  4
-  { &_toAElectricity,   &_awiWeapons[13], NULL,             0, 0, 0, -9, FALSE }, //  5
-  { &_toAIronBall,      &_awiWeapons[15], NULL,             0, 0, 0, -9, FALSE }, //  6
-  { &_toASniperBullets, &_awiWeapons[14], NULL,             0, 0, 0, -9, FALSE }, //  7
+  { NULL, &_awiWeapons[5],  &_awiWeapons[6],  0, 0, 0, -9, FALSE }, //  0
+  { NULL, &_awiWeapons[7],  &_awiWeapons[8],  0, 0, 0, -9, FALSE }, //  1
+  { NULL, &_awiWeapons[9],  NULL,             0, 0, 0, -9, FALSE }, //  2
+  { NULL, &_awiWeapons[10], NULL,             0, 0, 0, -9, FALSE }, //  3
+  { NULL, &_awiWeapons[12], NULL,             0, 0, 0, -9, FALSE }, //  4
+  { NULL, &_awiWeapons[13], NULL,             0, 0, 0, -9, FALSE }, //  5
+  { NULL, &_awiWeapons[15], NULL,             0, 0, 0, -9, FALSE }, //  6
+  { NULL, &_awiWeapons[14], NULL,             0, 0, 0, -9, FALSE }, //  7
 
-  { &_toASeriousBomb,   &_awiWeapons[16], NULL,             0, 0, 0, -9, FALSE }, //  8
+  { NULL, &_awiWeapons[16], NULL,             0, 0, 0, -9, FALSE }, //  8
 };
 
 static const INDEX aiAmmoRemap[8] = { 0, 1, 2, 3, 4, 5, 7, 6 };
 
 struct WeaponInfo _awiWeapons[18] = {
-  { WEAPON_NONE,            NULL,                 NULL,         FALSE },   //  0
-  { WEAPON_FISTS,           &_toWFists,           NULL,         FALSE },   //  1
-  { WEAPON_KNIFE,           &_toWKnife,           NULL,         FALSE },   //  2
-  { WEAPON_COLT,            &_toWColt,            NULL,         FALSE },   //  3
-  { WEAPON_DOUBLECOLT,      &_toWColt,            NULL,         FALSE },   //  4
-  { WEAPON_SINGLESHOTGUN,   &_toWSingleShotgun,   &_aaiAmmo[0], FALSE },   //  5
-  { WEAPON_DOUBLESHOTGUN,   &_toWDoubleShotgun,   &_aaiAmmo[0], FALSE },   //  6
-  { WEAPON_TOMMYGUN,        &_toWTommygun,        &_aaiAmmo[1], FALSE },   //  7
-  { WEAPON_MINIGUN,         &_toWMinigun,         &_aaiAmmo[1], FALSE },   //  8
-  { WEAPON_ROCKETLAUNCHER,  &_toWRocketLauncher,  &_aaiAmmo[2], FALSE },   //  9
-  { WEAPON_GRENADELAUNCHER, &_toWGrenadeLauncher, &_aaiAmmo[3], FALSE },   // 10
-  { WEAPON_CHAINSAW,        &_toWChainsaw,        NULL,         FALSE },   // 11
-  { WEAPON_FLAMER,          &_toWFlamer,          &_aaiAmmo[4], FALSE },   // 12
-  { WEAPON_LASER,           &_toWLaser,           &_aaiAmmo[5], FALSE },   // 13
-  { WEAPON_SNIPER,          &_toWSniper,          &_aaiAmmo[7], FALSE },   // 14
-  { WEAPON_IRONCANNON,      &_toWIronCannon,      &_aaiAmmo[6], FALSE },   // 15
-  { WEAPON_SERIOUSBOMB,     &_toWSeriousBomb,     &_aaiAmmo[8], FALSE },   // 16
-  { WEAPON_NONE,            NULL,                 NULL,         FALSE },   // 17
+  { WEAPON_NONE,            NULL,  NULL,         FALSE },   //  0
+  { WEAPON_FISTS,           NULL,  NULL,         FALSE },   //  1
+  { WEAPON_KNIFE,           NULL,  NULL,         FALSE },   //  2
+  { WEAPON_COLT,            NULL,  NULL,         FALSE },   //  3
+  { WEAPON_DOUBLECOLT,      NULL,  NULL,         FALSE },   //  4
+  { WEAPON_SINGLESHOTGUN,   NULL,  &_aaiAmmo[0], FALSE },   //  5
+  { WEAPON_DOUBLESHOTGUN,   NULL,  &_aaiAmmo[0], FALSE },   //  6
+  { WEAPON_TOMMYGUN,        NULL,  &_aaiAmmo[1], FALSE },   //  7
+  { WEAPON_MINIGUN,         NULL,  &_aaiAmmo[1], FALSE },   //  8
+  { WEAPON_ROCKETLAUNCHER,  NULL,  &_aaiAmmo[2], FALSE },   //  9
+  { WEAPON_GRENADELAUNCHER, NULL,  &_aaiAmmo[3], FALSE },   // 10
+  { WEAPON_CHAINSAW,        NULL,  NULL,         FALSE },   // 11
+  { WEAPON_FLAMER,          NULL,  &_aaiAmmo[4], FALSE },   // 12
+  { WEAPON_LASER,           NULL,  &_aaiAmmo[5], FALSE },   // 13
+  { WEAPON_SNIPER,          NULL,  &_aaiAmmo[7], FALSE },   // 14
+  { WEAPON_IRONCANNON,      NULL,  &_aaiAmmo[6], FALSE },   // 15
+  { WEAPON_SERIOUSBOMB,     NULL,  &_aaiAmmo[8], FALSE },   // 16
+  { WEAPON_NONE,            NULL,  NULL,         FALSE },   // 17
 
-//{ WEAPON_PIPEBOMB,        &_toWPipeBomb,        &_aaiAmmo[3], FALSE },   // 15
-//{ WEAPON_GHOSTBUSTER,     &_toWGhostBuster,     &_aaiAmmo[5], FALSE },   // 16
-//{ WEAPON_NUKECANNON,      &_toWNukeCannon,      &_aaiAmmo[7], FALSE },   // 17
+//{ WEAPON_PIPEBOMB,        &_pHAC->m_toWPipeBomb,        &_aaiAmmo[3], FALSE },   // 15
+//{ WEAPON_GHOSTBUSTER,     &_pHAC->m_toWGhostBuster,     &_aaiAmmo[5], FALSE },   // 16
+//{ WEAPON_NUKECANNON,      &_pHAC->m_toWNukeCannon,      &_aaiAmmo[7], FALSE },   // 17
 };
+
+// TODO: Do something with this dirty hack.
+void InitAmmoWeaponIconsLinks()
+{
+  CPrintF("Defining Ammo Icon Links:\n");
+
+  for (INDEX i = 0; i < 9; i++) {
+    CPrintF("  %d\n", i);
+    _aaiAmmo[i].ai_ptoAmmo = &_pHAC->m_atoAmmo[i];
+  }
+
+  CPrintF("Defining Weapon Icon Links:\n");
+  _awiWeapons[1].wi_ptoWeapon = &_pHAC->m_toWFists;
+  _awiWeapons[2].wi_ptoWeapon = &_pHAC->m_toWKnife;
+  _awiWeapons[3].wi_ptoWeapon = &_pHAC->m_toWColt;
+  _awiWeapons[4].wi_ptoWeapon = &_pHAC->m_toWColt;
+  _awiWeapons[5].wi_ptoWeapon = &_pHAC->m_toWSingleShotgun;
+  _awiWeapons[6].wi_ptoWeapon = &_pHAC->m_toWDoubleShotgun;
+  _awiWeapons[7].wi_ptoWeapon = &_pHAC->m_toWTommygun;
+  _awiWeapons[8].wi_ptoWeapon = &_pHAC->m_toWMinigun;
+  _awiWeapons[9].wi_ptoWeapon = &_pHAC->m_toWRocketLauncher;
+  _awiWeapons[10].wi_ptoWeapon = &_pHAC->m_toWGrenadeLauncher;
+  _awiWeapons[11].wi_ptoWeapon = &_pHAC->m_toWChainsaw;
+  _awiWeapons[12].wi_ptoWeapon = &_pHAC->m_toWFlamer;
+  _awiWeapons[13].wi_ptoWeapon = &_pHAC->m_toWLaser;
+  _awiWeapons[14].wi_ptoWeapon = &_pHAC->m_toWSniper;
+  _awiWeapons[15].wi_ptoWeapon = &_pHAC->m_toWIronCannon;
+  _awiWeapons[16].wi_ptoWeapon = &_pHAC->m_toWSeriousBomb;
+}
 
 // --------------------------------------------------------------------------------------
 // Compare functions for qsort().
@@ -498,8 +457,8 @@ extern INDEX HUD_SetAllPlayersStats( INDEX iSortKey)
 // --------------------------------------------------------------------------------------
 static void HUD_DrawBorder( FLOAT fCenterX, FLOAT fCenterY, FLOAT fSizeX, FLOAT fSizeY, COLOR colTiles)
 {
-  if (_toTile.GetData() == NULL) return;
-  if (_toTile.GetData()->ad_Anims == NULL) return;
+  if (_pHAC->m_toTile.GetData() == NULL) return;
+  if (_pHAC->m_toTile.GetData()->ad_Anims == NULL) return;
   
   // determine location
   const FLOAT fCenterI  = fCenterX * _pixDPWidth  / 640.0f;
@@ -522,7 +481,7 @@ static void HUD_DrawBorder( FLOAT fCenterX, FLOAT fCenterY, FLOAT fSizeX, FLOAT 
   colTiles |= _ulAlphaHUD;
 
   // put corners
-  _pDP->InitTexture(&_toTile, TRUE); // clamping on!
+  _pDP->InitTexture(&_pHAC->m_toTile, TRUE); // clamping on!
   _pDP->AddTexture(fLeft, fUp,   fLeftEnd, fUpEnd,   colTiles);
   _pDP->AddTexture(fRight,fUp,   fRightBeg,fUpEnd,   colTiles);
   _pDP->AddTexture(fRight,fDown, fRightBeg,fDownBeg, colTiles);
@@ -690,8 +649,8 @@ static void HUD_DrawAspectCorrectTextureCentered( class CTextureObject *_pTO, FL
 // --------------------------------------------------------------------------------------
 static void HUD_DrawSniperMask( void )
 {
-  if (_toSniperMask.GetData() == NULL) return;
-  if (_toSniperMask.GetData()->ad_Anims == NULL) return;
+  if (_pHAC->m_toSniperMask.GetData() == NULL) return;
+  if (_pHAC->m_toSniperMask.GetData()->ad_Anims == NULL) return;
   
   // determine location
   const FLOAT fSizeI = _pixDPWidth;
@@ -702,7 +661,7 @@ static void HUD_DrawSniperMask( void )
 
   COLOR colMask = C_WHITE|CT_OPAQUE;
 
-  CTextureData *ptd = (CTextureData*)_toSniperMask.GetData();
+  CTextureData *ptd = (CTextureData*)_pHAC->m_toSniperMask.GetData();
   const FLOAT fTexSizeI = ptd->GetPixWidth();
   const FLOAT fTexSizeJ = ptd->GetPixHeight();
   
@@ -723,7 +682,7 @@ static void HUD_DrawSniperMask( void )
 
     colMask = C_WHITE|ulSniperScopeBaseOpacity;
   
-    _pDP->InitTexture( &_toSniperMask);
+    _pDP->InitTexture( &_pHAC->m_toSniperMask);
 
     if (hud_bSniperScopeRenderFromQuarter) 
     {
@@ -775,7 +734,7 @@ static void HUD_DrawSniperMask( void )
       }
     }
     
-    HUD_DrawRotatedQuad(&_toSniperWheel, fCenterI, fCenterJ, 40.0f*_fYResolutionScaling, aAngle, colWhell|ulSniperScopeWheelOpacity);
+    HUD_DrawRotatedQuad(&_pHAC->m_toSniperWheel, fCenterI, fCenterJ, 40.0f*_fYResolutionScaling, aAngle, colWhell|ulSniperScopeWheelOpacity);
   }
 
   FLOAT fTM = _pTimer->GetLerpedCurrentTick();
@@ -792,7 +751,7 @@ static void HUD_DrawSniperMask( void )
       colLED = 0xFF442200;
     }
     
-    HUD_DrawAspectCorrectTextureCentered(&_toSniperLed, fCenterI-37.0f*_fYResolutionScaling,
+    HUD_DrawAspectCorrectTextureCentered(&_pHAC->m_toSniperLed, fCenterI-37.0f*_fYResolutionScaling,
       fCenterJ+36.0f*_fYResolutionScaling, 15.0f*_fYResolutionScaling, colLED|ulSniperScopeLedOpacity);
   }
 
@@ -830,7 +789,7 @@ static void HUD_DrawSniperMask( void )
     if (hud_fSniperScopeRangeIconOpacity > 0.0F) {
       ULONG ulSniperScopeRangeIconOpacity = NormFloatToByte(hud_fSniperScopeRangeIconOpacity);
 
-      HUD_DrawAspectCorrectTextureCentered(&_toSniperArrow, fCenterI-_fLeftX*_fYResolutionScaling,
+      HUD_DrawAspectCorrectTextureCentered(&_pHAC->m_toSniperArrow, fCenterI-_fLeftX*_fYResolutionScaling,
         fCenterJ-_fLeftYU*_fYResolutionScaling, _fIconSize*_fYResolutionScaling, 0xFFCC3300|ulSniperScopeRangeIconOpacity );
     }
 
@@ -852,7 +811,7 @@ static void HUD_DrawSniperMask( void )
     if (hud_fSniperScopeZoomIconOpacity > 0.0F) {
       ULONG ulSniperScopeZoomIconOpacity = NormFloatToByte(hud_fSniperScopeZoomIconOpacity);
 
-      HUD_DrawAspectCorrectTextureCentered(&_toSniperEye,   fCenterI+_fRightX*_fYResolutionScaling,
+      HUD_DrawAspectCorrectTextureCentered(&_pHAC->m_toSniperEye,   fCenterI+_fRightX*_fYResolutionScaling,
         fCenterJ-_fRightYU*_fYResolutionScaling, _fIconSize*_fYResolutionScaling, 0xFFCC3300|ulSniperScopeZoomIconOpacity ); //SE_COL_ORANGE_L
     }
 
@@ -930,7 +889,7 @@ static void HUD_FillWeaponAmmoTables(void)
 // (units are in pixels for 640x480 resolution - for other res HUD will be scalled automatically)
 // --------------------------------------------------------------------------------------
 extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner);
-extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner);
+extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner);
 extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner);
 
 extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner)
@@ -940,7 +899,7 @@ extern void DrawHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOO
   if (hud_iHUDType == 2) {
     DrawNewHUD(penPlayerCurrent, pdpCurrent, bSnooping, penPlayerOwner);
   } else if (hud_iHUDType == 1) {
-    DrawHybrideHUD(penPlayerCurrent, pdpCurrent, bSnooping, penPlayerOwner);
+    DrawHybridHUD(penPlayerCurrent, pdpCurrent, bSnooping, penPlayerOwner);
   } else {
     DrawOldHUD(penPlayerCurrent, pdpCurrent, bSnooping, penPlayerOwner);
   }
@@ -1023,7 +982,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
     HUD_DrawAnchoredRect(8, 8, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon(8, 8, 32, 32, EHHAT_LEFT, EHVAT_BOT, _toHealth, C_WHITE|CT_OPAQUE, fValue / TOP_HEALTH, FALSE);
+    HUD_DrawAnchroredIcon(8, 8, 32, 32, EHHAT_LEFT, EHVAT_BOT, _pHAC->m_toHealth, C_WHITE|CT_OPAQUE, fValue / TOP_HEALTH, FALSE);
 
     HUD_DrawAnchoredRectOutline( 8, 8, 32, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
@@ -1032,18 +991,22 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     strHealth.PrintF("%.0f", fValue);
     HUD_DrawAnchoredTextInRect(FLOAT2D(44, 8), FLOAT2D(80, 32), EHHAT_LEFT, EHVAT_BOT, strHealth, colDefault, fValue / TOP_HEALTH);
   }
+  
+  PIX pixShieldsVO = 0;
 
   // Armor
   if (_penPlayer->m_fArmor > 0.0F) {
+    pixShieldsVO = 40;
+
     fValue = Clamp(ceil(_penPlayer->m_fArmor), 0.0f, 999.0F);
     CTextureObject *ptoCurrentArmor = NULL;
       
     if (fValue <= 50.5f) {
-      ptoCurrentArmor = &_toArmorSmall;
+      ptoCurrentArmor = &_pHAC->m_toArmorSmall;
     } else if (fValue<=100.5f) {
-      ptoCurrentArmor = &_toArmorMedium;
+      ptoCurrentArmor = &_pHAC->m_toArmorMedium;
     } else {
-      ptoCurrentArmor = &_toArmorLarge;
+      ptoCurrentArmor = &_pHAC->m_toArmorLarge;
     }
     
     HUD_PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
@@ -1059,6 +1022,27 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     CTString strArmor;
     strArmor.PrintF("%.0f", fValue);
     HUD_DrawAnchoredTextInRect(FLOAT2D(44, 48), FLOAT2D(80, 32), EHHAT_LEFT, EHVAT_BOT, strArmor, colDefault, fValue / TOP_ARMOR);
+  }
+  
+  // Shields
+  if (_penPlayer->m_fShields > 0.0F) {
+    fValue = Clamp(ceil(_penPlayer->m_fShields), 0.0f, 999.0F);
+    CTextureObject *ptoCurrentArmor = &_pHAC->m_toShields;
+    
+    HUD_PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
+    //colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastArmor, penLast->m_tmArmorChanged, fMoverX, fMoverY);
+
+    HUD_DrawAnchoredRect( 8, 48 + pixShieldsVO, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchoredRect(44, 48 + pixShieldsVO, 80, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchroredIcon(8, 48 + pixShieldsVO, 32, 32, EHHAT_LEFT, EHVAT_BOT, *ptoCurrentArmor, C_WHITE|CT_OPAQUE, fValue / TOP_ARMOR, FALSE); // Icon
+    HUD_DrawAnchroredIcon(8, 48 + pixShieldsVO, 32, 32, EHHAT_LEFT, EHVAT_BOT, _pHAC->m_toShieldsTop, C_GREEN|CT_OPAQUE, fValue / TOP_ARMOR, FALSE); // Icon
+
+    HUD_DrawAnchoredRectOutline( 8, 48 + pixShieldsVO, 32, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+    HUD_DrawAnchoredRectOutline(44, 48 + pixShieldsVO, 80, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+    
+    CTString strShields;
+    strShields.PrintF("%.0f", fValue);
+    HUD_DrawAnchoredTextInRect(FLOAT2D(44, 48 + pixShieldsVO), FLOAT2D(80, 32), EHHAT_LEFT, EHVAT_BOT, strShields, colDefault, fValue / TOP_ARMOR);
   }
   
   // Current Weapon and its Ammo
@@ -1089,7 +1073,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.30f, 0.15f, FALSE);
         
       if (bAnyColt) {
-        ptoCurrentAmmo = &_toAColt;
+        ptoCurrentAmmo = &_pHAC->m_toAColt;
       }
       
       HUD_DrawAnchoredRect(  0 - 32, 8, 80, 32, EHHAT_CENTER, EHVAT_BOT, C_BLACK|_ulBrAlpha);
@@ -1196,7 +1180,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     
     HUD_DrawAnchoredRect ( 8,  8,  16, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect (28,  8, 104, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 8,  8,  16, 16, EHHAT_LEFT, EHVAT_TOP, _toFrags, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( 8,  8,  16, 16, EHHAT_LEFT, EHVAT_TOP, _pHAC->m_toFrags, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
     
     HUD_DrawAnchoredRectOutline( 8, 8,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 8, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
@@ -1211,7 +1195,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
     HUD_DrawAnchoredRect ( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect (28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _toExtraLive, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _pHAC->m_toExtraLive, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
     
     HUD_DrawAnchoredRectOutline( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
@@ -1226,7 +1210,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
     HUD_DrawAnchoredRect ( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect (28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _toDeaths, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _pHAC->m_toDeaths, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
     
     HUD_DrawAnchoredRectOutline( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
@@ -1248,7 +1232,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
     HUD_DrawAnchoredRect ( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect (28, 48, 104, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, _toClock, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, _pHAC->m_toClock, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
     
     HUD_DrawAnchoredRectOutline( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 48, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
@@ -1263,9 +1247,9 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   // [SSE] Radar
   #ifdef RADARAMA
   {
-    HUD_DrawAnchroredIcon( 8, 8,  128, 128, EHHAT_LEFT, EHVAT_TOP, _toRadarCircle, C_WHITE|_ulBrAlpha, 1.0F, FALSE);
-    HUD_DrawAnchroredIcon( 8, 8,  128, 128, EHHAT_LEFT, EHVAT_TOP, _toRadarMask,   _colHUD|_ulAlphaHUD, 1.0F, FALSE);
-    HUD_DrawAnchroredIcon( 8, 8,  128, 128, EHHAT_LEFT, EHVAT_TOP, _toRadarBorder, _colHUD|_ulAlphaHUD, 1.0F, FALSE);
+    HUD_DrawAnchroredIcon( 8, 8,  128, 128, EHHAT_LEFT, EHVAT_TOP, _pHAC->m_toRadarCircle, C_WHITE|_ulBrAlpha, 1.0F, FALSE);
+    HUD_DrawAnchroredIcon( 8, 8,  128, 128, EHHAT_LEFT, EHVAT_TOP, _pHAC->m_toRadarMask,   _colHUD|_ulAlphaHUD, 1.0F, FALSE);
+    HUD_DrawAnchroredIcon( 8, 8,  128, 128, EHHAT_LEFT, EHVAT_TOP, _pHAC->m_toRadarBorder, _colHUD|_ulAlphaHUD, 1.0F, FALSE);
     
     CPlacement3D plView = _penPlayer->en_plViewpoint;
     ANGLE3D a3dPlayerLookDir = ANGLE3D(((CEntity&)*_penPlayer).GetPlacement().pl_OrientationAngle(1) + plView.pl_OrientationAngle(1),0,0);
@@ -1301,13 +1285,13 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 				}
         
         if (plEnemy.pl_PositionVector.Length() < 200) {
-          CTextureObject *ptoDot = &_toRadarDot;
+          CTextureObject *ptoDot = &_pHAC->m_toRadarDot;
           
           if (Abs(plEnemy.pl_PositionVector(2)) > RHDIFF) {
             if (plEnemy.pl_PositionVector(2) > 0) {
-              ptoDot = &_toRadarDotUp;
+              ptoDot = &_pHAC->m_toRadarDotUp;
             } else if (plEnemy.pl_PositionVector(2) < 0) {
-              ptoDot = &_toRadarDotDown;
+              ptoDot = &_pHAC->m_toRadarDotDown;
             }
           }
 
@@ -1326,7 +1310,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     BOOL bBeating = _penPlayer->m_psGameStats.ps_iScore > _penPlayer->m_iHighScore;
     
     HUD_DrawAnchoredRect ( -54, 8,  16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( -54, 8,  16, 16, EHHAT_CENTER, EHVAT_TOP, _toHiScore, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( -54, 8,  16, 16, EHHAT_CENTER, EHVAT_TOP, _pHAC->m_toHiScore, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
     HUD_DrawAnchoredRect (  10, 8, 104, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     
     HUD_DrawAnchoredRectOutline(-54, 8,  16, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
@@ -1415,7 +1399,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
     // Swords Icon Box
     HUD_DrawAnchoredRect ( 0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toSwords, colIcon|CT_OPAQUE, 0.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( 0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, _pHAC->m_toSwords, colIcon|CT_OPAQUE, 0.0F, FALSE); // Icon
     HUD_DrawAnchoredRectOutline(0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
   }
 
@@ -1438,7 +1422,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       fNormValue = fValue/eb.m_fMaxHealth;
     }
     
-    CTextureObject *ptoBossIcon = &_toHealth;
+    CTextureObject *ptoBossIcon = &_pHAC->m_toHealth;
 
     // Q6785
     // [SSE] HudBosBarDisplay Entity
@@ -1495,7 +1479,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       
       HUD_DrawAnchoredRect (-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
       HUD_DrawAnchoredRect ( 10, 68, 64, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-      HUD_DrawAnchroredIcon(-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toOxygen, C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
+      HUD_DrawAnchroredIcon(-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, _pHAC->m_toOxygen, C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
       
       HUD_DrawAnchoredBar(10, 68, 64, 16, EHHAT_CENTER, EHVAT_TOP, BO_LEFT, NONE, fNormValue);
       
@@ -1540,7 +1524,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       
       HUD_DrawAnchoredRect ( 8, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
       HUD_DrawAnchoredRect (28, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-      HUD_DrawAnchroredIcon( 8, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, _toMessage, C_WHITE|CT_OPAQUE, 0.0F, TRUE); // Icon
+      HUD_DrawAnchroredIcon( 8, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, _pHAC->m_toMessage, C_WHITE|CT_OPAQUE, 0.0F, TRUE); // Icon
       
       HUD_DrawAnchoredRectOutline( 8, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
       HUD_DrawAnchoredRectOutline(28, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
@@ -1566,7 +1550,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     
     HUD_DrawAnchoredRect ( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect (28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, _toKey, C_WHITE|CT_OPAQUE, 0.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, _pHAC->m_toKey, C_WHITE|CT_OPAQUE, 0.0F, FALSE); // Icon
     
     HUD_DrawAnchoredRectOutline( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
@@ -1593,7 +1577,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
       FLOAT fNormValue = Clamp(tmDelta, 0.0F, ptmPowerupsMax[ii]) / ptmPowerupsMax[ii];
       HUD_DrawAnchoredRect (8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
-      HUD_DrawAnchroredIcon(8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _atoPowerups[ii], C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
+      HUD_DrawAnchroredIcon(8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _pHAC->m_atoPowerups[ii], C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
       
       HUD_DrawAnchoredBar(8 + (24 + 3) * iCol, 48, 4, 24, EHHAT_RIGHT, EHVAT_BOT, BO_DOWN, NONE, fNormValue);
       
@@ -1626,8 +1610,8 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
     for (INDEX i = 8; i >= 0; i--)
     {
-      CTextureObject *ptoAmmo = &_toASeriousBomb;
-      
+      CTextureObject *ptoAmmo = &_pHAC->m_atoAmmo[8]; // TODO: Magic number here.
+
       INDEX ii = 8 - i;
       
       COLOR colIcon = C_WHITE;
@@ -1692,7 +1676,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   }
 }
 
-extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner)
+extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, BOOL bSnooping, const CPlayer *penPlayerOwner)
 {
   // no player - no info, sorry
   if (penPlayerCurrent == NULL || (penPlayerCurrent->GetFlags()&ENF_DELETED)) return;
@@ -1789,7 +1773,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
     HUD_DrawAnchoredRect(8, 8, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon(8, 8, 32, 32, EHHAT_LEFT, EHVAT_BOT, _toHealth, C_WHITE|CT_OPAQUE, fValue / TOP_HEALTH, FALSE);
+    HUD_DrawAnchroredIcon(8, 8, 32, 32, EHHAT_LEFT, EHVAT_BOT, _pHAC->m_toHealth, C_WHITE|CT_OPAQUE, fValue / TOP_HEALTH, FALSE);
 
     HUD_DrawAnchoredRectOutline( 8, 8, 32, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
@@ -1799,24 +1783,26 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     HUD_DrawAnchoredTextInRect(FLOAT2D(44, 8), FLOAT2D(80, 32), EHHAT_LEFT, EHVAT_BOT, strHealth, colDefault, fValue / TOP_HEALTH);
   }
 
+  PIX pixShieldsVO = 0;
 
   // Armor
-  if (_penPlayer->m_fArmor > 0.0F)
-  {
+  if (_penPlayer->m_fArmor > 0.0F) {
+    pixShieldsVO = 40;
+
     fValue = Clamp(ceil(_penPlayer->m_fArmor), 0.0f, 999.0F);
     CTextureObject *ptoCurrentArmor = NULL;
       
     if (fValue <= 50.5f) {
-      ptoCurrentArmor = &_toArmorSmall;
+      ptoCurrentArmor = &_pHAC->m_toArmorSmall;
     } else if (fValue<=100.5f) {
-      ptoCurrentArmor = &_toArmorMedium;
+      ptoCurrentArmor = &_pHAC->m_toArmorMedium;
     } else {
-      ptoCurrentArmor = &_toArmorLarge;
+      ptoCurrentArmor = &_pHAC->m_toArmorLarge;
     }
     
     HUD_PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
     colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastArmor, penLast->m_tmArmorChanged, fMoverX, fMoverY);
-    
+
     HUD_DrawAnchoredRect( 8, 48, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect(44, 48, 80, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchroredIcon(8, 48, 32, 32, EHHAT_LEFT, EHVAT_BOT, *ptoCurrentArmor, C_WHITE|CT_OPAQUE, fValue / TOP_ARMOR, FALSE); // Icon
@@ -1827,6 +1813,26 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     CTString strArmor;
     strArmor.PrintF("%.0f", fValue);
     HUD_DrawAnchoredTextInRect(FLOAT2D(44, 48), FLOAT2D(80, 32), EHHAT_LEFT, EHVAT_BOT, strArmor, colDefault, fValue / TOP_ARMOR);
+  }
+  
+  // Shields
+  if (_penPlayer->m_fShields > 0.0F) {
+    fValue = Clamp(ceil(_penPlayer->m_fShields), 0.0f, 999.0F);
+    CTextureObject *ptoCurrentArmor = &_pHAC->m_toShields;
+    
+    HUD_PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
+    //colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastArmor, penLast->m_tmArmorChanged, fMoverX, fMoverY);
+
+    HUD_DrawAnchoredRect( 8, 48 + pixShieldsVO, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchoredRect(44, 48 + pixShieldsVO, 80, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
+    HUD_DrawAnchroredIcon(8, 48 + pixShieldsVO, 32, 32, EHHAT_LEFT, EHVAT_BOT, *ptoCurrentArmor, C_WHITE|CT_OPAQUE, fValue / TOP_ARMOR, FALSE); // Icon
+
+    HUD_DrawAnchoredRectOutline( 8, 48 + pixShieldsVO, 32, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+    HUD_DrawAnchoredRectOutline(44, 48 + pixShieldsVO, 80, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
+    
+    CTString strShields;
+    strShields.PrintF("%.0f", fValue);
+    HUD_DrawAnchoredTextInRect(FLOAT2D(44, 48 + pixShieldsVO), FLOAT2D(80, 32), EHHAT_LEFT, EHVAT_BOT, strShields, colDefault, fValue / TOP_ARMOR);
   }
 
   CTextureObject *ptoCurrentAmmo = NULL;
@@ -1861,7 +1867,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       
       // [SSE] Colt Bullets
       if (bAnyColt) {
-        ptoCurrentAmmo = &_toAColt;
+        ptoCurrentAmmo = &_pHAC->m_toAColt;
       }
       
       HUD_DrawAnchoredRect(  0 - 32, 8, 80, 32, EHHAT_CENTER, EHVAT_BOT, C_BLACK|_ulBrAlpha);
@@ -1893,7 +1899,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
     for (INDEX i = 8; i >= 0; i--)
     {
-      CTextureObject *ptoAmmo = &_toASeriousBomb;
+      CTextureObject *ptoAmmo = &_pHAC->m_atoAmmo[8]; // TODO: Magic number here.
       
       INDEX ii = 8 - i;
       
@@ -1969,7 +1975,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
       FLOAT fNormValue = Clamp(tmDelta, 0.0F, ptmPowerupsMax[ii]) / ptmPowerupsMax[ii];
       HUD_DrawAnchoredRect (8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
-      HUD_DrawAnchroredIcon(8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _atoPowerups[ii], C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
+      HUD_DrawAnchroredIcon(8 + (24 + 3) * iCol, 48, 24, 24, EHHAT_RIGHT, EHVAT_BOT, _pHAC->m_atoPowerups[ii], C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
       
       HUD_DrawAnchoredBar(8 + (24 + 3) * iCol, 48, 4, 24, EHHAT_RIGHT, EHVAT_BOT, BO_DOWN, NONE, fNormValue);
       
@@ -2126,7 +2132,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
     // Swords Icon Box
     HUD_DrawAnchoredRect ( 0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toSwords, colIcon|CT_OPAQUE, 0.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( 0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, _pHAC->m_toSwords, colIcon|CT_OPAQUE, 0.0F, FALSE); // Icon
     HUD_DrawAnchoredRectOutline(0, 8 + pixIconBoxShift, 16, 16, EHHAT_CENTER, EHVAT_TOP, col|_ulAlphaHUD);
   }
   
@@ -2145,7 +2151,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       fNormValue = fValue/eb.m_fMaxHealth;
     }
     
-    CTextureObject *ptoBossIcon = &_toHealth;
+    CTextureObject *ptoBossIcon = &_pHAC->m_toHealth;
 
     // Q6785
     // [SSE] HudBosBarDisplay Entity
@@ -2202,7 +2208,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       
       HUD_DrawAnchoredRect (-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
       HUD_DrawAnchoredRect ( 10, 68, 64, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-      HUD_DrawAnchroredIcon(-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, _toOxygen, C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
+      HUD_DrawAnchroredIcon(-34, 68, 16, 16, EHHAT_CENTER, EHVAT_TOP, _pHAC->m_toOxygen, C_WHITE|CT_OPAQUE, fNormValue, TRUE); // Icon
       
       HUD_DrawAnchoredBar(10, 68, 64, 16, EHHAT_CENTER, EHVAT_TOP, BO_LEFT, NONE, fNormValue);
       
@@ -2461,7 +2467,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     
     HUD_DrawAnchoredRect ( 8,  8,  16, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect (28,  8, 104, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 8,  8,  16, 16, EHHAT_LEFT, EHVAT_TOP, _toFrags, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( 8,  8,  16, 16, EHHAT_LEFT, EHVAT_TOP, _pHAC->m_toFrags, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
     
     HUD_DrawAnchoredRectOutline( 8, 8,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 8, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
@@ -2476,7 +2482,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
     HUD_DrawAnchoredRect ( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect (28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _toExtraLive, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _pHAC->m_toExtraLive, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
     
     HUD_DrawAnchoredRectOutline( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
@@ -2513,7 +2519,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
     HUD_DrawAnchoredRect ( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect (28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _toDeaths, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _pHAC->m_toDeaths, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
     
     HUD_DrawAnchoredRectOutline( 8, 28,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
@@ -2535,7 +2541,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
 
     HUD_DrawAnchoredRect ( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect (28, 48, 104, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, _toClock, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, _pHAC->m_toClock, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
     
     HUD_DrawAnchoredRectOutline( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 48, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
@@ -2554,7 +2560,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     BOOL bBeating = _penPlayer->m_psGameStats.ps_iScore > _penPlayer->m_iHighScore;
     
     HUD_DrawAnchoredRect ( -54, 8,  16, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( -54, 8,  16, 16, EHHAT_CENTER, EHVAT_TOP, _toHiScore, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( -54, 8,  16, 16, EHHAT_CENTER, EHVAT_TOP, _pHAC->m_toHiScore, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
     HUD_DrawAnchoredRect (  10, 8, 104, 16, EHHAT_CENTER, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     
     HUD_DrawAnchoredRectOutline(-54, 8,  16, 16, EHHAT_CENTER, EHVAT_TOP, _colHUD|_ulAlphaHUD);
@@ -2599,7 +2605,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
       
       HUD_DrawAnchoredRect ( 8, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
       HUD_DrawAnchoredRect (28, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-      HUD_DrawAnchroredIcon( 8, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, _toMessage, C_WHITE|CT_OPAQUE, 0.0F, TRUE); // Icon
+      HUD_DrawAnchroredIcon( 8, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, _pHAC->m_toMessage, C_WHITE|CT_OPAQUE, 0.0F, TRUE); // Icon
       
       HUD_DrawAnchoredRectOutline( 8, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
       HUD_DrawAnchoredRectOutline(28, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
@@ -2625,7 +2631,7 @@ extern void DrawHybrideHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurren
     
     HUD_DrawAnchoredRect ( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect (28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchroredIcon( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, _toKey, C_WHITE|CT_OPAQUE, 0.0F, FALSE); // Icon
+    HUD_DrawAnchroredIcon( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, _pHAC->m_toKey, C_WHITE|CT_OPAQUE, 0.0F, FALSE); // Icon
     
     HUD_DrawAnchoredRectOutline( 8 + pixShiftX, 8, 16, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28 + pixShiftX, 8, 52, 16, EHHAT_RIGHT, EHVAT_TOP, col|_ulAlphaHUD);
@@ -2758,7 +2764,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   HUD_DrawBorder( fCol, fRow, fChrUnit*3, fOneUnit, colBorder);
   HUD_DrawText( fCol, fRow, strValue, colDefault, fNormValue);
   fCol -= fAdvUnit+fChrUnit*3/2 -fHalfUnit;
-  HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _toHealth, C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
+  HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _pHAC->m_toHealth, C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
 
   // prepare and draw armor info (eventually)
   fValue = _penPlayer->m_fArmor;
@@ -2775,11 +2781,11 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
     HUD_DrawText( fCol, fRow, strValue, NONE, fNormValue);
     fCol -= fAdvUnit+fChrUnit*3/2 -fHalfUnit;
     if (fValue<=50.5f) {
-      HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _toArmorSmall, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
+      HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _pHAC->m_toArmorSmall, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
     } else if (fValue<=100.5f) {
-      HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _toArmorMedium, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
+      HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _pHAC->m_toArmorMedium, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
     } else {
-      HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _toArmorLarge, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
+      HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _pHAC->m_toArmorLarge, C_WHITE /*_colHUD*/, fNormValue, FALSE, 32, 32);
     }
   }
 
@@ -2808,7 +2814,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
 
     // [SSE] Colt Bullets
     if (bAnyColt) {
-      ptoCurrentAmmo = &_toAColt;
+      ptoCurrentAmmo = &_pHAC->m_toAColt;
     }
 
     // draw ammo, value and weapon
@@ -2885,7 +2891,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
     }
 
     HUD_DrawBorder( fCol,         fRow, fOneUnitS, fOneUnitS, colBombBorder);
-    HUD_DrawIcon(   fCol,         fRow, _toASeriousBomb, colBombIcon, fNormValue, FALSE, 32, 32);
+    HUD_DrawIcon(   fCol,         fRow, _pHAC->m_atoAmmo[8], colBombIcon, fNormValue, FALSE, 32, 32);
     HUD_DrawBar(    fCol+fBarPos, fRow, fOneUnitS/5, fOneUnitS-2, BO_DOWN, colBombBar, fNormValue);
     // make space for serious bomb
     fCol -= fAdvUnitS;
@@ -2933,7 +2939,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
     fNormValue = tmDelta / ptmPowerupsMax[i];
     // draw icon and a little bar
     HUD_DrawBorder( fCol,         fRow, fOneUnitS, fOneUnitS, colBorder);
-    HUD_DrawIcon(   fCol,         fRow, _atoPowerups[i], C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
+    HUD_DrawIcon(   fCol,         fRow, _pHAC->m_atoPowerups[i], C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
     HUD_DrawBar(    fCol+fBarPos, fRow, fOneUnitS/5, fOneUnitS-2, BO_DOWN, NONE, fNormValue);
     // play sound if icon is flashing
     if (fNormValue<=(_cttHUD.ctt_fLowMedium/2)) {
@@ -3021,7 +3027,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
       HUD_DrawBorder( fCol,      fRow, fOneUnit,         fOneUnit, colBorder);
       HUD_DrawBorder( fCol+fAdv, fRow, fOneUnit*4,       fOneUnit, colBorder);
       HUD_DrawBar(    fCol+fAdv, fRow, fOneUnit*4*0.975, fOneUnit*0.9375, BO_LEFT, NONE, fNormValue);
-      HUD_DrawIcon(   fCol,      fRow, _toOxygen, C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
+      HUD_DrawIcon(   fCol,      fRow, _pHAC->m_toOxygen, C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
       bOxygenOnScreen = TRUE;
     }
   }
@@ -3038,7 +3044,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
       fNormValue = fValue/eb.m_fMaxHealth;
     }
     
-    CTextureObject *ptoBossIcon = &_toHealth;
+    CTextureObject *ptoBossIcon = &_pHAC->m_toHealth;
     
     // Q6785
     // [SSE] HudBosBarDisplay Entity
@@ -3342,7 +3348,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
   HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
   HUD_DrawText(   fCol+fAdv, fRow, strValue, colScore, 1.0f);
-  HUD_DrawIcon(   fCol,      fRow, _toFrags, C_WHITE /*colScore*/, 1.0f, FALSE, 32, 32);
+  HUD_DrawIcon(   fCol,      fRow, _pHAC->m_toFrags, C_WHITE /*colScore*/, 1.0f, FALSE, 32, 32);
   
   // [SSE] Extra Lives System
   if (bCooperative && GetSP()->sp_ctCredits >= 0)
@@ -3355,7 +3361,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
     HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
     HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
     HUD_DrawText(   fCol+fAdv, fRow, strValue,  C_lGRAY, 1.0f);
-    HUD_DrawIcon(   fCol,      fRow, _toExtraLive, C_WHITE /*colMana*/, 1.0f, FALSE, 32, 32);
+    HUD_DrawIcon(   fCol,      fRow, _pHAC->m_toExtraLive, C_WHITE /*colMana*/, 1.0f, FALSE, 32, 32);
     
     if (GetSP()->sp_iScoreForExtraLive > 0)
     {
@@ -3392,7 +3398,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
     HUD_DrawBorder( fCol,      fRow, fOneUnit,           fOneUnit, colBorder);
     HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*fWidthAdj, fOneUnit, colBorder);
     HUD_DrawText(   fCol+fAdv, fRow, strValue,  colMana, 1.0f);
-    HUD_DrawIcon(   fCol,      fRow, _toDeaths, C_WHITE /*colMana*/, 1.0f, FALSE, 32, 32);
+    HUD_DrawIcon(   fCol,      fRow, _pHAC->m_toDeaths, C_WHITE /*colMana*/, 1.0f, FALSE, 32, 32);
   }
 
   // if single player or cooperative mode
@@ -3407,7 +3413,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
     HUD_DrawBorder( fCol,      fRow, fOneUnit,   fOneUnit, colBorder);
     HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*8, fOneUnit, colBorder);
     HUD_DrawText(   fCol+fAdv, fRow, strValue, NONE, bBeating ? 0.0f : 1.0f);
-    HUD_DrawIcon(   fCol,      fRow, _toHiScore, C_WHITE /*_colHUD*/, 1.0f, FALSE, 32, 32);
+    HUD_DrawIcon(   fCol,      fRow, _pHAC->m_toHiScore, C_WHITE /*_colHUD*/, 1.0f, FALSE, 32, 32);
 
     // prepare and draw unread messages
     if (hud_bShowMessages && _penPlayer->m_ctUnreadMessages > 0) {
@@ -3436,7 +3442,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
       HUD_DrawBorder( fCol,      fRow, fOneUnit,   fOneUnit, col);
       HUD_DrawBorder( fCol+fAdv, fRow, fChrUnit*4, fOneUnit, col);
       HUD_DrawText(   fCol+fAdv, fRow, strValue,   col, 1.0f);
-      HUD_DrawIcon(   fCol,      fRow, _toMessage, C_WHITE /*col*/, 0.0f, TRUE, 32 ,32);
+      HUD_DrawIcon(   fCol,      fRow, _pHAC->m_toMessage, C_WHITE /*col*/, 0.0f, TRUE, 32 ,32);
     }
   }
 
@@ -3567,76 +3573,79 @@ static void HUD_RegisterTextures()
   }
   
   // initialize tile texture
-  HUD_RegisterTexture(&_toTile, CTFILENAME("Textures\\Interface\\Tile.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toTile, CTFILENAME("Textures\\Interface\\Tile.tex"));
   
-  HUD_RegisterTexture(&_toHealth,  CTFILENAME("Textures\\Interface\\HSuper.tex"));
-  HUD_RegisterTexture(&_toOxygen,  CTFILENAME("Textures\\Interface\\Oxygen-2.tex"));
-  HUD_RegisterTexture(&_toFrags,   CTFILENAME("Textures\\Interface\\IBead.tex"));
-  HUD_RegisterTexture(&_toDeaths,  CTFILENAME("Textures\\Interface\\ISkull.tex"));
-  HUD_RegisterTexture(&_toScore,   CTFILENAME("Textures\\Interface\\IScore.tex"));
-  HUD_RegisterTexture(&_toHiScore, CTFILENAME("Textures\\Interface\\IHiScore.tex"));
-  HUD_RegisterTexture(&_toMessage, CTFILENAME("Textures\\Interface\\IMessage.tex"));
-  HUD_RegisterTexture(&_toMana,    CTFILENAME("Textures\\Interface\\IValue.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toHealth,  CTFILENAME("Textures\\Interface\\HSuper.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toOxygen,  CTFILENAME("Textures\\Interface\\Oxygen-2.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toFrags,   CTFILENAME("Textures\\Interface\\IBead.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toDeaths,  CTFILENAME("Textures\\Interface\\ISkull.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toScore,   CTFILENAME("Textures\\Interface\\IScore.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toHiScore, CTFILENAME("Textures\\Interface\\IHiScore.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toMessage, CTFILENAME("Textures\\Interface\\IMessage.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toMana,    CTFILENAME("Textures\\Interface\\IValue.tex"));
 
-  HUD_RegisterTexture(&_toArmorSmall,  CTFILENAME("Textures\\Interface\\ArSmall.tex"));
-  HUD_RegisterTexture(&_toArmorMedium, CTFILENAME("Textures\\Interface\\ArMedium.tex"));
-  HUD_RegisterTexture(&_toArmorLarge,  CTFILENAME("Textures\\Interface\\ArStrong.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toArmorSmall,  CTFILENAME("Textures\\Interface\\ArSmall.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toArmorMedium, CTFILENAME("Textures\\Interface\\ArMedium.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toArmorLarge,  CTFILENAME("Textures\\Interface\\ArStrong.tex"));
   
-  HUD_RegisterTexture(&_toExtraLive,  CTFILENAME("Textures\\Interface\\IExtraLive.tex"));
-  HUD_RegisterTexture(&_toSwords,     CTFILENAME("Textures\\Interface\\ISwords.tex"));
-  HUD_RegisterTexture(&_toKey,        CTFILENAME("Textures\\Interface\\IKey.tex")); // [SSE] Better Keys
-  HUD_RegisterTexture(&_toClock,      CTFILENAME("Textures\\Interface\\IClock.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toExtraLive,  CTFILENAME("Textures\\Interface\\IExtraLive.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toSwords,     CTFILENAME("Textures\\Interface\\ISwords.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toKey,        CTFILENAME("Textures\\Interface\\IKey.tex")); // [SSE] Better Keys
+  HUD_RegisterTexture(&_pHAC->m_toClock,      CTFILENAME("Textures\\Interface\\IClock.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toShields,    CTFILENAME("Textures\\Interface\\Shields.tex")); // [SSE] Shields
+  HUD_RegisterTexture(&_pHAC->m_toShieldsTop, CTFILENAME("Textures\\Interface\\ShieldsTop.tex")); // [SSE] Shields
 
   // [SSE] Radar
-  HUD_RegisterTexture(&_toRadarCircle,  CTFILENAME("Textures\\Interface\\RadarCircle.tex"));
-  HUD_RegisterTexture(&_toRadarMask,    CTFILENAME("Textures\\Interface\\RadarMask.tex"));
-  HUD_RegisterTexture(&_toRadarBorder,  CTFILENAME("Textures\\Interface\\RadarBorder.tex"));
-  HUD_RegisterTexture(&_toRadarDot,     CTFILENAME("Textures\\Interface\\RadarDot.tex"));
-  HUD_RegisterTexture(&_toRadarDotUp,   CTFILENAME("Textures\\Interface\\RadarDotUp.tex"));
-  HUD_RegisterTexture(&_toRadarDotDown, CTFILENAME("Textures\\Interface\\RadarDotDown.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toRadarCircle,  CTFILENAME("Textures\\Interface\\RadarCircle.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toRadarMask,    CTFILENAME("Textures\\Interface\\RadarMask.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toRadarBorder,  CTFILENAME("Textures\\Interface\\RadarBorder.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toRadarDot,     CTFILENAME("Textures\\Interface\\RadarDot.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toRadarDotUp,   CTFILENAME("Textures\\Interface\\RadarDotUp.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toRadarDotDown, CTFILENAME("Textures\\Interface\\RadarDotDown.tex"));
   //
 
   // initialize ammo textures
-  HUD_RegisterTexture(&_toAColt,          CTFILENAME("Textures\\Interface\\AmColt.tex"));
-  HUD_RegisterTexture(&_toAShells,        CTFILENAME("Textures\\Interface\\AmShells.tex"));
-  HUD_RegisterTexture(&_toABullets,       CTFILENAME("Textures\\Interface\\AmBullets.tex"));
-  HUD_RegisterTexture(&_toARockets,       CTFILENAME("Textures\\Interface\\AmRockets.tex"));
-  HUD_RegisterTexture(&_toAGrenades,      CTFILENAME("Textures\\Interface\\AmGrenades.tex"));
-  HUD_RegisterTexture(&_toANapalm,        CTFILENAME("Textures\\Interface\\AmFuelReservoir.tex"));
-  HUD_RegisterTexture(&_toAElectricity,   CTFILENAME("Textures\\Interface\\AmElectricity.tex"));
-  HUD_RegisterTexture(&_toAIronBall,      CTFILENAME("Textures\\Interface\\AmCannonBall.tex"));
-  HUD_RegisterTexture(&_toASniperBullets, CTFILENAME("Textures\\Interface\\AmSniperBullets.tex"));
-  HUD_RegisterTexture(&_toASeriousBomb,   CTFILENAME("Textures\\Interface\\AmSeriousBomb.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toAColt,          CTFILENAME("Textures\\Interface\\AmColt.tex"));
+
+  HUD_RegisterTexture(&_pHAC->m_atoAmmo[0], CTFILENAME("Textures\\Interface\\AmShells.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoAmmo[1], CTFILENAME("Textures\\Interface\\AmBullets.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoAmmo[2], CTFILENAME("Textures\\Interface\\AmRockets.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoAmmo[3], CTFILENAME("Textures\\Interface\\AmGrenades.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoAmmo[4], CTFILENAME("Textures\\Interface\\AmFuelReservoir.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoAmmo[5], CTFILENAME("Textures\\Interface\\AmElectricity.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoAmmo[6], CTFILENAME("Textures\\Interface\\AmCannonBall.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoAmmo[7], CTFILENAME("Textures\\Interface\\AmSniperBullets.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoAmmo[8], CTFILENAME("Textures\\Interface\\AmSeriousBomb.tex"));
 
   // initialize weapon textures
-  HUD_RegisterTexture(&_toWFists,           CTFILENAME("Textures\\Interface\\WFists.tex")); // [SSE] Fists Weapon
-  HUD_RegisterTexture(&_toWKnife,           CTFILENAME("Textures\\Interface\\WKnife.tex"));
-  HUD_RegisterTexture(&_toWColt,            CTFILENAME("Textures\\Interface\\WColt.tex"));
-  HUD_RegisterTexture(&_toWSingleShotgun,   CTFILENAME("Textures\\Interface\\WSingleShotgun.tex"));
-  HUD_RegisterTexture(&_toWDoubleShotgun,   CTFILENAME("Textures\\Interface\\WDoubleShotgun.tex"));
-  HUD_RegisterTexture(&_toWTommygun,        CTFILENAME("Textures\\Interface\\WTommygun.tex"));
-  HUD_RegisterTexture(&_toWMinigun,         CTFILENAME("Textures\\Interface\\WMinigun.tex"));
-  HUD_RegisterTexture(&_toWRocketLauncher,  CTFILENAME("Textures\\Interface\\WRocketLauncher.tex"));
-  HUD_RegisterTexture(&_toWGrenadeLauncher, CTFILENAME("Textures\\Interface\\WGrenadeLauncher.tex"));
-  HUD_RegisterTexture(&_toWLaser,           CTFILENAME("Textures\\Interface\\WLaser.tex"));
-  HUD_RegisterTexture(&_toWIronCannon,      CTFILENAME("Textures\\Interface\\WCannon.tex"));
-  HUD_RegisterTexture(&_toWChainsaw,        CTFILENAME("Textures\\Interface\\WChainsaw.tex"));
-  HUD_RegisterTexture(&_toWSniper,          CTFILENAME("Textures\\Interface\\WSniper.tex"));
-  HUD_RegisterTexture(&_toWFlamer,          CTFILENAME("Textures\\Interface\\WFlamer.tex"));
-  HUD_RegisterTexture(&_toWSeriousBomb,     CTFILENAME("Textures\\Interface\\WSeriousBomb.tex")); // [SSE] Gameplay - Serious Bomb Weapon
+  HUD_RegisterTexture(&_pHAC->m_toWFists,           CTFILENAME("Textures\\Interface\\WFists.tex")); // [SSE] Fists Weapon
+  HUD_RegisterTexture(&_pHAC->m_toWKnife,           CTFILENAME("Textures\\Interface\\WKnife.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toWColt,            CTFILENAME("Textures\\Interface\\WColt.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toWSingleShotgun,   CTFILENAME("Textures\\Interface\\WSingleShotgun.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toWDoubleShotgun,   CTFILENAME("Textures\\Interface\\WDoubleShotgun.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toWTommygun,        CTFILENAME("Textures\\Interface\\WTommygun.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toWMinigun,         CTFILENAME("Textures\\Interface\\WMinigun.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toWRocketLauncher,  CTFILENAME("Textures\\Interface\\WRocketLauncher.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toWGrenadeLauncher, CTFILENAME("Textures\\Interface\\WGrenadeLauncher.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toWLaser,           CTFILENAME("Textures\\Interface\\WLaser.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toWIronCannon,      CTFILENAME("Textures\\Interface\\WCannon.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toWChainsaw,        CTFILENAME("Textures\\Interface\\WChainsaw.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toWSniper,          CTFILENAME("Textures\\Interface\\WSniper.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toWFlamer,          CTFILENAME("Textures\\Interface\\WFlamer.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toWSeriousBomb,     CTFILENAME("Textures\\Interface\\WSeriousBomb.tex")); // [SSE] Gameplay - Serious Bomb Weapon
 
   // initialize powerup textures (DO NOT CHANGE ORDER!)
-  HUD_RegisterTexture(&_atoPowerups[0],    CTFILENAME("Textures\\Interface\\PInvisibility.tex"));
-  HUD_RegisterTexture(&_atoPowerups[1],    CTFILENAME("Textures\\Interface\\PInvulnerability.tex"));
-  HUD_RegisterTexture(&_atoPowerups[2],    CTFILENAME("Textures\\Interface\\PSeriousDamage.tex"));
-  HUD_RegisterTexture(&_atoPowerups[3],    CTFILENAME("Textures\\Interface\\PSeriousSpeed.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoPowerups[0],    CTFILENAME("Textures\\Interface\\PInvisibility.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoPowerups[1],    CTFILENAME("Textures\\Interface\\PInvulnerability.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoPowerups[2],    CTFILENAME("Textures\\Interface\\PSeriousDamage.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoPowerups[3],    CTFILENAME("Textures\\Interface\\PSeriousSpeed.tex"));
 
   // initialize sniper mask texture
-  HUD_RegisterTexture(&_toSniperMask,   CTFILENAME("Textures\\Interface\\SniperMask.tex"));
-  HUD_RegisterTexture(&_toSniperWheel,  CTFILENAME("Textures\\Interface\\SniperWheel.tex"));
-  HUD_RegisterTexture(&_toSniperArrow,  CTFILENAME("Textures\\Interface\\SniperArrow.tex"));
-  HUD_RegisterTexture(&_toSniperEye,    CTFILENAME("Textures\\Interface\\SniperEye.tex"));
-  HUD_RegisterTexture(&_toSniperLed,    CTFILENAME("Textures\\Interface\\SniperLed.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toSniperMask,   CTFILENAME("Textures\\Interface\\SniperMask.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toSniperWheel,  CTFILENAME("Textures\\Interface\\SniperWheel.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toSniperArrow,  CTFILENAME("Textures\\Interface\\SniperArrow.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toSniperEye,    CTFILENAME("Textures\\Interface\\SniperEye.tex"));
+  HUD_RegisterTexture(&_pHAC->m_toSniperLed,    CTFILENAME("Textures\\Interface\\SniperLed.tex"));
   
   _bTexturesRegistered = TRUE;
 }
@@ -3646,6 +3655,11 @@ static void HUD_RegisterTextures()
 // --------------------------------------------------------------------------------------
 extern void InitHUD(void)
 {
+  if (_pHAC == NULL) {
+    _pHAC = new CHudAssetsContainer();
+    InitAmmoWeaponIconsLinks();
+  }
+  
   InitDefaultTexture();
   
   CPrintF("Loading HUD assets...\n");
