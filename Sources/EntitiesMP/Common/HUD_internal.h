@@ -61,5 +61,7 @@ struct WeaponInfo
   BOOL wi_bHasWeapon;
 };
 
+static const INDEX aiAmmoRemap[8] = { 0, 1, 2, 3, 4, 5, 7, 6 };
+
 
 #endif

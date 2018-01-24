@@ -143,8 +143,6 @@ static struct AmmoInfo _aaiAmmo[9] = {
   { NULL, &_awiWeapons[16], NULL,             0, 0, 0, -9, FALSE }, //  8
 };
 
-static const INDEX aiAmmoRemap[8] = { 0, 1, 2, 3, 4, 5, 7, 6 };
-
 struct WeaponInfo _awiWeapons[18] = {
   { WEAPON_NONE,            NULL,  NULL,         FALSE },   //  0
   { WEAPON_FISTS,           NULL,  NULL,         FALSE },   //  1
