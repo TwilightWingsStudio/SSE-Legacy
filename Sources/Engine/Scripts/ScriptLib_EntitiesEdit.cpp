@@ -157,6 +157,31 @@ static int l_entitiesed_SetEntityLevel(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
+// Sets entity specified currency balance to given value.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "SetEntityBalance"
+static int l_entitiesed_SetEntityBalance(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 3);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  
+  INDEX iCurrencyID = ClampDn(luaL_checkinteger (L, 2), 0);
+  INDEX iValue = luaL_checkinteger (L, 3);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+  
+  CPrintF("CPlayer::SetBalance(%d, %d)\n", iCurrencyID, iValue);
+
+  static_cast<CLiveEntity*>(penEntity)->SetBalance(iCurrencyID, iValue);
+
+  return 0;
+}
+
+// --------------------------------------------------------------------------------------
 // Sets entity money to given value.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntityMoney"
@@ -467,6 +492,8 @@ static const struct luaL_Reg entitiesedLib [] = {
   {"SetEntityArmor", l_entitiesed_SetEntityArmor},
   {"SetEntityShields", l_entitiesed_SetEntityShields},
   {"SetEntityLevel", l_entitiesed_SetEntityLevel},
+
+  {"SetEntityBalance", l_entitiesed_SetEntityBalance},
   {"SetEntityMoney", l_entitiesed_SetEntityMoney},
   {"SetEntitySupplies", l_entitiesed_SetEntitySupplies},
   

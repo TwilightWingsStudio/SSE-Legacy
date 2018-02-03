@@ -198,12 +198,16 @@ void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScr
 
 BOOL luaut_CallVoid(lua_State *L, const char *pName)
 {
-  if (L == NULL) return FALSE;
+  if (L == NULL) {
+    ASSERTALWAYS("lua_State is NULL!");
+    return FALSE;
+  }
+
   if (pName == NULL) return FALSE;
   
   lua_getglobal(L, pName); // Put function to stack.
   
-  if(!lua_isfunction(L,-1)) {
+  if(!lua_isfunction(L, -1)) {
     lua_pop(L, 1);
     return FALSE;
   }

@@ -624,6 +624,28 @@ static int l_entities_GetEntityLevel(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
+// Gets entity balance for specified currency.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityBalance"
+static int l_entities_GetEntityBalance(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 2);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+
+  INDEX iCurrencyID = luaL_checkinteger (L, 2);
+  
+  lua_pushinteger(L, static_cast<CLiveEntity*>(penEntity)->GetBalance(iCurrencyID));
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
 // Gets entity money.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityMoney"
@@ -804,6 +826,7 @@ static const struct luaL_Reg entitiesLib [] = {
   //////// CEntity Utils ////////
   {"GetEntityParent", l_entities_GetEntityParent},
   {"GetEntityChildCount", l_entities_GetEntityChildCount},
+  //{"GetEntityChild", l_entities_GetEntityChild},
   {"GetEntityName", l_entities_GetEntityName},
   {"GetEntityClassName", l_entities_GetEntityClassName},
   //{"GetEntityInteractionProvider", l_entities_GetEntityInteractionProvider},
@@ -813,6 +836,7 @@ static const struct luaL_Reg entitiesLib [] = {
   {"GetEntityHealth", l_entities_GetEntityHealth},
   {"GetEntityShields", l_entities_GetEntityShields},
   {"GetEntityLevel", l_entities_GetEntityLevel},
+  {"GetEntityBalance", l_entities_GetEntityBalance},
   {"GetEntityMoney", l_entities_GetEntityMoney},
   {"GetEntitySupplies", l_entities_GetEntitySupplies},
 
@@ -832,11 +856,12 @@ static const struct luaL_Reg entitiesLib [] = {
   //////// Utils ////////
   {"DistanceBetweenEntities", l_entities_DistanceBetweenEntities},
   {"DistanceBetweenPoints", l_entities_DistanceBetweenPoints},
-  // FLOAT DistanceBetweenEntityAndPoint(EntityID, X, Y, Z)
+  // FLOAT DistanceBetweenEntityAndPos(EntityID, X, Y, Z)
   
   //////// Players ////////
   {"GetPlayerEntityByPLID", l_entities_GetPlayerEntityByPLID},
   {"GetPlayerID", l_entities_GetPlayerID},
+  // {"GetRndActivePlayerID", l_entities_GetRndActivePlayerID},
   {"GetPlayersCount", l_entities_GetPlayersCount},
   {"GetMaxPlayers", l_entities_GetMaxPlayers},
   

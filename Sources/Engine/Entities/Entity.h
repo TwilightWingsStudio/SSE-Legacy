@@ -814,7 +814,8 @@ class ENGINE_API CLiveEntity : public CEntity
     virtual FLOAT GetShields(void) const { return 0.0F; };
     virtual INDEX GetLevel(void) const { return 0; };
     
-    // Currencies
+    // [SSE] Currencies
+    virtual INDEX GetBalance(INDEX iCurrencyID) const { return 0; } // Universal getter.
     virtual INDEX GetMoney(void) const { return 0; };
     virtual INDEX GetSupplies(void) const { return 0; };
     
@@ -822,7 +823,8 @@ class ENGINE_API CLiveEntity : public CEntity
     virtual void SetShields(FLOAT fShields) {};
     virtual void SetLevel(INDEX iLevel) {};
     
-    // Currencies
+    // [SSE] Currencies
+    virtual void SetBalance(INDEX iCurrencyID, INDEX iValue) {}; // Universal setter.
     virtual void SetMoney(INDEX iMoney) {};
     virtual void SetSupplies(INDEX iSupllies) {};
     
