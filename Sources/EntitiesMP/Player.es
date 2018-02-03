@@ -79,6 +79,9 @@ extern void JumpFromBouncer(CEntity *penToBounce, CEntity *penBouncer);
 // [SSE] Weapon Inertia Effect
 #define WEAPON_INERTIA_MUL 0.05F
 
+// [SSE] Gameplay - Currencies
+#define SSE_MAX_CURRENCIES 4
+
 %}
 
 enum PlayerViewType {
@@ -1348,11 +1351,13 @@ properties:
  201 INDEX m_iLevel = 0,
 
  // [SSE] Gameplay - Currencies
- 202 INDEX m_iMoney = 0,
- 203 INDEX m_iSupplies = 0,
+ 202 INDEX m_iCurrency1 = 0,
+ 203 INDEX m_iCurrency2 = 0,
+ 204 INDEX m_iCurrency3 = 0,
+ 205 INDEX m_iCurrency4 = 0,
 
- 204 INDEX m_iScoreAccumulated = 0,
- 205 FLOAT m_fLiveCostMultiplier = 1.0F,
+ 205 INDEX m_iScoreAccumulated = 0,
+ 206 FLOAT m_fLiveCostMultiplier = 1.0F,
  
  // [SSE] Gameplay - Respawn Delay
  220 FLOAT m_tmKilled = -1.0f,
@@ -1553,21 +1558,40 @@ functions:
   }
   
   // --------------------------------------------------------------------------------------
-  // [SSE] Extended Engine API
+  // [SSE] Gameplay - Currencies
+  // Returns currency by its ID.
+  // --------------------------------------------------------------------------------------
+  virtual INDEX GetBalance(INDEX iCurrencyID) const
+  {
+    if (iCurrencyID < 0) {
+      return 0;
+    }
+
+    if (iCurrencyID >= SSE_MAX_CURRENCIES) {
+      return 0;
+    }
+    
+    const INDEX* aiCurrencies = &m_iCurrency1;
+    
+    return aiCurrencies[iCurrencyID];
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Gameplay - Currencies
   // Returns current money value.
   // --------------------------------------------------------------------------------------
   virtual INDEX GetMoney(void) const
   {
-    return m_iMoney;
+    return m_iCurrency1;
   }
   
   // --------------------------------------------------------------------------------------
-  // [SSE] Extended Engine API
+  // [SSE] Gameplay - Currencies
   // Returns current supplies value.
   // --------------------------------------------------------------------------------------
   virtual INDEX GetSupplies(void) const
   {
-    return m_iSupplies;
+    return m_iCurrency2;
   }
   
   // --------------------------------------------------------------------------------------
@@ -1598,12 +1622,31 @@ functions:
   };
   
   // --------------------------------------------------------------------------------------
+  // [SSE] Gameplay - Currencies
+  // Set the new value for specified currency.
+  // --------------------------------------------------------------------------------------
+  virtual void SetBalance(INDEX iCurrencyID, INDEX iValue)
+  {
+    if (iCurrencyID < 0) {
+      return;
+    }
+
+    if (iCurrencyID >= SSE_MAX_CURRENCIES) {
+      return;
+    }
+
+    INDEX* aiCurrencies = &m_iCurrency1;
+ 
+    aiCurrencies[iCurrencyID] = iValue;
+  };
+  
+  // --------------------------------------------------------------------------------------
   // [SSE] Extended Engine API
   // Sets the new money value.
   // --------------------------------------------------------------------------------------
   virtual void SetMoney(INDEX iMoney)
   {
-    m_iMoney = iMoney;
+    m_iCurrency1 = iMoney;
   };
   
   // --------------------------------------------------------------------------------------
@@ -1612,7 +1655,7 @@ functions:
   // --------------------------------------------------------------------------------------
   virtual void SetSupplies(INDEX iSupplies)
   {
-    m_iSupplies = iSupplies;
+    m_iCurrency2 = iSupplies;
   };
   
   // --------------------------------------------------------------------------------------

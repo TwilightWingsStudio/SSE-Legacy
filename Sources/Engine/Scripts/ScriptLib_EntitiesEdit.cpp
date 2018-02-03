@@ -173,8 +173,6 @@ static int l_entitiesed_SetEntityBalance(lua_State* L)
   
   ONLYVALIDENTITY(penEntity);
   ONLYLIVEENTITY(penEntity);
-  
-  CPrintF("CPlayer::SetBalance(%d, %d)\n", iCurrencyID, iValue);
 
   static_cast<CLiveEntity*>(penEntity)->SetBalance(iCurrencyID, iValue);
 
