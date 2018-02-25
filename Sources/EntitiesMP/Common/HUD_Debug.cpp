@@ -119,7 +119,16 @@ extern void HUD_DrawDebugMonitor()
   strReport.PrintF("%s^cCCCCCC#1 Sup-s: %d\n", strReport, _penPlayer->m_iCurrency2);
   strReport.PrintF("%s^cCCCCCC#2 Cr.    %d\n", strReport, _penPlayer->m_iCurrency3);
   strReport.PrintF("%s^cCCCCCC#3 Tk.    %d\n", strReport, _penPlayer->m_iCurrency4);
-  strReport.PrintF("%s^cCCCCCCShields: %.2f\n", strReport, _penPlayer->m_fShields);
+  
+  strReport.PrintF("%s^cCCCCCCShields: ", strReport);
+
+  if (_penPlayer->m_fShields >= 10000.0F) {
+    strReport.PrintF("%s%.1f k\n", strReport, _penPlayer->m_fShields / 1000.0F);
+  } else if (_penPlayer->m_fShields >= 1000.0F) {
+    strReport.PrintF("%s%.2f k\n", strReport, _penPlayer->m_fShields / 1000.0F);
+  } else {
+    strReport.PrintF("%s%.2f\n", strReport, _penPlayer->m_fShields);
+  }
 
   strReport += "\n\n";
   strReport += "^r[Mode Flags]^cCCCCCC\n";
