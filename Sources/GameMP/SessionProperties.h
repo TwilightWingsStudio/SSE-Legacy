@@ -16,6 +16,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define GMF_TEAMPLAY      (1L << 0)
 #define GMF_BASEONLYSPAWN (1L << 1)
 
+#define MUTF_INSTAGIB    (1L << 0)
+#define MUTF_VAMPIRE     (1L << 1)
+#define MUTF_ROCKETJUMP  (1L << 2)
+
 /*
  * Class responsible for describing game session
  */
@@ -155,9 +159,7 @@ public:
   INDEX sp_iTeamScore4;
   //
 
-  BOOL sp_bInstagib;       // [SSE] Gameplay - Mutators - Instagib
-  BOOL sp_bRocketJumpMode; // [SSE] RocketJump Mode
-  BOOL sp_bVampire;        // [SSE] Gameplay - Mutators - Vampire
+  ULONG sp_ulMutatorFlags;
 };
 
 // NOTE: never instantiate CSessionProperties, as its size is not fixed to the size defined in engine

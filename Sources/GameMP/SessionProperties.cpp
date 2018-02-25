@@ -228,7 +228,6 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
 
   sp.sp_bKeepSeriousDamageOnProjectiles = TRUE; // [SSE] Better Serious Damage
   sp.sp_bArmorInertiaDamping = TRUE;
-  sp.sp_bRocketJumpMode = FALSE; // [SSE] RocketJump Mode
 
   sp.sp_iBlood = Clamp( gam_iBlood, 0L, 3L);
   sp.sp_bGibs  = gam_bGibs;
@@ -307,7 +306,6 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_bKeepSeriousDamageOnProjectiles = gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
   
   sp.sp_bArmorInertiaDamping = gam_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
-  sp.sp_bRocketJumpMode = gam_bRocketJumpMode; // [SSE] RocketJump Mode
   
   sp.sp_bSafeFlamethrower = gam_bSafeFlamethrower; // [SSE] Gameplay - Safe Flamethrower
 
@@ -399,15 +397,22 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   if (sp.sp_bTeamPlay) {
     sp.sp_ctTeams = Clamp(gam_iTeamCount, 2L, 4L);
   }
-
-  sp.sp_bInstagib = sp.sp_bUseFrags || sp.sp_gmGameMode == CSessionProperties::GM_SCOREMATCH ? gam_bInstagib : FALSE; // [SSE] Gameplay - Mutators - Instagib
   
-  if (sp.sp_bInstagib) {
+  if ((sp.sp_bUseFrags || sp.sp_gmGameMode == CSessionProperties::GM_SCOREMATCH) && gam_bInstagib) {
+    sp.sp_ulMutatorFlags |= MUTF_INSTAGIB;
     sp.sp_bInfiniteAmmo = TRUE;
     sp.sp_bAllowWeapons = FALSE;
   }
 
-  sp.sp_bVampire = sp.sp_bUseFrags || sp.sp_gmGameMode == CSessionProperties::GM_SCOREMATCH ? gam_bVampire : FALSE; // [SSE] Gameplay - Mutators - Vampire
+  // [SSE] Gameplay - Mutators - Vampire
+  if ((sp.sp_bUseFrags || sp.sp_gmGameMode == CSessionProperties::GM_SCOREMATCH) && gam_bVampire) {
+    sp.sp_ulMutatorFlags |= MUTF_VAMPIRE;
+  }
+  
+  // [SSE] Gameplay - Mutators - RocketJump Mode
+  if (gam_bRocketJumpMode) {
+    sp.sp_ulMutatorFlags |= MUTF_ROCKETJUMP;
+  }
   
   // [SSE] GameModes - Team DeathMatch
   if (sp.sp_gmGameMode == CSessionProperties::GM_LASTMANSTANDING) {
