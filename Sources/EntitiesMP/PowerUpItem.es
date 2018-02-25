@@ -290,6 +290,7 @@ procedures:
     ePowerUp.puitType = m_puitType;
     ePowerUp.fValue = m_fValue; // [SSE] PowerUps Drop
     ePowerUp.bGenericPowerUp = FALSE;
+    ePowerUp.bDurationStacking = m_bDropped;
 
     // If powerup is received...
     if (epass.penOther->ReceiveItem(ePowerUp))
