@@ -152,15 +152,18 @@ extern void HUD_DrawDebugMonitor()
     strReport.PrintF("%s  UseFrags\n", strReport);
   }
   
-  strReport += "\n\n";
-  strReport += "^r[Mutators]^cCCCCCC\n";
-  
-  if (GetSP()->sp_bInstagib) {
-    strReport.PrintF("%s  Instagib\n", strReport);
-  }
-  
-  if (GetSP()->sp_bVampire) {
-    strReport.PrintF("%s  Vampire\n", strReport);
+  if (GetSP()->sp_bInstagib || GetSP()->sp_bVampire)
+  {
+    strReport += "\n\n";
+    strReport += "^r[Mutators]^cCCCCCC\n";
+    
+    if (GetSP()->sp_bInstagib) {
+      strReport.PrintF("%s  Instagib\n", strReport);
+    }
+    
+    if (GetSP()->sp_bVampire) {
+      strReport.PrintF("%s  Vampire\n", strReport);
+    }
   }
   
   strReport += "\n\n";
