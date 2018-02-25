@@ -380,7 +380,7 @@ static int l_entitiesed_TeleportEntityToPlacement(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
-// Teleports entity to given coords.
+// Teleports entity to placement of given entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "TeleportEntityToEntity"
 static int l_entitiesed_TeleportEntityToEntity(lua_State* L)
@@ -398,6 +398,7 @@ static int l_entitiesed_TeleportEntityToEntity(lua_State* L)
   DEFENTBYID(penSecondEntity, ulSecondEntityID);
   
   ONLYVALIDENTITY(penEntity);
+  ONLYVALIDENTITY(penSecondEntity);
 
   penEntity->Teleport(penSecondEntity->GetPlacement());
 
