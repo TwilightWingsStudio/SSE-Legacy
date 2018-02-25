@@ -152,17 +152,21 @@ extern void HUD_DrawDebugMonitor()
     strReport.PrintF("%s  UseFrags\n", strReport);
   }
   
-  if (GetSP()->sp_bInstagib || GetSP()->sp_bVampire)
+  if (GetSP()->sp_ulMutatorFlags != 0)
   {
     strReport += "\n\n";
     strReport += "^r[Mutators]^cCCCCCC\n";
     
-    if (GetSP()->sp_bInstagib) {
+    if (GetSP()->sp_ulMutatorFlags & MUTF_INSTAGIB) {
       strReport.PrintF("%s  Instagib\n", strReport);
     }
     
-    if (GetSP()->sp_bVampire) {
+    if (GetSP()->sp_ulMutatorFlags & MUTF_VAMPIRE) {
       strReport.PrintF("%s  Vampire\n", strReport);
+    }
+    
+    if (GetSP()->sp_ulMutatorFlags & MUTF_ROCKETJUMP) {
+      strReport.PrintF("%s  RocketJump\n", strReport);
     }
   }
   

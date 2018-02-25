@@ -4557,7 +4557,7 @@ functions:
     }
 
     // [SSE] Gameplay - Mutators - Instagib
-    if (penInflictor != this && penInflictor != NULL && GetSP()->sp_bInstagib && penInflictor->IsPlayerEntity())
+    if (penInflictor != this && penInflictor != NULL && (GetSP()->sp_ulMutatorFlags & MUTF_INSTAGIB) && penInflictor->IsPlayerEntity())
     {
       m_fShields = 0.0F;
       m_fArmor = 0.0F;
@@ -4567,7 +4567,7 @@ functions:
     }
     
     // [SSE] Gameplay - Mutators - Vampire
-    if (penInflictor != this && penInflictor != NULL && GetSP()->sp_bVampire && penInflictor->IsPlayerEntity() && penInflictor->IsAlive())
+    if (penInflictor != this && penInflictor != NULL && (GetSP()->sp_ulMutatorFlags & MUTF_VAMPIRE) && penInflictor->IsPlayerEntity() && penInflictor->IsAlive())
     {
       EReceiveHealing eHealing;
       eHealing.fValue = fSubHealth;
@@ -4578,7 +4578,7 @@ functions:
     DamageImpact(dmtType, GetSP()->sp_bArmorInertiaDamping ? fSubHealth : fDamageAmmount, vHitPoint, vDirection);
     
     // [SSE] RocketJump Mode
-    if (penInflictor != this || !GetSP()->sp_bRocketJumpMode || dmtType == DMT_BURNING) {
+    if (penInflictor != this || !(GetSP()->sp_ulMutatorFlags & MUTF_ROCKETJUMP) || dmtType == DMT_BURNING) {
       CPlayerEntity::ReceiveDamage( penInflictor, dmtType, fSubHealth, vHitPoint, vDirection); // receive damage
     }
 
@@ -7469,7 +7469,7 @@ functions:
       }
       
       // [SSE] Gameplay - Mutators - Instagib
-      if (GetSP()->sp_bInstagib) {
+      if (GetSP()->sp_ulMutatorFlags & MUTF_INSTAGIB) {
         iGiveWeapons = 0;
         iGiveWeapons |= 1 << (WEAPON_SNIPER - 2);
 
