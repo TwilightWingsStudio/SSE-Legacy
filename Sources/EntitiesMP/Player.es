@@ -5050,6 +5050,7 @@ functions:
 
       EPowerUp &ePowerUp = (EPowerUp&)ee;
       BOOL bGenericPowerUp = ePowerUp.bGenericPowerUp;
+      BOOL bDurationStacking = ePowerUp.bDurationStacking;
       FLOAT fValue = ePowerUp.fValue; 
 
       CGenericPowerUpItem *penGenericPowerUp = NULL;
@@ -5064,18 +5065,34 @@ functions:
       switch (ePowerUp.puitType)
       {
         case PUIT_INVISIB:
+          if (bDurationStacking) {
+            fValue += Clamp(m_tmInvisibility - tmNow, 0.0F, m_tmInvisibilityMax);
+          }
+
           m_tmInvisibility = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmInvisibilityMax) : m_tmInvisibilityMax);
           return TRUE;
 
         case PUIT_INVULNER:
+          if (bDurationStacking) {
+            fValue += Clamp(m_tmInvulnerability - tmNow, 0.0F, m_tmInvulnerabilityMax);
+          }
+        
           m_tmInvulnerability = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmInvulnerabilityMax) : m_tmInvulnerabilityMax);
           return TRUE;
 
         case PUIT_DAMAGE:
+          if (bDurationStacking) {
+            fValue += Clamp(m_tmSeriousDamage - tmNow, 0.0F, m_tmSeriousDamageMax);
+          }
+        
           m_tmSeriousDamage = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmSeriousDamageMax) : m_tmSeriousDamageMax);
           return TRUE;
 
         case PUIT_SPEED:
+          if (bDurationStacking) {
+            fValue += Clamp(m_tmSeriousSpeed - tmNow, 0.0F, m_tmSeriousSpeedMax);
+          }
+        
           m_tmSeriousSpeed = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmSeriousSpeedMax) : m_tmSeriousSpeedMax);
           return TRUE;
 

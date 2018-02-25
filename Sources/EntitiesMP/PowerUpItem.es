@@ -37,6 +37,7 @@ event EPowerUp {
   enum PowerUpItemType puitType,
   FLOAT fValue, // [SSE] PowerUps Drop
   BOOL bGenericPowerUp,
+  BOOL bDurationStacking,
 };
 
 %{

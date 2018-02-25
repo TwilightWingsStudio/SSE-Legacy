@@ -36,6 +36,7 @@ properties:
   4 CEntityPointer m_penSoundPick "Sound Pick Up",
   5 CTStringTrans m_strPickUpMessage "Message" = "Power Up!",
   6 FLOAT m_fDuration "Duration" = 10.0F,
+  7 BOOL m_bDurationStacking "Duration Stacking" = FALSE,
   
  10 FLOAT m_fParticlesSize "Particles Size" = 1.0F,
  11 FLOAT m_fParticlesHeight "Particles Height" = 1.0F,
@@ -137,6 +138,7 @@ procedures:
     ePowerUp.puitType = m_puitType;
     ePowerUp.fValue = ClampDn(m_fDuration, 0.0F);
     ePowerUp.bGenericPowerUp = TRUE;
+    ePowerUp.bDurationStacking = m_bDurationStacking;
     
     // If power up is received...
     if (epass.penOther->ReceiveItem(ePowerUp))
