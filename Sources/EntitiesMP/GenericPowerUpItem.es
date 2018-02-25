@@ -138,7 +138,7 @@ procedures:
     ePowerUp.fValue = ClampDn(m_fDuration, 0.0F);
     ePowerUp.bGenericPowerUp = TRUE;
     
-    // If key is received...
+    // If power up is received...
     if (epass.penOther->ReceiveItem(ePowerUp))
     {
       if(_pNetwork->IsPlayerLocal(epass.penOther)) {
