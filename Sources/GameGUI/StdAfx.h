@@ -44,8 +44,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 
 #include <EngineGUI/EngineGUI.h>
-#include <GameMP/Game.h>
-#include <GameGUIMP/GameGUI.h>
+#include <Game/Game.h>
+#include <GameGUI/GameGUI.h>
 #include <Engine/GameShell.h>
 
 extern class CGame *_pGame;
