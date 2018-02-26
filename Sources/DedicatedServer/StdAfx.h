@@ -16,7 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Engine.h>
 #include <Engine/Templates/Stock_CTextureData.h>
 #include <Engine/Templates/Stock_CModelData.h>
-#include <GameMP/Game.h>
+#include <Game/Game.h>
 
 /* rcg10042001 protect against Visual C-isms. */
 #ifdef _MSC_VER
@@ -28,9 +28,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #endif
 
 
-#include <EntitiesMP/Global.h>
-#include <EntitiesMP/Common/Common.h>
-#include <EntitiesMP/Common/GameInterface.h>
-#include <EntitiesMP/Player.h>
+#include <Entities/Global.h>
+#include <Entities/Common/Common.h>
+#include <Entities/Common/GameInterface.h>
+#include <Entities/Player.h>
 
 #undef DECL_DLL
