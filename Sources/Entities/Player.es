@@ -17,7 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %{
 
 #include "StdH.h"
-#include "GameMP/SEColors.h"
+#include "Game/SEColors.h"
 
 #include <Engine/Build.h>
 #include <Engine/Network/Network.h>

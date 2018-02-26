@@ -14,7 +14,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
 
 #include "StdH.h"
-#include "GameMP/SEColors.h"
+#include "Game/SEColors.h"
 
 #include "HUD.h"
 #include "HUD_internal.h"

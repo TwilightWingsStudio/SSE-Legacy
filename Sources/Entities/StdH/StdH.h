@@ -14,8 +14,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
 
 #include <Engine\Engine.h>
-#include <GameMP/SessionProperties.h>
-#include <GameMP/PlayerSettings.h>
+#include <Game/SessionProperties.h>
+#include <Game/PlayerSettings.h>
 
 /* rcg10042001 protect against Visual C-isms. */
 #ifdef _MSC_VER
