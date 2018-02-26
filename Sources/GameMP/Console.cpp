@@ -393,7 +393,7 @@ static void Key_Return(void)
     } else if (strEditingLine == "goodbye") {
       CPrintF("Ok, then foku, little faggot!\n");
 
-    } else if (strEditingLine == "graphics") {
+    } else if (strEditingLine == "graphics" || strEditingLine == "grafon") {
       CPrintF("FOKU!\n");
       
     } else if (strEditingLine == "hl3") {
@@ -416,6 +416,10 @@ static void Key_Return(void)
       
     } else if (strEditingLine == "shit") {
       CPrintF("I don't have shit. I think all shit already in your head if you typed it.\n");
+    //
+    //blin
+    //hardbass
+    //kolbasa
     //
 
     } else {

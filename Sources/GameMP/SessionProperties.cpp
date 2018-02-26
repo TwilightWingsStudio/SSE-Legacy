@@ -398,7 +398,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   }
   
   // [SSE] GameModes - Team DeathMatch
-  if (sp_ulGameModeFlags & GMF_TEAMPLAY) {
+  if (sp.sp_ulGameModeFlags & GMF_TEAMPLAY) {
     sp.sp_ctTeams = Clamp(gam_iTeamCount, 2L, 4L);
   }
   
