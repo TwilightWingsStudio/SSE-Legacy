@@ -286,12 +286,14 @@ ENGINE_API void SE_InitEngine(CTString strGameID)
 
   CRCT_Init();
 
-  _strEngineBuild.PrintF( TRANS("SeriousEngine Build: %d.%d"), _SE_BUILD_MAJOR, _SE_BUILD_MINOR);
+  _strEngineBuild.PrintF( TRANS("Version:    %d.%d"), _SE_BUILD_MAJOR, _SE_BUILD_MINOR);
 
   // print basic engine info
-  CPrintF(TRANS("--- Serious Engine Startup ---\n"));
-  CPrintF("  %s\n\n", _strEngineBuild);
-
+  CPrintF(TRANS("--- Serious Engine E Startup ---\n"));
+  CPrintF("  %s\n", _strEngineBuild);
+  CPrintF("  Revision:   %d\n", _ulEngineRevision);
+  CPrintF("  Build Date: %d/%d/%d\n\n", _ulEngineBuildYear, _ulEngineBuildMonth, _ulEngineBuildDay);
+  
   // print info on the started application
   CPrintF(TRANS("Executable: %s\n"), strExePath);
   CPrintF(TRANS("Assumed engine directory: %s\n"), _fnmApplicationPath);
