@@ -16,8 +16,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #ifndef __GAME_H
 #define __GAME_H 1
 
-#include <GameMP/PlayerSettings.h>
-#include <GameMP/SessionProperties.h>
+#include <Game/PlayerSettings.h>
+#include <Game/SessionProperties.h>
 
 #define GAME_SHELL_VER "V012"
 
