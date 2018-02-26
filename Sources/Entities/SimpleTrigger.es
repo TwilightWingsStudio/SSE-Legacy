@@ -1,4 +1,5 @@
-/* Copyright (c) 2002-2012 Croteam Ltd.
+/* Copyright (c) 2018 by ZCaliptium.
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as published by
 the Free Software Foundation
@@ -12,15 +13,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
-
-/*
-  NOTE: New procedures must be after the Main().
-  If you change this order you lose compatibility with the old maps.
-
-  If you need to use only this entity from SSE addon don't forget
-  about piece of code related to m_bCountAsSecret in the MusicHolder
-  entity.
-*/
 
 318
 %{

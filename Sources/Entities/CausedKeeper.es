@@ -1,4 +1,5 @@
-/* Copyright (c) 2002-2012 Croteam Ltd. 
+/* Copyright (c) 2018 by ZCaliptium.
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as published by
 the Free Software Foundation
@@ -44,7 +45,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Returns short entity description to show it in SED.
   // --------------------------------------------------------------------------------------
-  const CTString &GetDescription(void) const {
+  const CTString &GetDescription(void) const
+  {
     return m_strDescription;
   }
 
