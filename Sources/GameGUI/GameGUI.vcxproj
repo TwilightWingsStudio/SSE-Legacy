@@ -81,7 +81,7 @@
       <MinimalRebuild>true</MinimalRebuild>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;GAMEGUI_EXPORTS;_WINDLL;DIRECT3D_VERSION=0x0800;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\Debug\GameGUIMP.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>.\Debug\GameGUI.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ObjectFileName>.\Debug\</ObjectFileName>
@@ -92,7 +92,7 @@
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <TypeLibraryName>.\Debug\GameGUIMP.tlb</TypeLibraryName>
+      <TypeLibraryName>.\Debug\GameGUI.tlb</TypeLibraryName>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <TargetEnvironment>Win32</TargetEnvironment>
     </Midl>
@@ -102,15 +102,15 @@
     </ResourceCompile>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Debug\GameGUIMP.bsc</OutputFile>
+      <OutputFile>.\Debug\GameGUI.bsc</OutputFile>
     </Bscmake>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <OutputFile>Debug/GameGUIMPD.dll</OutputFile>
-      <ImportLibrary>.\Debug\GameGUIMPD.lib</ImportLibrary>
+      <OutputFile>Debug/GameGUID.dll</OutputFile>
+      <ImportLibrary>.\Debug\GameGUID.lib</ImportLibrary>
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
     <CustomBuildStep>
@@ -134,7 +134,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
       <OmitFramePointers>false</OmitFramePointers>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GAMEGUI_EXPORTS;_WINDLL;DIRECT3D_VERSION=0x0800;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\Release\GameGUIMP.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>.\Release\GameGUI.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ObjectFileName>.\Release\</ObjectFileName>
@@ -144,7 +144,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <TypeLibraryName>.\Release\GameGUIMP.tlb</TypeLibraryName>
+      <TypeLibraryName>.\Release\GameGUI.tlb</TypeLibraryName>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <TargetEnvironment>Win32</TargetEnvironment>
     </Midl>
@@ -154,15 +154,15 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     </ResourceCompile>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release\GameGUIMP.bsc</OutputFile>
+      <OutputFile>.\Release\GameGUI.bsc</OutputFile>
     </Bscmake>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <OutputFile>.\Release\GameGUIMP.dll</OutputFile>
-      <ImportLibrary>.\Release\GameGUIMP.lib</ImportLibrary>
+      <OutputFile>.\Release\GameGUI.dll</OutputFile>
+      <ImportLibrary>.\Release\GameGUI.lib</ImportLibrary>
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
     <CustomBuildStep>
@@ -241,7 +241,7 @@ copy Release\$(TargetName).lib $(SolutionDir)..\Bin\ &gt;nul</Command>
   <ItemGroup>
     <CustomBuild Include="bmp00001.bmp" />
     <CustomBuild Include="cursor_u.bmp" />
-    <CustomBuild Include="GameGUIMP.clw">
+    <CustomBuild Include="GameGUI.clw">
       <FileType>Document</FileType>
     </CustomBuild>
     <CustomBuild Include="ReadMe.txt" />

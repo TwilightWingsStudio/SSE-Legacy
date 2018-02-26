@@ -138,7 +138,7 @@
     <CustomBuild Include="cursor_u.bmp">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="GameGUIMP.clw">
+    <CustomBuild Include="GameGUI.clw">
       <Filter>Wizard Files</Filter>
     </CustomBuild>
     <CustomBuild Include="ReadMe.txt" />
