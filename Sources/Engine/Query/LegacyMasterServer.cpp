@@ -24,7 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/Server.h>
 #include <Engine/Network/Network.h>
 #include <Engine/Network/SessionState.h>
-#include <GameMP/SessionProperties.h> // TODO: GET RID OF THIS!
+#include <Game/SessionProperties.h> // TODO: GET RID OF THIS!
 
 #include <Engine/Query/MasterServerMgr.h>
 #include <Engine/Query/MSLegacy.h>
