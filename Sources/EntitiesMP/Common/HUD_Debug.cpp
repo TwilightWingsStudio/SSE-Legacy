@@ -136,7 +136,7 @@ extern void HUD_DrawDebugMonitor()
     strReport.PrintF("%s  Cooperative\n", strReport);
   }
   
-  if (GetSP()->sp_bTeamPlay) {
+  if (GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) {
     strReport.PrintF("%s  TeamPlay\n", strReport);
   }
   

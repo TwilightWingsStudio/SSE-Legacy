@@ -1688,7 +1688,7 @@ functions:
         SetArmor(fValue);
       }
     } else if (iCommandID == 3) {
-      if (GetSP()->sp_bTeamPlay && m_iTeamID != 0) {
+      if ((GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) && m_iTeamID != 0) {
         CPrintF(TRANS("%s joined as spectator.\n"), GetPlayerName());
 
         SwitchToEditorModel();
@@ -1838,8 +1838,9 @@ functions:
   void SpectatorControl()
   {
     CSpectatorCamera *pen = (CSpectatorCamera*)&*m_penSpectatorCamera;
+    const BOOL bTeamPlay = GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY; 
     
-    if (!GetSP()->sp_bTeamPlay || m_iTeamSelection == -1) {
+    if (!bTeamPlay || m_iTeamSelection == -1) {
       if (ulNewButtons & PLACT_WEAPON_NEXT) {
         pen->m_fSpeedMul = ClampUp(pen->m_fSpeedMul + 0.1F, 10.0F);
       }
@@ -1850,7 +1851,7 @@ functions:
     }
     
     // Use.
-    if (!GetSP()->sp_bTeamPlay || m_iTeamID != 0) {
+    if (!bTeamPlay || m_iTeamID != 0) {
       if (ulNewButtons & PLACT_USE) {
         pen->TogglePlayerControl();
         pen->StopCamera();
@@ -2433,7 +2434,7 @@ functions:
   {
     const CSessionProperties &sp = *GetSP();
     const BOOL bFragMatch = sp.sp_bUseFrags;
-    const BOOL bTeamPlay = sp.sp_bTeamPlay;
+    const BOOL bTeamPlay = sp.sp_ulGameModeFlags & GMF_TEAMPLAY;
     const INDEX ctTeams = sp.sp_ctTeams;
 
     extern INDEX HUD_SetAllPlayersStats( INDEX iSortKey);
@@ -3669,7 +3670,7 @@ functions:
     }
     
     // [SSE] GameModes - Team DeathMatch
-    if (GetSP()->sp_bTeamPlay && m_iTeamSelection != -1) {
+    if ((GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) && m_iTeamSelection != -1) {
       INDEX ctTeam1 = 0;
       INDEX ctTeam2 = 0;
       INDEX ctTeam3 = 0;
@@ -4407,7 +4408,7 @@ functions:
     
     // [SSE] GameModes - Team DeathMatch
     // If have no team selected then nobody can harm you!
-    if (GetSP()->sp_bTeamPlay && m_iTeamID == 0) {
+    if ((GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) && m_iTeamID == 0) {
       return;
     }
 
@@ -4441,7 +4442,7 @@ functions:
         }
 
       // [SSE] GameModes - Team DeathMatch
-      } else if (GetSP()->sp_bTeamPlay) {
+      } else if (GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) {
         if (IsOfClass(penInflictor, "Player")) {
           
           CPlayer *penPlayer = static_cast<CPlayer*>(penInflictor);
@@ -5367,7 +5368,7 @@ functions:
     
     // [SSE] GameModes - Team DeathMatch
     // if frag limit is out
-    if (GetSP()->sp_bTeamPlay && iFragLimit > 0) {
+    if ((GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) && iFragLimit > 0) {
       if (GetSP()->sp_iTeamScore1 >= iFragLimit || GetSP()->sp_iTeamScore2 >= iFragLimit || GetSP()->sp_iTeamScore3 >= iFragLimit || GetSP()->sp_iTeamScore4 >= iFragLimit) {
         bFinished = TRUE;
       }
@@ -7053,9 +7054,9 @@ functions:
     const CTString strPlayerStart = "Player Marker";
     
     // Get needed session properties.
-    const BOOL bTeamPlay = GetSP()->sp_bTeamPlay;
+    const BOOL bTeamPlay = GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY;
     const BOOL bPrefferSpawnOnBases = GetSP()->sp_bTeamPlayPrefferBases;
-    const BOOL bOnlyBasesSpawn = GetSP()->sp_bTeamPlayBaseOnlySpawn;
+    const BOOL bOnlyBasesSpawn = GetSP()->sp_ulGameModeFlags & GMF_BASEONLYSPAWN;
     const INDEX ctTeams = GetSP()->sp_ctTeams;
     
     static CStaticStackArray<CEntity*> apenMarkers;
@@ -7573,7 +7574,7 @@ functions:
    
     // [SSE] GameModes - Team DeathMatch
     // If not teamplay or have team selected.
-    if (!GetSP()->sp_bTeamPlay || m_iTeamID != 0) {
+    if (!(GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) || m_iTeamID != 0) {
       SpawnTeleport(); // spawn teleport effect
       SwitchToModel(); // return from editor model (if was fragged into pieces)
       
@@ -7907,7 +7908,7 @@ procedures:
             
             // [SSE] GameModes - Team DeathMatch
             // If teamplay and players are from same team.
-            if (GetSP()->sp_bTeamPlay && pplKillerPlayer->m_iTeamID == m_iTeamID) {
+            if ((GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) && pplKillerPlayer->m_iTeamID == m_iTeamID) {
               EKilledAlly eKilledAlly;
               eKilledAlly.iValue = GetSP()->sp_iTeamKillPenalty; // [SSE] Gameplay - TeamKill Penalty
               

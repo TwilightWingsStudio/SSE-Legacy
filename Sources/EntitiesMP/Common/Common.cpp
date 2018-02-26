@@ -956,7 +956,7 @@ BOOL SetPlayerAppearanceEx(CEntity *pen, CModelObject *pmo, CPlayerCharacter *pp
     return FALSE;
   }
   
-  if (pen && !bPreview && GetSP()->sp_bTeamPlay)
+  if (pen && !bPreview && (GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY))
   {
     CPlayer *penPlayer = static_cast<CPlayer*>(pen);
     

@@ -299,7 +299,7 @@ static COLOR HUD_GetInterfaceColor(const CPlayer *penPlayerOwner)
     return hud_colBorders;
   }
   
-  const BOOL bTeamPlay = GetSP()->sp_bTeamPlay;
+  const BOOL bTeamPlay = GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY;
   
   if (hud_bTeamColorBasedColor && bTeamPlay) {
     return HUD_GetTeamColor(penPlayerOwner->m_iTeamID);
@@ -949,7 +949,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   const BOOL bCooperative =  GetSP()->sp_bCooperative && !bSinglePlay;
   const BOOL bScoreMatch  = !GetSP()->sp_bCooperative && !GetSP()->sp_bUseFrags;
   const BOOL bFragMatch   = !GetSP()->sp_bCooperative &&  GetSP()->sp_bUseFrags;
-  const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
+  const BOOL bTeamDeathMatch = (GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
   const BOOL bSharedLives = GetSP()->sp_bSharedLives;
   const BOOL bSharedKeys = GetSP()->sp_bSharedKeys;
 
@@ -1711,7 +1711,7 @@ extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent
   INDEX iCurrentWeapon = _penWeapons->m_iCurrentWeapon;
   INDEX iWantedWeapon  = _penWeapons->m_iWantedWeapon;
   
-  const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
+  const BOOL bTeamDeathMatch = (GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
   const BOOL bSharedLives = GetSP()->sp_bSharedLives;
   const BOOL bSharedKeys = GetSP()->sp_bSharedKeys;
   
@@ -3093,7 +3093,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   const BOOL bCooperative =  GetSP()->sp_bCooperative && !bSinglePlay;
   const BOOL bScoreMatch  = !GetSP()->sp_bCooperative && !GetSP()->sp_bUseFrags;
   const BOOL bFragMatch   = !GetSP()->sp_bCooperative &&  GetSP()->sp_bUseFrags;
-  const BOOL bTeamDeathMatch = GetSP()->sp_bTeamPlay && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
+  const BOOL bTeamDeathMatch = (GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
   
   const INDEX ctTeams = GetSP()->sp_ctTeams;
   
