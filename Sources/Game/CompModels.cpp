@@ -16,7 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdAfx.h"
 #include "LCDDrawing.h"
 #define DECL_DLL
-#include "EntitiesMP/Common/Particles.h"
+#include "Entities/Common/Particles.h"
 
 #include "Models/Enemies/Headman/Headman.h"
 #include "Models/Enemies/Eyeman/Eyeman.h"

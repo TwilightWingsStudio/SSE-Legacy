@@ -113,7 +113,7 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>.\Release\Game.dll</OutputFile>
       <ImportLibrary>.\Release\Game.lib</ImportLibrary>
-      <AdditionalDependencies>user32.lib;Engine.lib;EntitiesMP.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>user32.lib;Engine.lib;Entities.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy Release\$(TargetName).dll $(SolutionDir)..\Bin\ &gt;nul
@@ -163,7 +163,7 @@ copy Release\$(TargetName).lib $(SolutionDir)..\Bin\ &gt;nul</Command>
       <SubSystem>Windows</SubSystem>
       <OutputFile>Debug/GameD.dll</OutputFile>
       <ImportLibrary>.\Debug\GameD.lib</ImportLibrary>
-      <AdditionalDependencies>user32.lib;EngineD.lib;EntitiesMPD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>user32.lib;EngineD.lib;EntitiesD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
     <CustomBuildStep>
