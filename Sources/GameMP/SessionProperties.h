@@ -13,6 +13,7 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
 
+// Players are divided in teams.
 #define GMF_TEAMPLAY      (1L << 0)
 #define GMF_BASEONLYSPAWN (1L << 1)
 
@@ -74,11 +75,9 @@ public:
   INDEX sp_iScoreLimit;       // stop game after a player/team reaches given score
   INDEX sp_iFragLimit;        // stop game after a player/team reaches given score
   INDEX sp_iTimeLimit;        // stop game after given number of minutes elapses
-  
-  // TODO: [ZCaliptium] Move gamemode-related booleans like sp_bTeamPlay into gamemode flags mask variable.
-  BOOL sp_bTeamPlayBaseOnlySpawn;
 
-  BOOL sp_bTeamPlay;          // players are divided in teams
+  ULONG sp_ulGameModeFlags;
+
   BOOL sp_bFriendlyFire;      // can harm player of same team
   BOOL sp_bWeaponsStay;       // weapon items do not dissapear when picked-up
   BOOL sp_bAmmoStays;         // ammo items do not dissapear when picked-up

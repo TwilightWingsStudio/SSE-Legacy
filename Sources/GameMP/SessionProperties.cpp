@@ -196,7 +196,6 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   sp.sp_tmSpawnInvulnerability = 0;
   sp.sp_tmRespawnDelay = 0; // [SSE] Respawn Delay
 
-  sp.sp_bTeamPlay = FALSE;
   sp.sp_bFriendlyFire = FALSE;
   sp.sp_bWeaponsStay = FALSE;
   sp.sp_bPlayEntireGame = TRUE;
@@ -276,7 +275,12 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_bSinglePlayer = FALSE;
   sp.sp_bPlayEntireGame = gam_bPlayEntireGame;
   sp.sp_bUseFrags = sp.sp_gmGameMode == CSessionProperties::GM_FRAGMATCH || sp.sp_gmGameMode == CSessionProperties::GM_TEAMDEATHMATCH || sp.sp_gmGameMode == CSessionProperties::GM_LASTMANSTANDING; // [SSE] Team DeathMatch
-  sp.sp_bTeamPlay = sp.sp_gmGameMode == CSessionProperties::GM_TEAMDEATHMATCH || sp.sp_gmGameMode == CSessionProperties::GM_LASTTEAMSTANDING; // [SSE] Team DeathMatch
+
+  // [SSE] Team DeathMatch
+  if (sp.sp_gmGameMode == CSessionProperties::GM_TEAMDEATHMATCH || sp.sp_gmGameMode == CSessionProperties::GM_LASTTEAMSTANDING) {
+    sp.sp_ulGameModeFlags |= GMF_TEAMPLAY;
+  }
+  
   sp.sp_bWeaponsStay = gam_bWeaponsStay;
   sp.sp_bFriendlyFire = gam_bFriendlyFire;
   sp.sp_ctMaxPlayers = gam_ctMaxPlayers;
@@ -394,7 +398,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   }
   
   // [SSE] GameModes - Team DeathMatch
-  if (sp.sp_bTeamPlay) {
+  if (sp_ulGameModeFlags & GMF_TEAMPLAY) {
     sp.sp_ctTeams = Clamp(gam_iTeamCount, 2L, 4L);
   }
   
