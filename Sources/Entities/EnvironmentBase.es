@@ -18,8 +18,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 %}
 
-uses "EntitiesMP/EnvironmentMarker";
-uses "EntitiesMP/WatchPlayers";
+uses "Entities/EnvironmentMarker";
+uses "Entities/WatchPlayers";
 
 class CEnvironmentBase: CMovableEntity {
 name      "Environment Base";

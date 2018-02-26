@@ -16,10 +16,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 610
 %{
 #include "StdH.h"
-#include "EntitiesMP/PyramidSpaceShip.h"
+#include "Entities/PyramidSpaceShip.h"
 %}
 
-uses "EntitiesMP/Marker";
+uses "Entities/Marker";
 
 class CPyramidSpaceShipMarker: CMarker
 {

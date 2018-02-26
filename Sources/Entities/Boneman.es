@@ -19,7 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "Models/Enemies/Boneman/Boneman.h"
 %}
 
-uses "EntitiesMP/EnemyBase";
+uses "Entities/EnemyBase";
 
 %{
   // info structure

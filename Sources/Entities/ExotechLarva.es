@@ -16,10 +16,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 346
 %{
 #include "StdH.h"
-#include "EntitiesMP/BackgroundViewer.h"
-#include "EntitiesMP/WorldSettingsController.h"
-#include "EntitiesMP/Common/PathFinding.h"
-#include "EntitiesMP/NavigationMarker.h"
+#include "Entities/BackgroundViewer.h"
+#include "Entities/WorldSettingsController.h"
+#include "Entities/Common/PathFinding.h"
+#include "Entities/NavigationMarker.h"
 #include "ModelsMP/Enemies/ExotechLarva/ExotechLarva.h"
 #include "ModelsMP/Enemies/ExotechLarva/Body.h"
 #include "ModelsMP/Enemies/ExotechLarva/Arm.h"
@@ -27,13 +27,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "ModelsMP/Enemies/ExotechLarva/Weapons/PlasmaGun.h"
 %}
 
-uses "EntitiesMP/ModelHolder2";
-uses "EntitiesMP/Projectile";
-uses "EntitiesMP/SoundHolder";
-uses "EntitiesMP/BloodSpray";
-uses "EntitiesMP/CannonBall";
-uses "EntitiesMP/ExotechLarvaCharger";
-uses "EntitiesMP/LarvaOffspring";
+uses "Entities/ModelHolder2";
+uses "Entities/Projectile";
+uses "Entities/SoundHolder";
+uses "Entities/BloodSpray";
+uses "Entities/CannonBall";
+uses "Entities/ExotechLarvaCharger";
+uses "Entities/LarvaOffspring";
 
 enum LarvaTarget {
   0 LT_NONE      "",   // no target

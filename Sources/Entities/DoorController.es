@@ -19,8 +19,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/CurrentVersion.h>
 %}
 
-uses "EntitiesMP/KeyItem";
-uses "EntitiesMP/Player";
+uses "Entities/KeyItem";
+uses "Entities/Player";
 
 enum DoorType {
   0 DT_AUTO       "Auto",       // opens automatically

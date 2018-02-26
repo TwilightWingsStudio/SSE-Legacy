@@ -19,8 +19,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "Models/Enemies/Werebull/Werebull.h"
 %}
 
-uses "EntitiesMP/EnemyBase";
-uses "EntitiesMP/EnemyRunInto";
+uses "Entities/EnemyBase";
+uses "Entities/EnemyRunInto";
 
 enum BullChar {
   0 BUC_SUMMER   "Summer",

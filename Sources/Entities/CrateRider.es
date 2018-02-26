@@ -20,8 +20,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "Models/CutSequences/CrateRider/Crate.h"
 %}
 
-uses "EntitiesMP/EnemyBase";
-uses "EntitiesMP/BasicEffects";
+uses "Entities/EnemyBase";
+uses "Entities/BasicEffects";
 
 %{
 // info structure

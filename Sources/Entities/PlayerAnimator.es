@@ -49,8 +49,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "Models/Weapons/Cannon/Cannon.h"
 %}
 
-uses "EntitiesMP/Player";
-uses "EntitiesMP/PlayerWeapons";
+uses "Entities/Player";
+uses "Entities/PlayerWeapons";
 
 // input parameter for animator
 event EAnimatorInit {

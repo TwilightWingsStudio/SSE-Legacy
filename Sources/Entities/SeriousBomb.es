@@ -16,9 +16,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 354
 %{
 #include "StdH.h"
-#include "EntitiesMP/BackgroundViewer.h"
-#include "EntitiesMP/WorldSettingsController.h"
-#include "EntitiesMP/EnemyBase.h"
+#include "Entities/BackgroundViewer.h"
+#include "Entities/WorldSettingsController.h"
+#include "Entities/EnemyBase.h"
 
 #define SERIOUSBOMB_PLAYERKILLDISTANCE 100.0F
 #define SERIOUSBOMB_SAFEDISTANCE 5.0F

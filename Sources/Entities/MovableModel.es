@@ -16,14 +16,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 2104
 %{
   #include "StdH.h"
-  #include "EntitiesMP/WorldSettingsController.h"
+  #include "Entities/WorldSettingsController.h"
 %}
 
-uses "EntitiesMP/ModelDestruction";
-uses "EntitiesMP/AnimationChanger";
-uses "EntitiesMP/BloodSpray";
-uses "EntitiesMP/ModelHolder2";
-uses "EntitiesMP/Player";
+uses "Entities/ModelDestruction";
+uses "Entities/AnimationChanger";
+uses "Entities/BloodSpray";
+uses "Entities/ModelHolder2";
+uses "Entities/Player";
 
 enum EBlockAction {
    0 EBA_STOP         "0 Stop",

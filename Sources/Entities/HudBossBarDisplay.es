@@ -16,7 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 1256
 %{
   #include "StdH.h"
-  #include <EntitiesMP/MusicHolder.h>
+  #include <Entities/MusicHolder.h>
 %}
 
 class CHudBossBarDisplay : CRationalEntity {

@@ -16,10 +16,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 404
 %{
 #include "StdH.h"
-#include "EntitiesMP/MusicHolder.h"
+#include "Entities/MusicHolder.h"
 %}
 
-uses "EntitiesMP/Marker";
+uses "Entities/Marker";
 
 enum PSGiveTakeMode {
   0 PSGTM_OLD  "0 Always Give Knife + Colt",

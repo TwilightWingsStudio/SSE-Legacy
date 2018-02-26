@@ -24,7 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define SL_PITCH_MAX (100.0F)
 %}
 
-uses "EntitiesMP/ModelDestruction";
+uses "Entities/ModelDestruction";
 
 class CSoundHolder : CRationalEntity {
 name      "SoundHolder";

@@ -25,10 +25,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #define MAX_DAMAGE_QUANTUM (MIN_DAMAGE_QUANTUM*10.0f)
   #define DEATH_BURN_TIME 4.0f
 
-  #include "EntitiesMP/MovingBrush.h"
+  #include "Entities/MovingBrush.h"
 %}
 
-uses "EntitiesMP/Light";
+uses "Entities/Light";
 
 // Input parameter for flame.
 event EFlame {

@@ -20,8 +20,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "ModelsMP/Enemies/ChainSawFreak/Saw.h"
 %}
 
-uses "EntitiesMP/EnemyBase";
-uses "EntitiesMP/EnemyRunInto";
+uses "Entities/EnemyBase";
+uses "Entities/EnemyRunInto";
 
 %{
 #define FREAK_SIZE 1.05f

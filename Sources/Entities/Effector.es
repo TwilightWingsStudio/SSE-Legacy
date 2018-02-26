@@ -16,8 +16,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 608
 %{
 #include "StdH.h"
-#include "EntitiesMP/Effector.h"
-#include <EntitiesMP/BloodSpray.h>
+#include "Entities/Effector.h"
+#include <Entities/BloodSpray.h>
 %}
 
 enum EffectorEffectType {

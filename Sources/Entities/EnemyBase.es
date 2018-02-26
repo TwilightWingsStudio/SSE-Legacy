@@ -16,22 +16,22 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 310
 %{
 #include "StdH.h"
-#include "EntitiesMP/Common/PathFinding.h"
-#include "EntitiesMP/NavigationMarker.h"
-#include "EntitiesMP/TacticsHolder.h"
+#include "Entities/Common/PathFinding.h"
+#include "Entities/NavigationMarker.h"
+#include "Entities/TacticsHolder.h"
 extern void JumpFromBouncer(CEntity *penToBounce, CEntity *penBouncer);
 extern INDEX ent_bReportBrokenChains;
 %}
 
-uses "EntitiesMP/Watcher";
-uses "EntitiesMP/BasicEffects";
-uses "EntitiesMP/Projectile";
-uses "EntitiesMP/Debris";
-uses "EntitiesMP/EnemyMarker";
-uses "EntitiesMP/MusicHolder";
-uses "EntitiesMP/BloodSpray";
-uses "EntitiesMP/EnemyFactionHolder";
-uses "EntitiesMP/EnemySettings"; // [SSE] Enemy Settings Entity
+uses "Entities/Watcher";
+uses "Entities/BasicEffects";
+uses "Entities/Projectile";
+uses "Entities/Debris";
+uses "Entities/EnemyMarker";
+uses "Entities/MusicHolder";
+uses "Entities/BloodSpray";
+uses "Entities/EnemyFactionHolder";
+uses "Entities/EnemySettings"; // [SSE] Enemy Settings Entity
 
 event ERestartAttack {
 };

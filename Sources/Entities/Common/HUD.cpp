@@ -22,12 +22,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <Engine/Graphics/DrawPort.h>
 
-#include <EntitiesMP/Player.h>
-#include <EntitiesMP/PlayerWeapons.h>
-#include <EntitiesMP/MusicHolder.h>
-#include <EntitiesMP/EnemyBase.h>
-#include <EntitiesMP/EnemyCounter.h>
-#include <EntitiesMP/HudBossBarDisplay.h>
+#include <Entities/Player.h>
+#include <Entities/PlayerWeapons.h>
+#include <Entities/MusicHolder.h>
+#include <Entities/EnemyBase.h>
+#include <Entities/EnemyCounter.h>
+#include <Entities/HudBossBarDisplay.h>
 
 #define ENTITY_DEBUG
 

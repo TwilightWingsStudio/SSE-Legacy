@@ -16,8 +16,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 240
 %{
 #include "StdH.h"
-#include "EntitiesMP/WorldSettingsController.h"
-#include "EntitiesMP/BackgroundViewer.h"
+#include "Entities/WorldSettingsController.h"
+#include "Entities/BackgroundViewer.h"
 %}
 
 %{

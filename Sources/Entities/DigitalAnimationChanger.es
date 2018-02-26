@@ -16,12 +16,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 296
 %{
 #include "StdH.h"
-#include <EntitiesMP/AnimationHub.h>
+#include <Entities/AnimationHub.h>
 %}
 
-uses "EntitiesMP/ModelHolder2";
-uses "EntitiesMP/MovableModel";
-uses "EntitiesMP/Light";
+uses "Entities/ModelHolder2";
+uses "Entities/MovableModel";
+uses "Entities/Light";
 
 enum EAnimType
 {

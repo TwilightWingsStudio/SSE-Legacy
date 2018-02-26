@@ -16,7 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 229
 %{
   #include "StdH.h"
-  #include "EntitiesMP/Player.h"
+  #include "Entities/Player.h"
 %}
 
 class CTrickyExecutor: CRationalEntity {

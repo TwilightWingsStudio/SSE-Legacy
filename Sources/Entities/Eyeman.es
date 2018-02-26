@@ -19,7 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "Models/Enemies/Eyeman/Eyeman.h"
 %}
 
-uses "EntitiesMP/EnemyFly";
+uses "Entities/EnemyFly";
 
 enum EyemanChar {
   0 EYC_SOLDIER   "Soldier [0]",    // soldier

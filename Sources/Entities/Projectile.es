@@ -17,8 +17,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %{
 #include "StdH.h"
 #include "Models/Weapons/Laser/Projectile/LaserProjectile.h"
-#include "EntitiesMP/EnemyBase.h"
-//#include "EntitiesMP/Dragonman.h"
+#include "Entities/EnemyBase.h"
+//#include "Entities/Dragonman.h"
 #include "Models/Enemies/Elementals/Projectile/IcePyramid.h"
 #include "Models/Enemies/ElementalLava/Projectile/LavaStone.h"
 #include "Models/Enemies/ElementalLava/Projectile/LavaBomb.h"
@@ -31,16 +31,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "ModelsMP/Enemies/ExotechLarva/Weapons/PlasmaGun.h"
 
-#include "EntitiesMP/PlayerWeapons.h"
-#include "EntitiesMP/Shooter.h"
+#include "Entities/PlayerWeapons.h"
+#include "Entities/Shooter.h"
 
 #define DEVIL_LASER_SPEED 100.0f
 #define DEVIL_ROCKET_SPEED 60.0f
 %}
 
-uses "EntitiesMP/BasicEffects";
-uses "EntitiesMP/Light";
-uses "EntitiesMP/Flame";
+uses "Entities/BasicEffects";
+uses "Entities/Light";
+uses "Entities/Flame";
 
 enum ProjectileType {
   0 PRT_ROCKET                "Rocket [00]",   // player rocket

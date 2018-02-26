@@ -20,9 +20,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "Models/Enemies/Scorpman/Gun.h"
 %}
 
-uses "EntitiesMP/EnemyBase";
-uses "EntitiesMP/Bullet";
-uses "EntitiesMP/Reminder";
+uses "Entities/EnemyBase";
+uses "Entities/Bullet";
+uses "Entities/Reminder";
 
 enum ScorpmanType {
   0 SMT_SOLDIER    "Soldier [0]",

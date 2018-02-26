@@ -19,9 +19,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "ModelsMP/Enemies/ExotechLarva/Charger/FloorCharger.h"
 %}
 
-uses "EntitiesMP/BloodSpray";
-uses "EntitiesMP/Projectile";
-uses "EntitiesMP/ExotechLarvaBattery";
+uses "Entities/BloodSpray";
+uses "Entities/Projectile";
+uses "Entities/ExotechLarvaBattery";
 
 event EActivateBeam {
   BOOL bTurnOn,

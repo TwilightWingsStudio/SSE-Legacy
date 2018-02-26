@@ -18,8 +18,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 %}
 
-uses "EntitiesMP/Marker";
-uses "EntitiesMP/Devil";
+uses "Entities/Marker";
+uses "Entities/Devil";
 
 enum DevilActionType {
   0 DAT_NONE                   "None",

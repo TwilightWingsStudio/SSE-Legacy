@@ -18,12 +18,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %{
   #include "StdH.h"
   #include "Models/Enemies/Beast/Beast.h"
-  #include "EntitiesMP/WorldSettingsController.h"
-  #include "EntitiesMP/BackgroundViewer.h"
+  #include "Entities/WorldSettingsController.h"
+  #include "Entities/BackgroundViewer.h"
 %}
 
-uses "EntitiesMP/EnemyBase";
-uses "EntitiesMP/BasicEffects";
+uses "Entities/EnemyBase";
+uses "Entities/BasicEffects";
 
 enum BeastType {
   0 BT_NORMAL         "Small [0]",      // normal (fighter)

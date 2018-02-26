@@ -18,11 +18,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 %}
 
-uses "EntitiesMP/ModelHolder2";
-uses "EntitiesMP/BasicEffects";
-uses "EntitiesMP/Debris";
-uses "EntitiesMP/BloodSpray";
-uses "EntitiesMP/SoundHolder";
+uses "Entities/ModelHolder2";
+uses "Entities/BasicEffects";
+uses "Entities/Debris";
+uses "Entities/BloodSpray";
+uses "Entities/SoundHolder";
 
 // event sent to entities in range of model destroy
 // (e.g light can turn off)

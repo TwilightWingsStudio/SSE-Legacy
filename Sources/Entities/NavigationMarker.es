@@ -16,12 +16,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 704
 %{
 #include "StdH.h"
-#include "EntitiesMP/Common/PathFinding.h"
+#include "Entities/Common/PathFinding.h"
 
 #define MAX_TARGETS 6
 %}
 
-uses "EntitiesMP/Marker";
+uses "Entities/Marker";
 
 %{
 // info structure

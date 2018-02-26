@@ -17,14 +17,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %{
 #include "StdH.h"
 
-#include "EntitiesMP/EnemyBase.h"
+#include "Entities/EnemyBase.h"
 #include "ModelsMP/Enemies/ExotechLarva/Projectile/TailProjectile.h"
 
 %}
 
-uses "EntitiesMP/BasicEffects";
-uses "EntitiesMP/Light";
-uses "EntitiesMP/Flame";
+uses "Entities/BasicEffects";
+uses "Entities/Light";
+uses "Entities/Flame";
 
 
 // input parameter for launching the LarvaOffspring

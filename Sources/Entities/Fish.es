@@ -19,7 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "Models/Enemies/Fish/Fish.h"
 %}
 
-uses "EntitiesMP/EnemyDive";
+uses "Entities/EnemyDive";
 
 %{
 static EntityInfo eiFish = {

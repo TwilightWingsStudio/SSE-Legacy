@@ -16,10 +16,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 222
 %{
 #include "StdH.h"
-#include "EntitiesMP/EnemyBase.h"
-#include "EntitiesMP/EnemySpawner.h"
-#include "EntitiesMP/Trigger.h"
-#include "EntitiesMP/Woman.h"
+#include "Entities/EnemyBase.h"
+#include "Entities/EnemySpawner.h"
+#include "Entities/Trigger.h"
+#include "Entities/Woman.h"
 %}
 
 

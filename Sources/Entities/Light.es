@@ -18,8 +18,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 %}
 
-uses "EntitiesMP/ModelDestruction";
-uses "EntitiesMP/AnimationChanger";
+uses "Entities/ModelDestruction";
+uses "Entities/AnimationChanger";
                
 enum LightType {
   0 LT_POINT          "Point light",

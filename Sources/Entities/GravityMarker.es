@@ -18,8 +18,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 %}
 
-uses "EntitiesMP/Marker";
-uses "EntitiesMP/GravityRouter";
+uses "Entities/Marker";
+uses "Entities/GravityRouter";
 
 enum GravityType {
   0 LT_PARALLEL     "Parallel",

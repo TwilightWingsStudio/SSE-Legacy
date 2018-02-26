@@ -18,7 +18,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "StdH.h"
 %}
 
-uses "EntitiesMP/Player";
+uses "Entities/Player";
 
 enum EPlayerVitalitySettingsType {
   0 EPVST_TARGETTED  "0 Target",

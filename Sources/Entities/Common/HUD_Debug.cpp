@@ -20,7 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <Engine/Graphics/DrawPort.h>
 
-#include <EntitiesMP/EnemyBase.h>
+#include <Entities/EnemyBase.h>
 
 extern const CPlayer *_penPlayer;
 extern COLOR _colHUD;

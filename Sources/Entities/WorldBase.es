@@ -16,17 +16,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 100
 %{
 #include "StdH.h"
-#include "EntitiesMP/BackgroundViewer.h"
-#include "EntitiesMP/WorldSettingsController.h"
+#include "Entities/BackgroundViewer.h"
+#include "Entities/WorldSettingsController.h"
 // for error checking:
-#include "EntitiesMP/EnemySpawner.h"
-#include "EntitiesMP/SoundHolder.h"
+#include "Entities/EnemySpawner.h"
+#include "Entities/SoundHolder.h"
 %}
 
-uses "EntitiesMP\FogMarker";
-uses "EntitiesMP\HazeMarker";
-uses "EntitiesMP\MirrorMarker";
-uses "EntitiesMP\GradientMarker";
+uses "Entities/FogMarker";
+uses "Entities/HazeMarker";
+uses "Entities/MirrorMarker";
+uses "Entities/GradientMarker";
 
 %{
 

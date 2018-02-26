@@ -19,8 +19,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "Models/Enemies/Headman/Headman.h"
 %}
 
-uses "EntitiesMP/EnemyBase";
-uses "EntitiesMP/BasicEffects";
+uses "Entities/EnemyBase";
+uses "Entities/BasicEffects";
 
 enum HeadmanType {
   0 HDT_FIRECRACKER   "Fire Cracker [0]",

@@ -16,8 +16,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 403
 %{
 #include "StdH.h"
-#include "EntitiesMP/Player.h"
-#include "EntitiesMP/PlayerWeapons.h"
+#include "Entities/Player.h"
+#include "Entities/PlayerWeapons.h"
 %}
 
 

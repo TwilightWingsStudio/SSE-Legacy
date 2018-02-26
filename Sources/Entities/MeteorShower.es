@@ -18,7 +18,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 %}
 
-uses "EntitiesMP/Projectile";
+uses "Entities/Projectile";
 //uses "Entities/EnemyMarker";
 
 class CMeteorShower : CRationalEntity {

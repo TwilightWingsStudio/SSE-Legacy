@@ -18,7 +18,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 %}
 
-uses "EntitiesMP/ModelHolder2";
+uses "Entities/ModelHolder2";
 
 class CCounter : CRationalEntity {
 name      "Counter";

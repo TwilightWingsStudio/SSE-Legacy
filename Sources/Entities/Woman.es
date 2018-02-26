@@ -18,10 +18,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 #include "ModelsMP/Enemies/Woman/Woman.h"
 #include "Models/Enemies/Headman/Headman.h"
-#include "EntitiesMP/Headman.h"
+#include "Entities/Headman.h"
 %}
 
-uses "EntitiesMP/EnemyFly";
+uses "Entities/EnemyFly";
 
 %{
   // info structure

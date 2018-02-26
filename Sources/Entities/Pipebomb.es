@@ -18,9 +18,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 %}
 
-uses "EntitiesMP/BasicEffects";
-uses "EntitiesMP/Light";
-uses "EntitiesMP/AmmoItem";
+uses "Entities/BasicEffects";
+uses "Entities/Light";
+uses "Entities/AmmoItem";
 
 // input parameter for launching the projectile
 event EDropPipebomb {

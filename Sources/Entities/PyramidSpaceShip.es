@@ -19,11 +19,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "Models/CutSequences/SpaceShip/SpaceShip.h"
 #include "Models/CutSequences/SpaceShip/Door.h"
 #include "Models/CutSequences/SpaceShip/LightBeam.h"
-#include "EntitiesMP/Effector.h"
-#include "EntitiesMP/Light.h"
+#include "Entities/Effector.h"
+#include "Entities/Light.h"
 %}
 
-uses "EntitiesMP/PyramidSpaceShipMarker";
+uses "Entities/PyramidSpaceShipMarker";
 
 enum PSSState {
   0 PSSS_IDLE                  "Idle",                      // idle

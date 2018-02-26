@@ -2,7 +2,7 @@
 %{
 #include "StdH.h"
 
-#include "EntitiesMP/EnemyBase.h"
+#include "Entities/EnemyBase.h"
 %}
 
 // input parameter for watcher

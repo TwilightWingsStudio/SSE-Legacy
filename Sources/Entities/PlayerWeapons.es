@@ -20,8 +20,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
     
   #include <Engine/Build.h>
 
-  #include "EntitiesMP/Player.h"
-  #include "EntitiesMP/Bullet.h"
+  #include "Entities/Player.h"
+  #include "Entities/Bullet.h"
   #include "Models/Weapons/Knife/Knife.h"
   #include "Models/Weapons/Knife/KnifeItem.h"
   #include "Models/Weapons/Colt/Colt.h"
@@ -59,17 +59,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "ModelsMP/Player/SeriousSam/Body.h"
   #include "ModelsMP/Player/SeriousSam/Player.h"
 
-  #include "EntitiesMP/Switch.h"
-  #include "EntitiesMP/PlayerView.h"
-  #include "EntitiesMP/PlayerAnimator.h"
-  #include "EntitiesMP/MovingBrush.h"
-  #include "EntitiesMP/MessageHolder.h"
-  #include "EntitiesMP/EnemyBase.h"
+  #include "Entities/Switch.h"
+  #include "Entities/PlayerView.h"
+  #include "Entities/PlayerAnimator.h"
+  #include "Entities/MovingBrush.h"
+  #include "Entities/MessageHolder.h"
+  #include "Entities/EnemyBase.h"
   
   // [SSE]
-  #include "EntitiesMP/SeriousBomb.h"
-  #include "EntitiesMP/SimpleSwitch.h"
-  #include "EntitiesMP/ProgressiveSwitch.h"
+  #include "Entities/SeriousBomb.h"
+  #include "Entities/SimpleSwitch.h"
+  #include "Entities/ProgressiveSwitch.h"
   //
 
   extern INDEX hud_bShowWeapon;
@@ -82,18 +82,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   extern INDEX cht_bInfiniteAmmo; // [SSE] Cheats Expansion
 %}
 
-uses "EntitiesMP/Player";
-uses "EntitiesMP/PlayerWeaponsEffects";
-uses "EntitiesMP/Projectile";
-uses "EntitiesMP/Bullet";
-uses "EntitiesMP/BasicEffects";
-uses "EntitiesMP/WeaponItem";
-uses "EntitiesMP/AmmoItem";
-uses "EntitiesMP/AmmoPack";
-uses "EntitiesMP/ModelHolder2";
-//uses "EntitiesMP/Pipebomb";
-//uses "EntitiesMP/GhostBusterRay";
-uses "EntitiesMP/CannonBall";
+uses "Entities/Player";
+uses "Entities/PlayerWeaponsEffects";
+uses "Entities/Projectile";
+uses "Entities/Bullet";
+uses "Entities/BasicEffects";
+uses "Entities/WeaponItem";
+uses "Entities/AmmoItem";
+uses "Entities/AmmoPack";
+uses "Entities/ModelHolder2";
+//uses "Entities/Pipebomb";
+//uses "Entities/GhostBusterRay";
+uses "Entities/CannonBall";
 
 // input parameter for weapons
 event EWeaponsInit {

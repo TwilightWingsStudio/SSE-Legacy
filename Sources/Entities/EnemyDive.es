@@ -18,9 +18,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 %}
 
-uses "EntitiesMP/EnemyBase";
-uses "EntitiesMP/Debris";
-uses "EntitiesMP/EnemyMarker";
+uses "Entities/EnemyBase";
+uses "Entities/Debris";
+uses "Entities/EnemyMarker";
 
 
 enum EnemyDiveType {

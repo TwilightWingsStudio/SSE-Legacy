@@ -18,11 +18,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %{
   #include "StdH.h"
   #include "Models/Items/ItemHolder/ItemHolder.h"
-  #include "EntitiesMP/SoundHolder.h"
+  #include "Entities/SoundHolder.h"
 %}
 
-uses "EntitiesMP/Item";
-uses "EntitiesMP/PowerUpItem";
+uses "Entities/Item";
+uses "Entities/PowerUpItem";
 
 class CGenericPowerUpItem : CItem {
 name      "CGenericPowerUpItem";

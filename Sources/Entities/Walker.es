@@ -19,8 +19,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "Models/Enemies/Walker/Walker.h"
 %}
 
-uses "EntitiesMP/EnemyBase";
-uses "EntitiesMP/Projectile";
+uses "Entities/EnemyBase";
+uses "Entities/Projectile";
 
 enum WalkerChar {
   0 WLC_SOLDIER   "Soldier [0]",    // soldier

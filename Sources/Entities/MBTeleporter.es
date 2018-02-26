@@ -16,12 +16,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 20503
 %{
   #include "StdH.h"
-  #include "EntitiesMP/MovingBrush.h"
-  #include "EntitiesMP/MovingBrushMarker.h"
-  #include "EntitiesMP/MovableBrush.h"
+  #include "Entities/MovingBrush.h"
+  #include "Entities/MovingBrushMarker.h"
+  #include "Entities/MovableBrush.h"
 %}
 
-uses "EntitiesMP/MovableModel";
+uses "Entities/MovableModel";
 
 class CMBTeleporter: CRationalEntity {
 name      "MBTeleporter";

@@ -28,8 +28,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 
-uses "EntitiesMP/BasicEffects";
-uses "EntitiesMP/Summoner";
+uses "Entities/BasicEffects";
+uses "Entities/Summoner";
 
 
 // input parameter for twister

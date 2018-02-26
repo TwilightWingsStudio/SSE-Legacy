@@ -17,7 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 2297
 %{
   #include "StdH.h"
-  #include "EntitiesMP/Player.h"
+  #include "Entities/Player.h"
 %}
 
 enum EPlayerExecutorType

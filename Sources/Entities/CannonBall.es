@@ -17,14 +17,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %{
 #include "StdH.h"
 #include "Models/Weapons/Cannon/Projectile/Cannonball.h"
-#include "EntitiesMP/MovingBrush.h"
-#include "EntitiesMP/DestroyableArchitecture.h"
+#include "Entities/MovingBrush.h"
+#include "Entities/DestroyableArchitecture.h"
 %}
 
-uses "EntitiesMP/BasicEffects";
-uses "EntitiesMP/Light";
-uses "EntitiesMP/PlayerWeapons";
-uses "EntitiesMP/EnemyBase";
+uses "Entities/BasicEffects";
+uses "Entities/Light";
+uses "Entities/PlayerWeapons";
+uses "Entities/EnemyBase";
 
 enum CannonBallType {
   0 CBT_IRON    "",

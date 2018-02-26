@@ -19,8 +19,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "ModelsMP/Enemies/ExotechLarva/Charger/WallCharger.h"
 %}
 
-uses "EntitiesMP/BloodSpray";
-uses "EntitiesMP/Projectile";
+uses "Entities/BloodSpray";
+uses "Entities/Projectile";
 
 class CExotechLarvaBattery : CRationalEntity {
 name      "ExotechLarvaBattery";

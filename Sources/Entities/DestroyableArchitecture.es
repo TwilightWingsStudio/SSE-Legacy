@@ -16,12 +16,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 107
 %{
 #include "StdH.h"
-#include "EntitiesMP/Effector.h"
-#include "EntitiesMP/MovingBrush.h"
+#include "Entities/Effector.h"
+#include "Entities/MovingBrush.h"
 %}
-uses "EntitiesMP/Devil";
-uses "EntitiesMP/Debris";
-uses "EntitiesMP\GradientMarker";
+uses "Entities/Devil";
+uses "Entities/Debris";
+uses "Entities\GradientMarker";
 
 %{
 struct DebrisInfo {

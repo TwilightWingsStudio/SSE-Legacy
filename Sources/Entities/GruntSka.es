@@ -19,8 +19,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 //#include "ModelsMP/Enemies/Grunt/Grunt.h"
 %}
 
-uses "EntitiesMP/EnemyBase";
-uses "EntitiesMP/BasicEffects";
+uses "Entities/EnemyBase";
+uses "Entities/BasicEffects";
 
 enum GruntSkaType {
   0 GT_SOLDIER    "Grunt soldier",

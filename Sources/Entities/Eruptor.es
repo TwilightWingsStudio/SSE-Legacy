@@ -18,8 +18,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 %}
 
-uses "EntitiesMP/ModelHolder2";
-uses "EntitiesMP/Projectile";
+uses "Entities/ModelHolder2";
+uses "Entities/Projectile";
 
 class CEruptor : CModelHolder2 {
 name      "Eruptor";

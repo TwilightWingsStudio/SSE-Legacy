@@ -16,11 +16,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 612
 %{
 #include "StdH.h"
-#include "EntitiesMP/WorldSettingsController.h"
-#include "EntitiesMP/BackgroundViewer.h"
+#include "Entities/WorldSettingsController.h"
+#include "Entities/BackgroundViewer.h"
 %}
 
-uses "EntitiesMP/Marker";
+uses "Entities/Marker";
 
 enum BlendControllerType {
   0 BCT_NONE                        "None",                      // no FX

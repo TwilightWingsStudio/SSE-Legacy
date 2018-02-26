@@ -14,8 +14,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
 
 #include "StdH.h"
-#include "EntitiesMP/Common/PathFinding.h"
-#include "EntitiesMP/NavigationMarker.h"
+#include "Entities/Common/PathFinding.h"
+#include "Entities/NavigationMarker.h"
 
 #define PRINTOUT(_dummy)
 //#define PRINTOUT(something) something

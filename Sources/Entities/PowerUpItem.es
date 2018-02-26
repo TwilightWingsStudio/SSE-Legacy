@@ -19,8 +19,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "Models/Items/ItemHolder/ItemHolder.h"
 %}
 
-uses "EntitiesMP/Item";
-uses "EntitiesMP/Player";
+uses "Entities/Item";
+uses "Entities/Player";
 
 // PowerUp type. 
 enum PowerUpItemType {

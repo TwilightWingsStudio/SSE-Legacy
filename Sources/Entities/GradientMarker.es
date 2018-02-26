@@ -18,8 +18,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "StdH.h"
 %}
 
-uses "EntitiesMP/Marker";
-uses "EntitiesMP/WorldBase";
+uses "Entities/Marker";
+uses "Entities/WorldBase";
 
 class CGradientMarker: CMarker {
 name      "Gradient Marker";

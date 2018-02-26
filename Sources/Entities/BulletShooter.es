@@ -16,8 +16,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 21365
 %{
   #include "StdH.h"
-  #include "EntitiesMP/Bullet.h"
-  #include "EntitiesMP/SoundHolder.h"
+  #include "Entities/Bullet.h"
+  #include "Entities/SoundHolder.h"
 %}
 
 enum EBSUsePenCausedAs {

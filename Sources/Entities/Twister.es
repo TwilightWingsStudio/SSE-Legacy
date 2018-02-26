@@ -28,9 +28,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 
-uses "EntitiesMP/AirElemental";
-uses "EntitiesMP/Elemental";
-uses "EntitiesMP/Spinner";
+uses "Entities/AirElemental";
+uses "Entities/Elemental";
+uses "Entities/Spinner";
 
 
 // input parameter for twister

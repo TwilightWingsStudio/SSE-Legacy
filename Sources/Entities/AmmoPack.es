@@ -19,7 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "Models/Items/ItemHolder/ItemHolder.h"
 %}
 
-uses "EntitiesMP/Item";
+uses "Entities/Item";
 
 // ammo type 
 enum AmmoPackType {
