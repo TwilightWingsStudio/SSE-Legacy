@@ -91,7 +91,7 @@ class CHudAssetsContainer
     CTextureObject m_toSniperLed;
     
     // Powerup textures (ORDER IS THE SAME AS IN PLAYER.ES!)
-    #define MAX_POWERUPS 4
+    #define MAX_POWERUPS 5
     CTextureObject m_atoPowerups[MAX_POWERUPS];
 };
 

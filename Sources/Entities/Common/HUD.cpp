@@ -1565,9 +1565,9 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 	
     INDEX iCol = 0;
 
-    for (INDEX i = 0; i < 4; i++)
+    for (INDEX i = 0; i < MAX_POWERUPS; i++)
     {
-      INDEX ii = 3 - i;
+      INDEX ii = MAX_POWERUPS - 1 - i;
       
       // skip if not active
       const TIME tmDelta = ptmPowerups[ii] - _tmNow;
@@ -1963,9 +1963,9 @@ extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent
 	
     INDEX iCol = 0;
 
-    for (INDEX i = 0; i < 4; i++)
+    for (INDEX i = 0; i < MAX_POWERUPS; i++)
     {
-      INDEX ii = 3 - i;
+      INDEX ii = MAX_POWERUPS - 1 - i;
       
       // skip if not active
       const TIME tmDelta = ptmPowerups[ii] - _tmNow;
@@ -3637,6 +3637,7 @@ static void HUD_RegisterTextures()
   HUD_RegisterTexture(&_pHAC->m_atoPowerups[1],    CTFILENAME("Textures\\Interface\\PInvulnerability.tex"));
   HUD_RegisterTexture(&_pHAC->m_atoPowerups[2],    CTFILENAME("Textures\\Interface\\PSeriousDamage.tex"));
   HUD_RegisterTexture(&_pHAC->m_atoPowerups[3],    CTFILENAME("Textures\\Interface\\PSeriousSpeed.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoPowerups[4],    CTFILENAME("Textures\\Interface\\PRegeneration.tex"));
 
   // initialize sniper mask texture
   HUD_RegisterTexture(&_pHAC->m_toSniperMask,   CTFILENAME("Textures\\Interface\\SniperMask.tex"));

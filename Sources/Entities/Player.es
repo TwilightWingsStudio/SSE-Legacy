@@ -4081,11 +4081,9 @@ functions:
     
     if (tmPowerUpRegen > 0.0F)
     {
-      CPrintF("%f\n", tmPowerUpRegen);
-      
       FLOAT fHealth = GetHealth();
-      FLOAT fTopHealth = TopHealth();
-      FLOAT fMaxHealth = MaxHealth();
+      const FLOAT fTopHealth = TopHealth();
+      const FLOAT fMaxHealth = MaxHealth();
 
       if (fHealth < fTopHealth) {
         SetHealth(ClampUp(fHealth + _pTimer->TickQuantum * 15, fTopHealth));
