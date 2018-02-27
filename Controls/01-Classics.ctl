@@ -15,28 +15,28 @@ Button
 Button
  Name: TTRS Strafe Left
  Key1: A
- Key2: Arrow Left
+ Key2: Q
  Pressed:  ctl_bMoveLeft = 1;
  Released: ctl_bMoveLeft = 0;
 
 Button
  Name: TTRS Strafe Right
  Key1: D
- Key2: Arrow Right
+ Key2: E
  Pressed:  ctl_bMoveRight = 1;
  Released: ctl_bMoveRight = 0;
 
 Button
  Name: TTRS Up/Jump
  Key1: Space
- Key2: None
+ Key2: R
  Pressed:  ctl_bMoveUp = 1;
  Released: ctl_bMoveUp = 0;
 
 Button
  Name: TTRS Down/Duck
- Key1: C
- Key2: Left Control
+ Key1: F
+ Key2: C
  Pressed:  ctl_bMoveDown = 1;
  Released: ctl_bMoveDown = 0;
 
@@ -99,13 +99,13 @@ Button
 Button
  Name: TTRS Fire
  Key1: Mouse Button 1
- Key2: None
+ Key2: Left Control
  Pressed:  ctl_bFire = 1;
  Released: ctl_bFire = 0;
 
 Button
  Name: TTRS Reload
- Key1: R
+ Key1: Left Alt
  Key2: None
  Pressed:  ctl_bReload = 1;
  Released: ctl_bReload = 0;
@@ -126,7 +126,7 @@ Button
 
 Button
  Name: TTRS Use/Sniper Zoom
- Key1: E
+ Key1: None
  Key2: None
  Pressed:  ctl_bUse = 1;
  Released: ctl_bUse = 0;
@@ -228,6 +228,20 @@ Button
  Key2: None
  Pressed:  ctl_bFireBomb = 1;
  Released: ctl_bFireBomb = 0;
+
+Button
+ Name: TTRS Strafe Left
+ Key1: Arrow Left
+ Key2: None
+ Pressed:  ctl_bMoveLeft = 1;
+ Released: ctl_bMoveLeft = 0;
+
+Button
+ Name: TTRS Strafe Right
+ Key1: Arrow Right
+ Key2: None
+ Pressed:  ctl_bMoveRight = 1;
+ Released: ctl_bMoveRight = 0;
 
 Button
  Name: TTRS Sniper Zoom +
