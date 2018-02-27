@@ -1324,14 +1324,17 @@ properties:
  156 FLOAT3D m_vLocalTranslation = FLOAT3D(0,0,0),
 
  // powerups (DO NOT CHANGE ORDER!) - needed by HUD.cpp
- 160 FLOAT m_tmInvisibility    = 0.0f, 
- 161 FLOAT m_tmInvulnerability = 0.0f, 
- 162 FLOAT m_tmSeriousDamage   = 0.0f, 
- 163 FLOAT m_tmSeriousSpeed    = 0.0f, 
+ 160 FLOAT m_tmInvisibility    = 0.0f,
+ 161 FLOAT m_tmInvulnerability = 0.0f,
+ 162 FLOAT m_tmSeriousDamage   = 0.0f,
+ 163 FLOAT m_tmSeriousSpeed    = 0.0f,
+ 164 FLOAT m_tmRegeneration    = 0.0f, // [SSE] Gameplay - Regeneration PowerUp
+
  166 FLOAT m_tmInvisibilityMax    = 30.0f,
  167 FLOAT m_tmInvulnerabilityMax = 30.0f,
  168 FLOAT m_tmSeriousDamageMax   = 40.0f,
  169 FLOAT m_tmSeriousSpeedMax    = 20.0f,
+ 170 FLOAT m_tmRegenerationMax    = 30.0F, // [SSE] Gameplay - Regeneration PowerUp
 
  180 FLOAT m_tmChainShakeEnd = 0.0f, // used to determine when to stop shaking due to chainsaw damage
  181 FLOAT m_fChainShakeStrength = 1.0f, // strength of shaking
@@ -4072,6 +4075,24 @@ functions:
     } else {
       TouristRegeneration();
     }
+
+    // [SSE] Gameplay - Regeneration PowerUp
+    const FLOAT tmPowerUpRegen = m_tmRegeneration - _pTimer->CurrentTick();
+    
+    if (tmPowerUpRegen > 0.0F)
+    {
+      CPrintF("%f\n", tmPowerUpRegen);
+      
+      FLOAT fHealth = GetHealth();
+      FLOAT fTopHealth = TopHealth();
+      FLOAT fMaxHealth = MaxHealth();
+
+      if (fHealth < fTopHealth) {
+        SetHealth(ClampUp(fHealth + _pTimer->TickQuantum * 15, fTopHealth));
+      } else if (fHealth < fMaxHealth) {
+        SetHealth(ClampUp(fHealth + _pTimer->TickQuantum * 5, fMaxHealth));
+      }
+    }
   }
 
   // --------------------------------------------------------------------------------------
@@ -5062,6 +5083,8 @@ functions:
       } else {
         ItemPicked(GetPowerUpPickMessage(ePowerUp.puitType), 0);
       }
+      
+      // TODO: Rewrite this ugly thing.
 
       switch (ePowerUp.puitType)
       {
@@ -5106,8 +5129,16 @@ functions:
             eMsg.fnmMessage = CTFILENAME("DataMP\\Messages\\Weapons\\seriousbomb.txt");
             this->SendEvent(eMsg);
           }
-
           return TRUE;              
+
+        // [SSE] Gameplay - Regeneration PowerUp
+        case PUIT_REGENERATION:
+          if (bDurationStacking) {
+            fValue += Clamp(m_tmRegeneration - tmNow, 0.0F, m_tmRegenerationMax);
+          }
+        
+          m_tmRegeneration = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmRegenerationMax) : m_tmRegenerationMax);
+          return TRUE;
       }
     }
 

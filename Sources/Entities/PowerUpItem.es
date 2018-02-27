@@ -29,6 +29,9 @@ enum PowerUpItemType {
   2 PUIT_DAMAGE   "[2] SeriousDamage",
   3 PUIT_SPEED    "[3] SeriousSpeed",
   4 PUIT_BOMB     "[4] SeriousBomb",
+  
+  // [SSE] Gameplay - Regeneration PowerUp
+  5 PUIT_REGENERATION "[5] Regeneration",
 };
 
 // Event for sending through receive item.
@@ -51,6 +54,9 @@ const char *GetPowerUpPickMessage(enum PowerUpItemType puit)
     case PUIT_DAMAGE   : return TRANS("^cFF0000Serious Damage!"); break;
     case PUIT_SPEED    : return TRANS("^cFF9400Serious Speed"); break;
     case PUIT_BOMB     : return TRANS("^cFF0000Serious Bomb!"); break;
+
+    // [SSE] Gameplay - Regeneration PowerUp
+    case PUIT_REGENERATION     : return TRANS("^cFF80FFRegeneration!"); break;
     
     default: return TRANS("unknown item"); break;
   };
@@ -120,6 +126,9 @@ functions:
       case PUIT_INVULNER:  PrecacheSound(SOUND_INVULNER);  break;
       case PUIT_DAMAGE  :  PrecacheSound(SOUND_DAMAGE  );  break;
       case PUIT_BOMB    :  PrecacheSound(SOUND_BOMB    );  break;
+
+      // [SSE] Gameplay - Regeneration PowerUp
+      case PUIT_REGENERATION  :  PrecacheSound(SOUND_PICKUP);  break;
       
       default: PrecacheSound(SOUND_PICKUP); break;
     }
@@ -142,7 +151,10 @@ functions:
       case PUIT_INVULNER:  pes->es_strName += " invulnerability";  break;
       case PUIT_DAMAGE  :  pes->es_strName += " serious damage";   break;
       case PUIT_SPEED   :  pes->es_strName += " serious speed";    break;
-      case PUIT_BOMB    :  pes->es_strName = "Serious Bomb!"; 
+      case PUIT_BOMB    :  pes->es_strName = "Serious Bomb!";
+
+      // [SSE] Gameplay - Regeneration PowerUp
+      case PUIT_REGENERATION   :  pes->es_strName += " regeneration";    break;
     }
 
     return TRUE;
@@ -181,6 +193,11 @@ functions:
         break;
       case PUIT_BOMB:
         Particles_Atomic(this, 2.0F * 0.75F * m_fStretch, (bOnGround ? 0.75F : 2.0F * 0.95F) * m_fStretch, PT_STAR05, 12);
+        break;
+
+      // [SSE] Gameplay - Regeneration PowerUp
+      case PUIT_REGENERATION:
+        Particles_Stardust( this, 2.0F * 0.75F * m_fStretch, (bOnGround ? 0.75F : 1.00F * 0.75F) * m_fStretch, PT_STAR08, 192);
         break;
     }
   }
@@ -303,7 +320,9 @@ procedures:
           case PUIT_INVULNER: IFeel_PlayEffect("PU_Invulnerability"); break;
           case PUIT_DAMAGE:   IFeel_PlayEffect("PU_Invulnerability"); break;
           case PUIT_SPEED:    IFeel_PlayEffect("PU_FastShoes"); break; 
-          case PUIT_BOMB:     IFeel_PlayEffect("PU_SeriousBomb"); break; 
+          case PUIT_BOMB:     IFeel_PlayEffect("PU_SeriousBomb"); break;
+
+          case PUIT_REGENERATION: IFeel_PlayEffect("PU_Invulnerability"); break;
         }
       }
       
