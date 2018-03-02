@@ -21,19 +21,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "Entities/PlayerWeapons.h"
 %}
 
-enum ESTUsePenCausedAs {
+enum EETUsePenCausedAs {
   0 ESTUP_NONE        "0 None",
   1 ESTUP_SOURCE      "1 Entity to Teleport",
   2 ESTUP_DESTINATION "2 Destination Target",
 };
 
-class CSimpleTeleport: CRationalEntity {
-name      "SimpleTeleport";
-thumbnail "Thumbnails\\SimpleTeleport.tbn";
+class CExactTeleport: CRationalEntity {
+name      "CExactTeleport";
+thumbnail "Thumbnails\\ExactTeleport.tbn";
 features  "HasName", "IsTargetable";
 
 properties:
-   1 CTString m_strName "Name" 'N'      = "Simple Teleport",
+   1 CTString m_strName "Name" 'N'      = "Exact Teleport",
    3 CTString m_strDescription = "",
    
    4 BOOL m_bActive              "Active" 'A' = TRUE,
@@ -42,7 +42,7 @@ properties:
    6 CEntityPointer m_penEnityToTP   "Entity To Teleport" 'E',
    7 CEntityPointer m_penDestination "Destination Target" 'T',
 
-  10 enum ESTUsePenCausedAs m_eUsePenCausedAs "Use penCaused as ..." = ESTUP_NONE,
+  10 enum EETUsePenCausedAs m_eUsePenCausedAs "Use penCaused as ..." = ESTUP_NONE,
    
   25 BOOL m_bForceStop              "Force Stop" 'F' = FALSE,
   26 BOOL m_bKeepOrientation        "Keep Orientation" = FALSE,
@@ -51,8 +51,8 @@ properties:
   30 BOOL m_bSpawnEffect "Spawn Effect" 'X' = FALSE,
 
 components:
-  1 model   MODEL_TELEPORTER   "Models\\Editor\\SimpleTeleport.mdl",
-  2 texture TEXTURE_TELEPORTER "Models\\Editor\\SimpleTeleport.tex",
+  1 model   MODEL_TELEPORTER   "Models\\Editor\\ExactTeleport.mdl",
+  2 texture TEXTURE_TELEPORTER "Models\\Editor\\ExactTeleport.tex",
   3 class   CLASS_BASIC_EFFECT  "Classes\\BasicEffect.ecl",
 
 functions:
@@ -173,12 +173,14 @@ procedures:
   
     autowait(0.1f);
   
-    wait() {
+    wait()
+    {
       on (EBegin) : { 
         resume;
       }
 
-      on(ETrigger eTrigger) : {
+      on(ETrigger eTrigger) :
+      {
         if (m_bActive) {
           DoTeleportation(eTrigger);
         }
