@@ -1359,8 +1359,8 @@ properties:
  204 INDEX m_iCurrency3 = 0,
  205 INDEX m_iCurrency4 = 0,
 
- 205 INDEX m_iScoreAccumulated = 0,
- 206 FLOAT m_fLiveCostMultiplier = 1.0F,
+ 206 INDEX m_iScoreAccumulated = 0,
+ 207 FLOAT m_fLiveCostMultiplier = 1.0F,
  
  // [SSE] Gameplay - Respawn Delay
  220 FLOAT m_tmKilled = -1.0f,
@@ -1705,6 +1705,36 @@ functions:
 
     //CPrintF("PLID %d received direct RPC!\n", GetMyPlayerIndex());
   };
+  
+  TIME GetMaxPowerUpDuration(PowerUpItemType type)
+  {
+    switch (type)
+    {
+      case PUIT_DAMAGE: {
+        return m_tmSeriousDamageMax; 
+      } break;
+      
+      case PUIT_SPEED: {
+        return m_tmSeriousSpeedMax; 
+      } break;
+      
+      case PUIT_INVISIB: {
+        return m_tmInvisibilityMax; 
+      } break;
+      
+      case PUIT_INVULNER: {
+        return m_tmInvulnerabilityMax; 
+      } break;
+      
+      case PUIT_REGENERATION: {
+        return m_tmRegenerationMax; 
+      } break;
+      
+      default: break;
+    }
+    
+    return 0.0F;
+  }
   
   // --------------------------------------------------------------------------------------
   // [SSE] ProgressiveSwitch
@@ -5083,39 +5113,40 @@ functions:
       }
       
       // TODO: Rewrite this ugly thing.
+      const TIME tmMaxDuration = GetMaxPowerUpDuration(ePowerUp.puitType);
 
       switch (ePowerUp.puitType)
       {
         case PUIT_INVISIB:
           if (bDurationStacking) {
-            fValue += Clamp(m_tmInvisibility - tmNow, 0.0F, m_tmInvisibilityMax);
+            fValue += Clamp(m_tmInvisibility - tmNow, 0.0F, tmMaxDuration);
           }
 
-          m_tmInvisibility = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmInvisibilityMax) : m_tmInvisibilityMax);
+          m_tmInvisibility = tmNow + (fValue > 0.0F ? ClampUp(fValue, tmMaxDuration) : tmMaxDuration);
           return TRUE;
 
         case PUIT_INVULNER:
           if (bDurationStacking) {
-            fValue += Clamp(m_tmInvulnerability - tmNow, 0.0F, m_tmInvulnerabilityMax);
+            fValue += Clamp(m_tmInvulnerability - tmNow, 0.0F, tmMaxDuration);
           }
         
-          m_tmInvulnerability = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmInvulnerabilityMax) : m_tmInvulnerabilityMax);
+          m_tmInvulnerability = tmNow + (fValue > 0.0F ? ClampUp(fValue, tmMaxDuration) : tmMaxDuration);
           return TRUE;
 
         case PUIT_DAMAGE:
           if (bDurationStacking) {
-            fValue += Clamp(m_tmSeriousDamage - tmNow, 0.0F, m_tmSeriousDamageMax);
+            fValue += Clamp(m_tmSeriousDamage - tmNow, 0.0F, tmMaxDuration);
           }
         
-          m_tmSeriousDamage = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmSeriousDamageMax) : m_tmSeriousDamageMax);
+          m_tmSeriousDamage = tmNow + (fValue > 0.0F ? ClampUp(fValue, tmMaxDuration) : tmMaxDuration);
           return TRUE;
 
         case PUIT_SPEED:
           if (bDurationStacking) {
-            fValue += Clamp(m_tmSeriousSpeed - tmNow, 0.0F, m_tmSeriousSpeedMax);
+            fValue += Clamp(m_tmSeriousSpeed - tmNow, 0.0F, tmMaxDuration);
           }
         
-          m_tmSeriousSpeed = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmSeriousSpeedMax) : m_tmSeriousSpeedMax);
+          m_tmSeriousSpeed = tmNow + (fValue > 0.0F ? ClampUp(fValue, tmMaxDuration) : tmMaxDuration);
           return TRUE;
 
         case PUIT_BOMB:
@@ -5132,10 +5163,10 @@ functions:
         // [SSE] Gameplay - Regeneration PowerUp
         case PUIT_REGENERATION:
           if (bDurationStacking) {
-            fValue += Clamp(m_tmRegeneration - tmNow, 0.0F, m_tmRegenerationMax);
+            fValue += Clamp(m_tmRegeneration - tmNow, 0.0F, tmMaxDuration);
           }
         
-          m_tmRegeneration = tmNow + (fValue > 0.0F ? ClampUp(fValue, m_tmRegenerationMax) : m_tmRegenerationMax);
+          m_tmRegeneration = tmNow + (fValue > 0.0F ? ClampUp(fValue, tmMaxDuration) : tmMaxDuration);
           return TRUE;
       }
     }
