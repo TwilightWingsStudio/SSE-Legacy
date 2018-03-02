@@ -1082,8 +1082,10 @@ functions:
       }
        
     } else {
-      if (IsMentalBlinkingEnabled() || GetSP()->sp_bMental) {
-        if (GetHealth()<=0) {
+      // Model blinking if mental difficulty.
+      if (IsMentalBlinkingEnabled() && GetSP()->sp_bMental)
+      {
+        if (GetHealth() <= 0) {
           if (en_RenderType == RT_SKAMODEL || en_RenderType == RT_SKAEDITORMODEL) {
             GetModelInstance()->SetModelColor(C_WHITE&0xFF);
           } else {
@@ -1115,6 +1117,7 @@ functions:
         }
       }
     }
+
     if (m_colBurning!=COLOR(C_WHITE|CT_OPAQUE))
     {
       colAmbient = MulColors( colAmbient, m_colBurning);
