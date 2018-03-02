@@ -302,7 +302,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
 
   sp.sp_iBlood = Clamp( gam_iBlood, 0L, 3L);
   sp.sp_bGibs  = gam_bGibs;
-  sp.sp_tmSpawnInvulnerability = gam_tmSpawnInvulnerability;
+  sp.sp_tmSpawnInvulnerability = Clamp(gam_tmSpawnInvulnerability, 0.0F, 5.0F); // [SSE][ZCaliptium] Restriced values. By default was any value, but I changed it.
   sp.sp_tmRespawnDelay = Clamp(gam_tmRespawnDelay, 0.0F, 60.0F); // [SSE] Respawn Delay
 
   sp.sp_bUseExtraEnemies = gam_bUseExtraEnemies;
