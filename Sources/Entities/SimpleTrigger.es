@@ -122,7 +122,7 @@ functions:
     if (m_penTarget4)  { ctUsed++; }
     if (m_penTarget5)  { ctUsed++; }
     
-    ((CTString&)m_strDescription).PrintF("[%d/5]", ctUsed);
+    ((CTString&)m_strDescription).PrintF("[%d/5] W=%.2f", ctUsed, m_fWaitTime);
     
     return m_strDescription;
   }
@@ -234,6 +234,15 @@ procedures:
         on (EDeactivate) : { pass; }
         otherwise(): { resume; }
       }
+      
+      if (m_bDebugMessages) {
+        CPrintF(TRANS("[%s] : Finished Awaiting!\n"), m_strName);
+      }
+    }
+    
+    if (m_bDebugMessages) {
+      CPrintF(TRANS("  Type=Normal\n"));
+      CPrintF(TRANS("  Sending event to all targets!\n"));
     }
 
     // send event to all targets
@@ -258,6 +267,10 @@ procedures:
         on (EDeactivate) : { pass; }
         otherwise(): { resume; }
       }
+      
+      if (m_bDebugMessages) {
+        CPrintF(TRANS("[%s] : Finished Awaiting!\n"), m_strName);
+      }
     }
 
     if (m_bDebugMessages) {
@@ -279,10 +292,10 @@ procedures:
         on (EDeactivate) : { pass; }
         otherwise(): { resume; }
       }
-    }
-    
-    if (m_bDebugMessages) {
-      CPrintF(TRANS("[%s] Finished Awaiting!\n"), m_strName);
+      
+      if (m_bDebugMessages) {
+        CPrintF(TRANS("[%s] : Finished Awaiting!\n"), m_strName);
+      }
     }
 
     m_iPos = IRnd() % 5 + 1;
