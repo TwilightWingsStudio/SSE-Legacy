@@ -560,9 +560,9 @@ BOOL CWorldEditorApp::SubInitInstance()
 
   // settings will be saved into registry instead of ini file
   if (_strModExt=="") {
-    SetRegistryKey( CString("CroTeam"));
+    SetRegistryKey( CString("TwilightWingsStudio\\SeriousEngineE"));
   } else {
-    SetRegistryKey( CString("CroTeam\\"+_strModExt));
+    SetRegistryKey( CString("TwilightWingsStudio\\SeriousEngineE" + _strModExt));
   }
 
   CPrintF("%s", cmd_strOutput);

@@ -140,7 +140,7 @@ BOOL CSeriousSkaStudioApp::SubInitInstance()
 	// Change the registry key under which our settings are stored.
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization.
-	SetRegistryKey( L"CroTeam");
+	SetRegistryKey( L"TwilightWingsStudio\\SeriousEngineE");
 
 	LoadStdProfileSettings(8);  // Load standard INI file options (including MRU)
 
