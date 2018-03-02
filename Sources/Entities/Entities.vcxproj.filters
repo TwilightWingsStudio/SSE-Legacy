@@ -577,9 +577,6 @@
     <ClCompile Include="Coder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SimpleTeleport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TrickyExecutor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -668,6 +665,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PlayerVitalitySettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ExactTeleport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1680,12 +1680,6 @@
     <ClInclude Include="Coder_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SimpleTeleport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SimpleTeleport_tables.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TrickyExecutor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1852,6 +1846,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PlayerVitalitySettings_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExactTeleport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExactTeleport_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2774,9 +2774,6 @@
     <CustomBuild Include="TrickyExecutor.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
-    <CustomBuild Include="SimpleTeleport.es">
-      <Filter>Class Files\Tools</Filter>
-    </CustomBuild>
     <CustomBuild Include="FlameInflictor.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
@@ -2843,10 +2840,11 @@
     <CustomBuild Include="PlayerExecutor.es">
       <Filter>Class Files\AI</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PlayerVitalitySettings.es">
-      <Filter>Class Files\Players</Filter>
-    </None>
+    <CustomBuild Include="PlayerVitalitySettings.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ExactTeleport.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

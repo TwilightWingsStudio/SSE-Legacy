@@ -192,6 +192,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="EnemyFactionHolder.cpp" />
     <ClCompile Include="EnemySettings.cpp" />
     <ClCompile Include="EntityParticles.cpp" />
+    <ClCompile Include="ExactTeleport.cpp" />
     <ClCompile Include="FlameInflictor.cpp" />
     <ClCompile Include="GenericKeyItem.cpp" />
     <ClCompile Include="GenericPowerUpItem.cpp" />
@@ -218,7 +219,6 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="ShellExecutor.cpp" />
     <ClCompile Include="SimpleParenter.cpp" />
     <ClCompile Include="SimpleSwitch.cpp" />
-    <ClCompile Include="SimpleTeleport.cpp" />
     <ClCompile Include="SimpleTrigger.cpp" />
     <ClCompile Include="SpectatorCamera.cpp" />
     <ClCompile Include="StdH\StdH.cpp">
@@ -459,6 +459,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="EnemySettings_tables.h" />
     <ClInclude Include="EntityParticles.h" />
     <ClInclude Include="EntityParticles_tables.h" />
+    <ClInclude Include="ExactTeleport.h" />
+    <ClInclude Include="ExactTeleport_tables.h" />
     <ClInclude Include="GenericKeyItem.h" />
     <ClInclude Include="GenericKeyItem_tables.h" />
     <ClInclude Include="GenericPowerUpItem.h" />
@@ -509,8 +511,6 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="SimpleParenter_tables.h" />
     <ClInclude Include="SimpleSwitch.h" />
     <ClInclude Include="SimpleSwitch_tables.h" />
-    <ClInclude Include="SimpleTeleport.h" />
-    <ClInclude Include="SimpleTeleport_tables.h" />
     <ClInclude Include="SimpleTrigger.h" />
     <ClInclude Include="SimpleTrigger_tables.h" />
     <ClInclude Include="SpectatorCamera.h" />
@@ -2922,19 +2922,6 @@ ecc Entities/%(Filename).es </Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="SimpleTeleport.es">
-      <FileType>Document</FileType>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Entities/%(Filename).es</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Entities/%(Filename).es</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
-ecc Entities/%(Filename).es </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
-ecc Entities/%(Filename).es </Command>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
     <CustomBuild Include="TrickyExecutor.es">
       <FileType>Document</FileType>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Entities/%(Filename).es</Message>
@@ -3287,6 +3274,19 @@ ecc Entities/%(Filename).es </Command>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="PlayerVitalitySettings.es">
+      <FileType>Document</FileType>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Entities/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Entities/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc Entities/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc Entities/%(Filename).es </Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="ExactTeleport.es">
       <FileType>Document</FileType>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Entities/%(Filename).es</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Entities/%(Filename).es</Message>
