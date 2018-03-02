@@ -34,15 +34,15 @@ features  "HasName", "IsTargetable";
 properties:
   1 CTString m_strName          "Name" 'N' = "Simple Parenter",
   2 CTString m_strDescription = "",
-  3 BOOL m_bActive   "Active" = TRUE,
+  3 BOOL m_bActive              "Active" 'V' = TRUE,
   4 BOOL m_bDebugMessages       "Debug Messages" = FALSE, 
   
   5 BOOL m_bTeleport            "Teleport Entity" = TRUE,
   6 BOOL m_bCopy                "Copy Entity"     = FALSE,
-  7 BOOL m_bAbsolute            "Absolute Offset" = FALSE,
+  7 BOOL m_bAbsoluteOffset      "Absolute Offset" = FALSE,
   8 BOOL m_bRotate              "Adjust Rotation" = TRUE,
-  9 CEntityPointer m_penTarget  "Entity to Parent",
- 10 CEntityPointer m_penParent "Parent to Entity",
+  9 CEntityPointer m_penTarget  "Entity to Parent" 'T',
+ 10 CEntityPointer m_penParent  "Parent to Entity" 'Y',
  
  20 FLOAT m_fOffsetX "X Offset" = 0.0F,
  21 FLOAT m_fOffsetY "Y Offset" = 0.0F,
@@ -128,7 +128,7 @@ functions:
     {
       plEntity.pl_PositionVector = plParent.pl_PositionVector;
 
-      if (m_bAbsolute) {
+      if (m_bAbsoluteOffset) {
         plEntity.pl_PositionVector += FLOAT3D(m_fOffsetX, m_fOffsetY, m_fOffsetZ);
       } else {
         CPlacement3D plOffset = CPlacement3D(FLOAT3D(m_fOffsetX, m_fOffsetY, m_fOffsetZ), ANGLE3D(0, 0, 0));
