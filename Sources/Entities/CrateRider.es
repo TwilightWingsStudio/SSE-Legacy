@@ -83,6 +83,14 @@ functions:
     m_apt2.Precache(m_fnmHeadTex2);
     m_aps.Precache(m_fnmDriveSnd);
   };
+  
+  // --------------------------------------------------------------------------------------
+  // Return TRUE if model should blink while mental gamerule enabled.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsMentalBlinkingEnabled()
+  {
+    return FALSE;
+  }
 
   // damage anim
   INDEX AnimForDamage(FLOAT fDamage) {

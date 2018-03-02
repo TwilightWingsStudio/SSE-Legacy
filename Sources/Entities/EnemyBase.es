@@ -370,6 +370,14 @@ functions:
   {
     return m_bCountKill;
   }
+  
+  // --------------------------------------------------------------------------------------
+  // Return TRUE if model should blink while mental gamerule enabled.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsMentalBlinkingEnabled()
+  {
+    return TRUE;
+  }
 
   // --------------------------------------------------------------------------------------
   // Causes cannonballs explode when touching them.
@@ -1074,7 +1082,7 @@ functions:
       }
        
     } else {
-      if (GetSP()->sp_bMental) {
+      if (IsMentalBlinkingEnabled() || GetSP()->sp_bMental) {
         if (GetHealth()<=0) {
           if (en_RenderType == RT_SKAMODEL || en_RenderType == RT_SKAEDITORMODEL) {
             GetModelInstance()->SetModelColor(C_WHITE&0xFF);

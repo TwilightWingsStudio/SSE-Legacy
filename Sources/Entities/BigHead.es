@@ -96,6 +96,14 @@ functions:
     }
     return CEnemyBase::HandleEvent(ee);
   }
+  
+  // --------------------------------------------------------------------------------------
+  // Return TRUE if model should blink while mental gamerule enabled.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL IsMentalBlinkingEnabled()
+  {
+    return FALSE;
+  }
 
   /* Entity info */
   void *GetEntityInfo(void)
