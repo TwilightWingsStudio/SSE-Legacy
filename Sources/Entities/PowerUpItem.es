@@ -104,6 +104,9 @@ components:
  54 texture TEXTURE_REFLECTION_PUPLE "ModelsMP\\ReflectionTextures\\Purple01.tex",
  55 texture TEXTURE_FLARE "Models\\Items\\Flares\\Flare.tex",
  56 model   MODEL_FLARE   "Models\\Items\\Flares\\Flare.mdl",
+ 
+ 80 model   MODEL_REGENERATION    "Models\\Items\\PowerUps\\Regeneration\\Regeneration.mdl",
+ 81 texture TEXTURE_REGENERATION  "Models\\Items\\PowerUps\\Regeneration\\Regeneration.tex",
 
 // ************** SOUNDS **************
 300 sound   SOUND_PICKUP   "SoundsMP\\Items\\PowerUp.wav",
@@ -257,6 +260,17 @@ functions:
         AddItem(  MODEL_BOMB, TEXTURE_BOMB, 0, 0, 0);  // set appearance
         AddFlare( MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );  // add flare
         StretchItem( FLOAT3D(1.0F*3.0F, 1.0F*3.0F, 1.0F*3.0));
+      } break;
+      
+      // [SSE] Gameplay - Regeneration PowerUp
+      case PUIT_REGENERATION: {
+        ForceCollisionBoxIndexChange( ITEMHOLDER_COLLISION_BOX_BIG);
+        m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 40.0F; 
+        m_strDescription.PrintF("Regeneration");
+
+        AddItem(  MODEL_REGENERATION, TEXTURE_REGENERATION, 0, 0, 0);  // set appearance
+        AddFlare( MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0.0F, 0.2F, 0.0F), FLOAT3D(1.0F, 1.0F, 0.3F) );  // add flare
+        StretchItem( FLOAT3D(1.0F*0.75F, 1.0F*0.75F, 1.0F*0.75));
       } break;
     }
   };
