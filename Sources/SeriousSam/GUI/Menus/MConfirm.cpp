@@ -34,16 +34,18 @@ void CConfirmMenu::Initialize_t(void)
   // Initialize "Yes" button.
   gm_pConfirmYes = new CMGButton(TRANS("YES"));
   gm_pConfirmYes->mg_boxOnScreen = BoxPopupYesLarge();
-  gm_pConfirmYes->mg_pmgLeft = gm_pConfirmYes->mg_pmgRight = gm_pConfirmNo;
   gm_pConfirmYes->mg_iCenterI = 1;
   gm_pConfirmYes->mg_bfsFontSize = BFS_LARGE;
 
   // Initialize "No" button.
   gm_pConfirmNo = new CMGButton(TRANS("NO"));
   gm_pConfirmNo->mg_boxOnScreen = BoxPopupNoLarge();
-  gm_pConfirmNo->mg_pmgLeft = gm_pConfirmNo->mg_pmgRight = gm_pConfirmYes;
   gm_pConfirmNo->mg_iCenterI = -1;
   gm_pConfirmNo->mg_bfsFontSize = BFS_LARGE;
+
+  // After buttons created we can make them neighbours.
+  gm_pConfirmYes->mg_pmgLeft = gm_pConfirmYes->mg_pmgRight = gm_pConfirmNo;
+  gm_pConfirmNo->mg_pmgLeft = gm_pConfirmNo->mg_pmgRight = gm_pConfirmYes;
   
   // Add components.  
   AddChild(gm_pConfirmLabel);

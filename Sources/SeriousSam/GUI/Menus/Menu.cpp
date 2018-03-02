@@ -554,6 +554,7 @@ void MenuUpdateMouseFocus(void)
       &&_pmgUnderCursor->mg_pmgDown ==NULL) {
       // it cannot be focused
       _pmgUnderCursor = NULL;
+
       return;
     }
 
@@ -803,6 +804,7 @@ BOOL DoMenu( CDrawPort *pdp)
 
   BOOL bStilInMenus = FALSE;
   _pGame->MenuPreRenderMenu(pgmCurrentMenu->gm_strName);
+
   // for each menu gadget
   FOREACHINLIST( CMenuGadget, m_lnNode, pgmCurrentMenu->m_lhChildren, itmg) {
     // if gadget is visible
