@@ -973,7 +973,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
 
   // Health
   {
-    fValue = Clamp(ceil(_penPlayer->GetHealth()), 0.0f, 999.0F);
+    fValue = Clamp(_penPlayer->GetHealth(), 0.0f, 999.0F);
     
     HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
     colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastHealth, penLast->m_tmHealthChanged, fMoverX, fMoverY);
@@ -986,7 +986,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     HUD_DrawAnchoredRectOutline(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
 
     CTString strHealth;
-    strHealth.PrintF("%.0f", fValue);
+    strHealth.PrintF("%d", (SLONG)ceil(fValue));
     HUD_DrawAnchoredTextInRect(FLOAT2D(44, 8), FLOAT2D(80, 32), EHHAT_LEFT, EHVAT_BOT, strHealth, colDefault, fValue / TOP_HEALTH);
   }
   
@@ -1764,7 +1764,7 @@ extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent
 
   // Health
   {
-    fValue = Clamp(ceil(_penPlayer->GetHealth()), 0.0f, 999.0F);
+    fValue = Clamp(_penPlayer->GetHealth(), 0.0f, 999.0F);
     
     HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.5f, 0.25f, FALSE);
     colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastHealth, penLast->m_tmHealthChanged, fMoverX, fMoverY);
@@ -1777,7 +1777,7 @@ extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent
     HUD_DrawAnchoredRectOutline(44, 8, 80, 32, EHHAT_LEFT, EHVAT_BOT, _colHUD|_ulAlphaHUD);
 
     CTString strHealth;
-    strHealth.PrintF("%.0f", fValue);
+    strHealth.PrintF("%d", (SLONG)ceil(fValue));
     HUD_DrawAnchoredTextInRect(FLOAT2D(44, 8), FLOAT2D(80, 32), EHHAT_LEFT, EHVAT_BOT, strHealth, colDefault, fValue / TOP_HEALTH);
   }
 
