@@ -122,12 +122,12 @@ extern void HUD_DrawDebugMonitor()
   
   strReport.PrintF("%s^cCCCCCCShields: ", strReport);
 
-  if (_penPlayer->m_fShields >= 10000.0F) {
-    strReport.PrintF("%s%.1f k\n", strReport, _penPlayer->m_fShields / 1000.0F);
+  if (_penPlayer->GetShields() >= 10000.0F) {
+    strReport.PrintF("%s%.1f k\n", strReport, _penPlayer->GetShields() / 1000.0F);
   } else if (_penPlayer->m_fShields >= 1000.0F) {
-    strReport.PrintF("%s%.2f k\n", strReport, _penPlayer->m_fShields / 1000.0F);
+    strReport.PrintF("%s%.2f k\n", strReport, _penPlayer->GetShields() / 1000.0F);
   } else {
-    strReport.PrintF("%s%.2f\n", strReport, _penPlayer->m_fShields);
+    strReport.PrintF("%s%.2f\n", strReport, _penPlayer->GetShields());
   }
 
   strReport += "\n\n";

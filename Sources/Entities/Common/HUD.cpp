@@ -993,10 +993,10 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   PIX pixShieldsVO = 0;
 
   // Armor
-  if (_penPlayer->m_fArmor > 0.0F) {
+  if (_penPlayer->GetArmor() > 0.0F) {
     pixShieldsVO = 40;
 
-    fValue = Clamp(ceil(_penPlayer->m_fArmor), 0.0f, 999.0F);
+    fValue = Clamp(ceil(_penPlayer->GetArmor()), 0.0f, 999.0F);
     CTextureObject *ptoCurrentArmor = NULL;
       
     if (fValue <= 50.5f) {
@@ -1023,8 +1023,8 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
   }
   
   // Shields
-  if (_penPlayer->m_fShields > 0.0F) {
-    fValue = Clamp(ceil(_penPlayer->m_fShields), 0.0f, 999.0F);
+  if (_penPlayer->GetShields() > 0.0F) {
+    fValue = Clamp(ceil(_penPlayer->GetShields()), 0.0f, 999.0F);
     CTextureObject *ptoCurrentArmor = &_pHAC->m_toShields;
     
     HUD_PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
@@ -1784,10 +1784,10 @@ extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent
   PIX pixShieldsVO = 0;
 
   // Armor
-  if (_penPlayer->m_fArmor > 0.0F) {
+  if (_penPlayer->GetArmor() > 0.0F) {
     pixShieldsVO = 40;
 
-    fValue = Clamp(ceil(_penPlayer->m_fArmor), 0.0f, 999.0F);
+    fValue = Clamp(ceil(_penPlayer->GetArmor()), 0.0f, 999.0F);
     CTextureObject *ptoCurrentArmor = NULL;
       
     if (fValue <= 50.5f) {
@@ -1814,8 +1814,8 @@ extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent
   }
   
   // Shields
-  if (_penPlayer->m_fShields > 0.0F) {
-    fValue = Clamp(ceil(_penPlayer->m_fShields), 0.0f, 999.0F);
+  if (_penPlayer->GetShields() > 0.0F) {
+    fValue = Clamp(ceil(_penPlayer->GetShields()), 0.0f, 999.0F);
     CTextureObject *ptoCurrentArmor = &_pHAC->m_toShields;
     
     HUD_PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
@@ -2258,7 +2258,7 @@ extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent
       const INDEX iFrags  = penPlayer->m_psGameStats.ps_iKills;
       const INDEX iDeaths = penPlayer->m_psGameStats.ps_iDeaths;
       const INDEX iHealth = ClampDn( (INDEX)ceil( penPlayer->GetHealth()), 0L);
-      const INDEX iArmor  = ClampDn( (INDEX)ceil( penPlayer->m_fArmor),    0L);
+      const INDEX iArmor  = ClampDn( (INDEX)ceil( penPlayer->GetArmor()),    0L);
       const INDEX iPing = ceil(penPlayer->en_tmPing*1000.0f);
 
       CTString strScore, strMana, strFrags, strDeaths, strHealth, strArmor, strPing;
@@ -2765,7 +2765,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   HUD_DrawIcon( fCol+fMoverX, fRow+fMoverY, _pHAC->m_toHealth, C_WHITE /*_colHUD*/, fNormValue, TRUE, 32, 32);
 
   // prepare and draw armor info (eventually)
-  fValue = _penPlayer->m_fArmor;
+  fValue = _penPlayer->GetArmor();
   if (fValue > 0.0f) {
     fNormValue = fValue/TOP_ARMOR;
     strValue.PrintF( "%d", (SLONG)ceil(fValue));
@@ -3134,7 +3134,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
       const INDEX iFrags  = penPlayer->m_psGameStats.ps_iKills;
       const INDEX iDeaths = penPlayer->m_psGameStats.ps_iDeaths;
       const INDEX iHealth = ClampDn( (INDEX)ceil( penPlayer->GetHealth()), 0L);
-      const INDEX iArmor  = ClampDn( (INDEX)ceil( penPlayer->m_fArmor),    0L);
+      const INDEX iArmor  = ClampDn( (INDEX)ceil( penPlayer->GetArmor()),    0L);
       const INDEX iPing = ceil(penPlayer->en_tmPing*1000.0f);
 
       CTString strScore, strMana, strFrags, strDeaths, strHealth, strArmor, strPing;
