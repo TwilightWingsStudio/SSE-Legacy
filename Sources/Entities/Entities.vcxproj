@@ -196,6 +196,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="FlameInflictor.cpp" />
     <ClCompile Include="GenericKeyItem.cpp" />
     <ClCompile Include="GenericPowerUpItem.cpp" />
+    <ClCompile Include="GenericVitalItem.cpp" />
     <ClCompile Include="HudBossBarDisplay.cpp" />
     <ClCompile Include="HudPicDisplay.cpp" />
     <ClCompile Include="MBTeleporter.cpp" />
@@ -465,6 +466,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="GenericKeyItem_tables.h" />
     <ClInclude Include="GenericPowerUpItem.h" />
     <ClInclude Include="GenericPowerUpItem_tables.h" />
+    <ClInclude Include="GenericVitalItem.h" />
+    <ClInclude Include="GenericVitalItem_tables.h" />
     <ClInclude Include="HudBossBarDisplay.h" />
     <ClInclude Include="HudBossBarDisplay_tables.h" />
     <ClInclude Include="HudPicDisplay.h" />
@@ -3292,6 +3295,19 @@ ecc Entities/%(Filename).es </Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Entities/%(Filename).es</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc Entities/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc Entities/%(Filename).es </Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="GenericVitalItem.es">
+      <FileType>Document</FileType>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Entities/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Entities/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
 ecc Entities/%(Filename).es </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
