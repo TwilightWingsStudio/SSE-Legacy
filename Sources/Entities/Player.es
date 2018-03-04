@@ -4897,7 +4897,9 @@ functions:
           fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopShields : 100.0F; // TODO: Remove magic numbers!
           fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxShields : 200.0F; // TODO: Remove magic numbers!
           
-          // TODO: Implement shields pickup multiplier.
+          if (penVitalitySettings) {
+            fValue *= penVitalitySettings->m_fShieldsPickUpMul;
+          }
         } break;
       }
 
