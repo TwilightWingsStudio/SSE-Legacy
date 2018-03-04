@@ -121,13 +121,15 @@ extern void HUD_DrawDebugMonitor()
   strReport.PrintF("%s^cCCCCCC#3 Tk.    %d\n", strReport, _penPlayer->m_iCurrency4);
   
   strReport.PrintF("%s^cCCCCCCShields: ", strReport);
+  
+  const FLOAT fShields = _penPlayer->GetShields();
 
-  if (_penPlayer->GetShields() >= 10000.0F) {
-    strReport.PrintF("%s%.1f k\n", strReport, _penPlayer->GetShields() / 1000.0F);
-  } else if (_penPlayer->m_fShields >= 1000.0F) {
-    strReport.PrintF("%s%.2f k\n", strReport, _penPlayer->GetShields() / 1000.0F);
+  if (fShields >= 10000.0F) {
+    strReport.PrintF("%s%.1f k\n", strReport, fShields / 1000.0F);
+  } else if (fShields >= 1000.0F) {
+    strReport.PrintF("%s%.2f k\n", strReport, fShields / 1000.0F);
   } else {
-    strReport.PrintF("%s%.2f\n", strReport, _penPlayer->GetShields());
+    strReport.PrintF("%s%.2f\n", strReport, fShields);
   }
 
   strReport += "\n\n";
