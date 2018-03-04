@@ -59,8 +59,14 @@ properties:
   43 FLOAT m_fArmorPickUpMul     "Mul Armor PickUp" = 1.0F,
   44 FLOAT m_fShieldsPickUpMul   "Mul Shields PickUp" = 1.0F,
   
-  50 FLOAT m_fArmorAbsorbtionMul "Mul Armor Absorbtion" = 0.66F,
+  50 FLOAT m_fArmorAbsorptionMul   "Mul Armor Absorption" = 0.66F,
+  51 FLOAT m_fShieldsAbsorptionMul "Mul Shields Absorption" = 1.0F,
 
+  // Rates of vital values decrementation.
+  55 FLOAT m_fHealthDecRate  "HP Decrement Rate" = 1.0F,
+  56 FLOAT m_fArmorDecRate   "AP Decrement Rate" = 1.0F,
+  57 FLOAT m_fShieldsDecRate "SP Decrement Rate" = 1.0F,
+  
   // Health, Armor & Shields
   70 FLOAT m_fTopHealth    "Health Top"   = 100.0F,
   71 FLOAT m_fExtraHealth  "Health Extra" = 100.0F,
@@ -76,6 +82,8 @@ properties:
 
   90 BOOL m_bCanDie     "Can Die" = TRUE,
  
+ // Deprecated
+ /*
   // Health Regeneration
  120 FLOAT m_fHealthRegenValue  "HP Regen. Val" = 0.0F, 
  121 FLOAT m_fHealthRegenMin    "HP Regen. Min" = 0.0F, 
@@ -93,6 +101,7 @@ properties:
  135 enum EPSRegenValueType m_etrvtArmorRegenValType "AP Regen. Val Type" = PSRT_EXACT_POINTS,
  136 enum EPSRegenValueType m_etrvtArmorRegenMinType "AP Regen. Min Type" = PSRT_EXACT_POINTS,
  137 enum EPSRegenValueType m_etrvtArmorRegenMaxType "AP Regen. Max Type" = PSRT_EXACT_POINTS,
+ */
 
 // --------------------------------------------------------------------------------------
 // C O M P O N E N T S
@@ -137,6 +146,21 @@ functions:
     }
     return m_strDescription;
   }
+  
+  void FixValues()
+  {
+    m_fTopHealth = ClampDn(m_fTopHealth, 1.0F);
+    m_fExtraHealth = ClampDn(m_fExtraHealth, 0.0F);
+    m_fOverHealth = ClampDn(m_fOverHealth, 0.0F);
+
+    m_fTopArmor = ClampDn(m_fTopArmor, 0.0F);
+    m_fExtraArmor = ClampDn(m_fExtraArmor, 0.0F);
+    m_fOverArmor = ClampDn(m_fOverArmor, 0.0F);
+    
+    m_fTopShields = ClampDn(m_fTopShields, 0.0F);
+    m_fExtraShields = ClampDn(m_fExtraShields, 0.0F);
+    m_fOverShields = ClampDn(m_fOverShields, 0.0F);
+  }
 
   // --------------------------------------------------------------------------------------
   // Event Handler here.
@@ -152,17 +176,7 @@ functions:
       }
       
       // retard protection
-      m_fTopHealth = ClampDn(m_fTopHealth, 1.0F);
-      m_fExtraHealth = ClampDn(m_fExtraHealth, 0.0F);
-      m_fOverHealth = ClampDn(m_fOverHealth, 0.0F);
-
-      m_fTopArmor = ClampDn(m_fTopArmor, 0.0F);
-      m_fExtraArmor = ClampDn(m_fExtraArmor, 0.0F);
-      m_fOverArmor = ClampDn(m_fOverArmor, 0.0F);
-      
-      m_fTopShields = ClampDn(m_fTopShields, 0.0F);
-      m_fExtraShields = ClampDn(m_fExtraShields, 0.0F);
-      m_fOverShields = ClampDn(m_fOverShields, 0.0F);
+      FixValues();
 
       // Do shit...
       switch (m_epstType) {
@@ -275,17 +289,7 @@ procedures:
   Main()
   {
     // retard protection
-    m_fTopHealth = ClampDn(m_fTopHealth, 1.0F);
-    m_fExtraHealth = ClampDn(m_fExtraHealth, 0.0F);
-    m_fOverHealth = ClampDn(m_fOverHealth, 0.0F);
-
-    m_fTopArmor = ClampDn(m_fTopArmor, 0.0F);
-    m_fExtraArmor = ClampDn(m_fExtraArmor, 0.0F);
-    m_fOverArmor = ClampDn(m_fOverArmor, 0.0F);
-
-    m_fTopShields = ClampDn(m_fTopShields, 0.0F);
-    m_fExtraShields = ClampDn(m_fExtraShields, 0.0F);
-    m_fOverShields = ClampDn(m_fOverShields, 0.0F);
+    FixValues();
 
     // set the nodel
     InitAsEditorModel();

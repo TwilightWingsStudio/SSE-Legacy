@@ -4024,6 +4024,7 @@ functions:
   // --------------------------------------------------------------------------------------
   void VitalityRegeneration(void)
   {
+    // Deprecated
     /*
     CPlayerVitalitySettingsEntity &enSettings = ((CPlayerVitalitySettingsEntity&)*m_penVitalitySettings);
     
@@ -4121,11 +4122,11 @@ functions:
   void ProcessRegen(void)
   {
     // [SSE] Player Settings Entity
-    if (m_penVitalitySettings && m_penVitalitySettings->IsActive()) {
+    /*if (m_penVitalitySettings && m_penVitalitySettings->IsActive()) {
       VitalityRegeneration();
-    } else {
+    } else {*/
       TouristRegeneration();
-    }
+    //}
 
     // [SSE] Gameplay - Regeneration PowerUp
     const FLOAT tmPowerUpRegen = m_tmRegeneration - _pTimer->CurrentTick();
@@ -4554,39 +4555,67 @@ functions:
       return;
     }
 
-    FLOAT fSubHealth, fSubArmor;
+    FLOAT fSubHealth, fSubShields;
+    FLOAT fSubArmor = 0.0F;
  
     if (dmtType == DMT_DROWNING) { // drowning
       fSubHealth = fDamageAmmount;
 
     } else {
-      // If we have any shields.
+      //////////////////////////////////////// SHIELDS ////////////////////////////////////////
+      const FLOAT fShieldsDecRate = penVitalitySettings ? penVitalitySettings->m_fShieldsDecRate : 1.0F;
+
+      // If we have any shields -> calculate absorbed damage.
       if (m_fShields > 0.0F)
       {
-        if (m_fShields >= fDamageAmmount) {
-          m_fShields -= fDamageAmmount;
-          fDamageAmmount = 0.0F;
-          return;
+        // Calculate possible absorbed part of damage.
+        if (penVitalitySettings) {
+          fSubShields = fDamageAmmount * penVitalitySettings->m_fShieldsAbsorptionMul;
         } else {
-          fDamageAmmount -= m_fShields;
+          fSubShields = fDamageAmmount * 1.0F;
+        }
+
+        fDamageAmmount = fDamageAmmount - fSubShields; // Assume that all damage absorbed.
+        m_fShields -= fSubShields * fShieldsDecRate;   // Decrease shields.
+        
+        // If shields below zero -> add difference to damage value.
+        if (m_fShields < 0) {
+          fDamageAmmount -= m_fShields / fShieldsDecRate; // Return back non-absorbed part of damage. 
           m_fShields = 0.0F;
         }
-      }
-      
-      // damage and armor
-      if (penVitalitySettings) {
-        fSubArmor  = fDamageAmmount * penVitalitySettings->m_fArmorAbsorbtionMul;
-      } else {
-        fSubArmor  = fDamageAmmount * 2.0f / 3.0f;      // 2/3 on armor damage
+        
+        // Shields should block very low damage if it left.
+        if (fDamageAmmount < 1.0F) {
+          return;
+        }
       }
 
-      fSubHealth = fDamageAmmount - fSubArmor;    // 1/3 on health damage
-      m_fArmor  -= fSubArmor;                     // decrease armor
+      //////////////////////////////////////// ARMOR ////////////////////////////////////////
+      const FLOAT fArmorDecRate = penVitalitySettings ? penVitalitySettings->m_fArmorDecRate : 1.0F;
+ 
+      // If we have any armor -> calculate absorbed damage.
+      if (m_fArmor > 0.0F)
+      {
+        // Calculate possible absorbed part of damage.
+        if (penVitalitySettings) {
+          fSubArmor  = fDamageAmmount * penVitalitySettings->m_fArmorAbsorptionMul;
+        } else {
+          fSubArmor  = fDamageAmmount * 2.0f / 3.0f;      // 2/3 on armor damage
+        }
 
-      if (m_fArmor < 0) {                         // armor below zero -> add difference to health damage
-        fSubHealth -= m_fArmor;
+        m_fArmor  -= fSubArmor * fArmorDecRate; // Decrease armor.
+      }
+
+      fSubHealth = fDamageAmmount - fSubArmor;
+
+      // If armor below zero -> add difference to health damage.
+      if (m_fArmor < 0) {                         
+        fSubHealth -= m_fArmor / fArmorDecRate; // Return back non-absorbed part of damage.
         m_fArmor    = 0.0f;
       }
+
+      const FLOAT fHealthDecRate = penVitalitySettings ? penVitalitySettings->m_fHealthDecRate : 1.0F;
+      fSubHealth *= fHealthDecRate;
     }
 
     // If any damage.
@@ -4636,7 +4665,7 @@ functions:
       fSubHealth = 100.0F;
       fDamageAmmount = 100.0F;
     }
-    
+
     // [SSE] Gameplay - Mutators - Vampire
     if (penInflictor != this && penInflictor != NULL && (GetSP()->sp_ulMutatorFlags & MUTF_VAMPIRE) && penInflictor->IsPlayerEntity() && penInflictor->IsAlive())
     {
@@ -4646,7 +4675,9 @@ functions:
       penInflictor->SendEvent(eHealing);
     }
 
-    DamageImpact(dmtType, GetSP()->sp_bArmorInertiaDamping ? fSubHealth : fDamageAmmount, vHitPoint, vDirection);
+    if ((GetSP()->sp_bArmorInertiaDamping && fSubHealth > 1.0F) || (!GetSP()->sp_bArmorInertiaDamping && fDamageAmmount > 1.0F)) {
+      DamageImpact(dmtType, GetSP()->sp_bArmorInertiaDamping ? fSubHealth : fDamageAmmount, vHitPoint, vDirection);
+    }
     
     // [SSE] RocketJump Mode
     if (penInflictor != this || !(GetSP()->sp_ulMutatorFlags & MUTF_ROCKETJUMP) || dmtType == DMT_BURNING) {
