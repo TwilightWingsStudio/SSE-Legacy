@@ -68,7 +68,7 @@ functions:
   // --------------------------------------------------------------------------------------
   // Called every time when entity receiving ETrigger entity event.
   // --------------------------------------------------------------------------------------
-  void DoExecution(const ETrigger &eTrigger)
+  void DoExecution(CEntity* penCaused, CEntity* penTarget)
   {
     const CEntityPointer* apenSlots = &m_penSlot1;
     
@@ -86,10 +86,10 @@ functions:
     }
     
     if (m_fnScript != "" && FileExists(m_fnScript)) {
-      _pScriptEngine->ExecEntityScript(this, m_fnScript, eTrigger.penCaused, aiSlots, m_bDebugMessages);
+      _pScriptEngine->ExecEntityScript(this, m_fnScript, penCaused, penTarget, aiSlots, m_bDebugMessages);
     }
     
-    SendToTarget(m_penTarget, EET_TRIGGER, eTrigger.penCaused);
+    SendToTarget(m_penTarget, EET_TRIGGER, penCaused);
   }
 
 procedures:
@@ -116,7 +116,16 @@ procedures:
 
       on (ETrigger eTrigger) : {
         if (m_bActive) {
-          DoExecution(eTrigger);
+          DoExecution(eTrigger.penCaused, NULL);
+        }
+
+        resume;
+      }
+      
+      // [SSE] Entities - Targeted Event
+      on (ETargeted eTargeted) : {
+        if (m_bActive) {
+          DoExecution(eTargeted.penCaused, eTargeted.penTarget);
         }
 
         resume;
