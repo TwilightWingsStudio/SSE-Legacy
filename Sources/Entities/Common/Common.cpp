@@ -196,6 +196,19 @@ void SendToTarget(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCa
   }
 };
 
+// [SSE] Entities - Targeted Event
+void SendTargetedEvent(CEntity *penSendEvent, CEntity *penCaused, CEntity *penTarget)
+{
+  if (penSendEvent == NULL) {
+    return;
+  }
+  
+  ETargeted eTargeted;
+  eTargeted.penCaused = penCaused;
+  eTargeted.penTarget = penTarget;
+  penSendEvent->SendEvent(eTargeted);
+};
+
 // send event in range
 void SendInRange(CEntity *penSource, EventEType eetEventType, const FLOATaabbox3D &boxRange) {
   switch (eetEventType) {
