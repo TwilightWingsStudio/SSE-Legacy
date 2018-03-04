@@ -491,11 +491,20 @@ procedures:
         }
         resume;
       }
+
       // if deactivated
       on (EDeactivate) : {
         // go to inactive state
         m_bActive = FALSE;
         jump Inactive();
+      }
+
+      // [SSE] Entities - Targeted Event
+      on (ETargeted eTargeted) :
+      { 
+        SendToTarget(this, EET_TRIGGER, eTargeted.penCaused);
+        
+        resume;
       }
     }
   };
