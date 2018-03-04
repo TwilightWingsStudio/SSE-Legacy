@@ -4024,6 +4024,7 @@ functions:
   // --------------------------------------------------------------------------------------
   void VitalityRegeneration(void)
   {
+    /*
     CPlayerVitalitySettingsEntity &enSettings = ((CPlayerVitalitySettingsEntity&)*m_penVitalitySettings);
     
     const FLOAT tmLastDamageDelta = _pTimer->CurrentTick() - m_tmLastDamage;
@@ -4113,6 +4114,7 @@ functions:
         }
       }
     }
+    */
   }
   
   // --------------------------------------------------------------------------------------
@@ -4127,17 +4129,17 @@ functions:
 
     // [SSE] Gameplay - Regeneration PowerUp
     const FLOAT tmPowerUpRegen = m_tmRegeneration - _pTimer->CurrentTick();
-    
+
     if (tmPowerUpRegen > 0.0F)
     {
       FLOAT fHealth = GetHealth();
       const FLOAT fTopHealth = TopHealth();
-      const FLOAT fMaxHealth = MaxHealth();
+      const FLOAT fExtraHealth = MaxHealth() - fTopHealth;
 
       if (fHealth < fTopHealth) {
         SetHealth(ClampUp(fHealth + _pTimer->TickQuantum * 15, fTopHealth));
-      } else if (fHealth < fMaxHealth) {
-        SetHealth(ClampUp(fHealth + _pTimer->TickQuantum * 5, fMaxHealth));
+      } else if (fHealth < (fTopHealth + fExtraHealth)) {
+        SetHealth(ClampUp(fHealth + _pTimer->TickQuantum * 5, fTopHealth + fExtraHealth));
       }
     }
   }
@@ -4877,23 +4879,27 @@ functions:
       
       const CGenericVitalItem *penGenericPowerUp = static_cast<CGenericVitalItem*>(&*eReceiveVital.penItem);
       const EVitalItemType eType = eReceiveVital.eType;
-      const BOOL bOverTopValue = eReceiveVital.bOverTopValue;
+      const EVitalValueRange eValueRange = eReceiveVital.eValueRange;
       FLOAT fValue = eReceiveVital.fValue;
       
       FLOAT fValueOld = 0.0F;
+
       FLOAT fTopValue = 0.0F;
-      FLOAT fMaxValue = 0.0F;
+      FLOAT fExtraValue = 0.0F;
+      FLOAT fOverValue = 0.0F;
 
       switch (eType)
       {
         default: {
           return FALSE; 
         } break;
-      
+
         case EVIT_HEALTH: {
           fValueOld = GetHealth();
+
           fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopHealth : TopHealth();
-          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxHealth : MaxHealth();
+          fExtraValue = penVitalitySettings ? penVitalitySettings->m_fExtraHealth : 100.0F;
+          fOverValue = penVitalitySettings ? penVitalitySettings->m_fOverHealth : 0.0F;
           
           if (penVitalitySettings) {
             fValue *= penVitalitySettings->m_fHealthPickUpMul;
@@ -4902,9 +4908,11 @@ functions:
 
         case EVIT_ARMOR: {
           fValueOld = GetArmor();
+
           fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopArmor : TopArmor();
-          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxArmor : MaxArmor();
-          
+          fExtraValue = penVitalitySettings ? penVitalitySettings->m_fExtraArmor : 100.0F;
+          fOverValue = penVitalitySettings ? penVitalitySettings->m_fOverArmor : 0.0F;
+
           if (penVitalitySettings) {
             fValue *= penVitalitySettings->m_fArmorPickUpMul;
           }
@@ -4912,8 +4920,10 @@ functions:
 
         case EVIT_SHIELDS: {
           fValueOld = GetShields();
+
           fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopShields : TopShields();
-          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxShields : MaxShields();
+          fExtraValue = penVitalitySettings ? penVitalitySettings->m_fExtraShields : 100.0F;
+          fOverValue = penVitalitySettings ? penVitalitySettings->m_fOverShields : 0.0F;
           
           if (penVitalitySettings) {
             fValue *= penVitalitySettings->m_fShieldsPickUpMul;
@@ -4925,12 +4935,14 @@ functions:
       if (fValue <= 0.0F) {
         return TRUE;
       }
-      
+
       FLOAT fValueNew = fValueOld + fValue;
-      
+
       // Apply ranges.
-      if (bOverTopValue) {
-        fValueNew = ClampUp(fValueNew, fMaxValue);
+      if (eValueRange == EVVR_OVER) {
+        fValueNew = ClampUp(fValueNew, fTopValue + fExtraValue + fOverValue);
+      } else if (eValueRange == EVVR_EXTRA) {
+        fValueNew = ClampUp(fValueNew, fTopValue + fExtraValue);
       } else {
         fValueNew = ClampUp(fValueNew, fTopValue);
       }
@@ -4968,7 +4980,7 @@ functions:
     {
       FLOAT fHealth = ((EHealth&)ee).fHealth;
       FLOAT fTopHealth = TopHealth();
-      FLOAT fMaxHealth = MaxHealth();
+      FLOAT fExtraHealth = MaxHealth() - fTopHealth;
 	  
       // If health pickup not allowed then don't do it!
       if (penPlayerSettings && !penPlayerSettings->m_bCanPickUpHealth) {
@@ -4980,7 +4992,7 @@ functions:
       {
         fHealth *= penVitalitySettings->m_fHealthPickUpMul;
         fTopHealth = penVitalitySettings->m_fTopHealth;
-        fMaxHealth = penVitalitySettings->m_fMaxHealth;
+        fExtraHealth = penVitalitySettings->m_fExtraHealth;
       }
 
       // If item won't give any health then pickup it always.
@@ -4993,7 +5005,7 @@ functions:
       FLOAT fHealthNew = fHealthOld + fHealth;
 
       if (((EHealth&)ee).bOverTopHealth) {
-        fHealthNew = ClampUp( fHealthNew, fMaxHealth);
+        fHealthNew = ClampUp( fHealthNew, fTopHealth + fExtraHealth);
       } else {
         fHealthNew = ClampUp( fHealthNew, fTopHealth);
       }
@@ -5014,7 +5026,7 @@ functions:
     {
       FLOAT fArmor = ((EArmor&)ee).fArmor;
       FLOAT fTopArmor = TopArmor();
-      FLOAT fMaxArmor = MaxArmor();
+      FLOAT fExtraArmor = MaxArmor() - fTopArmor;
 
       // [SSE] Player Settings Entity
       // If armor pickup not allowed then don't do it!
@@ -5027,7 +5039,7 @@ functions:
       {
         fArmor *= penVitalitySettings->m_fArmorPickUpMul;
         fTopArmor = penVitalitySettings->m_fTopArmor;
-        fMaxArmor = penVitalitySettings->m_fMaxArmor;
+        fExtraArmor = penVitalitySettings->m_fExtraArmor;
       }
 
       // If item won't give any armor then pickup it always.
@@ -5040,7 +5052,7 @@ functions:
       FLOAT fArmorNew = fArmorOld + fArmor;
 
       if (((EArmor&)ee).bOverTopArmor) {
-        fArmorNew = ClampUp( fArmorNew, fMaxArmor);
+        fArmorNew = ClampUp( fArmorNew, fTopArmor + fExtraArmor);
       } else {
         fArmorNew = ClampUp( fArmorNew, fTopArmor);
       }

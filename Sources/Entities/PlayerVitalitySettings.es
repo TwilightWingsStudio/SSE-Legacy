@@ -62,14 +62,17 @@ properties:
   50 FLOAT m_fArmorAbsorbtionMul "Mul Armor Absorbtion" = 0.66F,
 
   // Health, Armor & Shields
-  70 FLOAT m_fTopHealth "Health Top" = 100.0F,
-  71 FLOAT m_fMaxHealth "Health Max" = 200.0F,
+  70 FLOAT m_fTopHealth    "Health Top"   = 100.0F,
+  71 FLOAT m_fExtraHealth  "Health Extra" = 100.0F,
+  72 FLOAT m_fOverHealth   "Health Over"  = 0.0F,
 
-  75 FLOAT m_fTopArmor  "Armor Top" = 100.0F,
-  76 FLOAT m_fMaxArmor  "Armor Max" = 200.0F,
+  75 FLOAT m_fTopArmor     "Armor Top"   = 100.0F,
+  76 FLOAT m_fExtraArmor   "Armor Extra" = 100.0F,
+  77 FLOAT m_fOverArmor    "Armor Over"  = 0.0F,
 
-  80 FLOAT m_fTopShields "Shields Top" = 100.0F,
-  81 FLOAT m_fMaxShields "Shields Max" = 200.0F,
+  80 FLOAT m_fTopShields   "Shields Top"   = 100.0F,
+  81 FLOAT m_fExtraShields "Shields Extra" = 100.0F,
+  82 FLOAT m_fOverShields  "Shields Over"  = 0.0F,
 
   90 BOOL m_bCanDie     "Can Die" = TRUE,
  
@@ -149,11 +152,17 @@ functions:
       }
       
       // retard protection
-      m_fMaxHealth = ClampDn(m_fMaxHealth, 0.0F);
-      m_fTopHealth = Clamp(m_fTopHealth, 0.0F, m_fMaxHealth);
+      m_fTopHealth = ClampDn(m_fTopHealth, 1.0F);
+      m_fExtraHealth = ClampDn(m_fExtraHealth, 0.0F);
+      m_fOverHealth = ClampDn(m_fOverHealth, 0.0F);
 
-      m_fMaxArmor = ClampDn(m_fMaxArmor, 0.0F);
-      m_fTopArmor = Clamp(m_fTopArmor, 0.0F, m_fMaxArmor);
+      m_fTopArmor = ClampDn(m_fTopArmor, 0.0F);
+      m_fExtraArmor = ClampDn(m_fExtraArmor, 0.0F);
+      m_fOverArmor = ClampDn(m_fOverArmor, 0.0F);
+      
+      m_fTopShields = ClampDn(m_fTopShields, 0.0F);
+      m_fExtraShields = ClampDn(m_fExtraShields, 0.0F);
+      m_fOverShields = ClampDn(m_fOverShields, 0.0F);
 
       // Do shit...
       switch (m_epstType) {
@@ -266,11 +275,17 @@ procedures:
   Main()
   {
     // retard protection
-    m_fMaxHealth = ClampDn(m_fMaxHealth, 0.0F);
-    m_fTopHealth = Clamp(m_fTopHealth, 0.0F, m_fMaxHealth);
+    m_fTopHealth = ClampDn(m_fTopHealth, 1.0F);
+    m_fExtraHealth = ClampDn(m_fExtraHealth, 0.0F);
+    m_fOverHealth = ClampDn(m_fOverHealth, 0.0F);
 
-    m_fMaxArmor = ClampDn(m_fMaxArmor, 0.0F);
-    m_fTopArmor = Clamp(m_fTopArmor, 0.0F, m_fMaxArmor);
+    m_fTopArmor = ClampDn(m_fTopArmor, 0.0F);
+    m_fExtraArmor = ClampDn(m_fExtraArmor, 0.0F);
+    m_fOverArmor = ClampDn(m_fOverArmor, 0.0F);
+
+    m_fTopShields = ClampDn(m_fTopShields, 0.0F);
+    m_fExtraShields = ClampDn(m_fExtraShields, 0.0F);
+    m_fOverShields = ClampDn(m_fOverShields, 0.0F);
 
     // set the nodel
     InitAsEditorModel();
