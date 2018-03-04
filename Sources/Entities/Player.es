@@ -1074,6 +1074,24 @@ FLOAT TopHealth(void)
   }
 }
 
+FLOAT MaxShields(void)
+{
+  if (GetSP()->sp_gdGameDifficulty <= CSessionProperties::GD_EASY) {
+    return 300;
+  } else {
+    return 200;
+  }
+}
+
+FLOAT TopShields(void)
+{
+  if (GetSP()->sp_gdGameDifficulty <= CSessionProperties::GD_EASY) {
+    return 200;
+  } else {
+    return 100;
+  }
+}
+
 // info structure
 static EntityInfo eiPlayerGround = {
   EIBT_FLESH, 80.0f,
@@ -4894,8 +4912,8 @@ functions:
 
         case EVIT_SHIELDS: {
           fValueOld = GetShields();
-          fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopShields : 100.0F; // TODO: Remove magic numbers!
-          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxShields : 200.0F; // TODO: Remove magic numbers!
+          fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopShields : TopShields();
+          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxShields : MaxShields();
           
           if (penVitalitySettings) {
             fValue *= penVitalitySettings->m_fShieldsPickUpMul;
