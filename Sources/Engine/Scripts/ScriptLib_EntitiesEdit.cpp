@@ -240,6 +240,11 @@ static int l_entitiesed_SetEntityPropByName(lua_State* L)
   
   ONLYVALIDPROPERTY(pTargetProperty);
   
+  if (pTargetProperty->ep_ulFlags & EPROPF_READONLY)
+  {
+    return luaL_error(L, "%s() target property is read-only and cannot be changed!", SCRIPTFUNCNAME);
+  }
+  
   CEntityProperty::PropertyType eptTargetProperty = pTargetProperty->ep_eptType;
   SLONG offset = pTargetProperty->ep_slOffset; 
   
