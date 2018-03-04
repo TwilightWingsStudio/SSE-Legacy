@@ -62,6 +62,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "Entities/GenericKeyItem.h"
 #include "Entities/GenericPowerUpItem.h"
+#include "Entities/GenericVitalItem.h"
 #include "Entities/HudPicDisplay.h"
 
 #include "Entities/ProgressiveSwitch.h"
@@ -4851,8 +4852,83 @@ functions:
       penVitalitySettings = static_cast<CPlayerVitalitySettingsEntity*>(&*m_penVitalitySettings);
     }
 
+    // *********** VITAL ***********
+    if (ee.ee_slEvent == EVENTCODE_EReceiveVital)
+    {
+      const EReceiveVital &eReceiveVital = (EReceiveVital&)ee;
+      
+      const CGenericVitalItem *penGenericPowerUp = static_cast<CGenericVitalItem*>(&*eReceiveVital.penItem);
+      const EVitalItemType eType = eReceiveVital.eType;
+      const FLOAT fValue = eReceiveVital.fValue;
+      const BOOL bOverTopValue = eReceiveVital.bOverTopValue;
+      
+      FLOAT fValueOld = 0.0F;
+      FLOAT fTopValue = 0.0F;
+      FLOAT fMaxValue = 0.0F;
+
+      switch (eType)
+      {
+        default: {
+          return FALSE; 
+        } break;
+      
+        case EVIT_HEALTH: {
+          fValueOld = GetHealth();
+          fTopValue = TopHealth();
+          fMaxValue = MaxHealth();
+        } break;
+
+        case EVIT_ARMOR: {
+          fValueOld = GetArmor();
+          fTopValue = TopArmor();
+          fMaxValue = MaxArmor();
+        } break;
+
+        case EVIT_SHIELDS: {
+          fValueOld = GetShields();
+          fTopValue = 100.0F; // TODO: Remove magic numbers!
+          fMaxValue = 200.0F; // TODO: Remove magic numbers!
+        } break;
+      }
+      
+      FLOAT fValueNew = fValueOld + fValue;
+      
+      if (bOverTopValue) {
+        fValueNew = ClampUp(fValueNew, fMaxValue);
+      } else {
+        fValueNew = ClampUp(fValueNew, fTopValue);
+      }
+      
+      if (ceil(fValueNew) > ceil(fValueOld)) {
+        switch (eType)
+        {
+          case EVIT_HEALTH: {
+            SetHealth(fValueNew);
+            ItemPicked( TRANS("Health"), fValue);
+          } break;
+
+          case EVIT_ARMOR: {
+            SetArmor(fValueNew);
+            ItemPicked( TRANS("Armor"), fValue);
+          } break;
+
+          case EVIT_SHIELDS: {
+            SetShields(fValueNew);
+            ItemPicked( TRANS("Shields"), fValue);
+          } break;
+        }
+
+        m_iMana       += (INDEX)fValue;
+        m_fPickedMana += fValue;
+
+        return TRUE;
+      }
+
+      return FALSE;
+    }
+
     // *********** HEALTH ***********
-    if (ee.ee_slEvent == EVENTCODE_EHealth)
+    else if (ee.ee_slEvent == EVENTCODE_EHealth)
     {
       FLOAT fHealth = ((EHealth&)ee).fHealth;
       FLOAT fTopHealth = TopHealth();

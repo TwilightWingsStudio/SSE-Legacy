@@ -50,6 +50,7 @@ properties:
   4 CEntityPointer m_penSoundPick    "Sound Pick Up",
   5 CTStringTrans m_strPickUpMessage "Message" = "Vital",
   6 FLOAT m_fAmount                  "Amount"  = 1.0F,
+  7 BOOL  m_bOverTopValue            "Over Top Value" = TRUE, // TODO: Will be changed in future.
   
  10 FLOAT m_fParticlesSize   "Particles Size" = 1.0F,
  11 FLOAT m_fParticlesHeight "Particles Height" = 1.0F,
@@ -148,7 +149,7 @@ procedures:
     EReceiveVital eReceiveVital;
     eReceiveVital.eType = m_eType;
     eReceiveVital.fValue = m_fAmount;
-    eReceiveVital.bOverTopValue = FALSE;
+    eReceiveVital.bOverTopValue = m_bOverTopValue;
 
     // If health is received...
     if (epass.penOther->ReceiveItem(eReceiveVital))
