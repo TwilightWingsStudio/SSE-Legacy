@@ -82,6 +82,8 @@ properties:
   63 BOOL m_bCanPickUpPUPS      "Can PickUp PowerUPs" = TRUE,
   64 BOOL m_bCanPickUpWeapons   "Can PickUp Weapons" = TRUE,
   65 BOOL m_bCanPickUpAmmo      "Can PickUp Ammo" = TRUE,
+  
+ 100 CEntityPointer m_penDeathTarget  "On Death target" 'D',
  
  150 BOOL m_bLockCameraPitch "TEMP Lock Cam Pitch" = FALSE,
 

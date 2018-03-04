@@ -8006,8 +8006,17 @@ procedures:
     }
 
     // [SSE] Player Settings Entity
-    if (m_penSettings && ((CPlayerSettingsEntity&)*m_penSettings).m_bUntilDeath) {
-      m_penSettings = NULL;
+    if (m_penSettings)
+    {
+      CPlayerSettingsEntity& enSettings = ((CPlayerSettingsEntity&)*m_penSettings);
+      
+      if (m_penSettings->IsActive()) {
+        SendTargetedEvent(enSettings.m_penDeathTarget, eDeath.eLastDamage.penInflictor, this); // [SSE] Entities - Targeted Event
+      }
+      
+      if (enSettings.m_bUntilDeath) {
+        m_penSettings = NULL;
+      }
     }
     
     // [SSE] Player Vitality Settings Entity
