@@ -56,7 +56,7 @@ properties:
   41 FLOAT m_fSelfDamageMul     "Mul Damage Self" = 1.0F,
 
   42 FLOAT m_fHealthPickUpMul    "Mul Health PickUp" = 1.0F,
-  43 FLOAT m_fArmorPickUpMul    "Mul Armor PickUp" = 1.0F,
+  43 FLOAT m_fArmorPickUpMul     "Mul Armor PickUp" = 1.0F,
   
   50 FLOAT m_fArmorAbsorbtionMul "Mul Armor Absorbtion" = 0.66F,
 

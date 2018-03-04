@@ -4859,8 +4859,8 @@ functions:
       
       const CGenericVitalItem *penGenericPowerUp = static_cast<CGenericVitalItem*>(&*eReceiveVital.penItem);
       const EVitalItemType eType = eReceiveVital.eType;
-      const FLOAT fValue = eReceiveVital.fValue;
       const BOOL bOverTopValue = eReceiveVital.bOverTopValue;
+      FLOAT fValue = eReceiveVital.fValue;
       
       FLOAT fValueOld = 0.0F;
       FLOAT fTopValue = 0.0F;
@@ -4874,25 +4874,41 @@ functions:
       
         case EVIT_HEALTH: {
           fValueOld = GetHealth();
-          fTopValue = TopHealth();
-          fMaxValue = MaxHealth();
+          fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopHealth : TopHealth();
+          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxHealth : MaxHealth();
+          
+          if (penVitalitySettings) {
+            fValue *= penVitalitySettings->m_fHealthPickUpMul;
+          }
         } break;
 
         case EVIT_ARMOR: {
           fValueOld = GetArmor();
-          fTopValue = TopArmor();
-          fMaxValue = MaxArmor();
+          fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopArmor : TopArmor();
+          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxArmor : MaxArmor();
+          
+          if (penVitalitySettings) {
+            fValue *= penVitalitySettings->m_fArmorPickUpMul;
+          }
         } break;
 
         case EVIT_SHIELDS: {
           fValueOld = GetShields();
-          fTopValue = 100.0F; // TODO: Remove magic numbers!
-          fMaxValue = 200.0F; // TODO: Remove magic numbers!
+          fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopShields : 100.0F; // TODO: Remove magic numbers!
+          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxShields : 200.0F; // TODO: Remove magic numbers!
+          
+          // TODO: Implement shields pickup multiplier.
         } break;
+      }
+
+      // If item won't increase any vital value then pickup it always.
+      if (fValue <= 0.0F) {
+        return TRUE;
       }
       
       FLOAT fValueNew = fValueOld + fValue;
       
+      // Apply ranges.
       if (bOverTopValue) {
         fValueNew = ClampUp(fValueNew, fMaxValue);
       } else {
