@@ -371,9 +371,9 @@ procedures:
         if (!m_bActive) {
           resume;
         }
-        
+
         SendToTarget(this, EET_TRIGGER, eTargeted.penCaused);
-        
+
         resume;
       }
     }

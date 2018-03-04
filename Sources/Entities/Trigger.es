@@ -503,7 +503,7 @@ procedures:
       on (ETargeted eTargeted) :
       { 
         SendToTarget(this, EET_TRIGGER, eTargeted.penCaused);
-        
+
         resume;
       }
     }
