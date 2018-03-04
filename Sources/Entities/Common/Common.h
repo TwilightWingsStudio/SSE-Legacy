@@ -169,6 +169,10 @@ DECL_DLL void SendToTargetScript(CEntity *penSendEvent, INDEX iEventType, CEntit
 
 // send event to target
 DECL_DLL void SendToTarget(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused = NULL);
+
+// [SSE] Entities - Targeted Event
+DECL_DLL void SendTargetedEvent(CEntity *penSendEvent, CEntity *penCaused = NULL, CEntity *penTarget = NULL);
+
 // send event in range
 DECL_DLL void SendInRange(CEntity *penSource, EventEType eetEventType, const FLOATaabbox3D &boxRange);
 

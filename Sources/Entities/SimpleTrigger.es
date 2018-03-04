@@ -364,6 +364,18 @@ procedures:
 
         resume;
       }
+
+      // [SSE] Entities - Targeted Event
+      on (ETargeted eTargeted) :
+      {
+        if (!m_bActive) {
+          resume;
+        }
+
+        SendToTarget(this, EET_TRIGGER, eTargeted.penCaused);
+
+        resume;
+      }
     }
   };
 

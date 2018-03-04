@@ -100,6 +100,13 @@ event EArgumentedF {
   CEntityPointer penCaused,
   FLOAT fValue
 };
+
+// [SSE] Entities - Targeted Event
+// Advanced version of Trigger event which contains additional multifunctional argument.
+event ETargeted {
+  CEntityPointer penCaused,
+  CEntityPointer penTarget,
+};
 // [SSE]
 
 enum BoolEType {
@@ -122,6 +129,7 @@ enum EventEType {
  10 EET_STOPBLINDNESS     "Stop blindness event [10]",       // enemy stop being blind
  11 EET_STOPDEAFNESS      "Stop deafness event [11]",        // enemy stop being deaf
  12 EET_TELEPORTMOVINGBRUSH "Teleport moving brush [12]",    // moving brush teleporting event
+ 13 EET_TARGETED          "Targeted event [13]",          // [SSE] Entities - Targeted Event
 };
 
 

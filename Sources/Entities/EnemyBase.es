@@ -3364,7 +3364,8 @@ procedures:
       bCountAsKill = penSettings->m_bCountAsKill;
       
       if (penSettings->m_penDeathTarget) {
-        SendToTarget(penSettings->m_penDeathTarget, EET_TRIGGER, penKiller);
+        //SendToTarget(penSettings->m_penDeathTarget, EET_TRIGGER, penKiller); // Old versions.
+        SendTargetedEvent(penSettings->m_penDeathTarget, penKiller, this); // [SSE] Entities - Targeted Event
       }
     }
     //
@@ -3403,8 +3404,12 @@ procedures:
     GetWatcher()->SendEvent(EStop());
     GetWatcher()->SendEvent(EEnd());
 
-    // send event to death target
-    SendToTarget(m_penDeathTarget, m_eetDeathType, penKiller);
+    // [SSE] Entities - Targeted Event
+    if (m_eetDeathType == EET_TARGETED) {
+      SendTargetedEvent(m_penDeathTarget, penKiller, this);
+    } else {
+      SendToTarget(m_penDeathTarget, m_eetDeathType, penKiller); // Send an event to death target.
+    }
 
     // send event to spawner if any
     // NOTE: trigger's penCaused has been changed from penKiller to THIS;
