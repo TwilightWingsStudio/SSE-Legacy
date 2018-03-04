@@ -62,6 +62,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "Entities/GenericKeyItem.h"
 #include "Entities/GenericPowerUpItem.h"
+#include "Entities/GenericVitalItem.h"
 #include "Entities/HudPicDisplay.h"
 
 #include "Entities/ProgressiveSwitch.h"
@@ -4851,8 +4852,101 @@ functions:
       penVitalitySettings = static_cast<CPlayerVitalitySettingsEntity*>(&*m_penVitalitySettings);
     }
 
+    // *********** VITAL ***********
+    if (ee.ee_slEvent == EVENTCODE_EReceiveVital)
+    {
+      const EReceiveVital &eReceiveVital = (EReceiveVital&)ee;
+      
+      const CGenericVitalItem *penGenericPowerUp = static_cast<CGenericVitalItem*>(&*eReceiveVital.penItem);
+      const EVitalItemType eType = eReceiveVital.eType;
+      const BOOL bOverTopValue = eReceiveVital.bOverTopValue;
+      FLOAT fValue = eReceiveVital.fValue;
+      
+      FLOAT fValueOld = 0.0F;
+      FLOAT fTopValue = 0.0F;
+      FLOAT fMaxValue = 0.0F;
+
+      switch (eType)
+      {
+        default: {
+          return FALSE; 
+        } break;
+      
+        case EVIT_HEALTH: {
+          fValueOld = GetHealth();
+          fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopHealth : TopHealth();
+          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxHealth : MaxHealth();
+          
+          if (penVitalitySettings) {
+            fValue *= penVitalitySettings->m_fHealthPickUpMul;
+          }
+        } break;
+
+        case EVIT_ARMOR: {
+          fValueOld = GetArmor();
+          fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopArmor : TopArmor();
+          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxArmor : MaxArmor();
+          
+          if (penVitalitySettings) {
+            fValue *= penVitalitySettings->m_fArmorPickUpMul;
+          }
+        } break;
+
+        case EVIT_SHIELDS: {
+          fValueOld = GetShields();
+          fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopShields : 100.0F; // TODO: Remove magic numbers!
+          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxShields : 200.0F; // TODO: Remove magic numbers!
+          
+          if (penVitalitySettings) {
+            fValue *= penVitalitySettings->m_fShieldsPickUpMul;
+          }
+        } break;
+      }
+
+      // If item won't increase any vital value then pickup it always.
+      if (fValue <= 0.0F) {
+        return TRUE;
+      }
+      
+      FLOAT fValueNew = fValueOld + fValue;
+      
+      // Apply ranges.
+      if (bOverTopValue) {
+        fValueNew = ClampUp(fValueNew, fMaxValue);
+      } else {
+        fValueNew = ClampUp(fValueNew, fTopValue);
+      }
+      
+      if (ceil(fValueNew) > ceil(fValueOld)) {
+        switch (eType)
+        {
+          case EVIT_HEALTH: {
+            SetHealth(fValueNew);
+            ItemPicked( TRANS("Health"), fValue);
+          } break;
+
+          case EVIT_ARMOR: {
+            SetArmor(fValueNew);
+            ItemPicked( TRANS("Armor"), fValue);
+          } break;
+
+          case EVIT_SHIELDS: {
+            SetShields(fValueNew);
+            ItemPicked( TRANS("Shields"), fValue);
+          } break;
+        }
+
+        m_iMana       += (INDEX)fValue;
+        m_fPickedMana += fValue;
+
+        return TRUE;
+      }
+
+      return FALSE;
+    }
+
     // *********** HEALTH ***********
-    if (ee.ee_slEvent == EVENTCODE_EHealth)
+    else if (ee.ee_slEvent == EVENTCODE_EHealth)
     {
       FLOAT fHealth = ((EHealth&)ee).fHealth;
       FLOAT fTopHealth = TopHealth();

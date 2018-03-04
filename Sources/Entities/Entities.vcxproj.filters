@@ -670,6 +670,9 @@
     <ClCompile Include="ExactTeleport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GenericVitalItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1854,6 +1857,12 @@
     <ClInclude Include="ExactTeleport_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GenericVitalItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericVitalItem_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2845,6 +2854,9 @@
     </CustomBuild>
     <CustomBuild Include="ExactTeleport.es">
       <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GenericVitalItem.es">
+      <Filter>Class Files\Items</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
