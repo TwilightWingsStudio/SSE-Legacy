@@ -22,11 +22,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #define SCRIPT_THIS_ENTITYID "_entityID"
 #define SCRIPT_PENCAUSED_ENTITYID "_penCausedID"
+#define SCRIPT_PENTARGET_ENTITYID "_penTargetID"
 
 class ENGINE_API CScriptEngine
 {
   public:
-    void ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScript, CEntity* penCaused, INDEX aiSlots[5], BOOL bDebugMessages);
+    void ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScript, CEntity* penCaused, CEntity* penTarget, INDEX aiSlots[5], BOOL bDebugMessages);
 };
 
 ENGINE_API extern void (*_pSendEEvent)(CEntity* penTarget, INDEX iType, CEntity* penCaused);

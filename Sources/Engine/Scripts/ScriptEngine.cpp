@@ -93,7 +93,7 @@ extern void LUAJitTest(void *pArgs)
   lua_settop(state, 0); // Cleanup the stack.
 }
 
-void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScript, CEntity* penCaused, INDEX aiSlots[5], BOOL bDebugMessages)
+void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScript, CEntity* penCaused, CEntity* penTarget, INDEX aiSlots[5], BOOL bDebugMessages)
 {
   lua_State *state = CreateSafeState();
 
@@ -150,6 +150,9 @@ void CScriptEngine::ExecEntityScript(CEntity* penOwner, const CTFileName &fnmScr
 
     lua_pushinteger(state, penCaused ? penCaused->en_ulID : -1);
     lua_setglobal(state, SCRIPT_PENCAUSED_ENTITYID);
+    
+    lua_pushinteger(state, penTarget ? penTarget->en_ulID : -1);
+    lua_setglobal(state, SCRIPT_PENTARGET_ENTITYID);
     
     // Pins
     lua_pushinteger(state, aiSlots[0]);
