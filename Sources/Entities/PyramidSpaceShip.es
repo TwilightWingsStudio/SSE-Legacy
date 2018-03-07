@@ -862,7 +862,7 @@ procedures:
           if( crRay.cr_penHit != NULL)
           {
             InflictDirectDamage( crRay.cr_penHit, this, DMT_BULLET, 
-              10000.0f/GetGameDamageMultiplier()*_pTimer->TickQuantum/0.5f/16.0f,
+              10000.0f/GetGameDamageMultiplier(TRUE)*_pTimer->TickQuantum/0.5f/16.0f,
               FLOAT3D(0, 0, 0), (vSource-vDestination).Normalize());
             crRay.cr_penHit->SendEvent( EHitBySpaceShipBeam());
           }

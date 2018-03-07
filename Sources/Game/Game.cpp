@@ -76,7 +76,6 @@ static BOOL  _bProfiling = FALSE;
 static INDEX _ctProfileRecording = 0;
 static FLOAT gam_iRecordHighScore = -1.0f;
 
-
 extern FLOAT gam_afAmmoQuantity[5]        = {2.0f,  2.0f,  1.0f, 1.0f , 2.0f };
 extern FLOAT gam_afDamageStrength[5]      = {0.25f, 0.5f,  1.0f, 1.5f , 2.0f };
 extern FLOAT gam_afEnemyAttackSpeed[5]    = {0.75f, 0.75f, 1.0f, 2.0f , 2.0f };
@@ -84,6 +83,11 @@ extern FLOAT gam_afEnemyMovementSpeed[5]  = {1.0f , 1.0f , 1.0f, 1.25f, 1.25f};
 extern FLOAT gam_fManaTransferFactor = 0.5f;
 extern FLOAT gam_fExtraEnemyStrength          = 0;
 extern FLOAT gam_fExtraEnemyStrengthPerPlayer = 0;
+
+// [SSE] DDA System - Extra Boss Strength (+ Per Player)
+extern FLOAT gam_fExtraBossStrength          = 0;
+extern FLOAT gam_fExtraBossStrengthPerPlayer = 0;
+
 extern INDEX gam_iCredits = -1;   // number of credits for respawning
 extern FLOAT gam_tmSpawnInvulnerability = 3;
 extern INDEX gam_iScoreLimit = 100000;
@@ -991,6 +995,11 @@ void CGame::InitInternal( void)
   _pShell->DeclareSymbol("persistent user FLOAT gam_fManaTransferFactor;", &gam_fManaTransferFactor);
   _pShell->DeclareSymbol("persistent user FLOAT gam_fExtraEnemyStrength         ;", &gam_fExtraEnemyStrength          );
   _pShell->DeclareSymbol("persistent user FLOAT gam_fExtraEnemyStrengthPerPlayer;", &gam_fExtraEnemyStrengthPerPlayer );
+
+  // [SSE] DDA System - Extra Boss Strength (+ Per Player)
+  _pShell->DeclareSymbol("persistent user FLOAT gam_fExtraBossStrength         ;", &gam_fExtraBossStrength          );
+  _pShell->DeclareSymbol("persistent user FLOAT gam_fExtraBossStrengthPerPlayer;", &gam_fExtraBossStrengthPerPlayer );
+
   _pShell->DeclareSymbol("persistent user INDEX gam_iInitialMana;",        &gam_iInitialMana);
   _pShell->DeclareSymbol("persistent user INDEX gam_iScoreLimit;",  &gam_iScoreLimit);
   _pShell->DeclareSymbol("persistent user INDEX gam_iFragLimit;",   &gam_iFragLimit);

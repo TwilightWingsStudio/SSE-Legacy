@@ -98,8 +98,10 @@ public:
   INDEX sp_iInitialMana;        // life price (mana that each player'll have upon respawning)
   FLOAT sp_fExtraEnemyStrength;            // fixed adder for extra enemy power 
   FLOAT sp_fExtraEnemyStrengthPerPlayer;   // adder for extra enemy power per each player playing
-  // TODO: Extra Boss Strength
-  // TODO: Extra boss Strength PerPlayer
+  
+  // [SSE] DDA System - Extra Boss Strength (+ Per Player)
+  FLOAT sp_fExtraBossStrength;          // fixed adder for extra boss power
+  FLOAT sp_fExtraBossStrengthPerPlayer; // adder for extra boss power per each player playing
 
   INDEX sp_ctCredits;               // number of credits for this game
   INDEX sp_ctCreditsLeft;           // number of credits left on this level

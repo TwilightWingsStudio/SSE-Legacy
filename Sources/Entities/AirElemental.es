@@ -219,7 +219,7 @@ functions:
 
     // make sure we don't trigger another growth while growing
     FLOAT fHealth = GetHealth();
-    FLOAT fFullDamage = fDamageAmmount * DamageStrength( ((EntityInfo*)GetEntityInfo())->Eeibt, dmtType) * GetGameDamageMultiplier();
+    FLOAT fFullDamage = fDamageAmmount * DamageStrength( ((EntityInfo*)GetEntityInfo())->Eeibt, dmtType) * GetGameDamageMultiplier(TRUE);
     if (m_bAttGrow && m_iSize<2) { 
       if (fHealth-fFullDamage<afGrowArray[m_iSize+1][0]*m_fMaxHealth) {
         CEnemyBase::ReceiveDamage(penInflictor, dmtType, fDamageAmmount, vHitPoint, vDirection);

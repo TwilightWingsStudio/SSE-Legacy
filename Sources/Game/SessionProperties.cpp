@@ -23,6 +23,11 @@ extern FLOAT gam_afAmmoQuantity[5];
 extern FLOAT gam_fManaTransferFactor;
 extern FLOAT gam_fExtraEnemyStrength          ;
 extern FLOAT gam_fExtraEnemyStrengthPerPlayer ;
+
+// [SSE] DDA System - Extra Boss Strength (+ Per Player)
+extern FLOAT gam_fExtraBossStrength          ;
+extern FLOAT gam_fExtraBossStrengthPerPlayer ;
+
 extern INDEX gam_iCredits;
 extern FLOAT gam_tmSpawnInvulnerability;
 extern FLOAT gam_tmRespawnDelay; // [SSE] Respawn Delay
@@ -211,6 +216,10 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   sp.sp_fExtraEnemyStrength          = 0;
   sp.sp_fExtraEnemyStrengthPerPlayer = 0;
   
+  // [SSE] DDA System - Extra Boss Strength (+ Per Player)
+  sp.sp_fExtraBossStrength          = 0;
+  sp.sp_fExtraBossStrengthPerPlayer = 0;
+  
   // [SSE] Extra Lives System
   sp.sp_bSharedLives = FALSE;
   sp.sp_bRaisingLiveCost = FALSE;
@@ -296,8 +305,13 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_bRespawnInPlace   = gam_bRespawnInPlace  ;
 
   sp.sp_fManaTransferFactor = gam_fManaTransferFactor;
-  sp.sp_fExtraEnemyStrength          = gam_fExtraEnemyStrength         ;
-  sp.sp_fExtraEnemyStrengthPerPlayer = gam_fExtraEnemyStrengthPerPlayer;
+  sp.sp_fExtraEnemyStrength          = ClampDn(gam_fExtraEnemyStrength, 0.0F);
+  sp.sp_fExtraEnemyStrengthPerPlayer = ClampDn(gam_fExtraEnemyStrengthPerPlayer, 0.0F);
+
+  // [SSE] DDA System - Extra Boss Strength (+ Per Player)
+  sp.sp_fExtraBossStrength          = ClampDn(gam_fExtraBossStrength, 0.0F);
+  sp.sp_fExtraBossStrengthPerPlayer = ClampDn(gam_fExtraBossStrengthPerPlayer, 0.0F);
+
   sp.sp_iInitialMana        = gam_iInitialMana;
 
   sp.sp_iBlood = Clamp( gam_iBlood, 0L, 3L);

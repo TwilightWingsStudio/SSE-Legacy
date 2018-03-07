@@ -305,7 +305,7 @@ DECL_DLL CEntity *FixupCausedToPlayer(CEntity *penThis, CEntity *penCaused, BOOL
 DECL_DLL CPlacement3D LerpPlacementsPrecise(const CPlacement3D &pl0, const CPlacement3D &pl1, FLOAT fRatio);
 
 // obtain game extra damage per enemy and per player
-DECL_DLL FLOAT GetGameDamageMultiplier(void);
+DECL_DLL FLOAT GetGameDamageMultiplier(BOOL bBoss);
 
 // get entity's serious damage multiplier
 DECL_DLL FLOAT GetSeriousDamageMultiplier( CEntity *pen);
