@@ -42,7 +42,7 @@ features  "HasName","IsTargetable";
 properties:
 
    1 CTString m_strName          "Name" 'N' = "Pl. Vitality Settings",
-   2 CTString m_strDescription = "Pl. Vitality Settings",
+   2 CTString m_strDescription = "",
  
    3 BOOL m_bActive              "Active" 'A'       = TRUE, 
    4 BOOL m_bDebugMessages       "Debug Messages" = FALSE, 
@@ -68,20 +68,25 @@ properties:
   57 FLOAT m_fShieldsDecRate "SP Decrement Rate" = 1.0F,
   
   // Health, Armor & Shields
-  70 FLOAT m_fTopHealth    "Health Top"   = 100.0F,
-  71 FLOAT m_fExtraHealth  "Health Extra" = 100.0F,
-  72 FLOAT m_fOverHealth   "Health Over"  = 0.0F,
+  70 FLOAT m_fTopHealth    "Ex. Health Top"   = 100.0F,
+  71 FLOAT m_fExtraHealth  "Ex. Health Extra" = 100.0F,
+  72 FLOAT m_fOverHealth   "Ex. Health Over"  = 0.0F,
 
-  75 FLOAT m_fTopArmor     "Armor Top"   = 100.0F,
-  76 FLOAT m_fExtraArmor   "Armor Extra" = 100.0F,
-  77 FLOAT m_fOverArmor    "Armor Over"  = 0.0F,
+  75 FLOAT m_fTopArmor     "Ex. Armor Top"   = 100.0F,
+  76 FLOAT m_fExtraArmor   "Ex. Armor Extra" = 100.0F,
+  77 FLOAT m_fOverArmor    "Ex. Armor Over"  = 0.0F,
 
-  80 FLOAT m_fTopShields   "Shields Top"   = 100.0F,
-  81 FLOAT m_fExtraShields "Shields Extra" = 100.0F,
-  82 FLOAT m_fOverShields  "Shields Over"  = 0.0F,
+  80 FLOAT m_fTopShields   "Ex. Shields Top"   = 100.0F,
+  81 FLOAT m_fExtraShields "Ex. Shields Extra" = 100.0F,
+  82 FLOAT m_fOverShields  "Ex. Shields Over"  = 0.0F,
 
   90 BOOL m_bCanDie     "Can Die" = TRUE,
- 
+  
+ // TODO: Make the new regen system!
+ //120 FLOAT m_fHealthRegenDelay  "HP Regen Delay" = 0.0F,
+ //121 FLOAT m_fArmorRegenDelay   "AP Repair Delay" = 0.0F,
+ //122 FLOAT m_fShieldsRegenDelay "SP Recharge Delay" = 0.0F,
+
  // Deprecated
  /*
   // Health Regeneration

@@ -4496,7 +4496,7 @@ functions:
       return;
     }
 
-    FLOAT tmSpawnInvulnerability = GetSP()->sp_tmSpawnInvulnerability;
+    const FLOAT tmSpawnInvulnerability = GetSP()->sp_tmSpawnInvulnerability;
 
     // if invunerable after spawning then ignore damage
     // [SSE] Kill By Traps Always
@@ -4678,7 +4678,7 @@ functions:
     if ((GetSP()->sp_bArmorInertiaDamping && fSubHealth > 1.0F) || (!GetSP()->sp_bArmorInertiaDamping && fDamageAmmount > 1.0F)) {
       DamageImpact(dmtType, GetSP()->sp_bArmorInertiaDamping ? fSubHealth : fDamageAmmount, vHitPoint, vDirection);
     }
-    
+
     // [SSE] RocketJump Mode
     if (penInflictor != this || !(GetSP()->sp_ulMutatorFlags & MUTF_ROCKETJUMP) || dmtType == DMT_BURNING) {
       CPlayerEntity::ReceiveDamage( penInflictor, dmtType, fSubHealth, vHitPoint, vDirection); // receive damage
