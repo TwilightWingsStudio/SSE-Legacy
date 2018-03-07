@@ -113,6 +113,33 @@ functions:
     pamo->amo_moModelObject.SetData_t(m_fnModel);
     pamo->amo_moModelObject.AutoSetAttachments();
     
+    switch (m_puitType)
+    {
+      case PUIT_INVISIB: {
+        m_strDescription.PrintF("Invisibility");
+      } break;
+
+      case PUIT_INVULNER: {
+        m_strDescription.PrintF("Invulnerability");
+      } break;
+
+      case PUIT_DAMAGE: {
+        m_strDescription.PrintF("SeriousDamage");
+      } break;
+
+      case PUIT_SPEED: {
+        m_strDescription.PrintF("SeriousSpeed");
+      } break;
+
+      case PUIT_BOMB: {
+        m_strDescription.PrintF("SeriousBomb");
+      } break;
+
+      case PUIT_REGENERATION: {
+        m_strDescription.PrintF("Regeneration");
+      } break;
+    }
+    
     try {
       pamo->amo_moModelObject.mo_toTexture.SetData_t(m_fnTexture);
     } catch (char *strError) {

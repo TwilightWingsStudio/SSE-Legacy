@@ -117,6 +117,21 @@ functions:
   void SetProperties(void)
   {
     m_fRespawnTime = (m_fCustomRespawnTime > 0.0F) ? m_fCustomRespawnTime : 10.0F;
+    
+    switch (m_eType)
+    {
+      case EVIT_HEALTH: {
+        m_strDescription.PrintF("Health - A:%g  T:%g", m_fAmount, m_fRespawnTime);
+      } break;
+      
+      case EVIT_ARMOR: {
+        m_strDescription.PrintF("Armor - A:%g  T:%g", m_fAmount, m_fRespawnTime);
+      } break;
+      
+      case EVIT_SHIELDS: {
+        m_strDescription.PrintF("Shields - A:%g  T:%g", m_fAmount, m_fRespawnTime);
+      } break;
+    }
 
     if (m_fnModel == "") {
       m_fnModel=CTFILENAME("Models\\Editor\\Axis.mdl");
