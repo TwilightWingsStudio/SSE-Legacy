@@ -909,7 +909,7 @@ functions:
     fNewDamage *= DamageStrength( ((EntityInfo*)GetEntityInfo())->Eeibt, dmtType);
 
     // apply game extra damage per enemy and per player
-    fNewDamage *= GetGameDamageMultiplier();
+    fNewDamage *= GetGameDamageMultiplier(m_bBoss);
     
     // [SSE] Enemy Settings Entity
     if (m_penSettings && m_penSettings->IsActive()) {

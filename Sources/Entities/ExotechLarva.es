@@ -402,7 +402,7 @@ functions:
     // adjust damage
     fDamageAmmount *=DamageStrength( ((EntityInfo*)GetEntityInfo())->Eeibt, dmtType);
     // apply game extra damage per enemy and per player
-    fDamageAmmount *=GetGameDamageMultiplier();
+    fDamageAmmount *= GetGameDamageMultiplier(TRUE);
 
     // enough damage to blow both arms
     if (fHealthNow>fHealthBlow01 && fHealthAfter<fHealthBlow02) {

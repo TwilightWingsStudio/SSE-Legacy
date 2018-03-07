@@ -1516,17 +1516,18 @@ CPlacement3D LerpPlacementsPrecise(const CPlacement3D &pl0, const CPlacement3D &
 }
 
 // [SSE] DDA System - Adjustable Damage Resistance
-FLOAT GetGameDamageMultiplier(void)
+FLOAT GetGameDamageMultiplier(BOOL bBoss)
 {
+  const FLOAT fExtraStrength = bBoss ? GetSP()->sp_fExtraBossStrength : GetSP()->sp_fExtraEnemyStrength;
+  const FLOAT fExtraStrengthPerPlayer = bBoss ? GetSP()->sp_fExtraBossStrengthPerPlayer : GetSP()->sp_fExtraEnemyStrengthPerPlayer;
+
   FLOAT fGameDamageMultiplier = 1.0f; // Base Value.
-  FLOAT fExtraStrength = GetSP()->sp_fExtraEnemyStrength;
 
   // IF we have constant adjustment then apply it!
   if (fExtraStrength > 0) {
     fGameDamageMultiplier *= 1.0f / (1 + fExtraStrength);
   }
 
-  FLOAT fExtraStrengthPerPlayer = GetSP()->sp_fExtraEnemyStrengthPerPlayer;
   BOOL bSharedLives = GetSP()->sp_bSharedLives;
 
   // If EESPP enabled then it should be applied!

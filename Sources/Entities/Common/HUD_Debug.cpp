@@ -29,6 +29,8 @@ extern void HUD_DrawDebugMonitor()
 {
   const FLOAT fExtraEnemyStrength = GetSP()->sp_fExtraEnemyStrength;
   const FLOAT fExtraStrengthPerPlayer = GetSP()->sp_fExtraEnemyStrengthPerPlayer;
+  const FLOAT fExtraBossStrength = GetSP()->sp_fExtraBossStrength;
+  const FLOAT fExtraBossStrengthPerPlayer = GetSP()->sp_fExtraBossStrengthPerPlayer;
   const INDEX ctCredits = GetSP()->sp_ctCredits;
   const BOOL bSharedLives = GetSP()->sp_bSharedLives;
   const BOOL bSharedKeys = GetSP()->sp_bSharedKeys;
@@ -176,7 +178,10 @@ extern void HUD_DrawDebugMonitor()
   strReport += "^r[^cFFFFFFDDA System^r]^cCCCC00\n";
   strReport.PrintF("%sEES:   %.2f\n", strReport, fExtraEnemyStrength);
   strReport.PrintF("%sEESPP: %.2f\n", strReport, fExtraStrengthPerPlayer);
-  strReport.PrintF("%sDamage Mul: %.2f\n", strReport, GetGameDamageMultiplier());
+  strReport.PrintF("%sEBS:   %.2f\n", strReport, fExtraBossStrength);
+  strReport.PrintF("%sEBSPP: %.2f\n", strReport, fExtraBossStrengthPerPlayer);
+  strReport.PrintF("%sDmg Mul:     %.2f\n", strReport, GetGameDamageMultiplier(FALSE));
+  strReport.PrintF("%sDmg Mul (B): %.2f\n", strReport, GetGameDamageMultiplier(TRUE));
   
   FLOAT3D vPlayerPos = _penPlayer->GetPlacement().pl_PositionVector;
   
