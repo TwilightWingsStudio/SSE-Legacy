@@ -305,12 +305,12 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_bRespawnInPlace   = gam_bRespawnInPlace  ;
 
   sp.sp_fManaTransferFactor = gam_fManaTransferFactor;
-  sp.sp_fExtraEnemyStrength          = gam_fExtraEnemyStrength         ;
-  sp.sp_fExtraEnemyStrengthPerPlayer = gam_fExtraEnemyStrengthPerPlayer;
+  sp.sp_fExtraEnemyStrength          = ClampDn(gam_fExtraEnemyStrength, 0.0F);
+  sp.sp_fExtraEnemyStrengthPerPlayer = ClampDn(gam_fExtraEnemyStrengthPerPlayer, 0.0F);
 
   // [SSE] DDA System - Extra Boss Strength (+ Per Player)
-  sp.sp_fExtraBossStrength          = gam_fExtraBossStrength;
-  sp.sp_fExtraBossStrengthPerPlayer = gam_fExtraBossStrengthPerPlayer;
+  sp.sp_fExtraBossStrength          = ClampDn(gam_fExtraBossStrength, 0.0F);
+  sp.sp_fExtraBossStrengthPerPlayer = ClampDn(gam_fExtraBossStrengthPerPlayer, 0.0F);
 
   sp.sp_iInitialMana        = gam_iInitialMana;
 
