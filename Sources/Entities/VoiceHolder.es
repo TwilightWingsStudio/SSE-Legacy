@@ -27,7 +27,7 @@ features  "HasName", "IsTargetable";
 properties:
   1 CTString m_strName          "Name" 'N' = "VoiceHolder",
   3 CTString m_strDescription = "",
-  2 CTFileName m_fnmMessage  "Message" 'M' = CTString(""),
+  2 CTFileName m_fnmMessage  "Message" 'M' = CTString("") features(EPROPF_READONLY),
   5 BOOL m_bActive "Active" 'A' = TRUE,
   6 INDEX m_ctMaxTrigs            "Max trigs" 'X' = 1, // how many times could trig
 

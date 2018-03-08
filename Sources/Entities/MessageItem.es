@@ -36,7 +36,7 @@ thumbnail "Thumbnails\\MessageItem.tbn";
 properties:
   1 CTString m_strName          "Name" 'N' = "MessageItem",
   2 CTString m_strDescription = "",
-  3 CTFileName m_fnmMessage  "Message" 'M' = CTString(""),
+  3 CTFileName m_fnmMessage  "Message" 'M' = CTString("") features(EPROPF_READONLY),
   4 INDEX m_iSoundComponent = 0,
 
 components:

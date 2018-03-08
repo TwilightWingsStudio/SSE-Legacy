@@ -62,9 +62,9 @@ properties:
   2 FLOAT m_fScoreMedium "Score Medium" = 100.0f,
   3 FLOAT m_fScoreHeavy  "Score Heavy"  = 1000.0f,
 
- 10 CTFileName m_fnMusic0 "Music Light" 'M' = CTFILENAME(""),
- 11 CTFileName m_fnMusic1 "Music Medium"    = CTFILENAME(""),
- 12 CTFileName m_fnMusic2 "Music Heavy"     = CTFILENAME(""),
+ 10 CTFileName m_fnMusic0 "Music Light" 'M' = CTFILENAME("") features(EPROPF_READONLY),
+ 11 CTFileName m_fnMusic1 "Music Medium"    = CTFILENAME("") features(EPROPF_READONLY),
+ 12 CTFileName m_fnMusic2 "Music Heavy"     = CTFILENAME("") features(EPROPF_READONLY),
  13 CTFileName m_fnMusic3                   = CTFILENAME(""),  // event music
  14 CTFileName m_fnMusic4                   = CTFILENAME(""),  // continuous music
 

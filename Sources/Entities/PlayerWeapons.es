@@ -203,7 +203,6 @@ enum WeaponType {
 #define COLT_DAMAGE_COOP 10.0F
 #define COLT_MAG_SIZE 6
 
-
 #define DOUBLE_COLT_DAMAGE 17.5F      // [SSE] Balance Change. Default=10.0F
 #define DOUBLE_COLT_DAMAGE_COOP 10.0F
 

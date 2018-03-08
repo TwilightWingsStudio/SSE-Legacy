@@ -31,7 +31,7 @@ features "HasName", "HasDescription", "IsTargetable", "IsImportant";
 properties:
   1 CTString m_strName   "Name" 'N' = "",
   2 CTString m_strDescription = "",
-  3 CTFileName m_fnMusic "Music"   'M' = CTFILENAME(""),
+  3 CTFileName m_fnMusic "Music"   'M' = CTFILENAME("") features(EPROPF_READONLY),
   4 FLOAT m_fVolume "Volume" 'V' = 1.0f,
   5 enum MusicType m_mtType "Type" 'Y' = MT_EVENT,
   6 BOOL m_bForceStart "Force start" 'F' = TRUE,
