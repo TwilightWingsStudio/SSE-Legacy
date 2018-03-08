@@ -4024,6 +4024,8 @@ functions:
   // --------------------------------------------------------------------------------------
   void VitalityRegeneration(void)
   {
+    // Deprecated
+    /*
     CPlayerVitalitySettingsEntity &enSettings = ((CPlayerVitalitySettingsEntity&)*m_penVitalitySettings);
     
     const FLOAT tmLastDamageDelta = _pTimer->CurrentTick() - m_tmLastDamage;
@@ -4113,31 +4115,32 @@ functions:
         }
       }
     }
+    */
   }
   
   // --------------------------------------------------------------------------------------
   void ProcessRegen(void)
   {
     // [SSE] Player Settings Entity
-    if (m_penVitalitySettings && m_penVitalitySettings->IsActive()) {
+    /*if (m_penVitalitySettings && m_penVitalitySettings->IsActive()) {
       VitalityRegeneration();
-    } else {
+    } else {*/
       TouristRegeneration();
-    }
+    //}
 
     // [SSE] Gameplay - Regeneration PowerUp
     const FLOAT tmPowerUpRegen = m_tmRegeneration - _pTimer->CurrentTick();
-    
+
     if (tmPowerUpRegen > 0.0F)
     {
       FLOAT fHealth = GetHealth();
       const FLOAT fTopHealth = TopHealth();
-      const FLOAT fMaxHealth = MaxHealth();
+      const FLOAT fExtraHealth = MaxHealth() - fTopHealth;
 
       if (fHealth < fTopHealth) {
         SetHealth(ClampUp(fHealth + _pTimer->TickQuantum * 15, fTopHealth));
-      } else if (fHealth < fMaxHealth) {
-        SetHealth(ClampUp(fHealth + _pTimer->TickQuantum * 5, fMaxHealth));
+      } else if (fHealth < (fTopHealth + fExtraHealth)) {
+        SetHealth(ClampUp(fHealth + _pTimer->TickQuantum * 5, fTopHealth + fExtraHealth));
       }
     }
   }
@@ -4493,7 +4496,7 @@ functions:
       return;
     }
 
-    FLOAT tmSpawnInvulnerability = GetSP()->sp_tmSpawnInvulnerability;
+    const FLOAT tmSpawnInvulnerability = GetSP()->sp_tmSpawnInvulnerability;
 
     // if invunerable after spawning then ignore damage
     // [SSE] Kill By Traps Always
@@ -4552,39 +4555,67 @@ functions:
       return;
     }
 
-    FLOAT fSubHealth, fSubArmor;
+    FLOAT fSubHealth, fSubShields;
+    FLOAT fSubArmor = 0.0F;
  
     if (dmtType == DMT_DROWNING) { // drowning
       fSubHealth = fDamageAmmount;
 
     } else {
-      // If we have any shields.
+      //////////////////////////////////////// SHIELDS ////////////////////////////////////////
+      const FLOAT fShieldsDecRate = penVitalitySettings ? penVitalitySettings->m_fShieldsDecRate : 1.0F;
+
+      // If we have any shields -> calculate absorbed damage.
       if (m_fShields > 0.0F)
       {
-        if (m_fShields >= fDamageAmmount) {
-          m_fShields -= fDamageAmmount;
-          fDamageAmmount = 0.0F;
-          return;
+        // Calculate possible absorbed part of damage.
+        if (penVitalitySettings) {
+          fSubShields = fDamageAmmount * penVitalitySettings->m_fShieldsAbsorptionMul;
         } else {
-          fDamageAmmount -= m_fShields;
+          fSubShields = fDamageAmmount * 1.0F;
+        }
+
+        fDamageAmmount = fDamageAmmount - fSubShields; // Assume that all damage absorbed.
+        m_fShields -= fSubShields * fShieldsDecRate;   // Decrease shields.
+        
+        // If shields below zero -> add difference to damage value.
+        if (m_fShields < 0) {
+          fDamageAmmount -= m_fShields / fShieldsDecRate; // Return back non-absorbed part of damage. 
           m_fShields = 0.0F;
         }
-      }
-      
-      // damage and armor
-      if (penVitalitySettings) {
-        fSubArmor  = fDamageAmmount * penVitalitySettings->m_fArmorAbsorbtionMul;
-      } else {
-        fSubArmor  = fDamageAmmount * 2.0f / 3.0f;      // 2/3 on armor damage
+        
+        // Shields should block very low damage if it left.
+        if (fDamageAmmount < 1.0F) {
+          return;
+        }
       }
 
-      fSubHealth = fDamageAmmount - fSubArmor;    // 1/3 on health damage
-      m_fArmor  -= fSubArmor;                     // decrease armor
+      //////////////////////////////////////// ARMOR ////////////////////////////////////////
+      const FLOAT fArmorDecRate = penVitalitySettings ? penVitalitySettings->m_fArmorDecRate : 1.0F;
+ 
+      // If we have any armor -> calculate absorbed damage.
+      if (m_fArmor > 0.0F)
+      {
+        // Calculate possible absorbed part of damage.
+        if (penVitalitySettings) {
+          fSubArmor  = fDamageAmmount * penVitalitySettings->m_fArmorAbsorptionMul;
+        } else {
+          fSubArmor  = fDamageAmmount * 2.0f / 3.0f;      // 2/3 on armor damage
+        }
 
-      if (m_fArmor < 0) {                         // armor below zero -> add difference to health damage
-        fSubHealth -= m_fArmor;
+        m_fArmor  -= fSubArmor * fArmorDecRate; // Decrease armor.
+      }
+
+      fSubHealth = fDamageAmmount - fSubArmor;
+
+      // If armor below zero -> add difference to health damage.
+      if (m_fArmor < 0) {                         
+        fSubHealth -= m_fArmor / fArmorDecRate; // Return back non-absorbed part of damage.
         m_fArmor    = 0.0f;
       }
+
+      const FLOAT fHealthDecRate = penVitalitySettings ? penVitalitySettings->m_fHealthDecRate : 1.0F;
+      fSubHealth *= fHealthDecRate;
     }
 
     // If any damage.
@@ -4634,7 +4665,7 @@ functions:
       fSubHealth = 100.0F;
       fDamageAmmount = 100.0F;
     }
-    
+
     // [SSE] Gameplay - Mutators - Vampire
     if (penInflictor != this && penInflictor != NULL && (GetSP()->sp_ulMutatorFlags & MUTF_VAMPIRE) && penInflictor->IsPlayerEntity() && penInflictor->IsAlive())
     {
@@ -4644,8 +4675,10 @@ functions:
       penInflictor->SendEvent(eHealing);
     }
 
-    DamageImpact(dmtType, GetSP()->sp_bArmorInertiaDamping ? fSubHealth : fDamageAmmount, vHitPoint, vDirection);
-    
+    if ((GetSP()->sp_bArmorInertiaDamping && fSubHealth > 1.0F) || (!GetSP()->sp_bArmorInertiaDamping && fDamageAmmount > 1.0F)) {
+      DamageImpact(dmtType, GetSP()->sp_bArmorInertiaDamping ? fSubHealth : fDamageAmmount, vHitPoint, vDirection);
+    }
+
     // [SSE] RocketJump Mode
     if (penInflictor != this || !(GetSP()->sp_ulMutatorFlags & MUTF_ROCKETJUMP) || dmtType == DMT_BURNING) {
       CPlayerEntity::ReceiveDamage( penInflictor, dmtType, fSubHealth, vHitPoint, vDirection); // receive damage
@@ -4877,23 +4910,27 @@ functions:
       
       const CGenericVitalItem *penGenericPowerUp = static_cast<CGenericVitalItem*>(&*eReceiveVital.penItem);
       const EVitalItemType eType = eReceiveVital.eType;
-      const BOOL bOverTopValue = eReceiveVital.bOverTopValue;
+      const EVitalValueRange eValueRange = eReceiveVital.eValueRange;
       FLOAT fValue = eReceiveVital.fValue;
       
       FLOAT fValueOld = 0.0F;
+
       FLOAT fTopValue = 0.0F;
-      FLOAT fMaxValue = 0.0F;
+      FLOAT fExtraValue = 0.0F;
+      FLOAT fOverValue = 0.0F;
 
       switch (eType)
       {
         default: {
           return FALSE; 
         } break;
-      
+
         case EVIT_HEALTH: {
           fValueOld = GetHealth();
+
           fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopHealth : TopHealth();
-          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxHealth : MaxHealth();
+          fExtraValue = penVitalitySettings ? penVitalitySettings->m_fExtraHealth : 100.0F;
+          fOverValue = penVitalitySettings ? penVitalitySettings->m_fOverHealth : 0.0F;
           
           if (penVitalitySettings) {
             fValue *= penVitalitySettings->m_fHealthPickUpMul;
@@ -4902,9 +4939,11 @@ functions:
 
         case EVIT_ARMOR: {
           fValueOld = GetArmor();
+
           fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopArmor : TopArmor();
-          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxArmor : MaxArmor();
-          
+          fExtraValue = penVitalitySettings ? penVitalitySettings->m_fExtraArmor : 100.0F;
+          fOverValue = penVitalitySettings ? penVitalitySettings->m_fOverArmor : 0.0F;
+
           if (penVitalitySettings) {
             fValue *= penVitalitySettings->m_fArmorPickUpMul;
           }
@@ -4912,8 +4951,10 @@ functions:
 
         case EVIT_SHIELDS: {
           fValueOld = GetShields();
+
           fTopValue = penVitalitySettings ? penVitalitySettings->m_fTopShields : TopShields();
-          fMaxValue = penVitalitySettings ? penVitalitySettings->m_fMaxShields : MaxShields();
+          fExtraValue = penVitalitySettings ? penVitalitySettings->m_fExtraShields : 100.0F;
+          fOverValue = penVitalitySettings ? penVitalitySettings->m_fOverShields : 0.0F;
           
           if (penVitalitySettings) {
             fValue *= penVitalitySettings->m_fShieldsPickUpMul;
@@ -4925,12 +4966,14 @@ functions:
       if (fValue <= 0.0F) {
         return TRUE;
       }
-      
+
       FLOAT fValueNew = fValueOld + fValue;
-      
+
       // Apply ranges.
-      if (bOverTopValue) {
-        fValueNew = ClampUp(fValueNew, fMaxValue);
+      if (eValueRange == EVVR_OVER) {
+        fValueNew = ClampUp(fValueNew, fTopValue + fExtraValue + fOverValue);
+      } else if (eValueRange == EVVR_EXTRA) {
+        fValueNew = ClampUp(fValueNew, fTopValue + fExtraValue);
       } else {
         fValueNew = ClampUp(fValueNew, fTopValue);
       }
@@ -4968,7 +5011,7 @@ functions:
     {
       FLOAT fHealth = ((EHealth&)ee).fHealth;
       FLOAT fTopHealth = TopHealth();
-      FLOAT fMaxHealth = MaxHealth();
+      FLOAT fExtraHealth = MaxHealth() - fTopHealth;
 	  
       // If health pickup not allowed then don't do it!
       if (penPlayerSettings && !penPlayerSettings->m_bCanPickUpHealth) {
@@ -4980,7 +5023,7 @@ functions:
       {
         fHealth *= penVitalitySettings->m_fHealthPickUpMul;
         fTopHealth = penVitalitySettings->m_fTopHealth;
-        fMaxHealth = penVitalitySettings->m_fMaxHealth;
+        fExtraHealth = penVitalitySettings->m_fExtraHealth;
       }
 
       // If item won't give any health then pickup it always.
@@ -4993,7 +5036,7 @@ functions:
       FLOAT fHealthNew = fHealthOld + fHealth;
 
       if (((EHealth&)ee).bOverTopHealth) {
-        fHealthNew = ClampUp( fHealthNew, fMaxHealth);
+        fHealthNew = ClampUp( fHealthNew, fTopHealth + fExtraHealth);
       } else {
         fHealthNew = ClampUp( fHealthNew, fTopHealth);
       }
@@ -5014,7 +5057,7 @@ functions:
     {
       FLOAT fArmor = ((EArmor&)ee).fArmor;
       FLOAT fTopArmor = TopArmor();
-      FLOAT fMaxArmor = MaxArmor();
+      FLOAT fExtraArmor = MaxArmor() - fTopArmor;
 
       // [SSE] Player Settings Entity
       // If armor pickup not allowed then don't do it!
@@ -5027,7 +5070,7 @@ functions:
       {
         fArmor *= penVitalitySettings->m_fArmorPickUpMul;
         fTopArmor = penVitalitySettings->m_fTopArmor;
-        fMaxArmor = penVitalitySettings->m_fMaxArmor;
+        fExtraArmor = penVitalitySettings->m_fExtraArmor;
       }
 
       // If item won't give any armor then pickup it always.
@@ -5040,7 +5083,7 @@ functions:
       FLOAT fArmorNew = fArmorOld + fArmor;
 
       if (((EArmor&)ee).bOverTopArmor) {
-        fArmorNew = ClampUp( fArmorNew, fMaxArmor);
+        fArmorNew = ClampUp( fArmorNew, fTopArmor + fExtraArmor);
       } else {
         fArmorNew = ClampUp( fArmorNew, fTopArmor);
       }

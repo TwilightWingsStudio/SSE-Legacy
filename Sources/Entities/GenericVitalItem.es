@@ -30,12 +30,18 @@ enum EVitalItemType {
   2 EVIT_SHIELDS   "[2] Shields",
 };
 
+enum EVitalValueRange {
+  0 EVVR_TOP    "[0] Top Value",
+  1 EVVR_EXTRA  "[1] Extra Value",
+  2 EVVR_OVER   "[2] Over Value",
+};
+
 event EReceiveVital
 {
   CEntityPointer penItem,
   enum EVitalItemType eType,
   FLOAT fValue,
-  BOOL bOverTopValue,
+  EVitalValueRange eValueRange,
 };
 
 class CGenericVitalItem : CItem {
@@ -50,7 +56,7 @@ properties:
   4 CEntityPointer m_penSoundPick    "Sound Pick Up",
   5 CTStringTrans m_strPickUpMessage "Message" = "Vital",
   6 FLOAT m_fAmount                  "Amount"  = 1.0F,
-  7 BOOL  m_bOverTopValue            "Over Top Value" = TRUE, // TODO: Will be changed in future.
+  7 enum EVitalValueRange m_eValueRange   "Value Range" = EVVR_TOP,
   
  10 FLOAT m_fParticlesSize   "Particles Size" = 1.0F,
  11 FLOAT m_fParticlesHeight "Particles Height" = 1.0F,
@@ -164,7 +170,7 @@ procedures:
     EReceiveVital eReceiveVital;
     eReceiveVital.eType = m_eType;
     eReceiveVital.fValue = m_fAmount;
-    eReceiveVital.bOverTopValue = m_bOverTopValue;
+    eReceiveVital.eValueRange = m_eValueRange;
 
     // If health is received...
     if (epass.penOther->ReceiveItem(eReceiveVital))
