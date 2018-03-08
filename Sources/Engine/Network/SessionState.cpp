@@ -110,6 +110,7 @@ CSessionState::CSessionState(void)
   ses_bGameFinished = FALSE;
   ses_bWaitingForServer = FALSE;
   ses_strDisconnected = "";
+  ses_ctMinPlayers = 1; // [SSE] Minimum Players
   ses_ctMaxPlayers = 1;
   ses_bWaitAllPlayers = FALSE;
   ses_iLevel = 0;
@@ -151,6 +152,7 @@ void CSessionState::Stop(void)
   ses_bGameFinished = FALSE;
   ses_bWaitingForServer = FALSE;
   ses_strDisconnected = "";
+  ses_ctMinPlayers = 1; // [SSE] Minimum Players
   ses_ctMaxPlayers = 1;
   ses_fRealTimeFactor = 1.0f;
   ses_bWaitAllPlayers = FALSE;
@@ -207,6 +209,7 @@ void CSessionState::Start_t(INDEX ctLocalPlayers)
   ses_bWaitingForServer = FALSE;
   ses_bGameFinished = FALSE;
   ses_strDisconnected = "";
+  ses_ctMinPlayers = 1; // [SSE] Minimum Players
   ses_ctMaxPlayers = 1;
   ses_fRealTimeFactor = 1.0f;
   ses_bWaitAllPlayers = FALSE;
@@ -1781,21 +1784,23 @@ void CSessionState::Read_t(CTStream *pstr)  // throw char *
     pstr->ExpectID_t("SESV");
     (*pstr)>>iVersion;
   }
-  (*pstr)>>ses_tmLastProcessedTick;
-  (*pstr)>>ses_iLastProcessedSequence;
-  (*pstr)>>ses_iLevel;
-  (*pstr)>>ses_ulRandomSeed;
-  (*pstr)>>ses_ulSpawnFlags;
-  (*pstr)>>ses_tmSyncCheckFrequency;
-  (*pstr)>>ses_iExtensiveSyncCheck;
-  (*pstr)>>ses_tmLastSyncCheck;
-  (*pstr)>>ses_ctMaxPlayers;
-  (*pstr)>>ses_bWaitAllPlayers;
-  (*pstr)>>ses_bPause;
-  (*pstr)>>ses_bGameFinished;
-  if (iVersion>=SESSIONSTATEVERSION_WITHBULLETTIME) {
-    (*pstr)>>ses_fRealTimeFactor;
+  (*pstr) >> ses_tmLastProcessedTick;
+  (*pstr) >> ses_iLastProcessedSequence;
+  (*pstr) >> ses_iLevel;
+  (*pstr) >> ses_ulRandomSeed;
+  (*pstr) >> ses_ulSpawnFlags;
+  (*pstr) >> ses_tmSyncCheckFrequency;
+  (*pstr) >> ses_iExtensiveSyncCheck;
+  (*pstr) >> ses_tmLastSyncCheck;
+  (*pstr) >> ses_ctMaxPlayers;
+  (*pstr) >> ses_ctMinPlayers; // [SSE] Minimum Players Option
+  (*pstr) >> ses_bPause;
+  (*pstr) >> ses_bGameFinished;
+
+  if (iVersion >= SESSIONSTATEVERSION_WITHBULLETTIME) {
+    (*pstr) >> ses_fRealTimeFactor;
   }
+
   ses_bWaitingForServer = FALSE;
   ses_bWantPause = ses_bPause;
   ses_strDisconnected = "";
@@ -1936,22 +1941,23 @@ void CSessionState::Write_t(CTStream *pstr)  // throw char *
 #if DEBUG_SYNCSTREAMDUMPING
   CPrintF( "Session state write: Sequence %d, Time %.2f\n", ses_iLastProcessedSequence, ses_tmLastProcessedTick);
 #endif
+
   pstr->WriteID_t("SESV");
   (*pstr)<<INDEX(SESSIONSTATEVERSION_WITHBULLETTIME);
   // write time information and random seed
-  (*pstr)<<ses_tmLastProcessedTick;
-  (*pstr)<<ses_iLastProcessedSequence;
-  (*pstr)<<ses_iLevel;
-  (*pstr)<<ses_ulRandomSeed;
-  (*pstr)<<ses_ulSpawnFlags;
-  (*pstr)<<ses_tmSyncCheckFrequency;
-  (*pstr)<<ses_iExtensiveSyncCheck;
-  (*pstr)<<ses_tmLastSyncCheck;
-  (*pstr)<<ses_ctMaxPlayers;
-  (*pstr)<<ses_bWaitAllPlayers;
-  (*pstr)<<ses_bPause;
-  (*pstr)<<ses_bGameFinished;
-  (*pstr)<<ses_fRealTimeFactor;
+  (*pstr) << ses_tmLastProcessedTick;
+  (*pstr) << ses_iLastProcessedSequence;
+  (*pstr) << ses_iLevel;
+  (*pstr) << ses_ulRandomSeed;
+  (*pstr) << ses_ulSpawnFlags;
+  (*pstr) << ses_tmSyncCheckFrequency;
+  (*pstr) << ses_iExtensiveSyncCheck;
+  (*pstr) << ses_tmLastSyncCheck;
+  (*pstr) << ses_ctMaxPlayers;
+  (*pstr) << ses_ctMinPlayers; // [SSE] Minimum Players Option
+  (*pstr) << ses_bPause;
+  (*pstr) << ses_bGameFinished;
+  (*pstr) << ses_fRealTimeFactor;
   // write session properties to stream
   (*pstr)<<_pNetwork->ga_strSessionName;
   pstr->Write_t(_pNetwork->ga_aubProperties, NET_MAXSESSIONPROPERTIES);

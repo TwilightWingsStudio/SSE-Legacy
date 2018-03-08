@@ -2011,19 +2011,22 @@ FLOAT CNetworkLibrary::GetRealTimeFactor(void)
 // test if game is waiting for more players to connect
 BOOL CNetworkLibrary::IsWaitingForPlayers(void)
 {
-  // if game mode does not include waiting for players
+  // If game mode does not include waiting for players then not waiting.
   if (!ga_sesSessionState.ses_bWaitAllPlayers) {
-    // not waiting
     return FALSE;
   }
-  // if server
+  
+  // [SSE] Minimum Players
+  if (ga_sesSessionState.ses_ctMinPlayers <= 1) {
+    return FALSE;
+  }
+  
+  // if server then check number of players on server
   if (IsServer()) {
-    // check number of players on server
-    return ga_srvServer.GetPlayersCount()<ga_sesSessionState.ses_ctMaxPlayers;
-  // if not server
+    return ga_srvServer.GetPlayersCount() < ga_sesSessionState.ses_ctMaxPlayers;
+  // if not server then check number of players in session
   } else {
-    // check number of players in session
-    return ga_sesSessionState.GetPlayersCount()<ga_sesSessionState.ses_ctMaxPlayers;
+    return ga_sesSessionState.GetPlayersCount() < ga_sesSessionState.ses_ctMaxPlayers;
   }
 }
 // test if game is waiting for server
