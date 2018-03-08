@@ -73,6 +73,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <Engine/Query/MasterServerMgr.h>
 
+#include <Engine/Integrations/Discord_Integration.h>
+
 
 // pointer to global instance of the only game object in the application
 CNetworkLibrary *_pNetwork= NULL;
@@ -2372,6 +2374,8 @@ void CNetworkLibrary::MainLoop(void)
 {
   // synchronize access to network
   CTSingleLock slNetwork(&ga_csNetwork, TRUE);
+  
+  Discord_UpdateInfo(TRUE);
 
   // update network state variable (to control usage of some cvars that cannot be altered in mulit-player mode)
   _bMultiPlayer = (_pNetwork->ga_sesSessionState.GetPlayersCount() > 1);
@@ -3057,6 +3061,8 @@ extern void NET_MakeDefaultState_t(
 void CNetworkLibrary::GameInactive(void)
 {
   MS_EnumUpdate();
+  
+  Discord_UpdateInfo(FALSE);
 
   // if no network
   if (!_cmiComm.IsNetworkEnabled()) {

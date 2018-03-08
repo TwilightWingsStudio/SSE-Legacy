@@ -47,6 +47,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/revision.h>
 
 #include <Engine/Scripts/ScriptEngine.h>
+#include <Engine/Integrations/Discord_Integration.h>
 
 // this version string can be referenced from outside the engine
 ENGINE_API CTString _strEngineBuild  = "";
@@ -501,6 +502,9 @@ ENGINE_API void SE_InitEngine(CTString strGameID)
   CPrintF("Initializing script engine...\n");
   _pScriptEngine = new CScriptEngine;
   CPrintF("  done.\n");
+  
+  // [SSE] DRP
+  Discord_InitPlugin();
 }
 
 
@@ -563,6 +567,8 @@ ENGINE_API void SE_EndEngine(void)
 
   // deinit IFeel
   IFeel_DeleteDevice();
+  
+  Discord_EndPlugin();
 }
 
 
