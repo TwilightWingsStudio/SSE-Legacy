@@ -1108,6 +1108,9 @@ void CGame::InitInternal( void)
   _pShell->DeclareSymbol("CTString GetGameTypeShortNameSS(INDEX);",      &GetGameTypeShortName); // [SSE]
   _pShell->DeclareSymbol("INDEX GetSpawnFlagsForGameTypeSS(INDEX);",     &GetSpawnFlagsForGameType);
   _pShell->DeclareSymbol("INDEX IsMenuEnabledSS(CTString);",             &IsMenuEnabled);
+  
+  extern CTString GetCurrentGameModeName();
+  _pShell->DeclareSymbol("CTString GetCurrentGameModeNameSS();",         &GetCurrentGameModeName);
 
   _pShell->DeclareSymbol("user const INDEX ctl_iCurrentPlayerLocal;", &ctl_iCurrentPlayerLocal);
   _pShell->DeclareSymbol("user const INDEX ctl_iCurrentPlayer;",      &ctl_iCurrentPlayer);

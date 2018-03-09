@@ -481,6 +481,20 @@ CTString GetGameTypeShortName(INDEX iMode)
 }
 
 // [SSE]
+extern CTString GetCurrentGameModeName()
+{
+  switch (GetSP()->sp_gmGameMode)
+  {
+    default: return "";
+    
+    case CSessionProperties::GM_COOPERATIVE: return "Cooperative";
+    case CSessionProperties::GM_FRAGMATCH: return "DM";
+    case CSessionProperties::GM_TEAMDEATHMATCH: return "TDM";
+    case CSessionProperties::GM_SCOREMATCH: return "SM";
+  }
+}
+
+// [SSE]
 CTString GetGameTypeShortNameCfunc(void* pArgs)
 {
   INDEX iMode = NEXTARGUMENT(INDEX);
