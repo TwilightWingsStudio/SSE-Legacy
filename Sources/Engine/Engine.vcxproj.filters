@@ -125,6 +125,12 @@
     <Filter Include="Header Files\Query Headers">
       <UniqueIdentifier>{213d6870-6a86-43c8-b4be-01096c1ccddf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Integrations">
+      <UniqueIdentifier>{d8f93a7b-a0e5-45dd-9c35-cad5123ad6ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Integrations Headers">
+      <UniqueIdentifier>{c578ed08-b02c-4f4c-aa48-d6ec9ac0785e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Base\Anim.cpp">
@@ -796,6 +802,9 @@
     <ClCompile Include="Query\MasterServerMgr.cpp">
       <Filter>Source Files\Query</Filter>
     </ClCompile>
+    <ClCompile Include="Integrations\Discord_Integration.cpp">
+      <Filter>Source Files\Integrations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base\Anim.h">
@@ -1415,6 +1424,15 @@
     </ClInclude>
     <ClInclude Include="Query\MasterServerMgr.h">
       <Filter>Header Files\Query Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Integrations\Discord_Functions.h">
+      <Filter>Header Files\Integrations Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Integrations\Discord_Integration.h">
+      <Filter>Header Files\Integrations Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Integrations\Discord_Types.h">
+      <Filter>Header Files\Integrations Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

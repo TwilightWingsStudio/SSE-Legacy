@@ -314,6 +314,7 @@ $(SolutionDir)\prebuild_engine.bat</Command>
     <ClCompile Include="Base\Translation.cpp" />
     <ClCompile Include="Base\Unzip.cpp" />
     <ClCompile Include="Base\Updateable.cpp" />
+    <ClCompile Include="Integrations\Discord_Integration.cpp" />
     <ClCompile Include="Query\DarkPlacesMasterServer.cpp" />
     <ClCompile Include="Query\MasterServerMgr.cpp" />
     <ClCompile Include="Graphics\TextureIO.cpp" />
@@ -756,6 +757,9 @@ $(SolutionDir)\prebuild_engine.bat</Command>
     <ClInclude Include="Base\Unzip.h" />
     <ClInclude Include="Base\Updateable.h" />
     <ClInclude Include="Base\UpdateableRT.h" />
+    <ClInclude Include="Integrations\Discord_Functions.h" />
+    <ClInclude Include="Integrations\Discord_Integration.h" />
+    <ClInclude Include="Integrations\Discord_Types.h" />
     <ClInclude Include="Query\MasterServerMgr.h" />
     <ClInclude Include="Query\MSLegacy.h" />
     <ClInclude Include="Math\AABBox.h" />
