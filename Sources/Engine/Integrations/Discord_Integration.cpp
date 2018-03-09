@@ -78,8 +78,6 @@ typedef struct DiscordEventHandlers {
     void (*joinRequest)(const DiscordJoinRequest* request);
 } DiscordEventHandlers;
 
-static const char* APPLICATION_ID = "421325065930539018";
-
 #define DISCORD_REPLY_NO 0
 #define DISCORD_REPLY_YES 1
 #define DISCORD_REPLY_IGNORE 2
@@ -107,10 +105,18 @@ static void Discord_ClearFunctionPointers(void) {
   #undef DLLFUNCTION
 }
 
-
+// Some constants.
+static const char* APPLICATION_ID = "421325065930539018";
 #define DISCORD_LIB_NAME "discord-rpc.dll"
+#define DISCORD_SMALL_IMAGE_KEY "main-star-s"
+#define DISCORD_LARGE_IMAGE_KEY "main-large"
+
+// --------------------------------------------------------------------------------------
+// Should be called on engine startup.
+// --------------------------------------------------------------------------------------
 void Discord_InitPlugin()
 {
+  // If library already loaded then we should not try do anything.
   if (_hDiscordLib != NULL) {
     return;
   }
@@ -143,9 +149,13 @@ void Discord_InitPlugin()
   //handlers.joinGame = handleDiscordJoin;
   //handlers.spectateGame = handleDiscordSpectate;
   //handlers.joinRequest = handleDiscordJoinRequest;
-  pDiscord_Initialize(APPLICATION_ID, &handlers, 1, NULL);
+
+  pDiscord_Initialize(APPLICATION_ID, &handlers, 1, NULL); // Initialize the API.
 }
 
+// --------------------------------------------------------------------------------------
+// Should be called before application going to close.
+// --------------------------------------------------------------------------------------
 void Discord_EndPlugin()
 {
   if (_bDiscordEnabled)
@@ -185,6 +195,9 @@ static const char* GetCurrentGameStateName(BOOL bGameActive)
   return "In Menus";
 }
 
+// --------------------------------------------------------------------------------------
+// Get current unlocalized gamemode name.
+// --------------------------------------------------------------------------------------
 CTString _getCurrentGameModeName()
 {
   // get function that will provide us the info about gametype
@@ -198,6 +211,13 @@ CTString _getCurrentGameModeName()
   return pFunc();
 }
 
+// --------------------------------------------------------------------------------------
+// Perform Discord status update.
+//
+// Called very frequently from 
+//  - CNetworkLibrary::GameInactive
+//  - CNetworkLibrary::MainLoop.
+// --------------------------------------------------------------------------------------
 void Discord_UpdateInfo(BOOL bGameActive)
 {
   if (!_bDiscordEnabled) {
@@ -205,7 +225,8 @@ void Discord_UpdateInfo(BOOL bGameActive)
   }
   
   BOOL bGameActiveToggled = _bLastGameActive != bGameActive;
-  
+
+  // If game toggled then we should reset time.
   if (bGameActiveToggled)
   {
     _llStartTime = time(0);
@@ -222,13 +243,13 @@ void Discord_UpdateInfo(BOOL bGameActive)
     memset(&discordPresence, 0, sizeof(discordPresence));
 
     discordPresence.state = GetCurrentGameStateName(bGameActive);
-    discordPresence.largeImageKey = "main-large";
-    discordPresence.smallImageKey = "main-star-s";
+    discordPresence.largeImageKey = DISCORD_LARGE_IMAGE_KEY;
+    discordPresence.smallImageKey = DISCORD_SMALL_IMAGE_KEY;
 
+    // If we have game running then we should provite more info.
     if (bGameActive)
     {
       discordPresence.startTimestamp = _llStartTime;
-      //discordPresence.endTimestamp = time(0) + 5 * 60;
 
       sprintf(buffer, _getCurrentGameModeName());
       discordPresence.details = buffer;
@@ -254,9 +275,9 @@ void Discord_UpdateInfo(BOOL bGameActive)
       }
     }
 
-    pDiscord_UpdatePresence(&discordPresence);
+    pDiscord_UpdatePresence(&discordPresence); // Status update via API function call.
 
-    _tmLastPresenceUpdate = _pTimer->GetRealTimeTick();
+    _tmLastPresenceUpdate = _pTimer->GetRealTimeTick(); // Reset the timer.
   }
 
   pDiscord_RunCallbacks();
