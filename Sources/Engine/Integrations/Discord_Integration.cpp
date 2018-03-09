@@ -129,8 +129,6 @@ void Discord_InitPlugin()
     _bDiscordEnabled = TRUE;
     CPrintF(TRANS("%s loaded, Discord integration enabled\n"), DISCORD_LIB_NAME);
 
-    _pShell->DeclareSymbol("user void DRP_Update();", &Discord_UpdateInfo);
-
   } catch (char *strError) {
     CPrintF(TRANS("Discord integration disabled: %s\n"), strError);
     return;
@@ -187,6 +185,19 @@ static const char* GetCurrentGameStateName(BOOL bGameActive)
   return "In Menus";
 }
 
+CTString _getCurrentGameModeName()
+{
+  // get function that will provide us the info about gametype
+  CShellSymbol *pss = _pShell->GetSymbol("GetCurrentGameModeNameSS", TRUE);
+
+  if (pss == NULL) {
+    return "";
+  }
+
+  CTString (*pFunc)(void) = (CTString (*)(void))pss->ss_pvValue;
+  return pFunc();
+}
+
 void Discord_UpdateInfo(BOOL bGameActive)
 {
   if (!_bDiscordEnabled) {
@@ -219,7 +230,7 @@ void Discord_UpdateInfo(BOOL bGameActive)
       discordPresence.startTimestamp = _llStartTime;
       //discordPresence.endTimestamp = time(0) + 5 * 60;
 
-      sprintf(buffer, _getGameModeShortName(_getSP()->sp_gmGameMode));
+      sprintf(buffer, _getCurrentGameModeName());
       discordPresence.details = buffer;
       
       if (_pNetwork->ga_sesSessionState.ses_ctMaxPlayers > 1)
@@ -247,6 +258,8 @@ void Discord_UpdateInfo(BOOL bGameActive)
 
     _tmLastPresenceUpdate = _pTimer->GetRealTimeTick();
   }
-  
+
+  pDiscord_RunCallbacks();
+
   _bLastGameActive = bGameActive;
 }
