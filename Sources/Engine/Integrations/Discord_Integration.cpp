@@ -25,10 +25,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/Server.h>
 
 #include <Engine/Integrations/Discord_Integration.h>
+#include <Engine/Integrations/Discord_Types.h>
 
 #include <Game/SessionProperties.h> // TODO: GET RID OF THIS!
 
-#include <stdint.h>
 #include <time.h>
 
 static int64_t _llStartTime;
@@ -43,44 +43,6 @@ extern const CSessionProperties* _getSP();
 static void FailFunction_t(const char *strName) {
   ThrowF_t(TRANS("Function %s not found."), strName);
 }
-
-typedef struct DiscordRichPresence {
-    const char* state;   /* max 128 bytes */
-    const char* details; /* max 128 bytes */
-    int64_t startTimestamp;
-    int64_t endTimestamp;
-    const char* largeImageKey;  /* max 32 bytes */
-    const char* largeImageText; /* max 128 bytes */
-    const char* smallImageKey;  /* max 32 bytes */
-    const char* smallImageText; /* max 128 bytes */
-    const char* partyId;        /* max 128 bytes */
-    int partySize;
-    int partyMax;
-    const char* matchSecret;    /* max 128 bytes */
-    const char* joinSecret;     /* max 128 bytes */
-    const char* spectateSecret; /* max 128 bytes */
-    int8_t instance;
-} DiscordRichPresence;
-
-typedef struct DiscordJoinRequest {
-    const char* userId;
-    const char* username;
-    const char* discriminator;
-    const char* avatar;
-} DiscordJoinRequest;
-
-typedef struct DiscordEventHandlers {
-    void (*ready)(void);
-    void (*disconnected)(int errorCode, const char* message);
-    void (*errored)(int errorCode, const char* message);
-    void (*joinGame)(const char* joinSecret);
-    void (*spectateGame)(const char* spectateSecret);
-    void (*joinRequest)(const DiscordJoinRequest* request);
-} DiscordEventHandlers;
-
-#define DISCORD_REPLY_NO 0
-#define DISCORD_REPLY_YES 1
-#define DISCORD_REPLY_IGNORE 2
 
 #define DLLFUNCTION(dll, output, name, inputs, params, required) \
   output (__cdecl *p##name) inputs = NULL;
@@ -150,11 +112,11 @@ void Discord_InitPlugin()
   //handlers.spectateGame = handleDiscordSpectate;
   //handlers.joinRequest = handleDiscordJoinRequest;
 
-  pDiscord_Initialize(APPLICATION_ID, &handlers, 1, NULL); // Initialize the API.
+  pDiscord_Initialize(APPLICATION_ID, &handlers, 1, NULL); // Initialize the Discord API.
 }
 
 // --------------------------------------------------------------------------------------
-// Should be called before application going to close.
+// Should be called before application going to close. Performs proper shutdown.
 // --------------------------------------------------------------------------------------
 void Discord_EndPlugin()
 {
@@ -171,6 +133,9 @@ void Discord_EndPlugin()
 
 extern BOOL _bWorldEditorApp;
 
+// --------------------------------------------------------------------------------------
+// Returns current state name for the "state" field in the Presence.
+// --------------------------------------------------------------------------------------
 static const char* GetCurrentGameStateName(BOOL bGameActive)
 {
   if (_bWorldEditorApp) {
@@ -214,9 +179,9 @@ CTString _getCurrentGameModeName()
 // --------------------------------------------------------------------------------------
 // Perform Discord status update.
 //
-// Called very frequently from 
-//  - CNetworkLibrary::GameInactive
-//  - CNetworkLibrary::MainLoop.
+// Called very frequently from :
+//  - CNetworkLibrary::GameInactive()
+//  - CNetworkLibrary::MainLoop()
 // --------------------------------------------------------------------------------------
 void Discord_UpdateInfo(BOOL bGameActive)
 {
