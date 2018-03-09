@@ -97,6 +97,9 @@ void DarkPlaces_BuildStatusResponse(const char* challenge, CTString &strPacket, 
             "");
 }
 
+// --------------------------------------------------------------------------------------
+// Process packets while running server.
+// --------------------------------------------------------------------------------------
 void DarkPlaces_ServerParsePacket(INDEX iLength)
 {
   char *string = &_szBuffer[0];
@@ -168,6 +171,9 @@ void DarkPlaces_ServerParsePacket(INDEX iLength)
   //CPrintF("Received: %s\n", &_szBuffer[0]);
 }
 
+// --------------------------------------------------------------------------------------
+// Parse server-list received from the Master Server.
+// --------------------------------------------------------------------------------------
 void DarkPlaces_ParseServerList(unsigned char *data, INDEX iLength, BOOL bExtended)
 {
   CPrintF("Data Length: %d\n", iLength);
@@ -219,6 +225,9 @@ void DarkPlaces_ParseServerList(unsigned char *data, INDEX iLength, BOOL bExtend
   }
 }
 
+// --------------------------------------------------------------------------------------
+// Process packets while running client.
+// --------------------------------------------------------------------------------------
 void DarkPlaces_ClientParsePacket(INDEX iLength)
 {
   char *string = &_szBuffer[0];
