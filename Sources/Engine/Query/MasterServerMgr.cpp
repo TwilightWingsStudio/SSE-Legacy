@@ -280,10 +280,10 @@ extern void MS_OnServerStart(void)
     _sendPacket("q");
     
   // MSLegacy
-  } else {
-    CTString strPacket;
-    strPacket.PrintF("\\heartbeat\\%hu\\gamename\\serioussamse", (_pShell->GetINDEX("net_iPort") + 1));
-    _sendPacket(strPacket);
+  //} else {
+  //  CTString strPacket;
+  //  strPacket.PrintF("\\heartbeat\\%hu\\gamename\\serioussamse", (_pShell->GetINDEX("net_iPort") + 1));
+  //  _sendPacket(strPacket);
   }
 }
 
@@ -321,18 +321,18 @@ extern void MS_OnServerUpdate(void)
   }
 
   memset(&_szBuffer[0], 0, 2050);
-  int iLen = _recvPacket();
+  INDEX iLength = _recvPacket();
 
-  if (iLen > 0)
+  if (iLength > 0)
   {
     // [SSE]
     if (ga_bDarkPlacesMS) {
-      DarkPlaces_ServerParsePacket(iLen);
+      DarkPlaces_ServerParsePacket(iLength);
     } else if (!ga_bMSLegacy) {
       GameAgent_ProcessReceivedPacket();
     } else {
-      _szBuffer[iLen] = 0;
-      MSLegacy_ProcessReceivedPacket();
+      _szBuffer[iLength] = 0;
+      MSLegacy_ProcessReceivedPacket(iLength);
     }
  }
 

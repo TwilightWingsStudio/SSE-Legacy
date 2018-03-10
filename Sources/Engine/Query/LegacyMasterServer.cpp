@@ -81,7 +81,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
                     "\\healthandarmorstays\\%d" \
                     "\\allowhealth\\%d" \
                     "\\allowarmor\\%d" \
-                    "\\infinitearmor\\%d" \
+                    "\\infiniteammo\\%d" \
                     "\\respawninplace\\%d" \
                     "\\password\\0" \
                     "\\vipplayers\\1"
@@ -285,6 +285,7 @@ void MSLegacy_EnumTrigger(BOOL bInternet)
         return;
     }
 
+    // Master Server should respond to the game.
     /* Reading response from Master Server - returns the string with the secret key */
 
     iLen = 0;
@@ -296,7 +297,7 @@ void MSLegacy_EnumTrigger(BOOL bInternet)
     }
 
     iLen += iErr;
-    cResponse[iLen] = 0x00;
+    cResponse[iLen] = 0x00; // Terminate the response.
 
     /* Allocate memory for a buffer and get a pointer to it */
 
@@ -323,6 +324,7 @@ void MSLegacy_EnumTrigger(BOOL bInternet)
 
         ucKey = gsseckey(ucSec, ucGamekey, iEnctype);
     }
+
     ucSec -= 15;
     if (cResponse) free (cResponse);
     if (ucSec) free (ucSec);
@@ -376,7 +378,6 @@ void MSLegacy_EnumTrigger(BOOL bInternet)
     }
     iDynsz = BUFFSZ;
 
-
     /* The received encoded data after sending the string (Validate key) */
 
     iLen = 0;
@@ -393,6 +394,7 @@ void MSLegacy_EnumTrigger(BOOL bInternet)
             }
         }
     }
+
     CLEANMSSRUFF1;
     _iIPPortBufferLen = iLen;
 
@@ -431,13 +433,18 @@ void MSLegacy_EnumUpdate(void)
   }	
 }
 
-extern void MSLegacy_ProcessReceivedPacket()
+extern void MSLegacy_ProcessReceivedPacket(INDEX iLength)
 {
-  char *sPch1 = NULL, *sPch2 = NULL, *sPch3 = NULL, *sPch4 = NULL;
+  unsigned char *data = (unsigned char*)&_szBuffer[0];
+
+  char *sPch1 = NULL, *sPch2 = NULL, *sPch3 = NULL, *sPch4 = NULL, *sPch5;
+
   sPch1 = strstr(_szBuffer, "\\status\\");
   sPch2 = strstr(_szBuffer, "\\info\\");
   sPch3 = strstr(_szBuffer, "\\basic\\");
   sPch4 = strstr(_szBuffer, "\\players\\");
+
+  sPch5 = strstr(_szBuffer, "\\secure\\"); // [SSE] [ZCaliptium] Validation Fix.
 
   // status request
   if (sPch1) {
@@ -546,9 +553,27 @@ extern void MSLegacy_ProcessReceivedPacket()
 
     strPacket += "\\final\\\\queryid\\6.1";
     _sendPacketTo(strPacket, &_sinFrom);
+  
+  // [SSE] [ZCaliptium] '/validate/' - Validation request.
+  } else if (sPch5) {
+    //CPrintF("Received 'validate' request from MS.\n");
+    data += 8;
+    
+    //CPrintF("SecureKey: %s\n", data);
+    
+    u_char  ucGamekey[]          = {SERIOUSSAMKEY};
+    //u_char  ucReckey[]          = {"XUCXHC"};
+    //CPrintF("SecureKey: %s\n", ucReckey);
+    unsigned char *pValidateKey = NULL;
+    pValidateKey = gsseckey((u_char*)data, ucGamekey, 0);
+    
+    CTString strPacket;
+    strPacket.PrintF("\\validate\\%s\\final\\%s\\queryid\\2.1", pValidateKey, "");
+    _sendPacketTo(strPacket, &_sinFrom);
 
   } else {
-    CPrintF("Unknown query server response!\n");
+    CPrintF("Unknown query server command!\n");
+    CPrintF("%s\n", _szBuffer);
     return;
   }
 }

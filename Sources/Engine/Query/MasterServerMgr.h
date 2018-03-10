@@ -46,7 +46,7 @@ extern void GameAgent_EnumUpdate(void);
 
 // Legacy Master Server
 extern void MSLegacy_BuildHearthbeatPacket(CTString &strPacket);
-extern void MSLegacy_ProcessReceivedPacket();
+extern void MSLegacy_ProcessReceivedPacket(INDEX iLength);
 extern void MSLegacy_EnumTrigger(BOOL bInternet);
 extern void MSLegacy_EnumUpdate(void);
 
