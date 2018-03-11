@@ -673,6 +673,9 @@
     <ClCompile Include="GenericVitalItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ExactDamager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1863,6 +1866,12 @@
     <ClInclude Include="GenericVitalItem_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ExactDamager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExactDamager_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2857,6 +2866,9 @@
     </CustomBuild>
     <CustomBuild Include="GenericVitalItem.es">
       <Filter>Class Files\Items</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ExactDamager.es">
+      <Filter>Class Files\Tools</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
