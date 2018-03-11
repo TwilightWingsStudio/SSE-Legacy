@@ -21,10 +21,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "Entities/PlayerWeapons.h"
 %}
 
-enum EETUsePenCausedAs {
-  0 ESTUP_NONE        "0 None",
-  1 ESTUP_SOURCE      "1 Entity to Teleport",
-  2 ESTUP_DESTINATION "2 Destination Target",
+enum EExTTargetType {
+  0 EETTT_TARGET      "0 Target",
+  1 EETTT_THIS        "1 This Entity",
+  2 EETTT_PENCAUSED   "2 penCaused",
+  3 EETTT_PENTARGET   "3 penTarget (targetted)",
 };
 
 class CExactTeleport: CRationalEntity {
@@ -39,10 +40,11 @@ properties:
    4 BOOL m_bActive              "Active" 'A' = TRUE,
    5 BOOL m_bDebugMessages "Debug Messages" = FALSE,
 
-   6 CEntityPointer m_penEnityToTP   "Entity To Teleport" 'E',
+   6 CEntityPointer m_penEnityToTP   "Entity to Teleport" 'E',
    7 CEntityPointer m_penDestination "Destination Target" 'T',
 
-  10 enum EETUsePenCausedAs m_eUsePenCausedAs "Use penCaused as ..." = ESTUP_NONE,
+  10 enum EExTTargetType m_eEntityType      "EtT Type" = EETTT_TARGET,
+  11 enum EExTTargetType m_eDestinationType "Destination Type" = EETTT_TARGET,
    
   25 BOOL m_bForceStop              "Force Stop" 'F' = FALSE,
   26 BOOL m_bKeepOrientation        "Keep Orientation" = FALSE,
@@ -76,27 +78,27 @@ functions:
   // --------------------------------------------------------------------------------------
   // Teleports selected entity to destination if possible.
   // --------------------------------------------------------------------------------------
-  void DoTeleportation(const ETrigger &eTrigger)
+  void DoTeleportation(CEntity *penCaused, CEntity *penTarget)
   {
     CEntity *penEntityToTP = m_penEnityToTP;
     CEntity *penDestination = m_penDestination;
 
-    
-    switch (m_eUsePenCausedAs)
+    // Extended entity to teleport types.
+    switch (m_eEntityType)
     {
-      case ESTUP_SOURCE: {
-        if (eTrigger.penCaused) {
-          penEntityToTP = eTrigger.penCaused;
+      case EETTT_PENCAUSED: {
+        if (penCaused) {
+          penEntityToTP = penCaused;
         }
       } break;
       
-      case ESTUP_DESTINATION: {
-        if (eTrigger.penCaused) {
-          penDestination = eTrigger.penCaused;
+      case EETTT_PENTARGET: {
+        if (penTarget) {
+          penEntityToTP = penTarget;
         }
       } break;
       
-      case ESTUP_NONE: default: break;
+      default: break;
     }
 
     // If no any entity to teleport then stop.
@@ -106,6 +108,28 @@ functions:
       }
 
       return;
+    }
+    
+    // Extended teleport destination types.
+    switch (m_eDestinationType)
+    {
+      case EETTT_PENCAUSED: {
+        if (penCaused) {
+          penDestination = penCaused;
+        }
+      } break;
+      
+      case EETTT_PENTARGET: {
+        if (penTarget) {
+          penDestination = penTarget;
+        }
+      } break;
+
+      case EETTT_THIS: {
+        penDestination = this;
+      } break;
+
+      default: break;
     }
 
     // If no destination where teleport then stop.
@@ -119,9 +143,9 @@ functions:
 
     if (m_bDebugMessages) {
       if (penDestination == this) {
-        CPrintF(TRANS("[%s] : Teleporting %s to %s location.\n"), m_strName, penEntityToTP->GetName(), penDestination->GetName());
+        CPrintF(TRANS("[%s] : Teleporting %s to %s location.\n"), m_strName, penEntityToTP->GetName().Undecorated(), penDestination->GetName().Undecorated());
       } else {
-        CPrintF(TRANS("[%s] : Teleporting %s to this teleporter.\n"), m_strName, penEntityToTP->GetName());
+        CPrintF(TRANS("[%s] : Teleporting %s to this teleporter.\n"), m_strName, penEntityToTP->GetName().Undecorated());
       }
     }
 
@@ -170,7 +194,11 @@ procedures:
     // set appearance
     SetModel(MODEL_TELEPORTER);
     SetModelMainTexture(TEXTURE_TELEPORTER);
-  
+    
+    if (m_eEntityType == EETTT_THIS) {
+      m_eEntityType = EETTT_TARGET;
+    }
+
     autowait(0.1f);
   
     wait()
@@ -182,7 +210,16 @@ procedures:
       on(ETrigger eTrigger) :
       {
         if (m_bActive) {
-          DoTeleportation(eTrigger);
+          DoTeleportation(eTrigger.penCaused, NULL);
+        }
+
+        resume;
+      }
+      
+      // [SSE] Entities - Targeted Event
+      on (ETargeted eTargeted) : {
+        if (m_bActive) {
+          DoTeleportation(eTargeted.penCaused, eTargeted.penTarget);
         }
 
         resume;
