@@ -824,6 +824,10 @@ functions:
   // --------------------------------------------------------------------------------------
   BOOL ShouldReceiveDamageFromInflictor(CEntity *penInflictor)
   {
+    if (penInflictor == NULL) {
+      return TRUE;
+    }
+
     CEnemyFactionHolder* penEFH = GetFactionHolder(TRUE);
 
     // Friendly fire for factions.
