@@ -87,7 +87,7 @@ functions:
       
       case EEDTT_PENTARGET: {
         if (penTarget) {
-          penVictim = penCaused;
+          penVictim = penTarget;
         }
       } break;
       
@@ -114,7 +114,7 @@ functions:
 
       case EEDTT_PENTARGET: {
         if (penTarget) {
-          penInflictor = penCaused;
+          penInflictor = penTarget;
         }
       } break;
 
