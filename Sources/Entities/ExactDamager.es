@@ -20,9 +20,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 %}
 
 enum EExDTargetType {
-  0 EEDTT_TARGET      "1 Target",
-  1 EEDTT_PENCAUSED   "2 penCaused",
-  2 EEDTT_PENTARGET   "3 penTarget (targetted)",
+  0 EEDTT_TARGET      "0 Target",
+  1 EEDTT_THIS        "1 This Entity",
+  2 EEDTT_PENCAUSED   "2 penCaused",
+  3 EEDTT_PENTARGET   "3 penTarget (targetted)",
 };
 
 class CExactDamager : CRationalEntity {
@@ -117,6 +118,10 @@ functions:
           penInflictor = penTarget;
         }
       } break;
+      
+      case EEDTT_THIS: {
+        penInflictor = this;
+      } break;
 
       default: break;
     }
@@ -139,6 +144,10 @@ procedures:
     // set appearance
     SetModel(MODEL_EXACTDAMAGER);
     SetModelMainTexture(TEXTURE_EXACTDAMAGER);
+    
+    if (m_eVictimType == EEDTT_THIS) {
+      m_eVictimType = EEDTT_TARGET;
+    }
   
     autowait(0.1f);
   
