@@ -48,7 +48,7 @@ BOOL _bInitialized = FALSE;
 BOOL _bActivated = FALSE;
 BOOL _bActivatedLocal = FALSE;
 
-TIME _tmLastHeartbeat = 0;
+TIME _tmLastHeartbeat = -1.0F;
 
 CDynamicStackArray<CServerRequest> ga_asrRequests;
 

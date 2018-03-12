@@ -50,6 +50,7 @@ extern BOOL MatchesBanMask(const CTString &strString, const CTString &strMask);
 extern CClientInterface cm_aciClients[SERVER_CLIENTS];
 
 extern INDEX ser_iMaxAllowedChatPerSec;
+extern INDEX ser_bEnumeration;
 
 CSessionSocket::CSessionSocket(void)
 {
@@ -223,7 +224,9 @@ CServer::~CServer()
 void CServer::Stop(void)
 {
   // stop gameagent
-  MS_OnServerEnd();
+  if (ser_bEnumeration) {
+    MS_OnServerEnd();
+  }
 
   // tell all clients to disconnect
   INDEX ctClients = srv_assoSessions.sa_Count;
@@ -1429,7 +1432,9 @@ void CServer::Handle(INDEX iClient, CNetworkMessage &nmMessage)
       _pNetwork->SendToClientReliable(iClient, nmPlayerRegistered);
 
       // notify masterserver
-      MS_OnServerStateChanged();
+      if (ser_bEnumeration) {
+        MS_OnServerStateChanged();
+      }
     // if refused
     } else {
       // send him refusal message

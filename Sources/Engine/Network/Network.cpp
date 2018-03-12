@@ -2501,7 +2501,9 @@ void CNetworkLibrary::MainLoop(void)
   // if network
   if (_cmiComm.IsNetworkEnabled())
   {
-    MS_OnServerUpdate();
+    if (ser_bEnumeration) {
+      MS_OnServerUpdate();
+    }
 
 //    _cmiComm.Broadcast_Update();
 
