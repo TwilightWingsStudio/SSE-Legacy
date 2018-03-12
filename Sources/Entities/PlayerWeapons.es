@@ -6443,7 +6443,12 @@ procedures:
     }
 
     // fire one cell
-    autowait(0.1f);
+    //autowait(0.1F); // Old, was not working correctly because time is a float.
+
+    // [SSE] Laser Slowdown Fix
+    autowait(_pTimer->TickQuantum);
+    autowait(_pTimer->TickQuantum);
+
     m_moWeapon.PlayAnim(LASER_ANIM_FIRE, AOF_LOOPING|AOF_NORESTART);
     FireLaserRay();
     if (_pNetwork->IsPlayerLocal(m_penPlayer)) {IFeel_PlayEffect("Laser_fire");}
