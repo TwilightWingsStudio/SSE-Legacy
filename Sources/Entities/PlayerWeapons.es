@@ -5743,7 +5743,11 @@ procedures:
       }
     }
 
-    autowait(0.1f);
+    //autowait(0.1f); // Old
+    
+    // [SSE] Tommygun Slowdown Fix
+    autowait(_pTimer->TickQuantum);
+    autowait(_pTimer->TickQuantum);
 
     // no ammo -> change weapon
     if (m_iBullets <= 0) {
@@ -6304,7 +6308,12 @@ procedures:
       FireFlame();
       DecAmmo(m_iNapalm, 1);
       SpawnRangeSound(30.0f);
-      autowait(0.1f);
+
+      //autowait(0.1f); // Old
+      
+      // [SSE] Flamethrower Slowdown Fix
+      autowait(_pTimer->TickQuantum);
+      autowait(_pTimer->TickQuantum);
     }
 
     if (m_iNapalm <= 0) {
