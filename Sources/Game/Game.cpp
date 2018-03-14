@@ -156,9 +156,9 @@ extern INDEX gam_bArmorInertiaDamping = TRUE; // [SSE] Armor Inertia Damping Tog
 extern INDEX gam_bRocketJumpMode = FALSE; // [SSE] Gameplay - Mutators - RocketJump Mode
 extern INDEX gam_bInstagib = FALSE; // [SSE] Gameplay - Mutators - Instagib
 extern INDEX gam_bVampire = FALSE;  // [SSE] Gameplay - Mutators - Vampire
+extern INDEX gam_bFarewellGift = FALSE; // [SSE] Gameplay - Mutators - Farewell Gift
 
 extern FLOAT gam_tmRespawnDelay = 0.0F; // [SSE] Respawn Delay
-
 
 static INDEX hud_iEnableStats = 1;
 static FLOAT hud_fEnableFPS   = 1;
@@ -1060,6 +1060,7 @@ void CGame::InitInternal( void)
   _pShell->DeclareSymbol("persistent user INDEX gam_bRocketJumpMode;",  &gam_bRocketJumpMode); // [SSE] Gameplay - Mutators - RocketJump Mode
   _pShell->DeclareSymbol("persistent user INDEX gam_bInstagib;",  &gam_bInstagib);             // [SSE] Gameplay - Mutators - Instagib
   _pShell->DeclareSymbol("persistent user INDEX gam_bVampire;",  &gam_bVampire);               // [SSE] Gameplay - Mutators - Vampire
+  _pShell->DeclareSymbol("persistent user INDEX gam_bFarewellGift;",  &gam_bFarewellGift);     // [SSE] Gameplay - Mutators - Farewell Gift
 
   _pShell->DeclareSymbol("user INDEX gam_bQuickLoad;", &gam_bQuickLoad);
   _pShell->DeclareSymbol("user INDEX gam_bQuickSave;", &gam_bQuickSave);
