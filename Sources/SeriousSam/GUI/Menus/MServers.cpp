@@ -136,31 +136,31 @@ BOOL CServersMenu::OnEvent(const SEvent& event)
         RefreshServerList();
         return TRUE;
       
-      } else if (event.GuiEvent.Caller == &mgServerFilter[0]) {
+      } else if (event.GuiEvent.Caller == &mgServerFilter[0] || event.GuiEvent.Caller == &mgServerColumn[0]) {
         SortByServer();
         return TRUE;
       
-      } else if (event.GuiEvent.Caller == &mgServerFilter[1]) {
+      } else if (event.GuiEvent.Caller == &mgServerFilter[1] || event.GuiEvent.Caller == &mgServerColumn[1]) {
         SortByMap();
         return TRUE;
       
-      } else if (event.GuiEvent.Caller == &mgServerFilter[2]) {
+      } else if (event.GuiEvent.Caller == &mgServerFilter[2] || event.GuiEvent.Caller == &mgServerColumn[2]) {
         SortByPing();
         return TRUE;
       
-      } else if (event.GuiEvent.Caller == &mgServerFilter[3]) {
+      } else if (event.GuiEvent.Caller == &mgServerFilter[3] || event.GuiEvent.Caller == &mgServerColumn[3]) {
         SortByPlayers();
         return TRUE;
       
-      } else if (event.GuiEvent.Caller == &mgServerFilter[4]) {
+      } else if (event.GuiEvent.Caller == &mgServerFilter[4] || event.GuiEvent.Caller == &mgServerColumn[4]) {
         SortByGame();
         return TRUE;
       
-      } else if (event.GuiEvent.Caller == &mgServerFilter[5]) {
+      } else if (event.GuiEvent.Caller == &mgServerFilter[5] || event.GuiEvent.Caller == &mgServerColumn[5]) {
         SortByMod();
         return TRUE;
       
-      } else if (event.GuiEvent.Caller == &mgServerFilter[6]) {
+      } else if (event.GuiEvent.Caller == &mgServerFilter[6] || event.GuiEvent.Caller == &mgServerColumn[6]) {
         SortByVer();
         return TRUE;
       }
