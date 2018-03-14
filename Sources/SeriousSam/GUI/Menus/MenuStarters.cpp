@@ -122,6 +122,16 @@ void StartVarGameOptions(void)
   ChangeToMenu(&gmCurrent);
 }
 
+void StartVarGameMutators(void)
+{
+  _pGUIM->gmVarMenu.gm_pgmParentMenu = pgmCurrentMenu;
+  CVarMenu &gmCurrent = _pGUIM->gmVarMenu;
+
+  gmCurrent.gm_mgTitle.mg_strText = TRANS("GAME MUTATORS");
+  gmCurrent.gm_fnmMenuCFG = CTFILENAME("Scripts\\Menu\\GameMutators.cfg");
+  ChangeToMenu(&gmCurrent);
+}
+
 void StartSinglePlayerGameOptions(void)
 {
   CVarMenu &gmCurrent = _pGUIM->gmVarMenu;

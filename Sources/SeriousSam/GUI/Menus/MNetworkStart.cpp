@@ -183,7 +183,7 @@ BOOL CNetworkStartMenu::OnEvent(const SEvent& event)
         return TRUE;
 
       } else if (event.GuiEvent.Caller == &gm_mgGameMutators) {
-        // TODO: Write start here.
+        StartVarGameMutators();
         return TRUE;
 
       } else if (event.GuiEvent.Caller == &gm_mgStart) {

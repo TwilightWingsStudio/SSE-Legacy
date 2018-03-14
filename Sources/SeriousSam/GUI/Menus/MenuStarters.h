@@ -42,6 +42,7 @@ void StartSplitScreenQuickLoadMenu(void);
 void StartSplitScreenLoadMenu(void);
 void StartSplitScreenSaveMenu(void);
 void StartVarGameOptions(void);
+void StartVarGameMutators(void);
 void StartSinglePlayerGameOptions(void);
 void StartGameOptionsFromNetwork(void);
 void StartGameOptionsFromSplitScreen(void);
