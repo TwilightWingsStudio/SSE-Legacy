@@ -1804,6 +1804,33 @@ functions:
   }
 
   // --------------------------------------------------------------------------------------
+  void Explode(void)
+  {
+    // inflict damage
+    FLOAT3D vSource = GetPlacement().pl_PositionVector + FLOAT3D(0, 0.5F, 0);
+    InflictRangeDamage(this, DMT_EXPLOSION, 40.0f, vSource, 2.75f, 8.0f);
+
+    // spawn explosion
+    CPlacement3D plExplosion = GetPlacement();
+    CEntityPointer penExplosion = CreateEntity(plExplosion, CLASS_BASIC_EFFECT);
+    ESpawnEffect eSpawnEffect;
+    eSpawnEffect.colMuliplier = C_WHITE|CT_OPAQUE;
+    eSpawnEffect.betType = BET_BOMB;
+    eSpawnEffect.vStretch = FLOAT3D(1.0f, 1.0f, 1.0f);
+    penExplosion->Initialize(eSpawnEffect);
+
+    // explosion debris
+    eSpawnEffect.betType = BET_EXPLOSION_DEBRIS;
+    CEntityPointer penExplosionDebris = CreateEntity(plExplosion, CLASS_BASIC_EFFECT);
+    penExplosionDebris->Initialize(eSpawnEffect);
+
+    // explosion smoke
+    eSpawnEffect.betType = BET_EXPLOSION_SMOKE;
+    CEntityPointer penExplosionSmoke = CreateEntity(plExplosion, CLASS_BASIC_EFFECT);
+    penExplosionSmoke->Initialize(eSpawnEffect);
+  };
+
+  // --------------------------------------------------------------------------------------
   void ClearShellLaunchData( void)
   {
     // clear flying shells data array
@@ -8310,11 +8337,17 @@ procedures:
       m_penView->Initialize(eInit);
     }
 
-    if (ShouldBlowUp()) {
+    // [SSE] Gameplay - Mutators - Farewell Gift
+    if (GetSP()->sp_ulMutatorFlags & MUTF_FAREWELLGIFT) {
+      Explode();
       BlowUp();
     } else {
-      // leave a stain beneath
-      LeaveStain(TRUE);
+      if (ShouldBlowUp()) {
+        BlowUp();
+      } else {
+        // leave a stain beneath
+        LeaveStain(TRUE);
+      }
     }
 
     m_iMayRespawn = 0;
