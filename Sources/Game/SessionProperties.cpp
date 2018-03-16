@@ -88,6 +88,7 @@ extern INDEX gam_bInstagib; // [SSE] Gameplay - Mutators - Instagib
 extern INDEX gam_bVampire;  // [SSE] Gameplay - Mutators - Vampire
 extern INDEX gam_bFarewellGift; // [SSE] Gameplay - Mutators - Farewell Gift
 extern INDEX gam_bTouchExplode; // [SSE] Gameplay - Mutators - Touch Explode
+extern INDEX gam_bBloodyMess; // [SSE] Gameplay - Mutators - Bloody Mess
 
 static void SetGameModeParameters(CSessionProperties &sp)
 {
@@ -438,10 +439,15 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   if (gam_bFarewellGift) {  
     sp.sp_ulMutatorFlags |= MUTF_FAREWELLGIFT;
   }
-  
+
   // [SSE] Gameplay - Mutators - Touch Explode
   if (gam_bTouchExplode) {  
     sp.sp_ulMutatorFlags |= MUTF_TOUCHEXPLODE;
+  }
+
+  // [SSE] Gameplay - Mutators - Bloody Mess
+  if (gam_bBloodyMess) {  
+    sp.sp_ulMutatorFlags |= MUTF_BLOODYMESS;
   }
 
   // [SSE] GameModes - Team DeathMatch
