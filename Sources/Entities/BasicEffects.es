@@ -34,53 +34,53 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 uses "Entities/Light";
 
 enum BasicEffectType {
-  0 BET_NONE                 "None",     // no effect (never spawned)
-  1 BET_ROCKET               "Rocket",     // rocket explosion
-  2 BET_ROCKET_PLANE         "Rocket plane",     // rocket explosion on plane
-  3 BET_GRENADE              "Grenade",     // grenade explosion
-  4 BET_GRENADE_PLANE        "Grenade plane",     // grenade explosion on plane
-  5 BET_EXPLOSIONSTAIN       "Explosionstain",     // explosion stain on brush
-  6 BET_SHOCKWAVE            "Shockwave",     // shock wave
-  7 BET_LASERWAVE            "Laserwave",     // laser wave
- 10 BET_BLOODSPILL           "Blood spill",     // blood spill from bullet exit wound
- 11 BET_BLOODSTAIN           "Blood stain",     // blood stain
- 19 BET_BLOODSTAINGROW       "Blood staingrow",     // blood stain which grows bigger
- 12 BET_BLOODEXPLODE         "Blood explode",     // blood explosion at bullet entry wound 
- 13 BET_CANNON               "Cannon",     // cannon explosion
- 14 BET_CANNON_PLANE         "Cannon plane",     // cannon explosion on plane
- 15 BET_CANNONEXPLOSIONSTAIN "Cannon explosion stain",     // cannon explosion stain on brush
- 16 BET_CANNONSHOCKWAVE      "Cannon shockwave",     // cannon shock wave
- 17 BET_TELEPORT             "Teleport",     // teleportation
- 18 BET_BOMB                 "Bomb",     // small bomb explosion
- 20 BET_BULLETTRAIL          "Bullet trail",     // white trail where bullet has passed
- 21 BET_GIZMO_SPLASH_FX      "Gizmo splash fx",     // gizmo splash fx
- 22 BET_GIZMOSTAIN           "Gizmo stain",     // gizmo stain
- 30 BET_BULLETSTAINSTONE     "Bullet stain stone",     // bullet stain with ricochet on stone
- 31 BET_BULLETSTAINSAND      "Bullet stain sand",     // bullet stain with ricochet on sand
- 32 BET_BULLETSTAINWATER     "Bullet stain water",     // bullet stain with ricochet on water surface
- 33 BET_BULLETSTAINUNDERWATER "Bullet stain underwater",    // bullet stain with ricochet on underwater surface
- 34 BET_BULLETSTAINSTONENOSOUND "Bullet stain stonenosound",  // bullet stain on stone with no sound
- 35 BET_BULLETSTAINSANDNOSOUND  "Bullet stain sandnosound",  // bullet stain on sand with no sound
- 36 BET_BULLETSTAINWATERNOSOUND "Bullet stain waternosound",  // bullet stain on water surface with no sound
- 37 BET_BULLETSTAINUNDERWATERNOSOUND "Bullet stain underwater no sound", // bullet stain on under water surface with no sound
- 38 BET_BULLETSTAINREDSAND      "Bullet stain red sand",     // bullet stain with ricochet on red sand
- 39 BET_BULLETSTAINREDSANDNOSOUND "Bullet stain red sand no sound",   // bullet stain with ricochet on red sand without sound
- 40 BET_LIGHT_CANNON            "Light cannon",     // cannon explosion with lo sound volume
- 41 BET_CANNON_NOLIGHT          "Cannon no light",     // cannon explosion without light witn lo sound volume
- 42 BET_BULLETSTAINGRASS        "Bullet stain grass",     // bullet stain with ricochet on grass
- 43 BET_BULLETSTAINWOOD         "Bullet stain wood",     // bullet stain with ricochet on wood
- 44 BET_BULLETSTAINGRASSNOSOUND "Bullet stain grass no sound",     // bullet stain on grass with no sound
- 45 BET_BULLETSTAINWOODNOSOUND  "Bullet stain wood no sound",     // bullet stain on wood with no sound
- 46 BET_EXPLOSION_DEBRIS        "Explosion debris",     // debrises flying out of explosion
- 47 BET_EXPLOSION_SMOKE         "Explosion smoke",     // smoke left behind explosion
- 48 BET_SUMMONERSTAREXPLOSION   "Summoner star explosion",     // magic explosion of starts for summoner
- 49 BET_COLLECT_ENERGY          "Collect energy",
- 50 BET_GROWING_SWIRL           "Growing swirl",
-// 51 BET_SNIPER_RESIDUE          "Sniper Residue",		// smoke left after firing sniper
- 52 BET_DISAPPEAR_DUST          "Disappear dust",
- 53 BET_DUST_FALL               "Dust fall",
- 54 BET_BULLETSTAINSNOW         "Bullet stain snow", 
- 55 BET_BULLETSTAINSNOWNOSOUND  "Bullet stain snow", 
+  0 BET_NONE                 "None [0]",     // no effect (never spawned)
+  1 BET_ROCKET               "Rocket [1]",     // rocket explosion
+  2 BET_ROCKET_PLANE         "Rocket plane [2]",     // rocket explosion on plane
+  3 BET_GRENADE              "Grenade [3]",     // grenade explosion
+  4 BET_GRENADE_PLANE        "Grenade plane [4]",     // grenade explosion on plane
+  5 BET_EXPLOSIONSTAIN       "Explosionstain [5]",     // explosion stain on brush
+  6 BET_SHOCKWAVE            "Shockwave [6]",     // shock wave
+  7 BET_LASERWAVE            "Laserwave [7]",     // laser wave
+ 10 BET_BLOODSPILL           "Blood spill [10]",     // blood spill from bullet exit wound
+ 11 BET_BLOODSTAIN           "Blood stain [11]",     // blood stain
+ 19 BET_BLOODSTAINGROW       "Blood staingrow [19]",     // blood stain which grows bigger
+ 12 BET_BLOODEXPLODE         "Blood explode [12]",     // blood explosion at bullet entry wound 
+ 13 BET_CANNON               "Cannon [13]",     // cannon explosion
+ 14 BET_CANNON_PLANE         "Cannon plane [14]",     // cannon explosion on plane
+ 15 BET_CANNONEXPLOSIONSTAIN "Cannon explosion stain [15]",     // cannon explosion stain on brush
+ 16 BET_CANNONSHOCKWAVE      "Cannon shockwave [16]",     // cannon shock wave
+ 17 BET_TELEPORT             "Teleport [17]",     // teleportation
+ 18 BET_BOMB                 "Bomb [18]",     // small bomb explosion
+ 20 BET_BULLETTRAIL          "Bullet trail [20]",     // white trail where bullet has passed
+ 21 BET_GIZMO_SPLASH_FX      "Gizmo splash fx [21]",     // gizmo splash fx
+ 22 BET_GIZMOSTAIN           "Gizmo stain [22]",     // gizmo stain
+ 30 BET_BULLETSTAINSTONE     "Bullet stain stone [30]",     // bullet stain with ricochet on stone
+ 31 BET_BULLETSTAINSAND      "Bullet stain sand [31]",     // bullet stain with ricochet on sand
+ 32 BET_BULLETSTAINWATER     "Bullet stain water [32]",     // bullet stain with ricochet on water surface
+ 33 BET_BULLETSTAINUNDERWATER "Bullet stain underwater [33]",    // bullet stain with ricochet on underwater surface
+ 34 BET_BULLETSTAINSTONENOSOUND "Bullet stain stonenosound [34]",  // bullet stain on stone with no sound
+ 35 BET_BULLETSTAINSANDNOSOUND  "Bullet stain sandnosound [35]",  // bullet stain on sand with no sound
+ 36 BET_BULLETSTAINWATERNOSOUND "Bullet stain waternosound [36]",  // bullet stain on water surface with no sound
+ 37 BET_BULLETSTAINUNDERWATERNOSOUND "Bullet stain underwater no sound [37]", // bullet stain on under water surface with no sound
+ 38 BET_BULLETSTAINREDSAND      "Bullet stain red sand [38]",     // bullet stain with ricochet on red sand
+ 39 BET_BULLETSTAINREDSANDNOSOUND "Bullet stain red sand no sound [39]",   // bullet stain with ricochet on red sand without sound
+ 40 BET_LIGHT_CANNON            "Light cannon [40]",     // cannon explosion with lo sound volume
+ 41 BET_CANNON_NOLIGHT          "Cannon no light [41]",     // cannon explosion without light witn lo sound volume
+ 42 BET_BULLETSTAINGRASS        "Bullet stain grass [42]",     // bullet stain with ricochet on grass
+ 43 BET_BULLETSTAINWOOD         "Bullet stain wood [43]",     // bullet stain with ricochet on wood
+ 44 BET_BULLETSTAINGRASSNOSOUND "Bullet stain grass no sound [44]",     // bullet stain on grass with no sound
+ 45 BET_BULLETSTAINWOODNOSOUND  "Bullet stain wood no sound [45]",     // bullet stain on wood with no sound
+ 46 BET_EXPLOSION_DEBRIS        "Explosion debris [46]",     // debrises flying out of explosion
+ 47 BET_EXPLOSION_SMOKE         "Explosion smoke [47]",     // smoke left behind explosion
+ 48 BET_SUMMONERSTAREXPLOSION   "Summoner star explosion [48]",     // magic explosion of starts for summoner
+ 49 BET_COLLECT_ENERGY          "Collect energy [49]",
+ 50 BET_GROWING_SWIRL           "Growing swirl [50]",
+// 51 BET_SNIPER_RESIDUE          "Sniper Residue [51]",		// smoke left after firing sniper
+ 52 BET_DISAPPEAR_DUST          "Disappear dust [52]",
+ 53 BET_DUST_FALL               "Dust fall [53]",
+ 54 BET_BULLETSTAINSNOW         "Bullet stain snow [54]", 
+ 55 BET_BULLETSTAINSNOWNOSOUND  "Bullet stain snow [55]", 
 };
 
 
