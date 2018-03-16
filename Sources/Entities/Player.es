@@ -1804,7 +1804,7 @@ functions:
   }
 
   // --------------------------------------------------------------------------------------
-  void Explode(void)
+  void Explode(FLOAT fDamage)
   {
     // inflict damage
     FLOAT3D vSource = GetPlacement().pl_PositionVector + FLOAT3D(0, 0.5F, 0);
@@ -8339,7 +8339,7 @@ procedures:
 
     // [SSE] Gameplay - Mutators - Farewell Gift
     if (GetSP()->sp_ulMutatorFlags & MUTF_FAREWELLGIFT) {
-      Explode();
+      Explode(40.0F);
       BlowUp();
     } else {
       if (ShouldBlowUp()) {
@@ -9553,6 +9553,29 @@ procedures:
           PlaySound(m_soMouth, GenderSound(SOUND_JUMP), SOF_3D);
           if (_pNetwork->IsPlayerLocal(this)) {IFeel_PlayEffect("Jump");}
         }
+        
+        // [SSE] Gameplay - Mutators - Touch Explode
+        if (eTouch.penOther != NULL && (GetSP()->sp_ulMutatorFlags & MUTF_TOUCHEXPLODE))
+        {
+          // If we touch alive player.
+          if (eTouch.penOther->IsPlayerEntity() && eTouch.penOther->IsAlive())
+          {
+            FLOAT tmSpawnInvulnerability = GetSP()->sp_tmSpawnInvulnerability;
+            
+            // If we are invulnerable then we can't explode.
+            if (tmSpawnInvulnerability > 0 && _pTimer->CurrentTick() - m_tmSpawned < tmSpawnInvulnerability) {
+              resume;
+            }
+
+            SetHealth(1.0F);
+            SetArmor(0.0F);
+            SetShields(0.0F);
+            
+            InflictDirectDamage(this, NULL, DMT_DAMAGER, 100.0F, GetPlacement().pl_PositionVector, FLOAT3D(0, 1, 0));
+            Explode(50.0F);
+          }
+        }
+        
         resume;
       }
     }
