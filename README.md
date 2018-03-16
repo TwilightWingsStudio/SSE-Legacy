@@ -61,13 +61,27 @@ These have been modified to run correctly under the recent version of Windows. (
 Building
 --------
 
+**Setting up workspace.**
+
+Clone the repository into folder.
+
+Do not use spaces, cyrillic letters or special symbols such as ()+/[]' in the path to the source code. If you use described before symbols you will have building errors because Visual Studio can not correctly operate with these symbols. But you can use dash - and underscore _ symbols!
+
+**IDE and compilier.**
+
 To build Serious Engine 1, you'll need Visual Studio 2013 or 2015, Professional or Community edition ( https://www.visualstudio.com/post-download-vs?sku=community ).
 
 WARNING: If you will use Visual Studio higher than 2013 then you can encounter bugs. Also game compiled in VS 2015 or newer may be network incompatable with game compiled in VS 2013.
 
-Do not use spaces, cyrillic letters or special symbols such as ()+/[]' in the path to the solution. If you use described before symbols you will have building errors because Visual Studio can not correctly operate with these symbols. But you can use dash - and underscore _ symbols!
+**Building the Lua library.**
 
-Once you've installed Visual Studio and (optionally) DirectX8 SDK, you should open Visual Studio Developer Console and run msvcbuild.bat (located in `/Sources/luajit/src`) to build luajit library.
+Once you've installed Visual Studio and (optionally) DirectX8 SDK.
+ - Open Visual Studio Developer Console (you can find it in your Start menu).
+ - Command prompt directory should be `/Sources/luajit/src`.
+   - Use `cd /d <path>` command to navigate there.
+ - Run msvcbuild.bat (located in `/Sources/luajit/src`) to build luajit library.
+
+**Building the engine.**
 
 After that you can build the engine solution (`/Sources/All.sln`). Press F7 or Build -> Build solution. The libraries and executables will be put into `/Bin/` directory (or `/Bin/Debug/` if you are using the Debug configuration).
 
