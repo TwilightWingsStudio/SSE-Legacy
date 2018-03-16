@@ -22,7 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 uses "Entities/Debris";
 uses "Entities/ModelHolder2";
 
-class CDebrisSpawner: CRationalEntity {
+class CDebrisSpawner : CEntity {
 name      "Debris Spawner";
 thumbnail "Thumbnails\\DebrisSpawner.tbn";
 features  "HasName", "IsTargetable";
@@ -94,7 +94,7 @@ functions:
   SLONG GetUsedMemory(void)
   {
     // initial
-    SLONG slUsedMemory = sizeof(CDebrisSpawner) - sizeof(CRationalEntity) + CRationalEntity::GetUsedMemory();
+    SLONG slUsedMemory = sizeof(CDebrisSpawner) - sizeof(CEntity) + CEntity::GetUsedMemory();
     // add some more
     slUsedMemory += m_strName.Length();
     slUsedMemory += m_strDescription.Length();
@@ -108,92 +108,106 @@ functions:
   {
     return (CModelHolder2*)&*m_penTarget;
   }
+  
+  // --------------------------------------------------------------------------------------
+  // Spawn debrises!
+  // --------------------------------------------------------------------------------------
+  void DoSpawn()
+  {
+    if (!m_bActive) {
+      return;
+    }
+
+    // If missing debris MH2.
+    if (m_penTarget == NULL || m_penTarget->GetFlags()&ENF_DELETED)
+    {
+      if (m_bDebugMessages) {
+        CPrintF("[%s]: Unable to get debris model due to empty target/deleted ModelHolder2!\n", m_strName);
+      }
+
+      return;
+    }
+
+    // Not a ModelHolder2
+    if (!IsDerivedFromClass(m_penTarget, "ModelHolder2"))
+    {
+      if (m_bDebugMessages) {
+        CPrintF("[%s]: Unable to get debris model from a non-ModelHolder2 entity!\n", m_strName);
+      }
+
+      return;
+    }
+
+    // Spawn debris
+    if (m_bDebugMessages) {
+      CPrintF("[%s]: Spawning debris...\n", m_strName);
+    }
+
+    // If count is wrong.
+    if (m_iCount <= 0) {
+      if (m_bDebugMessages) {
+        CPrintF("  Debris count is less or equals to 0\n");
+      }
+
+      return;
+    }
+
+    INDEX iSpawnedDebris = 0;
+
+    for(INDEX iDebris = 0; iDebris < m_iCount; iDebris++)
+    {
+      ANGLE3D angLaunch = ANGLE3D(FRnd()*m_fThrowAngle-m_fThrowAngle/2,
+                                  FRnd()*m_fThrowAngle-m_fThrowAngle/2,
+                                  FRnd()*m_fThrowAngle-m_fThrowAngle/2);
+      FLOAT3D vLaunchDir;
+      AnglesToDirectionVector(GetPlacement().pl_OrientationAngle+angLaunch, vLaunchDir);
+      vLaunchDir = vLaunchDir*m_fThrowStrength;
+
+      FLOAT fDebrisSize = Clamp(m_fSize, 0.01f, 100.0f)+(FRnd()*2-1)*m_fRNDSizeFactor;
+
+      Debris_Begin(m_eibtType, m_dptParticles, m_betEffect, 1.0f, vLaunchDir, FLOAT3D(0, 0, 0), 0.0f, 0.0f);
+      
+      // Stretch.
+      FLOAT3D vStretch(GetModelHolder2()->m_fStretchX * GetModelHolder2()->m_fStretchAll * fDebrisSize,
+                       GetModelHolder2()->m_fStretchY * GetModelHolder2()->m_fStretchAll * fDebrisSize,
+                       GetModelHolder2()->m_fStretchZ * GetModelHolder2()->m_fStretchAll * fDebrisSize);
+
+      // Spawn placement.
+      CPlacement3D plSpawn;
+      plSpawn = CPlacement3D(GetPlacement().pl_PositionVector + FLOAT3D(FRnd()*m_rXSpawn, FRnd()*m_rYSpawn, FRnd()*m_rZSpawn), GetPlacement().pl_OrientationAngle);
+
+      if (Debris_Spawn_Template(m_eibtType, m_dptParticles, m_betEffect,
+          GetModelHolder2(), this, GetModelHolder2(), vStretch, 1.0f, plSpawn, vLaunchDir,
+          // Rotation speed
+          ANGLE3D(FRnd()*m_aRotation(1)-m_aRotation(1)/2,
+                  FRnd()*m_aRotation(2)-m_aRotation(2)/2,
+                  FRnd()*m_aRotation(3)-m_aRotation(3)/2),
+          m_bDebrisImmaterial, Clamp(m_fDustStretch, 0.0f, 100.0f), C_WHITE|CT_OPAQUE)) {
+        iSpawnedDebris++; // Count each piece
+      }
+    }
+
+    if (iSpawnedDebris <= 0) {
+      if (m_bDebugMessages) {
+        CPrintF("  Unable to spawn debris\n", m_iCount);
+      }
+    } else {
+      if (m_bDebugMessages) {
+        CPrintF("  Spawned %i debris\n", iSpawnedDebris);
+      }
+    }
+  }
 
   // --------------------------------------------------------------------------------------
   // The entity event handler.
   // --------------------------------------------------------------------------------------
   BOOL HandleEvent(const CEntityEvent &ee)
   {
-    if (ee.ee_slEvent == EVENTCODE_ETrigger || ee.ee_slEvent == EVENTCODE_EStart)
-    {
-      if (!m_bActive)
-      {
-        return CRationalEntity::HandleEvent(ee);
-      }
-
-      // If missing debris MH2.
-      if (m_penTarget == NULL || m_penTarget->GetFlags()&ENF_DELETED) {
-        if (m_bDebugMessages) {
-          CPrintF("[%s]: Unable to get debris model due to empty target/deleted ModelHolder2!\n", m_strName);
-        }
-
-      // Not a ModelHolder2
-      } else if (!IsDerivedFromClass(m_penTarget, "ModelHolder2")) {
-        if (m_bDebugMessages) {
-          CPrintF("[%s]: Unable to get debris model from a non-ModelHolder2 entity!\n", m_strName);
-        }
-
-      // Spawn debris
-      } else {
-        if (m_bDebugMessages) {
-          CPrintF("[%s]: Spawning debris...\n", m_strName);
-        }
-
-        if (m_iCount > 0)
-        {
-          INDEX iSpawnedDebris = 0;
-
-          for(INDEX iDebris = 0; iDebris < m_iCount; iDebris++)
-          {
-            ANGLE3D angLaunch = ANGLE3D(FRnd()*m_fThrowAngle-m_fThrowAngle/2,
-                                        FRnd()*m_fThrowAngle-m_fThrowAngle/2,
-                                        FRnd()*m_fThrowAngle-m_fThrowAngle/2);
-            FLOAT3D vLaunchDir;
-            AnglesToDirectionVector(GetPlacement().pl_OrientationAngle+angLaunch, vLaunchDir);
-            vLaunchDir = vLaunchDir*m_fThrowStrength;
-
-            FLOAT fDebrisSize = Clamp(m_fSize, 0.01f, 100.0f)+(FRnd()*2-1)*m_fRNDSizeFactor;
-
-            Debris_Begin(m_eibtType, m_dptParticles, m_betEffect, 1.0f, vLaunchDir, FLOAT3D(0, 0, 0), 0.0f, 0.0f);
-            
-            // Stretch.
-            FLOAT3D vStretch(GetModelHolder2()->m_fStretchX * GetModelHolder2()->m_fStretchAll * fDebrisSize,
-                             GetModelHolder2()->m_fStretchY * GetModelHolder2()->m_fStretchAll * fDebrisSize,
-                             GetModelHolder2()->m_fStretchZ * GetModelHolder2()->m_fStretchAll * fDebrisSize);
-
-            // Spawn placement.
-            CPlacement3D plSpawn;
-            plSpawn = CPlacement3D(GetPlacement().pl_PositionVector + FLOAT3D(FRnd()*m_rXSpawn, FRnd()*m_rYSpawn, FRnd()*m_rZSpawn), GetPlacement().pl_OrientationAngle);
-
-            if (Debris_Spawn_Template(m_eibtType, m_dptParticles, m_betEffect,
-                GetModelHolder2(), this, GetModelHolder2(), vStretch, 1.0f, plSpawn, vLaunchDir,
-                // Rotation speed
-                ANGLE3D(FRnd()*m_aRotation(1)-m_aRotation(1)/2,
-                        FRnd()*m_aRotation(2)-m_aRotation(2)/2,
-                        FRnd()*m_aRotation(3)-m_aRotation(3)/2),
-                m_bDebrisImmaterial, Clamp(m_fDustStretch, 0.0f, 100.0f), C_WHITE|CT_OPAQUE)) {
-              iSpawnedDebris++; // Count each piece
-            }
-          }
-
-          if (iSpawnedDebris <= 0) {
-            if (m_bDebugMessages) {
-              CPrintF("  Unable to spawn debris\n", m_iCount);
-            }
-          } else {
-            if (m_bDebugMessages) {
-              CPrintF("  Spawned %i debris\n", iSpawnedDebris);
-            }
-          }
-        } else {
-          if (m_bDebugMessages) {
-            CPrintF("  Debris count is less or equals to 0\n");
-          }
-        }
-      }
+    if (ee.ee_slEvent == EVENTCODE_ETrigger || ee.ee_slEvent == EVENTCODE_EStart) {
+      DoSpawn();
     }
 
-    return CRationalEntity::HandleEvent(ee);
+    return CEntity::HandleEvent(ee);
   }
 
 procedures:
@@ -202,6 +216,8 @@ procedures:
   // --------------------------------------------------------------------------------------
   Main()
   {
+    m_iCount = ClampDn(m_iCount, INDEX(0));
+    
     InitAsEditorModel();
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
     SetCollisionFlags(ECF_IMMATERIAL);
