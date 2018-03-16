@@ -87,6 +87,7 @@ extern INDEX gam_bRocketJumpMode; // [SSE] RocketJump Mode
 extern INDEX gam_bInstagib; // [SSE] Gameplay - Mutators - Instagib
 extern INDEX gam_bVampire;  // [SSE] Gameplay - Mutators - Vampire
 extern INDEX gam_bFarewellGift; // [SSE] Gameplay - Mutators - Farewell Gift
+extern INDEX gam_bTouchExplode; // [SSE] Gameplay - Mutators - Touch Explode
 
 static void SetGameModeParameters(CSessionProperties &sp)
 {
@@ -436,6 +437,11 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   // [SSE] Gameplay - Mutators - Farewell Gift
   if (gam_bFarewellGift) {  
     sp.sp_ulMutatorFlags |= MUTF_FAREWELLGIFT;
+  }
+  
+  // [SSE] Gameplay - Mutators - Touch Explode
+  if (gam_bTouchExplode) {  
+    sp.sp_ulMutatorFlags |= MUTF_TOUCHEXPLODE;
   }
 
   // [SSE] GameModes - Team DeathMatch

@@ -21,6 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define MUTF_VAMPIRE      (1L << 1)
 #define MUTF_ROCKETJUMP   (1L << 2)
 #define MUTF_FAREWELLGIFT (1L << 3)
+#define MUTF_TOUCHEXPLODE (1L << 4)
 
 /*
  * Class responsible for describing game session
