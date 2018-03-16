@@ -4787,7 +4787,7 @@ functions:
   // --------------------------------------------------------------------------------------
   BOOL ShouldBlowUp(void) 
   {
-    return GetSP()->sp_bGibs && (GetHealth()<=0) && (m_vDamage.Length() > _fBlowUpAmmount) && GetRenderType() == RT_MODEL;
+    return GetSP()->sp_bGibs && (GetHealth() <= 0) && ((m_vDamage.Length() > _fBlowUpAmmount) || (GetSP()->sp_ulMutatorFlags & MUTF_BLOODYMESS)) && GetRenderType() == RT_MODEL;
   };
 
   // --------------------------------------------------------------------------------------
