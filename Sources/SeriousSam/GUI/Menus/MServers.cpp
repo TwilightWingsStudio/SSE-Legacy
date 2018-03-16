@@ -114,6 +114,7 @@ static void RefreshServerList(void)
 
 void CServersMenu::StartMenu(void)
 {
+  RefreshServerList();
   CGameMenu::StartMenu();
 }
 
