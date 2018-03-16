@@ -21,12 +21,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 uses "Entities/BasicEffects";
 
 enum DebrisParticlesType {
-  0 DPT_NONE        "",   // no particles
-  1 DPT_BLOODTRAIL  "",   // blood
-  2 DPR_SMOKETRAIL  "",   // smoke
-  3 DPR_SPARKS      "",   // sparks (for robots)
-  4 DPR_FLYINGTRAIL "",   // just flying object
-  5 DPT_AFTERBURNER "",   // afterburner trail
+  0 DPT_NONE        "None [0]",         // no particles
+  1 DPT_BLOODTRAIL  "Blood Trail [1]",  // blood
+  2 DPR_SMOKETRAIL  "Smoke Trail [2]",  // smoke
+  3 DPR_SPARKS      "Sparks [3]",       // sparks (for robots)
+  4 DPR_FLYINGTRAIL "Flying Trail [4]", // just flying object
+  5 DPT_AFTERBURNER "Afterburner [5]",  // afterburner trail
 };
 
 // input parameter for spawning a debris

@@ -676,6 +676,9 @@
     <ClCompile Include="ExactDamager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DebrisSpawner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1872,6 +1875,12 @@
     <ClInclude Include="ExactDamager_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DebrisSpawner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DebrisSpawner_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2869,6 +2878,9 @@
     </CustomBuild>
     <CustomBuild Include="ExactDamager.es">
       <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="DebrisSpawner.es">
+      <Filter>Class Files\Effects</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
