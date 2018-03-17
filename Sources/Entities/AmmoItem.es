@@ -390,7 +390,8 @@ functions:
   {
     m_fValue = ceil(m_fValue * GetSP()->sp_fAmmoQuantity);
 
-    if (GetSP()->sp_bInfiniteAmmo && m_penTarget == NULL) {
+    // [SSE] Gameplay - Ammo Allow
+    if ((GetSP()->sp_bInfiniteAmmo || !GetSP()->sp_bAllowAmmo) && m_penTarget == NULL) {
       Destroy();
     }
   }
