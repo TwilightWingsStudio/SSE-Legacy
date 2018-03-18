@@ -177,7 +177,8 @@ functions:
   {
     //m_fValue = ceil(m_fValue*GetSP()->sp_fAmmoQuantity);
 
-    if (GetSP()->sp_bInfiniteAmmo && m_penTarget == NULL) {
+    // [SSE] Gameplay - Ammo Packs Allow
+    if ((GetSP()->sp_bInfiniteAmmo || !GetSP()->sp_bAllowAmmoPacks) && m_penTarget == NULL) {
       Destroy();
     }
   }
