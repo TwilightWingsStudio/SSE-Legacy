@@ -40,9 +40,10 @@ extern INDEX gam_bAmmoStays       ;
 extern INDEX gam_bHealthArmorStays;
 extern INDEX gam_bAllowHealth     ;
 extern INDEX gam_bAllowArmor      ;
-extern INDEX gam_bAllowPowerUps; // [SSE] Gameplay - PowerUps Allow
-extern INDEX gam_bAllowWeapons;  // [SSE] Gameplay - Weapons Allow
-extern INDEX gam_bAllowAmmo;     // [SSE] Gameplay - Ammo Allow
+extern INDEX gam_bAllowPowerUps;  // [SSE] Gameplay - PowerUps Allow
+extern INDEX gam_bAllowWeapons;   // [SSE] Gameplay - Weapons Allow
+extern INDEX gam_bAllowAmmo;      // [SSE] Gameplay - Ammo Allow
+extern INDEX gam_bAllowAmmoPacks; // [SSE] Gameplay - Ammo Packs Allow
 extern INDEX gam_bInfiniteAmmo    ;
 extern INDEX gam_bRespawnInPlace  ;
 extern INDEX gam_bPlayEntireGame;
@@ -213,9 +214,10 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
   sp.sp_bHealthArmorStays = FALSE;
   sp.sp_bAllowHealth = TRUE;
   sp.sp_bAllowArmor = TRUE;
-  sp.sp_bAllowPowerUps = TRUE; // [SSE] Gameplay - PowerUps Allow
-  sp.sp_bAllowWeapons = TRUE;  // [SSE] Gameplay - Weapons Allow
-  sp.sp_bAllowAmmo = TRUE;     // [SSE] Gameplay - Ammo Allow
+  sp.sp_bAllowPowerUps = TRUE;  // [SSE] Gameplay - PowerUps Allow
+  sp.sp_bAllowWeapons = TRUE;   // [SSE] Gameplay - Weapons Allow
+  sp.sp_bAllowAmmo = TRUE;      // [SSE] Gameplay - Ammo Allow
+  sp.sp_bAllowAmmoPacks = TRUE; // [SSE] Gameplay - Ammo Packs Allow
   sp.sp_bInfiniteAmmo = FALSE;
   sp.sp_bRespawnInPlace = FALSE;
   sp.sp_fExtraEnemyStrength          = 0;
@@ -304,9 +306,11 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   sp.sp_bHealthArmorStays = gam_bHealthArmorStays;
   sp.sp_bAllowHealth      = gam_bAllowHealth     ;
   sp.sp_bAllowArmor       = gam_bAllowArmor      ;
-  sp.sp_bAllowPowerUps    = gam_bAllowPowerUps; // [SSE] Gameplay - PowerUps Allow
-  sp.sp_bAllowWeapons     = gam_bAllowWeapons;  // [SSE] Gameplay - Weapons Allow
-  sp.sp_bAllowAmmo        = gam_bAllowAmmo;     // [SSE] Gameplay - Ammo Allow
+  sp.sp_bAllowPowerUps    = gam_bAllowPowerUps;  // [SSE] Gameplay - PowerUps Allow
+  sp.sp_bAllowWeapons     = gam_bAllowWeapons;   // [SSE] Gameplay - Weapons Allow
+  sp.sp_bAllowAmmo        = gam_bAllowAmmo;      // [SSE] Gameplay - Ammo Allow
+  sp.sp_bAllowAmmoPacks   = gam_bAllowAmmoPacks; // [SSE] Gameplay - Ammo Packs Allow
+
   sp.sp_bInfiniteAmmo     = gam_bInfiniteAmmo    ;
   sp.sp_bRespawnInPlace   = gam_bRespawnInPlace  ;
 

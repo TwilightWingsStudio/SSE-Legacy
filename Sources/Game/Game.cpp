@@ -98,9 +98,10 @@ extern INDEX gam_bAmmoStays = TRUE;
 extern INDEX gam_bHealthArmorStays = TRUE;
 extern INDEX gam_bAllowHealth = TRUE;
 extern INDEX gam_bAllowArmor = TRUE;
-extern INDEX gam_bAllowPowerUps = TRUE; // [SSE] Gameplay - PowerUps Allow
-extern INDEX gam_bAllowWeapons = TRUE;  // [SSE] Gameplay - Weapons Allow
-extern INDEX gam_bAllowAmmo = TRUE;     // [SSE] Gameplay - Ammo Allow
+extern INDEX gam_bAllowPowerUps = TRUE;  // [SSE] Gameplay - PowerUps Allow
+extern INDEX gam_bAllowWeapons = TRUE;   // [SSE] Gameplay - Weapons Allow
+extern INDEX gam_bAllowAmmo = TRUE;      // [SSE] Gameplay - Ammo Allow
+extern INDEX gam_bAllowAmmoPacks = TRUE; // [SSE] Gameplay - Ammo Packs Allow
 extern INDEX gam_bInfiniteAmmo = FALSE;
 extern INDEX gam_bRespawnInPlace = TRUE;
 extern INDEX gam_bPlayEntireGame = TRUE;
@@ -1020,6 +1021,7 @@ void CGame::InitInternal( void)
   _pShell->DeclareSymbol("persistent user INDEX gam_bAllowPowerUps   ;", &gam_bAllowPowerUps   ); // [SSE] Gameplay - PowerUps Allow
   _pShell->DeclareSymbol("persistent user INDEX gam_bAllowWeapons    ;", &gam_bAllowWeapons    ); // [SSE] Gameplay - Weapons Allow
   _pShell->DeclareSymbol("persistent user INDEX gam_bAllowAmmo       ;", &gam_bAllowAmmo       ); // [SSE] Gameplay - Ammo Allow
+  _pShell->DeclareSymbol("persistent user INDEX gam_bAllowAmmoPacks  ;", &gam_bAllowAmmoPacks  ); // [SSE] Gameplay - Ammo Packs Allow
 
   _pShell->DeclareSymbol("persistent user INDEX gam_bInfiniteAmmo    ;", &gam_bInfiniteAmmo    );
   _pShell->DeclareSymbol("persistent user INDEX gam_bRespawnInPlace  ;", &gam_bRespawnInPlace  );

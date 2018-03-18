@@ -91,6 +91,7 @@ public:
   BOOL sp_bAllowPowerUps;     // [SSE] Gameplay - PowerUps Allow
   BOOL sp_bAllowWeapons;      // [SSE] Gameplay - Weapons Allow
   BOOL sp_bAllowAmmo;         // [SSE] Gameplay - Ammo Allow
+  BOOL sp_bAllowAmmoPacks;    // [SSE] Gameplay - Ammo Packs Allow
   
   BOOL sp_bInfiniteAmmo;      // ammo is not consumed when firing
   BOOL sp_bRespawnInPlace;    // players respawn on the place where they were killed, not on markers (coop only)
