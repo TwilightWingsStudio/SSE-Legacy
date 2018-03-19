@@ -126,7 +126,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Turn the switch on.
   // --------------------------------------------------------------------------------------
-  void SwitchON() {
+  void SwitchON()
+  {
     // If already on then do nothing!
     if (m_bSwitchON) {
       return;
@@ -134,8 +135,12 @@ functions:
 
     m_bSwitchON = TRUE;
 
-    // send event to target
-    SendToTarget(m_penTarget, m_eetEvent, m_penCaused);
+    // If we use targeted event then follow different way.
+    if (m_eetEvent == EET_TARGETED) {
+      SendTargetedEvent(m_penTarget, m_penCaused, this); // [SSE] Entities - Targeted Event
+    } else {
+      SendToTarget(m_penTarget, m_eetEvent, m_penCaused); // send event to target
+    }
   };
   
   // --------------------------------------------------------------------------------------
@@ -149,13 +154,14 @@ functions:
     }
 
     m_bSwitchON = FALSE;
+    
+    CEntity *penOffTarget = m_penOffTarget != NULL ? m_penOffTarget : m_penTarget;
 
-    // if exists off target
-    if (m_penOffTarget != NULL) {
-      SendToTarget(m_penOffTarget, m_eetOffEvent, m_penCaused);
+    // If we use targeted event then follow different way.
+    if (m_eetOffEvent == EET_TARGETED) {
+      SendTargetedEvent(penOffTarget, m_penCaused, this); // [SSE] Entities - Targeted Event
     } else {
-      // send off event to target
-      SendToTarget(m_penTarget, m_eetOffEvent, m_penCaused);
+      SendToTarget(penOffTarget, m_eetOffEvent, m_penCaused); // send event to target
     }
   };
 
