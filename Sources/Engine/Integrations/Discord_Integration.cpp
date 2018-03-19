@@ -113,6 +113,8 @@ void Discord_InitPlugin()
   //handlers.joinRequest = handleDiscordJoinRequest;
 
   pDiscord_Initialize(APPLICATION_ID, &handlers, 1, NULL); // Initialize the Discord API.
+  
+  Discord_UpdateInfo(FALSE);
 }
 
 // --------------------------------------------------------------------------------------
@@ -158,6 +160,24 @@ static const char* GetCurrentGameStateName(BOOL bGameActive)
   }
 
   return "In Menus";
+}
+
+static const char* GetImageAssetName(BOOL bGameActive)
+{
+  if (_bWorldEditorApp) {
+    return "wed_large";
+  }
+
+  if (bGameActive)
+  {
+    if (_pNetwork != NULL) {
+      if (!_pNetwork->IsNetworkEnabled()) {
+        return "singleplayer_l";
+      }
+    }
+  }
+
+  return DISCORD_LARGE_IMAGE_KEY;
 }
 
 // --------------------------------------------------------------------------------------
@@ -208,11 +228,11 @@ void Discord_UpdateInfo(BOOL bGameActive)
     memset(&discordPresence, 0, sizeof(discordPresence));
 
     discordPresence.state = GetCurrentGameStateName(bGameActive);
-    discordPresence.largeImageKey = DISCORD_LARGE_IMAGE_KEY;
+    discordPresence.largeImageKey = GetImageAssetName(bGameActive);
     discordPresence.smallImageKey = DISCORD_SMALL_IMAGE_KEY;
 
     // If we have game running then we should provite more info.
-    if (bGameActive)
+    if (!_bWorldEditorApp && bGameActive)
     {
       discordPresence.startTimestamp = _llStartTime;
 
