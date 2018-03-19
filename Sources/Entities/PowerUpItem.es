@@ -116,6 +116,8 @@ components:
 304 sound   SOUND_SPEED    "SoundsMP\\Items\\SeriousSpeed.wav",
 305 sound   SOUND_BOMB     "SoundsMP\\Items\\SeriousBomb.wav",
 
+306 sound   SOUND_REGENERATION     "SoundsMP\\Items\\Regeneration.wav",
+
 functions:
   // --------------------------------------------------------------------------------------
   // No comments.
@@ -131,7 +133,7 @@ functions:
       case PUIT_BOMB    :  PrecacheSound(SOUND_BOMB    );  break;
 
       // [SSE] Gameplay - Regeneration PowerUp
-      case PUIT_REGENERATION  :  PrecacheSound(SOUND_PICKUP);  break;
+      case PUIT_REGENERATION  :  PrecacheSound(SOUND_REGENERATION);  break;
       
       default: PrecacheSound(SOUND_PICKUP); break;
     }
@@ -362,6 +364,11 @@ procedures:
       } else if (m_puitType == PUIT_DAMAGE) {
         PlaySound(m_soPick, SOUND_DAMAGE, SOF_3D);
         m_fPickSoundLen = GetSoundLength(SOUND_DAMAGE);
+        
+      // [SSE] Gameplay - Regeneration PowerUp
+      } else if (m_puitType == PUIT_REGENERATION) {
+        PlaySound(m_soPick, SOUND_REGENERATION, SOF_3D);
+        m_fPickSoundLen = GetSoundLength(SOUND_REGENERATION);
         
       } else if (TRUE) {
         PlaySound(m_soPick, SOUND_PICKUP, SOF_3D);
