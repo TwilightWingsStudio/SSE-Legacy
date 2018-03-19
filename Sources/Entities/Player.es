@@ -7741,6 +7741,11 @@ functions:
 
         bGiveKnifeAndColt = FALSE;
       }
+      
+      if (((CPlayerWeapons&)*m_penWeapons).m_iSeriousBombs > 0)
+      {
+        iGiveWeapons |= 1 << (WEAPON_SERIOUSBOMB - 2);
+      }
 
       // Give weapons.
       ((CPlayerWeapons&)*m_penWeapons).InitializeWeapons(iGiveWeapons, iTakeWeapons, iTakeAmmo, CpmStart.m_fMaxAmmoRatio, bGiveKnifeAndColt);
