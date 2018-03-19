@@ -37,7 +37,7 @@ event EInteractionComplete {
 
 enum EPSwitchType {
   0 EPST_ONEPLAYER  "0 One Player",
-  1 ESWT_MULTIPLE   "1 Multiple Players",
+  1 EPST_MULTIPLE   "1 Multiple Players",
 };
 
 enum EPSwitchBehavior {
@@ -197,7 +197,12 @@ functions:
         }
       }
 
-      SendToTarget(m_penBreakTarget, m_eetBreak, penPlayer);
+      // If we use targeted event then follow different way.
+      if (m_eetBreak == EET_TARGETED) {
+        SendTargetedEvent(m_penBreakTarget, penPlayer, this); // [SSE] Entities - Targeted Event
+      } else {
+        SendToTarget(m_penBreakTarget, m_eetBreak, penPlayer);
+      }
 
       m_fProgress = 0.0F;
 
@@ -213,7 +218,12 @@ functions:
         }
       }
 
-      SendToTarget(m_penStopTarget, m_eetStop, penPlayer);
+      // If we use targeted event then follow different way.
+      if (m_eetStop == EET_TARGETED) {
+        SendTargetedEvent(m_penStopTarget, penPlayer, this); // [SSE] Entities - Targeted Event
+      } else {
+        SendToTarget(m_penStopTarget, m_eetStop, penPlayer);
+      }
     }
   }
 
@@ -243,7 +253,12 @@ procedures:
             }
           }
 
-          SendToTarget(m_penJoinTarget, m_eetJoin, eStartInteraction.penPlayer);
+          // If we use targeted event then follow different way.
+          if (m_eetJoin == EET_TARGETED) {
+            SendTargetedEvent(m_penJoinTarget, eStartInteraction.penPlayer, this); // [SSE] Entities - Targeted Event
+          } else {
+            SendToTarget(m_penJoinTarget, m_eetJoin, eStartInteraction.penPlayer);
+          }
 
           resume;
         }
@@ -273,6 +288,7 @@ procedures:
           
           m_penLastTicker = eInteractionTick.penPlayer; // Remember the last ticker.
 
+          // If interaction not completed then don't go forward.
           if (m_fProgress < m_fMaxProgress) {
             resume;
           }
@@ -304,9 +320,14 @@ procedures:
               CPrintF("[PSw] %s : Sending event to [%s]\n", m_strName, m_penCompleteTarget->GetName());
             }
           }
-          
-          SendToTarget(m_penCompleteTarget, m_eetComplete, eInteractionTick.penPlayer);
-          
+
+          // If we use targeted event then follow different way.
+          if (m_eetJoin == EET_TARGETED) {
+            SendTargetedEvent(m_penCompleteTarget, eInteractionTick.penPlayer, this); // [SSE] Entities - Targeted Event
+          } else {
+            SendToTarget(m_penCompleteTarget, m_eetComplete, eInteractionTick.penPlayer);
+          }
+
           jump Idle();
         }
 
@@ -338,8 +359,13 @@ procedures:
             CPrintF("[PSw] %s : Sending event to [%s]\n", m_strName, m_penStartTarget->GetName());
           }
         }
-        
-        SendToTarget(m_penStartTarget, m_eetStart, eStartInteraction.penPlayer);
+
+        // If we use targeted event then follow different way.
+        if (m_eetStart == EET_TARGETED) {
+          SendTargetedEvent(m_penStartTarget, eStartInteraction.penPlayer, this); // [SSE] Entities - Targeted Event
+        } else {
+          SendToTarget(m_penStartTarget, m_eetStart, eStartInteraction.penPlayer);
+        }
 
         jump Working();
       }
