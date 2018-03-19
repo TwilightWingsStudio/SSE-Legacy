@@ -679,6 +679,9 @@
     <ClCompile Include="DebrisSpawner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EntityDestroyer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1881,6 +1884,12 @@
     <ClInclude Include="DebrisSpawner_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EntityDestroyer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityDestroyer_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2882,5 +2891,10 @@
     <CustomBuild Include="DebrisSpawner.es">
       <Filter>Class Files\Effects</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="EntityDestroyer.es">
+      <Filter>Class Files\Tools</Filter>
+    </None>
   </ItemGroup>
 </Project>

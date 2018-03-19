@@ -192,6 +192,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="DigitalAnimationChanger.cpp" />
     <ClCompile Include="EnemyFactionHolder.cpp" />
     <ClCompile Include="EnemySettings.cpp" />
+    <ClCompile Include="EntityDestroyer.cpp" />
     <ClCompile Include="EntityParticles.cpp" />
     <ClCompile Include="ExactDamager.cpp" />
     <ClCompile Include="ExactTeleport.cpp" />
@@ -462,6 +463,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="EnemyFactionHolder_tables.h" />
     <ClInclude Include="EnemySettings.h" />
     <ClInclude Include="EnemySettings_tables.h" />
+    <ClInclude Include="EntityDestroyer.h" />
+    <ClInclude Include="EntityDestroyer_tables.h" />
     <ClInclude Include="EntityParticles.h" />
     <ClInclude Include="EntityParticles_tables.h" />
     <ClInclude Include="ExactDamager.h" />
@@ -3335,6 +3338,19 @@ ecc Entities/%(Filename).es </Command>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="DebrisSpawner.es">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc Entities/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc Entities/%(Filename).es </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Entities/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Entities/%(Filename).es</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="EntityDestroyer.es">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
 ecc Entities/%(Filename).es </Command>
