@@ -297,15 +297,15 @@ procedures:
     ASSERT(epass.penOther != NULL);
  
     // Don't pick up more bombs than you can carry.
-    if (m_puitType == PUIT_BOMB)
-    {
-      if (IsOfClass(epass.penOther, "Player"))
-      {
-        if (((CPlayer &)*epass.penOther).m_iSeriousBombCount >= 3) {
-          return;
-        }
-      }
-    }
+    //if (m_puitType == PUIT_BOMB)
+    //{
+    //  if (IsOfClass(epass.penOther, "Player"))
+    //  {
+    //    if (((CPlayer &)*epass.penOther).m_iSeriousBombCount >= 3) {
+    //      return;
+    //    }
+    //  }
+    //}
 
     if (!(m_bPickupOnce || m_bRespawn))
     {

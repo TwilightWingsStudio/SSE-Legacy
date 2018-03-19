@@ -1361,7 +1361,7 @@ properties:
  183 FLOAT m_fChainsawShakeDX = 0.0f, 
  184 FLOAT m_fChainsawShakeDY = 0.0f,
 
- 190 INDEX m_iSeriousBombCount = 0,      // ammount of serious bombs player owns
+ //190 INDEX m_iSeriousBombCount = 0,      // ammount of serious bombs player owns
  191 INDEX m_iLastSeriousBombCount = 0,  // ammount of serious bombs player had before firing
  192 FLOAT m_tmSeriousBombFired = -10.0f,  // when the bomb was last fired
  
@@ -5335,16 +5335,18 @@ functions:
           m_tmSeriousSpeed = tmNow + (fValue > 0.0F ? ClampUp(fValue, tmMaxDuration) : tmMaxDuration);
           return TRUE;
 
-        case PUIT_BOMB:
+        case PUIT_BOMB: {
           ((CPlayerWeapons&)*m_penWeapons).ReceiveSeriousBomb();
-
+          
           // send computer message
           if (GetSP()->sp_bCooperative) {
             EComputerMessage eMsg;
             eMsg.fnmMessage = CTFILENAME("DataMP\\Messages\\Weapons\\seriousbomb.txt");
             this->SendEvent(eMsg);
           }
-          return TRUE;              
+
+          return TRUE; 
+        } break;
 
         // [SSE] Gameplay - Regeneration PowerUp
         case PUIT_REGENERATION:
