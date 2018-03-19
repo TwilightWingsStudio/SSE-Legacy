@@ -23,6 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define MUTF_FAREWELLGIFT (1L << 3)
 #define MUTF_TOUCHEXPLODE (1L << 4)
 #define MUTF_BLOODYMESS   (1L << 5)
+#define MUTF_CLOAKED      (1L << 6)
 
 /*
  * Class responsible for describing game session

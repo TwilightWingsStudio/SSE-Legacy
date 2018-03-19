@@ -161,6 +161,7 @@ extern INDEX gam_bVampire = FALSE;        // [SSE] Gameplay - Mutators - Vampire
 extern INDEX gam_bFarewellGift = FALSE;   // [SSE] Gameplay - Mutators - Farewell Gift
 extern INDEX gam_bTouchExplode = FALSE;   // [SSE] Gameplay - Mutators - Touch Explode
 extern INDEX gam_bBloodyMess = FALSE;     // [SSE] Gameplay - Mutators - Bloody Mess
+extern INDEX gam_bCloaked = FALSE;        // [SSE] Gameplay - Mutators - Cloaked
 
 extern FLOAT gam_tmRespawnDelay = 0.0F; // [SSE] Respawn Delay
 
@@ -1069,6 +1070,7 @@ void CGame::InitInternal( void)
   _pShell->DeclareSymbol("persistent user INDEX gam_bFarewellGift;", &gam_bFarewellGift);      // [SSE] Gameplay - Mutators - Farewell Gift
   _pShell->DeclareSymbol("persistent user INDEX gam_bTouchExplode;", &gam_bTouchExplode);      // [SSE] Gameplay - Mutators - Touch Explode
   _pShell->DeclareSymbol("persistent user INDEX gam_bBloodyMess;",   &gam_bBloodyMess);        // [SSE] Gameplay - Mutators - Bloody Mess
+  _pShell->DeclareSymbol("persistent user INDEX gam_bCloaked;",      &gam_bCloaked);           // [SSE] Gameplay - Mutators - Cloaked
 
   _pShell->DeclareSymbol("user INDEX gam_bQuickLoad;", &gam_bQuickLoad);
   _pShell->DeclareSymbol("user INDEX gam_bQuickSave;", &gam_bQuickSave);

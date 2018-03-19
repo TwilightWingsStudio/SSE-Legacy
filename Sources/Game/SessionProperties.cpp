@@ -85,12 +85,14 @@ extern INDEX gam_bSafeFlamethrower; // [SSE] Gameplay - Safe Flamethrower
 extern INDEX gam_bKeepSeriousDamageOnProjectiles; // [SSE] Better Serious Damage
 extern INDEX gam_bArmorInertiaDamping; // [SSE] Armor Inertia Damping Toggle
 
+// Mutators
 extern INDEX gam_bRocketJumpMode; // [SSE] RocketJump Mode
 extern INDEX gam_bInstagib; // [SSE] Gameplay - Mutators - Instagib
 extern INDEX gam_bVampire;  // [SSE] Gameplay - Mutators - Vampire
 extern INDEX gam_bFarewellGift; // [SSE] Gameplay - Mutators - Farewell Gift
 extern INDEX gam_bTouchExplode; // [SSE] Gameplay - Mutators - Touch Explode
 extern INDEX gam_bBloodyMess; // [SSE] Gameplay - Mutators - Bloody Mess
+extern INDEX gam_bCloaked; // [SSE] Gameplay - Mutators - Cloaked
 
 static void SetGameModeParameters(CSessionProperties &sp)
 {
@@ -455,6 +457,11 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   // [SSE] Gameplay - Mutators - Bloody Mess
   if (gam_bBloodyMess) {  
     sp.sp_ulMutatorFlags |= MUTF_BLOODYMESS;
+  }
+
+  // [SSE] Gameplay - Mutators - Cloaked
+  if (gam_bCloaked) {
+    sp.sp_ulMutatorFlags |= MUTF_CLOAKED;
   }
 
   // [SSE] GameModes - Team DeathMatch

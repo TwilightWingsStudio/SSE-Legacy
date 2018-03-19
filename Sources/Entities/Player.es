@@ -3050,22 +3050,26 @@ functions:
     COLOR colAlpha = m_moRender.mo_colBlendColor;
     colAlpha = (colAlpha&0xffffff00) + (COLOR(fFading*0xff)&0xff);
     m_moRender.mo_colBlendColor = colAlpha;
+    
+    const BOOL bCloakedMutator = GetSP()->sp_ulMutatorFlags & MUTF_CLOAKED; // [SSE] Gameplay - Mutators - Cloaked
 
     // if not connected
     if (m_ulFlags&PLF_NOTCONNECTED) {
       // pulse slowly
       fFading *= 0.25f+0.25f*Sin(tmNow/2.0f*360);
-    // if invisible
-    } else if (m_tmInvisibility>tmNow) {
+
+    // if invisible or cloaked mutator.
+    } else if (bCloakedMutator || m_tmInvisibility > tmNow) {
       FLOAT fIntensity=0.0f;
-      if ((m_tmInvisibility-tmNow)<3.0f)
+      if (!bCloakedMutator && (m_tmInvisibility-tmNow)<3.0f)
       {
         fIntensity = 0.5f-0.5f*cos((m_tmInvisibility-tmNow)*(6.0f*3.1415927f/3.0f));
       }
+
       if (_ulPlayerRenderingMask == 1<<GetMyPlayerIndex()) {
         colAlpha = (colAlpha&0xffffff00)|(INDEX)(INVISIBILITY_ALPHA_LOCAL+(FLOAT)(254-INVISIBILITY_ALPHA_LOCAL)*fIntensity);
       } else if (TRUE) {
-        if ((m_tmInvisibility-tmNow)<1.28f) {
+        if (!bCloakedMutator && (m_tmInvisibility-tmNow)<1.28f) {
           colAlpha = (colAlpha&0xffffff00)|(INDEX)(INVISIBILITY_ALPHA_REMOTE+(FLOAT)(254-INVISIBILITY_ALPHA_REMOTE)*fIntensity);
         } else if (TRUE) {
           colAlpha = (colAlpha&0xffffff00)|INVISIBILITY_ALPHA_REMOTE;
