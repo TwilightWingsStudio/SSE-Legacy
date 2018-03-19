@@ -62,7 +62,7 @@ struct SScreenResolution
   }
 };
 
-extern CTString astrDisplayAspectRatioTexts[5];
+extern CTString astrDisplayAspectRatioTexts[4];
 extern PIX apixWidths[23][2];
 
 extern SScreenResolution asWidths4x3[13];
