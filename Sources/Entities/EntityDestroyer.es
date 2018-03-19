@@ -1,4 +1,5 @@
-/* Copyright (c) 2002-2012 Croteam Ltd. 
+/* Copyright (c) 2018 by ZCaliptium.
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as published by
 the Free Software Foundation
@@ -15,7 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 5002
 %{
-#include "StdH.h"
+  #include "StdH.h"
 %}
 
 enum EDType {
@@ -25,7 +26,7 @@ enum EDType {
 };
 
 class CEntityDestroyer: CRationalEntity {
-name      "Entity Destroyer";
+name      "CEntityDestroyer";
 thumbnail "Thumbnails\\EntityDestroyer.tbn";
 features  "HasName", "HasTarget", "IsTargetable";
 
@@ -66,19 +67,172 @@ functions:
   // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const
   {
-    if (m_edtType == EDT_TARGET) {
-      if (m_penTarget == NULL) {
-        ((CTString&)m_strDescription).PrintF("-><none>");
-      } else {
-        ((CTString&)m_strDescription).PrintF("->%s", m_penTarget->GetName());
-      }
-    } else if (m_edtType == EDT_RANGED) {
-      ((CTString&)m_strDescription).PrintF("Range: %f", m_fDestroyRange);
-    } else {
-      ((CTString&)m_strDescription).PrintF("Box: %f,%f,%f",
+    switch (m_edtType)
+    {
+      case EDT_TARGET: {
+        if (m_penTarget == NULL) {
+          ((CTString&)m_strDescription).PrintF("-><none>");
+        } else {
+          ((CTString&)m_strDescription).PrintF("->%s", m_penTarget->GetName());
+        }
+      } break;
+
+      case EDT_RANGED: {
+        ((CTString&)m_strDescription).PrintF("Range: %f", m_fDestroyRange);
+      } break;
+
+      case EDT_BOX: {
+        ((CTString&)m_strDescription).PrintF("Box: %f,%f,%f",
         m_boxDestroyArea.Size()(1), m_boxDestroyArea.Size()(2), m_boxDestroyArea.Size()(3));
+      } break;
+
+      default: ((CTString&)m_strDescription).PrintF("<unknown-type>");
     }
+
     return m_strDescription;
+  }
+
+  // --------------------------------------------------------------------------------------
+  // Destroy entities!
+  // --------------------------------------------------------------------------------------
+  void DoDestruction(CEntity *penCaused)
+  {
+    if (!m_bActive) {
+      return;
+    }
+
+    BOOL bNoClass = m_strOnlyClass == "" ? TRUE : FALSE;
+    BOOL bNoName = m_strOnlyName == "" ? TRUE : FALSE;
+
+    INDEX iDeletedEntities = 0;
+
+    switch (m_edtType)
+    {
+      // in range
+      case EDT_RANGED: {
+        FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten)
+        {
+          CEntity *pen = iten;
+
+          // Ignore NULL, this entity and penCaused.
+          if (pen == NULL || pen == this || (m_bIgnorePenCaused && pen == penCaused)) {
+            continue;
+          }
+          
+          if ((((pen->en_RenderType == RT_EDITORMODEL || pen->en_RenderType == RT_SKAEDITORMODEL) && m_bIgnoreEditor) && m_bIgnoreEditor)
+              || pen->en_RenderType == RT_BRUSH) {
+            continue;
+          }
+    
+          CPlacement3D plEntity = pen->GetPlacement();
+          plEntity.AbsoluteToRelative(this->GetPlacement());
+
+          if (plEntity.pl_PositionVector.Length() <= ClampDn(m_fDestroyRange, 0.0f)
+          && (bNoClass || IsDerivedFromClass(pen, m_strOnlyClass)) && (bNoName || m_strOnlyName == pen->GetName())
+          && !pen->IsPlayerEntity())
+          {
+            pen->Destroy();
+            iDeletedEntities++;
+          }
+        }
+
+        if (m_bDebugMessages) {
+          if (iDeletedEntities > 0) {
+            CPrintF("[%s]: Destroyed %i entity(es) in range '%f'\n", m_strName, iDeletedEntities, m_fDestroyRange);
+          } else {
+            CPrintF("[%s]: No entities to destroy in range '%f'\n", m_strName, m_fDestroyRange);
+          }
+        }
+      } break;
+
+      // area
+      case EDT_BOX: {
+        FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten)
+        {
+          CEntity *pen = iten;
+
+          // Ignore NULL, this entity and penCaused.
+          if (pen == NULL || pen == this || (m_bIgnorePenCaused && pen == penCaused)) {
+            continue;
+          }
+          
+          if ((((pen->en_RenderType == RT_EDITORMODEL || pen->en_RenderType == RT_SKAEDITORMODEL) && m_bIgnoreEditor) && m_bIgnoreEditor)
+              || pen->en_RenderType == RT_BRUSH) {
+            continue;
+          }
+    
+          CPlacement3D plEntity = pen->GetPlacement();
+          plEntity.AbsoluteToRelative(this->GetPlacement());
+
+          if (plEntity.pl_PositionVector(1) >= m_boxDestroyArea.Min()(1) && plEntity.pl_PositionVector(1) <= m_boxDestroyArea.Max()(1)
+          &&  plEntity.pl_PositionVector(2) >= m_boxDestroyArea.Min()(2) && plEntity.pl_PositionVector(2) <= m_boxDestroyArea.Max()(2)
+          &&  plEntity.pl_PositionVector(3) >= m_boxDestroyArea.Min()(3) && plEntity.pl_PositionVector(3) <= m_boxDestroyArea.Max()(3)
+          && (bNoClass || IsDerivedFromClass(pen, m_strOnlyClass)) && (bNoName || m_strOnlyName == pen->GetName())
+          && !pen->IsPlayerEntity())
+          {
+            pen->Destroy();
+            iDeletedEntities++;
+          }
+        }
+
+        if (m_bDebugMessages) {
+          if (iDeletedEntities > 0) {
+            CPrintF("[%s]: Destroyed %i entity(es) in the area\n", m_strName, iDeletedEntities);
+          } else {
+            CPrintF("[%s]: No entities to destroy in the area\n", m_strName);
+          }
+        }
+      } break;
+
+      // target
+      default: {
+        // Filter invalid entities.
+        if (m_penTarget == NULL || m_penTarget->GetFlags()&ENF_DELETED) {
+          if (m_bDebugMessages) {
+            CPrintF("[%s]: No entity to destroy!\n", m_strName);
+          }
+        
+          return;
+        }
+
+        // Filter this entity.
+        if (m_penTarget == this && !(GetFlags()&ENF_DELETED)) {
+          if (m_bDebugMessages) {
+            CPrintF("[%s]: Entity can't destroy itself!\n", m_strName);
+          }
+
+          return;
+        }
+
+        CEntity *pen = m_penTarget;
+        CTString strDeletedEntity = pen->GetName();
+
+        // Filter the penCaused if necessary.
+        if (m_bIgnorePenCaused && pen == penCaused) {
+          if (m_bDebugMessages) {
+            CPrintF("[%s]: Can't destroy penCaused entity!\n", m_strName, strDeletedEntity);
+          }
+
+          return;
+        }
+
+        BOOL bEditorEntity = ((pen->en_RenderType == RT_EDITORMODEL || pen->en_RenderType == RT_SKAEDITORMODEL) && m_bIgnoreEditor);
+        
+        if ((bNoClass || IsDerivedFromClass(pen, m_strOnlyClass)) && (bNoName || m_strOnlyName == pen->GetName())
+        && pen->en_RenderType != RT_BRUSH && !bEditorEntity && !pen->IsPlayerEntity())
+        {
+          pen->Destroy();
+
+          if (m_bDebugMessages) {
+            CPrintF("[%s]: Destroyed '%s' entity\n", m_strName, strDeletedEntity);
+          }
+        } else {
+          if (m_bDebugMessages) {
+            CPrintF("[%s]: Can't destroy '%s' due to wrong class/name or it's a brush\n", m_strName, strDeletedEntity);
+          }
+        }
+      }
+    }
   }
   
   // --------------------------------------------------------------------------------------
@@ -96,131 +250,16 @@ functions:
 
     // Entity destroying
     if (ee.ee_slEvent == EVENTCODE_ETrigger) {
-      if (m_bActive)
-      {
-        BOOL bNoClass = m_strOnlyClass == "" ? TRUE : FALSE;
-        BOOL bNoName = m_strOnlyName == "" ? TRUE : FALSE;
-
-        INDEX iDeletedEntities = 0;
-
-        switch (m_edtType) {
-        // in range
-        case EDT_RANGED:
-          FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten)
-          {
-            CEntity *pen = iten;
-
-            if (pen == NULL || pen == this || (m_bIgnorePenCaused && pen == ((ETrigger &)ee).penCaused)) {
-              continue;
-            }
-            
-            if ((((pen->en_RenderType == RT_EDITORMODEL || pen->en_RenderType == RT_SKAEDITORMODEL) && m_bIgnoreEditor) && m_bIgnoreEditor)
-                || pen->en_RenderType == RT_BRUSH) {
-              continue;
-            }
-      
-            CPlacement3D plEntity = pen->GetPlacement();
-            plEntity.AbsoluteToRelative(this->GetPlacement());
-
-            if (plEntity.pl_PositionVector.Length() <= ClampDn(m_fDestroyRange, 0.0f)
-            && (bNoClass || IsDerivedFromClass(pen, m_strOnlyClass)) && (bNoName || m_strOnlyName == pen->GetName())
-            && !pen->IsPlayerEntity())
-            {
-              pen->Destroy();
-              iDeletedEntities++;
-            }
-          }
-
-          if (m_bDebugMessages) {
-            if (iDeletedEntities > 0) {
-              CPrintF("[%s]: Destroyed %i entity(es) in range '%f'\n", m_strName, iDeletedEntities, m_fDestroyRange);
-            } else {
-              CPrintF("[%s]: No entities to destroy in range '%f'\n", m_strName, m_fDestroyRange);
-            }
-          }
-          break;
-        // area
-        case EDT_BOX:
-          FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten)
-          {
-            CEntity *pen = iten;
-
-            if (pen == NULL || pen == this || (m_bIgnorePenCaused && pen == ((ETrigger &)ee).penCaused)) {
-              continue;
-            }
-            
-            if ((((pen->en_RenderType == RT_EDITORMODEL || pen->en_RenderType == RT_SKAEDITORMODEL) && m_bIgnoreEditor) && m_bIgnoreEditor)
-                || pen->en_RenderType == RT_BRUSH) {
-              continue;
-            }
-      
-            CPlacement3D plEntity = pen->GetPlacement();
-            plEntity.AbsoluteToRelative(this->GetPlacement());
-
-            if (plEntity.pl_PositionVector(1) >= m_boxDestroyArea.Min()(1) && plEntity.pl_PositionVector(1) <= m_boxDestroyArea.Max()(1)
-            &&  plEntity.pl_PositionVector(2) >= m_boxDestroyArea.Min()(2) && plEntity.pl_PositionVector(2) <= m_boxDestroyArea.Max()(2)
-            &&  plEntity.pl_PositionVector(3) >= m_boxDestroyArea.Min()(3) && plEntity.pl_PositionVector(3) <= m_boxDestroyArea.Max()(3)
-            && (bNoClass || IsDerivedFromClass(pen, m_strOnlyClass)) && (bNoName || m_strOnlyName == pen->GetName())
-            && !pen->IsPlayerEntity())
-            {
-              pen->Destroy();
-              iDeletedEntities++;
-            }
-          }
-
-          if (m_bDebugMessages) {
-            if (iDeletedEntities > 0) {
-              CPrintF("[%s]: Destroyed %i entity(es) in the area\n", m_strName, iDeletedEntities);
-            } else {
-              CPrintF("[%s]: No entities to destroy in the area\n", m_strName);
-            }
-          }
-          break;
-        // target
-        default: {
-          if (m_penTarget == NULL || m_penTarget->GetFlags()&ENF_DELETED) {
-            if (m_bDebugMessages) {
-              CPrintF("[%s]: No entity to destroy!\n", m_strName);
-            }
-          } else if (m_penTarget == this && !(GetFlags()&ENF_DELETED)) {
-            if (m_bDebugMessages) {
-              CPrintF("[%s]: Entity can't destroy itself!\n", m_strName);
-            }
-          } else {
-            CEntity *pen = m_penTarget;
-            CTString strDeletedEntity = pen->GetName();
-
-            if (m_bIgnorePenCaused && pen == ((ETrigger &)ee).penCaused) {
-              if (m_bDebugMessages) {
-                CPrintF("[%s]: Can't destroy penCaused entity!\n", m_strName, strDeletedEntity);
-              }
-              return CRationalEntity::HandleEvent(ee);
-            }
-
-            BOOL bEditorEntity = ((pen->en_RenderType == RT_EDITORMODEL || pen->en_RenderType == RT_SKAEDITORMODEL) && m_bIgnoreEditor);
-            
-            if ((bNoClass || IsDerivedFromClass(pen, m_strOnlyClass)) && (bNoName || m_strOnlyName == pen->GetName())
-            && pen->en_RenderType != RT_BRUSH && !bEditorEntity && !pen->IsPlayerEntity())
-            {
-              pen->Destroy();
-
-              if (m_bDebugMessages) {
-                CPrintF("[%s]: Destroyed '%s' entity\n", m_strName, strDeletedEntity);
-              }
-            } else {
-              if (m_bDebugMessages) {
-                CPrintF("[%s]: Can't destroy '%s' due to wrong class/name or it's a brush\n", m_strName, strDeletedEntity);
-              }
-            }
-          }
-        }}
-      }
+      DoDestruction(((ETrigger &)ee).penCaused);
     }
 
     return CRationalEntity::HandleEvent(ee);
   }
 
 procedures:
+  // --------------------------------------------------------------------------------------
+  // Entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     InitAsEditorModel();
@@ -232,4 +271,3 @@ procedures:
     SetModelMainTexture(TEXTURE_MARKER);
   }
 };
-
