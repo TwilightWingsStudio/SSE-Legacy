@@ -937,7 +937,7 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
     strExplanation.PrintF(TRANS(
       "This server runs version SSE-%d.%d-%d based game.\n"
       "Your game is not Serious Sam Evolution!\n"
-      "Please visit https://github.com/zcaliptium/Serious-Engine for more information."), _SE_BUILD_MAJOR / 10000, _SE_BUILD_MINOR, _ulEngineRevision);
+      "Please visit https://github.com/zcaliptium/Serious-Engine-E for more information."), _SE_BUILD_MAJOR / 10000, _SE_BUILD_MINOR, _ulEngineRevision);
 
     SendDisconnectMessage(iClient, strExplanation, /*bStream=*/TRUE, ser_bReportJoinAttemptsNotSSE);
     return;
@@ -950,7 +950,7 @@ void CServer::ConnectRemoteSessionState(INDEX iClient, CNetworkMessage &nm)
     strExplanation.PrintF(TRANS(
       "This server runs version SSE-%d.%d-%d.\n"
       "Your version is SSE-%d.%d-%d.\n"
-      "Please visit https://github.com/zcaliptium/Serious-Engine for more information."),
+      "Please visit https://github.com/zcaliptium/Serious-Engine-E for more information."),
       _SE_BUILD_MAJOR / 10000, _SE_BUILD_MINOR, _ulEngineRevision, iMajor, iMinor, iRevision);
 
     SendDisconnectMessage(iClient, strExplanation, /*bStream=*/TRUE, ser_bReportJoinAttemptsVersion);
