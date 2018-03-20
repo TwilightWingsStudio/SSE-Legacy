@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define GMF_TEAMPLAY      (1L << 0)
 #define GMF_BASEONLYSPAWN (1L << 1)
 
+// Mutator Flags
 #define MUTF_INSTAGIB     (1L << 0)
 #define MUTF_VAMPIRE      (1L << 1)
 #define MUTF_ROCKETJUMP   (1L << 2)
@@ -24,6 +25,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define MUTF_TOUCHEXPLODE (1L << 4)
 #define MUTF_BLOODYMESS   (1L << 5)
 #define MUTF_CLOAKED      (1L << 6)
+
+// Allow Item Flags
+#define AIF_HEALTH        (1L << 0)
+#define AIF_ARMOR         (1L << 1)
+#define AIF_SHIELDS       (1L << 2)
+#define AIF_WEAPONS       (1L << 3)
+#define AIF_AMMO          (1L << 4)
+#define AIF_AMMOPACKS     (1L << 5)
+#define AIF_POWERUPS      (1L << 6)
 
 /*
  * Class responsible for describing game session
@@ -87,12 +97,8 @@ public:
   BOOL sp_bAmmoStays;         // ammo items do not dissapear when picked-up
   BOOL sp_bHealthArmorStays;  // health/armor items do exist
   BOOL sp_bPlayEntireGame;    // don't finish after one level in coop
-  BOOL sp_bAllowHealth;       // health items do exist
-  BOOL sp_bAllowArmor;        // armor items do exist
-  BOOL sp_bAllowPowerUps;     // [SSE] Gameplay - PowerUps Allow
-  BOOL sp_bAllowWeapons;      // [SSE] Gameplay - Weapons Allow
-  BOOL sp_bAllowAmmo;         // [SSE] Gameplay - Ammo Allow
-  BOOL sp_bAllowAmmoPacks;    // [SSE] Gameplay - Ammo Packs Allow
+  
+  ULONG sp_ulAllowItemFlags;
   
   BOOL sp_bInfiniteAmmo;      // ammo is not consumed when firing
   BOOL sp_bRespawnInPlace;    // players respawn on the place where they were killed, not on markers (coop only)

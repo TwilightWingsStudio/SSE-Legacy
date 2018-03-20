@@ -214,12 +214,8 @@ void CGame::SetSinglePlayerSession(CSessionProperties &sp)
 
   sp.sp_bAmmoStays        = FALSE;
   sp.sp_bHealthArmorStays = FALSE;
-  sp.sp_bAllowHealth = TRUE;
-  sp.sp_bAllowArmor = TRUE;
-  sp.sp_bAllowPowerUps = TRUE;  // [SSE] Gameplay - PowerUps Allow
-  sp.sp_bAllowWeapons = TRUE;   // [SSE] Gameplay - Weapons Allow
-  sp.sp_bAllowAmmo = TRUE;      // [SSE] Gameplay - Ammo Allow
-  sp.sp_bAllowAmmoPacks = TRUE; // [SSE] Gameplay - Ammo Packs Allow
+  
+  sp.sp_ulAllowItemFlags = 0xFFFFFFFF;
   sp.sp_bInfiniteAmmo = FALSE;
   sp.sp_bRespawnInPlace = FALSE;
   sp.sp_fExtraEnemyStrength          = 0;
@@ -306,12 +302,30 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
 
   sp.sp_bAmmoStays        = gam_bAmmoStays       ;
   sp.sp_bHealthArmorStays = gam_bHealthArmorStays;
-  sp.sp_bAllowHealth      = gam_bAllowHealth     ;
-  sp.sp_bAllowArmor       = gam_bAllowArmor      ;
-  sp.sp_bAllowPowerUps    = gam_bAllowPowerUps;  // [SSE] Gameplay - PowerUps Allow
-  sp.sp_bAllowWeapons     = gam_bAllowWeapons;   // [SSE] Gameplay - Weapons Allow
-  sp.sp_bAllowAmmo        = gam_bAllowAmmo;      // [SSE] Gameplay - Ammo Allow
-  sp.sp_bAllowAmmoPacks   = gam_bAllowAmmoPacks; // [SSE] Gameplay - Ammo Packs Allow
+  
+  if (gam_bAllowHealth) {
+    sp.sp_ulAllowItemFlags |= AIF_HEALTH;
+  }
+  
+  if (gam_bAllowArmor) {
+    sp.sp_ulAllowItemFlags |= AIF_ARMOR;
+  }
+  
+  if (gam_bAllowWeapons) {
+    sp.sp_ulAllowItemFlags |= AIF_WEAPONS; // [SSE] Gameplay - Weapons Allow
+  }
+  
+  if (gam_bAllowAmmo) {
+    sp.sp_ulAllowItemFlags |= AIF_AMMO; // [SSE] Gameplay - Ammo Allow
+  }
+  
+  if (gam_bAllowAmmoPacks) {
+    sp.sp_ulAllowItemFlags |= AIF_AMMOPACKS; // [SSE] Gameplay - Ammo Packs Allow
+  }
+  
+  if (gam_bAllowPowerUps) {
+    sp.sp_ulAllowItemFlags |= AIF_POWERUPS; // [SSE] Gameplay - PowerUps Allow
+  }
 
   sp.sp_bInfiniteAmmo     = gam_bInfiniteAmmo    ;
   sp.sp_bRespawnInPlace   = gam_bRespawnInPlace  ;
@@ -372,8 +386,10 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_iScoreLimit = 0;
     sp.sp_iFragLimit  = 0;
     sp.sp_iTimeLimit  = 0;
-    sp.sp_bAllowHealth = TRUE;
-    sp.sp_bAllowArmor  = TRUE;
+
+    sp.sp_ulAllowItemFlags |= AIF_HEALTH;
+    sp.sp_ulAllowItemFlags |= AIF_ARMOR;
+    sp.sp_ulAllowItemFlags |= AIF_SHIELDS;
 
     sp.sp_iTeamKillPenalty = 0; // [SSE] Gameplay - TeamKill Penalty
 
@@ -431,7 +447,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
   if ((sp.sp_bUseFrags || sp.sp_gmGameMode == CSessionProperties::GM_SCOREMATCH) && gam_bInstagib) {
     sp.sp_ulMutatorFlags |= MUTF_INSTAGIB;
     sp.sp_bInfiniteAmmo = TRUE;
-    sp.sp_bAllowWeapons = FALSE;
+    sp.sp_ulAllowItemFlags &= ~AIF_WEAPONS; // Turn off weapon items.
   }
 
   // [SSE] Gameplay - Mutators - Vampire
@@ -667,12 +683,12 @@ CTString GetGameAgentRulesInfo(void)
   strKey.PrintF(";weaponsstay;%d", sp.sp_bWeaponsStay?0:1);
   strOut+=strKey;
 
-  strKey.PrintF(";ammostays;%d", sp.sp_bAmmoStays                   ?0:1);	strOut+=strKey;
-  strKey.PrintF(";healthandarmorstays;%d", sp.sp_bHealthArmorStays  ?0:1);	strOut+=strKey;
-  strKey.PrintF(";allowhealth;%d", sp.sp_bAllowHealth               ?0:1);	strOut+=strKey;
-  strKey.PrintF(";allowarmor;%d", sp.sp_bAllowArmor                 ?0:1);	strOut+=strKey;
-  strKey.PrintF(";infiniteammo;%d", sp.sp_bInfiniteAmmo             ?0:1);	strOut+=strKey;
-  strKey.PrintF(";respawninplace;%d", sp.sp_bRespawnInPlace         ?0:1);	strOut+=strKey;
+  strKey.PrintF(";ammostays;%d", sp.sp_bAmmoStays                   ? 0 : 1);	strOut += strKey;
+  strKey.PrintF(";healthandarmorstays;%d", sp.sp_bHealthArmorStays  ? 0 : 1);	strOut += strKey;
+  strKey.PrintF(";allowhealth;%d", (sp.sp_ulAllowItemFlags & AIF_HEALTH) ? 0 : 1);	strOut += strKey;
+  strKey.PrintF(";allowarmor;%d",  (sp.sp_ulAllowItemFlags & AIF_ARMOR)  ? 0 : 1);	strOut += strKey;
+  strKey.PrintF(";infiniteammo;%d", sp.sp_bInfiniteAmmo             ? 0 : 1);	strOut += strKey;
+  strKey.PrintF(";respawninplace;%d", sp.sp_bRespawnInPlace         ? 0 : 1);	strOut += strKey;
 
   if (sp.sp_bCooperative) {
     if (sp.sp_ctCredits<0) {
