@@ -98,6 +98,8 @@ MP3 playback is disabled by default. If you need this feature, you will have to 
 
 IFeel support is disabled in the open source version of Serious Engine 1 due to copyright issues. In case if you need IFeel support you will have to copy IFC22.dll and ImmWrapper.dll from the original game into the `/Bin/` folder.
 
+DiscordRichPresence binaries are not included into repository. You can take compiled binaries here ( https://github.com/discordapp/discord-rpc/releases ), Just put discord-rpc.dll into the `/Bin/` folder.
+
 Running
 -------
 
