@@ -142,7 +142,7 @@ functions:
     if (m_penTarget9)  { ctUsed++; }
     if (m_penTarget10) { ctUsed++; }
     
-    ((CTString&)m_strDescription).PrintF("[%d/5] W=%.2f", ctUsed, m_fWaitTime);
+    ((CTString&)m_strDescription).PrintF("[%d/10] W=%.2f", ctUsed, m_fWaitTime);
     
     return m_strDescription;
   }
