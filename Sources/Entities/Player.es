@@ -9573,16 +9573,24 @@ procedures:
           {
             FLOAT tmSpawnInvulnerability = GetSP()->sp_tmSpawnInvulnerability;
             
-            // If we are invulnerable then we can't explode.
+            // If we are invulnerable after spawn then we can't explode.
             if (tmSpawnInvulnerability > 0 && _pTimer->CurrentTick() - m_tmSpawned < tmSpawnInvulnerability) {
+              resume;
+            }
+            
+            const TIME tmInvulnerabilityDelta = m_tmInvulnerability - _pTimer->CurrentTick();
+            
+            // If invulnerable (powerup effect) then don't do anything.
+            if (tmInvulnerabilityDelta > 0.0F) {
               resume;
             }
 
             SetHealth(1.0F);
             SetArmor(0.0F);
             SetShields(0.0F);
-            
-            InflictDirectDamage(this, NULL, DMT_DAMAGER, 100.0F, GetPlacement().pl_PositionVector, FLOAT3D(0, 1, 0));
+
+            InflictDirectDamage(this, this, DMT_DAMAGER, 100.0F, GetPlacement().pl_PositionVector, FLOAT3D(0, 1, 0));
+
             Explode(50.0F);
           }
         }
