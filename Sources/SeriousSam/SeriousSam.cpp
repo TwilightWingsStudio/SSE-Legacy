@@ -553,6 +553,8 @@ BOOL Init( HINSTANCE hInstance, int nCmdShow, CTString strCmdLine)
   if (cmd_strPassword!="") {
     _pShell->SetString("net_strConnectPassword", cmd_strPassword);
   }
+  
+  extern BOOL cmd_bNoIntro; // [SSE]
 
   // if connecting to server from command line
   if (cmd_strServer!="") {
@@ -594,7 +596,9 @@ BOOL Init( HINSTANCE hInstance, int nCmdShow, CTString strCmdLine)
     }
   // if no relevant starting at command line
   } else {
-    StartNextDemo();
+    if (!cmd_bNoIntro) {
+      StartNextDemo();
+    }
   }
   return TRUE;
 }

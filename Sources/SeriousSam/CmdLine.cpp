@@ -27,6 +27,7 @@ extern CTString cmd_strPassword = ""; // network password
 extern CTString cmd_strOutput = ""; // output from parsing command line
 extern BOOL cmd_bServer = FALSE;  // set to run as server
 extern BOOL cmd_bQuickJoin = FALSE; // do not ask for players and network settings
+extern BOOL cmd_bNoIntro = FALSE; // [SSE]
 
 static CTString _strCmd;
 
@@ -92,17 +93,20 @@ CTString GetNextParam(void)
 void ParseCommandLine(CTString strCmd)
 {
   cmd_strOutput = "";
-  cmd_strOutput+=CTString(0, TRANS("Command line: '%s'\n"), strCmd);
-  // if no command line
+  cmd_strOutput += CTString(0, TRANS("Command line: '%s'\n"), strCmd);
+
+  // if no command line then do nothing
   if (strlen(strCmd) == 0) {
-    // do nothing
     return;
   }
+
   _strCmd = strCmd;
 
-  FOREVER {
+  FOREVER
+  {
     CTString strWord = GetNextParam();
-    if (strWord=="") {
+
+    if (strWord == "") {
       cmd_strOutput+="\n";
       return;
     } else if (strWord=="+level") {
@@ -111,6 +115,8 @@ void ParseCommandLine(CTString strCmd)
       cmd_bServer = TRUE;
     } else if (strWord=="+quickjoin") {
       cmd_bQuickJoin = TRUE;
+    } else if (strWord=="+nointro") {
+      cmd_bNoIntro = TRUE;
     } else if (strWord=="+game") {
       CTString strMod = GetNextParam();
       if (strMod!="SeriousSam") { // (we ignore default mod - always use base dir in that case)
