@@ -1387,6 +1387,9 @@ properties:
  // [SSE] GameModes - Team DeathMatch
  250 INDEX m_iTeamID = 0,
  251 INDEX m_iTeamSelection = 0,
+ 
+ // [SSE]
+ 300 BOOL m_bExploded = FALSE,
 
  // [SSE] Gameplay - Weapon Inertia Effect
  350 ANGLE3D m_aWeaponSway = ANGLE3D(0, 0, 0),
@@ -8349,7 +8352,7 @@ procedures:
     }
 
     // [SSE] Gameplay - Mutators - Farewell Gift
-    if (GetSP()->sp_ulMutatorFlags & MUTF_FAREWELLGIFT) {
+    if (GetSP()->sp_ulMutatorFlags & MUTF_FAREWELLGIFT && !m_bExploded) {
       Explode(40.0F);
       BlowUp();
     } else {
@@ -8360,6 +8363,8 @@ procedures:
         LeaveStain(TRUE);
       }
     }
+    
+    m_bExploded = FALSE;
 
     m_iMayRespawn = 0;
     // wait for anim of death
@@ -9592,6 +9597,7 @@ procedures:
             InflictDirectDamage(this, this, DMT_DAMAGER, 100.0F, GetPlacement().pl_PositionVector, FLOAT3D(0, 1, 0));
 
             Explode(50.0F);
+            m_bExploded = TRUE;
           }
         }
         
