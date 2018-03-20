@@ -122,7 +122,7 @@ functions:
     if (m_penTarget == NULL || m_penTarget->GetFlags()&ENF_DELETED)
     {
       if (m_bDebugMessages) {
-        CPrintF("[%s]: Unable to get debris model due to empty target/deleted ModelHolder2!\n", m_strName);
+        CPrintF("[%s] : Unable to get debris model due to empty target/deleted ModelHolder2!\n", m_strName);
       }
 
       return;
@@ -132,7 +132,7 @@ functions:
     if (!IsDerivedFromClass(m_penTarget, "ModelHolder2"))
     {
       if (m_bDebugMessages) {
-        CPrintF("[%s]: Unable to get debris model from a non-ModelHolder2 entity!\n", m_strName);
+        CPrintF("[%s] : Unable to get debris model from a non-ModelHolder2 entity!\n", m_strName);
       }
 
       return;
@@ -140,7 +140,7 @@ functions:
 
     // Spawn debris
     if (m_bDebugMessages) {
-      CPrintF("[%s]: Spawning debris...\n", m_strName);
+      CPrintF("[%s] : Spawning debris...\n", m_strName);
     }
 
     // If count is wrong.

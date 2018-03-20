@@ -78,11 +78,11 @@ functions:
       } break;
 
       case EDT_RANGED: {
-        ((CTString&)m_strDescription).PrintF("Range: %f", m_fDestroyRange);
+        ((CTString&)m_strDescription).PrintF("Range: %.3f", m_fDestroyRange);
       } break;
 
       case EDT_BOX: {
-        ((CTString&)m_strDescription).PrintF("Box: %f,%f,%f",
+        ((CTString&)m_strDescription).PrintF("Box: %.3f; %.3f; %.3f",
         m_boxDestroyArea.Size()(1), m_boxDestroyArea.Size()(2), m_boxDestroyArea.Size()(3));
       } break;
 
@@ -119,8 +119,8 @@ functions:
             continue;
           }
           
-          if ((((pen->en_RenderType == RT_EDITORMODEL || pen->en_RenderType == RT_SKAEDITORMODEL) && m_bIgnoreEditor) && m_bIgnoreEditor)
-              || pen->en_RenderType == RT_BRUSH) {
+          if (((pen->en_RenderType == RT_EDITORMODEL || pen->en_RenderType == RT_SKAEDITORMODEL) && m_bIgnoreEditor)
+             || pen->en_RenderType == RT_BRUSH) {
             continue;
           }
     
@@ -138,9 +138,9 @@ functions:
 
         if (m_bDebugMessages) {
           if (iDeletedEntities > 0) {
-            CPrintF("[%s]: Destroyed %i entity(es) in range '%f'\n", m_strName, iDeletedEntities, m_fDestroyRange);
+            CPrintF("[%s] : Destroyed %i entity(es) in range '%f'\n", m_strName, iDeletedEntities, m_fDestroyRange);
           } else {
-            CPrintF("[%s]: No entities to destroy in range '%f'\n", m_strName, m_fDestroyRange);
+            CPrintF("[%s] : No entities to destroy in range '%f'\n", m_strName, m_fDestroyRange);
           }
         }
       } break;
@@ -156,8 +156,8 @@ functions:
             continue;
           }
           
-          if ((((pen->en_RenderType == RT_EDITORMODEL || pen->en_RenderType == RT_SKAEDITORMODEL) && m_bIgnoreEditor) && m_bIgnoreEditor)
-              || pen->en_RenderType == RT_BRUSH) {
+          if (((pen->en_RenderType == RT_EDITORMODEL || pen->en_RenderType == RT_SKAEDITORMODEL) && m_bIgnoreEditor)
+             || pen->en_RenderType == RT_BRUSH) {
             continue;
           }
     
@@ -177,9 +177,9 @@ functions:
 
         if (m_bDebugMessages) {
           if (iDeletedEntities > 0) {
-            CPrintF("[%s]: Destroyed %i entity(es) in the area\n", m_strName, iDeletedEntities);
+            CPrintF("[%s] : Destroyed %i entity(es) in the area\n", m_strName, iDeletedEntities);
           } else {
-            CPrintF("[%s]: No entities to destroy in the area\n", m_strName);
+            CPrintF("[%s] : No entities to destroy in the area\n", m_strName);
           }
         }
       } break;
@@ -189,7 +189,7 @@ functions:
         // Filter invalid entities.
         if (m_penTarget == NULL || m_penTarget->GetFlags()&ENF_DELETED) {
           if (m_bDebugMessages) {
-            CPrintF("[%s]: No entity to destroy!\n", m_strName);
+            CPrintF("[%s] : No entity to destroy!\n", m_strName);
           }
         
           return;
@@ -198,7 +198,7 @@ functions:
         // Filter this entity.
         if (m_penTarget == this && !(GetFlags()&ENF_DELETED)) {
           if (m_bDebugMessages) {
-            CPrintF("[%s]: Entity can't destroy itself!\n", m_strName);
+            CPrintF("[%s] : Entity can't destroy itself!\n", m_strName);
           }
 
           return;
@@ -210,7 +210,7 @@ functions:
         // Filter the penCaused if necessary.
         if (m_bIgnorePenCaused && pen == penCaused) {
           if (m_bDebugMessages) {
-            CPrintF("[%s]: Can't destroy penCaused entity!\n", m_strName, strDeletedEntity);
+            CPrintF("[%s] : Can't destroy penCaused entity!\n", m_strName, strDeletedEntity);
           }
 
           return;
@@ -224,11 +224,11 @@ functions:
           pen->Destroy();
 
           if (m_bDebugMessages) {
-            CPrintF("[%s]: Destroyed '%s' entity\n", m_strName, strDeletedEntity);
+            CPrintF("[%s] : Destroyed '%s' entity\n", m_strName, strDeletedEntity);
           }
         } else {
           if (m_bDebugMessages) {
-            CPrintF("[%s]: Can't destroy '%s' due to wrong class/name or it's a brush\n", m_strName, strDeletedEntity);
+            CPrintF("[%s] : Can't destroy '%s' due to wrong class/name or it's a brush\n", m_strName, strDeletedEntity);
           }
         }
       }
