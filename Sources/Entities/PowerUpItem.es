@@ -283,7 +283,7 @@ functions:
   void AdjustDifficulty(void)
   {
     // [SSE] PowerUps Allow
-    if (!GetSP()->sp_bAllowPowerUps && m_penTarget == NULL) {
+    if (!(GetSP()->sp_ulAllowItemFlags & AIF_POWERUPS) && m_penTarget == NULL) {
       Destroy();
     }
   }

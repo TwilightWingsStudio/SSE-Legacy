@@ -292,7 +292,7 @@ functions:
   // --------------------------------------------------------------------------------------
   void AdjustDifficulty(void)
   {
-    if (!GetSP()->sp_bAllowArmor && m_penTarget == NULL) {
+    if (!(GetSP()->sp_ulAllowItemFlags & AIF_ARMOR) && m_penTarget == NULL) {
       Destroy();
     }
   }

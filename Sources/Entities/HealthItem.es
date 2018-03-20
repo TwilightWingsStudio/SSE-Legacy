@@ -317,7 +317,7 @@ functions:
   // --------------------------------------------------------------------------------------
   void AdjustDifficulty(void)
   {
-    if (!GetSP()->sp_bAllowHealth && m_penTarget == NULL) {
+    if (!(GetSP()->sp_ulAllowItemFlags & AIF_HEALTH) && m_penTarget == NULL) {
       Destroy();
     }
   }

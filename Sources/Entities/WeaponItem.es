@@ -441,7 +441,7 @@ functions:
   void AdjustDifficulty(void)
   {
     // [SSE] Weapons Allow
-    if (!GetSP()->sp_bAllowWeapons && m_penTarget == NULL) {
+    if (!(GetSP()->sp_ulAllowItemFlags & AIF_WEAPONS) && m_penTarget == NULL) {
       Destroy();
     }
   }
