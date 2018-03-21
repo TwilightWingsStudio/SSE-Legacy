@@ -95,8 +95,12 @@ functions:
     FLOAT3D vTarget;
 
     // target body
-    EntityInfo *peiTarget = (EntityInfo*) (pen->GetEntityInfo());
-    GetEntityInfoPosition(pen, peiTarget->vTargetCenter, vTarget);
+    if (pen->GetEntityInfo()) {
+      EntityInfo *peiTarget = (EntityInfo*) (pen->GetEntityInfo());
+      GetEntityInfoPosition(pen, peiTarget->vTargetCenter, vTarget);
+    } else {
+      vTarget = pen->GetPlacement().pl_PositionVector;
+    }
 
     // calculate
     m_vTarget = (vTarget - GetPlacement().pl_PositionVector).Normalize();
