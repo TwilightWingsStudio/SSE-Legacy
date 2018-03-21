@@ -239,7 +239,7 @@ void Discord_UpdateInfo(BOOL bGameActive)
       sprintf(buffer, _getCurrentGameModeName());
       discordPresence.details = buffer;
       
-      if (_pNetwork->ga_sesSessionState.ses_ctMaxPlayers > 1)
+      if (_pNetwork->IsNetworkEnabled() && _pNetwork->ga_sesSessionState.ses_ctMaxPlayers > 1)
       {
         sprintf(buffer2, _pNetwork->ga_World.wo_strName.Undecorated());
         discordPresence.largeImageText = buffer2;
