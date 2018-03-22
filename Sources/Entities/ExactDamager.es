@@ -98,7 +98,7 @@ functions:
     // If no any entity to damage then stop.
     if (penVictim == NULL) {
       if (m_bDebugMessages) {
-        CPrintF(TRANS("[%s] : Haven't any entity to damage!\n"), m_strName);
+        CPrintF(TRANS("[%s] : Nothing to damage!\n"), m_strName);
       }
 
       return;

@@ -34,10 +34,10 @@ thumbnail "Thumbnails\\ExactTeleport.tbn";
 features  "HasName", "IsTargetable";
 
 properties:
-   1 CTString m_strName "Name" 'N'      = "Exact Teleport",
-   3 CTString m_strDescription = "",
+   1 CTString m_strName "Name" 'N' = "Exact Teleport",
+   3 CTString m_strDescription     = "",
    
-   4 BOOL m_bActive              "Active" 'A' = TRUE,
+   4 BOOL m_bActive        "Active" 'A' = TRUE,
    5 BOOL m_bDebugMessages "Debug Messages" = FALSE,
 
    6 CEntityPointer m_penEnityToTP   "Entity to Teleport" 'E',
@@ -104,7 +104,7 @@ functions:
     // If no any entity to teleport then stop.
     if (penEntityToTP == NULL) {
       if (m_bDebugMessages) {
-        CPrintF(TRANS("[%s] : Haven't any entity to teleport!\n"), m_strName);
+        CPrintF(TRANS("[%s] : Nothing to teleport!\n"), m_strName);
       }
 
       return;
@@ -135,7 +135,7 @@ functions:
     // If no destination where teleport then stop.
     if (penDestination == NULL) {
       if (m_bDebugMessages) {
-        CPrintF(TRANS("[%s] : Haven't destination to teleport!\n"), m_strName);
+        CPrintF(TRANS("[%s] : No teleport destination!\n"), m_strName);
       }
 
       return;

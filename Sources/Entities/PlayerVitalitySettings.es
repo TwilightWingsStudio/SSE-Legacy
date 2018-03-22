@@ -200,7 +200,7 @@ functions:
             }
           } else {
             if (m_bDebugMessages) {
-              CPrintF("  canceled! Target is NULL or not CPlayer!\n");
+              CPrintF("  canceled! Target is NULL or isn't a CPlayer entity!\n");
             }
           }
 
@@ -224,7 +224,7 @@ functions:
             }
           } else {
             if (m_bDebugMessages) {
-              CPrintF("  canceled! penCaused is NULL or not CPlayer!\n");
+              CPrintF("  canceled! penCaused is NULL or isn't a CPlayer entity!\n");
             }
           }
         } break;

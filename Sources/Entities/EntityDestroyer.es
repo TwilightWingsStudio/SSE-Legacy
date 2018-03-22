@@ -86,7 +86,7 @@ functions:
         m_boxDestroyArea.Size()(1), m_boxDestroyArea.Size()(2), m_boxDestroyArea.Size()(3));
       } break;
 
-      default: ((CTString&)m_strDescription).PrintF("<unknown-type>");
+      default: ((CTString&)m_strDescription).PrintF("<unknown type>");
     }
 
     return m_strDescription;
@@ -101,8 +101,8 @@ functions:
       return;
     }
 
-    BOOL bNoClass = m_strOnlyClass == "" ? TRUE : FALSE;
-    BOOL bNoName = m_strOnlyName == "" ? TRUE : FALSE;
+    BOOL bNoClass = (m_strOnlyClass == "");
+    BOOL bNoName = (m_strOnlyName == "");
 
     INDEX iDeletedEntities = 0;
 
@@ -210,7 +210,7 @@ functions:
         // Filter the penCaused if necessary.
         if (m_bIgnorePenCaused && pen == penCaused) {
           if (m_bDebugMessages) {
-            CPrintF("[%s] : Can't destroy penCaused entity!\n", m_strName, strDeletedEntity);
+            CPrintF("[%s] : Can't destroy penCaused entity!\n", m_strName);
           }
 
           return;
@@ -219,7 +219,7 @@ functions:
         BOOL bEditorEntity = ((pen->en_RenderType == RT_EDITORMODEL || pen->en_RenderType == RT_SKAEDITORMODEL) && m_bIgnoreEditor);
         
         if ((bNoClass || IsDerivedFromClass(pen, m_strOnlyClass)) && (bNoName || m_strOnlyName == pen->GetName())
-        && pen->en_RenderType != RT_BRUSH && !bEditorEntity && !pen->IsPlayerEntity())
+          && pen->en_RenderType != RT_BRUSH && !bEditorEntity && !pen->IsPlayerEntity())
         {
           pen->Destroy();
 
@@ -228,7 +228,7 @@ functions:
           }
         } else {
           if (m_bDebugMessages) {
-            CPrintF("[%s] : Can't destroy '%s' due to wrong class/name or it's a brush\n", m_strName, strDeletedEntity);
+            CPrintF("[%s] : Can't destroy '%s' due to wrong class/name/render type!\n", m_strName, strDeletedEntity);
           }
         }
       }
