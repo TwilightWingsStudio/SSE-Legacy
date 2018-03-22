@@ -8529,15 +8529,19 @@ procedures:
       m_penView = NULL;
     }
 
-    // stop and kill flame
-    CEntityPointer penFlame = GetChildOfClass("Flame");
-    if (penFlame!=NULL)
-    {
-      // send the event to stop burning
-      EStopFlaming esf;
-      esf.m_bNow=TRUE;
-      penFlame->SendEvent(esf);
-    }
+    // [SSE] Additional parented flames fix.
+    // stop and kill all parented flames
+    {FOREACHINLIST(CEntity, en_lnInParent, en_lhChildren, itenChild) {
+      if (IsOfClass(itenChild, "Flame")) {
+        // check if it exists, just in case
+        if (itenChild != NULL && !(itenChild->GetFlags()&ENF_DELETED)) {
+          // send the event to stop burning
+          EStopFlaming esf;
+          esf.m_bNow=TRUE;
+          itenChild->SendEvent(esf);
+        }
+      }
+    }}
 
     if (m_penView != NULL) {
       ((CPlayerView&)*m_penView).SendEvent(EEnd());
