@@ -2894,7 +2894,7 @@ functions:
     }*/
 
     SetSpeakMouthPitch();
-    PlaySound( m_soSpeech, fnmMessage, SOF_3D|SOF_VOLUMETRIC);
+    PlaySound( m_soSpeech, fnmMessage, SOF_3D|SOF_VOICE|SOF_VOLUMETRIC);
   }
 
   // --------------------------------------------------------------------------------------
