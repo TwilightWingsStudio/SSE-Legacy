@@ -1391,6 +1391,8 @@ properties:
  // [SSE]
  300 BOOL m_bExploded = FALSE,
 
+ 320 CTString m_strSubtitles = "",
+
  // [SSE] Gameplay - Weapon Inertia Effect
  350 ANGLE3D m_aWeaponSway = ANGLE3D(0, 0, 0),
  351 ANGLE3D m_aWeaponSwayOld = ANGLE3D(0, 0, 0),
@@ -1432,7 +1434,7 @@ properties:
   PlayerStats m_psGameStats;
   PlayerStats m_psGameTotal;
 
-  CModelObject m_moRender;                  // model object to render - this one can be customized
+  CModelObject m_moRender;  // model object to render - this one can be customized
 }
 
 components:
@@ -2887,9 +2889,9 @@ functions:
   // --------------------------------------------------------------------------------------
   void SayVoiceMessage(const CTFileName &fnmMessage)
   {
-    if (GetSettings()->ps_ulFlags&PSF_NOQUOTES) {
+    /*if (GetSettings()->ps_ulFlags&PSF_NOQUOTES) {
       return;
-    }
+    }*/
 
     SetSpeakMouthPitch();
     PlaySound( m_soSpeech, fnmMessage, SOF_3D|SOF_VOLUMETRIC);
@@ -3683,6 +3685,9 @@ functions:
       }
     }
     // [SSE] Respawn Sign END
+
+    // [SSE] Subtitles render
+    RenderSubtitles(pdp);
   }
   
   // --------------------------------------------------------------------------------------
@@ -3913,6 +3918,7 @@ functions:
       pdp->Fill(colBlend);
     }
 
+
     // print center message
     if (_pTimer->CurrentTick()<m_tmCenterMessageEnd) {
       PIX pixDPWidth  = pdp->GetWidth();
@@ -3923,7 +3929,39 @@ functions:
       pdp->SetTextAspect( 1.0f);
       pdp->PutTextCXY( m_strCenterMessage, pixDPWidth*0.5f, pixDPHeight*0.85f, C_WHITE|0xDD);
     }
+
+    // [SSE] Subtitles render
+    RenderSubtitles(pdp);
   }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Subtitles render
+  // --------------------------------------------------------------------------------------
+  void RenderSubtitles(CDrawPort *pdp)
+  {
+    if (m_strSubtitles != "")
+    {
+      PIX pixDPWidth  = pdp->GetWidth();
+      PIX pixDPHeight = pdp->GetHeight();
+      FLOAT fScale = (FLOAT)pixDPWidth/640.0f;
+      pdp->SetFont( _pfdDisplayFont);
+      pdp->SetTextScaling( fScale);
+      pdp->SetTextAspect( 1.0f);
+
+      FLOAT pixRenderX = pixDPWidth*0.5f;
+      FLOAT pixRenderY = pixDPHeight*0.875f;
+
+      FLOAT fResolutionScaling = (FLOAT)pixDPWidth / 640.0f;
+      FLOAT fTextHeight = (fResolutionScaling + 1) * 0.5f * _pfdDisplayFont->GetHeight();
+      FLOAT fBoxAdd = 6.0f;
+
+      pdp->Fill(pixRenderX - pdp->GetTextWidth(m_strSubtitles)/2 - fBoxAdd*fResolutionScaling,
+                pixRenderY - fTextHeight/2 - fBoxAdd*fResolutionScaling,
+                pdp->GetTextWidth(m_strSubtitles) + fBoxAdd*2.0f*fResolutionScaling,
+                fTextHeight + fBoxAdd*2.0f*fResolutionScaling, C_BLACK|0x80);
+      pdp->PutTextCXY(m_strSubtitles, pixRenderX, pixRenderY, C_WHITE|0xDD);
+    }
+  };
 
   // --------------------------------------------------------------------------------------
   void RenderGameView(CDrawPort *pdp, void *pvUserData)
@@ -5745,6 +5783,12 @@ functions:
       } else { // if speeds are like running
         en_fStepDnHeight = -1; // allow falling
       }
+    }
+
+    // [SSE] Subtitles reset
+    if (m_strSubtitles != "" && !m_soSpeech.IsPlaying())
+    {
+      m_strSubtitles = "";
     }
 
     // limit diagonal speed against abusing
@@ -8532,9 +8576,9 @@ procedures:
     // [SSE] Additional parented flames fix.
     // stop and kill all parented flames
     {FOREACHINLIST(CEntity, en_lnInParent, en_lhChildren, itenChild) {
-      if (IsOfClass(itenChild, "Flame")) {
-        // check if it exists, just in case
-        if (itenChild != NULL && !(itenChild->GetFlags()&ENF_DELETED)) {
+      // check if it exists, just in case
+      if (itenChild != NULL && !(itenChild->GetFlags()&ENF_DELETED)) {
+        if (IsOfClass(itenChild, "Flame")) {
           // send the event to stop burning
           EStopFlaming esf;
           esf.m_bNow=TRUE;
@@ -9440,6 +9484,10 @@ procedures:
 
       on (EVoiceMessage eMsg) : {
         SayVoiceMessage(eMsg.fnmMessage);
+        if (GetSettings()->ps_ulFlags&PSF_SHOWSUBTITLES)
+        {
+          m_strSubtitles = eMsg.strSubtitles;
+        }
         resume;
       }
 

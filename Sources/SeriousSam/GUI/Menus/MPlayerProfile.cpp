@@ -135,7 +135,7 @@ void CPlayerProfileMenu::Initialize_t(void)
   gm_mg3rdPerson.mg_boxOnScreen = BoxPlayerSwitch(8.0f);
   gm_mg3rdPerson.mg_iCenterI = -1;
 
-  TRIGGER_MG(gm_mgQuotes, 4.0, gm_mg3rdPerson, gm_mgAutoSave, TRANS("VOICE QUOTES"), astrNoYes);
+  TRIGGER_MG(gm_mgQuotes, 4.0, gm_mg3rdPerson, gm_mgAutoSave, TRANS("SHOW SUBTITLES"), astrNoYes);
   gm_mgQuotes.mg_boxOnScreen = BoxPlayerSwitch(9.0f);
   gm_mgQuotes.mg_iCenterI = -1;
 
@@ -224,7 +224,7 @@ void CPlayerProfileMenu::SelectPlayer(INDEX iPlayer)
   gm_mg3rdPerson.mg_iSelected = (pps->ps_ulFlags&PSF_PREFER3RDPERSON) ? 1 : 0;
   gm_mg3rdPerson.ApplyCurrentSelection();
 
-  gm_mgQuotes.mg_iSelected = (pps->ps_ulFlags&PSF_NOQUOTES) ? 0 : 1;
+  gm_mgQuotes.mg_iSelected = (pps->ps_ulFlags&PSF_SHOWSUBTITLES) ? 1 : 0;
   gm_mgQuotes.ApplyCurrentSelection();
 
   gm_mgAutoSave.mg_iSelected = (pps->ps_ulFlags&PSF_AUTOSAVE) ? 1 : 0;
@@ -357,9 +357,9 @@ static void ChangeQuotes(INDEX iNew)
   INDEX iPlayer = *_pGUIM->gmPlayerProfile.gm_piCurrentPlayer;
   CPlayerSettings *pps = (CPlayerSettings *)_pGame->gm_apcPlayers[iPlayer].pc_aubAppearance;
   if (iNew) {
-    pps->ps_ulFlags &= ~PSF_NOQUOTES;
+    pps->ps_ulFlags |= PSF_SHOWSUBTITLES;
   } else {
-    pps->ps_ulFlags |= PSF_NOQUOTES;
+    pps->ps_ulFlags &= ~PSF_SHOWSUBTITLES;
   }
 }
 

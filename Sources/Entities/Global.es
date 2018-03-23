@@ -341,6 +341,7 @@ event EComputerMessage {
 // event for voice message to a player
 event EVoiceMessage {
   CTFileName fnmMessage,        // the message file
+  CTString strSubtitles,        // quote subtitles
 };
 
 event EHitBySpaceShipBeam {

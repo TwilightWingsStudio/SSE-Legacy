@@ -27,13 +27,17 @@ features  "HasName", "IsTargetable";
 properties:
   1 CTString m_strName          "Name" 'N' = "VoiceHolder",
   3 CTString m_strDescription = "",
-  2 CTFileName m_fnmMessage  "Message" 'M' = CTString("") features(EPROPF_READONLY),
-  5 BOOL m_bActive "Active" 'A' = TRUE,
-  6 INDEX m_ctMaxTrigs            "Max trigs" 'X' = 1, // how many times could trig
+  2 CTFileName m_fnmMessage     "Message" 'M' = CTString("") features(EPROPF_READONLY),
 
-  {
-    CAutoPrecacheSound m_aps;
-  }
+  5 BOOL m_bActive     "Active" 'A' = TRUE,
+  6 INDEX m_ctMaxTrigs "Max trigs" 'X' = 1, // how many times could trig
+
+ // [SSE] Subtitles support
+ 10 CTString m_strSubtitles "Subtitles" 'S' = "",
+
+{
+  CAutoPrecacheSound m_aps;
+}
 
 components:
   1 model   MODEL_MARKER     "Models\\Editor\\VoiceHolder.mdl",
@@ -77,6 +81,7 @@ procedures:
         CEntity *penCaused = FixupCausedToPlayer(this, eTrigger.penCaused);
         EVoiceMessage eMsg;
         eMsg.fnmMessage = m_fnmMessage;
+        eMsg.strSubtitles = m_strSubtitles;
         penCaused->SendEvent(eMsg);
 
         // if max trig count is used for counting
@@ -107,4 +112,3 @@ procedures:
     return;
   }
 };
-
