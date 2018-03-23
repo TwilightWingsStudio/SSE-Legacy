@@ -33,8 +33,12 @@ class CAudioOptionsMenu : public CGameMenu
     CMGTrigger *gm_pAudioAutoTrigger;
     CMGTrigger *gm_pAudioAPITrigger;
     CMGTrigger *gm_pFrequencyTrigger;
+
+    CMGSlider *gm_pMasterVolume;
     CMGSlider *gm_pWaveVolume;
     CMGSlider *gm_pMPEGVolume;
+    CMGSlider *gm_pVoiceVolume;
+
     CMGButton *gm_pApplyButton;
 
   public:

@@ -37,7 +37,6 @@ void CAudioOptionsMenu::Initialize_t(void)
   gm_pAudioAutoTrigger = new CMGTrigger(TRANS("AUTO-ADJUST"));
   gm_pAudioAutoTrigger->mg_strTip = TRANS("adjust quality to fit your system");
   gm_pAudioAutoTrigger->mg_pmgUp = gm_pApplyButton;
-  gm_pAudioAutoTrigger->mg_pmgDown = gm_pFrequencyTrigger;
   gm_pAudioAutoTrigger->mg_boxOnScreen = BoxMediumRow(0);
   gm_pAudioAutoTrigger->mg_astrTexts = astrNoYes;
   gm_pAudioAutoTrigger->mg_ctTexts = sizeof(astrNoYes) / sizeof(astrNoYes[0]);
@@ -47,7 +46,6 @@ void CAudioOptionsMenu::Initialize_t(void)
   gm_pFrequencyTrigger = new CMGTrigger(TRANS("FREQUENCY"));
   gm_pFrequencyTrigger->mg_strTip = TRANS("select sound quality or turn sound off");
   gm_pFrequencyTrigger->mg_pmgUp = gm_pAudioAutoTrigger;
-  gm_pFrequencyTrigger->mg_pmgDown = gm_pAudioAPITrigger;
   gm_pFrequencyTrigger->mg_boxOnScreen = BoxMediumRow(1);
   gm_pFrequencyTrigger->mg_astrTexts = astrFrequencyRadioTexts;
   gm_pFrequencyTrigger->mg_ctTexts = sizeof(astrFrequencyRadioTexts) / sizeof(astrFrequencyRadioTexts[0]);
@@ -57,32 +55,49 @@ void CAudioOptionsMenu::Initialize_t(void)
   gm_pAudioAPITrigger = new CMGTrigger(TRANS("SOUND SYSTEM"));
   gm_pAudioAPITrigger->mg_strTip = TRANS("choose sound system (API) to use");
   gm_pAudioAPITrigger->mg_pmgUp = gm_pFrequencyTrigger;
-  gm_pAudioAPITrigger->mg_pmgDown = gm_pWaveVolume;
   gm_pAudioAPITrigger->mg_boxOnScreen = BoxMediumRow(2);
   gm_pAudioAPITrigger->mg_astrTexts = astrSoundAPIRadioTexts;
   gm_pAudioAPITrigger->mg_ctTexts = sizeof(astrSoundAPIRadioTexts) / sizeof(astrSoundAPIRadioTexts[0]);
   gm_pAudioAPITrigger->mg_strValue = astrSoundAPIRadioTexts[0];
+  
+  // Initialize "Master Volume" slider.
+  gm_pMasterVolume = new CMGSlider(TRANS("MASTER VOLUME"));
+  gm_pMasterVolume->mg_boxOnScreen = BoxMediumRow(3);
+  gm_pMasterVolume->mg_strTip = TRANS("adjust volume of all sounds");
+  gm_pMasterVolume->mg_pmgUp = gm_pAudioAPITrigger;
 
   // Initialize "Sound Effects Volume" slider.
   gm_pWaveVolume = new CMGSlider(TRANS("SOUND EFFECTS VOLUME"));
-  gm_pWaveVolume->mg_boxOnScreen = BoxMediumRow(3);
+  gm_pWaveVolume->mg_boxOnScreen = BoxMediumRow(4);
   gm_pWaveVolume->mg_strTip = TRANS("adjust volume of in-game sound effects");
-  gm_pWaveVolume->mg_pmgUp = gm_pAudioAPITrigger;
-  gm_pWaveVolume->mg_pmgDown = gm_pMPEGVolume;
+  gm_pWaveVolume->mg_pmgUp = gm_pMasterVolume;
 
   // Initialize "Music Volume" slider.
   gm_pMPEGVolume = new CMGSlider(TRANS("MUSIC VOLUME"));
-  gm_pMPEGVolume->mg_boxOnScreen = BoxMediumRow(4);
+  gm_pMPEGVolume->mg_boxOnScreen = BoxMediumRow(5);
   gm_pMPEGVolume->mg_strTip = TRANS("adjust volume of in-game music");
   gm_pMPEGVolume->mg_pmgUp = gm_pWaveVolume;
-  gm_pMPEGVolume->mg_pmgDown = gm_pApplyButton;
+  
+  // Initialize "Voice Volume" slider.
+  gm_pVoiceVolume = new CMGSlider(TRANS("VOICE VOLUME"));
+  gm_pVoiceVolume->mg_boxOnScreen = BoxMediumRow(6);
+  gm_pVoiceVolume->mg_strTip = TRANS("adjust volume of in-game voices");
+  gm_pVoiceVolume->mg_pmgUp = gm_pMPEGVolume;
 
   // Initialize "Apply" button.
   gm_pApplyButton = new CMGButton(TRANS("APPLY"));
   gm_pApplyButton->mg_bfsFontSize = BFS_LARGE;
-  gm_pApplyButton->mg_boxOnScreen = BoxBigRow(4);
+  gm_pApplyButton->mg_boxOnScreen = BoxBigRow(6);
   gm_pApplyButton->mg_strTip = TRANS("activate selected options");
   gm_pApplyButton->mg_pmgUp = gm_pMPEGVolume;
+
+  gm_pAudioAutoTrigger->mg_pmgDown = gm_pFrequencyTrigger;
+  gm_pFrequencyTrigger->mg_pmgDown = gm_pAudioAPITrigger;
+  gm_pAudioAPITrigger->mg_pmgDown = gm_pMasterVolume;
+  gm_pMasterVolume->mg_pmgDown = gm_pWaveVolume;
+  gm_pWaveVolume->mg_pmgDown = gm_pMPEGVolume;
+  gm_pMPEGVolume->mg_pmgDown = gm_pVoiceVolume;
+  gm_pVoiceVolume->mg_pmgDown = gm_pApplyButton;  
   gm_pApplyButton->mg_pmgDown = gm_pAudioAutoTrigger;
 
   // Add components.
@@ -90,8 +105,11 @@ void CAudioOptionsMenu::Initialize_t(void)
   AddChild(gm_pAudioAutoTrigger);
   AddChild(gm_pFrequencyTrigger);
   AddChild(gm_pAudioAPITrigger);
+
+  AddChild(gm_pMasterVolume);
   AddChild(gm_pWaveVolume);
   AddChild(gm_pMPEGVolume);
+  AddChild(gm_pVoiceVolume);
   AddChild(gm_pApplyButton);
 }
 
@@ -110,6 +128,11 @@ static void RefreshSoundFormat(void)
 
   gmCurrent.gm_pAudioAutoTrigger->mg_iSelected = Clamp(sam_bAutoAdjustAudio, 0, 1);
   gmCurrent.gm_pAudioAPITrigger->mg_iSelected = Clamp(_pShell->GetINDEX("snd_iInterface"), 0L, 2L);
+  
+  gmCurrent.gm_pMasterVolume->mg_iMinPos = 0;
+  gmCurrent.gm_pMasterVolume->mg_iMaxPos = VOLUME_STEPS;
+  gmCurrent.gm_pMasterVolume->mg_iCurPos = (INDEX)(_pShell->GetFLOAT("snd_fMasterVolume")*VOLUME_STEPS + 0.5f);
+  gmCurrent.gm_pMasterVolume->ApplyCurrentPosition();
 
   gmCurrent.gm_pWaveVolume->mg_iMinPos = 0;
   gmCurrent.gm_pWaveVolume->mg_iMaxPos = VOLUME_STEPS;
@@ -120,6 +143,11 @@ static void RefreshSoundFormat(void)
   gmCurrent.gm_pMPEGVolume->mg_iMaxPos = VOLUME_STEPS;
   gmCurrent.gm_pMPEGVolume->mg_iCurPos = (INDEX)(_pShell->GetFLOAT("snd_fMusicVolume")*VOLUME_STEPS + 0.5f);
   gmCurrent.gm_pMPEGVolume->ApplyCurrentPosition();
+  
+  gmCurrent.gm_pVoiceVolume->mg_iMinPos = 0;
+  gmCurrent.gm_pVoiceVolume->mg_iMaxPos = VOLUME_STEPS;
+  gmCurrent.gm_pVoiceVolume->mg_iCurPos = (INDEX)(_pShell->GetFLOAT("snd_fVoiceVolume")*VOLUME_STEPS + 0.5f);
+  gmCurrent.gm_pVoiceVolume->ApplyCurrentPosition();
 
   gmCurrent.gm_pAudioAutoTrigger->ApplyCurrentSelection();
   gmCurrent.gm_pAudioAPITrigger->ApplyCurrentSelection();
@@ -141,12 +169,22 @@ BOOL CAudioOptionsMenu::OnEvent(const SEvent& event)
     {
       INDEX iNewValue = event.GuiEvent.IntValue;
       
-      if (event.GuiEvent.Caller == gm_pWaveVolume) {
+      // "Master Volume"
+      if (event.GuiEvent.Caller == gm_pMasterVolume) {
+        _pShell->SetFLOAT("snd_fMasterVolume", event.GuiEvent.IntValue / FLOAT(VOLUME_STEPS));
+        return TRUE;
+      
+      } else if (event.GuiEvent.Caller == gm_pWaveVolume) {
         _pShell->SetFLOAT("snd_fSoundVolume", event.GuiEvent.IntValue / FLOAT(VOLUME_STEPS));
         return TRUE;
 
       } else if (event.GuiEvent.Caller == gm_pMPEGVolume) {
         _pShell->SetFLOAT("snd_fMusicVolume", event.GuiEvent.IntValue / FLOAT(VOLUME_STEPS));
+        return TRUE;
+      
+      // Voice Volume
+      } else if (event.GuiEvent.Caller == gm_pVoiceVolume) {
+        _pShell->SetFLOAT("snd_fVoiceVolume", event.GuiEvent.IntValue / FLOAT(VOLUME_STEPS));
         return TRUE;
 
       } else if (event.GuiEvent.Caller == gm_pFrequencyTrigger) {
@@ -157,14 +195,23 @@ BOOL CAudioOptionsMenu::OnEvent(const SEvent& event)
       }
 
     } else if (event.GuiEvent.EventType == EGET_TRIGGERED) {
+      
+      if (event.GuiEvent.Caller == gm_pMasterVolume) {
+        gm_pMasterVolume->mg_iCurPos -= 5;
+        gm_pMasterVolume->ApplyCurrentPosition();
 
-      if (event.GuiEvent.Caller == gm_pWaveVolume) {
+      } else if (event.GuiEvent.Caller == gm_pWaveVolume) {
         gm_pWaveVolume->mg_iCurPos -= 5;
         gm_pWaveVolume->ApplyCurrentPosition();
 
       } else if (event.GuiEvent.Caller == gm_pMPEGVolume) {
         gm_pMPEGVolume->mg_iCurPos -= 5;
         gm_pMPEGVolume->ApplyCurrentPosition();
+      
+      // "Voice Volume"
+      } else if (event.GuiEvent.Caller == gm_pVoiceVolume) {
+        gm_pVoiceVolume->mg_iCurPos -= 5;
+        gm_pVoiceVolume->ApplyCurrentPosition();
 
       } else if (event.GuiEvent.Caller == gm_pApplyButton) {
         sam_bAutoAdjustAudio = gm_pAudioAutoTrigger->mg_iSelected;
