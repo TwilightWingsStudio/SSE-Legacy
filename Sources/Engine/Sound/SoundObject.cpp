@@ -52,6 +52,7 @@ extern FLOAT snd_fSoundVolume;
 extern FLOAT snd_fMusicVolume;
 
 // [SSE] Advanced Sound Mixer
+extern FLOAT snd_fMasterVolume;
 extern FLOAT snd_fVoiceVolume;
 
 static CTString GetPred(CEntity*pen)
@@ -301,6 +302,10 @@ void CSoundObject::Play_internal( CSoundData *pCsdLink, SLONG slFlags)
         so_fLastLeftVolume  *= snd_fSoundVolume;
         so_fLastRightVolume *= snd_fSoundVolume;
       }
+
+      // [SSE] Advanced Sound Mixer
+      so_fLastLeftVolume  *= snd_fMasterVolume;
+      so_fLastRightVolume *= snd_fMasterVolume;
     }
   }
 }
@@ -621,6 +626,10 @@ void CSoundObject::PrepareSound(void)
     so_fLastLeftVolume  *= snd_fSoundVolume;
     so_fLastRightVolume *= snd_fSoundVolume;
   }
+  
+  // [SSE] Advanced Sound Mixer
+  so_fLastLeftVolume  *= snd_fMasterVolume;
+  so_fLastRightVolume *= snd_fMasterVolume;
 };
 
 

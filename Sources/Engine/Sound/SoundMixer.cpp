@@ -39,6 +39,7 @@ extern FLOAT snd_fMusicVolume;
 extern INDEX snd_bMono;
 
 // [SSE] Advanced Sound Mixer
+extern FLOAT snd_fMasterVolume;
 extern FLOAT snd_fVoiceVolume;
 
 
@@ -72,6 +73,9 @@ void ResetMixer( const SLONG *pslBuffer, const SLONG slBufferSize)
   // clamp master volumes
   snd_fSoundVolume = Clamp(snd_fSoundVolume, 0.0f, 1.0f);
   snd_fMusicVolume = Clamp(snd_fMusicVolume, 0.0f, 1.0f);
+
+  snd_fMasterVolume = Clamp(snd_fMasterVolume, 0.0f, 1.0f);
+  snd_fVoiceVolume = Clamp(snd_fVoiceVolume, 0.0f, 1.0f);
 
   // cache local variables
   ASSERT( slBufferSize%4==0);
@@ -629,6 +633,10 @@ void MixSound( CSoundObject *pso)
     fNewLeftVolume  *= snd_fSoundVolume;
     fNewRightVolume *= snd_fSoundVolume;
   }
+
+  // [SSE] Advanced Sound Mixer
+  fNewLeftVolume  *= snd_fMasterVolume;
+  fNewRightVolume *= snd_fMasterVolume;
 
   // if both channel volumes are too low
   if( fLeftVolume<0.001f && fRightVolume<0.001f && fNewLeftVolume<0.001f && fNewRightVolume<0.001f)

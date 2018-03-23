@@ -52,6 +52,7 @@ extern FLOAT snd_fSoundVolume = 1.0f; // master volume for sound playing [0..1]
 extern FLOAT snd_fMusicVolume = 1.0f; // master volume for music playing [0..1]
 
 // [SSE] Advanced Sound Mixer
+extern FLOAT snd_fMasterVolume = 1.0F; // controls volume of everything
 extern FLOAT snd_fVoiceVolume = 1.0F; // master volume for voice playing [0..1]
 
 // NOTES: 
@@ -769,6 +770,8 @@ void CSoundLibrary::Init(void)
   _pShell->DeclareSymbol( "persistent user FLOAT snd_fBFilter;",     &snd_fBFilter);
   _pShell->DeclareSymbol( "persistent user FLOAT snd_fUFilter;",     &snd_fUFilter);
   _pShell->DeclareSymbol( "persistent user FLOAT snd_fDFilter;",     &snd_fDFilter);
+
+  _pShell->DeclareSymbol( "persistent user FLOAT snd_fMasterVolume;", &snd_fMasterVolume); // [SSE] Advanced Sound Mixer
   _pShell->DeclareSymbol( "persistent user FLOAT snd_fSoundVolume;", &snd_fSoundVolume);
   _pShell->DeclareSymbol( "persistent user FLOAT snd_fMusicVolume;", &snd_fMusicVolume);
   _pShell->DeclareSymbol( "persistent user FLOAT snd_fVoiceVolume;", &snd_fVoiceVolume); // [SSE] Advanced Sound Mixer
