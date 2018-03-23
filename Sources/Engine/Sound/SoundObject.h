@@ -36,6 +36,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define SOF_NONGAME      (1L<<7)   // game sounds are not mixed while the game is paused
 #define SOF_NOFILTER     (1L<<8)   // used to disable listener-specific filters - i.e. underwater
 
+// [SSE] Advanced Sound Mixer
+#define SOF_VOICE        (1L << 9) // use voice-volume master control
+
 #define SOF_PAUSED       (1L<<28)  // playing, but paused (internal)
 #define SOF_LOADED       (1L<<29)  // sound just loaded (internal)
 #define SOF_PREPARE      (1L<<30)  // prepared for playing (internal)

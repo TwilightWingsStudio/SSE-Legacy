@@ -38,6 +38,9 @@ extern FLOAT snd_fSoundVolume;
 extern FLOAT snd_fMusicVolume;
 extern INDEX snd_bMono;
 
+// [SSE] Advanced Sound Mixer
+extern FLOAT snd_fVoiceVolume;
+
 
 // a bunch of local vars coming up
 
@@ -612,10 +615,16 @@ void MixSound( CSoundObject *pso)
   FLOAT fNewLeftVolume  = ClampDn( pso->so_sp.sp_fLeftVolume,  0.0f);
   FLOAT fNewRightVolume = ClampDn( pso->so_sp.sp_fRightVolume, 0.0f);
 
+  // [SSE] Advanced Sound Mixer
+  if (pso->so_slFlags & SOF_VOICE) {
+    fNewLeftVolume  *= snd_fVoiceVolume;
+    fNewRightVolume *= snd_fVoiceVolume;  
+
   // adjust for master volume
-  if(pso->so_slFlags&SOF_MUSIC) {
+  } else if (pso->so_slFlags&SOF_MUSIC) {
     fNewLeftVolume  *= snd_fMusicVolume;
     fNewRightVolume *= snd_fMusicVolume;
+
   } else {
     fNewLeftVolume  *= snd_fSoundVolume;
     fNewRightVolume *= snd_fSoundVolume;

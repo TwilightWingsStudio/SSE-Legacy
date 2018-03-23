@@ -51,6 +51,9 @@ extern BOOL _bPredictionActive;
 extern FLOAT snd_fSoundVolume;
 extern FLOAT snd_fMusicVolume;
 
+// [SSE] Advanced Sound Mixer
+extern FLOAT snd_fVoiceVolume;
+
 static CTString GetPred(CEntity*pen)
 {
   CTString str1;
@@ -284,8 +287,14 @@ void CSoundObject::Play_internal( CSoundData *pCsdLink, SLONG slFlags)
       so_swLastLeftSample  = 0;
       so_swLastRightSample = 0;
     } else {
+      
+      // [SSE] Advanced Sound Mixer
+      if (so_slFlags & SOF_VOICE) {
+        so_fLastLeftVolume  *= snd_fVoiceVolume;
+        so_fLastRightVolume *= snd_fVoiceVolume;
+
       // adjust for master volume
-      if(so_slFlags&SOF_MUSIC) {
+      } else if(so_slFlags&SOF_MUSIC) {
         so_fLastLeftVolume  *= snd_fMusicVolume;
         so_fLastRightVolume *= snd_fMusicVolume;
       } else {
@@ -597,10 +606,17 @@ void CSoundObject::PrepareSound(void)
 
   so_fLastLeftVolume = so_spNew.sp_fLeftVolume;
   so_fLastRightVolume = so_spNew.sp_fRightVolume;
+  
+  // [SSE] Advanced Sound Mixer
+  if (so_slFlags & SOF_VOICE) {
+    so_fLastLeftVolume  *= snd_fVoiceVolume;
+    so_fLastRightVolume *= snd_fVoiceVolume;
+  
   // adjust for master volume
-  if(so_slFlags&SOF_MUSIC) {
+  } else if(so_slFlags&SOF_MUSIC) {
     so_fLastLeftVolume  *= snd_fMusicVolume;
     so_fLastRightVolume *= snd_fMusicVolume;
+
   } else {
     so_fLastLeftVolume  *= snd_fSoundVolume;
     so_fLastRightVolume *= snd_fSoundVolume;
