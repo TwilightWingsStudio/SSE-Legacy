@@ -54,7 +54,7 @@ properties:
   2 CTFileName m_fnModel      "Model" 'M'   = CTFILENAME("Models\\Editor\\Axis.mdl")   features(EPROPF_READONLY),
   3 CTFileName m_fnTexture    "Texture" 'T' = CTFILENAME("Models\\Editor\\Vector.tex") features(EPROPF_READONLY),
   4 CEntityPointer m_penSoundPick    "Sound Pick Up",
-  5 CTStringTrans m_strPickUpMessage "Message" = "Vital",
+  //5 CTStringTrans m_strPickUpMessage "Message" = "Vital",
   6 FLOAT m_fAmount                  "Amount"  = 1.0F,
   7 enum EVitalValueRange m_eValueRange   "Value Range" = EVVR_TOP,
   
