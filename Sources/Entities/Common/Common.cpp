@@ -136,63 +136,76 @@ void SendToTargetScript(CEntity *penSendEvent, INDEX iEventType, CEntity *penCau
 }
 
 // send event to target
-void SendToTarget(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused) {
-  // if target is valid
-  if (penSendEvent != NULL) {
-    switch (eetEventType) {
-      // send START event
-      case EET_START: {
-        EStart eStart;
-        eStart.penCaused = penCaused;
-        penSendEvent->SendEvent(eStart);
-                      } break;
-      // send STOP event
-      case EET_STOP:
-        penSendEvent->SendEvent(EStop());
-        break;
-      // send TRIGGER event
-      case EET_TRIGGER: {
-        ETrigger eTrigger;
-        eTrigger.penCaused = penCaused;
-        penSendEvent->SendEvent(eTrigger);
-                        } break;
-      // don't send event (IGNORE)
-      case EET_IGNORE:
-        break;
-      // send ACTIVATE event
-      case EET_ACTIVATE:
-        penSendEvent->SendEvent(EActivate());
-        break;
-      // send DEACTIVATE event
-      case EET_DEACTIVATE:
-        penSendEvent->SendEvent(EDeactivate());
-        break;
-      // send ENVIRONMENTSTART event
-      case EET_ENVIRONMENTSTART:
-        penSendEvent->SendEvent(EEnvironmentStart());
-        break;
-      // send ENVIRONMENTSTOP event
-      case EET_ENVIRONMENTSTOP:
-        penSendEvent->SendEvent(EEnvironmentStop());
-        break;
-      // send STARTATTACK event
-      case EET_STARTATTACK:
-        penSendEvent->SendEvent(EStartAttack());
-        break;
-      // send STOPATTACK event
-      case EET_STOPATTACK:
-        penSendEvent->SendEvent(EStopAttack());
-        break;
-      case EET_STOPBLINDNESS:
-        penSendEvent->SendEvent(EStopBlindness());
-        break;
-      case EET_STOPDEAFNESS:
-        penSendEvent->SendEvent(EStopDeafness());
-        break;
-      case EET_TELEPORTMOVINGBRUSH:
-        penSendEvent->SendEvent(ETeleportMovingBrush());
-        break;
-    }
+void SendToTarget(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused)
+{
+  // If we don't have target then don't send event.
+  if (penSendEvent == NULL) {
+    return;
+  }
+
+  switch (eetEventType)
+  {
+    // send START event
+    case EET_START: {
+      EStart eStart;
+      eStart.penCaused = penCaused;
+      penSendEvent->SendEvent(eStart);
+                    } break;
+    // send STOP event
+    case EET_STOP:
+      penSendEvent->SendEvent(EStop());
+      break;
+    // send TRIGGER event
+    case EET_TRIGGER: {
+      ETrigger eTrigger;
+      eTrigger.penCaused = penCaused;
+      penSendEvent->SendEvent(eTrigger);
+    } break;
+
+    // [SSE] Entities - Targeted Event
+    case EET_TARGETED:
+      ETargeted eTargeted;
+      eTargeted.penCaused = penCaused;
+      eTargeted.penTarget = NULL;
+      penSendEvent->SendEvent(eTargeted);
+    } break;
+    
+    // don't send event (IGNORE)
+    case EET_IGNORE:
+      break;
+    // send ACTIVATE event
+    case EET_ACTIVATE:
+      penSendEvent->SendEvent(EActivate());
+      break;
+    // send DEACTIVATE event
+    case EET_DEACTIVATE:
+      penSendEvent->SendEvent(EDeactivate());
+      break;
+    // send ENVIRONMENTSTART event
+    case EET_ENVIRONMENTSTART:
+      penSendEvent->SendEvent(EEnvironmentStart());
+      break;
+    // send ENVIRONMENTSTOP event
+    case EET_ENVIRONMENTSTOP:
+      penSendEvent->SendEvent(EEnvironmentStop());
+      break;
+    // send STARTATTACK event
+    case EET_STARTATTACK:
+      penSendEvent->SendEvent(EStartAttack());
+      break;
+    // send STOPATTACK event
+    case EET_STOPATTACK:
+      penSendEvent->SendEvent(EStopAttack());
+      break;
+    case EET_STOPBLINDNESS:
+      penSendEvent->SendEvent(EStopBlindness());
+      break;
+    case EET_STOPDEAFNESS:
+      penSendEvent->SendEvent(EStopDeafness());
+      break;
+    case EET_TELEPORTMOVINGBRUSH:
+      penSendEvent->SendEvent(ETeleportMovingBrush());
+      break;
   }
 };
 
