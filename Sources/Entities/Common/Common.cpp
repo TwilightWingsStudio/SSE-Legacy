@@ -150,11 +150,13 @@ void SendToTarget(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCa
       EStart eStart;
       eStart.penCaused = penCaused;
       penSendEvent->SendEvent(eStart);
-                    } break;
+    } break;
+
     // send STOP event
-    case EET_STOP:
+    case EET_STOP: {
       penSendEvent->SendEvent(EStop());
-      break;
+    } break;
+
     // send TRIGGER event
     case EET_TRIGGER: {
       ETrigger eTrigger;
@@ -163,7 +165,7 @@ void SendToTarget(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCa
     } break;
 
     // [SSE] Entities - Targeted Event
-    case EET_TARGETED:
+    case EET_TARGETED: {
       ETargeted eTargeted;
       eTargeted.penCaused = penCaused;
       eTargeted.penTarget = NULL;
