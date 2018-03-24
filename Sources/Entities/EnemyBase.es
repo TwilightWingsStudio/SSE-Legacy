@@ -827,6 +827,11 @@ functions:
     if (penInflictor == NULL) {
       return TRUE;
     }
+    
+    // Always deal damage to self.
+    if (penInflictor == this) {
+      return TRUE;
+    }
 
     CEnemyFactionHolder* penEFH = GetFactionHolder(TRUE);
 
