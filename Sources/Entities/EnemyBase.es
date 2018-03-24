@@ -916,7 +916,8 @@ functions:
     fNewDamage *= GetGameDamageMultiplier(m_bBoss);
     
     // [SSE] Enemy Settings Entity
-    if (m_penSettings && m_penSettings->IsActive()) {
+    // Block damage until enemy alive.
+    if (m_penSettings && m_penSettings->IsActive() && IsAlive()) {
       fNewDamage *= static_cast<CEnemySettingsEntity*>(&*m_penSettings)->m_fDamageTakeMul;
     }
     //
