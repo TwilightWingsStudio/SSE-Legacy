@@ -19,13 +19,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "StdH.h"
 %}
 
-enum EExDTargetType {
-  0 EEDTT_TARGET      "0 Target",
-  1 EEDTT_THIS        "1 This Entity",
-  2 EEDTT_PENCAUSED   "2 penCaused",
-  3 EEDTT_PENTARGET   "3 penTarget (targetted)",
-};
-
 class CExactDamager : CRationalEntity {
 name      "CExactDamager";
 thumbnail "Thumbnails\\ExactDamager.tbn";
@@ -44,8 +37,8 @@ properties:
    8 CEntityPointer m_penInflictor "Inflictor Target" 'Y',
    9 CEntityPointer m_penVictim    "Victim Target" 'E',
    
-  10 enum EExDTargetType m_eInflictorType "Inflictor Type" = EEDTT_TARGET,
-  11 enum EExDTargetType m_eVictimType    "Victim Type"    = EEDTT_TARGET,
+  10 enum TETargetType m_teInflictorType "Inflictor Type" = TETT_TARGET,
+  11 enum TETargetType m_teVictimType    "Victim Type"    = TETT_TARGET,
 
 components:
   1 model   MODEL_EXACTDAMAGER   "Models\\Editor\\ExactDamager.mdl",
@@ -78,15 +71,15 @@ functions:
     CEntity *penInflictor = m_penInflictor;
 
     // Extended victim types.
-    switch (m_eVictimType)
+    switch (m_teVictimType)
     {
-      case EEDTT_PENCAUSED: {
+      case TETT_PENCAUSED: {
         if (penCaused) {
           penVictim = penCaused;
         }
       } break;
       
-      case EEDTT_PENTARGET: {
+      case TETT_PENTARGET: {
         if (penTarget) {
           penVictim = penTarget;
         }
@@ -105,21 +98,21 @@ functions:
     }
 
     // Extended inflictor types.
-    switch (m_eInflictorType)
+    switch (m_teInflictorType)
     {
-      case EEDTT_PENCAUSED: {
+      case TETT_PENCAUSED: {
         if (penCaused) {
           penInflictor = penCaused;
         }
       } break;
 
-      case EEDTT_PENTARGET: {
+      case TETT_PENTARGET: {
         if (penTarget) {
           penInflictor = penTarget;
         }
       } break;
       
-      case EEDTT_THIS: {
+      case TETT_THIS: {
         penInflictor = this;
       } break;
 
@@ -145,8 +138,8 @@ procedures:
     SetModel(MODEL_EXACTDAMAGER);
     SetModelMainTexture(TEXTURE_EXACTDAMAGER);
     
-    if (m_eVictimType == EEDTT_THIS) {
-      m_eVictimType = EEDTT_TARGET;
+    if (m_teVictimType == TETT_THIS) {
+      m_teVictimType = TETT_TARGET;
     }
   
     autowait(0.1f);

@@ -21,13 +21,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "Entities/PlayerWeapons.h"
 %}
 
-enum EExTTargetType {
-  0 EETTT_TARGET      "0 Target",
-  1 EETTT_THIS        "1 This Entity",
-  2 EETTT_PENCAUSED   "2 penCaused",
-  3 EETTT_PENTARGET   "3 penTarget (targetted)",
-};
-
 class CExactTeleport: CRationalEntity {
 name      "CExactTeleport";
 thumbnail "Thumbnails\\ExactTeleport.tbn";
@@ -43,8 +36,8 @@ properties:
    6 CEntityPointer m_penEnityToTP   "Entity to Teleport" 'E',
    7 CEntityPointer m_penDestination "Destination Target" 'T',
 
-  10 enum EExTTargetType m_eEntityType      "EtT Type" = EETTT_TARGET,
-  11 enum EExTTargetType m_eDestinationType "Destination Type" = EETTT_TARGET,
+  10 enum TETargetType m_teEntityType      "EtT Type" = TETT_TARGET,
+  11 enum TETargetType m_teDestinationType "Destination Type" = TETT_TARGET,
    
   25 BOOL m_bForceStop              "Force Stop" 'F' = FALSE,
   26 BOOL m_bKeepOrientation        "Keep Orientation" = FALSE,
@@ -84,15 +77,15 @@ functions:
     CEntity *penDestination = m_penDestination;
 
     // Extended entity to teleport types.
-    switch (m_eEntityType)
+    switch (m_teEntityType)
     {
-      case EETTT_PENCAUSED: {
+      case TETT_PENCAUSED: {
         if (penCaused) {
           penEntityToTP = penCaused;
         }
       } break;
       
-      case EETTT_PENTARGET: {
+      case TETT_PENTARGET: {
         if (penTarget) {
           penEntityToTP = penTarget;
         }
@@ -111,21 +104,21 @@ functions:
     }
     
     // Extended teleport destination types.
-    switch (m_eDestinationType)
+    switch (m_teDestinationType)
     {
-      case EETTT_PENCAUSED: {
+      case TETT_PENCAUSED: {
         if (penCaused) {
           penDestination = penCaused;
         }
       } break;
       
-      case EETTT_PENTARGET: {
+      case TETT_PENTARGET: {
         if (penTarget) {
           penDestination = penTarget;
         }
       } break;
 
-      case EETTT_THIS: {
+      case TETT_THIS: {
         penDestination = this;
       } break;
 
@@ -195,8 +188,8 @@ procedures:
     SetModel(MODEL_TELEPORTER);
     SetModelMainTexture(TEXTURE_TELEPORTER);
     
-    if (m_eEntityType == EETTT_THIS) {
-      m_eEntityType = EETTT_TARGET;
+    if (m_teEntityType == TETT_THIS) {
+      m_teEntityType = TETT_TARGET;
     }
 
     autowait(0.1f);
