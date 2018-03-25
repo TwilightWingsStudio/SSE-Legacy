@@ -1028,7 +1028,7 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
     CTextureObject *ptoCurrentArmor = &_pHAC->m_toShields;
     
     HUD_PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
-    //colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastArmor, penLast->m_tmArmorChanged, fMoverX, fMoverY);
+    colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastShields, penLast->m_tmShieldsChanged, fMoverX, fMoverY);
 
     HUD_DrawAnchoredRect( 8, 48 + pixShieldsVO, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect(44, 48 + pixShieldsVO, 80, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
@@ -1819,7 +1819,7 @@ extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent
     CTextureObject *ptoCurrentArmor = &_pHAC->m_toShields;
     
     HUD_PrepareColorTransitions( colMax, colTop, colMid, C_lGRAY, 0.5f, 0.25f, FALSE);
-    //colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastArmor, penLast->m_tmArmorChanged, fMoverX, fMoverY);
+    colDefault = HUD_AddShaker( 5, fValue, penLast->m_iLastShields, penLast->m_tmShieldsChanged, fMoverX, fMoverY);
 
     HUD_DrawAnchoredRect( 8, 48 + pixShieldsVO, 32, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchoredRect(44, 48 + pixShieldsVO, 80, 32, EHHAT_LEFT, EHVAT_BOT, C_BLACK|_ulBrAlpha);

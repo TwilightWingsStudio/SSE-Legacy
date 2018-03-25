@@ -135,7 +135,9 @@ void SendToTargetScript(CEntity *penSendEvent, INDEX iEventType, CEntity *penCau
   SendToTarget(penSendEvent, (EventEType)iEventType, penCaused);
 }
 
-// send event to target
+// --------------------------------------------------------------------------------------
+// Send event to target.
+// --------------------------------------------------------------------------------------
 void SendToTarget(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused)
 {
   // If we don't have target then don't send event.
@@ -211,7 +213,10 @@ void SendToTarget(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCa
   }
 };
 
-// [SSE] Send event to target with an additional entity.
+// --------------------------------------------------------------------------------------
+// [SSE] Entities - Targeted Event
+// Send event to target with an additional entity.
+// --------------------------------------------------------------------------------------
 void SendToTargetEx(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused, CEntity *penTarget)
 {
   if (penSendEvent == NULL) {

@@ -1331,6 +1331,10 @@ properties:
  137 FLOAT m_tmAmmoChanged   = -9,
  
  138 FLOAT m_tmMinigunAutoFireStart = -1.0f,
+ 
+ // [SSE]
+ 139 INDEX m_iLastShields = 0,
+ 140 FLOAT m_tmShieldsChanged = -9,
 
  150 FLOAT3D m_vLastStain  = FLOAT3D(0,0,0), // where last stain was left
    
