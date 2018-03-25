@@ -132,6 +132,14 @@ enum EventEType {
  13 EET_TARGETED          "Targeted event [13]",          // [SSE] Entities - Targeted Event
 };
 
+// [SSE] Extended target selection (Targeted Event Target Type).
+enum TETargetType {
+  0 TETT_TARGET      "0 Target",
+  1 TETT_THIS        "1 This Entity",
+  2 TETT_PENCAUSED   "2 penCaused",
+  3 TETT_PENTARGET   "3 penTarget (targeted)",
+};
+
 
 // entity info structure enums
 enum EntityInfoBodyType {

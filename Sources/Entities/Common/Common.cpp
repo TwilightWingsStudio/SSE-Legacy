@@ -211,6 +211,25 @@ void SendToTarget(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCa
   }
 };
 
+// [SSE] Send event to target with an additional entity.
+void SendToTargetEx(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused, CEntity *penTarget)
+{
+  if (penSendEvent == NULL) {
+    return;
+  }
+
+  if (eetEventType == EET_TARGETED) {
+    ETargeted eTargeted;
+    eTargeted.penCaused = penCaused;
+    eTargeted.penTarget = penTarget;
+    penSendEvent->SendEvent(eTargeted);
+
+    return;
+  }
+
+  SendToTarget(penSendEvent, eetEventType, penCaused);
+}
+
 // [SSE] Entities - Targeted Event
 void SendTargetedEvent(CEntity *penSendEvent, CEntity *penCaused, CEntity *penTarget)
 {
