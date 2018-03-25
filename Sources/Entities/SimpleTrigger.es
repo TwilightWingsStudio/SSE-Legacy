@@ -26,6 +26,11 @@ enum ESTType {
   2 STT_PROCEDURAL "Procedural [2]",
 };
 
+enum ESTMaxTrigsBehavior {
+  0 ESTMTB_DESTROY "Destroy the Trigger [0]",
+  1 ESTMTB_KEEP    "Keep in the World [1]"  
+};
+
 class CSimpleTrigger: CRationalEntity {
 name      "SimpleTrigger";
 thumbnail "Thumbnails\\SimpleTrigger.tbn";
@@ -57,6 +62,7 @@ properties:
   41 CEntityPointer m_penTargetArg,
   
   42 INDEX m_ctMaxTrigs            "Max trigs" 'X' = -1, // how many times could trig
+  43 enum ESTMaxTrigsBehavior m_eMaxTrigsBehavior "Max trigs Behavior" = ESTMTB_DESTROY,
 
   45 COLOR m_colColor              "Trigger Color" = C_WHITE,
 
@@ -64,8 +70,6 @@ properties:
 
   93 enum ESTType m_eTType  "Type" = STT_NORMAL,
   94 INDEX m_iPos                 = 0,
-
- 122 BOOL m_bDestroyOnMaxTriggs "Destroy on Max Triggs" = TRUE,
 
 components:
   1 model   MODEL_MARKER     "Models\\Editor\\SimpleTrigger.mdl",
@@ -183,7 +187,7 @@ functions:
       // decrease count
       m_ctMaxTrigs -= 1;
       // if we trigged max times
-      if ( m_ctMaxTrigs <= 0 && m_bDestroyOnMaxTriggs) {
+      if ( m_ctMaxTrigs <= 0 && m_eMaxTrigsBehavior == ESTMTB_DESTROY) {
         // cease to exist
         Destroy();
       }
