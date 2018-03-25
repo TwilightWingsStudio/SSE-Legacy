@@ -22,7 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 uses "Entities/Player";
 
 enum EPlayerVitalitySettingsType {
-  0 EPVST_TARGETTED  "0 Target",
+  0 EPVST_TARGETED  "0 Target",
   1 EPVST_PENCAUSED  "1 Target=penCaused",
   2 EPVST_ALLPLAYERS "2 Affect All Players",
 };
@@ -82,6 +82,20 @@ properties:
 
   90 BOOL m_bCanDie     "Can Die" = TRUE,
   
+  /*
+  INDEX m_ctHealthSegmentsTop    "HP Top Segments"   = 1,
+  INDEX m_ctHealthSegmentsExtra  "HP Extra Segments" = 1,
+  INDEX m_ctHealthSegmentsOver   "HP Over Segments"  = 1,
+  
+  INDEX m_ctArmorSegmentsTop     "AP Top Segments"   = 1,
+  INDEX m_ctArmorSegmentsExtra   "AP Extra Segments" = 1,
+  INDEX m_ctArmorSegmentsOver    "AP Over Segments"  = 1,
+  
+  INDEX m_ctShieldsSegmentsTop   "SP Top Segments"   = 1,
+  INDEX m_ctShieldsSegmentsExtra "SP Extra Segments" = 1,
+  INDEX m_ctShieldsSegmentsOver  "SP Over Segments"  = 1,
+  */
+
  // TODO: Make the new regen system!
  //120 FLOAT m_fHealthRegenDelay  "HP Regen Delay" = 0.0F,
  //121 FLOAT m_fArmorRegenDelay   "AP Repair Delay" = 0.0F,
@@ -97,7 +111,7 @@ properties:
  125 enum EPSRegenValueType m_etrvtHealthRegenValType "HP Regen. Val Type" = PSRT_EXACT_POINTS,
  126 enum EPSRegenValueType m_etrvtHealthRegenMinType "HP Regen. Min Type" = PSRT_EXACT_POINTS,
  127 enum EPSRegenValueType m_etrvtHealthRegenMaxType "HP Regen. Max Type" = PSRT_EXACT_POINTS,
-  
+
   // Armor Regeneration
  130 FLOAT m_fArmorRegenValue  "AP Regen. Val" = 0.0F, 
  131 FLOAT m_fArmorRegenMin    "AP Regen. Min" = 0.0F, 
@@ -139,7 +153,7 @@ functions:
       ((CTString&)m_strDescription).PrintF("[Always]");
     }
     
-    if (m_epstType == EPVST_TARGETTED) {
+    if (m_epstType == EPVST_TARGETED) {
       ((CTString&)m_strDescription).PrintF("%s-> Target", m_strDescription);
       
     } else if (m_epstType == EPVST_PENCAUSED) {
@@ -186,7 +200,7 @@ functions:
       // Do shit...
       switch (m_epstType) {
         // Target
-        case EPVST_TARGETTED: {
+        case EPVST_TARGETED: {
           if (m_bDebugMessages) {
             CPrintF("[PVS] %s : Applying settings for Target...\n", GetName());
           }
@@ -200,7 +214,7 @@ functions:
             }
           } else {
             if (m_bDebugMessages) {
-              CPrintF("  canceled! Target is NULL or isn't a CPlayer entity!\n");
+              CPrintF("  canceled! Target is NULL or not CPlayer!\n");
             }
           }
 
@@ -224,7 +238,7 @@ functions:
             }
           } else {
             if (m_bDebugMessages) {
-              CPrintF("  canceled! penCaused is NULL or isn't a CPlayer entity!\n");
+              CPrintF("  canceled! penCaused is NULL or not CPlayer!\n");
             }
           }
         } break;

@@ -22,7 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 uses "Entities/EnemyBase";
 
 enum EEnemySettingsType {
-  0 EEST_TARGETTED  "Target [0]",
+  0 EEST_TARGETED  "Target [0]",
   1 EEST_PENCAUSED  "Target=penCaused [1]",
 };
 
@@ -93,7 +93,7 @@ functions:
   // --------------------------------------------------------------------------------------
   const CTString &GetDescription(void) const
   {
-    if (m_eType == EEST_TARGETTED) {
+    if (m_eType == EEST_TARGETED) {
       ((CTString&)m_strDescription).PrintF("-> Target");
       
     } else if (m_eType == EEST_PENCAUSED) {
@@ -120,7 +120,7 @@ functions:
       switch (m_eType)
       {
         // Target
-        case EEST_TARGETTED: {
+        case EEST_TARGETED: {
           if (m_bDebugMessages) {
             CPrintF("[ES] %s : Applying settings for Target...\n", GetName());
           }

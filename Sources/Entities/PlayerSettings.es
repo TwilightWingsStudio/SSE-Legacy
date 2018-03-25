@@ -22,7 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 uses "Entities/Player";
 
 enum EPlayerSettingsType {
-  0 EPST_TARGETTED  "0 Target",
+  0 EPST_TARGETED  "0 Target",
   1 EPST_PENCAUSED  "1 Target=penCaused",
   2 EPST_ALLPLAYERS "2 Affect All Players",
 };
@@ -118,7 +118,7 @@ functions:
       ((CTString&)m_strDescription).PrintF("[Always]");
     }
     
-    if (m_epstType == EPST_TARGETTED) {
+    if (m_epstType == EPST_TARGETED) {
       ((CTString&)m_strDescription).PrintF("%s-> Target", m_strDescription);
       
     } else if (m_epstType == EPST_PENCAUSED) {
@@ -149,7 +149,7 @@ functions:
       // Do shit...
       switch (m_epstType) {
         // Target
-        case EPST_TARGETTED: {
+        case EPST_TARGETED: {
           if (m_bDebugMessages) {
             CPrintF("[PS] %s : Applying settings for Target...\n", GetName());
           }
