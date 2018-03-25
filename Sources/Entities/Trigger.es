@@ -430,9 +430,13 @@ procedures:
 
         if (m_bDebugMessages) {
           if (eTrigger.penCaused != NULL) {
-            CPrintF(TRANS("[%s] : triggered by %s\n"), m_strName, eTrigger.penCaused->GetName());
+            CPrintF("[%s] : Received ETrigger(-> %d)\n", m_strName, eTrigger.penCaused->en_ulID);
           } else {
-            CPrintF(TRANS("[%s] : triggered by unknown entity\n"), m_strName);
+            CPrintF("[%s] : Received ETrigger(-> NULL)\n", m_strName);
+          }
+          
+          if (eTrigger.penCaused) {
+            CPrintF("  penCaused.Name = '%s'\n", eTrigger.penCaused->GetName().Undecorated());
           }
         }
 
