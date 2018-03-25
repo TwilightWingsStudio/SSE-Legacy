@@ -36,6 +36,11 @@ enum ETType {
   4 TT_DELRAND    "Delayed randomly [4]",
 };
 
+enum ETMaxTrigsBehavior {
+  0 ETMTB_DESTROY "Destroy the Trigger [0]",
+  1 ETMTB_KEEP    "Keep in the World [1]"  
+};
+
 class CTrigger: CRationalEntity {
 name      "Trigger";
 thumbnail "Thumbnails\\Trigger.tbn";
@@ -83,6 +88,7 @@ properties:
   40 INDEX m_iCountTmp = 0,          // use count value to determine when to send events
   41 CEntityPointer m_penCaused,     // who touched it last time
   42 INDEX m_ctMaxTrigs            "Max trigs" 'X' = -1, // how many times could trig
+  43 enum ETMaxTrigsBehavior m_eMaxTrigsBehavior "Max trigs Behavior" = ETMTB_DESTROY,
 
   45 COLOR m_colColor              "Trigger Color" = C_WHITE,
 
@@ -102,8 +108,6 @@ properties:
  111 FLOAT m_fMinTime           "Min Time between Trigs" = 0.0f,
  112 FLOAT m_fRandDelayFactor   "Random delay factor"    = 0.5F,
  113 FLOAT m_fWaitInternal = 1.0f,
-
- 122 BOOL m_bDestroyOnMaxTriggs "Destroy on Max Triggs" = TRUE,
 
  125 CTString m_strTellCountMsg "Count tell message" = "%d more to go...",
 
@@ -270,7 +274,7 @@ functions:
       // decrease count
       m_ctMaxTrigs -= 1;
       // if we trigged max times
-      if ( m_ctMaxTrigs <= 0 && m_bDestroyOnMaxTriggs) {
+      if ( m_ctMaxTrigs <= 0 && m_eMaxTrigsBehavior == ETMTB_DESTROY) {
         // cease to exist
         Destroy();
       }
