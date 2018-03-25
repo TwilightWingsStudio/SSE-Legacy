@@ -53,7 +53,9 @@ properties:
   30 FLOAT m_fWaitTime             "Wait" 'W' = 0.0f,          // wait before send events
   31 BOOL m_bAutoStart             "Auto start" 'A' = FALSE,   // trigger auto starts
 
-  41 CEntityPointer m_penCaused,     // who touched it last time
+  40 CEntityPointer m_penCaused,     // who touched it last time
+  41 CEntityPointer m_penTargetArg,
+  
   42 INDEX m_ctMaxTrigs            "Max trigs" 'X' = -1, // how many times could trig
 
   45 COLOR m_colColor              "Trigger Color" = C_WHITE,
@@ -130,13 +132,16 @@ functions:
   // --------------------------------------------------------------------------------------
   // Extended function to use global event type.
   // --------------------------------------------------------------------------------------
-  void SendToTargetM(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused) {
+  void SendToTargetM(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused)
+  {
+    // If global is not set.
     if (m_eetGlobal == EET_IGNORE) {
-      SendToTarget(penSendEvent, eetEventType, m_penCaused);
+      SendToTargetEx(penSendEvent, eetEventType, m_penCaused, m_penTargetArg);
       return;
     }
+
     // We have a global? Override eventtype!
-    SendToTarget(penSendEvent, m_eetGlobal, m_penCaused);
+    SendToTargetEx(penSendEvent, m_eetGlobal, m_penCaused, m_penTargetArg);
   }
 
   // --------------------------------------------------------------------------------------
@@ -162,6 +167,9 @@ functions:
     return slUsedMemory;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Apply the color.
+  // --------------------------------------------------------------------------------------
   BOOL AdjustShadingParameters(FLOAT3D &vLightDirection, COLOR &colLight, COLOR &colAmbient)
   {
     colAmbient = m_colColor;
@@ -283,6 +291,9 @@ procedures:
     return;
   }
 
+  // --------------------------------------------------------------------------------------
+  // The random trigger state.
+  // --------------------------------------------------------------------------------------
   Random()
   {
     if (m_fWaitTime > 0.0f) {
@@ -310,6 +321,9 @@ procedures:
     return;
   }
 
+  // --------------------------------------------------------------------------------------
+  // The active state.
+  // --------------------------------------------------------------------------------------
   Active()
   {
     //main loop
@@ -341,17 +355,22 @@ procedures:
         if (!m_bActive) {
           resume;
         }
-        
+
         if (m_bDebugMessages) {
           if (eTrigger.penCaused != NULL) {
-            CPrintF(TRANS("[%s] : triggered through %s\n"), m_strName, eTrigger.penCaused->GetName());
+            CPrintF("[%s] : Received ETrigger(-> %d)\n", m_strName, eTrigger.penCaused->en_ulID);
           } else {
-            CPrintF(TRANS("[%s] : triggered through NULL entity\n"), m_strName);
+            CPrintF("[%s] : Received ETrigger(-> NULL)\n", m_strName);
+          }
+          
+          if (eTrigger.penCaused) {
+            CPrintF("  penCaused.Name = '%s'\n", eTrigger.penCaused->GetName().Undecorated());
           }
         }
 
         if (m_ctMaxTrigs > 0 || m_ctMaxTrigs == -1) {
           m_penCaused = eTrigger.penCaused;
+          m_penTargetArg = NULL;
 
           if (m_eTType == STT_NORMAL) {
             call SendEventToTargets();
@@ -372,7 +391,30 @@ procedures:
           resume;
         }
 
-        SendToTarget(this, EET_TRIGGER, eTargeted.penCaused);
+        if (m_bDebugMessages) {
+          CPrintF("[%s] : Received ETargeted(-> %d, -> %d)\n", m_strName, eTargeted.penCaused ? eTargeted.penCaused->en_ulID : 0, eTargeted.penTarget ? eTargeted.penTarget->en_ulID : 0);
+          
+          if (eTargeted.penCaused) {
+            CPrintF("  penCaused.Name = '%s'\n", eTargeted.penCaused->GetName().Undecorated());
+          }
+          
+          if (eTargeted.penTarget) {
+            CPrintF("  penTarget.Name = '%s'\n", eTargeted.penTarget->GetName().Undecorated());
+          }
+        }
+
+        if (m_ctMaxTrigs > 0 || m_ctMaxTrigs == -1) {
+          m_penCaused = eTargeted.penCaused;
+          m_penTargetArg = eTargeted.penTarget;
+
+          if (m_eTType == STT_NORMAL) {
+            call SendEventToTargets();
+          } else if (m_eTType == STT_PROCEDURAL) {
+            call Procedural();
+          } else if (m_eTType == STT_RANDOM) {
+            call Random();
+          }
+        }
 
         resume;
       }
