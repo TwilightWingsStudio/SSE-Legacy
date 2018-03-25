@@ -135,12 +135,7 @@ functions:
 
     m_bSwitchON = TRUE;
 
-    // If we use targeted event then follow different way.
-    if (m_eetEvent == EET_TARGETED) {
-      SendTargetedEvent(m_penTarget, m_penCaused, this); // [SSE] Entities - Targeted Event
-    } else {
-      SendToTarget(m_penTarget, m_eetEvent, m_penCaused); // send event to target
-    }
+    SendToTargetEx(m_penTarget, m_eetEvent, m_penCaused, this); // send event to target
   };
   
   // --------------------------------------------------------------------------------------
@@ -157,12 +152,7 @@ functions:
     
     CEntity *penOffTarget = m_penOffTarget != NULL ? m_penOffTarget : m_penTarget;
 
-    // If we use targeted event then follow different way.
-    if (m_eetOffEvent == EET_TARGETED) {
-      SendTargetedEvent(penOffTarget, m_penCaused, this); // [SSE] Entities - Targeted Event
-    } else {
-      SendToTarget(penOffTarget, m_eetOffEvent, m_penCaused); // send event to target
-    }
+    SendToTargetEx(penOffTarget, m_eetOffEvent, m_penCaused, this); // send event to target
   };
 
 procedures:

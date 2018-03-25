@@ -52,9 +52,9 @@ thumbnail "Thumbnails\\ProgressiveSwitch.tbn";
 features  "HasName", "IsTargetable";
 
 properties:
-  1 CTString m_strName        "Name" 'N'        = "Progressive Switch",
+  1 CTString m_strName    "Name" 'N' = "Progressive Switch",
 
-  3 BOOL m_bActive            "Active" 'A' = TRUE,
+  3 BOOL m_bActive        "Active" 'A' = TRUE,
   4 BOOL m_bDebugMessages "Debug Messages" = FALSE,
 
   5 enum EPSwitchType m_epstType  "Type" = EPST_ONEPLAYER,
@@ -71,11 +71,11 @@ properties:
  23 CEntityPointer m_penBreakTarget    "On Break Target" COLOR(C_dRED|0xFF),
  24 CEntityPointer m_penCompleteTarget "On Complete Target" COLOR(C_dGREEN|0xFF),
  
- 30 enum EventEType m_eetStart      "On Start Event type"    = EET_TRIGGER,
- 31 enum EventEType m_eetJoin       "On Join Event type"    = EET_TRIGGER,
- 32 enum EventEType m_eetStop       "On Stop Event type"    = EET_TRIGGER,
- 33 enum EventEType m_eetBreak      "On Break Event type"    = EET_TRIGGER,
- 34 enum EventEType m_eetComplete   "On Complete Event type" = EET_TRIGGER, // When the interaction successfully ended. penCaused will be last tick.
+ 30 enum EventEType m_eetStart    "On Start Event type"    = EET_TRIGGER,
+ 31 enum EventEType m_eetJoin     "On Join Event type"     = EET_TRIGGER,
+ 32 enum EventEType m_eetStop     "On Stop Event type"     = EET_TRIGGER,
+ 33 enum EventEType m_eetBreak    "On Break Event type"    = EET_TRIGGER,
+ 34 enum EventEType m_eetComplete "On Complete Event type" = EET_TRIGGER, // When the interaction successfully ended. penCaused will be last tick.
  
  // internal -> do not use
  41 CEntityPointer m_penLastTicker,   // who triggered it last time
@@ -197,12 +197,7 @@ functions:
         }
       }
 
-      // If we use targeted event then follow different way.
-      if (m_eetBreak == EET_TARGETED) {
-        SendTargetedEvent(m_penBreakTarget, penPlayer, this); // [SSE] Entities - Targeted Event
-      } else {
-        SendToTarget(m_penBreakTarget, m_eetBreak, penPlayer);
-      }
+      SendToTargetEx(m_penBreakTarget, m_eetBreak, penPlayer, this);
 
       m_fProgress = 0.0F;
 
@@ -218,12 +213,7 @@ functions:
         }
       }
 
-      // If we use targeted event then follow different way.
-      if (m_eetStop == EET_TARGETED) {
-        SendTargetedEvent(m_penStopTarget, penPlayer, this); // [SSE] Entities - Targeted Event
-      } else {
-        SendToTarget(m_penStopTarget, m_eetStop, penPlayer);
-      }
+      SendToTargetEx(m_penStopTarget, m_eetStop, penPlayer, this);
     }
   }
 
@@ -253,12 +243,7 @@ procedures:
             }
           }
 
-          // If we use targeted event then follow different way.
-          if (m_eetJoin == EET_TARGETED) {
-            SendTargetedEvent(m_penJoinTarget, eStartInteraction.penPlayer, this); // [SSE] Entities - Targeted Event
-          } else {
-            SendToTarget(m_penJoinTarget, m_eetJoin, eStartInteraction.penPlayer);
-          }
+          SendToTargetEx(m_penJoinTarget, m_eetJoin, eStartInteraction.penPlayer, this);
 
           resume;
         }
@@ -321,12 +306,7 @@ procedures:
             }
           }
 
-          // If we use targeted event then follow different way.
-          if (m_eetJoin == EET_TARGETED) {
-            SendTargetedEvent(m_penCompleteTarget, eInteractionTick.penPlayer, this); // [SSE] Entities - Targeted Event
-          } else {
-            SendToTarget(m_penCompleteTarget, m_eetComplete, eInteractionTick.penPlayer);
-          }
+          SendToTargetEx(m_penCompleteTarget, m_eetComplete, eInteractionTick.penPlayer, this);
 
           jump Idle();
         }
@@ -360,12 +340,7 @@ procedures:
           }
         }
 
-        // If we use targeted event then follow different way.
-        if (m_eetStart == EET_TARGETED) {
-          SendTargetedEvent(m_penStartTarget, eStartInteraction.penPlayer, this); // [SSE] Entities - Targeted Event
-        } else {
-          SendToTarget(m_penStartTarget, m_eetStart, eStartInteraction.penPlayer);
-        }
+        SendToTargetEx(m_penStartTarget, m_eetStart, eStartInteraction.penPlayer, this);
 
         jump Working();
       }
