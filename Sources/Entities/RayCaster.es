@@ -35,21 +35,23 @@ features  "HasName", "HasTarget", "IsTargetable";
 
 properties:
    1 CTString m_strName          "Name" 'N' = "Ray Caster",
-   3 CTString m_strDescription = "",
+   2 CTString m_strDescription = "",
 
-   5 BOOL m_bActive  "Active"            = TRUE,
-   6 enum ERCTestType m_ercttType "Detection Type" = RCTT_NONE,
-   7 FLOAT m_fRange  "Range"             = 50.0F,
-   8 FLOAT m_fTestR  "Ray Radius"        = 0.0F,
-  10 CEntityPointer m_penTarget  "Target" 'T' COLOR(C_BROWN|0xFF),
+   3 BOOL m_bActive               "Active"            = TRUE,
+   4 enum ERCTestType m_ercttType "Detection Type" = RCTT_NONE,
+   5 CEntityPointer m_penTarget   "Target" 'T' COLOR(C_BROWN|0xFF),
 
-  // 14 reserved for check interval.
-  15 BOOL m_bPerTickCheck      "Per Tick Check" = FALSE,
+   6 FLOAT m_fRange      "Range"            = 50.0F,
+   7 FLOAT m_fTestR      "Ray Radius"       = 0.0F,
+   8 FLOAT m_fHitOffset  "Hit Point Offset" = 0.0F,
 
-     // Here is variables for data output.
+  10 BOOL m_bAutoCast      "Auto Cast"          = FALSE,
+  11 FLOAT m_fCastInterval "Auto Cast Interval" = 0.05f,
+
+  // Variables for data output.
   20 CEntityPointer m_penHit "Hit Target",
-  21 FLOAT3D m_vPos  "Hit Pos"           = FLOAT3D(0.0F, 0.0F, 0.0F),
-  22 FLOAT m_fBack   "Distance from Hit" = 0.0F,
+  21 FLOAT3D m_vHitPos       "Hit Pos"      = FLOAT3D(0.0F, 0.0F, 0.0F),
+  22 FLOAT m_fHitDistance    "Hit Distance" = 0.0F,
 
 components:
    1 model   MODEL_RAYCASTER     "Models\\Editor\\RayCaster.mdl",
@@ -93,7 +95,7 @@ functions:
   }
   
   // --------------------------------------------------------------------------------------
-  // Casts this fucked ray!
+  // Cast the ray.
   // --------------------------------------------------------------------------------------
   void DoCastRay()
   {
@@ -137,15 +139,16 @@ functions:
 
     if (crRay.cr_penHit) {
       m_penHit = crRay.cr_penHit;
-      m_vPos = crRay.cr_vHit;
+      m_vHitPos = crRay.cr_vHit;
       FLOAT fDistance = crRay.cr_fHitDistance;
+      m_fHitDistance = fDistance;
 
       if(crRay.cr_fHitDistance > m_fRange){
         fDistance = m_fRange;
       }
 
       CPlacement3D plPos = GetPlacement();
-      CPlacement3D plNew = CPlacement3D(FLOAT3D(0, 0, m_fBack-fDistance), ANGLE3D(0, 0, 0));
+      CPlacement3D plNew = CPlacement3D(FLOAT3D(0, 0, m_fHitOffset-fDistance), ANGLE3D(0, 0, 0));
       CPlacement3D plRotation = CPlacement3D(FLOAT3D(0, 0, 0), GetPlacement().pl_OrientationAngle);
       plNew.RelativeToAbsolute(plRotation);
       plPos.pl_PositionVector += plNew.pl_PositionVector;
@@ -154,10 +157,12 @@ functions:
         m_penTarget->SetPlacement(CPlacement3D(plPos.pl_PositionVector, m_penTarget->GetPlacement().pl_OrientationAngle));
       }
 
-      m_vPos = plPos.pl_PositionVector;
-    } else { 
+      m_vHitPos = plPos.pl_PositionVector;
+    } else {
+      m_fHitDistance = m_fRange;
+
       CPlacement3D plPos = GetPlacement();
-      CPlacement3D plNew = CPlacement3D(FLOAT3D(0, 0, m_fBack-m_fRange), ANGLE3D(0, 0, 0));
+      CPlacement3D plNew = CPlacement3D(FLOAT3D(0, 0, m_fHitOffset-m_fRange), ANGLE3D(0, 0, 0));
       CPlacement3D plRotation = CPlacement3D(FLOAT3D(0, 0, 0), GetPlacement().pl_OrientationAngle);
       plNew.RelativeToAbsolute(plRotation);
       plPos.pl_PositionVector += plNew.pl_PositionVector;
@@ -166,7 +171,7 @@ functions:
         m_penTarget->SetPlacement(CPlacement3D(plPos.pl_PositionVector, m_penTarget->GetPlacement().pl_OrientationAngle));
       }
 
-      m_vPos = plPos.pl_PositionVector;
+      m_vHitPos = plPos.pl_PositionVector;
     }
   }
 
@@ -193,10 +198,10 @@ procedures:
 
     while (TRUE)
     {
-      wait(_pTimer->TickQuantum)
+      wait(m_fCastInterval)
       {
         on (EBegin) : { 
-          if (m_bPerTickCheck) {
+          if (m_bAutoCast) {
             DoCastRay();
           }
 
