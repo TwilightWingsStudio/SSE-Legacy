@@ -391,9 +391,8 @@ static int l_entities_GetEntityPosX(lua_State* L)
   DEFENTBYID(penEntity, ulEntityID);
   
   ONLYVALIDENTITY(penEntity);
-  ONLYLIVEENTITY(penEntity);
   
-  lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetPlacement().pl_PositionVector(1));
+  lua_pushnumber(L, penEntity->GetPlacement().pl_PositionVector(1));
 
   return 1;
 }
@@ -411,9 +410,8 @@ static int l_entities_GetEntityPosY(lua_State* L)
   DEFENTBYID(penEntity, ulEntityID);
   
   ONLYVALIDENTITY(penEntity);
-  ONLYLIVEENTITY(penEntity);
   
-  lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetPlacement().pl_PositionVector(2));
+  lua_pushnumber(L, penEntity->GetPlacement().pl_PositionVector(2));
 
   return 1;
 }
@@ -431,9 +429,8 @@ static int l_entities_GetEntityPosZ(lua_State* L)
   DEFENTBYID(penEntity, ulEntityID);
   
   ONLYVALIDENTITY(penEntity);
-  ONLYLIVEENTITY(penEntity);
   
-  lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetPlacement().pl_PositionVector(3));
+  lua_pushnumber(L, penEntity->GetPlacement().pl_PositionVector(3));
 
   return 1;
 }
@@ -451,9 +448,8 @@ static int l_entities_GetEntityRotH(lua_State* L)
   DEFENTBYID(penEntity, ulEntityID);
   
   ONLYVALIDENTITY(penEntity);
-  ONLYLIVEENTITY(penEntity);
-  
-  lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetPlacement().pl_OrientationAngle(1));
+
+  lua_pushnumber(L, penEntity->GetPlacement().pl_OrientationAngle(1));
 
   return 1;
 }
@@ -471,9 +467,8 @@ static int l_entities_GetEntityRotP(lua_State* L)
   DEFENTBYID(penEntity, ulEntityID);
   
   ONLYVALIDENTITY(penEntity);
-  ONLYLIVEENTITY(penEntity);
   
-  lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetPlacement().pl_OrientationAngle(2));
+  lua_pushnumber(L, penEntity->GetPlacement().pl_OrientationAngle(2));
 
   return 1;
 }
@@ -491,9 +486,8 @@ static int l_entities_GetEntityRotB(lua_State* L)
   DEFENTBYID(penEntity, ulEntityID);
   
   ONLYVALIDENTITY(penEntity);
-  ONLYLIVEENTITY(penEntity);
   
-  lua_pushnumber(L, static_cast<CLiveEntity*>(penEntity)->GetPlacement().pl_OrientationAngle(3));
+  lua_pushnumber(L, penEntity->GetPlacement().pl_OrientationAngle(3));
 
   return 1;
 }
