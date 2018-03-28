@@ -19,12 +19,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #pragma once
 #endif
 
-extern CTString ga_strServer;
-extern CTString ga_strMSLegacy;
-extern CTString ga_strDarkPlacesMS;
-extern BOOL ga_bMSLegacy;
-extern BOOL ga_bDarkPlacesMS;
-extern BOOL ga_bDarkPlacesDebug;
+extern CTString ms_strServer;
+extern CTString ms_strMSLegacy;
+extern CTString ms_strDarkPlacesMS;
+extern BOOL ms_bMSLegacy;
+extern BOOL ms_bDarkPlacesMS;
+extern BOOL ms_bDarkPlacesDebug;
 
 extern void MS_OnServerStart(void);
 extern void MS_OnServerEnd(void);

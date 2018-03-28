@@ -116,7 +116,7 @@ void DarkPlaces_ServerParsePacket(INDEX iLength)
     // Short info.
     if (iLength >= 7 && !memcmp(data, "getinfo", 7))
     {
-      if (ga_bDarkPlacesDebug) {
+      if (ms_bDarkPlacesDebug) {
         CPrintF("Received 'getinfo' text command!\n");
       }
 
@@ -138,7 +138,7 @@ void DarkPlaces_ServerParsePacket(INDEX iLength)
     // Full status.
     if (iLength >= 9 && !memcmp(string, "getstatus", 9))
     {
-      if (ga_bDarkPlacesDebug) {
+      if (ms_bDarkPlacesDebug) {
         CPrintF("Received 'getstatus' text command!\n");
       }
 
@@ -164,14 +164,14 @@ void DarkPlaces_ServerParsePacket(INDEX iLength)
       
       _sendPacketTo(strPacket, &_sinFrom);
       
-      if (ga_bDarkPlacesDebug) {
+      if (ms_bDarkPlacesDebug) {
         CPrintF("Received 'getchallenge' text command!\n");
       }
       
       return;
     }
     
-    if (ga_bDarkPlacesDebug) {
+    if (ms_bDarkPlacesDebug) {
       CPrintF("Received unknown text command!\n");
       CPrintF("Data[%d]: %s\n", iLength, data);    
     }
@@ -184,7 +184,7 @@ void DarkPlaces_ServerParsePacket(INDEX iLength)
 // --------------------------------------------------------------------------------------
 void DarkPlaces_ParseServerList(unsigned char *data, INDEX iLength, BOOL bExtended)
 {
-  if (ga_bDarkPlacesDebug) {
+  if (ms_bDarkPlacesDebug) {
     CPrintF("Data Length: %d\n", iLength);
   }
   
@@ -200,7 +200,7 @@ void DarkPlaces_ParseServerList(unsigned char *data, INDEX iLength, BOOL bExtend
         CTString strIP;
         strIP.PrintF("%u.%u.%u.%u", data[1], data[2], data[3], data[4]);
     
-        if (ga_bDarkPlacesDebug) {
+        if (ms_bDarkPlacesDebug) {
           CPrintF("%s:%hu\n", strIP, uPort);
         }
         
@@ -231,7 +231,7 @@ void DarkPlaces_ParseServerList(unsigned char *data, INDEX iLength, BOOL bExtend
       
     // Unknown Data.
     } else {
-      if (ga_bDarkPlacesDebug) {
+      if (ms_bDarkPlacesDebug) {
         CPrintF("Error! Unknown data while parsing server list!\n");
       }
       break;
@@ -256,7 +256,7 @@ void DarkPlaces_ClientParsePacket(INDEX iLength)
     // Regular Servers Response.
     if (iLength >= 19 && !memcmp(string, "getserversResponse\\", 19))
     {
-      if (ga_bDarkPlacesDebug) {
+      if (ms_bDarkPlacesDebug) {
         CPrintF("Received 'getserversResponse\\'!\n");
       }
 
@@ -272,7 +272,7 @@ void DarkPlaces_ClientParsePacket(INDEX iLength)
     // Extended Servers Response.
     if (iLength >= 21 && !memcmp(string, "getserversExtResponse", 21))
     {
-      if (ga_bDarkPlacesDebug) {
+      if (ms_bDarkPlacesDebug) {
         CPrintF("Received 'getserversExtResponse'!\n");
       }
 
@@ -288,7 +288,7 @@ void DarkPlaces_ClientParsePacket(INDEX iLength)
     // Status Response from one of servers from Server List
     if (iLength >= 15 && !memcmp(string, "statusResponse\x0A", 15))
     {
-      if (ga_bDarkPlacesDebug) {
+      if (ms_bDarkPlacesDebug) {
         CPrintF("Received 'statusResponse'!\n");
       }
       
@@ -296,7 +296,7 @@ void DarkPlaces_ClientParsePacket(INDEX iLength)
       string += 15;
       iLength -= 15;
 
-      if (ga_bDarkPlacesDebug) {
+      if (ms_bDarkPlacesDebug) {
         CPrintF("Data[%d]: %s\n", iLength, data);
       }  
 
@@ -360,7 +360,7 @@ void DarkPlaces_ClientParsePacket(INDEX iLength)
                 } else if (strKey == "sv_maxclients") {
                     strMaxPlayers = strValue;
                 } else {
-                  if (ga_bDarkPlacesDebug) {
+                  if (ms_bDarkPlacesDebug) {
                     CPrintF("Unknown DarkPlaces parameter key '%s'!\n", strKey);
                   }
                 }
@@ -402,7 +402,7 @@ void DarkPlaces_ClientParsePacket(INDEX iLength)
       return;
     }
 
-    if (ga_bDarkPlacesDebug) {
+    if (ms_bDarkPlacesDebug) {
       CPrintF("Received unknown text command!\n");
       CPrintF("Data[%d]: %s\n", iLength, data);   
     }

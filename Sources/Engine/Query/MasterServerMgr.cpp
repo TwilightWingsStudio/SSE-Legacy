@@ -52,13 +52,13 @@ TIME _tmLastHeartbeat = -1.0F;
 
 CDynamicStackArray<CServerRequest> ga_asrRequests;
 
-extern CTString ga_strServer = "master.333networks.com";
-extern CTString ga_strMSLegacy = "master.333networks.com";
-extern CTString ga_strDarkPlacesMS = "192.168.1.4";
+extern CTString ms_strServer = "master.333networks.com";
+extern CTString ms_strMSLegacy = "master.333networks.com";
+extern CTString ms_strDarkPlacesMS = "192.168.1.4";
 
-extern BOOL ga_bMSLegacy = TRUE;
-extern BOOL ga_bDarkPlacesMS = FALSE;
-extern BOOL ga_bDarkPlacesDebug = FALSE;
+extern BOOL ms_bMSLegacy = TRUE;
+extern BOOL ms_bDarkPlacesMS = FALSE;
+extern BOOL ms_bDarkPlacesDebug = FALSE;
 
 void _uninitWinsock();
 
@@ -87,18 +87,18 @@ void _initializeWinsock(void)
   // get the host IP
   hostent* phe;
   
-  if (ga_bDarkPlacesMS) {
-    phe = gethostbyname(ga_strDarkPlacesMS);
-  } else if (!ga_bMSLegacy) {
-    phe = gethostbyname(ga_strServer);
+  if (ms_bDarkPlacesMS) {
+    phe = gethostbyname(ms_strDarkPlacesMS);
+  } else if (!ms_bMSLegacy) {
+    phe = gethostbyname(ms_strServer);
   } else {
-    phe = gethostbyname(ga_strMSLegacy);
+    phe = gethostbyname(ms_strMSLegacy);
   }
 
   // if we couldn't resolve the hostname
   if (phe == NULL) {
     // report and stop
-    CPrintF("Couldn't resolve GameAgent server %s.\n", ga_strServer);
+    CPrintF("Couldn't resolve GameAgent server %s.\n", ms_strServer);
     _uninitWinsock();
     return;
   }
@@ -109,9 +109,9 @@ void _initializeWinsock(void)
   _sin->sin_addr.s_addr = *(ULONG*)phe->h_addr_list[0];
   
   // [SSE]
-  if (ga_bDarkPlacesMS) {
+  if (ms_bDarkPlacesMS) {
     _sin->sin_port = htons(27950);
-  } else if (!ga_bMSLegacy) {
+  } else if (!ms_bMSLegacy) {
     _sin->sin_port = htons(9005);
   } else {
     _sin->sin_port = htons(27900);
@@ -215,11 +215,11 @@ extern void MS_SendHeartbeat(INDEX iChallenge)
   CTString strPacket;
   
   // [SSE]
-  if (ga_bDarkPlacesMS) {
+  if (ms_bDarkPlacesMS) {
     DarkPlaces_BuildHearthbeatPacket(strPacket);
 
   // GameAgent
-  } else if (!ga_bMSLegacy) {
+  } else if (!ms_bMSLegacy) {
     GameAgent_BuildHearthbeatPacket(strPacket, iChallenge);
 
   // MSLegacy
@@ -261,7 +261,7 @@ extern void MS_OnServerStart(void)
   _bInitialized = TRUE;
   
   // [SSE]
-  if (ga_bDarkPlacesMS) {
+  if (ms_bDarkPlacesMS) {
     CTString strPacket;
     strPacket.PrintF("\xFF\xFF\xFF\xFFheartbeat DarkPlaces\x0A");
     
@@ -272,7 +272,7 @@ extern void MS_OnServerStart(void)
   //
 
   // GameAgent
-  if (!ga_bMSLegacy) {
+  if (!ms_bMSLegacy) {
     _sendPacket("q");
     
   // MSLegacy
@@ -292,11 +292,11 @@ extern void MS_OnServerEnd(void)
     return;
   }
 
-  if (ga_bDarkPlacesMS) {
+  if (ms_bDarkPlacesMS) {
     MS_SendHeartbeat(0);
     MS_SendHeartbeat(0);
     // TODO: Write here something
-  } else if (ga_bMSLegacy) {
+  } else if (ms_bMSLegacy) {
     CTString strPacket;
     strPacket.PrintF("\\heartbeat\\%hu\\gamename\\serioussamse\\statechanged", (_pShell->GetINDEX("net_iPort") + 1));
     _sendPacket(strPacket);
@@ -322,9 +322,9 @@ extern void MS_OnServerUpdate(void)
   if (iLength > 0)
   {
     // [SSE]
-    if (ga_bDarkPlacesMS) {
+    if (ms_bDarkPlacesMS) {
       DarkPlaces_ServerParsePacket(iLength);
-    } else if (!ga_bMSLegacy) {
+    } else if (!ms_bMSLegacy) {
       GameAgent_ProcessReceivedPacket();
     } else {
       _szBuffer[iLength] = 0;
@@ -347,9 +347,9 @@ extern void MS_OnServerStateChanged(void)
     return;
   }
 
-  if (ga_bDarkPlacesMS) {
+  if (ms_bDarkPlacesMS) {
     // TODO: Write here something
-  } else if (!ga_bMSLegacy) {
+  } else if (!ms_bMSLegacy) {
     _sendPacket("u");
   } else {
     CTString strPacket;
@@ -367,12 +367,12 @@ extern void MS_EnumTrigger(BOOL bInternet)
     return;
   }
   
-  if (ga_bDarkPlacesMS) {
+  if (ms_bDarkPlacesMS) {
     DarkPlaces_EnumTrigger(bInternet);
     return; 
   }
   
-  if (ga_bMSLegacy) {
+  if (ms_bMSLegacy) {
     MSLegacy_EnumTrigger(bInternet);
     return;
   }
@@ -390,11 +390,11 @@ extern void MS_EnumUpdate(void)
   }
 
   // [SSE]
-  if (ga_bDarkPlacesMS) {
+  if (ms_bDarkPlacesMS) {
     DarkPlaces_EnumUpdate();
   
   // GameAgent
-  } else if (!ga_bMSLegacy) {
+  } else if (!ms_bMSLegacy) {
     GameAgent_EnumUpdate();
 
   // MSLegacy

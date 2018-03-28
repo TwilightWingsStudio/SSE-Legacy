@@ -250,7 +250,7 @@ void MSLegacy_EnumTrigger(BOOL bInternet)
             *cSec                = NULL;
 
 
-    strcpy(cMS,ga_strMSLegacy);
+    strcpy(cMS, ms_strMSLegacy);
 
     WSADATA wsadata;
     if (WSAStartup(MAKEWORD(2,2), &wsadata) != 0) {
