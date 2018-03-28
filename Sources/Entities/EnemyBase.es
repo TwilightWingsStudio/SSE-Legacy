@@ -3900,6 +3900,12 @@ procedures:
         {
           // notify wounding to others
           WoundedNotify(eDamage);
+
+          // HACK! Always notify others because the Innactive state, but don't play wounded if Should not.
+          if (!CanBeWounded()) {
+            SendEvent(EReturn());
+            resume;
+          }
  
           // [SSE] Enemy Settings Entity
           if (!IsSilent()) {

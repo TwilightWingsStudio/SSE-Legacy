@@ -204,6 +204,15 @@ functions:
     CEnemyBase::Write_t(istr);
     m_emEmiter.Write_t(*istr);
   }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE]
+  // Returns TRUE when enemy can be wound, otherwise returns FALSE.
+  // --------------------------------------------------------------------------------------
+  virtual BOOL CanBeWounded(void)
+  {
+    return FALSE;
+  }
 
   BOOL IsTargetValid(SLONG slPropertyOffset, CEntity *penTarget)
   {
@@ -824,8 +833,6 @@ procedures:
   
   Fire(EVoid) : CEnemyBase::Fire
   {
-    //CPrintF("Summoner::Fire()\n");
-    
     // if not allready fired
     if (!m_bFiredThisTurn)
     {
