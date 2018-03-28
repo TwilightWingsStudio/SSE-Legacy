@@ -33,6 +33,7 @@ extern BOOL map_bIsFirstEncounter;
 
 static CTextureObject _atoGenericLoadingScreens[MAXLOADINGSCREENS];
 static INDEX _iGenericLoadingScreens = -1;
+static BOOL _bGenericLoadingScreensError = FALSE;
 
 #define REFRESHTIME (0.2f)
 
@@ -56,7 +57,7 @@ void RemapLevelNames(INDEX &iLevel)
   }
 }
 
-static void LoadGenericLoadingScreens()
+static void ObtainGenericLoadingScreens()
 {
   try
   {
@@ -74,6 +75,7 @@ static void LoadGenericLoadingScreens()
     ((CTextureData*)_atoGenericLoadingScreens[2].GetData())->Force(TEX_CONSTANT);
   } catch (char *strError) {
     CPrintF("Warning! %s\n", strError);
+    _bGenericLoadingScreensError = TRUE;
   }
 }
 
@@ -175,9 +177,9 @@ static void LoadingHook_t(CProgressHookInfo *pphi)
     tvLast = _pTimer->GetHighPrecisionTimer();
     return;
   }
-  
-  if (_iGenericLoadingScreens < 0) {
-    LoadGenericLoadingScreens();
+
+  if (!_bGenericLoadingScreensError && _iGenericLoadingScreens < 0) {
+    ObtainGenericLoadingScreens();
   }
   
   if (_iGenericLoadingScreens > 0 && !GetSP()->sp_bQuickTest) {
