@@ -24,6 +24,7 @@ extern CTString ga_strMSLegacy;
 extern CTString ga_strDarkPlacesMS;
 extern BOOL ga_bMSLegacy;
 extern BOOL ga_bDarkPlacesMS;
+extern BOOL ga_bDarkPlacesDebug;
 
 extern void MS_OnServerStart(void);
 extern void MS_OnServerEnd(void);

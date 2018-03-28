@@ -1375,6 +1375,7 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("persistent user CTString ga_strDarkPlacesMS;", &ga_strDarkPlacesMS);
   _pShell->DeclareSymbol("persistent user INDEX ga_bMSLegacy;", &ga_bMSLegacy);
   _pShell->DeclareSymbol("persistent user INDEX ga_bDarkPlacesMS;", &ga_bDarkPlacesMS);
+  _pShell->DeclareSymbol("persistent user INDEX ga_bDarkPlacesDebug;", &ga_bDarkPlacesDebug);
 
   _pShell->DeclareSymbol("INDEX pwoCurrentWorld;", &_pwoCurrentWorld);
 }

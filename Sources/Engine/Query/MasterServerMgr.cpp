@@ -52,17 +52,13 @@ TIME _tmLastHeartbeat = -1.0F;
 
 CDynamicStackArray<CServerRequest> ga_asrRequests;
 
-//extern CTString ga_strServer = "master1.croteam.org";
 extern CTString ga_strServer = "master.333networks.com";
-//extern CTString ga_strMSLegacy = "master1.croteam.org";
 extern CTString ga_strMSLegacy = "master.333networks.com";
 extern CTString ga_strDarkPlacesMS = "192.168.1.4";
 
 extern BOOL ga_bMSLegacy = TRUE;
-
 extern BOOL ga_bDarkPlacesMS = FALSE;
-
-//BOOL ga_bMSLegacy = FALSE;
+extern BOOL ga_bDarkPlacesDebug = FALSE;
 
 void _uninitWinsock();
 
