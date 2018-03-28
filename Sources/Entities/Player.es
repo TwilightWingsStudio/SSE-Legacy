@@ -8598,6 +8598,11 @@ procedures:
 
     FindMusicHolder();
 
+    // [SSE] Underwater sound fix.
+    if (m_soLocalAmbientLoop.IsPlaying()) {
+      m_soLocalAmbientLoop.Stop();
+    }
+
     // initialize player (from PlayerMarker)
     InitializePlayer();
 
