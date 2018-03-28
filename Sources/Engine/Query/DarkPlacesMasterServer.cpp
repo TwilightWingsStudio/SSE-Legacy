@@ -334,6 +334,8 @@ void DarkPlaces_ClientParsePacket(INDEX iLength)
           case '\\': {
             //if (strKey != "gamemode") {
               if (bReadValue) {
+                //CPrintF("  %s = %s\n", strKey, strValue);
+                
                 // we're done reading the value, check which key it was
                 if (strKey == "gamename") {
                     strGameName = strValue;
@@ -386,6 +388,19 @@ void DarkPlaces_ClientParsePacket(INDEX iLength)
         
         data += 1;
         iLength -= 1;
+      }
+      
+      if (strGameMode != "")
+      {
+        CTString strDummy;
+
+        for (INDEX i = 0; i < strGameMode.Length(); i++)
+        {
+          if (strGameMode.str_String[i] == ':') {
+            strGameMode.Split(i, strGameType, strDummy);
+            break;
+          }
+        }
       }
 
       // add the server to the serverlist
