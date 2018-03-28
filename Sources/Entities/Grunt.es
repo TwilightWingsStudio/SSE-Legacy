@@ -105,7 +105,7 @@ functions:
   // [SSE]
   // Returns TRUE when enemy can be wound, otherwise returns FALSE.
   // --------------------------------------------------------------------------------------
-  virtual BOOL CanBeWound(void)
+  virtual BOOL CanBeWounded(void)
   {
     return GetHealth() < (m_fMaxHealth / 2);
   }

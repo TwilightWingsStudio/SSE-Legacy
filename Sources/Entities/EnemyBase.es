@@ -272,7 +272,7 @@ functions:
   // [SSE]
   // Returns TRUE when enemy can be wound, otherwise returns FALSE.
   // --------------------------------------------------------------------------------------
-  virtual BOOL CanBeWound(void)
+  virtual BOOL CanBeWounded(void)
   {
     return TRUE;
   }
@@ -3694,7 +3694,7 @@ procedures:
           }
         }
         
-        if (!CanBeWound()) {
+        if (!CanBeWounded()) {
           resume;
         }
 
