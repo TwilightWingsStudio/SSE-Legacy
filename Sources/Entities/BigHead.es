@@ -104,6 +104,14 @@ functions:
   {
     return FALSE;
   }
+  
+  // --------------------------------------------------------------------------------------
+  // Should be counted as kill?
+  // --------------------------------------------------------------------------------------
+  BOOL CountAsKill(void)
+  {
+    return FALSE;
+  }
 
   /* Entity info */
   void *GetEntityInfo(void)

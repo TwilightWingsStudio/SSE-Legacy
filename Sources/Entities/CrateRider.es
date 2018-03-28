@@ -92,6 +92,14 @@ functions:
     return FALSE;
   }
 
+  // --------------------------------------------------------------------------------------
+  // Should be counted as kill?
+  // --------------------------------------------------------------------------------------
+  BOOL CountAsKill(void)
+  {
+    return FALSE;
+  }
+
   // damage anim
   INDEX AnimForDamage(FLOAT fDamage) {
     INDEX iAnim;

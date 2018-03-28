@@ -145,6 +145,11 @@ functions:
         // If not template
         if (!penEnemy->m_bTemplate)
         {
+          // Don't count non-enemies creatures.
+          if (IsOfClass(pen, "BigHead") || IsOfClass(pen, "CrateRider")) {
+            continue;
+          }
+          
           // [SSE] Enemy Settings Entity
           if (penEnemy->m_penSettings) {
             CEnemySettingsEntity *penSettings = static_cast<CEnemySettingsEntity*>(&*penEnemy->m_penSettings);
@@ -163,7 +168,7 @@ functions:
 
           // if this is a woman kamikaze carrier, add another one to count
           if (IsOfClass(pen, "Woman")) {
-              if (((CWoman *)&*pen)->m_bKamikazeCarrier) { m_ctEnemiesInWorld++; }
+            if (((CWoman *)&*pen)->m_bKamikazeCarrier) { m_ctEnemiesInWorld++; }
           }
         }
 
@@ -172,7 +177,12 @@ functions:
         CEnemySpawner *penSpawner = (CEnemySpawner *)pen;
 
         // if not teleporting and count in statistics enabled
-        if (penSpawner->m_estType != EST_TELEPORTER && penSpawner->m_bCountInStatistics) {
+        if (penSpawner->m_estType != EST_TELEPORTER && penSpawner->m_bCountInStatistics)
+        {
+          // Don't count non-enemies creatures.
+          if (IsOfClass(penSpawner->m_penTarget, "BigHead") || IsOfClass(penSpawner->m_penTarget, "CrateRider")) {
+            continue;
+          }
 
           // add total count
           m_ctEnemiesInWorld += penSpawner->m_ctTotal;
