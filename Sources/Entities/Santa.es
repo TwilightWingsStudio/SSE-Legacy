@@ -97,6 +97,14 @@ functions:
   }
 
   // --------------------------------------------------------------------------------------
+  // Should be counted as kill?
+  // --------------------------------------------------------------------------------------
+  BOOL CountAsKill(void)
+  {
+    return FALSE;
+  }
+
+  // --------------------------------------------------------------------------------------
   /* Handle an event, return false if the event is not handled. */
   // --------------------------------------------------------------------------------------
   BOOL HandleEvent(const CEntityEvent &ee)
@@ -332,22 +340,18 @@ procedures:
     // find the one who killed, or other best suitable player
     CEntityPointer penKiller = eDeath.eLastDamage.penInflictor;
 
-    if (penKiller==NULL || !IsOfClass(penKiller, "Player")) {
+    if (penKiller == NULL || !IsOfClass(penKiller, "Player")) {
       penKiller = m_penEnemy;
     }
 
-    if (penKiller==NULL || !IsOfClass(penKiller, "Player")) {
+    if (penKiller == NULL || !IsOfClass(penKiller, "Player")) {
       penKiller = FixupCausedToPlayer(this, penKiller, /*bWarning=*/FALSE);
     }
 
-    BOOL bCountAsKill = CountAsKill();
-    
     // [SSE] Enemy Settings Entity
     if (m_penSettings && m_penSettings->IsActive())
     {
       CEnemySettingsEntity *penSettings = static_cast<CEnemySettingsEntity*>(&*m_penSettings);
-
-      bCountAsKill = penSettings->m_bCountAsKill;
       
       if (penSettings->m_penDeathTarget) {
         SendToTarget(penSettings->m_penDeathTarget, EET_TRIGGER, penKiller);
