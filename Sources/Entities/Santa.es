@@ -352,10 +352,8 @@ procedures:
     if (m_penSettings && m_penSettings->IsActive())
     {
       CEnemySettingsEntity *penSettings = static_cast<CEnemySettingsEntity*>(&*m_penSettings);
-      
-      if (penSettings->m_penDeathTarget) {
-        SendToTarget(penSettings->m_penDeathTarget, EET_TRIGGER, penKiller);
-      }
+
+      SendToTargetEx(penSettings->m_penDeathTarget, EET_TARGETED, penKiller, this); // Send an event to death target.
     }
     //
 
