@@ -474,7 +474,7 @@ static int l_entitiesed_SendEEventToEntity(lua_State* L)
     return luaL_error(L, "%s() _pSendEEvent is NULL! How it possible?", SCRIPTFUNCNAME);
   }
   
-  if (iTypeID < 0 || iTypeID > 12) {
+  if (iTypeID < 0 || iTypeID > 13) {
     return luaL_error(L, "%s() Got invalid EventEType!", SCRIPTFUNCNAME);
   }
   
@@ -485,6 +485,42 @@ static int l_entitiesed_SendEEventToEntity(lua_State* L)
 
   (*_pSendEEvent)(penEntity, iTypeID, penSecondEntity);
   
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
+// Sends event of given EventEType to target with custom penCaused argument.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "SendEEventExToEntity"
+static int l_entitiesed_SendEEventExToEntity(lua_State* L)
+{
+  const INDEX REQUIRED_ARGS = 4;
+  
+  INDEX ctArgs = lua_gettop(L);
+  
+  ONLYREQARGCT(ctArgs, REQUIRED_ARGS);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  INDEX iTypeID = luaL_checkinteger (L, 2);
+  ULONG ulSecondEntityID = luaL_checkinteger (L, 3);
+  ULONG ulThirdEntityID = luaL_checkinteger (L, 4);
+  
+  if (_pSendEEventEx == NULL) {
+    return luaL_error(L, "%s() _pSendEEventEx is NULL! How it possible?", SCRIPTFUNCNAME);
+  }
+  
+  if (iTypeID < 0 || iTypeID > 13) {
+    return luaL_error(L, "%s() Got invalid EventEType!", SCRIPTFUNCNAME);
+  }
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  ONLYVALIDENTITY(penEntity);
+
+  DEFENTBYID(penSecondEntity, ulSecondEntityID);
+  DEFENTBYID(penThirdEntity,  ulThirdEntityID);
+
+  (*_pSendEEventEx)(penEntity, iTypeID, penSecondEntity, penThirdEntity);
+
   return 1;
 }
 
@@ -520,6 +556,7 @@ static const struct luaL_Reg entitiesedLib [] = {
 
   // SendEvent
   {"SendEEventToEntity", l_entitiesed_SendEEventToEntity},
+  {"SendEEventExToEntity", l_entitiesed_SendEEventExToEntity},
   
   {NULL, NULL} /* end of array */
 };

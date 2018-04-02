@@ -31,6 +31,7 @@ class ENGINE_API CScriptEngine
 };
 
 ENGINE_API extern void (*_pSendEEvent)(CEntity* penTarget, INDEX iType, CEntity* penCaused);
+ENGINE_API extern void (*_pSendEEventEx)(CEntity* penTarget, INDEX iType, CEntity* penCaused, CEntity* penTargetArg);
 ENGINE_API extern CScriptEngine *_pScriptEngine;
 
 #endif  /* include-once check. */

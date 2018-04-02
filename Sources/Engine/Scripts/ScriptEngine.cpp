@@ -36,6 +36,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 CScriptEngine *_pScriptEngine = NULL;
 void (*_pSendEEvent)(CEntity* penTarget, INDEX iType, CEntity* penCaused) = NULL;
+void (*_pSendEEventEx)(CEntity* penTarget, INDEX iType, CEntity* penCaused, CEntity* penTargetArg) = NULL;
 
 static lua_State *CreateSafeState()
 {
