@@ -166,6 +166,7 @@ DECL_DLL void GetPositionCastRay(CEntity *penSource, CEntity *penTarget, FLOAT3D
 DECL_DLL void SetBoolFromBoolEType(BOOL &bSet, BoolEType bet);
 
 DECL_DLL void SendToTargetScript(CEntity *penSendEvent, INDEX iEventType, CEntity *penCaused = NULL); // [SSE] Script Engine
+DECL_DLL void SendToTargetExScript(CEntity *penSendEvent, INDEX iEventType, CEntity *penCaused = NULL, CEntity *penTarget = NULL); // [SSE] Script Engine
 
 // send event to target
 DECL_DLL void SendToTarget(CEntity *penSendEvent, EventEType eetEventType, CEntity *penCaused = NULL);

@@ -1003,6 +1003,7 @@ void CPlayer_OnInitClass(void)
   CPlayerWeapons_Init();
   
   _pSendEEvent = &SendToTargetScript; // [SSE] Script Engine
+  _pSendEEventEx = &SendToTargetExScript; // [SSE] Script Engine
 
   // initialize HUD
   InitHUD();
@@ -1374,8 +1375,6 @@ properties:
  // [SSE] Gameplay - Personal/Shared Lives
  200 INDEX m_iLives = 0,
 
- 201 INDEX m_iLevel = 0,
-
  // [SSE] Gameplay - Currencies
  202 INDEX m_iCurrency1 = 0,
  203 INDEX m_iCurrency2 = 0,
@@ -1384,6 +1383,10 @@ properties:
 
  206 INDEX m_iScoreAccumulated = 0,
  207 FLOAT m_fLiveCostMultiplier = 1.0F,
+ 
+ // [SSE] Gameplay - Progression
+ 210 INDEX m_iLevel = 0,
+ 211 INDEX m_iExperience = 0,
  
  // [SSE] Gameplay - Respawn Delay
  220 FLOAT m_tmKilled = -1.0f,

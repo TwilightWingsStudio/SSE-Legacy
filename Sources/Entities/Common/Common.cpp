@@ -135,6 +135,12 @@ void SendToTargetScript(CEntity *penSendEvent, INDEX iEventType, CEntity *penCau
   SendToTarget(penSendEvent, (EventEType)iEventType, penCaused);
 }
 
+
+void SendToTargetExScript(CEntity *penSendEvent, INDEX iEventType, CEntity *penCaused, CEntity *penTarget)
+{
+  SendToTargetEx(penSendEvent, (EventEType)iEventType, penCaused, penTarget);
+}
+
 // --------------------------------------------------------------------------------------
 // Send event to target.
 // --------------------------------------------------------------------------------------
