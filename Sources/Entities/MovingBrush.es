@@ -20,7 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 uses "Entities/MovingBrushMarker";
 uses "Entities/SoundHolder";
-uses "Entities\MirrorMarker";
+uses "Entities/MirrorMarker";
 uses "Entities/Debris";
 
 event EHit {
@@ -54,8 +54,8 @@ features  "HasName", "IsTargetable";
 
 properties:
 
-  1 CTString m_strName            "Name" 'N' = "Moving Brush",
-  2 CTString m_strDescription = "",
+  1 CTString m_strName        "Name" 'N' = "Moving Brush",
+  2 CTString m_strDescription            = "",
   
   3 CEntityPointer m_penTarget    "Target" 'T' COLOR(C_BLUE|0xFF),
   4 BOOL m_bAutoStart             "Auto start" 'A' = FALSE,
@@ -132,7 +132,7 @@ properties:
  67 enum EventEType m_eetBlowupEvent "Blowup Event - Type" = EET_IGNORE,  // type of event to send
  68 CEntityPointer m_penBlowupEvent  "Blowup Event - Target" COLOR(C_BLACK|0xFF),            // target to send event to
  69 BOOL m_bZoning              "Zoning"     'Z' =FALSE,
- 70 BOOL m_bMoveOnDamage "Move on damage" = FALSE,    // move when recive damage
+ 70 BOOL m_bMoveOnDamage        "Move on damage" = FALSE,    // move when recive damage
  71 FLOAT m_fTouchDamage        "Touch damage" = 0.0f,
  72 COLOR m_colDebrises         "Color of debrises" = C_WHITE,
  74 INDEX m_ctDebrises          "Debris count" = 12,
@@ -204,7 +204,7 @@ functions:
 
     // send event on damage
     if(m_tdeSendEventOnDamage!=TDE_TOUCHONLY && CanReactOnEntity(penInflictor)) {
-      SendToTarget(m_penTouchEvent, m_eetTouchEvent, penInflictor);
+      SendToTargetEx(m_penTouchEvent, m_eetTouchEvent, penInflictor, this);
     }
 
     // if not destroyable
@@ -462,7 +462,7 @@ functions:
     }
 
     // marker event -> SEND ALWAYS (if target is valid) !!!
-    SendToTarget(mbm.m_penMarkerEvent, mbm.m_eetMarkerEvent);
+    SendToTargetEx(mbm.m_penMarkerEvent, mbm.m_eetMarkerEvent, NULL, this);
 
     // sound entity
     if (mbm.m_penSoundStart!=NULL) {
@@ -921,7 +921,7 @@ procedures:
         }
         // send event on touch
         if(m_tdeSendEventOnDamage!=TDE_DAMAGEONLY && CanReactOnEntity(eTouch.penOther)) {
-          SendToTarget(m_penTouchEvent, m_eetTouchEvent);
+          SendToTargetEx(m_penTouchEvent, m_eetTouchEvent, eTouch.penOther, this);
         }
         // if not already moving
         if(!m_bMoving) {
@@ -1022,7 +1022,7 @@ procedures:
           iten->SendEvent( EBrushDestroyed());
         }
         // send event to blowup target
-        SendToTarget(m_penBlowupEvent, m_eetBlowupEvent, eDeath.eLastDamage.penInflictor);
+        SendToTargetEx(m_penBlowupEvent, m_eetBlowupEvent, eDeath.eLastDamage.penInflictor, this);
 
         // make sure it doesn't loop with destroying itself
         m_tdeSendEventOnDamage = TDE_TOUCHONLY;
