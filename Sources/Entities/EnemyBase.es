@@ -193,6 +193,8 @@ properties:
 
 191 BOOL m_bCountKill = TRUE, // TODO: Move to flags-like variable.
 
+195 BOOL m_bIsActive = TRUE, // [SSE]
+
 //213 CEntityPointer m_penFriend,
 //214 BOOL m_bRunningToFriend = FALSE,
 
@@ -364,7 +366,7 @@ functions:
   }
 
   // --------------------------------------------------------------------------------------
-  // Of should be counted as kill.
+  // Should be counted as kill?
   // --------------------------------------------------------------------------------------
   virtual BOOL CountAsKill(void)
   {
@@ -3603,6 +3605,8 @@ procedures:
   // --------------------------------------------------------------------------------------
   Active(EVoid) 
   {
+    m_bIsActive = TRUE; // [SSE]
+    
     m_fDamageConfused = 0.0f;
     // logic loop
     wait () {
@@ -3861,6 +3865,8 @@ procedures:
   // --------------------------------------------------------------------------------------
   Inactive(EVoid) 
   {
+    m_bIsActive = FALSE; // [SSE]
+    
     // stop moving
     StopMoving();                 
     StandingAnim();

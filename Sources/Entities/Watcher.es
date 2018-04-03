@@ -405,13 +405,12 @@ functions:
     FLOAT fSeeDistance  = GetOwner()->m_fIgnoreRange;
     FLOAT fStopDistance  = Max(fSeeDistance*1.5f, GetOwner()->m_fActivityRange);
 
-    // if players exited enemy's scope
+    // if players exited enemy's scope then stop owner
     if (fOrgDistance < fStopDistance && m_fClosestPlayer >= fStopDistance) {
-      // stop owner
       m_penOwner->SendEvent(EStop());
-    // if players entered enemy's scope
-    } else if (fOrgDistance >= fStopDistance && m_fClosestPlayer < fStopDistance) {
-      // start owner
+
+    // if players entered enemy's scope & enemy is in Innactive state. Then start owner.
+    } else if (!GetOwner()->m_bIsActive && /*fOrgDistance >= fStopDistance && */ m_fClosestPlayer < fStopDistance) {
       m_penOwner->SendEvent(EStart());
     }
 
