@@ -480,9 +480,14 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_ulMutatorFlags |= MUTF_CLOAKED;
   }
 
-  // [SSE] GameModes - Team DeathMatch
+  // [SSE] GameModes - LMS
   if (sp.sp_gmGameMode == CSessionProperties::GM_LASTMANSTANDING) {
     sp.sp_iFragLimit = 0;
+  }
+
+  // [SSE] GameModes - LMS & LTS
+  if (sp.sp_gmGameMode == CSessionProperties::GM_LASTMANSTANDING || sp.sp_gmGameMode == CSessionProperties::GM_LASTTEAMSTANDING) {
+    sp.sp_ulGameModeFlags |= GMF_LIMITEDLIVES;
   }
 }
 

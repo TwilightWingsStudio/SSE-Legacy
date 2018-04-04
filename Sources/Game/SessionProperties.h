@@ -16,6 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // Players are divided in teams.
 #define GMF_TEAMPLAY      (1L << 0)
 #define GMF_BASEONLYSPAWN (1L << 1)
+#define GMF_LIMITEDLIVES  (1L << 2) // Gamemode can be run only on limited lives.
 
 // Mutator Flags
 #define MUTF_INSTAGIB     (1L << 0)
@@ -50,7 +51,6 @@ public:
     GM_TEAMDEATHMATCH,   // [SSE] GameModes - Team DeathMatch
     GM_LASTGAMEMODE,     // Not actually gamemode. Just border.
     GM_LASTMANSTANDING,  // [SSE] GameModes - LMS
-
     
     GM_CAPTURETHEFLAG,   // [SSE] GameModes - CTF
     GM_LASTTEAMSTANDING, // [SSE] GameModes - LTS
