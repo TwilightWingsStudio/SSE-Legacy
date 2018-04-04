@@ -157,6 +157,27 @@ static int l_entitiesed_SetEntityLevel(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
+// Sets entity experience to given value.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "SetEntityExperience"
+static int l_entitiesed_SetEntityExperience(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 2);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  INDEX iLevel = ClampDn(luaL_checkinteger (L, 2), 0);
+
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+
+  static_cast<CLiveEntity*>(penEntity)->SetExperience(iLevel);
+
+  return 0;
+}
+
+// --------------------------------------------------------------------------------------
 // Sets entity specified currency balance to given value.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntityBalance"
@@ -528,11 +549,16 @@ static const struct luaL_Reg entitiesedLib [] = {
   {"SetEntityParent", l_entitiesed_SetEntityParent},
 
   //////// Setters for CLiveEntity ////////
+  // Vital.
   {"SetEntityHealth", l_entitiesed_SetEntityHealth},
   {"SetEntityArmor", l_entitiesed_SetEntityArmor},
   {"SetEntityShields", l_entitiesed_SetEntityShields},
-  {"SetEntityLevel", l_entitiesed_SetEntityLevel},
 
+  // Progression.
+  {"SetEntityLevel", l_entitiesed_SetEntityLevel},
+  {"SetEntityExperience", l_entitiesed_SetEntityExperience},
+
+  // Currencies.
   {"SetEntityBalance", l_entitiesed_SetEntityBalance},
   {"SetEntityMoney", l_entitiesed_SetEntityMoney},
   {"SetEntitySupplies", l_entitiesed_SetEntitySupplies},

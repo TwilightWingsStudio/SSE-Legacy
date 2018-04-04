@@ -618,6 +618,26 @@ static int l_entities_GetEntityLevel(lua_State* L)
 }
 
 // --------------------------------------------------------------------------------------
+// Gets entity experience.
+// --------------------------------------------------------------------------------------
+#define SCRIPTFUNCNAME "GetEntityExperience"
+static int l_entities_GetEntityExperience(lua_State* L)
+{
+  ONLYREQARGCT(lua_gettop(L), 1);
+  
+  ULONG ulEntityID = luaL_checkinteger (L, 1);
+  
+  DEFENTBYID(penEntity, ulEntityID);
+  
+  ONLYVALIDENTITY(penEntity);
+  ONLYLIVEENTITY(penEntity);
+  
+  lua_pushinteger(L, static_cast<CLiveEntity*>(penEntity)->GetExperience());
+
+  return 1;
+}
+
+// --------------------------------------------------------------------------------------
 // Gets entity balance for specified currency.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityBalance"
@@ -826,10 +846,16 @@ static const struct luaL_Reg entitiesLib [] = {
   //{"GetEntityInteractionProvider", l_entities_GetEntityInteractionProvider},
 
   //////// Getters for CLiveEntity ////////
+  // Vital.
   {"GetEntityArmor", l_entities_GetEntityArmor},
   {"GetEntityHealth", l_entities_GetEntityHealth},
   {"GetEntityShields", l_entities_GetEntityShields},
+  
+  // Progression.
   {"GetEntityLevel", l_entities_GetEntityLevel},
+  {"GetEntityExperience", l_entities_GetEntityExperience},
+  
+  // Currencies.
   {"GetEntityBalance", l_entities_GetEntityBalance},
   {"GetEntityMoney", l_entities_GetEntityMoney},
   {"GetEntitySupplies", l_entities_GetEntitySupplies},
