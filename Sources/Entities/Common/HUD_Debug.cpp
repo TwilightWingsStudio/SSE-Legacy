@@ -117,6 +117,8 @@ extern void HUD_DrawDebugMonitor()
   }
 
   strReport.PrintF("%s^cCCCCCCLevel: %d\n", strReport, _penPlayer->m_iLevel);
+  strReport.PrintF("%s^cCCCCCCExp: %d\n", strReport, _penPlayer->m_iExperience);
+
   strReport.PrintF("%s^cCCCCCC#0 Money: %d\n", strReport, _penPlayer->m_iCurrency1);
   strReport.PrintF("%s^cCCCCCC#1 Sup-s: %d\n", strReport, _penPlayer->m_iCurrency2);
   strReport.PrintF("%s^cCCCCCC#2 Cr.    %d\n", strReport, _penPlayer->m_iCurrency3);
