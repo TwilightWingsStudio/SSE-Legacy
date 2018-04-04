@@ -1583,12 +1583,21 @@ functions:
   }
   
   // --------------------------------------------------------------------------------------
-  // [SSE] Extended Engine API
+  // [SSE] Gameplay - Progression
   // Returns current level value.
   // --------------------------------------------------------------------------------------
   virtual INDEX GetLevel(void) const
   {
     return m_iLevel;
+  }
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Gameplay - Progression
+  // Returns current level value.
+  // --------------------------------------------------------------------------------------
+  virtual INDEX GetExperience(void) const
+  {
+    return m_iExperience;
   }
   
   // --------------------------------------------------------------------------------------
@@ -1647,12 +1656,21 @@ functions:
   };
   
   // --------------------------------------------------------------------------------------
-  // [SSE] Extended Engine API
+  // [SSE] Gameplay - Progression
   // Sets the new level value.
   // --------------------------------------------------------------------------------------
   virtual void SetLevel(INDEX iLevel)
   {
     m_iLevel = iLevel;
+  };
+  
+  // --------------------------------------------------------------------------------------
+  // [SSE] Gameplay - Progression
+  // Sets the new experience value.
+  // --------------------------------------------------------------------------------------
+  virtual void SetExperience(INDEX iExperience)
+  {
+    m_iExperience = iExperience;
   };
   
   // --------------------------------------------------------------------------------------
