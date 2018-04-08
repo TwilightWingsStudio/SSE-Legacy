@@ -154,7 +154,35 @@ functions:
 
     return slUsedMemory;
   }
+  
+  // --------------------------------------------------------------------------------------
+  // Shows dialog wnd with relations list.
+  // --------------------------------------------------------------------------------------
+  void ShowInfoDialog()
+  {
+    CTString strCode;
+    strCode.PrintF("Faction Index = [%0d]\n\n", m_iFactionIndex);
+    
+    for (INDEX i = 0; i < 32; i++)
+    {
+      EFRelationToPlayers ertpRelation = GetRelationToFaction(i);
+      
+      CTString strTemp;
+      strTemp.PrintF("[%02d] = ", i);
+      
+      strCode += strTemp;
+      
+      if (ertpRelation == FRT_ENEMY) {
+        strCode += "Enemy\n";
+      } else if (ertpRelation == FRT_NEUTRAL) {
+        strCode += "Neutral\n";
+      } else {
+        strCode += "Friend\n";
+      }
+    }
 
+    WarningMessage(strCode);
+  }
 
 procedures:
 
@@ -163,35 +191,16 @@ procedures:
   // --------------------------------------------------------------------------------------
   Main()
   {
+    // Clamp to limits.
     if (m_iFactionIndex < EFHI_00) { m_iFactionIndex = EFHI_00; }
     if (m_iFactionIndex > EFHI_31) { m_iFactionIndex = EFHI_31; }
     
+    // If should display info dialog.
     if (m_bCode)
     {
       m_bCode = FALSE;
       
-      CTString strCode;
-      strCode.PrintF("Faction Index = [%0d]\n\n", m_iFactionIndex);
-      
-      for (INDEX i = 0; i < 32; i++)
-      {
-        EFRelationToPlayers ertpRelation = GetRelationToFaction(i);
-        
-        CTString strTemp;
-        strTemp.PrintF("[%02d] = ", i);
-        
-        strCode += strTemp;
-        
-        if (ertpRelation == FRT_ENEMY) {
-          strCode += "Enemy\n";
-        } else if (ertpRelation == FRT_NEUTRAL) {
-          strCode += "Neutral\n";
-        } else {
-          strCode += "Friend\n";
-        }
-      }
-
-      WarningMessage(strCode);
+      ShowInfoDialog();
     }
   
     InitAsEditorModel();
