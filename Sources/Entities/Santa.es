@@ -162,18 +162,25 @@ functions:
     m_tmLastSpawnTime = _pTimer->CurrentTick();
 
     // choose an item to spawn
-    INDEX ctTemplates = 0;
-    if (m_penTemplate0 != NULL) { ctTemplates++; }
-    if (m_penTemplate1 != NULL) { ctTemplates++; }
-    if (m_penTemplate2 != NULL) { ctTemplates++; }
-    if (m_penTemplate3 != NULL) { ctTemplates++; }
-    if (m_penTemplate4 != NULL) { ctTemplates++; }
+    INDEX ctTopTemplate = 0;
+    
+    // [SSE] Gameplay - Santa Item Drop
+    // Here is better item drop algorithm.
+    // Now it will drop any item between 0 and highest non-NULL target.
+    // In vanilla it was like item between 0 and (template count - 1)
 
-    if (ctTemplates == 0) {
+    if (m_penTemplate0 != NULL) { ctTopTemplate = 1; }
+    if (m_penTemplate1 != NULL) { ctTopTemplate = 2; }
+    if (m_penTemplate2 != NULL) { ctTopTemplate = 3; }
+    if (m_penTemplate3 != NULL) { ctTopTemplate = 4; }
+    if (m_penTemplate4 != NULL) { ctTopTemplate = 5; }
+
+    // If no templates then do nothing.
+    if (ctTopTemplate == 0) {
       return;
     }
 
-    INDEX iTemplate = IRnd()%ctTemplates;
+    INDEX iTemplate = IRnd() % ctTopTemplate;
     CEntity *penItem = (&m_penTemplate0)[iTemplate];
 
     // if the target doesn't exist, or is destroyed
