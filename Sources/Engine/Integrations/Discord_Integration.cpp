@@ -35,10 +35,12 @@ static int64_t _llStartTime;
 static BOOL _bDiscordEnabled = FALSE;
 static BOOL _bLastGameActive = FALSE;
 static TIME _tmLastPresenceUpdate = 0;
+static BOOL _bLastIntegrationEnabled = FALSE;
 static HINSTANCE _hDiscordLib = NULL;
 
+extern INDEX drp_bIntegrationEnabled = TRUE;
+
 extern CTString _getGameModeShortName(INDEX iGameMode);
-extern const CSessionProperties* _getSP();
 
 static void FailFunction_t(const char *strName) {
   ThrowF_t(TRANS("Function %s not found."), strName);
@@ -73,6 +75,20 @@ static const char* APPLICATION_ID = "421325065930539018";
 #define DISCORD_SMALL_IMAGE_KEY "main-star-s"
 #define DISCORD_LARGE_IMAGE_KEY "main-large"
 
+static void _InitializeAPI()
+{
+  DiscordEventHandlers handlers;
+  memset(&handlers, 0, sizeof(handlers));
+  //handlers.ready = handleDiscordReady;
+  //handlers.disconnected = handleDiscordDisconnected;
+  //handlers.errored = handleDiscordError;
+  //handlers.joinGame = handleDiscordJoin;
+  //handlers.spectateGame = handleDiscordSpectate;
+  //handlers.joinRequest = handleDiscordJoinRequest;
+  
+  pDiscord_Initialize(APPLICATION_ID, &handlers, 1, NULL); // Initialize the Discord API.
+}
+
 // --------------------------------------------------------------------------------------
 // Should be called on engine startup.
 // --------------------------------------------------------------------------------------
@@ -84,6 +100,9 @@ void Discord_InitPlugin()
   }
   
   _llStartTime = time(0);
+  
+  // Setup shell symbols.
+  _pShell->DeclareSymbol("persistent user INDEX drp_bIntegrationEnabled;", &drp_bIntegrationEnabled);
 
   try {
     _hDiscordLib = ::LoadLibraryA(DISCORD_LIB_NAME);
@@ -101,20 +120,13 @@ void Discord_InitPlugin()
     CPrintF(TRANS("Discord integration disabled: %s\n"), strError);
     return;
   }
-  
-  
-  DiscordEventHandlers handlers;
-  memset(&handlers, 0, sizeof(handlers));
-  //handlers.ready = handleDiscordReady;
-  //handlers.disconnected = handleDiscordDisconnected;
-  //handlers.errored = handleDiscordError;
-  //handlers.joinGame = handleDiscordJoin;
-  //handlers.spectateGame = handleDiscordSpectate;
-  //handlers.joinRequest = handleDiscordJoinRequest;
 
-  pDiscord_Initialize(APPLICATION_ID, &handlers, 1, NULL); // Initialize the Discord API.
-  
-  Discord_UpdateInfo(FALSE);
+  _InitializeAPI();
+
+  if (drp_bIntegrationEnabled) {
+    _bLastIntegrationEnabled = TRUE;
+    Discord_UpdateInfo(FALSE);
+  }
 }
 
 // --------------------------------------------------------------------------------------
@@ -162,6 +174,9 @@ static const char* GetCurrentGameStateName(BOOL bGameActive)
   return "In Menus";
 }
 
+// --------------------------------------------------------------------------------------
+// Returns asset name of large icon which represents current state.
+// --------------------------------------------------------------------------------------
 static const char* GetImageAssetName(BOOL bGameActive)
 {
   if (_bWorldEditorApp) {
@@ -206,6 +221,18 @@ CTString _getCurrentGameModeName()
 void Discord_UpdateInfo(BOOL bGameActive)
 {
   if (!_bDiscordEnabled) {
+    return;
+  }
+
+  // If was enabled and now disabled. Then clear presence.
+  if (!drp_bIntegrationEnabled && _bLastIntegrationEnabled) {
+    pDiscord_ClearPresence();
+  }
+  
+  _bLastIntegrationEnabled = drp_bIntegrationEnabled;
+  
+  // If disabled then don't send presence.
+  if (!drp_bIntegrationEnabled) {
     return;
   }
   
