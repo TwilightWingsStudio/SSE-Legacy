@@ -43,8 +43,9 @@ properties:
   
   // info comes now
   19 BOOL m_bPlayerExists      "Is Player Exists" = FALSE,
-  20 FLOAT m_fHealth           "Player Health" = -1.0f,
-  21 FLOAT m_fArmor            "Player Armor"  = -1.0f,
+  20 FLOAT m_fHealth           "V Player Health" = -1.0f,
+  21 FLOAT m_fArmor            "V Player Armor"  = -1.0f,
+  22 FLOAT m_fShields          "V Player Shields" = -1.0f,
   25 BOOL m_bDead              "Is Dead"       = FALSE,
   35 CTString m_strPlayerName  "Player Name" = "",
   
@@ -91,6 +92,7 @@ functions:
 
     m_fHealth = penPlayer.GetHealth();
     m_fArmor = penPlayer.GetArmor();
+    m_fShields = penPlayer.GetShields();
     m_strPlayerName = penPlayer.GetName();
     m_bDead = !(penPlayer.GetFlags()&ENF_ALIVE);
 
@@ -100,6 +102,7 @@ functions:
       CPrintF("  Name: %s\n", m_strPlayerName);
       CPrintF("  Health: %f\n", m_fHealth);
       CPrintF("  Armor: %f\n", m_fArmor);
+      CPrintF("  Shields: %f\n", m_fShields);
       CPrintF("  Is Dead: %d\n", m_bDead);
     }
 
@@ -108,7 +111,7 @@ functions:
     // For safety.
     if (penWeapons == NULL) {
       if (m_bDebugMessages) {
-        CPrintF("  Weapons are unavailable!\n", m_fArmor);
+        CPrintF("  Weapons are unavailable!\n");
       }
       return;
     }
