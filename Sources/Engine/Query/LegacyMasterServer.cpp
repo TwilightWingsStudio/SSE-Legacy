@@ -132,7 +132,7 @@ extern CDynamicStackArray<CServerRequest> ga_asrRequests;
 // --------------------------------------------------------------------------------------
 void MSLegacy_BuildHearthbeatPacket(CTString &strPacket)
 {
-  strPacket.PrintF("\\heartbeat\\%hu\\gamename\\serioussamse", (_pShell->GetINDEX("net_iPort") + 1));
+  strPacket.PrintF("\\heartbeat\\%hu\\gamename\\%s", (_pShell->GetINDEX("net_iPort") + 1), SERIOUSSAMSTR);
 }
 
 void MSLegacy_EnumTrigger(BOOL bInternet)

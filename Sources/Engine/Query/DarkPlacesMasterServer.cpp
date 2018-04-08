@@ -351,8 +351,6 @@ void DarkPlaces_ClientParsePacket(INDEX iLength)
                     strGameMode = strValue;
                 } else if (strKey == "mapname") {
                     strLevel = strValue;
-                } else if (strKey == "gametype") {
-                    strGameType = strValue;
                 } else if (strKey == "modname") {
                     strActiveMod = strValue;
                 } else if (strKey == "clients") {
