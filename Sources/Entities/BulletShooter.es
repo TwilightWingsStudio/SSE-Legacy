@@ -45,8 +45,9 @@ properties:
   15 CEntityPointer m_penInflictor "Inflictor",
   16 CEntityPointer m_penTarget    "Target",
 
-  17 enum EBSUsePenCausedAs m_eUsePenCausedAs "Use penCaused as ..." = EBSUP_NONE,
-
+  17 enum TETargetType m_teInflictorType "Inflictor Type" = TETT_TARGET,
+  18 enum TETargetType m_teTargetType    "Target Type"    = TETT_TARGET,
+  
   20 FLOAT m_fWait      "Min Fire Delay" = 0.1F,
   21 FLOAT m_tmFired = 0.0F,
   
@@ -81,7 +82,7 @@ functions:
   // --------------------------------------------------------------------------------------
   // Fires the bullet in given direction with given properties.
   // --------------------------------------------------------------------------------------
-  void ShootBullet(const ETrigger &eTrigger, const CPlacement3D &pl)
+  void ShootBullet(CEntity *penCaused, CEntity *penTargetArg, const CPlacement3D &pl)
   {
     CEntity *penInflictor = m_penInflictor;
     CEntity *penTarget = m_penTarget;
@@ -91,18 +92,39 @@ functions:
     // Initialize the bullet.
     EBulletInit eInit;
     
-    if (m_eUsePenCausedAs == EBSUP_INFLICTOR) {
-      penInflictor = eTrigger.penCaused;
-    } else if (m_eUsePenCausedAs == EBSUP_DESTINATION) {
-      penTarget = eTrigger.penCaused;
+    // Extended inflictor types.
+    switch (m_teInflictorType)
+    {
+      case TETT_THIS: {
+        penInflictor = this;
+      } break;
+      
+      case TETT_PENCAUSED: {
+        penInflictor = penCaused;
+      } break;
+      
+      case TETT_PENTARGET: {
+        penInflictor = penTargetArg;
+      } break;
     }
 
-    if (penInflictor) {
-      eInit.penOwner = penInflictor;
-    } else {
-      eInit.penOwner = this;
+    // Extended target types.
+    switch (m_teTargetType)
+    {
+      case TETT_PENCAUSED: {
+        penTarget = penCaused;
+      } break;
+      
+      case TETT_PENTARGET: {
+        penTarget = penTargetArg;
+      } break;
     }
-  
+
+    if (penInflictor == NULL) {
+      penInflictor = this;
+    }
+
+    eInit.penOwner = penInflictor;
     eInit.fDamage = m_fBulletDamage;
     penBullet->Initialize(eInit);
 
@@ -121,9 +143,9 @@ functions:
   // --------------------------------------------------------------------------------------
   // Calls firing method and plays sound if any sound selected.
   // --------------------------------------------------------------------------------------
-  void Shoot(const ETrigger &eTrigger, const CPlacement3D &pl)
+  void DoShoot(CEntity *penCaused, CEntity *penTarget)
   {
-    ShootBullet(eTrigger, pl);
+    ShootBullet(penCaused, penTarget, GetPlacement());
 
     // If we have SoundHolder selected then shooting sound.
     if (m_penSoundFire != NULL)
@@ -133,6 +155,7 @@ functions:
       PlaySound(m_soFire, sh.m_fnSound, sh.m_iPlayType);
     }
   }
+
 procedures:
 
 /************************************************************
@@ -143,10 +166,15 @@ procedures:
   // --------------------------------------------------------------------------------------
   Main(EVoid)
   {
-    // Validate Sound
+    // Validate Sound.
     if (m_penSoundFire != NULL && !IsDerivedFromClass(m_penSoundFire, "SoundHolder")) {
       m_penSoundFire = NULL;
       WarningMessage("Only SoundHolder can be selected as ""Sound Fire"" for BulletShooter!");
+    }
+    
+    // Validate Target Type.
+    if (m_teTargetType == TETT_THIS) {
+      m_teTargetType = TETT_TARGET;
     }
 
     InitAsEditorModel();
@@ -162,26 +190,37 @@ procedures:
     
     wait()
     {
-      on(EBegin) : {
+      on (EBegin) : {
         resume;
       };
     
-      on(ETrigger eTrigger) :
+      on (ETrigger eTrigger) :
       {
         if (m_bActive && m_tmFired + m_fWait < _pTimer->CurrentTick()) {
           m_tmFired = _pTimer->CurrentTick();
-          Shoot(eTrigger, GetPlacement());
+          DoShoot(eTrigger.penCaused, NULL);
         }
     
         resume;
       }
+      
+      // [SSE] Entities - Targeted Event
+      on (ETargeted eTargeted) :
+      {
+        if (m_bActive && m_tmFired + m_fWait < _pTimer->CurrentTick()) {
+          m_tmFired = _pTimer->CurrentTick();
+          DoShoot(eTargeted.penCaused, eTargeted.penTarget);
+        }
+        
+        resume;
+      }
 
-      on(EActivate):{
+      on (EActivate) : {
         m_bActive = TRUE;
         resume;
       }
 
-      on(EDeactivate):{
+      on (EDeactivate) : {
         m_bActive = FALSE;
         resume;
       }
