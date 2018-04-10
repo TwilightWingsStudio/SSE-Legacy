@@ -193,7 +193,7 @@ functions:
         }
 
         // Skip enmies from ally and neutral factions.
-        EFRelationToPlayers efrtpRelation = penEFH->GetRelationToFaction(penEnemyEFH->m_iFactionIndex);
+        EFactionRelation efrtpRelation = penEFH->GetRelationToFaction(penEnemyEFH->m_iFactionIndex);
         if (efrtpRelation == FRT_ALLY || efrtpRelation == FRT_NEUTRAL) {
           continue;
         }

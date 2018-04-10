@@ -56,7 +56,7 @@ enum EFHIndex {
   31 EFHI_31 "Faction [31]",
 };
 
-enum EFRelationToPlayers {
+enum EFactionRelation {
   0 FRT_ENEMY   "Enemy [0]",
   1 FRT_NEUTRAL "Neutral [1]",
   2 FRT_ALLY    "Ally [2]",
@@ -81,7 +81,7 @@ properties:
  17 BOOL m_bDamageFromMembers  "Damage From Members" = FALSE,
  19 BOOL m_bDamageFromPlayers  "Damage From Players" = TRUE,
  
- 30 enum EFRelationToPlayers m_efrtRelationToPlayers "Relation To Player(s)" = FRT_NEUTRAL,
+ 30 enum EFactionRelation m_efrtRelationToPlayers "Relation To Player(s)" = FRT_NEUTRAL,
  
  40 BOOL m_bCode          "Output as Script" = FALSE,
 
@@ -117,7 +117,7 @@ functions:
   // --------------------------------------------------------------------------------------
   // Returns relation to specified faction.
   // --------------------------------------------------------------------------------------
-  EFRelationToPlayers GetRelationToFaction(INDEX iFactionIndex)
+  EFactionRelation GetRelationToFaction(INDEX iFactionIndex)
   {
     ULONG ulFaction = (1<<INDEX(iFactionIndex));
 
@@ -165,16 +165,16 @@ functions:
     
     for (INDEX i = 0; i < 32; i++)
     {
-      EFRelationToPlayers ertpRelation = GetRelationToFaction(i);
+      EFactionRelation eRelation = GetRelationToFaction(i);
       
       CTString strTemp;
       strTemp.PrintF("[%02d] = ", i);
       
       strCode += strTemp;
       
-      if (ertpRelation == FRT_ENEMY) {
+      if (eRelation == FRT_ENEMY) {
         strCode += "Enemy\n";
-      } else if (ertpRelation == FRT_NEUTRAL) {
+      } else if (eRelation == FRT_NEUTRAL) {
         strCode += "Neutral\n";
       } else {
         strCode += "Friend\n";
