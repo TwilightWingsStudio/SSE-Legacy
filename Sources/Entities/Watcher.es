@@ -192,9 +192,9 @@ functions:
           continue;
         }
 
-        // Skip enmies from ally and neutral factions.
-        EFactionRelation efrtpRelation = penEFH->GetRelationToFaction(penEnemyEFH->m_iFactionIndex);
-        if (efrtpRelation == FRT_ALLY || efrtpRelation == FRT_NEUTRAL) {
+        // Skip enemies from ally and neutral factions.
+        EFactionRelation eRelation = penEFH->GetRelationToFaction(penEnemyEFH->m_iFactionIndex);
+        if (eRelation == FRT_ALLY || eRelation == FRT_NEUTRAL) {
           continue;
         }
 
@@ -252,7 +252,7 @@ functions:
 
       // If we have faction holder.
       if (penEFH != NULL) {
-        if (penEFH->m_efrtRelationToPlayers != FRT_ENEMY) {
+        if (penEFH->m_eRelationToPlayers != FRT_ENEMY) {
           continue;
         }
       }

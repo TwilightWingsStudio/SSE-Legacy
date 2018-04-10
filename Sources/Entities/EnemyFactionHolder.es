@@ -81,7 +81,7 @@ properties:
  17 BOOL m_bDamageFromMembers  "Damage From Members" = FALSE,
  19 BOOL m_bDamageFromPlayers  "Damage From Players" = TRUE,
  
- 30 enum EFactionRelation m_efrtRelationToPlayers "Relation To Player(s)" = FRT_NEUTRAL,
+ 30 enum EFactionRelation m_eRelationToPlayers "Relation To Player(s)" = FRT_NEUTRAL,
  
  40 BOOL m_bCode          "Output as Script" = FALSE,
 

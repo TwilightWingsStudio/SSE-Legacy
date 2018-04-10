@@ -424,7 +424,7 @@ functions:
     CEnemyFactionHolder* penEFH = GetFactionHolder(FALSE);
 
     // If invalid index in faction holder we cant' use this faction holder!
-    if (penEFH != NULL && penEFH->IsIndexValid() && penEFH->m_efrtRelationToPlayers != FRT_ENEMY) {
+    if (penEFH != NULL && penEFH->IsIndexValid() && penEFH->m_eRelationToPlayers != FRT_ENEMY) {
       return;
     }
 
@@ -1291,7 +1291,7 @@ functions:
       }
       
       // Allies can't be attacked.
-      if (penEFH->m_efrtRelationToPlayers == FRT_ALLY) {
+      if (penEFH->m_eRelationToPlayers == FRT_ALLY) {
         return FALSE;
       }
 
@@ -3745,7 +3745,7 @@ procedures:
           if (penEFH && penEFH->IsIndexValid())
           {
             // Skip if player not enemy.
-            if (penEFH->m_efrtRelationToPlayers == FRT_ALLY) {
+            if (penEFH->m_eRelationToPlayers == FRT_ALLY) {
               resume;
             }
             
@@ -3778,7 +3778,7 @@ procedures:
         BOOL bTargetChanged = FALSE;
         
         // If we have EFH and toucher is player, and if player is enemy for faction then set him as target.
-        if (penEFH != NULL && eTouch.penOther->IsPlayerEntity() && penEFH->m_efrtRelationToPlayers == FRT_ENEMY) {
+        if (penEFH != NULL && eTouch.penOther->IsPlayerEntity() && penEFH->m_eRelationToPlayers == FRT_ENEMY) {
           bTargetChanged = SetTargetHard(eTouch.penOther); // set the new target if needed
         }
 
