@@ -682,6 +682,9 @@
     <ClCompile Include="EntityDestroyer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GenericAmmoItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1890,6 +1893,12 @@
     <ClInclude Include="EntityDestroyer_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GenericAmmoItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericAmmoItem_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2792,12 +2801,6 @@
     <CustomBuild Include="VariableHolder.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
-    <CustomBuild Include="Coder.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
-    <CustomBuild Include="CausedKeeper.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
     <CustomBuild Include="RangeDamager.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
@@ -2843,9 +2846,6 @@
     <CustomBuild Include="DigitalAnimationChanger.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
-    <CustomBuild Include="SimpleTrigger.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
     <CustomBuild Include="ParticleCloudsHolder.es">
       <Filter>Class Files\Effects</Filter>
     </CustomBuild>
@@ -2864,20 +2864,11 @@
     <CustomBuild Include="HudPicDisplay.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
-    <CustomBuild Include="HudBossBarDisplay.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
     <CustomBuild Include="GenericKeyItem.es">
       <Filter>Class Files\Items</Filter>
     </CustomBuild>
     <CustomBuild Include="GenericPowerUpItem.es">
       <Filter>Class Files\Items</Filter>
-    </CustomBuild>
-    <CustomBuild Include="PlayerExecutor.es">
-      <Filter>Class Files\AI</Filter>
-    </CustomBuild>
-    <CustomBuild Include="PlayerVitalitySettings.es">
-      <Filter>Class Files\AI</Filter>
     </CustomBuild>
     <CustomBuild Include="ExactTeleport.es">
       <Filter>Class Files\Tools</Filter>
@@ -2891,10 +2882,31 @@
     <CustomBuild Include="DebrisSpawner.es">
       <Filter>Class Files\Effects</Filter>
     </CustomBuild>
+    <CustomBuild Include="EntityDestroyer.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SimpleTrigger.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Coder.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="PlayerVitalitySettings.es">
+      <Filter>Class Files\Players</Filter>
+    </CustomBuild>
+    <CustomBuild Include="PlayerExecutor.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CausedKeeper.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
+    <CustomBuild Include="HudBossBarDisplay.es">
+      <Filter>Class Files\Tools</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="EntityDestroyer.es">
-      <Filter>Class Files\Tools</Filter>
+    <None Include="GenericAmmoItem.es">
+      <Filter>Class Files\Items</Filter>
     </None>
   </ItemGroup>
 </Project>
