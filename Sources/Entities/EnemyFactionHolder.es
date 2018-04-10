@@ -77,10 +77,12 @@ properties:
  10 INDEX m_ulAlliesMask  "Allies Mask" = 0,
  11 INDEX m_ulEnemiesMask "Enemies Mask" = 0,
 
- 15 BOOL m_bDamageFromAllies   "Damage From Allies"  = FALSE,
- 17 BOOL m_bDamageFromMembers  "Damage From Members" = FALSE,
- 19 BOOL m_bDamageFromPlayers  "Damage From Players" = TRUE,
- 
+ // Damage filters.
+ 15 BOOL m_bDamageFromAllies  "Damage From Allies"  = FALSE,
+ 16 BOOL m_bDamageFromFoes    "Damage From Foes"    = TRUE,
+ 17 BOOL m_bDamageFromMembers "Damage From Members" = FALSE,
+ 19 BOOL m_bDamageFromPlayers "Damage From Players" = TRUE,
+
  30 enum EFactionRelation m_eRelationToPlayers "Relation To Player(s)" = FRT_NEUTRAL,
  
  40 BOOL m_bCode          "Output as Script" = FALSE,

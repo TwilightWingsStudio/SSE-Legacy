@@ -847,6 +847,7 @@ functions:
 
     } else if (IsDerivedFromClass(penInflictor, "Enemy Base")) {
       
+      // If this EnemyBase is in valid faction.
       if (penEFH && penEFH->IsIndexValid()) {
         CEnemyFactionHolder* penEnemyEFH = ((CEnemyBase*)penInflictor)->GetFactionHolder(TRUE);
         
@@ -856,8 +857,14 @@ functions:
           if (penEFH->m_iFactionIndex == iEnemyFactionIndex && !penEFH->m_bDamageFromMembers) {
             return FALSE;
           }
+          
+          EFactionRelation eRelation = penEFH->GetRelationToFaction(iEnemyFactionIndex);
 
-          if (penEFH->GetRelationToFaction(iEnemyFactionIndex) == FRT_ALLY && !penEFH->m_bDamageFromAllies) {
+          if (eRelation == FRT_ALLY && !penEFH->m_bDamageFromAllies) {
+            return FALSE;
+          }
+
+          if (eRelation == FRT_ENEMY && !penEFH->m_bDamageFromFoes) {
             return FALSE;
           }
         }
