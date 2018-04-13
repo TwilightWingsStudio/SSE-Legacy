@@ -151,7 +151,7 @@ procedures:
     m_bSwitchON = TRUE;
 
     // send event to target
-    SendToTarget(m_penTarget, m_eetEvent, m_penCaused);
+    SendToTargetEx(m_penTarget, m_eetEvent, m_penCaused, this);
 
     // wait for anim end
     wait(GetModelObject()->GetAnimLength(m_iModelONAnimation)) {
@@ -177,10 +177,10 @@ procedures:
 
     // if exists off target
     if (m_penOffTarget != NULL) {
-      SendToTarget(m_penOffTarget, m_eetOffEvent, m_penCaused);
+      SendToTargetEx(m_penOffTarget, m_eetOffEvent, m_penCaused, this);
     } else {
       // send off event to target
-      SendToTarget(m_penTarget, m_eetOffEvent, m_penCaused);
+      SendToTargetEx(m_penTarget, m_eetOffEvent, m_penCaused, this);
     }
     // wait for anim end
     wait(GetModelObject()->GetAnimLength(m_iModelOFFAnimation)) {
