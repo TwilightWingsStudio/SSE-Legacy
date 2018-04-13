@@ -685,6 +685,9 @@
     <ClCompile Include="GenericAmmoItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TargetHub.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Common.h">
@@ -1899,6 +1902,12 @@
     <ClInclude Include="GenericAmmoItem_tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TargetHub.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TargetHub_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NavigationMarker.es">
@@ -2903,10 +2912,13 @@
     <CustomBuild Include="HudBossBarDisplay.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
+    <CustomBuild Include="GenericAmmoItem.es">
+      <Filter>Class Files\AI</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="GenericAmmoItem.es">
-      <Filter>Class Files\Items</Filter>
+    <None Include="TargetHub.es">
+      <Filter>Class Files\Tools</Filter>
     </None>
   </ItemGroup>
 </Project>

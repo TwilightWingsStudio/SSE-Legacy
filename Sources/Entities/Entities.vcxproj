@@ -412,6 +412,7 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClCompile Include="Switch.cpp" />
     <ClCompile Include="TacticsChanger.cpp" />
     <ClCompile Include="TacticsHolder.cpp" />
+    <ClCompile Include="TargetHub.cpp" />
     <ClCompile Include="Teleport.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TextFXHolder.cpp" />
@@ -807,6 +808,8 @@ copy Debug\$(TargetName).lib $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
     <ClInclude Include="TacticsChanger_tables.h" />
     <ClInclude Include="TacticsHolder.h" />
     <ClInclude Include="TacticsHolder_tables.h" />
+    <ClInclude Include="TargetHub.h" />
+    <ClInclude Include="TargetHub_tables.h" />
     <ClInclude Include="Teleport.h" />
     <ClInclude Include="Teleport_tables.h" />
     <ClInclude Include="Terrain.h" />
@@ -3372,6 +3375,19 @@ ecc Entities/%(Filename).es </Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Entities/%(Filename).es</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
+ecc Entities/%(Filename).es </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
+ecc Entities/%(Filename).es </Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="TargetHub.es">
+      <FileType>Document</FileType>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Entities/%(Filename).es</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Entities/%(Filename).es</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd $(SolutionDir)
 ecc Entities/%(Filename).es </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)
