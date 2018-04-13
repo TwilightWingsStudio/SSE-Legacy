@@ -217,13 +217,21 @@ procedures:
       }
 
       // start -> switch ON
-      on (EStart) : {
+      on (EStart) :
+      {
+        m_penLastRelay = NULL;
+        m_penCaused = NULL;
+
         SwitchON();
         resume;
       }
 
       // stop -> switch OFF
-      on (EStop) : {
+      on (EStop) :
+      {
+        m_penLastRelay = NULL;
+        m_penCaused = NULL;
+
         SwitchOFF();
         resume;
       }
