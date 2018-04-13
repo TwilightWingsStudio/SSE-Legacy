@@ -109,6 +109,13 @@ event ETargeted {
 };
 // [SSE]
 
+// [SSE]
+// Single (non-progressive) interaction between somebody and Interaction Provider.
+event EOneInteraction {
+  CEntityPointer penCaused,
+  CEntityPointer penRelay
+};
+
 enum BoolEType {
   0 BET_TRUE      "True",   // true
   1 BET_FALSE     "False",  // false
