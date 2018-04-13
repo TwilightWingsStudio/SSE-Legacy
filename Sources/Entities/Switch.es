@@ -57,6 +57,8 @@ properties:
  // TODO:
  //31 BOOL m_bUseOnLook "Use On Look" = FALSE,
  
+ 40 CEntityPointer m_penLastRelay,
+ 
 components:
 
 
@@ -139,7 +141,8 @@ procedures:
   // --------------------------------------------------------------------------------------
   // Turn the switch on.
   // --------------------------------------------------------------------------------------
-  SwitchON() {
+  SwitchON()
+  {
     // If already on then do nothing!
     if (m_bSwitchON) {
       return;
@@ -151,7 +154,7 @@ procedures:
     m_bSwitchON = TRUE;
 
     // send event to target
-    SendToTargetEx(m_penTarget, m_eetEvent, m_penCaused, this);
+    SendToTargetEx(m_penTarget, m_eetEvent, m_penCaused, m_penLastRelay != NULL ? m_penLastRelay : this);
 
     // wait for anim end
     wait(GetModelObject()->GetAnimLength(m_iModelONAnimation)) {
@@ -164,7 +167,8 @@ procedures:
   // --------------------------------------------------------------------------------------
   // Turn the switch off.
   // --------------------------------------------------------------------------------------
-  SwitchOFF() {
+  SwitchOFF()
+  {
     // If already off then do nothing!
     if (!m_bSwitchON) {
       return;
@@ -177,11 +181,12 @@ procedures:
 
     // if exists off target
     if (m_penOffTarget != NULL) {
-      SendToTargetEx(m_penOffTarget, m_eetOffEvent, m_penCaused, this);
+      SendToTargetEx(m_penOffTarget, m_eetOffEvent, m_penCaused, m_penLastRelay != NULL ? m_penLastRelay : this);
     } else {
       // send off event to target
-      SendToTargetEx(m_penTarget, m_eetOffEvent, m_penCaused, this);
+      SendToTargetEx(m_penTarget, m_eetOffEvent, m_penCaused, m_penLastRelay != NULL ? m_penLastRelay : this);
     }
+
     // wait for anim end
     wait(GetModelObject()->GetAnimLength(m_iModelOFFAnimation)) {
       on (EBegin) : { resume; } on (ETimer) : { stop; } on (EDeath) : { pass; } otherwise(): { resume; }
@@ -193,18 +198,35 @@ procedures:
   // --------------------------------------------------------------------------------------
   // MainLoop for Switch with Type=Once.
   // --------------------------------------------------------------------------------------
-  MainLoop_Once() {
+  MainLoop_Once()
+  {
     m_bUseable = TRUE;
 
-    //main loop
-    wait() {
+    // Main loop.
+    wait()
+    {
       // trigger event -> change switch
-      on (ETrigger eTrigger) : {
-        if (CanReactOnEntity(eTrigger.penCaused) && m_bUseable) {
+      on (ETrigger eTrigger) :
+      {
+        EOneInteraction eInteraction;
+        eInteraction.penCaused = eTrigger.penCaused;
+        eInteraction.penRelay = NULL;
+        
+        SendEvent(eInteraction);
+      }
+
+      // [SSE]
+      // Interaction Event -> Switch ON.
+      on (EOneInteraction eInteraction) :
+      {
+        if (CanReactOnEntity(eInteraction.penCaused) && m_bUseable) {
           m_bUseable = FALSE;
-          m_penCaused = eTrigger.penCaused;
+          m_penCaused = eInteraction.penCaused;
+          m_penLastRelay = eInteraction.penRelay;
           call SwitchON();
         }
+
+        resume;
       }
 
       // start -> switch ON
@@ -229,16 +251,33 @@ procedures:
   // --------------------------------------------------------------------------------------
   // MainLoop for Switch with Type=OnOff.
   // --------------------------------------------------------------------------------------
-  MainLoop_OnOff() {
+  MainLoop_OnOff()
+  {
     m_bUseable = TRUE;
 
-    //main loop
-    wait() {
+    // Main loop.
+    wait()
+    {
       // trigger event -> change switch
-      on (ETrigger eTrigger) : {
-        if (CanReactOnEntity(eTrigger.penCaused) && m_bUseable) {
+      on (ETrigger eTrigger) :
+      {
+        EOneInteraction eInteraction;
+        eInteraction.penCaused = eTrigger.penCaused;
+        eInteraction.penRelay = NULL;
+        
+        SendEvent(eInteraction);
+      }
+
+      // [SSE]
+      // Interaction Event -> Change Switch.
+      on (EOneInteraction eInteraction) :
+      {
+        if (CanReactOnEntity(eInteraction.penCaused) && m_bUseable)
+        {
           m_bUseable = FALSE;
-          m_penCaused = eTrigger.penCaused;
+          m_penCaused = eInteraction.penCaused;
+          m_penLastRelay = eInteraction.penRelay;    
+
           // if switch is ON make it OFF
           if (m_bSwitchON) {
             call SwitchOFF();
@@ -247,6 +286,8 @@ procedures:
             call SwitchON();
           }
         }
+
+        resume;
       }
 
       // start -> switch ON
@@ -262,7 +303,7 @@ procedures:
       }
 
       // when dead
-      on(EDeath): {
+      on (EDeath) : {
         if (m_penDestruction != NULL) {
           jump CModelHolder2::Die();
         }
@@ -280,8 +321,9 @@ procedures:
   // --------------------------------------------------------------------------------------
   // The entry point.
   // --------------------------------------------------------------------------------------
-  Main() {
-    // init as model
+  Main()
+  {
+    // Init as model.
     CModelHolder2::InitModelHolder();
 
     if (m_bInvisible) {

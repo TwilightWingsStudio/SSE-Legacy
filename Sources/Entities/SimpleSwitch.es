@@ -47,6 +47,7 @@ properties:
  // internal -> do not use
  20 BOOL m_bSwitchON = FALSE,
  21 CEntityPointer m_penCaused,   // who triggered it last time
+ 22 CEntityPointer m_penLastRelay,
 
  // [SSE]
  30 FLOAT m_fUseRange "Use Range" = 2.0F,
@@ -135,7 +136,7 @@ functions:
 
     m_bSwitchON = TRUE;
 
-    SendToTargetEx(m_penTarget, m_eetEvent, m_penCaused, this); // send event to target
+    SendToTargetEx(m_penTarget, m_eetEvent, m_penCaused, m_penLastRelay != NULL ? m_penLastRelay : this); // send event to target
   };
   
   // --------------------------------------------------------------------------------------
@@ -152,7 +153,7 @@ functions:
     
     CEntity *penOffTarget = m_penOffTarget != NULL ? m_penOffTarget : m_penTarget;
 
-    SendToTargetEx(penOffTarget, m_eetOffEvent, m_penCaused, this); // send event to target
+    SendToTargetEx(penOffTarget, m_eetOffEvent, m_penCaused, m_penLastRelay != NULL ? m_penLastRelay : this); // send event to target
   };
 
 procedures:
@@ -175,10 +176,22 @@ procedures:
       // trigger event -> change switch
       on (ETrigger eTrigger) :
       {
-        if (m_bActive && CanReactOnEntity(eTrigger.penCaused))
+        EOneInteraction eInteraction;
+        eInteraction.penCaused = eTrigger.penCaused;
+        eInteraction.penRelay = NULL;
+        
+        SendEvent(eInteraction);
+        resume;
+      }
+
+      // [SSE]
+      on (EOneInteraction eInteraction) :
+      {
+        if (m_bActive && CanReactOnEntity(eInteraction.penCaused))
         {
-          m_penCaused = eTrigger.penCaused;
-          
+          m_penLastRelay = eInteraction.penRelay;
+          m_penCaused = eInteraction.penCaused;
+
           if (m_swtType == ESWT_ONCE) {
             m_bActive = FALSE;
           }

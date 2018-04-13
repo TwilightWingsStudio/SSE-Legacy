@@ -5486,6 +5486,7 @@ functions:
     // cast ray from weapon
     CPlayerWeapons *penWeapons = GetPlayerWeapons();
     CEntity *pen = penWeapons->m_penRayHit;
+    CEntity *penRelay = NULL;
     FLOAT fRayHitDistance = penWeapons->m_fRayHitDistance;
 
     // if hit
@@ -5495,6 +5496,7 @@ functions:
 
     // If target is interaction relay then get its interaction provider.
     if (pen->IsInteractionRelay()) {
+      penRelay = pen;
       pen = pen->GetInteractionProvider();
     }
 
@@ -5517,8 +5519,14 @@ functions:
       CSwitch &enSwitch = (CSwitch&)*pen;
 
       // If switch near enough and is useable then send it a trigger event.
-      if (enSwitch.m_bUseable) {
-        SendToTarget(pen, EET_TRIGGER, this);
+      if (enSwitch.m_bUseable)
+      {
+        // Initialize the event.
+        EOneInteraction eInteraction;
+        eInteraction.penCaused = this;
+        eInteraction.penRelay = penRelay;
+        
+        pen->SendEvent(eInteraction);
         return TRUE;
       }
 
@@ -5527,8 +5535,14 @@ functions:
       CSimpleSwitch &enSwitch = (CSimpleSwitch&)*pen;
 
       // If switch near enough and is useable then send it a trigger event.
-      if (enSwitch.m_bActive) {
-        SendToTarget(pen, EET_TRIGGER, this);
+      if (enSwitch.m_bActive)
+      {
+        // Initialize the event.
+        EOneInteraction eInteraction;
+        eInteraction.penCaused = this;
+        eInteraction.penRelay = penRelay;
+        
+        pen->SendEvent(eInteraction);
         return TRUE;
       }
       
