@@ -39,11 +39,13 @@ properties:
   19 CEntityPointer m_penTarget10 "Target 10",
 
 components:
-  1 model     MODEL_HUB  "Models\\Editor\\TargetHub.mdl",
+  1 model   MODEL_HUB    "Models\\Editor\\TargetHub.mdl",
   2 texture TEXTURE_HUB  "Models\\Editor\\TargetHub.tex",
 
 functions:
-
+  // --------------------------------------------------------------------------------------
+  // The entity event handler.
+  // --------------------------------------------------------------------------------------
   BOOL HandleEvent(const CEntityEvent &ee)
   {
     CEntity *penCaused = NULL;
@@ -79,6 +81,7 @@ functions:
       }
     }
 
+    // redirect received event to all targets
     const CEntityPointer *apenTargets = &m_penTarget01;
 
     for (INDEX iTarget = 0; iTarget < 10; iTarget++) {
@@ -89,6 +92,9 @@ functions:
   }
 
 procedures:
+  // --------------------------------------------------------------------------------------
+  // The entry point.
+  // --------------------------------------------------------------------------------------
   Main()
   {
     InitAsEditorModel();
@@ -98,6 +104,7 @@ procedures:
     // set appearance
     SetModel(MODEL_HUB);
     SetModelMainTexture(TEXTURE_HUB);
+
     return;
   }
 };
