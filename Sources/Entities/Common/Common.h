@@ -177,6 +177,9 @@ DECL_DLL void SendToTargetEx(CEntity *penSendEvent, EventEType eetEventType, CEn
 // [SSE] Entities - Targeted Event
 DECL_DLL void SendTargetedEvent(CEntity *penSendEvent, CEntity *penCaused = NULL, CEntity *penTarget = NULL);
 
+// [SSE] Event Code -> Event Type conversion.
+DECL_DLL EventEType EventCodeToEventType(INDEX iEvent);
+
 // send event in range
 DECL_DLL void SendInRange(CEntity *penSource, EventEType eetEventType, const FLOATaabbox3D &boxRange);
 

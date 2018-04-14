@@ -210,29 +210,6 @@ functions:
     // Send event to target depending on input value.
     SendToSpecifiedTarget(i);
   }
-  
-  EventEType EventCodeToEventType(INDEX iEvent)
-  {
-    switch (iEvent)
-    {
-      case EVENTCODE_EStart: return EET_START;
-      case EVENTCODE_EStop: return EET_STOP;
-      case EVENTCODE_ETrigger: return EET_TRIGGER;
-      case EVENTCODE_EActivate: return EET_ACTIVATE;
-      case EVENTCODE_EDeactivate: return EET_DEACTIVATE;
-      case EVENTCODE_EEnvironmentStart: return EET_ENVIRONMENTSTART;
-      case EVENTCODE_EEnvironmentStop: return EET_ENVIRONMENTSTOP;
-      case EVENTCODE_EStartAttack: return EET_STARTATTACK;
-      case EVENTCODE_EStopAttack: return EET_STOPATTACK;
-      case EVENTCODE_EStopBlindness: return EET_STOPBLINDNESS;
-      case EVENTCODE_EStopDeafness: return EET_STOPDEAFNESS;
-      case EVENTCODE_ETeleportMovingBrush: return EET_TELEPORTMOVINGBRUSH;
-
-      default: break;
-    }
-
-    return EET_IGNORE;
-  }
 
   void DoFDecoder(const CEntityEvent &ee)
   {

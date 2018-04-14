@@ -2912,13 +2912,11 @@
     <CustomBuild Include="HudBossBarDisplay.es">
       <Filter>Class Files\Tools</Filter>
     </CustomBuild>
-    <CustomBuild Include="GenericAmmoItem.es">
+    <CustomBuild Include="TargetHub.es">
       <Filter>Class Files\AI</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="TargetHub.es">
-      <Filter>Class Files\Tools</Filter>
-    </None>
+    <CustomBuild Include="GenericAmmoItem.es">
+      <Filter>Class Files\Items</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

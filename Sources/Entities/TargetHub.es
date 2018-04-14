@@ -44,29 +44,6 @@ components:
 
 functions:
 
-  EventEType EventCodeToEventType(INDEX iEvent)
-  {
-    switch (iEvent)
-    {
-      case EVENTCODE_EStart: return EET_START;
-      case EVENTCODE_EStop: return EET_STOP;
-      case EVENTCODE_ETrigger: return EET_TRIGGER;
-      case EVENTCODE_EActivate: return EET_ACTIVATE;
-      case EVENTCODE_EDeactivate: return EET_DEACTIVATE;
-      case EVENTCODE_EEnvironmentStart: return EET_ENVIRONMENTSTART;
-      case EVENTCODE_EEnvironmentStop: return EET_ENVIRONMENTSTOP;
-      case EVENTCODE_EStartAttack: return EET_STARTATTACK;
-      case EVENTCODE_EStopAttack: return EET_STOPATTACK;
-      case EVENTCODE_EStopBlindness: return EET_STOPBLINDNESS;
-      case EVENTCODE_EStopDeafness: return EET_STOPDEAFNESS;
-      case EVENTCODE_ETeleportMovingBrush: return EET_TELEPORTMOVINGBRUSH;
-      case EVENTCODE_ETargeted: return EET_TARGETED;
-      default: break;
-    }
-
-    return EET_IGNORE;
-  }
-
   BOOL HandleEvent(const CEntityEvent &ee)
   {
     CEntity *penCaused = NULL;
