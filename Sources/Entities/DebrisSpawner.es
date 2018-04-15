@@ -203,7 +203,20 @@ functions:
   // --------------------------------------------------------------------------------------
   BOOL HandleEvent(const CEntityEvent &ee)
   {
+    // spawn debris
     if (ee.ee_slEvent == EVENTCODE_ETrigger || ee.ee_slEvent == EVENTCODE_EStart) {
+      DoSpawn();
+    }
+
+    // receive new debris template if possible and then spawn
+    if (ee.ee_slEvent == EVENTCODE_ETargeted)
+    {
+      CEntity *penDebris = ((ETargeted &)ee).penTarget;
+
+      if (IsOfClass(penDebris, "ModelHolder2") && penDebris != NULL) {
+        m_penTarget = penDebris;
+      }
+
       DoSpawn();
     }
 

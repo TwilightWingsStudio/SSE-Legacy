@@ -193,11 +193,19 @@ procedures:
         resume;
       }
 
-      on(ETrigger) : {
+      on (ETrigger) :
+      {
         if (m_bActive) {
           DoExecution();
         }
+        resume;
+      }
 
+      on (ETargeted) :
+      {
+        if (m_bActive) {
+          DoExecution();
+        }
         resume;
       }
 

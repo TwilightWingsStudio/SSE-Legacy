@@ -195,12 +195,17 @@ procedures:
           resume;
         }
 
-        on(ETrigger) : {
+        on (ETrigger) : {
           UpdateInfo();
           resume;
         }
 
-        on(ETimer) : { stop; }
+        on (ETargeted) : {
+          UpdateInfo();
+          resume;
+        }
+
+        on (ETimer) : { stop; }
       }
     }
   }

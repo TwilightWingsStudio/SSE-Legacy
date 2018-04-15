@@ -65,7 +65,7 @@ functions:
   // --------------------------------------------------------------------------------------
   // Called every time when entity receiving ETrigger entity event.
   // --------------------------------------------------------------------------------------
-  void DoExecution(const ETrigger &eTrigger)
+  void DoExecution(CEntity *penCaused, CEntity *penTarget)
   {
     FLOAT fGenFloat = FRnd();
     
@@ -81,7 +81,7 @@ functions:
       }
 
       if (m_penSuccessTarget) {
-        SendToTarget(m_penSuccessTarget, m_eetSuccess, eTrigger.penCaused);
+        SendToTargetEx(m_penSuccessTarget, m_eetSuccess, penCaused, penTarget);
       }
     } else {
       if (m_bDebugMessages) {
@@ -95,7 +95,7 @@ functions:
       }
 
       if (m_penFailTarget) {
-        SendToTarget(m_penFailTarget, m_eetFail, eTrigger.penCaused);
+        SendToTargetEx(m_penFailTarget, m_eetFail, penCaused, penTarget);
       }
     }
   }
@@ -124,11 +124,19 @@ procedures:
         resume;
       }
 
-      on(ETrigger eTrigger) : {
+      on (ETrigger eTrigger) :
+      {
         if (m_bActive) {
-          DoExecution(eTrigger);
+          DoExecution(eTrigger.penCaused, NULL);
         }
+        resume;
+      }
 
+      on (ETargeted eTargeted) :
+      {
+        if (m_bActive) {
+          DoExecution(eTargeted.penCaused, eTargeted.penTarget);
+        }
         resume;
       }
 

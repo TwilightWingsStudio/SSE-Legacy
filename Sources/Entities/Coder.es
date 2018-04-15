@@ -250,7 +250,6 @@ functions:
 
     i = GetIDByEventType(ett);
 
-
     m_iIOIndex = GetIValueByID(i);
     m_fIOFloat = GetFValueByID(i);
 
@@ -269,7 +268,8 @@ functions:
   BOOL HandleEvent(const CEntityEvent &ee)
   {
     // Decoders can be started only by trigger event.
-    if (ee.ee_slEvent == EVENTCODE_ETrigger && (m_etType == ECMT_IDECODER || m_etType == ECMT_FDECODER)) {
+    if ((ee.ee_slEvent == EVENTCODE_ETrigger || ee.ee_slEvent == EVENTCODE_ETargeted)
+     && (m_etType == ECMT_IDECODER || m_etType == ECMT_FDECODER)) {
       ETrigger eTrigger = ((ETrigger &) ee);
       m_penCaused = eTrigger.penCaused;
 

@@ -208,7 +208,12 @@ procedures:
           resume;
         }
 
-        on(ETrigger) : {
+        on (ETrigger) : {
+          DoCastRay();
+          resume;
+        }
+
+        on (ETargeted) : {
           DoCastRay();
           resume;
         }

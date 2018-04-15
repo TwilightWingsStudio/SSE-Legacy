@@ -59,7 +59,7 @@ functions:
   // --------------------------------------------------------------------------------------
   // Generates these fucked random numbers!
   // --------------------------------------------------------------------------------------
-  void DoRandom(const ETrigger &eTrigger)
+  void DoRandom(void)
   {
     if (ervType == ERVT_INDEX) {
       m_fOutput = IRnd()%((INDEX)(ceil(m_fMaxValue) - ceil(m_fMinValue) + 1)) + ceil(m_fMinValue);
@@ -100,11 +100,19 @@ procedures:
         resume;
       }
 
-      on(ETrigger eTrigger) : {
+      on (ETrigger) :
+      {
         if (m_bActive) {
-          DoRandom(eTrigger);
+          DoRandom();
         }
+        resume;
+      }
 
+      on (ETargeted) :
+      {
+        if (m_bActive) {
+          DoRandom();
+        }
         resume;
       }
 

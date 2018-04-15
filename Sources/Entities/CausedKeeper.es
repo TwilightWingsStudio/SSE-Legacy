@@ -25,17 +25,17 @@ thumbnail "Thumbnails\\CausedKeeper.tbn";
 features  "HasName", "IsTargetable";
 
 properties:
-   1 CTString m_strName "Name" 'N'      = "Caused Keeper",
-   3 CTString m_strDescription = "",
+   1 CTString m_strName "Name" 'N'  = "Caused Keeper",
+   3 CTString m_strDescription      = "",
    
-   4 BOOL m_bActive              "Active" 'A' = TRUE,
-   5 BOOL m_bDebugMessages "Debug Messages" = FALSE,
+   4 BOOL m_bActive         "Active" 'A' = TRUE,
+   5 BOOL m_bDebugMessages  "Debug Messages" = FALSE,
 
-   6 CEntityPointer m_penTarget      "Target" 'T',
+   6 CEntityPointer m_penTarget "Target" 'T',
 
   10 CTString m_strOnlyClass "Class Only" = "",
   
-  11 BOOL m_bResetOnNull "Reset If penCaused=NULL" = TRUE,
+  11 BOOL m_bResetOnNull  "Reset If penCaused=NULL" = TRUE,
 
 components:
   1 model   MODEL_CAUSEDKEEPER   "Models\\Editor\\CausedKeeper.mdl",
@@ -53,10 +53,8 @@ functions:
   // --------------------------------------------------------------------------------------
   // Saves penCaused into property if possible.
   // --------------------------------------------------------------------------------------
-  void DoKeep(const ETrigger &eTrigger)
+  void DoKeep(CEntity *penCaused)
   {
-    CEntity *penCaused = eTrigger.penCaused;
-
     if (penCaused == NULL)
     {
       if (m_bResetOnNull) {
@@ -106,11 +104,19 @@ procedures:
         resume;
       }
 
-      on(ETrigger eTrigger) : {
+      on (ETrigger eTrigger) :
+      {
         if (m_bActive) {
-          DoKeep(eTrigger);
+          DoKeep(eTrigger.penCaused);
         }
+        resume;
+      }
 
+      on (ETargeted eTargeted) :
+      {
+        if (m_bActive) {
+          DoKeep(eTargeted.penCaused);
+        }
         resume;
       }
 

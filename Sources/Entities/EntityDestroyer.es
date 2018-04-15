@@ -253,6 +253,10 @@ functions:
       DoDestruction(((ETrigger &)ee).penCaused);
     }
 
+    if (ee.ee_slEvent == EVENTCODE_ETargeted) {
+      DoDestruction(((ETargeted &)ee).penCaused);
+    }
+
     return CRationalEntity::HandleEvent(ee);
   }
 

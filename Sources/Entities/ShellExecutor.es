@@ -64,7 +64,7 @@ functions:
   }
 
   // --------------------------------------------------------------------------------------
-  // Called every time when entity receiving ETrigger entity event.
+  // Called every time when it is triggered.
   // --------------------------------------------------------------------------------------
   void DoExecution()
   {
@@ -119,11 +119,19 @@ procedures:
         resume;
       }
 
-      on (ETrigger) : {
+      on (ETrigger) :
+      {
         if (m_bActive) {
           DoExecution();
         }
+        resume;
+      }
 
+      on (ETargeted) :
+      {
+        if (m_bActive) {
+          DoExecution();
+        }
         resume;
       }
 

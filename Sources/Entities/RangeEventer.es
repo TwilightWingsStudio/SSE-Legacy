@@ -60,9 +60,9 @@ functions:
   }
 
   // --------------------------------------------------------------------------------------
-  // Called every time when entity receiving ETrigger entity event.
+  // Called every time when it is triggered.
   // --------------------------------------------------------------------------------------
-  void DoSend(const ETrigger &eTrigger)
+  void DoSend(CEntity *penCaused, CEntity *penTarget)
   {
     if (m_eetRange == EET_IGNORE)
     {
@@ -73,8 +73,8 @@ functions:
       return;
     }
     
-    BOOL bNoClass = m_strRangeClass == "" ? TRUE : FALSE;
-    BOOL bNoName = m_strRangeName == "" ? TRUE : FALSE;
+    BOOL bNoClass = (m_strRangeClass == "");
+    BOOL bNoName = (m_strRangeName == "");
     
     INDEX ctTriggered = 0;
     
@@ -104,7 +104,7 @@ functions:
 
       if (plEntity.pl_PositionVector.Length() <= m_fSendRange && (bNoClass || IsDerivedFromClass(pen, m_strRangeClass)) && (bNoName || m_strRangeName == pen->GetName()))
       {
-        SendToTarget(pen, m_eetRange, eTrigger.penCaused);
+        SendToTargetEx(pen, m_eetRange, penCaused, penTarget);
         
         if (m_bDebugMessages) {
           ctTriggered++;
@@ -148,12 +148,19 @@ procedures:
         resume;
       }
 
-      on(ETrigger eTrigger) :
+      on (ETrigger eTrigger) :
       {
         if (m_bActive) {
-          DoSend(eTrigger);
+          DoSend(eTrigger.penCaused, NULL);
         }
+        resume;
+      }
 
+      on (ETargeted eTargeted) :
+      {
+        if (m_bActive) {
+          DoSend(eTargeted.penCaused, eTargeted.penTarget);
+        }
         resume;
       }
 

@@ -67,15 +67,18 @@ properties:
   1 CTString m_strName          "Name" 'N' = "Entity Particles",
   2 CTString m_strDescription = "",
   3 CEntityPointer m_penTarget  "Target" 'T' COLOR(C_dGREEN|0xFF),
-  4 enum ParticleTexture m_ptTexture  "Texture" = PT_STAR01,
-  5 FLOAT m_fSize "Size" = 1.0f,
-  6 COLOR m_colColor "Color" = COLOR(C_WHITE|0xFF),
+
+  4 enum ParticleTexture m_ptTexture   "Texture" = PT_STAR01,
+  5 FLOAT m_fSize                      "Size" = 1.0f,
+  6 COLOR m_colColor                   "Color" = COLOR(C_WHITE|0xFF),
   7 enum EntityParticlesType m_eptType "Type" = EPT_ROMBOIDTRAIL,
-  8 BOOL m_bInfiniteRender "Infinite Render" = TRUE, // if FALSE, then several particles will use "m_fStartTime"
-  9 FLOAT m_fStartTime "Time Start" = 0.0f, // Trigger Event sets "m_fStartTime" to "_pTimer->CurrentTick()"
- 10 FLOAT m_fAddTime "Time Add" = 0.0f, // how much the particles should be visible (depends on the type)
- 11 BOOL m_bActive "Active" = TRUE,
- 12 BOOL m_bRenderOnlyOnTarget "Render only on Target" = FALSE, // don't render particles if m_penTarget == NULL
+
+  8 BOOL m_bInfiniteRender  "Infinite Render" = TRUE, // if FALSE, then several particles will use "m_fStartTime"
+  9 FLOAT m_fStartTime      "Time Start" = 0.0f, // Trigger Event sets "m_fStartTime" to "_pTimer->CurrentTick()"
+ 10 FLOAT m_fAddTime        "Time Add" = 0.0f, // how much the particles should be visible (depends on the type)
+
+ 11 BOOL m_bActive              "Active" = TRUE,
+ 12 BOOL m_bRenderOnlyOnTarget  "Render only on Target" = FALSE, // don't render particles if m_penTarget == NULL
 
  20 FLOAT m_fParameter1   "Param FLOAT 1" = 0.0f,
  21 FLOAT m_fParameter2   "Param FLOAT 2" = 0.0f,
@@ -255,22 +258,30 @@ procedures:
 
     wait()
     {
-      on(EBegin) : {
+      on (EBegin) : {
         resume;
       };
 
-      on(ETrigger) :
+      // reset render time
+      on (ETrigger) :
       {
         m_fStartTime = _pTimer->CurrentTick();
         resume;
       }
 
-      on(EActivate) :{
+      // change target
+      on (ETargeted eTargeted) :
+      {
+        m_penTarget = eTargeted.penTarget;
+        resume;
+      }
+
+      on (EActivate) :{
         m_bActive = TRUE;
         resume;
       }
 
-      on(EDeactivate) :{
+      on (EDeactivate) :{
         m_bActive = FALSE;
         resume;
       }
