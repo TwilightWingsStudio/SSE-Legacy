@@ -221,6 +221,7 @@ procedures:
   // --------------------------------------------------------------------------------------
   Main()
   {
+    // Disallow negative and 0 sizes.
     if (m_fSize < 0.01f) {
       m_fSize = 0.01f;
     }
@@ -232,26 +233,6 @@ procedures:
     // set appearance
     SetModel(MODEL_MARKER);
     SetModelMainTexture(TEXTURE_MARKER);
-
-    /*switch (m_eptType) {
-      //case EPT_ROMBOIDTRAIL: Particles_RomboidTrail_Prepare(this); break;
-      case EPT_BOMBTRAIL: Particles_BombTrail_Prepare(this); break;
-      case EPT_FIRECRACKERTRAIL: Particles_FirecrackerTrail_Prepare(this); break;
-      //case EPT_SPIRALTRAIL: Particles_SpiralTrail_Prepare(this); break;
-      //case EPT_COLOREDSTARSTRAIL: Particles_ColoredStarsTrail_Prepare(this); break;
-      //case EPT_WHITELINETRAIL: Particles_WhiteLineTrail_Prepare(this); break;
-      case EPT_FIREBALLTRAIL: Particles_Fireball01Trail_Prepare(this); break;
-      case EPT_GRENADETRAIL: Particles_GrenadeTrail_Prepare(this); break;
-      case EPT_CANNONBALL: Particles_CannonBall_Prepare(this); break;
-      case EPT_LAVATRAIL: Particles_LavaTrail_Prepare(this); break;
-      case EPT_LAVABOMBTRAIL: Particles_LavaBombTrail_Prepare(this); break;
-      case EPT_ROCKETTRAIL: Particles_RocketTrail_Prepare(this); break;
-      case EPT_BEASTTRAIL: Particles_BeastProjectileTrail_Prepare(this); break;
-      case EPT_BEASTBIGTRAIL: Particles_BeastBigProjectileTrail_Prepare(this); break;
-      case EPT_BEASTDEBRISTRAIL: Particles_BeastProjectileDebrisTrail_Prepare(this); break;
-      case EPT_AFTERBURNER: Particles_AfterBurner_Prepare(this); break;
-      case EPT_RUNNINGDUST: Particles_RunningDust_Prepare(this); break;
-    }*/
 
     // Spawn in world editor.
     autowait(0.1f);

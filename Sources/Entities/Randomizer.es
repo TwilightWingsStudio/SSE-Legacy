@@ -57,19 +57,19 @@ functions:
   }
 
   // --------------------------------------------------------------------------------------
-  // Generates these fucked random numbers!
+  // Generates random numbers.
   // --------------------------------------------------------------------------------------
   void DoRandom(void)
   {
     if (ervType == ERVT_INDEX) {
       m_fOutput = IRnd()%((INDEX)(ceil(m_fMaxValue) - ceil(m_fMinValue) + 1)) + ceil(m_fMinValue);
       if (m_bDebugMessages) {
-        CPrintF("%s : Generated random INDEX[%d, %d] = %d\n", m_strName, (INDEX)ceil(m_fMinValue), (INDEX)ceil(m_fMaxValue), (INDEX)m_fOutput);
+        CPrintF("[%s] : Generated random INDEX[%d, %d] = %d\n", m_strName, (INDEX)ceil(m_fMinValue), (INDEX)ceil(m_fMaxValue), (INDEX)m_fOutput);
       }
     } else {
       m_fOutput = FRnd() * (m_fMaxValue - m_fMinValue) + m_fMinValue;
       if (m_bDebugMessages) {
-        CPrintF("%s : Generated random FLOAT[%f, %f] = %f\n", m_strName, m_fMinValue, m_fMaxValue, m_fOutput);
+        CPrintF("[%s] : Generated random FLOAT[%f, %f] = %f\n", m_strName, m_fMinValue, m_fMaxValue, m_fOutput);
       }
     }
   }
@@ -84,7 +84,7 @@ procedures:
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
     SetCollisionFlags(ECF_IMMATERIAL);
     
-    // Retard protection.
+    // Set limit for randomizing.
     m_fMinValue = ClampDn(m_fMinValue, 0.0F);
     m_fMaxValue = ClampDn(m_fMaxValue, m_fMinValue);
 

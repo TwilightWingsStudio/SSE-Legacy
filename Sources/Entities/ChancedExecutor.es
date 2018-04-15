@@ -71,7 +71,7 @@ functions:
     
     if (fGenFloat <= m_fChance) {
       if (m_bDebugMessages) {
-        CPrintF("%s : Success! (%.2f <= %.2f)\n", GetName(), fGenFloat, m_fChance);
+        CPrintF("[%s] : Success! (%.2f <= %.2f)\n", GetName(), fGenFloat, m_fChance);
         
         if (m_penSuccessTarget) {
           CPrintF("  Sent event to '%s'.\n", m_penSuccessTarget->GetName());
@@ -85,7 +85,7 @@ functions:
       }
     } else {
       if (m_bDebugMessages) {
-        CPrintF("%s : Fail! (%.2f > %.2f)\n", GetName(), fGenFloat, m_fChance);
+        CPrintF("[%s] : Fail! (%.2f > %.2f)\n", GetName(), fGenFloat, m_fChance);
         
         if (m_penSuccessTarget) {
           CPrintF("  Sent event to '%s'.\n", m_penSuccessTarget->GetName());
@@ -142,7 +142,7 @@ procedures:
 
       on (EActivate) : {
         if (m_bDebugMessages) {
-          CPrintF("%s : Activated!\n", GetName());
+          CPrintF("[%s] : Activated!\n", GetName());
         }
         
         m_bActive = TRUE;
@@ -151,7 +151,7 @@ procedures:
 
       on (EDeactivate) : {
         if (m_bDebugMessages) {
-          CPrintF("%s : Deactivated!\n", GetName());
+          CPrintF("[%s] : Deactivated!\n", GetName());
         }
 
         m_bActive = FALSE;
