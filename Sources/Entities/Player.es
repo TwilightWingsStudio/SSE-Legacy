@@ -4601,33 +4601,33 @@ functions:
       return;
     }
 
-    // check for friendly fire
-    if (!GetSP()->sp_bFriendlyFire && penInflictor != this)
+    // Check for friendly fire.
+    if (penInflictor != NULL && penInflictor != this && !GetSP()->sp_bFriendlyFire)
     {
-      if (GetSP()->sp_bCooperative) {
-        if (IsOfClass(penInflictor, "Player")) {
+      if (penInflictor->IsPlayerEntity())
+      {
+        // In cooperative players won't kill others.
+        if (GetSP()->sp_bCooperative) {
           return;
-        }
 
-      // [SSE] GameModes - Team DeathMatch
-      } else if (GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) {
-        if (IsOfClass(penInflictor, "Player")) {
-          
+        // [SSE] GameModes - Team DeathMatch
+        } else if (GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) {
           CPlayer *penPlayer = static_cast<CPlayer*>(penInflictor);
 
+          // If from the same team.
           if (penPlayer->m_iTeamID == m_iTeamID) {
             return;
           }
-        }
+        } 
       }
     }
 
-    // ignore heat damage if dead
+    // Ignore heat damage if dead. Heat does not matter if you are dead. :)
     if (dmtType == DMT_HEAT && IsDead()) {
       return;
     }
 
-    // adjust for difficulty
+    // Adjust for difficulty.
     FLOAT fDifficultyDamage = GetSP()->sp_fDamageStrength;
     if (fDifficultyDamage <= 1.0f || penInflictor != this) {
       fDamageAmmount *= fDifficultyDamage;
