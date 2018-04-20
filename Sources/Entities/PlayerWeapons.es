@@ -4605,6 +4605,23 @@ functions:
     return m_bSniping;
   };
 
+  // --------------------------------------------------------------------------------------
+  // Returns translation multiplier for current weapon.
+  // --------------------------------------------------------------------------------------
+  FLOAT GetTranslationMultiplier()
+  {
+    if (m_iCurrentWeapon == WEAPON_FISTS || m_iCurrentWeapon == WEAPON_KNIFE) {
+      return 1.3F;
+    }
+    
+    // [SSE]
+    if (m_iCurrentWeapon == WEAPON_CHAINSAW) {
+      return 1.15F;
+    }
+    
+    return 1.0F;
+  };
+
 procedures:
   /*
    *  >>>---   WEAPON CHANGE PROCEDURE  ---<<<

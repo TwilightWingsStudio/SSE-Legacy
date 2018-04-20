@@ -2607,10 +2607,13 @@ functions:
 
     CTString strRank = TRANS("NO.");
     CTString strFrag = bFragMatch ? TRANS("FRAGS"):TRANS("SCORE");
+    CTString strRatio = TRANS("RATIO");
     CTString strPing = TRANS("PING");
     CTString strName = TRANS("PLAYER");
+
     INDEX ctRankChars = Max(strRank.Length(), INDEX(3)) ;
     INDEX ctFragChars = Max(strFrag.Length(), INDEX(7)) ;
+    INDEX ctRatioChars = Max(strRatio.Length(), INDEX(7)); // [SSE]
     INDEX ctPingChars = Max(strPing.Length(), INDEX(5)) ;
     INDEX ctNameChars = Max(strName.Length(), INDEX(20));
 
@@ -2618,6 +2621,7 @@ functions:
     strStats += "^cFFFFFF";
     strStats += PadStringRight(strRank, ctRankChars)+" ";
     strStats += PadStringLeft (strFrag, ctFragChars)+" ";
+    strStats += PadStringLeft (strRatio, ctRatioChars) + " "; // [SSE]
     strStats += PadStringLeft (strPing, ctPingChars)+" ";
     strStats += PadStringRight(strName, ctNameChars)+" ";
     strStats += "^r";
@@ -2628,10 +2632,19 @@ functions:
       CPlayer *penPlayer = _apenPlayers[iPlayer];
       INDEX iPing = ceil(penPlayer->en_tmPing*1000.0f);
       INDEX iScore = bFragMatch ? penPlayer->m_psLevelStats.ps_iKills : penPlayer->m_psLevelStats.ps_iScore;
+
+      FLOAT fRatio = bFragMatch ? penPlayer->m_psLevelStats.ps_iKills / Max((FLOAT)penPlayer->m_psLevelStats.ps_iDeaths, 1.0F) : 0.0F; // [SSE]
+      fRatio = ClampDn(fRatio, 0.0F);
+      
       CTString strName = penPlayer->GetPlayerName();
 
       strStats += PadStringRight(CTString(0, "%d", iPlayer+1), ctRankChars)+" ";
       strStats += PadStringLeft (CTString(0, "%d", iScore),    ctFragChars)+" ";
+
+      if (bFragMatch) {
+        strStats += PadStringLeft (CTString(0, "%.2f", fRatio),  ctRatioChars)+" ";
+      }
+
       strStats += PadStringLeft (CTString(0, "%d", iPing),     ctPingChars)+" ";
       strStats += PadStringRight(strName,                      ctNameChars)+" ";
       strStats += "\n";
@@ -6272,6 +6285,9 @@ functions:
     ((CPlayerAnimator&)*m_penAnimator).Fall();
   }
 
+  // --------------------------------------------------------------------------------------
+  // Actions processing while player is alive.
+  // --------------------------------------------------------------------------------------
   void ActiveActions(const CPlayerAction &paAction)
   {
     // translation
@@ -6282,17 +6298,10 @@ functions:
       vTranslation *= cht_fTranslationMultiplier;
     }
 
-    if (!GetSP()->sp_bCooperative) {
-      // enable faster moving if holding knife in DM
-      INDEX iCurrentWeapon = ((CPlayerWeapons&)*m_penWeapons).m_iCurrentWeapon;
-
-      if (iCurrentWeapon == WEAPON_NONE || iCurrentWeapon == WEAPON_FISTS || iCurrentWeapon == WEAPON_KNIFE) {
-        vTranslation *= 1.3f;
-      
-      // [SSE]
-      } else if (iCurrentWeapon == WEAPON_CHAINSAW) {
-        vTranslation *= 1.15f;
-      }
+    if (!GetSP()->sp_bCooperative)
+    {
+      // Movement speed depends on weapon in DM.
+      vTranslation *= ((CPlayerWeapons&)*m_penWeapons).GetTranslationMultiplier();
 
       // Player running faster in DM
       vTranslation(1) *= 1.35f;
