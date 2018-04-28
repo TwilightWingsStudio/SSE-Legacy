@@ -56,6 +56,8 @@ extern CTString ms_strServer = "master.333networks.com";
 extern CTString ms_strMSLegacy = "master.333networks.com";
 extern CTString ms_strDarkPlacesMS = "192.168.1.4";
 
+extern CTString ms_strGameName = "serioussamse";
+
 extern BOOL ms_bMSLegacy = TRUE;
 extern BOOL ms_bDarkPlacesMS = FALSE;
 extern BOOL ms_bDarkPlacesDebug = FALSE;

@@ -30,7 +30,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Query/MasterServerMgr.h>
 
 #define DP_NET_PROTOCOL_VERSION 3
-#define DP_GAME_NAME "Xonotic"
 
 extern CTString _getGameModeShortName(INDEX iGameMode);
 extern const CSessionProperties* _getSP();
@@ -67,7 +66,7 @@ void DarkPlaces_BuildQCStatus(CTString &strStatus)
 {
   INDEX ctFreeSlots = _pNetwork->ga_sesSessionState.ses_ctMaxPlayers - _pNetwork->ga_srvServer.GetClientsCount();
   
-  strStatus.PrintF("%s:%s:P%d:S%d:F%d:M%s::score!!", _getGameModeShortName(_getSP()->sp_gmGameMode), "0.8.2", 0, ctFreeSlots, 0, DP_GAME_NAME);
+  strStatus.PrintF("%s:%s:P%d:S%d:F%d:M%s::score!!", _getGameModeShortName(_getSP()->sp_gmGameMode), "0.8.2", 0, ctFreeSlots, 0, ms_strGameName);
 }
 
 // --------------------------------------------------------------------------------------
@@ -89,7 +88,7 @@ void DarkPlaces_BuildStatusResponse(const char* challenge, CTString &strPacket, 
             "%s%s"
             "%s",
             bFullStatus ? "statusResponse" : "infoResponse",
-            DP_GAME_NAME, "", _ulEngineRevision, ctMaxPlayers,
+            ms_strGameName, "", _ulEngineRevision, ctMaxPlayers,
             _pNetwork->ga_srvServer.GetClientsCount(), 0, _pNetwork->ga_World.wo_strName, _pShell->GetString("gam_strSessionName"), DP_NET_PROTOCOL_VERSION,
             "\\qcstatus\\", strStatus,
             challenge ? "\\challenge\\" : "", challenge ? challenge : "",
@@ -433,7 +432,7 @@ void DarkPlaces_EnumTrigger(BOOL bInternet)
   _bInitialized = TRUE;
   
   CTString strPacket;
-  strPacket.PrintF("\xFF\xFF\xFF\xFFgetservers %s %u empty full", DP_GAME_NAME, DP_NET_PROTOCOL_VERSION);
+  strPacket.PrintF("\xFF\xFF\xFF\xFFgetservers %s %u empty full", ms_strGameName, DP_NET_PROTOCOL_VERSION);
   _sendPacket(strPacket); // Send enumeration packet to masterserver.
 
   _setStatus(".");

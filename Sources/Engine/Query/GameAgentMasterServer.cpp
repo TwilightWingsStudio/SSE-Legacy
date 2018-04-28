@@ -60,7 +60,7 @@ extern void GameAgent_BuildHearthbeatPacket(CTString &strPacket, INDEX iChalleng
       _pNetwork->ga_World.wo_strName,
       _getGameModeName(_getSP()->sp_gmGameMode),
       _SE_VER_STRING,
-      _pShell->GetString("sam_strGameName"));
+      ms_strGameName);
 }
 
 extern void GameAgent_ProcessReceivedPacket()
@@ -86,7 +86,7 @@ extern void GameAgent_ProcessReceivedPacket()
         _pNetwork->ga_World.wo_strName,
         _getGameModeName(_getSP()->sp_gmGameMode),
         _SE_VER_STRING,
-        _pShell->GetString("sam_strGameName"),
+        ms_strGameName,
         _pShell->GetString("gam_strSessionName"));
       _sendPacketTo(strPacket, &_sinFrom);
       break;
