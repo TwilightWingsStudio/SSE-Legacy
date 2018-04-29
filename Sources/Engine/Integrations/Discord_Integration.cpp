@@ -38,9 +38,10 @@ static TIME _tmLastPresenceUpdate = 0;
 static BOOL _bLastIntegrationEnabled = FALSE;
 static HINSTANCE _hDiscordLib = NULL;
 
-extern INDEX drp_bIntegrationEnabled = TRUE;
+extern INDEX drp_bEnableIntegration = TRUE;
+extern INDEX drp_bReportMapNameInSP = FALSE;
 
-extern CTString _getGameModeShortName(INDEX iGameMode);
+extern BOOL _bDedicatedServer;
 
 static void FailFunction_t(const char *strName) {
   ThrowF_t(TRANS("Function %s not found."), strName);
@@ -73,7 +74,8 @@ static void Discord_ClearFunctionPointers(void) {
 static const char* APPLICATION_ID = "421325065930539018";
 #define DISCORD_LIB_NAME "discord-rpc.dll"
 #define DISCORD_SMALL_IMAGE_KEY "main-star-s"
-#define DISCORD_LARGE_IMAGE_KEY "main-large"
+#define DISCORD_LARGE_IMAGE_KEY "mainmenu_l"
+#define DISCORD_SP_IMAGE_KEY "singleplayer_l"
 
 static void _InitializeAPI()
 {
@@ -102,7 +104,8 @@ void Discord_InitPlugin()
   _llStartTime = time(0);
   
   // Setup shell symbols.
-  _pShell->DeclareSymbol("persistent user INDEX drp_bIntegrationEnabled;", &drp_bIntegrationEnabled);
+  _pShell->DeclareSymbol("persistent user INDEX drp_bEnableIntegration;", &drp_bEnableIntegration);
+  _pShell->DeclareSymbol("persistent user INDEX drp_bReportMapNameInSP;", &drp_bReportMapNameInSP);
 
   try {
     _hDiscordLib = ::LoadLibraryA(DISCORD_LIB_NAME);
@@ -123,7 +126,7 @@ void Discord_InitPlugin()
 
   _InitializeAPI();
 
-  if (drp_bIntegrationEnabled) {
+  if (drp_bEnableIntegration) {
     _bLastIntegrationEnabled = TRUE;
     Discord_UpdateInfo(FALSE);
   }
@@ -175,27 +178,6 @@ static const char* GetCurrentGameStateName(BOOL bGameActive)
 }
 
 // --------------------------------------------------------------------------------------
-// Returns asset name of large icon which represents current state.
-// --------------------------------------------------------------------------------------
-static const char* GetImageAssetName(BOOL bGameActive)
-{
-  if (_bWorldEditorApp) {
-    return "wed_large";
-  }
-
-  if (bGameActive)
-  {
-    if (_pNetwork != NULL) {
-      if (!_pNetwork->IsNetworkEnabled()) {
-        return "singleplayer_l";
-      }
-    }
-  }
-
-  return DISCORD_LARGE_IMAGE_KEY;
-}
-
-// --------------------------------------------------------------------------------------
 // Get current unlocalized gamemode name.
 // --------------------------------------------------------------------------------------
 CTString _getCurrentGameModeName()
@@ -212,6 +194,33 @@ CTString _getCurrentGameModeName()
 }
 
 // --------------------------------------------------------------------------------------
+// Returns asset name of large icon which represents current state.
+// --------------------------------------------------------------------------------------
+static const char* GetImageAssetName(BOOL bGameActive)
+{
+  if (_bWorldEditorApp) {
+    return "wed_large";
+  }
+
+  if (bGameActive)
+  {
+    if (_pNetwork != NULL) {
+      if (!_pNetwork->IsNetworkEnabled()) {
+        return DISCORD_SP_IMAGE_KEY;
+      } else {
+        if (_getCurrentGameModeName() == "Cooperative") {
+          return "multiplayer_l";
+        }
+        
+        return "versus_l";
+      }
+    }
+  }
+
+  return DISCORD_LARGE_IMAGE_KEY;
+}
+
+// --------------------------------------------------------------------------------------
 // Perform Discord status update.
 //
 // Called very frequently from :
@@ -225,14 +234,19 @@ void Discord_UpdateInfo(BOOL bGameActive)
   }
 
   // If was enabled and now disabled. Then clear presence.
-  if (!drp_bIntegrationEnabled && _bLastIntegrationEnabled) {
+  if (!drp_bEnableIntegration && _bLastIntegrationEnabled) {
     pDiscord_ClearPresence();
   }
   
-  _bLastIntegrationEnabled = drp_bIntegrationEnabled;
+  _bLastIntegrationEnabled = drp_bEnableIntegration;
   
   // If disabled then don't send presence.
-  if (!drp_bIntegrationEnabled) {
+  if (!drp_bEnableIntegration) {
+    return;
+  }
+  
+  // Disable if we running the Dedicated Server.
+  if (_bDedicatedServer) {
     return;
   }
   
@@ -266,13 +280,19 @@ void Discord_UpdateInfo(BOOL bGameActive)
       sprintf(buffer, _getCurrentGameModeName());
       discordPresence.details = buffer;
       
-      if (_pNetwork->IsNetworkEnabled() && _pNetwork->ga_sesSessionState.ses_ctMaxPlayers > 1)
-      {
+      BOOL bIsNetworkGame = _pNetwork->IsNetworkEnabled() && _pNetwork->ga_sesSessionState.ses_ctMaxPlayers > 1;
+
+      // Mapname can be always visible in MP. In SP only if allowed by player.
+      if (bIsNetworkGame || drp_bReportMapNameInSP) {
         sprintf(buffer2, _pNetwork->ga_World.wo_strName.Undecorated());
         discordPresence.largeImageText = buffer2;
-        
+      }
+
+      // Muliplayer session specific data.
+      if (bIsNetworkGame)
+      {
         //discordPresence.partyId = "party1234";
-        
+
         if (_pNetwork->IsServer()) {
           discordPresence.partySize = _pNetwork->ga_srvServer.GetPlayersCount();
         } else {
