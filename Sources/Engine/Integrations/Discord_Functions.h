@@ -20,9 +20,10 @@ DLLFUNCTION( DRP, void, Discord_Initialize, (const char* applicationId, DiscordE
 DLLFUNCTION( DRP, void, Discord_Shutdown, (void), 0,0);
 DLLFUNCTION( DRP, void, Discord_RunCallbacks, (void), 0,0);
 //DLLFUNCTION( DRP, void, Discord_UpdateConnection, (void), 0,0);
-DLLFUNCTION( DRP, void, Discord_UpdatePresence, (const DiscordRichPresence* presence), 8,0);
+DLLFUNCTION( DRP, void, Discord_UpdatePresence, (const DiscordRichPresence* presence), 4,0);
 DLLFUNCTION( DRP, void, Discord_ClearPresence, (void), 0,0);
 DLLFUNCTION( DRP, void, Discord_Respond, (const char* userid, /* DISCORD_REPLY_ */ int reply), 8,0);
+DLLFUNCTION( DRP, void, Discord_UpdateHandlers, (DiscordEventHandlers* handlers), 4,0);
 
 // Functions from the discord_register.h
 DLLFUNCTION( DRP, void, Discord_Register, (const char* applicationId, const char* command), 8,0);
