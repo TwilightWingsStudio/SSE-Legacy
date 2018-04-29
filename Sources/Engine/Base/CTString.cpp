@@ -211,7 +211,7 @@ CTString CTString::Undecorated(void) const
       // if one of the control codes, skip corresponding number of characters
       case 'c':  pchSrc += 2+FindZero((UBYTE*)pchSrc+2,6);  break;
       case 'a':  pchSrc += 2+FindZero((UBYTE*)pchSrc+2,2);  break;
-      case 'f':  pchSrc += 2+FindZero((UBYTE*)pchSrc+2,2);  break;
+      case 'f':  pchSrc += 2+FindZero((UBYTE*)pchSrc+2,1);  break;
       case 'b':  case 'i':  case 'r':  case 'o':
       case 'C':  case 'A':  case 'F':  case 'B':  case 'I':  pchSrc+=2;  break;
       // if it is the escape char again, skip the first escape and copy the char
