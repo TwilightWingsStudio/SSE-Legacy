@@ -465,6 +465,11 @@ public:
   void SetPlacement(const CPlacement3D &plNew);     // use this only in WEd
   void FallDownToFloor( void);
   inline const CPlacement3D &GetPlacement(void) const { return en_plPlacement; };
+
+  // [SSE] Position/Orientation Fast Getters.
+  inline FLOAT3D GetPosition(void) const { return en_plPlacement.pl_PositionVector; }
+  inline ANGLE3D GetOrientation(void) const { return en_plPlacement.pl_OrientationAngle; }
+  
   inline const FLOATmatrix3D &GetRotationMatrix(void) const { return en_mRotation; };
   // this one is used in rendering - gets lerped placement between ticks
   virtual CPlacement3D GetLerpedPlacement(void) const;
