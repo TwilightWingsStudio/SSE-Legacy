@@ -19,14 +19,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "StdH.h"
 %}
 
-enum ECondition{
+enum ECondition {
    0 EC_SAME         "0 ==",
    2 EC_DIFFERENT    "1 !=",
    1 EC_LARGER       "2 >",
    3 EC_SMALLER      "3 <",
    4 EC_SMALLER_SAME "4 <=",
    5 EC_LARGER_SAME  "5 >=",
-   
+
+  // Bitwise conditions.   
    6 EC_BITMASKINC   "6 & (WIP)",
    7 EC_BITMASKEXC   "7 !& (WIP)",
    8 EC_BITINC       "8 & (1 << X) (WIP)",
@@ -34,7 +35,7 @@ enum ECondition{
 
 };
 
-enum EConType{
+enum EConType {
    0 ECT_ENTITY    "00 Property By Name",
    1 ECT_POSX      "01 Pos(X)",
    2 ECT_POSY      "02 Pos(Y)",
@@ -113,23 +114,21 @@ functions:
   // --------------------------------------------------------------------------------------
   // Called every time when entity receives ETrigger event and it's active.
   // --------------------------------------------------------------------------------------
-  void HandleETrigger(const CEntityEvent &ee)
+  void DoCompare(CEntity *penCaused, CEntity *penTargetArg)
   {
     // If non-active.
     if (!m_bActive) {
       return;
     }
 
-    ETrigger eTrigger = ((ETrigger &) ee);
-
     // If enabled then set penCaused as condition target 1.
-    if (m_bCaused1 && eTrigger.penCaused) {
-      m_penIfCondition1 = eTrigger.penCaused;
+    if (m_bCaused1 && penCaused) {
+      m_penIfCondition1 = penCaused;
     }
 
     // If enabled then set penCaused as condition target 2.
-    if (m_bCaused2 && eTrigger.penCaused) {
-      m_penIfCondition2 = eTrigger.penCaused;
+    if (m_bCaused2 && penCaused) {
+      m_penIfCondition2 = penCaused;
     }
 
     if (m_penIfCondition1 == NULL) {
@@ -494,7 +493,7 @@ functions:
     }
 
     if (be) {
-      SendToTarget(m_penError, EET_TRIGGER, eTrigger.penCaused);
+      SendToTarget(m_penError, EET_TRIGGER, penCaused);
     }
 
     // trigger proper target
@@ -504,7 +503,7 @@ functions:
           CPrintF(TRANS("[C][%s] : Triggering [If Target]: %s\n"), m_strName, m_penIfTarget->GetName());
         }
 
-        SendToTarget(m_penIfTarget, EET_TRIGGER, eTrigger.penCaused);
+        SendToTarget(m_penIfTarget, EET_TRIGGER, penCaused);
       } else if (m_bDebugMessages) {
         CPrintF(TRANS("[C][%s] : Result=TRUE, but no [If Target] to trigger\n"), m_strName);
       }
@@ -514,7 +513,7 @@ functions:
           CPrintF(TRANS("[C][%s] : Triggering [Else Target]: %s\n"), m_strName, m_penElseTarget->GetName());
         }
 
-        SendToTarget(m_penElseTarget, EET_TRIGGER, eTrigger.penCaused);
+        SendToTarget(m_penElseTarget, EET_TRIGGER, penCaused);
       } else if (m_bDebugMessages) {
         CPrintF(TRANS("[C][%s] : Result=FALSE, but no [Else Target] to trigger\n"), m_strName);
       }
@@ -526,8 +525,16 @@ functions:
   // --------------------------------------------------------------------------------------
   BOOL HandleEvent(const CEntityEvent &ee)
   {
+    // Trigger Event
     if (ee.ee_slEvent == EVENTCODE_ETrigger) {
-      HandleETrigger(ee);
+      DoCompare(((ETrigger &) ee).penCaused, NULL);
+    }
+    
+    // Targeted Event
+    if (ee.ee_slEvent == EVENTCODE_ETargeted) {
+      const ETargeted &eTargeted = ((ETargeted &) ee);
+      
+      DoCompare(eTargeted.penCaused, eTargeted.penTarget);
     }
 
     if (ee.ee_slEvent== EVENTCODE_EActivate) {
