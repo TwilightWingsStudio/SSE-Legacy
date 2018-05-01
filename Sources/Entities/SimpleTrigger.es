@@ -99,6 +99,8 @@ functions:
           CPrintF(TRANS("[%s] Activated!\n"), m_strName);
         }
       }
+      
+      return TRUE;
     }
 
     if (ee.ee_slEvent == EVENTCODE_EDeactivate) {
@@ -110,6 +112,13 @@ functions:
           CPrintF(TRANS("[%s] Deactivated!\n"), m_strName);
         }
       }
+      
+      return TRUE;
+    }
+    
+    // If non-active then ignore ETrigger & ETargeted.
+    if (!m_bActive && (ee.ee_slEvent == EVENTCODE_ETrigger || ee.ee_slEvent == EVENTCODE_ETargeted)) {
+      return FALSE;
     }
 
     return CRationalEntity::HandleEvent(ee);
@@ -235,6 +244,9 @@ functions:
   }
 
 procedures:
+  // --------------------------------------------------------------------------------------
+  // Normal mode.
+  // --------------------------------------------------------------------------------------
   SendEventToTargets()
   {
     // if needed wait some time before event is send
@@ -243,7 +255,6 @@ procedures:
       {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
-        on (EDeactivate) : { pass; }
         otherwise(): { resume; }
       }
       
@@ -276,7 +287,6 @@ procedures:
       wait (m_fWaitTime) {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
-        on (EDeactivate) : { pass; }
         otherwise(): { resume; }
       }
       
@@ -304,7 +314,6 @@ procedures:
       wait (m_fWaitTime) {
         on (EBegin) : { resume; }
         on (ETimer) : { stop; }
-        on (EDeactivate) : { pass; }
         otherwise(): { resume; }
       }
       
@@ -356,10 +365,6 @@ procedures:
       // cascade trigger
       on (ETrigger eTrigger) :
       {
-        if (!m_bActive) {
-          resume;
-        }
-
         if (m_bDebugMessages) {
           if (eTrigger.penCaused != NULL) {
             CPrintF("[%s] : Received ETrigger(-> %d)\n", m_strName, eTrigger.penCaused->en_ulID);
@@ -391,10 +396,6 @@ procedures:
       // [SSE] Entities - Targeted Event
       on (ETargeted eTargeted) :
       {
-        if (!m_bActive) {
-          resume;
-        }
-
         if (m_bDebugMessages) {
           CPrintF("[%s] : Received ETargeted(-> %d, -> %d)\n", m_strName, eTargeted.penCaused ? eTargeted.penCaused->en_ulID : 0, eTargeted.penTarget ? eTargeted.penTarget->en_ulID : 0);
           
