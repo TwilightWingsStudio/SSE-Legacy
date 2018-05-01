@@ -19,23 +19,27 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   #include "StdH.h"
 %}
 
-enum ECondition {
-   0 EC_SAME         "0 ==",
-   2 EC_DIFFERENT    "1 !=",
-   1 EC_LARGER       "2 >",
-   3 EC_SMALLER      "3 <",
-   4 EC_SMALLER_SAME "4 <=",
-   5 EC_LARGER_SAME  "5 >=",
+enum EConditionOp
+{
+   0 EC_NOP          "00 No Operation",
+
+  // Basic Operations
+   1 EC_SAME         "01 ==",
+   2 EC_DIFFERENT    "02 !=",
+   3 EC_LARGER       "03 >",
+   4 EC_SMALLER      "04 <",
+   5 EC_SMALLER_SAME "05 <=",
+   6 EC_LARGER_SAME  "06 >=",
 
   // Bitwise conditions.   
-   6 EC_BITMASKINC   "6 & (WIP)",
-   7 EC_BITMASKEXC   "7 !& (WIP)",
-   8 EC_BITINC       "8 & (1 << X) (WIP)",
-   9 EC_BITEX        "9 !& (1 << X) (WIP)",
-
+   7 EC_BITMASKINC   "07  & (WIP)",
+   8 EC_BITMASKEXC   "08  !& (WIP)",
+   9 EC_BITINC       "09 & (1 << X) (WIP)",
+  10 EC_BITEX        "10 !& (1 << X) (WIP)",
 };
 
-enum EConType {
+enum EConType
+{
    0 ECT_ENTITY    "00 Property By Name",
    1 ECT_POSX      "01 Pos(X)",
    2 ECT_POSY      "02 Pos(Y)",
@@ -54,6 +58,91 @@ enum EConType {
   15 ECT_TYPE      "15 Entity Class (unchangeable)",
   16 ECT_PROPBYID  "16 Property By ID (changer only)"
 };
+
+%{
+static const char *PropertyTypeToShortName(EConType eType)
+{
+  switch (eType)
+  {
+    case ECT_POSX: {
+      return "PosX"; 
+    } break;
+
+    case ECT_POSY: {
+      return "PosY";
+    } break;
+
+    case ECT_POSZ: {
+      return "PosZ";
+    } break;
+
+    case ECT_SPEEDX: {
+      return "SpeedX";
+    } break;
+
+    case ECT_SPEEDY: {
+      return "SpeedY";
+    } break;
+
+    case ECT_SPEEDZ: {
+      return "SpeedZ";
+    } break;
+
+    case ECT_SPEEDALL: {
+      return "SpeedTotal";
+    } break;
+
+    case ECT_ROTH: {
+      return "RotH";
+    } break;
+
+    case ECT_ROTB: {
+      return "RotP";
+    } break;
+
+    case ECT_ROTP: {
+      return "RotB";
+    } break;
+
+    case ECT_SPEEDXREL: {
+      return "SpeedXRel";
+    } break;
+
+    case ECT_SPEEDYREL: {
+      return "SpeedYRel";
+    } break;
+
+    case ECT_SPEEDZREL: {
+      return "SpeedZRel";
+    } break;
+
+    case ECT_HEALTH: {
+      return "Health";
+    } break;
+
+    case ECT_TYPE: {
+      return "EntityClass";
+    } break;
+  }
+  
+  return "<Error>";
+}
+
+static inline BOOL IsIndexEPT(CEntityProperty::PropertyType eptProperty)
+{
+  switch (eptProperty)
+  {
+    case CEntityProperty::EPT_INDEX: return TRUE;
+    case CEntityProperty::EPT_ENUM: return TRUE;
+    case CEntityProperty::EPT_FLAGS: return TRUE;
+    case CEntityProperty::EPT_ANIMATION: return TRUE;
+    case CEntityProperty::EPT_ILLUMINATIONTYPE: return TRUE;
+    case CEntityProperty::EPT_COLOR: return TRUE;
+  }
+  
+  return FALSE;
+}
+%}
 
 class CCondition: CEntity {
 name      "Condition";
@@ -74,7 +163,7 @@ properties:
    7 CEntityPointer m_penIfTarget      "If Target"             COLOR(C_RED|0xFF),
    8 CEntityPointer m_penElseTarget    "Else Target"           COLOR(C_RED|0xFF),
 
-   9 enum ECondition m_eCondition "Operation" = EC_SAME,
+   9 enum EConditionOp m_eCondition "Operation" = EC_SAME,
   10 BOOL m_bActive        "Active"           = TRUE,
   11 BOOL m_bDebugMessages         "Debug Messages"   = FALSE,
   12 BOOL m_bAbs1          "Property 1 As Absolute" = FALSE,
@@ -84,8 +173,8 @@ properties:
   15 enum EConType  m_eCT1 "Target 1 Property Type" = ECT_ENTITY,
   16 enum EConType  m_eCT2 "Target 2 Property Type" = ECT_ENTITY,
 
-  17 BOOL m_bCaused1       "Target 1=penCaused" = FALSE,
-  18 BOOL m_bCaused2       "Target 2=penCaused" = FALSE,
+  17 enum TETargetType m_teTargetType1   "Target 1 Type"    = TETT_TARGET,
+  18 enum TETargetType m_teTargetType2   "Target 2 Type"    = TETT_TARGET,
 
   19 CEntityPointer m_penError "Error Target",
   20 CTString m_strClass       "Class Name"  = "",
@@ -114,228 +203,348 @@ functions:
   // --------------------------------------------------------------------------------------
   // Called every time when entity receives ETrigger event and it's active.
   // --------------------------------------------------------------------------------------
-  void DoCompare(CEntity *penCaused, CEntity *penTargetArg)
+  BOOL DoCompare(CEntity *penCaused, CEntity *penTargetArg)
   {
     // If non-active.
     if (!m_bActive) {
-      return;
+      return TRUE;
+    }
+    
+    if (m_bDebugMessages)
+    {
+      CPrintF("[C][%s] : Received event (-> %d, -> %d)\n", m_strName, penCaused ? penCaused->en_ulID : 0, penTargetArg ? penTargetArg->en_ulID : 0);
+      
+      if (penCaused) {
+        CPrintF("  penCaused.Name = '%s'\n", penCaused->GetName().Undecorated());
+      }
+      
+      if (penTargetArg) {
+        CPrintF("  penTarget.Name = '%s'\n", penTargetArg->GetName().Undecorated());
+      }
     }
 
-    // If enabled then set penCaused as condition target 1.
-    if (m_bCaused1 && penCaused) {
-      m_penIfCondition1 = penCaused;
+    // Extended Target 1 types.
+    switch (m_teTargetType1)
+    {
+      case TETT_PENCAUSED: {
+        if (penCaused) {
+          m_penIfCondition1 = penCaused;
+        }
+      } break;
+
+      case TETT_PENTARGET: {
+        if (penTargetArg) {
+          m_penIfCondition1 = penTargetArg;
+        }
+      } break;
+
+      default: break;
+    }
+    
+    // Extended Target 2 types.
+    switch (m_teTargetType2)
+    {
+      case TETT_PENCAUSED: {
+        if (penCaused) {
+          m_penIfCondition2 = penCaused;
+        }
+      } break;
+
+      case TETT_PENTARGET: {
+        if (penTargetArg) {
+          m_penIfCondition2 = penTargetArg;
+        }
+      } break;
+
+      default: break;
     }
 
-    // If enabled then set penCaused as condition target 2.
-    if (m_bCaused2 && penCaused) {
-      m_penIfCondition2 = penCaused;
-    }
-
-    if (m_penIfCondition1 == NULL) {
+    // Check both targets. If no atleast one target then process the error.
+    if (m_penIfCondition1 == NULL && m_penIfCondition2 == NULL)
+    {
       if (m_bDebugMessages) {
-        CPrintF(TRANS("[C][%s] : First Condition Target Not Set!\n"), m_strName);
+        CPrintF(TRANS("  Error! Both targets are NULL!\n"));
       }
 
-      return;
+      return FALSE;
     }
 
-    // Check condition target 2 existance and compare data types.
-    if (m_penIfCondition2) {
-      if (m_bDebugMessages && m_eCT1 == ECT_ENTITY && m_eCT2 == ECT_ENTITY && m_penIfCondition1->PropertyForName(m_strProperty1) && m_penIfCondition2->PropertyForName(m_strProperty2) && m_penIfCondition1->PropertyForName(m_strProperty1)->ep_eptType!=m_penIfCondition2->PropertyForName(m_strProperty2)->ep_eptType) {
-        CPrintF(TRANS("[C][%s] : Different Data Types!\n"), m_strName);
-      }
-    } else {
+    // Initialize some variables.
+    CEntityProperty *pProperty1 = NULL;
+    CEntityProperty *pProperty2 = NULL;
+
+    if (m_eCT1 == ECT_PROPBYID || m_eCT2 == ECT_PROPBYID)
+    {
       if (m_bDebugMessages) {
-        CPrintF(TRANS("[C][%s] : Second Condition Target Not Set!\n"), m_strName);
+        CPrintF(TRANS("  Error! Property By ID is currently not supported by Condition!\n"));
+      }
+
+      return FALSE;
+    }
+
+    // Get the first property.
+    if (m_penIfCondition1 && m_eCT1 == ECT_ENTITY)
+    {
+      if (m_strProperty1 == "") {
+        if (m_bDebugMessages) {
+          CPrintF(TRANS("  Error! [Target 1 Property Name] is empty!\n"));
+        }
+
+        return FALSE;
+      }
+      
+      
+      pProperty1 = m_penIfCondition1->PropertyForName(m_strProperty1);
+    }
+
+    // Get the second property.
+    if (m_penIfCondition2 && m_eCT2 == ECT_ENTITY)
+    {
+      if (m_strProperty2 == "") {
+        if (m_bDebugMessages) {
+          CPrintF(TRANS("  Error! [Target 2 Property Name] is empty!\n"));
+        }
+
+        return FALSE;
+      }
+      
+      pProperty2 = m_penIfCondition2->PropertyForName(m_strProperty2);
+    }
+
+    // Output targets status.
+    if (m_bDebugMessages)
+    {
+      if (m_penIfCondition1 == NULL) {
+        CPrintF("  [Target 1] == NULL!\n");
+      } else if (m_penIfCondition2 == NULL) {
+        CPrintF("  [Target 2] == NULL!\n");
+      } else {
+        CPrintF("  Both targets are present!\n");
       }
     }
 
-    if (m_eCT1 == ECT_ENTITY && m_bDebugMessages && m_penIfCondition1->PropertyForName(m_strProperty1) == NULL) {
-      CPrintF(TRANS("[C][%s] : Condition 1 : %s Not Found\n"), m_strName, m_strProperty1);
-      return;
+    // If [Target 1] valid but entity property not found.
+    if (m_penIfCondition1 && m_eCT1 == ECT_ENTITY && pProperty1 == NULL)
+    {
+      if (m_bDebugMessages) {
+        CPrintF(TRANS("  Error! [Target 1].[%s] not found\n"), m_strProperty1);
+      }
+      
+      return FALSE;
     }
 
-    BOOL bResult = 0, be = 0;
+    // If [Target 2] valid but entity property not found.
+    if (m_penIfCondition2 && m_eCT2 == ECT_ENTITY && pProperty2 == NULL)
+    {
+      if (m_bDebugMessages) {
+        CPrintF(TRANS("  Error! [Target 2].[%s] not found\n"), m_strProperty2);
+      }
+      
+      return FALSE;
+    }
 
+    BOOL bResult = FALSE, bError = FALSE;
+
+    // Classname check.
     if (m_eCT1 == ECT_TYPE) {
       if (IsDerivedFromClass(m_penIfCondition1, m_strClass)) {
         bResult = TRUE;
       }
+
     } else {
-      FLOAT fValue;
-      FLOAT fValue2;
+      FLOAT fValue, fValue2;
+      INDEX iValue, iValue2;
       CEntityPointer penPointer;
       CEntityPointer penPointer2;
       CTString strValue;
       CTString strValue2;
-      BOOL bf1, bf2, bp1, bp2, bs1, bs2;
+      BOOL bf1 = FALSE, bf2 = FALSE, bp1 = FALSE, bp2 = FALSE, bs1 = FALSE, bs2 = FALSE;
+      BOOL bi1 = FALSE, bi2 = FALSE;
 
-      if (m_eCT1 == ECT_ENTITY) {
-        CEntityProperty* pProperty = m_penIfCondition1->PropertyForName(m_strProperty1);
-
-        if (pProperty != NULL) {
-          SLONG offset1 = pProperty->ep_slOffset;
-          CEntityProperty::PropertyType eptType = pProperty->ep_eptType;
-
-          if (eptType == CEntityProperty::EPT_FLOAT || eptType == CEntityProperty::EPT_INDEX || eptType == CEntityProperty::EPT_RANGE || eptType == CEntityProperty::EPT_BOOL || eptType == CEntityProperty::EPT_ANGLE) {
-            fValue = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1));
-            bf1 = TRUE;
-          } else if (eptType== CEntityProperty::EPT_ENTITYPTR) {
-            penPointer = *((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1));
-            bp1 = TRUE;
-          } else if (eptType == CEntityProperty::EPT_STRING || eptType == CEntityProperty::EPT_FILENAME) {
-            strValue = *((CTString *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1));
-            bs1 = TRUE;
-          }
-        }
-      } else if (m_eCT1 == ECT_POSX) {
-        fValue = m_penIfCondition1->GetPlacement().pl_PositionVector(1);
-        bf1 = TRUE;
-      } else if (m_eCT1 == ECT_POSY) {
-        fValue = m_penIfCondition1->GetPlacement().pl_PositionVector(2);
-        bf1 = TRUE;
-      } else if (m_eCT1 == ECT_POSZ) {
-        fValue = m_penIfCondition1->GetPlacement().pl_PositionVector(3);
-        bf1 = TRUE;
-      } else if (m_eCT1 == ECT_ROTH) {
-        fValue = m_penIfCondition1->GetPlacement().pl_OrientationAngle(1);
-        bf1 = TRUE;
-      } else if (m_eCT1 == ECT_ROTP) {
-        fValue = m_penIfCondition1->GetPlacement().pl_OrientationAngle(2);
-        bf1 = TRUE;
-      } else if (m_eCT1 == ECT_ROTB) {
-        fValue = m_penIfCondition1->GetPlacement().pl_OrientationAngle(3);
-        bf1 = TRUE;
-      } else if (m_penIfCondition1->GetFlags()&ENF_ALIVE && m_eCT1 == ECT_HEALTH) {
-        fValue = ((CLiveEntity&)*m_penIfCondition1).en_fHealth;
-        bf1 = TRUE;
-      } else if (IsDerivedFromClass(m_penIfCondition1,"MovableEntity")) {
-        if (m_eCT1 == ECT_SPEEDX) {
-          fValue = ((CMovableEntity&)*m_penIfCondition1).en_vCurrentTranslationAbsolute(1);
+      // If entity property.
+      if (m_eCT1 == ECT_ENTITY)
+      {
+        SLONG offset1 = pProperty1->ep_slOffset;
+        CEntityProperty::PropertyType eptType = pProperty1->ep_eptType;
+        
+        if (IsIndexEPT(eptType)) {
+          iValue = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1));
+          bi1 = TRUE;
+        } else if (eptType == CEntityProperty::EPT_FLOAT || eptType == CEntityProperty::EPT_RANGE || eptType == CEntityProperty::EPT_ANGLE) {
+          fValue = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1));
           bf1 = TRUE;
-        } else if (m_eCT1 == ECT_SPEEDY) {
-          fValue = ((CMovableEntity&)*m_penIfCondition1).en_vCurrentTranslationAbsolute(2);
-          bf1 = TRUE;
-        } else if (m_eCT1 == ECT_SPEEDZ) {
-          fValue = ((CMovableEntity&)*m_penIfCondition1).en_vCurrentTranslationAbsolute(3);
-          bf1 = TRUE;
-        } else if (m_eCT1 == ECT_SPEEDALL) {
-          fValue = ((CMovableEntity&)*m_penIfCondition1).en_vCurrentTranslationAbsolute.Length();
-          bf1 = TRUE;
-        } else if (m_eCT1 == ECT_SPEEDXREL) {
-          CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition1).en_vCurrentTranslationAbsolute,ANGLE3D(0,0,0));
-          CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition1->GetPlacement().pl_OrientationAngle);
-          plSpeed.AbsoluteToRelative(plRot);
-          fValue = plSpeed.pl_PositionVector(1);
-          bf1 = TRUE;
-        } else if (m_eCT1 == ECT_SPEEDYREL) {
-          CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition1).en_vCurrentTranslationAbsolute,ANGLE3D(0,0,0));
-          CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition1->GetPlacement().pl_OrientationAngle);
-          plSpeed.AbsoluteToRelative(plRot);
-          fValue = plSpeed.pl_PositionVector(2);
-          bf1 = TRUE;
-        } else if (m_eCT1 == ECT_SPEEDZREL) {
-          CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition1).en_vCurrentTranslationAbsolute,ANGLE3D(0,0,0));
-          CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition1->GetPlacement().pl_OrientationAngle);
-          plSpeed.AbsoluteToRelative(plRot);
-          fValue = plSpeed.pl_PositionVector(3);
-          bf1 = TRUE;
+        } else if (eptType== CEntityProperty::EPT_ENTITYPTR) {
+          penPointer = *((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1));
+          bp1 = TRUE;
+        } else if (eptType == CEntityProperty::EPT_STRING || eptType == CEntityProperty::EPT_FILENAME) {
+          strValue = *((CTString *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset1));
+          bs1 = TRUE;
         }
 
+      // If non-property.
       } else {
-        be = TRUE;
-        if (m_bDebugMessages) {
-          CPrintF(TRANS("[C][%s][1] : Don't use speeds on not moving entities or health on entities without health\n"), m_strName);
-        }
+        fValue = GetFloatNonEP(m_penIfCondition1, m_eCT1, bError);
+        bf1 = !bError;
       }
 
       if (m_penIfCondition2) {
+        // If entity property.
         if (m_eCT2 == ECT_ENTITY) {
-          CEntityProperty* pProperty2 = m_penIfCondition2->PropertyForName(m_strProperty2);
+          SLONG offset2 = pProperty2->ep_slOffset;
+          CEntityProperty::PropertyType eptType = pProperty2->ep_eptType;
 
-          if (pProperty2 != NULL) {
-            SLONG offset2 = pProperty2->ep_slOffset;
-            CEntityProperty::PropertyType eptType = pProperty2->ep_eptType;
+          if (IsIndexEPT(eptType)) {
+            iValue2 = *((INDEX *)(((UBYTE *)(CEntity*)&*m_penIfCondition1) + offset2));
+            bi2 = TRUE;
+          } else if (eptType == CEntityProperty::EPT_FLOAT || eptType == CEntityProperty::EPT_RANGE || eptType == CEntityProperty::EPT_ANGLE) {
+            fValue2 = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penIfCondition2) + offset2));
+            bf2 = TRUE;
+          } else if (eptType == CEntityProperty::EPT_ENTITYPTR) {
+            penPointer2 = *((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penIfCondition2) + offset2));
+            bp2 = TRUE;
+          } else if (eptType == CEntityProperty::EPT_STRING || eptType == CEntityProperty::EPT_FILENAME) {
+            strValue2 = *((CTString *)(((UBYTE *)(CEntity*)&*m_penIfCondition2) + offset2));
+            bs2 = TRUE;
+          }
 
-            if (eptType == CEntityProperty::EPT_FLOAT || eptType == CEntityProperty::EPT_INDEX || eptType == CEntityProperty::EPT_RANGE || eptType == CEntityProperty::EPT_BOOL || eptType == CEntityProperty::EPT_ANGLE) {
-              fValue2 = *((FLOAT *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2));
-              bf2 = TRUE;
-            } else if (eptType == CEntityProperty::EPT_ENTITYPTR) {
-              penPointer2 = *((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2));
-              bp2 = TRUE;
-            } else if (eptType == CEntityProperty::EPT_STRING || eptType == CEntityProperty::EPT_FILENAME) {
-              strValue2 = *((CTString *)(((UBYTE *)(CEntity*)&*m_penIfCondition2)+offset2));
-              bs2 = TRUE;
-            }
-          }
-        } else if (m_eCT2 == ECT_POSX) {
-          fValue2 = m_penIfCondition2->GetPlacement().pl_PositionVector(1);
-          bf2 = TRUE;
-        } else if (m_eCT2 == ECT_POSY) {
-          fValue2 = m_penIfCondition2->GetPlacement().pl_PositionVector(2);
-          bf2 = TRUE;
-        } else if (m_eCT2 == ECT_POSZ) {
-          fValue2 = m_penIfCondition2->GetPlacement().pl_PositionVector(3);
-          bf2 = TRUE;
-        } else if (m_eCT2 == ECT_ROTH) {
-          fValue2 = m_penIfCondition2->GetPlacement().pl_OrientationAngle(1);
-          bf2 = TRUE;
-        } else if (m_eCT2 == ECT_ROTP) {
-          fValue2 = m_penIfCondition2->GetPlacement().pl_OrientationAngle(2);
-          bf2 = TRUE;
-        } else if (m_eCT2 == ECT_ROTB) {
-          fValue2 = m_penIfCondition2->GetPlacement().pl_OrientationAngle(3);
-          bf2 = TRUE;
-        } else if (m_penIfCondition2->GetFlags()&ENF_ALIVE&&m_eCT2 == ECT_HEALTH) {
-          fValue2 = ((CLiveEntity&)*m_penIfCondition2).en_fHealth;
-          bf2 = TRUE;
-        } else if (IsDerivedFromClass(m_penIfCondition1,"MovableEntity")) {
-          if (m_eCT2 == ECT_SPEEDX) {
-            fValue2 = ((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute(1);
-            bf2 = TRUE;
-          } else if (m_eCT2 == ECT_SPEEDY) {
-            fValue2 = ((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute(2);
-            bf2 = TRUE;
-          } else if (m_eCT2 == ECT_SPEEDZ) {
-            fValue2 = ((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute(3);
-            bf2 = TRUE;
-          } else if (m_eCT2 == ECT_SPEEDALL) {
-            fValue2 = ((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute.Length();
-            bf2 = TRUE;
-          } else if (m_eCT2 == ECT_SPEEDXREL) {
-            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute, ANGLE3D(0, 0, 0));
-            CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0), m_penIfCondition2->GetPlacement().pl_OrientationAngle);
-            plSpeed.AbsoluteToRelative(plRot);
-            fValue2 = plSpeed.pl_PositionVector(1);
-            bf2 = TRUE;
-          } else if (m_eCT2 == ECT_SPEEDYREL) {
-            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute, ANGLE3D(0, 0, 0));
-            CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0), m_penIfCondition2->GetPlacement().pl_OrientationAngle);
-            plSpeed.AbsoluteToRelative(plRot);
-            fValue2 = plSpeed.pl_PositionVector(2);
-            bf2 = TRUE;
-          } else if (m_eCT2 == ECT_SPEEDZREL) {
-            CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition2).en_vCurrentTranslationAbsolute, ANGLE3D(0, 0, 0));
-            CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0), m_penIfCondition2->GetPlacement().pl_OrientationAngle);
-            plSpeed.AbsoluteToRelative(plRot);
-            fValue2 = plSpeed.pl_PositionVector(3);
-            bf2 = TRUE;
-          }
+        // If non-property.
         } else {
-          be = TRUE;
-          if (m_bDebugMessages) {
-            CPrintF(TRANS("[C][%s][2] : Don't use speeds on not moving entities or health on entities without health\n"), m_strName);
-          }
+          fValue = GetFloatNonEP(m_penIfCondition2, m_eCT2, bError);
+          bf2 = !bError;
         }
-      } else {
-        be = TRUE;
-        CPrintF(TRANS("[C][%s] : Set the second condition target goddammit\n"), GetName());
       }
 
-      // FLOAT
-      if (bf1 && bf2) {
-        if (m_bDebugMessages)
+      // INDEX FLOAT
+      if (bi1 && bf2)
+      {
+        fValue = (FLOAT)iValue; // Convert INDEX to FLOAT.
+        bf1 = TRUE;
+        bi1 = FALSE;
+
+        if (m_bDebugMessages) {
+          CPrintF("  INDEX(%d) -> FLOAT(%.2f)\n", iValue, fValue);
+        }
+      }
+
+      // FLOAT INDEX
+      if (bf1 && bi2)
+      {
+        fValue2 = (FLOAT)iValue2; // Convert INDEX to FLOAT.
+        bf2 = TRUE;
+        bi2 = FALSE;
+
+        if (m_bDebugMessages) {
+          CPrintF("  INDEX(%d) -> FLOAT(%.2f)\n", iValue2, fValue2);
+        }
+      }
+
+      // INDEX INDEX
+      if (bi1 && bi2) {
+        if (m_bDebugMessages) {
+          CPrintF("[C][%s] : Comparing two integer properties...\n", m_strName);
+        }
+
+        if (m_bAbs1) {
+          iValue = Abs(iValue);
+        }
+        
+        if (m_bAbs2) {
+          iValue2 = Abs(iValue2);
+        }
+
+        // Act according to condition type.
+        switch (m_eCondition)
         {
+          // [==]
+          case EC_SAME: {
+            if (m_bDebugMessages) {
+              CPrintF("  Expression = (INDEX(%d) == INDEX(%d))\n", iValue, iValue2);
+            }
+
+            if (iValue == iValue2) {
+              bResult = TRUE;
+            }
+          } break;
+
+          // [!=]
+          case EC_DIFFERENT: {
+            if (m_bDebugMessages) {
+              CPrintF("  Expression = (INDEX(%d) != INDEX(%d))\n", iValue, iValue2);
+            }
+
+            if (iValue != iValue2) {
+              bResult = TRUE;
+            }
+          } break;
+
+          // [>]
+          case EC_LARGER: {
+            if (m_bDebugMessages) {
+              CPrintF("  Expression = (INDEX(%d) > INDEX(%d))\n", iValue, iValue2);
+            }
+
+            if (iValue > iValue2) {
+              bResult = TRUE;
+            }
+          } break;
+          
+          // [>=]
+          case EC_LARGER_SAME: {
+            if (m_bDebugMessages) {
+              CPrintF("  Expression = (INDEX(%d) >= INDEX(%d))\n", iValue, iValue2);
+            }
+
+            if (iValue >= iValue2) {
+              bResult = TRUE;
+            }
+          } break;
+          
+          // [<]
+          case EC_SMALLER: {
+            if (m_bDebugMessages) {
+              CPrintF("  Expression = (INDEX(%d) < INDEX(%d))\n", iValue, iValue2);
+            }
+            
+            if (iValue < iValue2) {
+              bResult = TRUE;
+            }
+          } break;
+          
+          // [<=]
+          case EC_SMALLER_SAME: {
+            if (m_bDebugMessages) {
+              CPrintF("  Expression = (INDEX(%d) <= INDEX(%d))\n", iValue, iValue2);
+            }
+
+            if (iValue <= iValue2) {
+              bResult = TRUE;
+            }
+          } break;
+        }
+
+      // ONE INDEX
+      } else if (bi1) {
+        if (m_eCondition == EC_NOP) {
+          
+          if (m_bDebugMessages) {
+            CPrintF("  Expression = (INDEX(%d))\n", iValue);
+          }
+
+          if (iValue != 0) {
+            bResult = TRUE;
+          }
+        } else {
+          if (m_bDebugMessages) {
+            CPrintF("  Error! Missing second operand!\n");
+          }
+          
+          bError = TRUE;
+        }
+      }
+
+      // FLOAT FLOAT
+      if (bf1 && bf2) {
+        if (m_bDebugMessages) {
           CPrintF("[C][%s] : Comparing two floating point properties...\n", m_strName);
         }
         
@@ -345,95 +554,130 @@ functions:
         // Take absolute values if it enabled.
         if (m_bAbs1) {rAbs1 = abs(rAbs1);}
         if (m_bAbs2) {rAbs2 = abs(rAbs2);}
+        
+        // Act according to condition type.
+        switch (m_eCondition)
+        {
+          // [==]
+          case EC_SAME: {
+            if (m_bDebugMessages) {
+              CPrintF("  Expression = (FLOAT(%.4f) == FLOAT(%.4f))\n", rAbs1, rAbs2);
+            }
 
-        if (m_eCondition == EC_SAME) {
-          if (m_bDebugMessages) {
-            CPrintF("  Condition = [==] (same)\n");
-          }
+            if (rAbs1 == rAbs2) {
+              bResult = TRUE;
+            }
+          } break;
 
-          if (rAbs1 == rAbs2) {
-            bResult = TRUE;
-          }
-        } else if (m_eCondition == EC_DIFFERENT) {
-          if (m_bDebugMessages) {
-            CPrintF("  Condition = [!=] (different)\n");
-          }
+          // [!=]
+          case EC_DIFFERENT: {
+            if (m_bDebugMessages) {
+              CPrintF("  Expression = (FLOAT(%.4f) != FLOAT(%.4f))\n", rAbs1, rAbs2);
+            }
+            
+            if (rAbs1 != rAbs2) {
+              bResult = TRUE;
+            }
+          } break;
+
+          // [>]
+          case EC_LARGER: {
+            if (m_bDebugMessages) {
+              CPrintF("  Expression = (FLOAT(%.4f) > FLOAT(%.4f))\n", rAbs1, rAbs2);
+            }
+
+            if (rAbs1 > rAbs2) {
+              bResult = TRUE;
+            }
+          } break;
           
-          if (rAbs1 != rAbs2) {
-            bResult = TRUE;
-          }
-        } else if (m_eCondition == EC_LARGER) {
-          if (m_bDebugMessages) {
-            CPrintF("  Condition = [>] (larger)\n");
-          }
-
-          if (rAbs1 > rAbs2) {
-            bResult = TRUE;
-          }
-        } else if (m_eCondition == EC_LARGER_SAME) {
-          if (m_bDebugMessages) {
-            CPrintF("  Condition = [>=] (larger-same)\n");
-          }
+          // [>=]
+          case EC_LARGER_SAME: {
+            if (m_bDebugMessages) {
+              CPrintF("  Expression = (FLOAT(%.4f) >= FLOAT(%.4f))\n", rAbs1, rAbs2);
+            }
+            
+            if (rAbs1 >= rAbs2) {
+              bResult = TRUE;
+            }
+          } break;
           
-          if (rAbs1 >= rAbs2) {
-            bResult = TRUE;
-          }
-        } else if (m_eCondition == EC_SMALLER) {
-          if (m_bDebugMessages) {
-            CPrintF("  Condition = [<] (smaller)\n");
-          }
+          // [<]
+          case EC_SMALLER: {
+            if (m_bDebugMessages) {
+              CPrintF("  Expression = (FLOAT(%.4f) < FLOAT(%.4f))\n", rAbs1, rAbs2);
+            }
 
-          if (rAbs1 < rAbs2) {
-            bResult = TRUE;
-          }
-        } else if (m_eCondition == EC_SMALLER_SAME) {
-          if (m_bDebugMessages) {
-            CPrintF("  Condition = [<=] (smaller-same)\n");
-          }
+            if (rAbs1 < rAbs2) {
+              bResult = TRUE;
+            }
+          } break;
+          
+          // [<=]
+          case EC_SMALLER_SAME: {
+            if (m_bDebugMessages) {
+              CPrintF("  Expression = (FLOAT(%.4f) <= FLOAT(%.4f))\n", rAbs1, rAbs2);
+            }
 
-          if (rAbs1 <= rAbs2) {
-            bResult = TRUE;
-          }
+            if (rAbs1 <= rAbs2) {
+              bResult = TRUE;
+            }
+          } break;
         }
-      
+
       // ONE FLOAT
       } else if (bf1) {
-        if (fValue > 0) {
-          bResult = TRUE;
+
+        if (m_eCondition == EC_NOP) {
+          if (m_bDebugMessages) {
+            CPrintF("  Expression = (FLOAT(%.4f))\n", fValue);
+          }
+
+          if (fValue != 0.0F) {
+            bResult = TRUE;
+          }
+        } else {
+          if (m_bDebugMessages) {
+            CPrintF("  Error! Missing second operand!\n");
+          }
+          
+          bError = TRUE;
         }
 
-      // POINTER
+      // POINTER POINTER
       } else if (bp1 && bp2) {
         if (m_bDebugMessages)
         {
-          CPrintF("[%s] : Comparing two pointers...\n", m_strName);
+          CPrintF("[C][%s] : Comparing two pointers...\n", m_strName);
 
           if (penPointer) {
-            CPrintF("  [%s].[%s] = [#%d][%s]\n", ((CEntity&)*m_penIfCondition1).GetName(), m_strProperty1, penPointer->en_ulID, penPointer->GetName());
+            CPrintF("  [%s].[%s] = (-> %d)[%s]\n", ((CEntity&)*m_penIfCondition1).GetName(), m_strProperty1, penPointer->en_ulID, penPointer->GetName());
           } else {
             CPrintF("  [%s].[%s] = NULL\n", ((CEntity&)*m_penIfCondition1).GetName(), m_strProperty1);
           }
           
           if (penPointer2) {
-            CPrintF("  [%s].[%s] = [#%d][%s]\n", ((CEntity&)*m_penIfCondition2).GetName(), m_strProperty2, penPointer2->en_ulID, penPointer2->GetName());
+            CPrintF("  [%s].[%s] = (-> %d)[%s]\n", ((CEntity&)*m_penIfCondition2).GetName(), m_strProperty2, penPointer2->en_ulID, penPointer2->GetName());
           } else {
             CPrintF("  [%s].[%s] = NULL\n", ((CEntity&)*m_penIfCondition2).GetName(), m_strProperty2);
           }
         }
         
+        // [==]
         if (m_eCondition == EC_SAME)
         {
           if (m_bDebugMessages) {
-            CPrintF("  Condition = [==] (same)\n");
+            CPrintF("  Expression = ((-> %d) == (-> %d))\n", penPointer ? penPointer->en_ulID : 0, penPointer2 ? penPointer2->en_ulID : 0);
           }
 
           if (penPointer == penPointer2) {
             bResult = TRUE;
           }
 
+        // [!=]
         } else if (m_eCondition == EC_DIFFERENT) {
           if (m_bDebugMessages) {
-            CPrintF("  Condition = [!=] (different)\n");
+            CPrintF("  Expression = ((-> %d) 1= (-> %d))\n", penPointer ? penPointer->en_ulID : 0, penPointer2 ? penPointer2->en_ulID : 0);
           }
 
           if (penPointer != penPointer2) {
@@ -485,39 +729,143 @@ functions:
 
       // Other
       } else {
-        be = TRUE;
+        bError = TRUE;
         if (m_bDebugMessages) {
           CPrintF(TRANS("[%s] : Unsupported Data Type\n"), m_strName);
         }
       }
     }
 
-    if (be) {
-      SendToTarget(m_penError, EET_TRIGGER, penCaused);
+    if (bError) {
+      return FALSE;
     }
 
     // trigger proper target
     if (bResult) {
       if (m_penIfTarget) {
         if (m_bDebugMessages) {
-          CPrintF(TRANS("[C][%s] : Triggering [If Target]: %s\n"), m_strName, m_penIfTarget->GetName());
+          CPrintF(TRANS("  Triggering [If Target]: %s\n"), m_strName, m_penIfTarget->GetName());
         }
 
         SendToTarget(m_penIfTarget, EET_TRIGGER, penCaused);
       } else if (m_bDebugMessages) {
-        CPrintF(TRANS("[C][%s] : Result=TRUE, but no [If Target] to trigger\n"), m_strName);
+        CPrintF(TRANS("  Result = TRUE, but no [If Target] to trigger\n"), m_strName);
       }
+
     } else {
       if (m_penElseTarget) {
         if (m_bDebugMessages) {
-          CPrintF(TRANS("[C][%s] : Triggering [Else Target]: %s\n"), m_strName, m_penElseTarget->GetName());
+          CPrintF(TRANS("  Triggering [Else Target]: %s\n"), m_penElseTarget->GetName());
         }
 
         SendToTarget(m_penElseTarget, EET_TRIGGER, penCaused);
       } else if (m_bDebugMessages) {
-        CPrintF(TRANS("[C][%s] : Result=FALSE, but no [Else Target] to trigger\n"), m_strName);
+        CPrintF(TRANS("  Result = FALSE, but no [Else Target] to send event.\n"));
       }
     }
+    
+    return TRUE;
+  }
+
+  // --------------------------------------------------------------------------------------
+  // Returns non-property float from given entity.
+  // --------------------------------------------------------------------------------------
+  FLOAT GetFloatNonEP(CEntity *penSource, EConType eType, BOOL &bError)
+  {
+    // Position & Orientation
+    switch (eType)
+    {
+      case ECT_POSX: {
+        return penSource->GetPlacement().pl_PositionVector(1);
+      } break;
+      
+      case ECT_POSY: {
+        return penSource->GetPlacement().pl_PositionVector(2);
+      } break;
+      
+      case ECT_POSZ: {
+        return penSource->GetPlacement().pl_PositionVector(3);
+      } break;
+    
+      case ECT_ROTH: {
+        return penSource->GetPlacement().pl_OrientationAngle(1);
+      } break;
+
+      case ECT_ROTP: {
+        return penSource->GetPlacement().pl_OrientationAngle(2);
+      } break;
+
+      case ECT_ROTB: {
+        return penSource->GetPlacement().pl_OrientationAngle(3);
+      } break;
+    }
+
+    // Health
+    if (eType == ECT_HEALTH)
+    {
+      if (penSource->IsLiveEntity()) {
+        return ((CLiveEntity&)*penSource).GetHealth();
+      } else {
+        if (m_bDebugMessages) {
+          CPrintF(TRANS("[C][%s] : Don't use health on entities without health!\n"), m_strName);
+        }
+
+        bError = TRUE;
+        return 0.0F;
+      }
+    }
+
+    // Absolute & Relative Speeds
+    if (penSource->IsMovableEntity()) {
+      CMovableEntity *penMovableSource = static_cast<CMovableEntity *>(penSource);
+      
+      switch (eType)
+      {
+        case ECT_SPEEDX: {
+          return penMovableSource->en_vCurrentTranslationAbsolute(1);
+        } break;
+        
+        case ECT_SPEEDY: {
+          return penMovableSource->en_vCurrentTranslationAbsolute(2);
+        } break;
+        
+        case ECT_SPEEDZ: {
+          return penMovableSource->en_vCurrentTranslationAbsolute(3);
+        } break;
+        
+        case ECT_SPEEDALL: {
+          return penMovableSource->en_vCurrentTranslationAbsolute.Length();
+        } break;
+        
+        case ECT_SPEEDXREL: {
+          CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition1).en_vCurrentTranslationAbsolute,ANGLE3D(0, 0, 0));
+          CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition1->GetPlacement().pl_OrientationAngle);
+          plSpeed.AbsoluteToRelative(plRot);
+          return plSpeed.pl_PositionVector(1);
+        } break;
+        
+        case ECT_SPEEDYREL: {
+          CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition1).en_vCurrentTranslationAbsolute,ANGLE3D(0, 0, 0));
+          CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition1->GetPlacement().pl_OrientationAngle);
+          plSpeed.AbsoluteToRelative(plRot);
+          return plSpeed.pl_PositionVector(2);
+        } break;
+        
+        case ECT_SPEEDZREL: {
+          CPlacement3D plSpeed = CPlacement3D(((CMovableEntity&)*m_penIfCondition1).en_vCurrentTranslationAbsolute,ANGLE3D(0, 0, 0));
+          CPlacement3D plRot = CPlacement3D(FLOAT3D(0, 0, 0),m_penIfCondition1->GetPlacement().pl_OrientationAngle);
+          plSpeed.AbsoluteToRelative(plRot);
+          return plSpeed.pl_PositionVector(3);
+        } break;
+      }
+    }
+    
+    if (m_bDebugMessages) {
+      CPrintF(TRANS("[C][%s] : Invalid property type!\n"), m_strName);
+    }
+
+    bError = TRUE;
+    return 0.0F;
   }
 
   // --------------------------------------------------------------------------------------
@@ -526,15 +874,25 @@ functions:
   BOOL HandleEvent(const CEntityEvent &ee)
   {
     // Trigger Event
-    if (ee.ee_slEvent == EVENTCODE_ETrigger) {
-      DoCompare(((ETrigger &) ee).penCaused, NULL);
+    if (ee.ee_slEvent == EVENTCODE_ETrigger)
+    {
+      const ETrigger &eTrigger = ((ETrigger &) ee);
+
+      // If error occured then send event to error target.
+      if (!DoCompare(eTrigger.penCaused, NULL)) {
+        SendToTarget(m_penError, EET_TRIGGER, eTrigger.penCaused);
+      }
     }
     
     // Targeted Event
-    if (ee.ee_slEvent == EVENTCODE_ETargeted) {
+    if (ee.ee_slEvent == EVENTCODE_ETargeted)
+    {
       const ETargeted &eTargeted = ((ETargeted &) ee);
       
-      DoCompare(eTargeted.penCaused, eTargeted.penTarget);
+      // If error occured then send event to error target.
+      if (!DoCompare(eTargeted.penCaused, eTargeted.penTarget)) {
+        SendToTarget(m_penError, EET_TRIGGER, eTargeted.penCaused);
+      }
     }
 
     if (ee.ee_slEvent== EVENTCODE_EActivate) {
@@ -558,6 +916,22 @@ procedures:
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
     SetCollisionFlags(ECF_IMMATERIAL);
 
+    if (m_teTargetType1 == TETT_THIS) {
+      m_teTargetType1 = TETT_TARGET;
+    }
+
+    if (m_teTargetType2 == TETT_THIS) {
+      m_teTargetType2 = TETT_TARGET;
+    }
+    
+    if (m_eCT1 == ECT_PROPBYID) {
+      m_eCT1 = ECT_ENTITY;
+    }
+    
+    if (m_eCT2 == ECT_PROPBYID) {
+      m_eCT2 = ECT_ENTITY;
+    }
+
     if (m_bCode) {
       m_bCode = FALSE;
       CTString strCode = "if ( ";
@@ -576,26 +950,7 @@ procedures:
           strCode += ".";
 
           // Select first operand's name.
-          switch (m_eCT1)
-          {
-            case ECT_POSX:      strCode += "PosX"; break;
-            case ECT_POSY:      strCode += "PosY"; break;
-            case ECT_POSZ:      strCode += "PosZ"; break;
-            case ECT_SPEEDX:    strCode += "SpeedX"; break;
-            case ECT_SPEEDY:    strCode += "SpeedY"; break;
-            case ECT_SPEEDZ:    strCode += "SpeedZ"; break;
-            case ECT_SPEEDALL:  strCode += "SpeedTotal"; break;
-            case ECT_ROTH:      strCode += "RotH"; break;
-            case ECT_ROTB:      strCode += "RotP"; break;
-            case ECT_ROTP:      strCode += "RotB"; break;
-            case ECT_SPEEDXREL: strCode += "SpeedXRel"; break;
-            case ECT_SPEEDYREL: strCode += "SpeedYRel"; break;
-            case ECT_SPEEDZREL: strCode += "SpeedZRel"; break;
-            case ECT_HEALTH:    strCode += "Health"; break;
-            case ECT_TYPE:      strCode += "EntityClass"; break;
-          
-            default: break;
-          };
+          strCode += PropertyTypeToShortName(m_eCT1);
         }
       } else {
         strCode += "NULL";
@@ -631,26 +986,7 @@ procedures:
           strCode += ".";
 
           // Select second operand's name.
-          switch (m_eCT2)
-          {
-            case ECT_POSX:      strCode += "PosX"; break;
-            case ECT_POSY:      strCode += "PosY"; break;
-            case ECT_POSZ:      strCode += "PosZ"; break;
-            case ECT_SPEEDX:    strCode += "SpeedX"; break;
-            case ECT_SPEEDY:    strCode += "SpeedY"; break;
-            case ECT_SPEEDZ:    strCode += "SpeedZ"; break;
-            case ECT_SPEEDALL:  strCode += "SpeedTotal"; break;
-            case ECT_ROTH:      strCode += "RotH"; break;
-            case ECT_ROTB:      strCode += "RotP"; break;
-            case ECT_ROTP:      strCode += "RotB"; break;
-            case ECT_SPEEDXREL: strCode += "SpeedXRel"; break;
-            case ECT_SPEEDYREL: strCode += "SpeedYRel"; break;
-            case ECT_SPEEDZREL: strCode += "SpeedZRel"; break;
-            case ECT_HEALTH:    strCode += "Health"; break;
-            case ECT_TYPE:      strCode += "EntityClass"; break;
-          
-            default: break;
-          };
+          strCode += PropertyTypeToShortName(m_eCT2);
         }
       } else {
         strCode += "NULL";
