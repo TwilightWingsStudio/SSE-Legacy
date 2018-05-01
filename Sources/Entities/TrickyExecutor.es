@@ -107,11 +107,21 @@ procedures:
         resume;
       }
 
-      on(ETrigger) : {
+      // Trigger
+      on (ETrigger) : {
         if (m_bActive) {
           DoExecution();
         }
 
+        resume;
+      }
+      
+      // Targeted
+      on (ETargeted eTargeted) :
+      {
+        if (m_bActive) {
+          DoExecution();
+        }
         resume;
       }
 

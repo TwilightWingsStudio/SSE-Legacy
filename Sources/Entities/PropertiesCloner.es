@@ -69,17 +69,17 @@ functions:
   // --------------------------------------------------------------------------------------
   // Processes all business logic here. Called on trigger event.
   // --------------------------------------------------------------------------------------
-  void DoClone(const ETrigger &eTrigger)
+  void DoClone(CEntity *penCaused)
   {
     CEntity *penTarget1 = m_penTarget1;
     CEntity *penTarget2 = m_penTarget2;
 
     if (m_bPenCausedAsTarget1) {
-      penTarget1 = eTrigger.penCaused;
+      penTarget1 = penCaused;
     }
 
     if (m_bPenCausedAsTarget2) {
-      penTarget2 = eTrigger.penCaused;
+      penTarget2 = penCaused;
     }
 
     // If non-existing target then cancel.
@@ -170,12 +170,22 @@ procedures:
         resume;
       }
 
+      // Trigger
       on(ETrigger eTrigger) :
       {
         if (m_bActive) {
-          DoClone(eTrigger);
+          DoClone(eTrigger.penCaused);
         }
 
+        resume;
+      }
+      
+      // Targeted
+      on (ETargeted eTargeted) :
+      {
+        if (m_bActive) {
+          DoClone(eTargeted.penCaused);
+        }
         resume;
       }
 
