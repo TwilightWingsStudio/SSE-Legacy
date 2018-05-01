@@ -261,23 +261,21 @@ functions:
   // --------------------------------------------------------------------------------------
   // This code executes on Trigger Event.
   // --------------------------------------------------------------------------------------
-  void HandleETrigger(const CEntityEvent &ee)
+  void DoChange(CEntity *penCaused, CEntity *penTargetArg)
   {
     // If non-active.
     if (!m_bActive) {
       return;
     }
 
-    ETrigger eTrigger = ((ETrigger &) ee);
-
-    //
-    if (m_bPenCausedAsSource && eTrigger.penCaused) {
-      m_penSource = eTrigger.penCaused;
+    // Source=penCaused
+    if (m_bPenCausedAsSource && penCaused) {
+      m_penSource = penCaused;
     }
 
     // Target=penCaused
-    if (m_bPenCausedAsTarget && eTrigger.penCaused) {
-      m_penTarget = eTrigger.penCaused;
+    if (m_bPenCausedAsTarget && penCaused) {
+      m_penTarget = penCaused;
     }
 
     // If invalid target.
@@ -526,8 +524,9 @@ functions:
           penNew = ((CEntityPointer *)(((UBYTE *)(CEntity*)&*m_penSource) + offset1)); 
         }
 
-        if (m_bPenCausedAsTargetValue && eTrigger.penCaused) {
-          penNew = &eTrigger.penCaused;
+        if (m_bPenCausedAsTargetValue && penCaused) {
+          CEntityPointer tv = penCaused;
+          penNew = &tv;
         }
 
         *penPointer = *penNew;
@@ -1497,10 +1496,18 @@ functions:
   // --------------------------------------------------------------------------------------
   // Event handler.
   // --------------------------------------------------------------------------------------
-  BOOL HandleEvent(const CEntityEvent &ee) { 
-
+  BOOL HandleEvent(const CEntityEvent &ee)
+  {
+    // Trigger Event
     if (ee.ee_slEvent == EVENTCODE_ETrigger) {
-      HandleETrigger(ee);
+      DoChange(((ETrigger &) ee).penCaused, NULL);
+    }
+    
+    // Targeted Event
+    if (ee.ee_slEvent == EVENTCODE_ETargeted) {
+      const ETargeted &eTargeted = ((ETargeted &) ee);
+      
+      DoChange(eTargeted.penCaused, eTargeted.penTarget);
     }
 
     if (ee.ee_slEvent == EVENTCODE_EActivate) {
