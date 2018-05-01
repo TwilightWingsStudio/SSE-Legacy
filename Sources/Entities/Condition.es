@@ -441,7 +441,7 @@ functions:
       // INDEX INDEX
       if (bi1 && bi2) {
         if (m_bDebugMessages) {
-          CPrintF("[C][%s] : Comparing two integer properties...\n", m_strName);
+          CPrintF("  Comparing two integer properties...\n");
         }
 
         if (m_bAbs1) {
@@ -540,12 +540,11 @@ functions:
           
           bError = TRUE;
         }
-      }
 
       // FLOAT FLOAT
-      if (bf1 && bf2) {
+      } else if (bf1 && bf2) {
         if (m_bDebugMessages) {
-          CPrintF("[C][%s] : Comparing two floating point properties...\n", m_strName);
+          CPrintF("  Comparing two floating point properties...\n");
         }
         
         FLOAT rAbs1 = fValue;
@@ -648,7 +647,7 @@ functions:
       } else if (bp1 && bp2) {
         if (m_bDebugMessages)
         {
-          CPrintF("[C][%s] : Comparing two pointers...\n", m_strName);
+          CPrintF("  Comparing two pointers...\n");
 
           if (penPointer) {
             CPrintF("  [%s].[%s] = (-> %d)[%s]\n", ((CEntity&)*m_penIfCondition1).GetName(), m_strProperty1, penPointer->en_ulID, penPointer->GetName());
@@ -691,10 +690,10 @@ functions:
         if (bs2) {
           if (m_bDebugMessages)
           {
-            CPrintF("[%s] : Comparing two strings...\n", m_strName);
+            CPrintF("  Comparing two strings...\n");
           }
           
-          // ===
+          // ==
           if (m_eCondition == EC_SAME) {
             if (m_bDebugMessages) {
               CPrintF("  Condition = [==] (same)\n");
@@ -720,7 +719,7 @@ functions:
           if (strValue != "") {
           if (m_bDebugMessages)
           {
-            CPrintF("[%s] : Checking if string is not empty...\n", m_strName);
+            CPrintF("  Checking if string is not empty...\n");
           }
             
             bResult = TRUE;
@@ -731,7 +730,7 @@ functions:
       } else {
         bError = TRUE;
         if (m_bDebugMessages) {
-          CPrintF(TRANS("[%s] : Unsupported Data Type\n"), m_strName);
+          CPrintF(TRANS("  Unsupported Data Type\n"));
         }
       }
     }
@@ -744,12 +743,12 @@ functions:
     if (bResult) {
       if (m_penIfTarget) {
         if (m_bDebugMessages) {
-          CPrintF(TRANS("  Triggering [If Target]: %s\n"), m_strName, m_penIfTarget->GetName());
+          CPrintF(TRANS("  Triggering [If Target]: %s\n"), m_penIfTarget->GetName());
         }
 
         SendToTarget(m_penIfTarget, EET_TRIGGER, penCaused);
       } else if (m_bDebugMessages) {
-        CPrintF(TRANS("  Result = TRUE, but no [If Target] to trigger\n"), m_strName);
+        CPrintF(TRANS("  Result = TRUE, but no [If Target] to trigger\n"));
       }
 
     } else {
@@ -807,7 +806,7 @@ functions:
         return ((CLiveEntity&)*penSource).GetHealth();
       } else {
         if (m_bDebugMessages) {
-          CPrintF(TRANS("[C][%s] : Don't use health on entities without health!\n"), m_strName);
+          CPrintF(TRANS("  Don't use health on entities without health!\n"));
         }
 
         bError = TRUE;
@@ -861,7 +860,7 @@ functions:
     }
     
     if (m_bDebugMessages) {
-      CPrintF(TRANS("[C][%s] : Invalid property type!\n"), m_strName);
+      CPrintF(TRANS("  Invalid property type!\n"));
     }
 
     bError = TRUE;
