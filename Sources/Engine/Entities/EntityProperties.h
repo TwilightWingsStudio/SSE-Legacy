@@ -215,6 +215,11 @@ public:
   class CEntityProperty *PropertyForName(const CTString &strPropertyName);
   /* Get pointer to entity property from its packed identifier. */
   class CEntityProperty *PropertyForTypeAndID(CEntityProperty::PropertyType eptType, ULONG ulID);
+
+  // [SSE]
+  // Get pointer to entity property from its packed ID.
+  class CEntityProperty *PropertyForID(ULONG ulID);
+
   /* Get event handler given state and event code. */
   CEntity::pEventHandler HandlerForStateAndEvent(SLONG slState, SLONG slEvent);
   /* Get event handler name for given state. */

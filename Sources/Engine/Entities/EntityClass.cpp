@@ -374,6 +374,15 @@ class CEntityProperty *CEntityClass::PropertyForTypeAndID(
   return ec_pdecDLLClass->PropertyForTypeAndID((CEntityProperty::PropertyType)ulType, ulID);
 };
 
+// --------------------------------------------------------------------------------------
+// [SSE]
+// Get pointer to entity property from its packed ID.
+// --------------------------------------------------------------------------------------
+class CEntityProperty *CEntityClass::PropertyForID(ULONG ulID)
+{
+  return ec_pdecDLLClass->PropertyForID(ulID);
+};
+
 /* Get event handler for given state and event code. */
 CEntity::pEventHandler CEntityClass::HandlerForStateAndEvent(SLONG slState, SLONG slEvent) {
   return ec_pdecDLLClass->HandlerForStateAndEvent(slState, slEvent);
@@ -457,6 +466,30 @@ class CEntityProperty *CDLLEntityClass::PropertyForTypeAndID(
     return NULL;
   }
 };
+
+// --------------------------------------------------------------------------------------
+// [SSE]
+// Get pointer to entity property from its packed ID.
+// --------------------------------------------------------------------------------------
+class CEntityProperty *CDLLEntityClass::PropertyForID(ULONG ulID)
+{
+  // For each property...
+  for (INDEX iProperty = 0; iProperty < dec_ctProperties; iProperty++)
+  {
+    // If it has that same identifier then return it.
+    if (dec_aepProperties[iProperty].ep_ulID == ulID) {
+      return &dec_aepProperties[iProperty];
+    }
+  }
+
+  // If base class exists then look in the base class.
+  if (dec_pdecBase != NULL) {
+    return dec_pdecBase->PropertyForID(ulID);
+  }
+
+  return NULL; // Otherwise - nothing found!
+};
+
 
 /*
  * Get pointer to component from its identifier.

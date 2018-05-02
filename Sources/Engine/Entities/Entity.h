@@ -224,6 +224,11 @@ public:
   class CEntityComponent *ComponentForTypeAndID(ULONG ulType, ULONG ulID);
   /* Get pointer to entity property from its name. */
   class CEntityProperty *PropertyForName(const CTString &strPropertyName);
+
+  // [SSE]
+  // Get pointer to entity property from its packed ID.
+  class CEntityProperty *PropertyForID(ULONG ulID);
+  
   /* Copy one entity property from property of another entity. */
   void CopyOneProperty( CEntityProperty &epPropertySrc, CEntityProperty &epPropertyDest,
                         CEntity &enOther, ULONG ulFlags);

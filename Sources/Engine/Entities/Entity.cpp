@@ -3728,6 +3728,15 @@ class CEntityProperty *CEntity::PropertyForName(const CTString &strPropertyName)
 {
   return en_pecClass->PropertyForName(strPropertyName);
 }
+
+// --------------------------------------------------------------------------------------
+// [SSE]
+// Get pointer to entity property from its packed ID.
+// --------------------------------------------------------------------------------------
+class CEntityProperty *CEntity::PropertyForID(ULONG ulID)
+{
+  return en_pecClass->PropertyForID(ulID);
+}
  
 /* Create a new entity of given class in this world. */
 CEntity *CEntity::CreateEntity(const CPlacement3D &plPlacement, SLONG idClass)
