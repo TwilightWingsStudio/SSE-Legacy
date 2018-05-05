@@ -32,8 +32,8 @@ enum EConditionOp
    6 EC_LARGER_SAME  "06 >=",
 
   // Bitwise conditions.   
-   7 EC_BITMASKINC   "07  & (WIP)",
-   8 EC_BITMASKEXC   "08  !& (WIP)",
+   7 EC_BITMASKINC   "07 & (WIP)",
+   8 EC_BITMASKEXC   "08 !& (WIP)",
    9 EC_BITINC       "09 & (1 << X) (WIP)",
   10 EC_BITEX        "10 !& (1 << X) (WIP)",
 };
@@ -41,22 +41,30 @@ enum EConditionOp
 enum EConType
 {
    0 ECT_ENTITY    "00 Property By Name",
-   1 ECT_POSX      "01 Pos(X)",
-   2 ECT_POSY      "02 Pos(Y)",
-   3 ECT_POSZ      "03 Pos(Z)",
-   4 ECT_SPEEDX    "04 Speed(X)",
-   5 ECT_SPEEDY    "05 Speed(Y)",
-   6 ECT_SPEEDZ    "06 Speed(Z)",
-   7 ECT_SPEEDALL  "07 Speed(Total)",
-   8 ECT_ROTH      "08 Rotation(H)",
-   9 ECT_ROTP      "09 Rotation(P)",
-  10 ECT_ROTB      "10 Rotation(B)",
-  11 ECT_SPEEDXREL "11 Relative Speed(X)",
-  12 ECT_SPEEDYREL "12 Relative Speed(Y)",
-  13 ECT_SPEEDZREL "13 Relative Speed(Z)",
-  14 ECT_HEALTH    "14 Health",
-  15 ECT_TYPE      "15 Entity Class (unchangeable)",
-  16 ECT_PROPBYID  "16 Property By ID (changer only)"
+   1 ECT_PROPBYID  "01 Property By ID (changer only)",
+
+  // Position and Orientation.
+   2 ECT_POSX      "02 Pos(X)",
+   3 ECT_POSY      "03 Pos(Y)",
+   4 ECT_POSZ      "04 Pos(Z)",
+   5 ECT_ROTH      "05 Rotation(H)",
+   6 ECT_ROTP      "06 Rotation(P)",
+   7 ECT_ROTB      "07 Rotation(B)",
+   
+  // Speeds
+   8 ECT_SPEEDX    "08 Speed(X)",
+   9 ECT_SPEEDY    "09 Speed(Y)",
+  10 ECT_SPEEDZ    "10 Speed(Z)",
+  11 ECT_SPEEDALL  "11 Speed(Total)",
+  12 ECT_SPEEDXREL "12 Relative Speed(X)",
+  13 ECT_SPEEDYREL "13 Relative Speed(Y)",
+  14 ECT_SPEEDZREL "14 Relative Speed(Z)",
+
+  // Vital
+  15 ECT_HEALTH    "15 Health",
+  16 ECT_ARMOR     "16 Armor",
+  17 ECT_SHIELDS   "17 Shields",
+  18 ECT_TYPE      "18 Entity Class (unchangeable)"
 };
 
 %{
@@ -118,6 +126,14 @@ static const char *PropertyTypeToShortName(EConType eType)
 
     case ECT_HEALTH: {
       return "Health";
+    } break;
+
+    case ECT_ARMOR: {
+      return "Armor";
+    } break;
+
+    case ECT_SHIELDS: {
+      return "Shields";
     } break;
 
     case ECT_TYPE: {
@@ -799,18 +815,31 @@ functions:
       } break;
     }
 
-    // Health
-    if (eType == ECT_HEALTH)
+    // Health, Armor, Shields
+    if (eType == ECT_HEALTH || eType == ECT_ARMOR || eType == ECT_SHIELDS)
     {
-      if (penSource->IsLiveEntity()) {
-        return ((CLiveEntity&)*penSource).GetHealth();
-      } else {
+      if (!penSource->IsLiveEntity()) {
         if (m_bDebugMessages) {
           CPrintF(TRANS("  Don't use health on entities without health!\n"));
         }
 
         bError = TRUE;
         return 0.0F;
+      }
+      
+      switch (eType)
+      {
+        case ECT_HEALTH: {
+          return ((CLiveEntity&)*penSource).GetHealth();
+        } break;
+
+        case ECT_ARMOR: {
+          return ((CLiveEntity&)*penSource).GetArmor();
+        } break;
+
+        case ECT_SHIELDS: {
+          return ((CLiveEntity&)*penSource).GetShields();
+        } break;
       }
     }
 
