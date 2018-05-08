@@ -1,4 +1,4 @@
-/* Copyright (c) 2017 by ZCaliptium
+/* Copyright (c) 2018 by ZCaliptium
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as published by
@@ -63,7 +63,8 @@ class CHudAssetsContainer
     //
     
     // Ammo textures
-    CTextureObject m_toAColt;
+    CTextureObject m_atoColtAmmo[7];
+
     CTextureObject m_atoAmmo[9];
     
     // Weapon textures

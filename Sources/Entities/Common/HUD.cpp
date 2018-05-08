@@ -1071,7 +1071,9 @@ extern void DrawNewHUD( const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, 
       HUD_PrepareColorTransitions( colMax, colTop, colMid, C_RED, 0.30f, 0.15f, FALSE);
         
       if (bAnyColt) {
-        ptoCurrentAmmo = &_pHAC->m_toAColt;
+        INDEX iTexIndex = Clamp(_penWeapons->GetAmmo(), INDEX(0), INDEX(6));
+        
+        ptoCurrentAmmo = &_pHAC->m_atoColtAmmo[iTexIndex];
       }
       
       HUD_DrawAnchoredRect(  0 - 32, 8, 80, 32, EHHAT_CENTER, EHVAT_BOT, C_BLACK|_ulBrAlpha);
@@ -1865,7 +1867,9 @@ extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent
       
       // [SSE] Colt Bullets
       if (bAnyColt) {
-        ptoCurrentAmmo = &_pHAC->m_toAColt;
+        INDEX iTexIndex = Clamp(_penWeapons->GetAmmo(), INDEX(0), INDEX(6));
+        
+        ptoCurrentAmmo = &_pHAC->m_atoColtAmmo[iTexIndex];
       }
       
       HUD_DrawAnchoredRect(  0 - 32, 8, 80, 32, EHHAT_CENTER, EHVAT_BOT, C_BLACK|_ulBrAlpha);
@@ -2812,7 +2816,9 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
 
     // [SSE] Colt Bullets
     if (bAnyColt) {
-      ptoCurrentAmmo = &_pHAC->m_toAColt;
+      INDEX iTexIndex = Clamp(_penWeapons->GetAmmo(), INDEX(0), INDEX(6));
+      
+      ptoCurrentAmmo = &_pHAC->m_atoColtAmmo[iTexIndex];
     }
 
     // draw ammo, value and weapon
@@ -3602,9 +3608,16 @@ static void HUD_RegisterTextures()
   HUD_RegisterTexture(&_pHAC->m_toRadarDotDown, CTFILENAME("Textures\\Interface\\RadarDotDown.tex"));
   //
 
-  // initialize ammo textures
-  HUD_RegisterTexture(&_pHAC->m_toAColt,          CTFILENAME("Textures\\Interface\\AmColt.tex"));
+  // [SSE]
+  HUD_RegisterTexture(&_pHAC->m_atoColtAmmo[0], CTFILENAME("Textures\\Interface\\RevolverCylinder_0.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoColtAmmo[1], CTFILENAME("Textures\\Interface\\RevolverCylinder_1.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoColtAmmo[2], CTFILENAME("Textures\\Interface\\RevolverCylinder_2.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoColtAmmo[3], CTFILENAME("Textures\\Interface\\RevolverCylinder_3.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoColtAmmo[4], CTFILENAME("Textures\\Interface\\RevolverCylinder_4.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoColtAmmo[5], CTFILENAME("Textures\\Interface\\RevolverCylinder_5.tex"));
+  HUD_RegisterTexture(&_pHAC->m_atoColtAmmo[6], CTFILENAME("Textures\\Interface\\RevolverCylinder_6.tex"));
 
+  // initialize ammo textures
   HUD_RegisterTexture(&_pHAC->m_atoAmmo[0], CTFILENAME("Textures\\Interface\\AmShells.tex"));
   HUD_RegisterTexture(&_pHAC->m_atoAmmo[1], CTFILENAME("Textures\\Interface\\AmBullets.tex"));
   HUD_RegisterTexture(&_pHAC->m_atoAmmo[2], CTFILENAME("Textures\\Interface\\AmRockets.tex"));
