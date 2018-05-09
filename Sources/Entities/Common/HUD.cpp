@@ -1276,12 +1276,7 @@ static void HUD_DrawLeftTop()
     HUD_DrawAnchoredRectOutline(28, 28, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredTextInRect (FLOAT2D(28, 28), FLOAT2D(104, 16), EHHAT_LEFT, EHVAT_TOP, strMana, C_lGRAY, 1.0F);
   }
-  
-  // set font and prepare font parameters
-  _pfdDisplayFont->SetFixedWidth();
-  _pDP->SetFont( _pfdDisplayFont);
-  _pDP->SetTextLineSpacing(0);
-  
+
   // Time Limit
   if ((bScoreMatch || bFragMatch) && hud_bShowMatchInfo && GetSP()->sp_iTimeLimit > 0)
   {
@@ -1296,12 +1291,8 @@ static void HUD_DrawLeftTop()
     
     HUD_DrawAnchoredRectOutline( 8, 48,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
     HUD_DrawAnchoredRectOutline(28, 48, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (FLOAT2D(28, 48 + 2), FLOAT2D(104, 16), EHHAT_LEFT, EHVAT_TOP, strTime, C_WHITE|_ulAlphaHUD, 1.0F, 0.75F);
+    HUD_DrawAnchoredTextInRect (FLOAT2D(28, 48/* + 2*/), FLOAT2D(104, 16), EHHAT_LEFT, EHVAT_TOP, strTime, C_lGRAY|_ulAlphaHUD, 1.0F, 0.75F);
   }
-  
-  _pfdDisplayFont->SetVariableWidth();
-  _pDP->SetFont( &_fdNumbersFont);
-  _pDP->SetTextCharSpacing(1);
 }
 
 static void HUD_DrawRightTop()
