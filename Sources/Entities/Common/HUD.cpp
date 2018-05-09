@@ -1204,6 +1204,7 @@ static void HUD_DrawLeftTop()
   const BOOL bCooperative =  GetSP()->sp_bCooperative && !bSinglePlay;
   const BOOL bScoreMatch  = !GetSP()->sp_bCooperative && !GetSP()->sp_bUseFrags;
   const BOOL bFragMatch   = !GetSP()->sp_bCooperative &&  GetSP()->sp_bUseFrags;
+  const BOOL bTeamDeathMatch = (GetSP()->sp_ulGameModeFlags & GMF_TEAMPLAY) && GetSP()->sp_bUseFrags; // [SSE] Team DeathMatch
   const BOOL bSharedLives = GetSP()->sp_bSharedLives;
   
   INDEX iScore = _penPlayer->m_psGameStats.ps_iScore;
@@ -1232,19 +1233,35 @@ static void HUD_DrawLeftTop()
 
     iScore = iScoreSum; // in case of coop play, show squad (common) score
   }
-
+  
   // LSC Up - Score / Frags
   {
     CTString strScore;
     strScore.PrintF("%d", iScore);
     
     HUD_DrawAnchoredRect ( 8,  8,  16, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
-    HUD_DrawAnchoredRect (28,  8, 104, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
     HUD_DrawAnchroredIcon( 8,  8,  16, 16, EHHAT_LEFT, EHVAT_TOP, _pHAC->m_toFrags, C_WHITE|CT_OPAQUE, 1.0F, FALSE); // Icon
-    
     HUD_DrawAnchoredRectOutline( 8, 8,  16, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
-    HUD_DrawAnchoredRectOutline(28, 8, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
-    HUD_DrawAnchoredTextInRect (FLOAT2D(28, 8), FLOAT2D(104, 16), EHHAT_LEFT, EHVAT_TOP, strScore, C_lGRAY, 1.0F);
+    
+    INDEX iFragLimit = GetSP()->sp_iFragLimit;
+    
+    // If frag limit the draw box for it.
+    if (bFragMatch && iFragLimit && !bTeamDeathMatch) {
+      HUD_DrawAnchoredRect (28,  8, 50, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchoredRectOutline(28, 8, 50, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+      HUD_DrawAnchoredTextInRect (FLOAT2D(28, 8), FLOAT2D(50, 16), EHHAT_LEFT, EHVAT_TOP, strScore, C_lGRAY, 1.0F);
+
+      strScore.PrintF("%d", iFragLimit);
+
+      HUD_DrawAnchoredRect (82,  8, 50, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchoredRectOutline(82, 8, 50, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+      HUD_DrawAnchoredTextInRect (FLOAT2D(82, 8), FLOAT2D(50, 16), EHHAT_LEFT, EHVAT_TOP, strScore, C_lGRAY, 1.0F);
+
+    } else {
+      HUD_DrawAnchoredRect (28,  8, 104, 16, EHHAT_LEFT, EHVAT_TOP, C_BLACK|_ulBrAlpha);
+      HUD_DrawAnchoredRectOutline(28, 8, 104, 16, EHHAT_LEFT, EHVAT_TOP, _colHUD|_ulAlphaHUD);
+      HUD_DrawAnchoredTextInRect (FLOAT2D(28, 8), FLOAT2D(104, 16), EHHAT_LEFT, EHVAT_TOP, strScore, C_lGRAY, 1.0F);
+    }
   }
 
   // LSC Down - SP/Coop = Extra Lives
@@ -2053,19 +2070,22 @@ extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent
       CTString strLimitsInfo = "";
 
       extern INDEX HUD_SetAllPlayersStats( INDEX iSortKey);
+
       // fill players table
       const INDEX ctPlayers = HUD_SetAllPlayersStats(bFragMatch?5:3); // sort by frags or by score
+
       // find maximum frags/score that one player has
-      INDEX iMaxFrags = LowerLimit(INDEX(0));
+      //INDEX iMaxFrags = LowerLimit(INDEX(0));
       INDEX iMaxScore = LowerLimit(INDEX(0));
 
       {for(INDEX iPlayer=0; iPlayer<ctPlayers; iPlayer++) {
         CPlayer *penPlayer = _apenPlayers[iPlayer];
-        iMaxFrags = Max(iMaxFrags, penPlayer->m_psLevelStats.ps_iKills);
+        //iMaxFrags = Max(iMaxFrags, penPlayer->m_psLevelStats.ps_iKills);
         iMaxScore = Max(iMaxScore, penPlayer->m_psLevelStats.ps_iScore);
       }}
 
       // [SSE] TeamDeathmatch
+      /*
       if (bTeamDeathMatch)
       {
         iMaxFrags = Max(GetSP()->sp_iTeamScore1, GetSP()->sp_iTeamScore2);
@@ -2074,10 +2094,10 @@ extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent
         if (ctTeams >= 4) iMaxFrags = Max(iMaxFrags, GetSP()->sp_iTeamScore4);
       }
 
-      if (GetSP()->sp_iFragLimit>0) {
+      if (GetSP()->sp_iFragLimit > 0) {
         INDEX iFragsLeft = ClampDn(GetSP()->sp_iFragLimit-iMaxFrags, INDEX(0));
         strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("FRAGS LEFT"), iFragsLeft);
-      }
+      }*/
 
       if (GetSP()->sp_iScoreLimit>0) {
         INDEX iScoreLeft = ClampDn(GetSP()->sp_iScoreLimit-iMaxScore, INDEX(0));
@@ -2091,13 +2111,39 @@ extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent
       _pDP->PutText( strLimitsInfo, 5.0f*_pixDPWidth/640.0f, 68.0f*_pixDPWidth/640.0f, C_WHITE|CT_OPAQUE);
     }
 
-
     // prepare color for local player printouts
     bMaxScore  ? colScore  = C_WHITE : colScore  = C_lGRAY;
     bMaxMana   ? colMana   = C_WHITE : colMana   = C_lGRAY;
     bMaxFrags  ? colFrags  = C_WHITE : colFrags  = C_lGRAY;
     bMaxDeaths ? colDeaths = C_WHITE : colDeaths = C_lGRAY;
   }
+  
+  // [SSE] Extra Lives System
+  if (bCooperative && GetSP()->sp_ctCredits >= 0)
+  {
+    if (GetSP()->sp_iScoreForExtraLive > 0)
+    {
+      CTString strLimitsInfo;
+      
+      FLOAT fLiveCostMultipleir = bSharedLives ? GetSP()->sp_fLiveCostMultiplier : _penPlayer->m_fLiveCostMultiplier;
+      INDEX iLiveCost = GetSP()->sp_iScoreForExtraLive * fLiveCostMultipleir;
+      INDEX iAccumulateScore = bSharedLives ? GetSP()->sp_iScoreForExtraLiveAccum : _penPlayer->m_iScoreAccumulated;
+      INDEX iScoreLeft = ClampDn(iLiveCost - iAccumulateScore, INDEX(0));
+
+      strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("SCORE LEFT"), iScoreLeft);
+      
+      _pfdDisplayFont->SetFixedWidth();
+      _pDP->SetFont( _pfdDisplayFont);
+      _pDP->SetTextScaling( fTextScale*0.8f );
+      _pDP->SetTextCharSpacing( -2.0f*fTextScale);
+      _pDP->PutText( strLimitsInfo, 5.0f*_pixDPWidth/640.0f, 48.0f*_pixDPWidth/640.0f, C_WHITE|CT_OPAQUE);
+      
+      _pfdDisplayFont->SetVariableWidth();
+      _pDP->SetFont( &_fdNumbersFont);
+      _pDP->SetTextCharSpacing(1);
+    }
+  }
+  //
 
   // printout player latency if needed
   if (hud_bShowLatency) {
@@ -2768,12 +2814,12 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
         if (ctTeams >= 4) iMaxFrags = Max(iMaxFrags, GetSP()->sp_iTeamScore4);
       }
 
-      if (GetSP()->sp_iFragLimit>0) {
+      if (GetSP()->sp_iFragLimit > 0) {
         INDEX iFragsLeft = ClampDn(GetSP()->sp_iFragLimit-iMaxFrags, INDEX(0));
         strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("FRAGS LEFT"), iFragsLeft);
       }
 
-      if (GetSP()->sp_iScoreLimit>0) {
+      if (GetSP()->sp_iScoreLimit > 0) {
         INDEX iScoreLeft = ClampDn(GetSP()->sp_iScoreLimit-iMaxScore, INDEX(0));
         strLimitsInfo.PrintF("%s^cFFFFFF%s: %d\n", strLimitsInfo, TRANS("SCORE LEFT"), iScoreLeft);
       }
