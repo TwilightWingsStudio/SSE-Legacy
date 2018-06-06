@@ -24,9 +24,9 @@
 This is the unofficial fork of Serious Engine 1.
 This fork will be always synchronized with the official repository - https://github.com/Croteam-official/Serious-Engine.
 
-This fork created for extra features which are focused on improving gameplay stability and adding more opportunities for different kinds of content creation - mapping (with set of new Entities and improved existing ones) and modding (with new functionality added to the engine).
+This fork is created for extra features which are focused on improving gameplay stability and adding more opportunities for different kinds of content creation - mapping (with set of new Entities and improved existing ones) and modding (with new functionality added to the engine).
 
-For some reasons these features not added into Official repository. But I wish what in some day my project will become superior than Official.
+For some reasons these features are not added into Official repository. But I wish that in some day my project will become superior than Official.
 
 ========================
 
@@ -56,7 +56,8 @@ Here is Serious Engine v.1.10 source code, including the following projects:
   * `GameAgent` The serverlist masterserver written in Python (requires version 2.X).
   * `libogg`, `libvorbis` Third party libraries used for playing OGG-encoded ingame music (see http://www.vorbis.com/ for more information)
 
-These have been modified to run correctly under the recent version of Windows. (Tested: Win7 x64, Win8 x64, Win8.1 x64)
+These have been modified to run correctly under the recent version of Windows.
+(Tested: Win7 x64, Win8 x64, Win8.1 x64, Win10 x64)
 
 Building
 --------
@@ -65,13 +66,13 @@ Building
 
 Clone the repository into folder.
 
-Do not use spaces, cyrillic letters or special symbols such as ()+/[]' in the path to the source code. If you use described before symbols you will have building errors because Visual Studio can not correctly operate with these symbols. But you can use dash - and underscore _ symbols!
+Do not use spaces, non-latin letters or special symbols such as ()+/[]' in the path to the source code. If you use described symbols/letters, you will have building errors because Visual Studio can not correctly operate with these symbols/letters. But you can use dash "-" and underscore "_" symbols!
 
 **IDE and compilier.**
 
 To build Serious Engine 1, you'll need Visual Studio 2013 or 2015, Professional or Community edition ( https://www.visualstudio.com/post-download-vs?sku=community ).
 
-WARNING: If you will use Visual Studio higher than 2013 then you can encounter bugs. Also game compiled in VS 2015 or newer may be network incompatable with game compiled in VS 2013.
+WARNING: If you will use Visual Studio higher or lower than 2013 then you can encounter bugs. Also game compiled with newer or older version of Visual Studio may be network incompatible with game compiled in VS 2013.
 
 **Building the Lua library.**
 
