@@ -1264,7 +1264,7 @@ static void HUD_DrawLeftTop()
     }
   }
 
-  // LSC Down - SP/Coop = Extra Lives
+  // LSC Down - SP/Coop = Lives
   if (bCooperative && GetSP()->sp_ctCredits >= 0)
   {
     CTString strLives;
@@ -2118,7 +2118,7 @@ extern void DrawHybridHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent
     bMaxDeaths ? colDeaths = C_WHITE : colDeaths = C_lGRAY;
   }
   
-  // [SSE] Extra Lives System
+  // [SSE] Gameplay - Lives System
   if (bCooperative && GetSP()->sp_ctCredits >= 0)
   {
     if (GetSP()->sp_iScoreForExtraLive > 0)
@@ -2879,7 +2879,7 @@ extern void DrawOldHUD(const CPlayer *penPlayerCurrent, CDrawPort *pdpCurrent, B
   HUD_DrawText(   fCol+fAdv, fRow, strValue, colScore, 1.0f);
   HUD_DrawIcon(   fCol,      fRow, _pHAC->m_toFrags, C_WHITE /*colScore*/, 1.0f, FALSE, 32, 32);
   
-  // [SSE] Extra Lives System
+  // [SSE] Gameplay - Lives System
   if (bCooperative && GetSP()->sp_ctCredits >= 0)
   {
     strValue.PrintF( "%d", bSharedLives ? GetSP()->sp_ctCreditsLeft : _penPlayer->m_iLives);
