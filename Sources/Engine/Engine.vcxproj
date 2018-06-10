@@ -314,6 +314,7 @@ $(SolutionDir)\prebuild_engine.bat</Command>
     <ClCompile Include="Base\Translation.cpp" />
     <ClCompile Include="Base\Unzip.cpp" />
     <ClCompile Include="Base\Updateable.cpp" />
+    <ClCompile Include="Graphics\FontData_EFND_IO.cpp" />
     <ClCompile Include="Integrations\Discord_Integration.cpp" />
     <ClCompile Include="Query\DarkPlacesMasterServer.cpp" />
     <ClCompile Include="Query\MasterServerMgr.cpp" />

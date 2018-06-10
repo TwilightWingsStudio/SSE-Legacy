@@ -805,6 +805,9 @@
     <ClCompile Include="Integrations\Discord_Integration.cpp">
       <Filter>Source Files\Integrations</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\FontData_EFND_IO.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base\Anim.h">
