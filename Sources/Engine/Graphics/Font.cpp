@@ -41,10 +41,10 @@ CFontCharData::CFontCharData(void)
 // --------------------------------------------------------------------------------------
 void CFontCharData::Read_t(  CTStream *inFile)
 {
-  *inFile>>fcd_pixXOffset;
-  *inFile>>fcd_pixYOffset;
-  *inFile>>fcd_pixStart;
-  *inFile>>fcd_pixEnd;
+  (*inFile) >> fcd_pixXOffset;
+  (*inFile) >> fcd_pixYOffset;
+  (*inFile) >> fcd_pixStart;
+  (*inFile) >> fcd_pixEnd;
 }
 
 // --------------------------------------------------------------------------------------
@@ -52,10 +52,10 @@ void CFontCharData::Read_t(  CTStream *inFile)
 // --------------------------------------------------------------------------------------
 void CFontCharData::Write_t( CTStream *outFile)
 {
-  *outFile<<fcd_pixXOffset;
-  *outFile<<fcd_pixYOffset;
-  *outFile<<fcd_pixStart;
-  *outFile<<fcd_pixEnd;
+  (*outFile) << fcd_pixXOffset;
+  (*outFile) << fcd_pixYOffset;
+  (*outFile) << fcd_pixStart;
+  (*outFile) << fcd_pixEnd;
 }
 
 CFontData::CFontData()

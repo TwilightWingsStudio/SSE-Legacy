@@ -221,6 +221,7 @@ void CFontData::Read_EFND_t(CTStream *inFile) // throw char *
     }
 
     fd_bMonotype = TRUE;
+    fd_bFixedWidth = TRUE;
 
     delete apMonotypeCharData;
   }
@@ -234,7 +235,11 @@ void CFontData::Read_EFND_t(CTStream *inFile) // throw char *
       fd_fcdFontCharData[iCharData].fcd_pixYOffset = apVarCharData[iCharData].fcd_iOffsetY;
       fd_fcdFontCharData[iCharData].fcd_pixStart   = apVarCharData[iCharData].fcd_iStartX;
       fd_fcdFontCharData[iCharData].fcd_pixEnd     = apVarCharData[iCharData].fcd_iEndX;
+      
     }
+
+    fd_bMonotype = FALSE;
+    fd_bFixedWidth = FALSE;
 
     delete apVarCharData;
   }
