@@ -1,4 +1,6 @@
-/* Copyright (c) 2002-2012 Croteam Ltd. 
+/* Copyright (c) 2018 by ZCaliptium
+Copyright (c) 2002-2012 Croteam Ltd.
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as published by
 the Free Software Foundation
@@ -23,69 +25,115 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <Engine/Engine.h>
 
+void PrintHelp()
+{
+  printf("USAGE: MakeFont <texture_file> <char_width> <char_height>\n");
+  printf("<char_order_file> [-A] [-M]\n");
+  printf("\n");
+  printf("texture_file: FULL PATH to texture file that represents font\n");
+  printf("char_width: maximum width (in pixels) of single character\n");
+  printf("char_height: maximum height (in pixels) of single character\n");
+  printf("char_order_file: full path to ASCII file that shows\n");
+  printf("                 graphical order of character in font texture\n");
+  printf("-A: do not include alpha channel when determining character width \n");
+  printf("-M: font will be created as monotype font \n");
+  printf("\n");
+  printf("NOTES: - out file will have the name as texture file, but \".fnt\" extension\n");
+  printf("       - texture file must begin with character that will be a replacement for\n");
+  printf("         each character that hasn't got definition in this texture file\n");
+}
 
+// --------------------------------------------------------------------------------------
+// Business logic here.
+// --------------------------------------------------------------------------------------
 void SubMain( int argc, char *argv[])
 {
-  printf("\nMakeFONT - Font Tables Maker (2.51)\n");
-  printf(  "           (C)1999 CROTEAM Ltd\n\n");
+  printf("\nMakeFONT - Font Tables Maker (2.52)\n");
+  printf("             (C) 1999 CROTEAM Ltd\n");
+  printf("             (C) 2018 ZCaliptium\n\n");
+
   // 5 to 7 parameters are allowed as input
-  if( (argc<5) || (argc>6))
+  if((argc < 5) || (argc > 7))
   {
-    printf( "USAGE: MakeFont <texture_file> <char_width> <char_height> ");
-    printf( "<char_order_file> [-A]\n");
-    printf( "\n");
-    printf( "texture_file: FULL PATH to texture file that represents font\n");
-    printf( "char_width: maximum width (in pixels) of single character\n");
-    printf( "char_height: maximum height (in pixels) of single character\n");
-    printf( "char_order_file: full path to ASCII file that shows\n");
-    printf( "                 graphical order of character in font texture\n");
-    printf( "-A: do not include alpha channel when determining character width \n");
-    printf( "\n");
-    printf( "NOTES: - out file will have the name as texture file, but \".fnt\" extension\n");
-    printf( "       - texture file must begin with character that will be a replacement for\n");
-    printf( "         each character that hasn't got definition in this texture file\n");
-    exit( EXIT_FAILURE);
-  }
-
-  // initialize engine
-  SE_InitEngine("");
-
-  // first input parameter is texture name
-  CTFileName fnTextureFileName = CTString(argv[1]);
-  // parameters 2 and 3 give us character dimensions
-  ULONG ulCharWidth = strtoul( argv[2], NULL, 10);
-  ULONG ulCharHeight= strtoul( argv[3], NULL, 10);
-  // parameter 4 specifies text file for character arrangements
-  CTFileName fnOrderFile = CTString(argv[4]);
-
-  // alpha channel ignore check
-  BOOL bUseAlpha = TRUE;
-  if( argc==6 && (argv[5][1]=='a' || argv[5][1]=='A')) bUseAlpha = FALSE;
-
-  // font generation starts
-  printf( "- Generating font table.\n");
-  // try to create font
-  CFontData fdFontData;
-  try
-  { 
-    // remove application path from font texture file
-    fnTextureFileName.RemoveApplicationPath_t();
-    // create font
-    fdFontData.Make_t( fnTextureFileName, ulCharWidth, ulCharHeight, fnOrderFile, bUseAlpha);
-  }
-  // catch and report errors
-  catch(char *strError)
-  {
-    printf( "! Cannot create font.\n  %s\n", strError);
+    PrintHelp();
     exit(EXIT_FAILURE);
   }
+
+  // Initialize engine.
+  SE_InitEngine("");
+
+  // First input parameter is texture name.
+  CTFileName fnTextureFileName = CTString(argv[1]);
+
+  // Parameters 2 and 3 give us character dimensions.
+  ULONG ulCharWidth = strtoul( argv[2], NULL, 10);
+  ULONG ulCharHeight= strtoul( argv[3], NULL, 10);
+
+  // Parameter 4 specifies text file for character arrangements.
+  CTFileName fnOrderFile = CTString(argv[4]);
+
+  BOOL bUseAlpha = TRUE;
+  BOOL bMonotype = FALSE; // [SSE]
+
+  if (argc > 5)
+  {
+    for (int k = 5; k <= argc; ++k)
+    {
+      if (!argv[k] || !*argv[k])
+        break;
+
+      switch (argv[k][1])
+      {
+        case 'a':
+        case 'A': {
+          bUseAlpha = FALSE;
+        } break;
+        
+        case 'm':
+        case 'M': {
+          bMonotype = TRUE;
+        } break;
+        
+        default: {
+          printf("Unknown option %s.\n", argv[k]);
+          exit(EXIT_FAILURE);
+        }
+      }
+    }
+  }
   
-  // save processed data
-  printf( "- Saving font table file.\n");
-  // create font name
+  printf(" - Alpha usage %s!\n", bUseAlpha ? "ON" : "OFF");
+  if (bMonotype) {
+    printf(" - Monotype mode ON!\n");
+  }
+
+  // font generation starts
+  printf(" - Generating font table.\n");
+  // try to create font
+  CFontData fdFontData;
+
+  try
+  { 
+    // Remove application path from font texture file.
+    fnTextureFileName.RemoveApplicationPath_t();
+    // Create font.
+    fdFontData.Make_t( fnTextureFileName, ulCharWidth, ulCharHeight, fnOrderFile, bUseAlpha, bMonotype);
+  }
+  // Catch and report errors.
+  catch(char *strError)
+  {
+    printf("! Cannot create font.\n  %s\n", strError);
+    exit(EXIT_FAILURE);
+  }
+
+  // Save processed data.
+  printf(" - Saving font table file.\n");
+
+  // Create font name.
   CTFileName strFontFileName;
-  strFontFileName = fnTextureFileName.FileDir()+fnTextureFileName.FileName() + ".fnt";
-  // try to
+  strFontFileName = fnTextureFileName.FileDir() + fnTextureFileName.FileName() + ".fnt";
+
+  // Try to.
   try
   {
     fdFontData.Save_t( strFontFileName);
@@ -95,20 +143,24 @@ void SubMain( int argc, char *argv[])
     printf("! Cannot save font.\n  %s\n", strError);
     exit(EXIT_FAILURE);
   }
-  printf( "- '%s' created successfuly.\n", strFontFileName);
+
+  printf(" - '%s' created successfuly.\n", strFontFileName);
   
   exit( EXIT_SUCCESS);
 }
 
-
-// ---------------- Main
+// --------------------------------------------------------------------------------------
+// The entry point.
+// --------------------------------------------------------------------------------------
 int main( int argc, char *argv[])
 {
   CTSTREAM_BEGIN
   {
     SubMain(argc, argv);
   }
+
   CTSTREAM_END;
   getch();
+
   return 0;
 }
