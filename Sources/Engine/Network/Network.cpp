@@ -108,7 +108,6 @@ extern INDEX ser_bClientsMayPause = TRUE;
 extern FLOAT ser_tmSyncCheckFrequency = 1.0f;
 extern INDEX ser_iSyncCheckBuffer = 60;
 extern INDEX ser_bEnumeration  = TRUE;
-extern INDEX ser_bPingGameAgent = TRUE;
 extern FLOAT ser_tmKeepAlive = 0.1f;
 extern FLOAT ser_tmPingUpdate = 3.0f;
 extern INDEX ser_bWaitFirstPlayer = 0;
@@ -1290,7 +1289,6 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("persistent user INDEX net_bLerping;",       &net_bLerping);
   _pShell->DeclareSymbol("persistent user INDEX ser_bClientsMayPause;", &ser_bClientsMayPause);
   _pShell->DeclareSymbol("persistent user INDEX ser_bEnumeration;",      &ser_bEnumeration);
-  _pShell->DeclareSymbol("persistent user INDEX ser_bPingGameAgent;", &ser_bPingGameAgent);
   _pShell->DeclareSymbol("persistent user FLOAT ser_tmKeepAlive;", &ser_tmKeepAlive);
   _pShell->DeclareSymbol("persistent user FLOAT ser_tmPingUpdate;", &ser_tmPingUpdate);
   _pShell->DeclareSymbol("persistent user INDEX ser_bWaitFirstPlayer;", &ser_bWaitFirstPlayer);
