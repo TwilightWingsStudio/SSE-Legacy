@@ -318,45 +318,6 @@ copy Release\$(TargetName).map $(SolutionDir)..\Bin\SeriousSam.map &gt;nul </Com
     <CustomBuild Include="nodrop.cur" />
     <CustomBuild Include="res\SeriousSam.ico" />
     <CustomBuild Include="Splash.bmp" />
-    <CustomBuild Include="..\..\Flesh\Scripts\Menu\ApplyShadowmaps.ini">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Flesh\Scripts\Menu\ApplyTextures.ini">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Flesh\Scripts\Menu\ApplyVideo.ini">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Flesh\Scripts\CustomOptions\GameOptions.cfg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Flesh\Scripts\Menu\GameOptions.cfg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Flesh\Scripts\CustomOptions\GameOptions.des">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Flesh\Scripts\CustomOptions\GFX-AdvancedRendering.cfg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Flesh\Scripts\CustomOptions\GFX-AdvancedRendering.des">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Flesh\Scripts\CustomOptions\PredictionOptions.cfg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Flesh\Scripts\CustomOptions\PredictionOptions.des">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Flesh\Scripts\Menu\RenderingOptions.cfg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Flesh\Scripts\Addons\SFX-AutoAdjust.des">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Flesh\Data\Credits.txt" />
-    <CustomBuild Include="..\..\Flesh\Data\Credits_Demo.txt" />
-    <CustomBuild Include="..\..\Flesh\Data\Credits_End.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SeriousSam.rc" />
