@@ -20,7 +20,7 @@
     <SccLocalPath>
     </SccLocalPath>
     <ProjectGuid>{F0E01B8A-1C93-85CB-693E-B9CA24A27168}</ProjectGuid>
-    <ProjectName>SeriousSam</ProjectName>
+    <ProjectName>GameExecutable</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" Label="Configuration">
@@ -84,7 +84,7 @@
       <MinimalRebuild>true</MinimalRebuild>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_AFXDLL;_WINDLL;_USRDLL;DIRECT3D_VERSION=0x0800;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\Debug\SeriousSam.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>.\Debug\GameExecutable.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>StdH.h</PrecompiledHeaderFile>
       <ObjectFileName>.\Debug\</ObjectFileName>
@@ -112,15 +112,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>gamed.lib gamempd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <OutputFile>Debug\SeriousSam.exe</OutputFile>
+      <OutputFile>Debug\GameExecutable.exe</OutputFile>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
     <CustomBuildStep>
-      <Command>copy Debug\$(TargetName).exe $(SolutionDir)..\Bin\Debug\ &gt;nul 
-copy Debug\$(TargetName).map $(SolutionDir)..\Bin\Debug\ &gt;nul </Command>
+      <Command>copy Debug\$(TargetName).exe $(SolutionDir)..\Bin\Debug\SeriousSam.exe &gt;nul 
+copy Debug\$(TargetName).map $(SolutionDir)..\Bin\Debug\SeriousSam.map &gt;nul </Command>
       <Message>Copying %(Filename) binaries to \Bin\Debug</Message>
-      <Outputs>$(SolutionDir)..\Bin\Debug\$(InputName).exe;%(Outputs)</Outputs>
+      <Outputs>$(SolutionDir)..\Bin\Debug\SeriousSam.exe;%(Outputs)</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -137,7 +137,7 @@ copy Debug\$(TargetName).map $(SolutionDir)..\Bin\Debug\ &gt;nul </Command>
       <StringPooling>true</StringPooling>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_WINDLL;_AFXDLL;_USRDLL;DIRECT3D_VERSION=0x0800;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\Release\SeriousSam.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>.\Release\GameExecutable.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>StdH.h</PrecompiledHeaderFile>
       <ObjectFileName>.\Release\</ObjectFileName>
@@ -165,15 +165,15 @@ copy Debug\$(TargetName).map $(SolutionDir)..\Bin\Debug\ &gt;nul </Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>game.lib gamemp.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <OutputFile>Release\SeriousSam.exe</OutputFile>
+      <OutputFile>Release\GameExecutable.exe</OutputFile>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
     <CustomBuildStep>
-      <Command>copy Release\$(TargetName).exe $(SolutionDir)..\Bin\ &gt;nul 
-copy Release\$(TargetName).map $(SolutionDir)..\Bin\ &gt;nul </Command>
+      <Command>copy Release\$(TargetName).exe $(SolutionDir)..\Bin\SeriousSam.exe &gt;nul 
+copy Release\$(TargetName).map $(SolutionDir)..\Bin\SeriousSam.map &gt;nul </Command>
       <Message>Copying %(Filename) binaries to \Bin</Message>
-      <Outputs>$(SolutionDir)..\Bin\$(InputName).exe;%(Outputs)</Outputs>
+      <Outputs>$(SolutionDir)..\Bin\SeriousSam.exe;%(Outputs)</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
