@@ -778,18 +778,6 @@
     <ClCompile Include="Models\ModelDataIO.cpp">
       <Filter>Source Files\Models</Filter>
     </ClCompile>
-    <ClCompile Include="Scripts\ScriptEngine.cpp">
-      <Filter>Source Files\Scripts</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripts\ScriptLib_Base.cpp">
-      <Filter>Source Files\Scripts</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripts\ScriptLib_Entities.cpp">
-      <Filter>Source Files\Scripts</Filter>
-    </ClCompile>
-    <ClCompile Include="Scripts\ScriptLib_EntitiesEdit.cpp">
-      <Filter>Source Files\Scripts</Filter>
-    </ClCompile>
     <ClCompile Include="Query\DarkPlacesMasterServer.cpp">
       <Filter>Source Files\Query</Filter>
     </ClCompile>
@@ -807,6 +795,18 @@
     </ClCompile>
     <ClCompile Include="Graphics\FontData_EFND_IO.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\LuaLib_Entities.cpp">
+      <Filter>Source Files\Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\LuaLib_EntitiesEdit.cpp">
+      <Filter>Source Files\Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\ScriptEngine.cpp">
+      <Filter>Source Files\Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\LuaLib_Base.cpp">
+      <Filter>Source Files\Scripts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

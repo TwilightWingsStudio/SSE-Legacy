@@ -442,12 +442,10 @@ $(SolutionDir)\prebuild_engine.bat</Command>
     <ClCompile Include="Models\ModelDataIO.cpp" />
     <ClCompile Include="Query\GameAgentMasterServer.cpp" />
     <ClCompile Include="Query\LegacyMasterServer.cpp" />
+    <ClCompile Include="Scripts\LuaLib_Base.cpp" />
+    <ClCompile Include="Scripts\LuaLib_Entities.cpp" />
+    <ClCompile Include="Scripts\LuaLib_EntitiesEdit.cpp" />
     <ClCompile Include="Scripts\ScriptEngine.cpp" />
-    <ClCompile Include="Scripts\ScriptLib_Base.cpp" />
-    <ClCompile Include="Scripts\ScriptLib_Entities.cpp">
-      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</PreprocessToFile>
-    </ClCompile>
-    <ClCompile Include="Scripts\ScriptLib_EntitiesEdit.cpp" />
     <ClCompile Include="Ska\AnimSetIO.cpp" />
     <ClCompile Include="Ska\MeshIO.cpp" />
     <ClCompile Include="Ska\SkeletonIO.cpp" />
