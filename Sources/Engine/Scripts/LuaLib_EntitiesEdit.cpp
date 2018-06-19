@@ -28,6 +28,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <luajit/src/lualib.h>
 #include <luajit/src/lauxlib.h>
 
+#include <Engine/Scripts/LuaLib_EntitiesEdit.h>
 #include <Engine/Scripts/ScriptEngine.h>
 #include <Engine/Scripts/ScriptEngine_internal.h>
 
@@ -55,7 +56,7 @@ static inline BOOL IsIndexEPT(CEntityProperty::PropertyType eptProperty)
 // Sets entity health to given value.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntityParent"
-static int l_entitiesed_SetEntityParent(lua_State* L)
+int CLuaLibEntitiesEdit::l_SetEntityParent(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 2);
   
@@ -76,7 +77,7 @@ static int l_entitiesed_SetEntityParent(lua_State* L)
 // Sets entity health to given value.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntityHealth"
-static int l_entitiesed_SetEntityHealth(lua_State* L)
+int CLuaLibEntitiesEdit::l_SetEntityHealth(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 2);
   
@@ -97,7 +98,7 @@ static int l_entitiesed_SetEntityHealth(lua_State* L)
 // Sets entity armor to given value.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntityArmor"
-static int l_entitiesed_SetEntityArmor(lua_State* L)
+int CLuaLibEntitiesEdit::l_SetEntityArmor(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 2);
   
@@ -118,7 +119,7 @@ static int l_entitiesed_SetEntityArmor(lua_State* L)
 // Sets entity shields to given value.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntityShields"
-static int l_entitiesed_SetEntityShields(lua_State* L)
+int CLuaLibEntitiesEdit::l_SetEntityShields(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 2);
   
@@ -139,7 +140,7 @@ static int l_entitiesed_SetEntityShields(lua_State* L)
 // Sets entity level to given value.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntityLevel"
-static int l_entitiesed_SetEntityLevel(lua_State* L)
+int CLuaLibEntitiesEdit::l_SetEntityLevel(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 2);
   
@@ -160,7 +161,7 @@ static int l_entitiesed_SetEntityLevel(lua_State* L)
 // Sets entity experience to given value.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntityExperience"
-static int l_entitiesed_SetEntityExperience(lua_State* L)
+int CLuaLibEntitiesEdit::l_SetEntityExperience(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 2);
   
@@ -181,7 +182,7 @@ static int l_entitiesed_SetEntityExperience(lua_State* L)
 // Sets entity specified currency balance to given value.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntityBalance"
-static int l_entitiesed_SetEntityBalance(lua_State* L)
+int CLuaLibEntitiesEdit::l_SetEntityBalance(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 3);
   
@@ -204,7 +205,7 @@ static int l_entitiesed_SetEntityBalance(lua_State* L)
 // Sets entity money to given value.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntityMoney"
-static int l_entitiesed_SetEntityMoney(lua_State* L)
+int CLuaLibEntitiesEdit::l_SetEntityMoney(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 2);
   
@@ -225,7 +226,7 @@ static int l_entitiesed_SetEntityMoney(lua_State* L)
 // Sets entity supplies to given value.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntitySupplies"
-static int l_entitiesed_SetEntitySupplies(lua_State* L)
+int CLuaLibEntitiesEdit::l_SetEntitySupplies(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 2);
   
@@ -246,7 +247,7 @@ static int l_entitiesed_SetEntitySupplies(lua_State* L)
 // Gets entity property value by its name.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntityPropByName"
-static int l_entitiesed_SetEntityPropByName(lua_State* L)
+int CLuaLibEntitiesEdit::l_SetEntityPropByName(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 3);
   
@@ -318,7 +319,7 @@ static int l_entitiesed_SetEntityPropByName(lua_State* L)
 // Sets the entity rotation.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SetEntityRotation"
-static int l_entitiesed_SetEntityRotation(lua_State* L)
+int CLuaLibEntitiesEdit::l_SetEntityRotation(lua_State* L)
 {
   const INDEX REQUIRED_ARGS = 4;
 
@@ -347,7 +348,7 @@ static int l_entitiesed_SetEntityRotation(lua_State* L)
 // Teleports entity to given coords.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "TeleportEntityToPosition"
-static int l_entitiesed_TeleportEntityToPosition(lua_State* L)
+int CLuaLibEntitiesEdit::l_TeleportEntityToPosition(lua_State* L)
 {
   const INDEX REQUIRED_ARGS = 4;
 
@@ -375,7 +376,7 @@ static int l_entitiesed_TeleportEntityToPosition(lua_State* L)
 // Teleports entity to given placement.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "TeleportEntityToPlacement"
-static int l_entitiesed_TeleportEntityToPlacement(lua_State* L)
+int CLuaLibEntitiesEdit::l_TeleportEntityToPlacement(lua_State* L)
 {
   const INDEX REQUIRED_ARGS = 7;
 
@@ -409,7 +410,7 @@ static int l_entitiesed_TeleportEntityToPlacement(lua_State* L)
 // Teleports entity to placement of given entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "TeleportEntityToEntity"
-static int l_entitiesed_TeleportEntityToEntity(lua_State* L)
+int CLuaLibEntitiesEdit::l_TeleportEntityToEntity(lua_State* L)
 {
   const INDEX REQUIRED_ARGS = 2;
 
@@ -435,7 +436,7 @@ static int l_entitiesed_TeleportEntityToEntity(lua_State* L)
 // Generates sync-safe random integer.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GenerateSyncSafeInt"
-static int l_entitiesed_GenerateSyncSafeInt(lua_State* L)
+int CLuaLibEntitiesEdit::l_GenerateSyncSafeInt(lua_State* L)
 {
   lua_getglobal(L, SCRIPT_THIS_ENTITYID);
   
@@ -457,7 +458,7 @@ static int l_entitiesed_GenerateSyncSafeInt(lua_State* L)
 // Generates sync-safe random float.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GenerateSyncSafeFloat"
-static int l_entitiesed_GenerateSyncSafeFloat(lua_State* L)
+int CLuaLibEntitiesEdit::l_GenerateSyncSafeFloat(lua_State* L)
 {
   lua_getglobal(L, SCRIPT_THIS_ENTITYID);
   
@@ -479,7 +480,7 @@ static int l_entitiesed_GenerateSyncSafeFloat(lua_State* L)
 // Sends event of given EventEType to target with custom penCaused argument.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SendEEventToEntity"
-static int l_entitiesed_SendEEventToEntity(lua_State* L)
+int CLuaLibEntitiesEdit::l_SendEEventToEntity(lua_State* L)
 {
   const INDEX REQUIRED_ARGS = 3;
   
@@ -513,7 +514,7 @@ static int l_entitiesed_SendEEventToEntity(lua_State* L)
 // Sends event of given EventEType to target with custom penCaused argument.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "SendEEventExToEntity"
-static int l_entitiesed_SendEEventExToEntity(lua_State* L)
+int CLuaLibEntitiesEdit::l_SendEEventExToEntity(lua_State* L)
 {
   const INDEX REQUIRED_ARGS = 4;
   
@@ -545,51 +546,51 @@ static int l_entitiesed_SendEEventExToEntity(lua_State* L)
   return 1;
 }
 
-static const struct luaL_Reg entitiesedLib [] = {
-  {"SetEntityParent", l_entitiesed_SetEntityParent},
+const luaL_Reg CLuaLibEntitiesEdit::methods[] = {
+  {"SetEntityParent", CLuaLibEntitiesEdit::l_SetEntityParent},
 
   //////// Setters for CLiveEntity ////////
   // Vital.
-  {"SetEntityHealth", l_entitiesed_SetEntityHealth},
-  {"SetEntityArmor", l_entitiesed_SetEntityArmor},
-  {"SetEntityShields", l_entitiesed_SetEntityShields},
+  {"SetEntityHealth", CLuaLibEntitiesEdit::l_SetEntityHealth},
+  {"SetEntityArmor", CLuaLibEntitiesEdit::l_SetEntityArmor},
+  {"SetEntityShields", CLuaLibEntitiesEdit::l_SetEntityShields},
 
   // Progression.
-  {"SetEntityLevel", l_entitiesed_SetEntityLevel},
-  {"SetEntityExperience", l_entitiesed_SetEntityExperience},
+  {"SetEntityLevel", CLuaLibEntitiesEdit::l_SetEntityLevel},
+  {"SetEntityExperience", CLuaLibEntitiesEdit::l_SetEntityExperience},
 
   // Currencies.
-  {"SetEntityBalance", l_entitiesed_SetEntityBalance},
-  {"SetEntityMoney", l_entitiesed_SetEntityMoney},
-  {"SetEntitySupplies", l_entitiesed_SetEntitySupplies},
+  {"SetEntityBalance", CLuaLibEntitiesEdit::l_SetEntityBalance},
+  {"SetEntityMoney", CLuaLibEntitiesEdit::l_SetEntityMoney},
+  {"SetEntitySupplies", CLuaLibEntitiesEdit::l_SetEntitySupplies},
   
   //////// Working with properties ////////
-  {"SetEntityPropByName", l_entitiesed_SetEntityPropByName},
+  {"SetEntityPropByName", CLuaLibEntitiesEdit::l_SetEntityPropByName},
   // void SetEntityPropByID(EID, PROPID, Value)
   
   //////// Setters for position and Orientation ////////
-  {"SetEntityRotation", l_entitiesed_SetEntityRotation},
-  {"TeleportEntityToPosition", l_entitiesed_TeleportEntityToPosition},
-  {"TeleportEntityToPlacement", l_entitiesed_TeleportEntityToPlacement},
-  {"TeleportEntityToEntity", l_entitiesed_TeleportEntityToEntity},
+  {"SetEntityRotation", CLuaLibEntitiesEdit::l_SetEntityRotation},
+  {"TeleportEntityToPosition", CLuaLibEntitiesEdit::l_TeleportEntityToPosition},
+  {"TeleportEntityToPlacement", CLuaLibEntitiesEdit::l_TeleportEntityToPlacement},
+  {"TeleportEntityToEntity", CLuaLibEntitiesEdit::l_TeleportEntityToEntity},
   
   // TeleportEntityToEntityWithOffset
   
-  {"GenerateSyncSafeInt", l_entitiesed_GenerateSyncSafeInt},
-  {"GenerateSyncSafeFloat", l_entitiesed_GenerateSyncSafeFloat},
+  {"GenerateSyncSafeInt", CLuaLibEntitiesEdit::l_GenerateSyncSafeInt},
+  {"GenerateSyncSafeFloat", CLuaLibEntitiesEdit::l_GenerateSyncSafeFloat},
   
   // Weapon and Ammo
 
   // SendEvent
-  {"SendEEventToEntity", l_entitiesed_SendEEventToEntity},
-  {"SendEEventExToEntity", l_entitiesed_SendEEventExToEntity},
+  {"SendEEventToEntity", CLuaLibEntitiesEdit::l_SendEEventToEntity},
+  {"SendEEventExToEntity", CLuaLibEntitiesEdit::l_SendEEventExToEntity},
   
-  {NULL, NULL} /* end of array */
+  {0, 0} /* end of array */
 };
 
 void luaopen_luaentitiesedlib(lua_State *L)
 {
   lua_getglobal(L, "_G");
-  luaL_register(L, NULL, entitiesedLib);
+  luaL_register(L, NULL, CLuaLibEntitiesEdit::methods);
   lua_pop(L, 1);
 }

@@ -31,6 +31,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <luajit/src/lualib.h>
 #include <luajit/src/lauxlib.h>
 
+#include <Engine/Scripts/LuaLib_Entities.h>
 #include <Engine/Scripts/ScriptEngine_internal.h>
 
 #define SCRIPTLIBPREFIX entities
@@ -57,7 +58,7 @@ static inline BOOL IsIndexEPT(CEntityProperty::PropertyType eptProperty)
 // Checks if entity valid.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsEntityValid"
-static int l_entities_IsEntityValid(lua_State* L)
+int CLuaLibEntities::l_IsEntityValid(lua_State* L)
 {  
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -74,7 +75,7 @@ static int l_entities_IsEntityValid(lua_State* L)
 // Checks if entity is live entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsLiveEntity"
-static int l_entities_IsLiveEntity(lua_State* L)
+int CLuaLibEntities::l_IsLiveEntity(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -93,7 +94,7 @@ static int l_entities_IsLiveEntity(lua_State* L)
 // Checks if entity is rational entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsRationalEntity"
-static int l_entities_IsRationalEntity(lua_State* L)
+int CLuaLibEntities::l_IsRationalEntity(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -112,7 +113,7 @@ static int l_entities_IsRationalEntity(lua_State* L)
 // Checks if entity is player entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsMovableEntity"
-static int l_entities_IsMovableEntity(lua_State* L)
+int CLuaLibEntities::l_IsMovableEntity(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -131,7 +132,7 @@ static int l_entities_IsMovableEntity(lua_State* L)
 // Checks if entity is player entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsPlayerEntity"
-static int l_entities_IsPlayerEntity(lua_State* L)
+int CLuaLibEntities::l_IsPlayerEntity(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -150,7 +151,7 @@ static int l_entities_IsPlayerEntity(lua_State* L)
 // Checks if entity is marker entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsMarkerEntity"
-static int l_entities_IsMarkerEntity(lua_State* L)
+int CLuaLibEntities::l_IsMarkerEntity(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -169,7 +170,7 @@ static int l_entities_IsMarkerEntity(lua_State* L)
 // Checks if entity is interaction provider.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsInteractionProvider"
-static int l_entities_IsInteractionProvider(lua_State* L)
+int CLuaLibEntities::l_IsInteractionProvider(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -188,7 +189,7 @@ static int l_entities_IsInteractionProvider(lua_State* L)
 // Checks if entity is interaction relay.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsInteractionRelay"
-static int l_entities_IsInteractionRelay(lua_State* L)
+int CLuaLibEntities::l_IsInteractionRelay(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -207,7 +208,7 @@ static int l_entities_IsInteractionRelay(lua_State* L)
 // Checks if entity is alive
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsEntityAlive"
-static int l_entities_IsEntityAlive(lua_State* L)
+int CLuaLibEntities::l_IsEntityAlive(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -226,7 +227,7 @@ static int l_entities_IsEntityAlive(lua_State* L)
 // Checks if entity is dead
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsEntityDead"
-static int l_entities_IsEntityDead(lua_State* L)
+int CLuaLibEntities::l_IsEntityDead(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -245,7 +246,7 @@ static int l_entities_IsEntityDead(lua_State* L)
 // Checks if entity is active.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsEntityActive"
-static int l_entities_IsEntityActive(lua_State* L)
+int CLuaLibEntities::l_IsEntityActive(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -264,7 +265,7 @@ static int l_entities_IsEntityActive(lua_State* L)
 // Checks if entity is instance of class.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsEntityOfClass"
-static int l_entities_IsEntityOfClass(lua_State* L)
+int CLuaLibEntities::l_IsEntityOfClass(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 2);
   
@@ -285,7 +286,7 @@ static int l_entities_IsEntityOfClass(lua_State* L)
 // Checks if entity is instance of child class.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "IsEntityDerivedFromClass"
-static int l_entities_IsEntityDerivedFromClass(lua_State* L)
+int CLuaLibEntities::l_IsEntityDerivedFromClass(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 2);
   
@@ -306,7 +307,7 @@ static int l_entities_IsEntityDerivedFromClass(lua_State* L)
 // Gets the parent entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityParent"
-static int l_entities_GetEntityParent(lua_State* L)
+int CLuaLibEntities::l_GetEntityParent(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -325,7 +326,7 @@ static int l_entities_GetEntityParent(lua_State* L)
 // Gets the child count of entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityChildCount"
-static int l_entities_GetEntityChildCount(lua_State* L)
+int CLuaLibEntities::l_GetEntityChildCount(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -344,7 +345,7 @@ static int l_entities_GetEntityChildCount(lua_State* L)
 // Gets the entity name.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityName"
-static int l_entities_GetEntityName(lua_State* L)
+int CLuaLibEntities::l_GetEntityName(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -363,7 +364,7 @@ static int l_entities_GetEntityName(lua_State* L)
 // Gets the entity class name.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityClassName"
-static int l_entities_GetEntityClassName(lua_State* L)
+int CLuaLibEntities::l_GetEntityClassName(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -382,7 +383,7 @@ static int l_entities_GetEntityClassName(lua_State* L)
 // Gets entity position on X axis.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityPosX"
-static int l_entities_GetEntityPosX(lua_State* L)
+int CLuaLibEntities::l_GetEntityPosX(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -401,7 +402,7 @@ static int l_entities_GetEntityPosX(lua_State* L)
 // Gets entity position on Y axis.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityPosY"
-static int l_entities_GetEntityPosY(lua_State* L)
+int CLuaLibEntities::l_GetEntityPosY(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -420,7 +421,7 @@ static int l_entities_GetEntityPosY(lua_State* L)
 // Gets entity position on Z axis.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityPosZ"
-static int l_entities_GetEntityPosZ(lua_State* L)
+int CLuaLibEntities::l_GetEntityPosZ(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -439,7 +440,7 @@ static int l_entities_GetEntityPosZ(lua_State* L)
 // Gets entity heading rotation.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityRotH"
-static int l_entities_GetEntityRotH(lua_State* L)
+int CLuaLibEntities::l_GetEntityRotH(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -458,7 +459,7 @@ static int l_entities_GetEntityRotH(lua_State* L)
 // Gets entity pitch rotation.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityRotP"
-static int l_entities_GetEntityRotP(lua_State* L)
+int CLuaLibEntities::l_GetEntityRotP(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -477,7 +478,7 @@ static int l_entities_GetEntityRotP(lua_State* L)
 // Gets entity banking rotation.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityRotB"
-static int l_entities_GetEntityRotB(lua_State* L)
+int CLuaLibEntities::l_GetEntityRotB(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -496,7 +497,7 @@ static int l_entities_GetEntityRotB(lua_State* L)
 // Returns distance between two specified entities.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "DistanceBetweenEntities"
-static int l_entities_DistanceBetweenEntities(lua_State* L)
+int CLuaLibEntities::l_DistanceBetweenEntities(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 2);
   
@@ -518,7 +519,7 @@ static int l_entities_DistanceBetweenEntities(lua_State* L)
 // Returns distance between two specified points.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "DistanceBetweenPoints"
-static int l_entities_DistanceBetweenPoints(lua_State* L)
+int CLuaLibEntities::l_DistanceBetweenPoints(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 6);
 
@@ -541,7 +542,7 @@ static int l_entities_DistanceBetweenPoints(lua_State* L)
 // Gets entity health.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityHealth"
-static int l_entities_GetEntityHealth(lua_State* L)
+int CLuaLibEntities::l_GetEntityHealth(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -561,7 +562,7 @@ static int l_entities_GetEntityHealth(lua_State* L)
 // Gets entity armor.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityArmor"
-static int l_entities_GetEntityArmor(lua_State* L)
+int CLuaLibEntities::l_GetEntityArmor(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -581,7 +582,7 @@ static int l_entities_GetEntityArmor(lua_State* L)
 // Gets entity shields.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityShields"
-static int l_entities_GetEntityShields(lua_State* L)
+int CLuaLibEntities::l_GetEntityShields(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -601,7 +602,7 @@ static int l_entities_GetEntityShields(lua_State* L)
 // Gets entity level.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityLevel"
-static int l_entities_GetEntityLevel(lua_State* L)
+int CLuaLibEntities::l_GetEntityLevel(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -621,7 +622,7 @@ static int l_entities_GetEntityLevel(lua_State* L)
 // Gets entity experience.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityExperience"
-static int l_entities_GetEntityExperience(lua_State* L)
+int CLuaLibEntities::l_GetEntityExperience(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -641,7 +642,7 @@ static int l_entities_GetEntityExperience(lua_State* L)
 // Gets entity balance for specified currency.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityBalance"
-static int l_entities_GetEntityBalance(lua_State* L)
+int CLuaLibEntities::l_GetEntityBalance(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 2);
   
@@ -663,7 +664,7 @@ static int l_entities_GetEntityBalance(lua_State* L)
 // Gets entity money.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityMoney"
-static int l_entities_GetEntityMoney(lua_State* L)
+int CLuaLibEntities::l_GetEntityMoney(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -683,7 +684,7 @@ static int l_entities_GetEntityMoney(lua_State* L)
 // Gets entity supplies.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntitySupplies"
-static int l_entities_GetEntitySupplies(lua_State* L)
+int CLuaLibEntities::l_GetEntitySupplies(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -703,7 +704,7 @@ static int l_entities_GetEntitySupplies(lua_State* L)
 // Gets entity property value by its name.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetEntityPropByName"
-static int l_entities_GetEntityPropByName(lua_State* L)
+int CLuaLibEntities::l_GetEntityPropByName(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 2);
   
@@ -753,7 +754,7 @@ static int l_entities_GetEntityPropByName(lua_State* L)
 // Gets player entity id by its PLID.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetPlayerEntityByPLID"
-static int l_entities_GetPlayerEntityByPLID(lua_State* L)
+int CLuaLibEntities::l_GetPlayerEntityByPLID(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -774,7 +775,7 @@ static int l_entities_GetPlayerEntityByPLID(lua_State* L)
 // Gets active players count.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetPlayersCount"
-static int l_entities_GetPlayersCount(lua_State* L)
+int CLuaLibEntities::l_GetPlayersCount(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 0);
   
@@ -787,7 +788,7 @@ static int l_entities_GetPlayersCount(lua_State* L)
 // Gets max players count.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetMaxPlayers"
-static int l_entities_GetMaxPlayers(lua_State* L)
+int CLuaLibEntities::l_GetMaxPlayers(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 0);
   
@@ -800,7 +801,7 @@ static int l_entities_GetMaxPlayers(lua_State* L)
 // Gets PLID from entity.
 // --------------------------------------------------------------------------------------
 #define SCRIPTFUNCNAME "GetPlayerID"
-static int l_entities_GetPlayerID(lua_State* L)
+int CLuaLibEntities::l_GetPlayerID(lua_State* L)
 {
   ONLYREQARGCT(lua_gettop(L), 1);
   
@@ -816,74 +817,74 @@ static int l_entities_GetPlayerID(lua_State* L)
   return 1;
 }
 
-static const struct luaL_Reg entitiesLib [] = {
+const luaL_Reg CLuaLibEntities::methods[] = {
   //////// Common entity checks ////////
-  {"IsEntityValid", l_entities_IsEntityValid},
-  {"IsLiveEntity", l_entities_IsLiveEntity},
-  {"IsRationalEntity", l_entities_IsRationalEntity},
-  {"IsMovableEntity", l_entities_IsMovableEntity},
-  {"IsPlayerEntity", l_entities_IsPlayerEntity},
+  {"IsEntityValid", CLuaLibEntities::l_IsEntityValid},
+  {"IsLiveEntity", CLuaLibEntities::l_IsLiveEntity},
+  {"IsRationalEntity", CLuaLibEntities::l_IsRationalEntity},
+  {"IsMovableEntity", CLuaLibEntities::l_IsMovableEntity},
+  {"IsPlayerEntity", CLuaLibEntities::l_IsPlayerEntity},
 
-  {"IsMarkerEntity", l_entities_IsMarkerEntity},
-  {"IsInteractionProvider", l_entities_IsInteractionProvider},
-  {"IsInteractionRelay", l_entities_IsInteractionRelay},
+  {"IsMarkerEntity", CLuaLibEntities::l_IsMarkerEntity},
+  {"IsInteractionProvider", CLuaLibEntities::l_IsInteractionProvider},
+  {"IsInteractionRelay", CLuaLibEntities::l_IsInteractionRelay},
 
-  {"IsEntityAlive", l_entities_IsEntityAlive},
-  {"IsEntityDead", l_entities_IsEntityDead},
+  {"IsEntityAlive", CLuaLibEntities::l_IsEntityAlive},
+  {"IsEntityDead", CLuaLibEntities::l_IsEntityDead},
   
-  {"IsEntityActive", l_entities_IsEntityActive},
+  {"IsEntityActive", CLuaLibEntities::l_IsEntityActive},
   
   //////// Exact Class Checks ////////
-  {"IsEntityOfClass", l_entities_IsEntityOfClass},
-  {"IsEntityDerivedFromClass", l_entities_IsEntityDerivedFromClass},
+  {"IsEntityOfClass", CLuaLibEntities::l_IsEntityOfClass},
+  {"IsEntityDerivedFromClass", CLuaLibEntities::l_IsEntityDerivedFromClass},
 
   //////// CEntity Utils ////////
-  {"GetEntityParent", l_entities_GetEntityParent},
-  {"GetEntityChildCount", l_entities_GetEntityChildCount},
-  //{"GetEntityChild", l_entities_GetEntityChild},
-  {"GetEntityName", l_entities_GetEntityName},
-  {"GetEntityClassName", l_entities_GetEntityClassName},
-  //{"GetEntityInteractionProvider", l_entities_GetEntityInteractionProvider},
+  {"GetEntityParent", CLuaLibEntities::l_GetEntityParent},
+  {"GetEntityChildCount", CLuaLibEntities::l_GetEntityChildCount},
+  //{"GetEntityChild", CLuaLibEntities::l_GetEntityChild},
+  {"GetEntityName", CLuaLibEntities::l_GetEntityName},
+  {"GetEntityClassName", CLuaLibEntities::l_GetEntityClassName},
+  //{"GetEntityInteractionProvider", CLuaLibEntities:l_GetEntityInteractionProvider},
 
   //////// Getters for CLiveEntity ////////
   // Vital.
-  {"GetEntityArmor", l_entities_GetEntityArmor},
-  {"GetEntityHealth", l_entities_GetEntityHealth},
-  {"GetEntityShields", l_entities_GetEntityShields},
+  {"GetEntityArmor", CLuaLibEntities::l_GetEntityArmor},
+  {"GetEntityHealth", CLuaLibEntities::l_GetEntityHealth},
+  {"GetEntityShields", CLuaLibEntities::l_GetEntityShields},
   
   // Progression.
-  {"GetEntityLevel", l_entities_GetEntityLevel},
-  {"GetEntityExperience", l_entities_GetEntityExperience},
+  {"GetEntityLevel", CLuaLibEntities::l_GetEntityLevel},
+  {"GetEntityExperience", CLuaLibEntities::l_GetEntityExperience},
   
   // Currencies.
-  {"GetEntityBalance", l_entities_GetEntityBalance},
-  {"GetEntityMoney", l_entities_GetEntityMoney},
-  {"GetEntitySupplies", l_entities_GetEntitySupplies},
+  {"GetEntityBalance", CLuaLibEntities::l_GetEntityBalance},
+  {"GetEntityMoney", CLuaLibEntities::l_GetEntityMoney},
+  {"GetEntitySupplies", CLuaLibEntities::l_GetEntitySupplies},
 
   //////// Working with properties ////////
-  {"GetEntityPropByName", l_entities_GetEntityPropByName},
+  {"GetEntityPropByName", CLuaLibEntities::l_GetEntityPropByName},
   // <multitype> GetEntityPropByID(EID, PROPID)
   
   //////// Getters for position and Orientation ////////
-  {"GetEntityPosX", l_entities_GetEntityPosX},
-  {"GetEntityPosY", l_entities_GetEntityPosY},
-  {"GetEntityPosZ", l_entities_GetEntityPosZ},
+  {"GetEntityPosX", CLuaLibEntities::l_GetEntityPosX},
+  {"GetEntityPosY", CLuaLibEntities::l_GetEntityPosY},
+  {"GetEntityPosZ", CLuaLibEntities::l_GetEntityPosZ},
   
-  {"GetEntityRotH", l_entities_GetEntityRotH},
-  {"GetEntityRotP", l_entities_GetEntityRotP},
-  {"GetEntityRotB", l_entities_GetEntityRotB},
+  {"GetEntityRotH", CLuaLibEntities::l_GetEntityRotH},
+  {"GetEntityRotP", CLuaLibEntities::l_GetEntityRotP},
+  {"GetEntityRotB", CLuaLibEntities::l_GetEntityRotB},
   
   //////// Utils ////////
-  {"DistanceBetweenEntities", l_entities_DistanceBetweenEntities},
-  {"DistanceBetweenPoints", l_entities_DistanceBetweenPoints},
+  {"DistanceBetweenEntities", CLuaLibEntities::l_DistanceBetweenEntities},
+  {"DistanceBetweenPoints", CLuaLibEntities::l_DistanceBetweenPoints},
   // FLOAT DistanceBetweenEntityAndPos(EntityID, X, Y, Z)
   
   //////// Players ////////
-  {"GetPlayerEntityByPLID", l_entities_GetPlayerEntityByPLID},
-  {"GetPlayerID", l_entities_GetPlayerID},
+  {"GetPlayerEntityByPLID", CLuaLibEntities::l_GetPlayerEntityByPLID},
+  {"GetPlayerID", CLuaLibEntities::l_GetPlayerID},
   // {"GetRndActivePlayerID", l_entities_GetRndActivePlayerID},
-  {"GetPlayersCount", l_entities_GetPlayersCount},
-  {"GetMaxPlayers", l_entities_GetMaxPlayers},
+  {"GetPlayersCount", CLuaLibEntities::l_GetPlayersCount},
+  {"GetMaxPlayers", CLuaLibEntities::l_GetMaxPlayers},
   
   //////// Raycasting ////////
   /*
@@ -901,12 +902,12 @@ static const struct luaL_Reg entitiesLib [] = {
   // EID CastRayFromPosToEntity(EID, X, Y, Z, CCastRay::TestType)
   // EID CastRayFromEntityToPos(EID, X, Y, Z, CCastRay::TestType)
   
-  {NULL, NULL} /* end of array */
+  {0, 0} /* end of array */
 };
 
 void luaopen_luaentitieslib(lua_State *L)
 {
   lua_getglobal(L, "_G");
-  luaL_register(L, NULL, entitiesLib);
+  luaL_register(L, NULL, CLuaLibEntities::methods);
   lua_pop(L, 1);
 }

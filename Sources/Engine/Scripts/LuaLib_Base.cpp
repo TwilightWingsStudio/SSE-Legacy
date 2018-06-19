@@ -27,9 +27,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <luajit/src/lualib.h>
 #include <luajit/src/lauxlib.h>
 
+#include <Engine/Scripts/LuaLib_Base.h>
 #include <Engine/Scripts/ScriptEngine_internal.h>
 
-static int l_sebase_print(lua_State* L)
+int CLuaLibBase::l_print(lua_State* L)
 {
   INDEX ctArgs = lua_gettop(L);
   
@@ -45,7 +46,7 @@ static int l_sebase_print(lua_State* L)
   return 0;
 }
 
-static int l_sebase_debug(lua_State* L)
+int CLuaLibBase::l_debug(lua_State* L)
 {
   INDEX ctArgs = lua_gettop(L);
   
@@ -61,15 +62,16 @@ static int l_sebase_debug(lua_State* L)
   return 0;
 }
 
-static const struct luaL_Reg sebaseLib [] = {
-  {"print", l_sebase_print},
-  {"debug", l_sebase_debug},
-  {NULL, NULL} /* end of array */
+const luaL_Reg CLuaLibBase::methods[] = {
+  {"print", CLuaLibBase::l_print},
+  {"debug", CLuaLibBase::l_debug},
+
+  {0, 0} /* end of array */
 };
 
 void luaopen_luasebaselib(lua_State *L)
 {
   lua_getglobal(L, "_G");
-  luaL_register(L, NULL, sebaseLib);
+  luaL_register(L, NULL, CLuaLibBase::methods);
   lua_pop(L, 1);
 }
