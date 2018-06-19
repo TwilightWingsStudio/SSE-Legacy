@@ -63,7 +63,7 @@ extern void GameAgent_BuildHearthbeatPacket(CTString &strPacket, INDEX iChalleng
       ms_strGameName);
 }
 
-extern void GameAgent_ProcessReceivedPacket()
+extern void GameAgent_ServerParsePacket(INDEX iLength)
 {
   // check the received packet ID
   switch (_szBuffer[0])
@@ -145,17 +145,8 @@ extern void GameAgent_EnumTrigger(BOOL bInternet)
   _setStatus(".");
 }
 
-extern void GameAgent_EnumUpdate(void)
+void GameAgent_ClientParsePacket(INDEX iLength)
 {
-  int iLen = _recvPacket();
-
-  if (iLen == -1) {
-    return;
-  }
-
-  // null terminate the buffer
-  _szBuffer[iLen] = 0;
-
   switch (_szBuffer[0])
   {
     case 's':
@@ -171,7 +162,8 @@ extern void GameAgent_EnumUpdate(void)
       _pNetwork->ga_strEnumerationStatus = "";
   
       sIPPort* pServers = (sIPPort*)(_szBuffer + 1);
-      while(iLen - ((CHAR*)pServers - _szBuffer) >= sizeof(sIPPort)) {
+
+      while(iLength - ((CHAR*)pServers - _szBuffer) >= sizeof(sIPPort)) {
         sIPPort ip = *pServers;
   
         CTString strIP;
@@ -211,44 +203,47 @@ extern void GameAgent_EnumUpdate(void)
       CTString strKey;
       CTString strValue;
   
-      while(*pszPacket != 0) {
-        switch (*pszPacket) {
-        case ';':
-          if (strKey != "sessionname") {
-            if (bReadValue) {
-              // we're done reading the value, check which key it was
-              if (strKey == "players") {
-                strPlayers = strValue;
-              } else if (strKey == "maxplayers") {
-                strMaxPlayers = strValue;
-              } else if (strKey == "level") {
-                strLevel = strValue;
-              } else if (strKey == "gametype") {
-                strGameType = strValue;
-              } else if (strKey == "version") {
-                strVersion = strValue;
-              } else if (strKey == "gamename") {
-                strGameName = strValue;
-              } else {
-                CPrintF("Unknown GameAgent parameter key '%s'!", strKey);
+      while(*pszPacket != 0)
+      {
+        switch (*pszPacket)
+        {
+          case ';': {
+            if (strKey != "sessionname") {
+              if (bReadValue) {
+                // we're done reading the value, check which key it was
+                if (strKey == "players") {
+                  strPlayers = strValue;
+                } else if (strKey == "maxplayers") {
+                  strMaxPlayers = strValue;
+                } else if (strKey == "level") {
+                  strLevel = strValue;
+                } else if (strKey == "gametype") {
+                  strGameType = strValue;
+                } else if (strKey == "version") {
+                  strVersion = strValue;
+                } else if (strKey == "gamename") {
+                  strGameName = strValue;
+                } else {
+                  CPrintF("Unknown GameAgent parameter key '%s'!", strKey);
+                }
+    
+                // reset temporary holders
+                strKey = "";
+                strValue = "";
               }
-  
-              // reset temporary holders
-              strKey = "";
-              strValue = "";
             }
-          }
-          bReadValue = !bReadValue;
-          break;
+
+            bReadValue = !bReadValue;
+          } break;
   
-        default:
-          // read into the value or into the key, depending where we are
-          if (bReadValue) {
-            strValue.InsertChar(strlen(strValue), *pszPacket);
-          } else {
-            strKey.InsertChar(strlen(strKey), *pszPacket);
-          }
-          break;
+          default: {
+            // read into the value or into the key, depending where we are
+            if (bReadValue) {
+              strValue.InsertChar(strlen(strValue), *pszPacket);
+            } else {
+              strKey.InsertChar(strlen(strKey), *pszPacket);
+            }
+          } break;
         }
   
         // move to next character
@@ -265,9 +260,12 @@ extern void GameAgent_EnumUpdate(void)
       _pNetwork->ga_lhEnumeratedSessions.AddTail(ns.ns_lnNode);
   
       long long tmPing = -1;
+
       // find the request in the request array
-      for (INDEX i=0; i<ga_asrRequests.Count(); i++) {
+      for (INDEX i = 0; i < ga_asrRequests.Count(); i++)
+      {
         CServerRequest &req = ga_asrRequests[i];
+
         if (req.sr_ulAddress == _sinFrom.sin_addr.s_addr && req.sr_iPort == _sinFrom.sin_port) {
           tmPing = _pTimer->GetHighPrecisionTimer().GetMilliseconds() - req.sr_tmRequestTime;
           ga_asrRequests.Delete(&req);
@@ -292,8 +290,21 @@ extern void GameAgent_EnumUpdate(void)
       ns.ns_strVer = strVersion;
     } break;
     
-    default:
+    default: {
       CPrintF("Unknown enum packet ID %x!\n", _szBuffer[0]);
-      break;
-    }
+    } break;
+  }
+}
+
+extern void GameAgent_EnumUpdate(void)
+{
+  int iLength = _recvPacket();
+
+  if (iLength == -1) {
+    return;
+  }
+
+  _szBuffer[iLength] = 0; // Terminate the buffer with NULL.
+
+  GameAgent_ClientParsePacket(iLength);
 }

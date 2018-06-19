@@ -327,7 +327,7 @@ extern void MS_OnServerUpdate(void)
     if (ms_bDarkPlacesMS) {
       DarkPlaces_ServerParsePacket(iLength);
     } else if (!ms_bMSLegacy) {
-      GameAgent_ProcessReceivedPacket();
+      GameAgent_ServerParsePacket(iLength);
     } else {
       _szBuffer[iLength] = 0;
       MSLegacy_ProcessReceivedPacket(iLength);

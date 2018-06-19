@@ -42,9 +42,9 @@ extern void MS_EnumCancel(void);
 
 // GameAgent Master Server
 extern void GameAgent_BuildHearthbeatPacket(CTString &strPacket, INDEX iChallenge);
-extern void GameAgent_ProcessReceivedPacket();
 extern void GameAgent_EnumTrigger(BOOL bInternet);
 extern void GameAgent_EnumUpdate(void);
+extern void GameAgent_ServerParsePacket(INDEX iLength);
 
 // Legacy Master Server
 extern void MSLegacy_BuildHearthbeatPacket(CTString &strPacket);

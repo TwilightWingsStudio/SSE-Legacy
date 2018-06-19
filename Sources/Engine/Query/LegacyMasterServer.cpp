@@ -135,87 +135,96 @@ void MSLegacy_BuildHearthbeatPacket(CTString &strPacket)
   strPacket.PrintF("\\heartbeat\\%hu\\gamename\\%s", (_pShell->GetINDEX("net_iPort") + 1), SERIOUSSAMSTR);
 }
 
+static void _LocalSearch()
+{
+  // make sure that there are no requests still stuck in buffer
+  ga_asrRequests.Clear();
+
+  // we're not a server
+  _bServer = FALSE;
+  _pNetwork->ga_strEnumerationStatus = ".";
+
+  WORD     _wsaRequested;
+  WSADATA  wsaData;
+  PHOSTENT _phHostinfo;
+  ULONG    _uIP,*_pchIP = &_uIP;
+  USHORT   _uPort,*_pchPort = &_uPort;
+  INT      _iLen;
+  char     _cName[256],*_pch,_strFinal[8] = {0};
+
+  struct in_addr addr;
+
+  // make the buffer that we'll use for packet reading
+  if (_szIPPortBufferLocal != NULL) {
+     return;
+  }
+  _szIPPortBufferLocal = new char[1024];
+
+  // start WSA
+  _wsaRequested = MAKEWORD( 2, 2 );
+  if (WSAStartup(_wsaRequested, &wsaData) != 0) {
+    CPrintF("Error initializing winsock!\n");
+    if (_szIPPortBufferLocal != NULL) {
+      delete[] _szIPPortBufferLocal;
+    }
+    _szIPPortBufferLocal = NULL;
+    _uninitWinsock();
+    _bInitialized = FALSE;
+    _pNetwork->ga_bEnumerationChange = FALSE;
+    _pNetwork->ga_strEnumerationStatus = "";
+    WSACleanup();
+
+    return;
+  }
+
+  _pch = _szIPPortBufferLocal;
+  _iLen = 0;
+  strcpy(_strFinal,"\\final\\");
+
+  if (gethostname ( _cName, sizeof(_cName)) == 0)
+  {
+    if ((_phHostinfo = gethostbyname(_cName)) != NULL)
+    {
+      int _iCount = 0;
+      while(_phHostinfo->h_addr_list[_iCount])
+      {
+        
+        addr.s_addr = *(u_long *) _phHostinfo->h_addr_list[_iCount];
+        _uIP = htonl(addr.s_addr);
+       
+        CPrintF("%lu\n", _uIP);
+        
+        for (UINT uPort = 25601; uPort < 25622; ++uPort){
+          _uPort = htons(uPort);
+          memcpy(_pch,_pchIP,4);
+          _pch  +=4;
+          _iLen +=4;
+          memcpy(_pch,_pchPort,2);
+          _pch  +=2;
+          _iLen +=2;
+        }
+        ++_iCount;
+      }
+
+      memcpy(_pch,_strFinal, 7);
+      _pch  +=7;
+      _iLen +=7;
+      _pch[_iLen] = 0x00;
+    }
+  }
+
+  _iIPPortBufferLocalLen = _iLen;
+
+  _bActivatedLocal = TRUE;
+  _bInitialized = TRUE;
+  _initializeWinsock();
+}
+
 void MSLegacy_EnumTrigger(BOOL bInternet)
 {
   // Local Search with Legacy Protocol
   if (!bInternet) {
-    // make sure that there are no requests still stuck in buffer
-    ga_asrRequests.Clear();
-
-    // we're not a server
-    _bServer = FALSE;
-    _pNetwork->ga_strEnumerationStatus = ".";
-	
-    WORD     _wsaRequested;
-    WSADATA  wsaData;
-    PHOSTENT _phHostinfo;
-    ULONG    _uIP,*_pchIP = &_uIP;
-    USHORT   _uPort,*_pchPort = &_uPort;
-    INT      _iLen;
-    char     _cName[256],*_pch,_strFinal[8] = {0};
-
-    struct in_addr addr;
-
-    // make the buffer that we'll use for packet reading
-    if (_szIPPortBufferLocal != NULL) {
-       return;
-    }
-    _szIPPortBufferLocal = new char[1024];
-	
-    // start WSA
-    _wsaRequested = MAKEWORD( 2, 2 );
-    if (WSAStartup(_wsaRequested, &wsaData) != 0) {
-      CPrintF("Error initializing winsock!\n");
-      if (_szIPPortBufferLocal != NULL) {
-        delete[] _szIPPortBufferLocal;
-      }
-      _szIPPortBufferLocal = NULL;
-      _uninitWinsock();
-      _bInitialized = FALSE;
-      _pNetwork->ga_bEnumerationChange = FALSE;
-      _pNetwork->ga_strEnumerationStatus = "";
-      WSACleanup();
-
-      return;
-    }
-
-    _pch = _szIPPortBufferLocal;
-    _iLen = 0;
-    strcpy(_strFinal,"\\final\\");
-	
-    if (gethostname ( _cName, sizeof(_cName)) == 0)
-    {
-      if ((_phHostinfo = gethostbyname(_cName)) != NULL)
-      {
-        int _iCount = 0;
-        while(_phHostinfo->h_addr_list[_iCount])
-        {
-          addr.s_addr = *(u_long *) _phHostinfo->h_addr_list[_iCount];
-          _uIP = htonl(addr.s_addr);
-          
-          for (UINT uPort = 25601; uPort < 25622; ++uPort){
-            _uPort = htons(uPort);
-            memcpy(_pch,_pchIP,4);
-            _pch  +=4;
-            _iLen +=4;
-            memcpy(_pch,_pchPort,2);
-            _pch  +=2;
-            _iLen +=2;
-          }
-          ++_iCount;
-        }
-        memcpy(_pch,_strFinal, 7);
-        _pch  +=7;
-        _iLen +=7;
-        _pch[_iLen] = 0x00;
-      }
-	  }
-
-    _iIPPortBufferLocalLen = _iLen;
-
-    _bActivatedLocal = TRUE;
-    _bInitialized = TRUE;
-    _initializeWinsock();	
+    _LocalSearch();
     return;
 	
   // Internet Search
