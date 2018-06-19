@@ -330,7 +330,7 @@ extern void MS_OnServerUpdate(void)
       GameAgent_ServerParsePacket(iLength);
     } else {
       _szBuffer[iLength] = 0;
-      MSLegacy_ProcessReceivedPacket(iLength);
+      MSLegacy_ServerParsePacket(iLength);
     }
  }
 

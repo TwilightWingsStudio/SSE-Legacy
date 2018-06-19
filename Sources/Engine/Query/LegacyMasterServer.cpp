@@ -442,7 +442,7 @@ void MSLegacy_EnumUpdate(void)
   }	
 }
 
-extern void MSLegacy_ProcessReceivedPacket(INDEX iLength)
+extern void MSLegacy_ServerParsePacket(INDEX iLength)
 {
   unsigned char *data = (unsigned char*)&_szBuffer[0];
 
@@ -587,6 +587,119 @@ extern void MSLegacy_ProcessReceivedPacket(INDEX iLength)
   }
 }
 
+static void MSLegacy_ParseStatusResponse(sockaddr_in &_sinClient)
+{
+  CTString strPlayers;
+  CTString strMaxPlayers;
+  CTString strLevel;
+  CTString strGameType;
+  CTString strVersion;
+  CTString strGameName;
+  CTString strSessionName;
+
+  CTString strGamePort;
+  CTString strServerLocation;
+  CTString strGameMode;
+  CTString strActiveMod;
+
+  CHAR* pszPacket = _szBuffer + 1; // we do +1 because the first character is always '\', which we don't care about.
+
+  BOOL bReadValue = FALSE;
+  CTString strKey;
+  CTString strValue;
+
+  while(*pszPacket != 0)
+  {
+    switch (*pszPacket)
+    {
+      case '\\': {
+        if (strKey != "gamemode") {
+          if (bReadValue) {
+            // we're done reading the value, check which key it was
+            if (strKey == "gamename") {
+                strGameName = strValue;
+            } else if (strKey == "gamever") {
+                strVersion = strValue;
+            } else if (strKey == "location") {
+                strServerLocation = strValue;
+            } else if (strKey == "hostname") {
+                strSessionName = strValue;
+            } else if (strKey == "hostport") {
+                strGamePort = strValue;
+            } else if (strKey == "mapname") {
+                strLevel = strValue;
+            } else if (strKey == "gametype") {
+                strGameType = strValue;
+            } else if (strKey == "activemod") {
+                strActiveMod = strValue;
+            } else if (strKey == "numplayers") {
+                strPlayers = strValue;
+            } else if (strKey == "maxplayers") {
+                strMaxPlayers = strValue;
+            } else {
+                //CPrintF("Unknown GameAgent parameter key '%s'!", strKey);
+            }
+            // reset temporary holders
+            strKey = "";
+            strValue = "";
+          }
+        }
+        bReadValue = !bReadValue;
+      } break;
+
+      default: {
+        // read into the value or into the key, depending where we are
+        if (bReadValue) {
+            strValue.InsertChar(strlen(strValue), *pszPacket);
+        } else {
+            strKey.InsertChar(strlen(strKey), *pszPacket);
+        }
+      } break;
+    }
+
+    // move to next character
+    pszPacket++;
+  }
+
+  // check if we still have a maxplayers to back up
+  if (strKey == "gamemode") {
+      strGameMode = strValue;
+  }
+
+  if (strActiveMod != "") {
+      strGameName = strActiveMod;
+  }
+
+  long long tmPing = -1;
+  // find the request in the request array
+  for (INDEX i=0; i<ga_asrRequests.Count(); i++) {
+      CServerRequest &req = ga_asrRequests[i];
+      if (req.sr_ulAddress == _sinClient.sin_addr.s_addr && req.sr_iPort == _sinClient.sin_port) {
+          tmPing = _pTimer->GetHighPrecisionTimer().GetMilliseconds() - req.sr_tmRequestTime;
+          ga_asrRequests.Delete(&req);
+          break;
+      }
+  }
+
+  if (tmPing > 0 && tmPing < 2500000)
+  {
+    // insert the server into the serverlist
+    CNetworkSession &ns = *new CNetworkSession;
+    _pNetwork->ga_lhEnumeratedSessions.AddTail(ns.ns_lnNode);
+
+    // add the server to the serverlist
+    ns.ns_strSession = strSessionName;
+    ns.ns_strAddress = inet_ntoa(_sinClient.sin_addr) + CTString(":") + CTString(0, "%d", htons(_sinClient.sin_port) - 1);
+    ns.ns_tmPing = (tmPing / 1000.0f);
+    ns.ns_strWorld = strLevel;
+    ns.ns_ctPlayers = atoi(strPlayers);
+    ns.ns_ctMaxPlayers = atoi(strMaxPlayers);
+    ns.ns_strGameType = strGameType;
+    ns.ns_strMod = strGameName;
+    ns.ns_strVer = strVersion;
+  }
+}
+
 DWORD WINAPI _MS_Thread(LPVOID lpParam)
 {
   SOCKET _sockudp = NULL;
@@ -613,170 +726,73 @@ DWORD WINAPI _MS_Thread(LPVOID lpParam)
       break;
     }
 
-      _sIPPort ip = *pServerIP;
+    _sIPPort ip = *pServerIP;
 
-      CTString strIP;
-      strIP.PrintF("%d.%d.%d.%d", ip.bFirst, ip.bSecond, ip.bThird, ip.bFourth);
+    CTString strIP;
+    strIP.PrintF("%d.%d.%d.%d", ip.bFirst, ip.bSecond, ip.bThird, ip.bFourth);
 
-      sockaddr_in sinServer;
-      sinServer.sin_family = AF_INET;
-      sinServer.sin_addr.s_addr = inet_addr(strIP);
-      sinServer.sin_port = ip.iPort;
+    sockaddr_in sinServer;
+    sinServer.sin_family = AF_INET;
+    sinServer.sin_addr.s_addr = inet_addr(strIP);
+    sinServer.sin_port = ip.iPort;
 
-      // insert server status request into container
-      CServerRequest &sreq = ga_asrRequests.Push();
-      sreq.sr_ulAddress = sinServer.sin_addr.s_addr;
-      sreq.sr_iPort = sinServer.sin_port;
-      sreq.sr_tmRequestTime = _pTimer->GetHighPrecisionTimer().GetMilliseconds();
+    // insert server status request into container
+    CServerRequest &sreq = ga_asrRequests.Push();
+    sreq.sr_ulAddress = sinServer.sin_addr.s_addr;
+    sreq.sr_iPort = sinServer.sin_port;
+    sreq.sr_tmRequestTime = _pTimer->GetHighPrecisionTimer().GetMilliseconds();
 
-      // send packet to server
-      sendto(_sockudp,"\\status\\",8,0,
-          (sockaddr *) &sinServer, sizeof(sinServer));
+    // send packet to server
+    sendto(_sockudp,"\\status\\",8,0,
+        (sockaddr *) &sinServer, sizeof(sinServer));
 
-      sockaddr_in _sinClient;
-      int _iClientLength = sizeof(_sinClient);
+    sockaddr_in _sinClient;
+    int _iClientLength = sizeof(_sinClient);
 
-      fd_set readfds_udp;                         // declare a read set
-      struct timeval timeout_udp;                 // declare a timeval for our timer
-      int iRet = -1;
+    fd_set readfds_udp;                         // declare a read set
+    struct timeval timeout_udp;                 // declare a timeval for our timer
+    int iRet = -1;
 
-      FD_ZERO(&readfds_udp);                      // zero out the read set
-      FD_SET(_sockudp, &readfds_udp);                // add socket to the read set
-      timeout_udp.tv_sec = 0;                     // timeout = 0 seconds
-      timeout_udp.tv_usec = 50000;               // timeout += 0.05 seconds
-      int _iN = select(_sockudp + 1, &readfds_udp, NULL, NULL, &timeout_udp);
-      if (_iN > 0) {
-        /** do recvfrom stuff **/
-        iRet =  recvfrom(_sockudp, _szBuffer, 2048, 0, (sockaddr*)&_sinClient, &_iClientLength);
-        FD_CLR(_sockudp, &readfds_udp);
-        if (iRet != -1 && iRet > 100 && iRet != SOCKET_ERROR) {
-          // null terminate the buffer
-          _szBuffer[iRet] = 0;
-          char *sPch = NULL;
-          sPch = strstr(_szBuffer, "\\gamename\\serioussamse\\");
-          if (!sPch) {
-              CPrintF("Unknown query server response!\n");
-              return -1;
-          } else {
+    FD_ZERO(&readfds_udp);                      // zero out the read set
+    FD_SET(_sockudp, &readfds_udp);                // add socket to the read set
+    timeout_udp.tv_sec = 0;                     // timeout = 0 seconds
+    timeout_udp.tv_usec = 50000;               // timeout += 0.05 seconds
+    int _iN = select(_sockudp + 1, &readfds_udp, NULL, NULL, &timeout_udp);
 
-              CTString strPlayers;
-              CTString strMaxPlayers;
-              CTString strLevel;
-              CTString strGameType;
-              CTString strVersion;
-              CTString strGameName;
-              CTString strSessionName;
+    if (_iN > 0)
+    {
+      /** do recvfrom stuff **/
+      iRet =  recvfrom(_sockudp, _szBuffer, 2048, 0, (sockaddr*)&_sinClient, &_iClientLength);
+      FD_CLR(_sockudp, &readfds_udp);
 
-              CTString strGamePort;
-              CTString strServerLocation;
-              CTString strGameMode;
-              CTString strActiveMod;
+      if (iRet != -1 && iRet > 100 && iRet != SOCKET_ERROR) {
+        // null terminate the buffer
+        _szBuffer[iRet] = 0;
+        char *sPch = NULL;
+        sPch = strstr(_szBuffer, "\\gamename\\serioussamse\\");
 
-              CHAR* pszPacket = _szBuffer + 1; // we do +1 because the first character is always '\', which we don't care about.
-
-              BOOL bReadValue = FALSE;
-              CTString strKey;
-              CTString strValue;
-
-              while(*pszPacket != 0) {
-              switch (*pszPacket) {
-              case '\\':
-                  if (strKey != "gamemode") {
-                    if (bReadValue) {
-                      // we're done reading the value, check which key it was
-                      if (strKey == "gamename") {
-                          strGameName = strValue;
-                      } else if (strKey == "gamever") {
-                          strVersion = strValue;
-                      } else if (strKey == "location") {
-                          strServerLocation = strValue;
-                      } else if (strKey == "hostname") {
-                          strSessionName = strValue;
-                      } else if (strKey == "hostport") {
-                          strGamePort = strValue;
-                      } else if (strKey == "mapname") {
-                          strLevel = strValue;
-                      } else if (strKey == "gametype") {
-                          strGameType = strValue;
-                      } else if (strKey == "activemod") {
-                          strActiveMod = strValue;
-                      } else if (strKey == "numplayers") {
-                          strPlayers = strValue;
-                      } else if (strKey == "maxplayers") {
-                          strMaxPlayers = strValue;
-                      } else {
-                          //CPrintF("Unknown GameAgent parameter key '%s'!", strKey);
-                      }
-                      // reset temporary holders
-                      strKey = "";
-                      strValue = "";
-                    }
-                  }
-                  bReadValue = !bReadValue;
-                  break;
-
-              default:
-                  // read into the value or into the key, depending where we are
-                  if (bReadValue) {
-                      strValue.InsertChar(strlen(strValue), *pszPacket);
-                  } else {
-                      strKey.InsertChar(strlen(strKey), *pszPacket);
-                  }
-                  break;
-                }
-                // move to next character
-                pszPacket++;
-              }
-
-              // check if we still have a maxplayers to back up
-              if (strKey == "gamemode") {
-                  strGameMode = strValue;
-              }
-              if (strActiveMod != "") {
-                  strGameName = strActiveMod;
-              }
-      
-              long long tmPing = -1;
-              // find the request in the request array
-              for (INDEX i=0; i<ga_asrRequests.Count(); i++) {
-                  CServerRequest &req = ga_asrRequests[i];
-                  if (req.sr_ulAddress == _sinClient.sin_addr.s_addr && req.sr_iPort == _sinClient.sin_port) {
-                      tmPing = _pTimer->GetHighPrecisionTimer().GetMilliseconds() - req.sr_tmRequestTime;
-                      ga_asrRequests.Delete(&req);
-                      break;
-                  }
-              }
-
-              if (tmPing > 0 && tmPing < 2500000) {
-          // insert the server into the serverlist
-                  CNetworkSession &ns = *new CNetworkSession;
-                  _pNetwork->ga_lhEnumeratedSessions.AddTail(ns.ns_lnNode);
-        
-                  // add the server to the serverlist
-                  ns.ns_strSession = strSessionName;
-                  ns.ns_strAddress = inet_ntoa(_sinClient.sin_addr) + CTString(":") + CTString(0, "%d", htons(_sinClient.sin_port) - 1);
-                  ns.ns_tmPing = (tmPing / 1000.0f);
-                  ns.ns_strWorld = strLevel;
-                  ns.ns_ctPlayers = atoi(strPlayers);
-                  ns.ns_ctMaxPlayers = atoi(strMaxPlayers);
-                  ns.ns_strGameType = strGameType;
-                  ns.ns_strMod = strGameName;
-                  ns.ns_strVer = strVersion;
-              }
-          }
+        if (!sPch) {
+            CPrintF("Unknown query server response!\n");
+            return -1;
         } else {
-          // find the request in the request array
-          for (INDEX i=0; i<ga_asrRequests.Count(); i++) {
-            CServerRequest &req = ga_asrRequests[i];
-            if (req.sr_ulAddress == _sinClient.sin_addr.s_addr && req.sr_iPort == _sinClient.sin_port) {
-              ga_asrRequests.Delete(&req);
-              break;
-            }
+          MSLegacy_ParseStatusResponse(_sinClient);
+        }
+
+      } else {
+        // find the request in the request array
+        for (INDEX i = 0; i < ga_asrRequests.Count(); i++)
+        {
+          CServerRequest &req = ga_asrRequests[i];
+          if (req.sr_ulAddress == _sinClient.sin_addr.s_addr && req.sr_iPort == _sinClient.sin_port) {
+            ga_asrRequests.Delete(&req);
+            break;
           }
         }
       }
-      pServerIP++;
-      _iIPPortBufferLen -= 6;
+    }
+
+    pServerIP++;
+    _iIPPortBufferLen -= 6;
   }
 
   if (_szIPPortBuffer) free (_szIPPortBuffer);
@@ -842,8 +858,7 @@ DWORD WINAPI _LocalNet_Thread(LPVOID lpParam)
     sreq.sr_tmRequestTime = _pTimer->GetHighPrecisionTimer().GetMilliseconds();
 
     // send packet to server
-    sendto(_sockudp,"\\status\\",8,0,
-        (sockaddr *) &sinServer, sizeof(sinServer));
+    sendto(_sockudp,"\\status\\",8,0, (sockaddr *) &sinServer, sizeof(sinServer));
 
     sockaddr_in _sinClient;
     int _iClientLength = sizeof(_sinClient);
@@ -856,6 +871,7 @@ DWORD WINAPI _LocalNet_Thread(LPVOID lpParam)
     FD_SET(_sockudp, &readfds_udp);             // add socket to the read set
     timeout_udp.tv_sec = 0;                     // timeout = 0 seconds
     timeout_udp.tv_usec = 50000;                // timeout += 0.05 seconds
+
     int _iN = select(_sockudp + 1, &readfds_udp, NULL, NULL, &timeout_udp);
 
     if (_iN > 0)
@@ -863,14 +879,17 @@ DWORD WINAPI _LocalNet_Thread(LPVOID lpParam)
       /** do recvfrom stuff **/
       iRet =  recvfrom(_sockudp, _szBuffer, 2048, 0, (sockaddr*)&_sinClient, &_iClientLength);
       FD_CLR(_sockudp, &readfds_udp);
-      if (iRet != -1 && iRet > 100 && iRet != SOCKET_ERROR) {
+
+      if (iRet != -1 && iRet > 100 && iRet != SOCKET_ERROR)
+      {
         // null terminate the buffer
         _szBuffer[iRet] = 0;
         char *sPch = NULL;
         sPch = strstr(_szBuffer, "\\gamename\\serioussamse\\");
 
         if (!sPch) {
-            CPrintF("Unknown query server response!\n");
+          CPrintF("Unknown query server response!\n");
+
           if (_szIPPortBufferLocal != NULL) {
             delete[] _szIPPortBufferLocal;
           }
@@ -878,116 +897,13 @@ DWORD WINAPI _LocalNet_Thread(LPVOID lpParam)
           WSACleanup();
           return -1;
         } else {
-
-            CTString strPlayers;
-            CTString strMaxPlayers;
-            CTString strLevel;
-            CTString strGameType;
-            CTString strVersion;
-            CTString strGameName;
-            CTString strSessionName;
-
-            CTString strGamePort;
-            CTString strServerLocation;
-            CTString strGameMode;
-            CTString strActiveMod;
-
-            CHAR* pszPacket = _szBuffer + 1; // we do +1 because the first character is always '\', which we don't care about.
-
-            BOOL bReadValue = FALSE;
-            CTString strKey;
-            CTString strValue;
-
-            while(*pszPacket != 0) {
-            switch (*pszPacket) {
-            case '\\':
-                if (strKey != "gamemode") {
-                  if (bReadValue) {
-                    // we're done reading the value, check which key it was
-                    if (strKey == "gamename") {
-                        strGameName = strValue;
-                    } else if (strKey == "gamever") {
-                        strVersion = strValue;
-                    } else if (strKey == "location") {
-                        strServerLocation = strValue;
-                    } else if (strKey == "hostname") {
-                        strSessionName = strValue;
-                    } else if (strKey == "hostport") {
-                        strGamePort = strValue;
-                    } else if (strKey == "mapname") {
-                        strLevel = strValue;
-                    } else if (strKey == "gametype") {
-                        strGameType = strValue;
-                    } else if (strKey == "activemod") {
-                        strActiveMod = strValue;
-                    } else if (strKey == "numplayers") {
-                        strPlayers = strValue;
-                    } else if (strKey == "maxplayers") {
-                        strMaxPlayers = strValue;
-                    } else {
-          //CPrintF("Unknown GameAgent parameter key '%s'!", strKey);
-                    }
-                    // reset temporary holders
-                    strKey = "";
-                    strValue = "";
-                  }
-                }
-                bReadValue = !bReadValue;
-                break;
-
-            default:
-                // read into the value or into the key, depending where we are
-                if (bReadValue) {
-                    strValue.InsertChar(strlen(strValue), *pszPacket);
-                } else {
-                    strKey.InsertChar(strlen(strKey), *pszPacket);
-                }
-                break;
-              }
-              // move to next character
-              pszPacket++;
-            }
-
-            // check if we still have a maxplayers to back up
-            if (strKey == "gamemode") {
-                strGameMode = strValue;
-            }
-            if (strActiveMod != "") {
-                strGameName = strActiveMod;
-            }
-
-            long long tmPing = -1;
-            // find the request in the request array
-            for (INDEX i=0; i<ga_asrRequests.Count(); i++) {
-                CServerRequest &req = ga_asrRequests[i];
-                if (req.sr_ulAddress == _sinClient.sin_addr.s_addr && req.sr_iPort == _sinClient.sin_port) {
-                    tmPing = _pTimer->GetHighPrecisionTimer().GetMilliseconds() - req.sr_tmRequestTime;
-                    ga_asrRequests.Delete(&req);
-                    break;
-                }
-            }
-
-            if (tmPing > 0 && tmPing < 2500000) {
-                // insert the server into the serverlist
-                _pNetwork->ga_strEnumerationStatus = "";
-                CNetworkSession &ns = *new CNetworkSession;
-                _pNetwork->ga_lhEnumeratedSessions.AddTail(ns.ns_lnNode);
-      
-                // add the server to the serverlist
-                ns.ns_strSession = strSessionName;
-                ns.ns_strAddress = inet_ntoa(_sinClient.sin_addr) + CTString(":") + CTString(0, "%d", htons(_sinClient.sin_port) - 1);
-                ns.ns_tmPing = (tmPing / 1000.0f);
-                ns.ns_strWorld = strLevel;
-                ns.ns_ctPlayers = atoi(strPlayers);
-                ns.ns_ctMaxPlayers = atoi(strMaxPlayers);
-                ns.ns_strGameType = strGameType;
-                ns.ns_strMod = strGameName;
-                ns.ns_strVer = strVersion;
-            }
+          MSLegacy_ParseStatusResponse(_sinClient);
         }
+
       } else {
         // find the request in the request array
-        for (INDEX i=0; i<ga_asrRequests.Count(); i++) {
+        for (INDEX i=0; i<ga_asrRequests.Count(); i++)
+        {
           CServerRequest &req = ga_asrRequests[i];
           if (req.sr_ulAddress == _sinClient.sin_addr.s_addr && req.sr_iPort == _sinClient.sin_port) {
             ga_asrRequests.Delete(&req);

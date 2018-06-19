@@ -48,9 +48,9 @@ extern void GameAgent_ServerParsePacket(INDEX iLength);
 
 // Legacy Master Server
 extern void MSLegacy_BuildHearthbeatPacket(CTString &strPacket);
-extern void MSLegacy_ProcessReceivedPacket(INDEX iLength);
 extern void MSLegacy_EnumTrigger(BOOL bInternet);
 extern void MSLegacy_EnumUpdate(void);
+extern void MSLegacy_ServerParsePacket(INDEX iLength);
 
 // DarkPlaces Master Server
 extern void DarkPlaces_BuildHearthbeatPacket(CTString &strPacket);
