@@ -3192,6 +3192,10 @@ static void HUD_RegisterTextures()
 // --------------------------------------------------------------------------------------
 extern void InitHUD(void)
 {
+  if (_bDedicatedServer) {
+    return;
+  }
+  
   if (_pHAC == NULL) {
     _pHAC = new CHudAssetsContainer();
     InitAmmoWeaponIconsLinks();
