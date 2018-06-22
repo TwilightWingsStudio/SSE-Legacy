@@ -801,7 +801,12 @@ void CGameTimerHandler::HandleTimer(void)
 
 
 void CGame::GameHandleTimer(void)
-{
+{ 
+  // [SSE] Light Dedicated Server
+  if (_bDedicatedServer) {
+    return; // Server don't care about buttons.
+  }
+
   // if direct input is active
   if( _pInput->IsInputEnabled() && !gm_bMenuOn)
   {
@@ -969,7 +974,11 @@ void CGame::InitInternal( void)
 
   gm_MenuSplitScreenCfg = SSC_PLAY1;
 
-  LoadPlayersAndControls();
+  // [SSE] Light Dedicated Server
+  // Server don't need such things.
+  if (!_bDedicatedServer) {
+    LoadPlayersAndControls();
+  }
 
   gm_iWEDSinglePlayer = 0;
   gm_iSinglePlayer = 0;
@@ -1148,11 +1157,14 @@ void CGame::InitInternal( void)
     FatalError(TRANS("Current player controls are invalid."));
   }
 
-  // load common controls
-  try {
-    _ctrlCommonControls.Load_t(fnmCommonControls);
-  } catch (char * /*strError*/) {
-    //FatalError(TRANS("Cannot load common controls: %s\n"), strError);
+  // [SSE] Light Dedicated Server
+  if (!_bDedicatedServer) {
+    // load common controls
+    try {
+      _ctrlCommonControls.Load_t(fnmCommonControls);
+    } catch (char * /*strError*/) {
+      //FatalError(TRANS("Cannot load common controls: %s\n"), strError);
+    }
   }
 
   // init LCD textures/fonts
@@ -1187,6 +1199,7 @@ void CGame::EndInternal(void)
   StopGame();
   // remove game timer handler
   _pTimer->RemHandler( &m_gthGameTimerHandler);
+
   // save persistent symbols
   if (!_bDedicatedServer) {
     _pShell->StorePersistentSymbols(fnmPersistentSymbols);
@@ -1210,7 +1223,11 @@ void CGame::EndInternal(void)
   } catch (char *strError) {
     WarningMessage(TRANS("Cannot save console history:\n%s"), strError);
   }
-  SavePlayersAndControls();
+  
+  // [SSE] Light Dedicated Server
+  if (!_bDedicatedServer) {
+    SavePlayersAndControls();
+  }
 
   // save game shell settings
   try {
@@ -1753,9 +1770,13 @@ void LoadPlayer(CPlayerCharacter &pc, INDEX i)
  */
 void CGame::LoadPlayersAndControls( void)
 {
+  CPrintF("Loading controls...\n");
+  
   for (INDEX iControls=0; iControls<8; iControls++) {
     LoadControls(gm_actrlControls[iControls], iControls);
   }
+  
+  CPrintF("Loading players...\n");
 
   for (INDEX iPlayer=0; iPlayer<8; iPlayer++) {
     LoadPlayer(gm_apcPlayers[iPlayer], iPlayer);
@@ -1919,7 +1940,7 @@ static void PrintStats( CDrawPort *pdpDrawPort)
       // skip hours
       strTime.PrintF( "%2d:%02d", ulTime/60, ulTime%60);
     }
-    pdpDrawPort->PutTextC( strTime, slDPWidth*0.5f, slDPHeight*0.06f, C_WHITE|CT_OPAQUE);
+    pdpDrawPort->PutTextC( strTime, slDPWidth * 0.5f, slDPHeight*0.06f, C_WHITE|CT_OPAQUE);
   }
 
   // if required, print real time
