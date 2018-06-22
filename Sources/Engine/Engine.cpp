@@ -282,7 +282,12 @@ ENGINE_API void SE_InitEngine(CTString strGameID)
   _pTimer = new CTimer;
   _pGfx   = new CGfxLibrary;
   _pSound = new CSoundLibrary;
-  _pInput = new CInput;
+
+  // [SSE] Light Dedicated Server
+  if (!_bDedicatedServer) {
+    _pInput = new CInput;
+  }
+
   _pNetwork = new CNetworkLibrary;
 
   CRCT_Init();
@@ -444,7 +449,10 @@ ENGINE_API void SE_InitEngine(CTString strGameID)
   }
 #endif
 
-  _pInput->Initialize();
+  // [SSE] Light Dedicated Server
+  if (!_bDedicatedServer) {
+    _pInput->Initialize();
+  }
 
   _pGfx->Init();
   _pSound->Init();
@@ -504,7 +512,9 @@ ENGINE_API void SE_InitEngine(CTString strGameID)
   CPrintF("  done.\n");
   
   // [SSE] DRP
-  Discord_InitPlugin();
+  if (!_bDedicatedServer) {
+    Discord_InitPlugin();
+  }
 }
 
 
@@ -534,8 +544,10 @@ ENGINE_API void SE_EndEngine(void)
   CRCT_Clear();
 
   // shutdown
-  if( _pNetwork != NULL) { delete _pNetwork;  _pNetwork=NULL; }
-  delete _pInput;    _pInput   = NULL;  
+  if ( _pNetwork != NULL) { delete _pNetwork;  _pNetwork = NULL; }
+  
+  // _pInput can be NULL while running DedicatedServer.
+  if (   _pInput != NULL) { delete _pInput;    _pInput   = NULL; }
   delete _pSound;    _pSound   = NULL;  
   delete _pGfx;      _pGfx     = NULL;    
   delete _pTimer;    _pTimer   = NULL;  
