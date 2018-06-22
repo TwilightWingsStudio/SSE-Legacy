@@ -454,6 +454,8 @@ extern void MSLegacy_ServerParsePacket(INDEX iLength)
   sPch4 = strstr(_szBuffer, "\\players\\");
 
   sPch5 = strstr(_szBuffer, "\\secure\\"); // [SSE] [ZCaliptium] Validation Fix.
+  
+  //CPrintF("Data[%d]: %s\n", iLength, _szBuffer);
 
   // status request
   if (sPch1) {
@@ -587,7 +589,7 @@ extern void MSLegacy_ServerParsePacket(INDEX iLength)
   }
 }
 
-static void MSLegacy_ParseStatusResponse(sockaddr_in &_sinClient)
+static void MSLegacy_ParseStatusResponse(sockaddr_in &_sinClient, BOOL bIgnorePing)
 {
   CTString strPlayers;
   CTString strMaxPlayers;
@@ -680,8 +682,12 @@ static void MSLegacy_ParseStatusResponse(sockaddr_in &_sinClient)
           break;
       }
   }
+  
+  if (bIgnorePing) {
+    tmPing = 0;
+  }
 
-  if (tmPing > 0 && tmPing < 2500000)
+  if (bIgnorePing || (tmPing > 0 && tmPing < 2500000))
   {
     // insert the server into the serverlist
     CNetworkSession &ns = *new CNetworkSession;
@@ -775,7 +781,7 @@ DWORD WINAPI _MS_Thread(LPVOID lpParam)
             CPrintF("Unknown query server response!\n");
             return -1;
         } else {
-          MSLegacy_ParseStatusResponse(_sinClient);
+          MSLegacy_ParseStatusResponse(_sinClient, FALSE);
         }
 
       } else {
@@ -834,31 +840,53 @@ DWORD WINAPI _LocalNet_Thread(LPVOID lpParam)
   }
 
   _sIPPort* pServerIP = (_sIPPort*)(_szIPPortBufferLocal);
-
-  while(_iIPPortBufferLocalLen >= 6)
+  
+  int optval = 1;
+  if (setsockopt(_sockudp, SOL_SOCKET, SO_BROADCAST, (char *)&optval, sizeof(optval)) != 0)
   {
-    if (!strncmp((char *)pServerIP, "\\final\\", 7)) {
+    return -1;
+  }
+
+  struct   sockaddr_in saddr;
+  saddr.sin_family = AF_INET;
+  saddr.sin_addr.s_addr = 0xFFFFFFFF;
+  
+  unsigned short startport = 25601;
+  unsigned short endport =  startport + 20;
+  
+	for (int i = startport ; i <= endport ; i += 1)
+	{
+    saddr.sin_port = htons(i);
+    sendto(_sockudp, "\\status\\", 8, 0, (sockaddr *) &saddr, sizeof(saddr));
+  }
+
+  //while(_iIPPortBufferLocalLen >= 6)
+  {
+    /*if (!strncmp((char *)pServerIP, "\\final\\", 7)) {
       break;
-    }
+    }*/
 
     _sIPPort ip = *pServerIP;
 
     CTString strIP;
     strIP.PrintF("%d.%d.%d.%d", ip.bFourth, ip.bThird, ip.bSecond, ip.bFirst);
 
+    /*
     sockaddr_in sinServer;
     sinServer.sin_family = AF_INET;
     sinServer.sin_addr.s_addr = inet_addr(strIP);
     sinServer.sin_port = ip.iPort;
+    */
 
     // insert server status request into container
+    /*
     CServerRequest &sreq = ga_asrRequests.Push();
     sreq.sr_ulAddress = sinServer.sin_addr.s_addr;
     sreq.sr_iPort = sinServer.sin_port;
-    sreq.sr_tmRequestTime = _pTimer->GetHighPrecisionTimer().GetMilliseconds();
+    sreq.sr_tmRequestTime = _pTimer->GetHighPrecisionTimer().GetMilliseconds();*/
 
     // send packet to server
-    sendto(_sockudp,"\\status\\",8,0, (sockaddr *) &sinServer, sizeof(sinServer));
+    //sendto(_sockudp,"\\status\\",8,0, (sockaddr *) &sinServer, sizeof(sinServer));
 
     sockaddr_in _sinClient;
     int _iClientLength = sizeof(_sinClient);
@@ -870,9 +898,11 @@ DWORD WINAPI _LocalNet_Thread(LPVOID lpParam)
     FD_ZERO(&readfds_udp);                      // zero out the read set
     FD_SET(_sockudp, &readfds_udp);             // add socket to the read set
     timeout_udp.tv_sec = 0;                     // timeout = 0 seconds
-    timeout_udp.tv_usec = 50000;                // timeout += 0.05 seconds
+    timeout_udp.tv_usec = 250000; // 0.25 sec //50000;                // timeout += 0.05 seconds
 
     int _iN = select(_sockudp + 1, &readfds_udp, NULL, NULL, &timeout_udp);
+    
+    CPrintF("Received %d answers.\n", _iN);
 
     if (_iN > 0)
     {
@@ -897,7 +927,7 @@ DWORD WINAPI _LocalNet_Thread(LPVOID lpParam)
           WSACleanup();
           return -1;
         } else {
-          MSLegacy_ParseStatusResponse(_sinClient);
+          MSLegacy_ParseStatusResponse(_sinClient, TRUE);
         }
 
       } else {
@@ -913,8 +943,8 @@ DWORD WINAPI _LocalNet_Thread(LPVOID lpParam)
       }
     }
 
-    pServerIP++;
-    _iIPPortBufferLocalLen -= 6;
+   // pServerIP++;
+    //_iIPPortBufferLocalLen -= 6;
   }
 
   if (_szIPPortBufferLocal != NULL) {

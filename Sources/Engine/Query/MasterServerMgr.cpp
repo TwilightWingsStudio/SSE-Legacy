@@ -129,6 +129,14 @@ void _initializeWinsock(void)
     _sinLocal->sin_family = AF_INET;
     _sinLocal->sin_addr.s_addr = inet_addr("0.0.0.0");
     _sinLocal->sin_port = htons(_pShell->GetINDEX("net_iPort") + 1);
+    
+    int optval = 1;
+    if (setsockopt(_socket, SOL_SOCKET, SO_BROADCAST, (char *)&optval, sizeof(optval)) != 0)
+    {
+      CPrintF("Error while allowing UDP broadcast receiving for socket.");
+      _uninitWinsock();
+      return;
+    }
 
     // bind the socket
     bind(_socket, (sockaddr*)_sinLocal, sizeof(*_sinLocal));
