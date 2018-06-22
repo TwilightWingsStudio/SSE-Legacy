@@ -6793,9 +6793,12 @@ functions:
         if (m_ulLastButtons&PLACT_RELOAD) {
           m_ulFlags &= ~PLF_RESPAWNINPLACE;
         }
+        
+        // If lives can be obtained then player should be able respawn.
+        BOOL bLivesCanBeObtained = GetSP()->sp_iScoreForExtraLive > 0;
 
         // If playing with respawn with limited (> 0) credits or infinite credits (<= -1).
-        if (bRespawnAllowed && bRespawnDelayPassed && GetSP()->sp_ctCredits != 0)
+        if (bRespawnAllowed && bRespawnDelayPassed && (bLivesCanBeObtained || GetSP()->sp_ctCredits != 0))
         {
           BOOL bSharedLives = GetSP()->sp_bSharedLives;
           
@@ -8496,6 +8499,7 @@ procedures:
           stop; 
         } 
       }
+      
       // if autoaction is received
       on (EAutoAction eAutoAction) : {
         // if we are in coop
@@ -8510,6 +8514,7 @@ procedures:
         // ignore the actions
         resume;
       }
+
       on (EDisconnected) : { pass; }
       on (EReceiveScore) : { pass; }
       on (EKilledEnemy) : { pass; }
