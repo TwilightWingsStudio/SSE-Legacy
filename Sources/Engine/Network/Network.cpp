@@ -1581,12 +1581,7 @@ void CNetworkLibrary::StartPeerToPeer_t(const CTString &strSessionName,
     ga_World.Clear();
     throw;
   }
-  
-  // [SSE] Network Update - Better Random
-  if (ser_bBetterRandomOnStart) {
-    BetterRandom();
-  }
-  
+
   CallProgressHook_t(1.0f);
 
   // remember maximum number of players
@@ -1606,7 +1601,12 @@ void CNetworkLibrary::StartPeerToPeer_t(const CTString &strSessionName,
   // start timer sync anew
   ga_ctTimersPending = 0;
   FinishCRCGather();
-  CPrintF( TRANS("  started.\n"));
+  CPrintF( TRANS("  started.                  \n"));
+
+  // [SSE] Network Update - Better Random
+  if (ser_bBetterRandomOnStart) {
+    BetterRandom();
+  }
 }
 
 /*
@@ -1755,10 +1755,11 @@ void CNetworkLibrary::EnumSessions(BOOL bInternet)
     delete &*itns;
   }
 
+  // [SSE] [ZCaliptium] We don't need since we init own socket for query protocols.
   // make sure network is on
-  if (!_cmiComm.IsNetworkEnabled()) {
-    _cmiComm.PrepareForUse(/*network*/TRUE, /*client*/FALSE); // have to enumerate as server
-  }
+  //if (!_cmiComm.IsNetworkEnabled()) {
+  //  _cmiComm.PrepareForUse(/*network*/TRUE, /*client*/FALSE); // have to enumerate as server
+  //}
 
   // request enumeration
   MS_EnumTrigger(bInternet);
