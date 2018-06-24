@@ -59,7 +59,7 @@ static void DarkPlaces_BuildQCStatus(CTString &strStatus)
 {
   INDEX ctFreeSlots = _pNetwork->ga_sesSessionState.ses_ctMaxPlayers - _pNetwork->ga_srvServer.GetClientsCount();
   
-  strStatus.PrintF("%s:%s:P%d:S%d:F%d:M%s::score!!", _getGameModeShortName(_getSP()->sp_gmGameMode), "0.8.2", 0, ctFreeSlots, 0, ms_strGameName);
+  strStatus.PrintF("%s:%d:P%d:S%d:F%d:M%s::score!!", _getGameModeShortName(_getSP()->sp_gmGameMode), _ulEngineRevision, 0, ctFreeSlots, 0, ms_strGameName);
 }
 
 // --------------------------------------------------------------------------------------
@@ -177,6 +177,10 @@ static void DarkPlaces_ParseStatusResponse(unsigned char *data, INDEX iLength)
     data += 1;
     iLength -= 1;
   }
+  
+  // Ugly hack because of ugly parser code.
+  data[iLength] = '\\';
+  data[iLength + 1] = 0;
 
   while (*data != 0)
   {
@@ -186,7 +190,6 @@ static void DarkPlaces_ParseStatusResponse(unsigned char *data, INDEX iLength)
         //if (strKey != "gamemode") {
           if (bReadValue) {
             //CPrintF("  %s = %s\n", strKey, strValue);
-            
             // we're done reading the value, check which key it was
             if (strKey == "gamename") {
                 strGameName = strValue;
@@ -225,7 +228,6 @@ static void DarkPlaces_ParseStatusResponse(unsigned char *data, INDEX iLength)
       } break;
       
       default: {
-        
         // read into the value or into the key, depending where we are
         if (bReadValue) {
           strValue.InsertChar(strlen(strValue), *data);
@@ -251,7 +253,6 @@ static void DarkPlaces_ParseStatusResponse(unsigned char *data, INDEX iLength)
       }
     }
   }
-  
 
   long long tmPing = -1;
 
