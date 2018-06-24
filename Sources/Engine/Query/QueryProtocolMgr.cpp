@@ -56,12 +56,13 @@ TIME _tmLastHeartbeat = -1.0F;
 CDynamicStackArray<CServerRequest> ga_asrRequests;
 
 extern CTString ms_strServer = "master.333networks.com";
-extern CTString ms_strMSLegacy = "master.333networks.com";
+extern CTString ms_strLegacyMS = "master.333networks.com";
 extern CTString ms_strDarkPlacesMS = "192.168.1.4";
 
 extern CTString ms_strGameName = "serioussamse";
 
-extern BOOL ms_bMSLegacy = TRUE;
+extern BOOL ms_bLegacyMS = TRUE;
+extern BOOL ms_bLegacyDebug = TRUE;
 extern BOOL ms_bDarkPlacesMS = FALSE;
 extern BOOL ms_bDarkPlacesDebug = FALSE;
 
@@ -98,10 +99,10 @@ void _initializeWinsock(void)
   
   if (ms_bDarkPlacesMS) {
     phe = gethostbyname(ms_strDarkPlacesMS);
-  } else if (!ms_bMSLegacy) {
+  } else if (!ms_bLegacyMS) {
     phe = gethostbyname(ms_strServer);
   } else {
-    phe = gethostbyname(ms_strMSLegacy);
+    phe = gethostbyname(ms_strLegacyMS);
   }
 
   // if we couldn't resolve the hostname
@@ -120,7 +121,7 @@ void _initializeWinsock(void)
   // [SSE]
   if (ms_bDarkPlacesMS) {
     _sin->sin_port = htons(27950);
-  } else if (!ms_bMSLegacy) {
+  } else if (!ms_bLegacyMS) {
     _sin->sin_port = htons(9005);
   } else {
     _sin->sin_port = htons(27900);
@@ -256,7 +257,7 @@ void CQueryProtocolMgr::SendHeartbeat(INDEX iChallenge)
     _pDarkPlacesProtocol->BuildHearthbeatPacket(strPacket);
 
   // GameAgent
-  } else if (!ms_bMSLegacy) {
+  } else if (!ms_bLegacyMS) {
     _pGameAgentProtocol->BuildHearthbeatPacket(strPacket, iChallenge);
 
   // MSLegacy
@@ -289,7 +290,7 @@ void CQueryProtocolMgr::OnServerStart(void)
   //
 
   // GameAgent
-  if (!ms_bMSLegacy) {
+  if (!ms_bLegacyMS) {
     _sendPacket("q");
     
   // MSLegacy
@@ -313,7 +314,7 @@ void CQueryProtocolMgr::OnServerEnd(void)
     SendHeartbeat(0);
     SendHeartbeat(0);
     // TODO: Write here something
-  } else if (ms_bMSLegacy) {
+  } else if (ms_bLegacyMS) {
     CTString strPacket;
     strPacket.PrintF("\\heartbeat\\%hu\\gamename\\serioussamse\\statechanged", (_pShell->GetINDEX("net_iPort") + 1));
     _sendPacket(strPacket);
@@ -341,7 +342,7 @@ void CQueryProtocolMgr::OnServerUpdate(void)
     // [SSE]
     if (ms_bDarkPlacesMS) {
       _pDarkPlacesProtocol->ServerParsePacket(iLength);
-    } else if (!ms_bMSLegacy) {
+    } else if (!ms_bLegacyMS) {
       _pGameAgentProtocol->ServerParsePacket(iLength);
     } else {
       _szBuffer[iLength] = 0;
@@ -366,7 +367,7 @@ void CQueryProtocolMgr::OnServerStateChanged(void)
 
   if (ms_bDarkPlacesMS) {
     // TODO: Write here something
-  } else if (!ms_bMSLegacy) {
+  } else if (!ms_bLegacyMS) {
     _sendPacket("u");
   } else {
     CTString strPacket;
@@ -389,7 +390,7 @@ void CQueryProtocolMgr::EnumTrigger(BOOL bInternet)
     return; 
   }
   
-  if (ms_bMSLegacy) {
+  if (ms_bLegacyMS) {
     _pLegacyProtocol->EnumTrigger(bInternet);
     return;
   }
@@ -411,7 +412,7 @@ void CQueryProtocolMgr::EnumUpdate(void)
     _pDarkPlacesProtocol->EnumUpdate();
   
   // GameAgent
-  } else if (!ms_bMSLegacy) {
+  } else if (!ms_bLegacyMS) {
     _pGameAgentProtocol->EnumUpdate();
 
   // MSLegacy

@@ -1373,10 +1373,11 @@ void CNetworkLibrary::Init(const CTString &strGameID)
   _pShell->DeclareSymbol("persistent user INDEX wed_bUseGenericTextureReplacement;", &wed_bUseGenericTextureReplacement);
 
   _pShell->DeclareSymbol("persistent user CTString ms_strServer;", &ms_strServer);
-  _pShell->DeclareSymbol("persistent user CTString ms_strMSLegacy;", &ms_strMSLegacy);
+  _pShell->DeclareSymbol("persistent user CTString ms_strLegacyMS;", &ms_strLegacyMS);
   _pShell->DeclareSymbol("persistent user CTString ms_strDarkPlacesMS;", &ms_strDarkPlacesMS);
   _pShell->DeclareSymbol("persistent user CTString ms_strGameName;", &ms_strGameName);
-  _pShell->DeclareSymbol("persistent user INDEX ms_bMSLegacy;", &ms_bMSLegacy);
+  _pShell->DeclareSymbol("persistent user INDEX ms_bLegacyMS;", &ms_bLegacyMS);
+  _pShell->DeclareSymbol("persistent user INDEX ms_bLegacyDebug;", &ms_bLegacyDebug);
   _pShell->DeclareSymbol("persistent user INDEX ms_bDarkPlacesMS;", &ms_bDarkPlacesMS);
   _pShell->DeclareSymbol("persistent user INDEX ms_bDarkPlacesDebug;", &ms_bDarkPlacesDebug);
 

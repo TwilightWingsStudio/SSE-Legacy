@@ -189,7 +189,7 @@ static void _LocalSearch()
         addr.s_addr = *(u_long *) _phHostinfo->h_addr_list[_iCount];
         _uIP = htonl(addr.s_addr);
        
-        CPrintF("%lu\n", _uIP);
+        //CPrintF("%lu\n", _uIP);
         
         for (UINT uPort = 25601; uPort < 25622; ++uPort){
           _uPort = htons(uPort);
@@ -256,7 +256,7 @@ void CLegacyQueryProtocol::EnumTrigger(BOOL bInternet)
             *cSec                = NULL;
 
 
-    strcpy(cMS, ms_strMSLegacy);
+    strcpy(cMS, ms_strLegacyMS);
 
     WSADATA wsadata;
     if (WSAStartup(MAKEWORD(2,2), &wsadata) != 0) {
@@ -511,6 +511,11 @@ void CLegacyQueryProtocol::ServerParsePacket(INDEX iLength)
   sPch5 = strstr(_szBuffer, "\\secure\\"); // [SSE] [ZCaliptium] Validation Fix.
   
   //CPrintF("Data[%d]: %s\n", iLength, _szBuffer);
+  
+  if (iLength >= 5 && data[0] == 0xFF && data[1] == 0xFF && data[2] == 0xFF && data[3] == 0xFF) {
+    CPrintF("Legacy protocol socket received DarkPlaces network command! Ignoring!\n");
+    return;
+  }
 
   // status request
   if (sPch1) {
@@ -870,33 +875,11 @@ DWORD WINAPI _LocalNet_Thread(LPVOID lpParam)
     sendto(_sockudp, "\\status\\", 8, 0, (sockaddr *) &saddr, sizeof(saddr));
   }
 
-  //while(_iIPPortBufferLocalLen >= 6)
   {
-    /*if (!strncmp((char *)pServerIP, "\\final\\", 7)) {
-      break;
-    }*/
-
     _sIPPort ip = *pServerIP;
 
     CTString strIP;
     strIP.PrintF("%d.%d.%d.%d", ip.bFourth, ip.bThird, ip.bSecond, ip.bFirst);
-
-    /*
-    sockaddr_in sinServer;
-    sinServer.sin_family = AF_INET;
-    sinServer.sin_addr.s_addr = inet_addr(strIP);
-    sinServer.sin_port = ip.iPort;
-    */
-
-    // insert server status request into container
-    /*
-    CServerRequest &sreq = ga_asrRequests.Push();
-    sreq.sr_ulAddress = sinServer.sin_addr.s_addr;
-    sreq.sr_iPort = sinServer.sin_port;
-    sreq.sr_tmRequestTime = _pTimer->GetHighPrecisionTimer().GetMilliseconds();*/
-
-    // send packet to server
-    //sendto(_sockudp,"\\status\\",8,0, (sockaddr *) &sinServer, sizeof(sinServer));
 
     sockaddr_in _sinClient;
     int _iClientLength = sizeof(_sinClient);
@@ -952,9 +935,6 @@ DWORD WINAPI _LocalNet_Thread(LPVOID lpParam)
         }
       }
     }
-
-   // pServerIP++;
-    //_iIPPortBufferLocalLen -= 6;
   }
 
   if (_szIPPortBufferLocal != NULL) {

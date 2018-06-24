@@ -22,12 +22,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #endif
 
 extern CTString ms_strServer;
-extern CTString ms_strMSLegacy;
+extern CTString ms_strLegacyMS;
 extern CTString ms_strDarkPlacesMS;
 extern CTString ms_strGameName;
-extern BOOL ms_bMSLegacy;
 extern BOOL ms_bDarkPlacesMS;
 extern BOOL ms_bDarkPlacesDebug;
+extern BOOL ms_bLegacyMS;
+extern BOOL ms_bLegacyDebug;
 
 class CQueryProtocolMgr
 {
