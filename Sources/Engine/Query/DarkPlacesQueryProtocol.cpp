@@ -149,6 +149,134 @@ static void DarkPlaces_ParseServerList(unsigned char *data, INDEX iLength, BOOL 
   }
 }
 
+
+static void DarkPlaces_ParseStatusResponse(unsigned char *data, INDEX iLength)
+{
+  CNetworkSession &ns = *new CNetworkSession;
+  _pNetwork->ga_lhEnumeratedSessions.AddTail(ns.ns_lnNode);
+  
+  BOOL bReadValue = FALSE;
+  CTString strKey;
+  CTString strValue;
+  
+  CTString strPlayers;
+  CTString strMaxPlayers;
+  CTString strLevel;
+  CTString strGameType;
+  CTString strVersion;
+  CTString strGameName;
+  CTString strSessionName;
+
+  CTString strGamePort;
+  CTString strServerLocation;
+  CTString strGameMode;
+  CTString strActiveMod;
+  
+  // Skip first separator!
+  if (*data == '\\') {
+    data += 1;
+    iLength -= 1;
+  }
+
+  while (*data != 0)
+  {
+    switch (data[0])
+    {
+      case '\\': {
+        //if (strKey != "gamemode") {
+          if (bReadValue) {
+            //CPrintF("  %s = %s\n", strKey, strValue);
+            
+            // we're done reading the value, check which key it was
+            if (strKey == "gamename") {
+                strGameName = strValue;
+            } else if (strKey == "gameversion") {
+                strVersion = strValue;
+            } else if (strKey == "location") {
+                strServerLocation = strValue;
+            } else if (strKey == "hostname") {
+                strSessionName = strValue;
+            } else if (strKey == "hostport") {
+                strGamePort = strValue;
+            } else if (strKey == "qcstatus") {
+                strGameMode = strValue;
+            } else if (strKey == "mapname") {
+                strLevel = strValue;
+            } else if (strKey == "modname") {
+                strActiveMod = strValue;
+            } else if (strKey == "clients") {
+                strPlayers = strValue;
+            } else if (strKey == "bots") {
+            } else if (strKey == "protocol") {
+            } else if (strKey == "sv_maxclients") {
+                strMaxPlayers = strValue;
+            } else {
+              if (ms_bDarkPlacesDebug) {
+                CPrintF("Unknown DarkPlaces parameter key '%s'!\n", strKey);
+              }
+            }
+            // reset temporary holders
+            strKey = "";
+            strValue = "";
+          }
+        //}
+
+        bReadValue = !bReadValue;
+      } break;
+      
+      default: {
+        
+        // read into the value or into the key, depending where we are
+        if (bReadValue) {
+          strValue.InsertChar(strlen(strValue), *data);
+        } else {
+          strKey.InsertChar(strlen(strKey), *data);
+        }
+      }
+    }
+    
+    data += 1;
+    iLength -= 1;
+  }
+  
+  if (strGameMode != "")
+  {
+    CTString strDummy;
+
+    for (INDEX i = 0; i < strGameMode.Length(); i++)
+    {
+      if (strGameMode.str_String[i] == ':') {
+        strGameMode.Split(i, strGameType, strDummy);
+        break;
+      }
+    }
+  }
+  
+
+  long long tmPing = -1;
+
+  // Find the request in the request array.
+  for (INDEX i=0; i<ga_asrRequests.Count(); i++) {
+      CServerRequest &req = ga_asrRequests[i];
+      if (req.sr_ulAddress == _sinFrom.sin_addr.s_addr && req.sr_iPort == _sinFrom.sin_port) {
+          tmPing = _pTimer->GetHighPrecisionTimer().GetMilliseconds() - req.sr_tmRequestTime;
+          ga_asrRequests.Delete(&req);
+          break;
+      }
+  }
+
+  // add the server to the serverlist
+  ns.ns_strSession = strSessionName;
+  ns.ns_strAddress = inet_ntoa(_sinFrom.sin_addr) + CTString(":") + CTString(0, "%d", htons(_sinFrom.sin_port) - 1);
+  ns.ns_tmPing = (tmPing / 1000.0f);
+  ns.ns_strWorld = strLevel;
+  ns.ns_ctPlayers = atoi(strPlayers);
+  ns.ns_ctMaxPlayers = atoi(strMaxPlayers);
+  ns.ns_strGameType = strGameType;
+  ns.ns_strMod = strGameName;
+  ns.ns_strVer = strVersion;
+}
+
 // --------------------------------------------------------------------------------------
 // Builds hearthbeat packet.
 // --------------------------------------------------------------------------------------
@@ -300,117 +428,7 @@ void CDarkPlacesQueryProtocol::ClientParsePacket(INDEX iLength)
         CPrintF("Data[%d]: %s\n", iLength, data);
       }  
 
-      CNetworkSession &ns = *new CNetworkSession;
-      _pNetwork->ga_lhEnumeratedSessions.AddTail(ns.ns_lnNode);
-      
-      BOOL bReadValue = FALSE;
-      CTString strKey;
-      CTString strValue;
-      
-      CTString strPlayers;
-      CTString strMaxPlayers;
-      CTString strLevel;
-      CTString strGameType;
-      CTString strVersion;
-      CTString strGameName;
-      CTString strSessionName;
-
-      CTString strGamePort;
-      CTString strServerLocation;
-      CTString strGameMode;
-      CTString strActiveMod;
-      
-      // Skip first separator!
-      if (*data == '\\') {
-        data += 1;
-        string += 1;
-        iLength -= 1;
-      }
-
-      while (*data != 0)
-      {
-        switch (data[0])
-        {
-          case '\\': {
-            //if (strKey != "gamemode") {
-              if (bReadValue) {
-                //CPrintF("  %s = %s\n", strKey, strValue);
-                
-                // we're done reading the value, check which key it was
-                if (strKey == "gamename") {
-                    strGameName = strValue;
-                } else if (strKey == "gameversion") {
-                    strVersion = strValue;
-                } else if (strKey == "location") {
-                    strServerLocation = strValue;
-                } else if (strKey == "hostname") {
-                    strSessionName = strValue;
-                } else if (strKey == "hostport") {
-                    strGamePort = strValue;
-                } else if (strKey == "qcstatus") {
-                    strGameMode = strValue;
-                } else if (strKey == "mapname") {
-                    strLevel = strValue;
-                } else if (strKey == "modname") {
-                    strActiveMod = strValue;
-                } else if (strKey == "clients") {
-                    strPlayers = strValue;
-                } else if (strKey == "bots") {
-                } else if (strKey == "protocol") {
-                } else if (strKey == "sv_maxclients") {
-                    strMaxPlayers = strValue;
-                } else {
-                  if (ms_bDarkPlacesDebug) {
-                    CPrintF("Unknown DarkPlaces parameter key '%s'!\n", strKey);
-                  }
-                }
-                // reset temporary holders
-                strKey = "";
-                strValue = "";
-              }
-            //}
-
-            bReadValue = !bReadValue;
-          } break;
-          
-          default: {
-            
-            // read into the value or into the key, depending where we are
-            if (bReadValue) {
-              strValue.InsertChar(strlen(strValue), *data);
-            } else {
-              strKey.InsertChar(strlen(strKey), *data);
-            }
-          }
-        }
-        
-        data += 1;
-        iLength -= 1;
-      }
-      
-      if (strGameMode != "")
-      {
-        CTString strDummy;
-
-        for (INDEX i = 0; i < strGameMode.Length(); i++)
-        {
-          if (strGameMode.str_String[i] == ':') {
-            strGameMode.Split(i, strGameType, strDummy);
-            break;
-          }
-        }
-      }
-
-      // add the server to the serverlist
-      ns.ns_strSession = strSessionName;
-      ns.ns_strAddress = inet_ntoa(_sinFrom.sin_addr) + CTString(":") + CTString(0, "%d", htons(_sinFrom.sin_port) - 1);
-      ns.ns_tmPing = (10000.0F / 1000.0f);
-      ns.ns_strWorld = strLevel;
-      ns.ns_ctPlayers = atoi(strPlayers);
-      ns.ns_ctMaxPlayers = atoi(strMaxPlayers);
-      ns.ns_strGameType = strGameType;
-      ns.ns_strMod = strGameName;
-      ns.ns_strVer = strVersion;
+      DarkPlaces_ParseStatusResponse(data, iLength);
       
       return;
     }

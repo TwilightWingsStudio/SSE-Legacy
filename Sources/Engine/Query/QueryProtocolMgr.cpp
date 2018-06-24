@@ -351,7 +351,7 @@ void CQueryProtocolMgr::OnServerUpdate(void)
 
   // send a heartbeat every 150 seconds
   if (_pTimer->GetRealTimeTick() - _tmLastHeartbeat >= 150.0f) {
-  SendHeartbeat(0);
+    SendHeartbeat(0);
   }
 }
 
