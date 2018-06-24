@@ -35,6 +35,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 extern CTString _getGameModeShortName(INDEX iGameMode);
 extern const CSessionProperties* _getSP();
 
+extern SOCKET _socket;
 extern sockaddr_in _sinFrom;
 extern CHAR* _szBuffer;
 
@@ -43,6 +44,7 @@ extern BOOL _bInitialized;
 extern BOOL _bActivated;
 extern BOOL _bActivatedLocal;
 
+extern void _initializeWinsock(void);
 extern void _sendPacket(const char* szBuffer);
 extern void _sendPacket(const char* pubBuffer, INDEX iLen);
 extern void _sendPacketTo(const char* szBuffer, sockaddr_in* addsin);
@@ -451,9 +453,30 @@ void CDarkPlacesQueryProtocol::EnumTrigger(BOOL bInternet)
   // Initialization.
   _bInitialized = TRUE;
   
-  CTString strPacket;
-  strPacket.PrintF("\xFF\xFF\xFF\xFFgetservers %s %u empty full", ms_strGameName, DP_NET_PROTOCOL_VERSION);
-  _sendPacket(strPacket); // Send enumeration packet to masterserver.
+  if (bInternet) {
+    CTString strPacket;
+    strPacket.PrintF("\xFF\xFF\xFF\xFFgetservers %s %u empty full", ms_strGameName, DP_NET_PROTOCOL_VERSION);
+    _sendPacket(strPacket); // Send enumeration packet to masterserver.
+
+  // LAN search.
+  } else {
+    _initializeWinsock();
+    
+    struct   sockaddr_in saddr;
+    saddr.sin_family = AF_INET;
+    saddr.sin_addr.s_addr = 0xFFFFFFFF;
+    
+    unsigned short startport = 25601;
+    unsigned short endport =  startport + 20;
+
+    for (int i = startport ; i <= endport ; i += 1)
+    {
+      saddr.sin_port = htons(i);
+      //sendto(_sockudp, "\xFF\xFF\xFF\xFFgetstatus", 8, 0, (sockaddr *) &saddr, sizeof(saddr));
+      
+      _sendPacketTo("\xFF\xFF\xFF\xFFgetstatus", &saddr);
+    }
+  }
 
   _setStatus(".");
 }
