@@ -319,7 +319,6 @@ $(SolutionDir)\prebuild_engine.bat</Command>
     <ClCompile Include="Query\DarkPlacesQueryProtocol.cpp" />
     <ClCompile Include="Query\GameAgentQueryProtocol.cpp" />
     <ClCompile Include="Query\LegacyQueryProtocol.cpp" />
-    <ClCompile Include="Query\MasterServerMgr.cpp" />
     <ClCompile Include="Graphics\TextureIO.cpp" />
     <ClCompile Include="Math\Float.cpp" />
     <ClCompile Include="Math\Functions.cpp" />
@@ -442,6 +441,7 @@ $(SolutionDir)\prebuild_engine.bat</Command>
     </ClCompile>
     <ClCompile Include="Models\ModelData.cpp" />
     <ClCompile Include="Models\ModelDataIO.cpp" />
+    <ClCompile Include="Query\QueryProtocolMgr.cpp" />
     <ClCompile Include="Scripts\LuaLib_Base.cpp" />
     <ClCompile Include="Scripts\LuaLib_Entities.cpp" />
     <ClCompile Include="Scripts\LuaLib_EntitiesEdit.cpp" />
@@ -762,7 +762,6 @@ $(SolutionDir)\prebuild_engine.bat</Command>
     <ClInclude Include="Query\DarkPlacesQueryProtocol.h" />
     <ClInclude Include="Query\GameAgentQueryProtocol.h" />
     <ClInclude Include="Query\LegacyQueryProtocol.h" />
-    <ClInclude Include="Query\MasterServerMgr.h" />
     <ClInclude Include="Query\MSLegacy.h" />
     <ClInclude Include="Math\AABBox.h" />
     <ClInclude Include="Math\FixInt.h" />
@@ -804,6 +803,7 @@ $(SolutionDir)\prebuild_engine.bat</Command>
     <ClInclude Include="Graphics\TextureEffects.h" />
     <ClInclude Include="Graphics\Vertex.h" />
     <ClInclude Include="Graphics\ViewPort.h" />
+    <ClInclude Include="Query\QueryProtocolMgr.h" />
     <ClInclude Include="Scripts\ScriptEngine.h" />
     <ClInclude Include="Sound\al_functions.h" />
     <ClInclude Include="Sound\DSound.h" />

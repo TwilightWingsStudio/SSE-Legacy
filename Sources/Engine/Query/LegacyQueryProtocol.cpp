@@ -27,7 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Game/SessionProperties.h> // TODO: GET RID OF THIS!
 
 #include <Engine/Query/LegacyQueryProtocol.h>
-#include <Engine/Query/MasterServerMgr.h>
+#include <Engine/Query/QueryProtocolMgr.h>
 #include <Engine/Query/MSLegacy.h>
 
 #define MSPORT      28900
@@ -128,13 +128,9 @@ extern void _setStatus(const CTString &strStatus);
 
 extern CDynamicStackArray<CServerRequest> ga_asrRequests;
 
-// --------------------------------------------------------------------------------------
-// Builds hearthbeat packet.
-// --------------------------------------------------------------------------------------
-void MSLegacy_BuildHearthbeatPacket(CTString &strPacket)
-{
-  strPacket.PrintF("\\heartbeat\\%hu\\gamename\\%s", (_pShell->GetINDEX("net_iPort") + 1), SERIOUSSAMSTR);
-}
+// Threads.
+DWORD WINAPI _MS_Thread(LPVOID lpParam);
+DWORD WINAPI _LocalNet_Thread(LPVOID lpParam);
 
 static void _LocalSearch()
 {
@@ -443,6 +439,64 @@ void CLegacyQueryProtocol::EnumUpdate(void)
   }	
 }
 
+static void MSLegacy_BuildStatusResponse(CTString &strPacket)
+{
+  CTString strLocation;
+  strLocation = _pShell->GetString("net_strLocalHost");
+
+  if (strLocation == ""){
+    strLocation = "Heartland";
+  }
+
+  strPacket.PrintF( PCKQUERY,
+    _pShell->GetString("sam_strGameName"),
+    _SE_VER_STRING,
+    //_pShell->GetString("net_strLocalHost"),
+    strLocation,
+    _pShell->GetString("gam_strSessionName"),
+    _pShell->GetINDEX("net_iPort"),
+    _pNetwork->ga_World.wo_strName,
+    _getGameModeName(_getSP()->sp_gmGameMode),
+    _pNetwork->ga_srvServer.GetPlayersCount(),
+    _pNetwork->ga_sesSessionState.ses_ctMaxPlayers,
+    _pShell->GetINDEX("gam_bFriendlyFire"),
+    _pShell->GetINDEX("gam_bWeaponsStay"),
+    _pShell->GetINDEX("gam_bAmmoStays"),
+    _pShell->GetINDEX("gam_bHealthArmorStays"),
+    _pShell->GetINDEX("gam_bAllowHealth"),
+    _pShell->GetINDEX("gam_bAllowArmor"),
+    _pShell->GetINDEX("gam_bInfiniteAmmo"),
+    _pShell->GetINDEX("gam_bRespawnInPlace"));
+
+    for (INDEX i=0; i<_pNetwork->ga_srvServer.GetPlayersCount(); i++)
+    {
+      CPlayerBuffer &plb = _pNetwork->ga_srvServer.srv_aplbPlayers[i];
+      CPlayerTarget &plt = _pNetwork->ga_sesSessionState.ses_apltPlayers[i];
+      if (plt.plt_bActive) {
+        CTString strPlayer;
+        plt.plt_penPlayerEntity->GetMSLegacyPlayerInf(plb.plb_Index, strPlayer);
+
+        // if we don't have enough space left for the next player
+        if (strlen(strPacket) + strlen(strPlayer) > 2048) {
+          // send the packet
+          _sendPacketTo(strPacket, &_sinFrom);
+          strPacket = "";
+        }
+        strPacket += strPlayer;
+      }
+    }
+
+  strPacket += "\\final\\\\queryid\\333.1";
+}
+
+// --------------------------------------------------------------------------------------
+// Builds hearthbeat packet.
+// --------------------------------------------------------------------------------------
+void CLegacyQueryProtocol::BuildHearthbeatPacket(CTString &strPacket)
+{
+  strPacket.PrintF("\\heartbeat\\%hu\\gamename\\%s", (_pShell->GetINDEX("net_iPort") + 1), SERIOUSSAMSTR);
+}
+
 void CLegacyQueryProtocol::ServerParsePacket(INDEX iLength)
 {
   unsigned char *data = (unsigned char*)&_szBuffer[0];
@@ -461,52 +515,7 @@ void CLegacyQueryProtocol::ServerParsePacket(INDEX iLength)
   // status request
   if (sPch1) {
     CTString strPacket;
-    CTString strLocation;
-    strLocation = _pShell->GetString("net_strLocalHost");
 
-    if (strLocation == ""){
-      strLocation = "Heartland";
-    }
-
-    strPacket.PrintF( PCKQUERY,
-      _pShell->GetString("sam_strGameName"),
-      _SE_VER_STRING,
-      //_pShell->GetString("net_strLocalHost"),
-      strLocation,
-      _pShell->GetString("gam_strSessionName"),
-      _pShell->GetINDEX("net_iPort"),
-      _pNetwork->ga_World.wo_strName,
-      _getGameModeName(_getSP()->sp_gmGameMode),
-      _pNetwork->ga_srvServer.GetPlayersCount(),
-      _pNetwork->ga_sesSessionState.ses_ctMaxPlayers,
-      _pShell->GetINDEX("gam_bFriendlyFire"),
-      _pShell->GetINDEX("gam_bWeaponsStay"),
-      _pShell->GetINDEX("gam_bAmmoStays"),
-      _pShell->GetINDEX("gam_bHealthArmorStays"),
-      _pShell->GetINDEX("gam_bAllowHealth"),
-      _pShell->GetINDEX("gam_bAllowArmor"),
-      _pShell->GetINDEX("gam_bInfiniteAmmo"),
-      _pShell->GetINDEX("gam_bRespawnInPlace"));
-
-      for (INDEX i=0; i<_pNetwork->ga_srvServer.GetPlayersCount(); i++)
-      {
-        CPlayerBuffer &plb = _pNetwork->ga_srvServer.srv_aplbPlayers[i];
-        CPlayerTarget &plt = _pNetwork->ga_sesSessionState.ses_apltPlayers[i];
-        if (plt.plt_bActive) {
-          CTString strPlayer;
-          plt.plt_penPlayerEntity->GetMSLegacyPlayerInf(plb.plb_Index, strPlayer);
-
-          // if we don't have enough space left for the next player
-          if (strlen(strPacket) + strlen(strPlayer) > 2048) {
-            // send the packet
-            _sendPacketTo(strPacket, &_sinFrom);
-            strPacket = "";
-          }
-          strPacket += strPlayer;
-        }
-      }
-
-    strPacket += "\\final\\\\queryid\\333.1";
     _sendPacketTo(strPacket, &_sinFrom);
 
   // info request

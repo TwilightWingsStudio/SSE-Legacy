@@ -26,10 +26,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/SessionState.h>
 #include <Game/SessionProperties.h> // TODO: GET RID OF THIS!
 
+#include <Engine/Query/QueryProtocolMgr.h>
 #include <Engine/Query/DarkPlacesQueryProtocol.h>
 #include <Engine/Query/GameAgentQueryProtocol.h>
 #include <Engine/Query/LegacyQueryProtocol.h>
-#include <Engine/Query/MasterServerMgr.h>
 
 #pragma comment(lib, "wsock32.lib")
 
@@ -227,27 +227,6 @@ const CSessionProperties* _getSP()
   return ((const CSessionProperties *)_pNetwork->GetSessionProperties());
 }
 
-extern void MS_SendHeartbeat(INDEX iChallenge)
-{
-  CTString strPacket;
-  
-  // [SSE]
-  if (ms_bDarkPlacesMS) {
-    DarkPlaces_BuildHearthbeatPacket(strPacket);
-
-  // GameAgent
-  } else if (!ms_bMSLegacy) {
-    GameAgent_BuildHearthbeatPacket(strPacket, iChallenge);
-
-  // MSLegacy
-  } else {
-    MSLegacy_BuildHearthbeatPacket(strPacket);
-  }
-
-  _sendPacket(strPacket);
-  _tmLastHeartbeat = _pTimer->GetRealTimeTick();
-}
-
 extern void _setStatus(const CTString &strStatus)
 {
   _pNetwork->ga_bEnumerationChange = TRUE;
@@ -268,10 +247,31 @@ void CServerRequest::Clear(void)
   sr_tmRequestTime = 0;
 }
 
+void CQueryProtocolMgr::SendHeartbeat(INDEX iChallenge)
+{
+  CTString strPacket;
+  
+  // [SSE]
+  if (ms_bDarkPlacesMS) {
+    _pDarkPlacesProtocol->BuildHearthbeatPacket(strPacket);
+
+  // GameAgent
+  } else if (!ms_bMSLegacy) {
+    _pGameAgentProtocol->BuildHearthbeatPacket(strPacket, iChallenge);
+
+  // MSLegacy
+  } else {
+    _pLegacyProtocol->BuildHearthbeatPacket(strPacket);
+  }
+
+  _sendPacket(strPacket);
+  _tmLastHeartbeat = _pTimer->GetRealTimeTick();
+}
+
 // --------------------------------------------------------------------------------------
 // Called on every network server startup.
 // --------------------------------------------------------------------------------------
-extern void MS_OnServerStart(void)
+void CQueryProtocolMgr::OnServerStart(void)
 {
   // join
   _bServer = TRUE;
@@ -303,15 +303,15 @@ extern void MS_OnServerStart(void)
 // --------------------------------------------------------------------------------------
 // Called if server has been stopped.
 // --------------------------------------------------------------------------------------
-extern void MS_OnServerEnd(void)
+void CQueryProtocolMgr::OnServerEnd(void)
 {
   if (!_bInitialized) {
     return;
   }
 
   if (ms_bDarkPlacesMS) {
-    MS_SendHeartbeat(0);
-    MS_SendHeartbeat(0);
+    SendHeartbeat(0);
+    SendHeartbeat(0);
     // TODO: Write here something
   } else if (ms_bMSLegacy) {
     CTString strPacket;
@@ -327,7 +327,7 @@ extern void MS_OnServerEnd(void)
 // Regular network server update.
 // Responds to enumeration pings and sends pings to masterserver.
 // --------------------------------------------------------------------------------------
-extern void MS_OnServerUpdate(void)
+void CQueryProtocolMgr::OnServerUpdate(void)
 {
   if ((_socket == NULL) || (!_bInitialized)) {
     return;
@@ -347,18 +347,18 @@ extern void MS_OnServerUpdate(void)
       _szBuffer[iLength] = 0;
       _pLegacyProtocol->ServerParsePacket(iLength);
     }
- }
+  }
 
- // send a heartbeat every 150 seconds
- if (_pTimer->GetRealTimeTick() - _tmLastHeartbeat >= 150.0f) {
-    MS_SendHeartbeat(0);
- }
+  // send a heartbeat every 150 seconds
+  if (_pTimer->GetRealTimeTick() - _tmLastHeartbeat >= 150.0f) {
+  SendHeartbeat(0);
+  }
 }
 
 // --------------------------------------------------------------------------------------
 // Notify master server that the server state has changed.
 // --------------------------------------------------------------------------------------
-extern void MS_OnServerStateChanged(void)
+void CQueryProtocolMgr::OnServerStateChanged(void)
 {
   if (!_bInitialized) {
     return;
@@ -378,7 +378,7 @@ extern void MS_OnServerStateChanged(void)
 // --------------------------------------------------------------------------------------
 // Request serverlist enumeration. Sends request packet.
 // --------------------------------------------------------------------------------------
-extern void MS_EnumTrigger(BOOL bInternet)
+void CQueryProtocolMgr::EnumTrigger(BOOL bInternet)
 {
   if (_pNetwork->ga_bEnumerationChange) {
     return;
@@ -400,7 +400,7 @@ extern void MS_EnumTrigger(BOOL bInternet)
 // --------------------------------------------------------------------------------------
 // Client update for enumerations.
 // --------------------------------------------------------------------------------------
-extern void MS_EnumUpdate(void)
+void CQueryProtocolMgr::EnumUpdate(void)
 {
   if ((_socket == NULL) || (!_bInitialized)) {
     return;
@@ -423,7 +423,7 @@ extern void MS_EnumUpdate(void)
 // --------------------------------------------------------------------------------------
 // Cancel the master server serverlist enumeration.
 // --------------------------------------------------------------------------------------
-extern void MS_EnumCancel(void)
+void CQueryProtocolMgr::EnumCancel(void)
 {
   if (_bInitialized) {
     CPrintF("...MS_EnumCancel!\n");

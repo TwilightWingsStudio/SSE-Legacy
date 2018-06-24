@@ -29,7 +29,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/Network.h>
 #include <Engine/Network/Server.h>
 
-#include <Engine/Query/MasterServerMgr.h>
+#include <Engine/Query/QueryProtocolMgr.h>
 
 
 #pragma comment(lib, "wsock32.lib")
@@ -271,7 +271,7 @@ void CCommunicationInterface::PrepareForUse(BOOL bUseNetwork, BOOL bClient)
   }
 
   // make sure winsock is off (could be on if enumeration was triggered)
-  MS_EnumCancel();
+  CQueryProtocolMgr::EnumCancel();
   EndWinsock();
 
   if (bUseNetwork) {

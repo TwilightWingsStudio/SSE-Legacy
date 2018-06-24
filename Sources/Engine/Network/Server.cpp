@@ -35,7 +35,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Entities/InternalClasses.h>
 #include <Engine/Base/CRC.h>
 #include <Engine/Base/ErrorTable.h>
-#include <Engine/Query/MasterServerMgr.h>
+#include <Engine/Query/QueryProtocolMgr.h>
 
 #include <Engine/Templates/StaticArray.cpp>
 
@@ -225,7 +225,7 @@ void CServer::Stop(void)
 {
   // stop gameagent
   if (ser_bEnumeration) {
-    MS_OnServerEnd();
+    CQueryProtocolMgr::OnServerEnd();
   }
 
   // tell all clients to disconnect
@@ -298,7 +298,7 @@ void CServer::Start_t(void)
 
   // init gameagent
   if (_cmiComm.IsNetworkEnabled()) {
-    MS_OnServerStart();
+    CQueryProtocolMgr::OnServerStart();
   }
 }
 
@@ -1433,7 +1433,7 @@ void CServer::Handle(INDEX iClient, CNetworkMessage &nmMessage)
 
       // notify masterserver
       if (ser_bEnumeration) {
-        MS_OnServerStateChanged();
+        CQueryProtocolMgr::OnServerStateChanged();
       }
     // if refused
     } else {

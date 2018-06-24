@@ -27,7 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Game/SessionProperties.h> // TODO: GET RID OF THIS!
 
 #include <Engine/Query/GameAgentQueryProtocol.h>
-#include <Engine/Query/MasterServerMgr.h>
+#include <Engine/Query/QueryProtocolMgr.h>
 
 extern const CSessionProperties* _getSP();
 extern CTString _getGameModeName(INDEX iGameMode);
@@ -52,7 +52,7 @@ extern CDynamicStackArray<CServerRequest> ga_asrRequests;
 // --------------------------------------------------------------------------------------
 // Builds hearthbeat packet.
 // --------------------------------------------------------------------------------------
-extern void GameAgent_BuildHearthbeatPacket(CTString &strPacket, INDEX iChallenge)
+void CGameAgentQueryProtocol::BuildHearthbeatPacket(CTString &strPacket, INDEX iChallenge)
 {
   strPacket.PrintF("0;challenge;%d;players;%d;maxplayers;%d;level;%s;gametype;%s;version;%s;product;%s",
       iChallenge,
@@ -73,7 +73,7 @@ void CGameAgentQueryProtocol::ServerParsePacket(INDEX iLength)
     {
       int iChallenge = *(INDEX*)(_szBuffer + 1);
       // send the challenge
-      MS_SendHeartbeat(iChallenge);
+      CQueryProtocolMgr::SendHeartbeat(iChallenge);
       break;
     }
 
@@ -164,7 +164,7 @@ void CGameAgentQueryProtocol::ClientParsePacket(INDEX iLength)
   
       sIPPort* pServers = (sIPPort*)(_szBuffer + 1);
 
-      while(iLength - ((CHAR*)pServers - _szBuffer) >= sizeof(sIPPort)) {
+      while (iLength - ((CHAR*)pServers - _szBuffer) >= sizeof(sIPPort)) {
         sIPPort ip = *pServers;
   
         CTString strIP;

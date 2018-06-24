@@ -1,4 +1,4 @@
-/* Copyright (c) 2017 ZCaliptium
+/* Copyright (c) 2018 ZCaliptium.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as published by
@@ -28,7 +28,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Game/SessionProperties.h> // TODO: GET RID OF THIS!
 
 #include <Engine/Query/DarkPlacesQueryProtocol.h>
-#include <Engine/Query/MasterServerMgr.h>
+#include <Engine/Query/QueryProtocolMgr.h>
 
 #define DP_NET_PROTOCOL_VERSION 3
 
@@ -51,14 +51,6 @@ extern void _setStatus(const CTString &strStatus);
 extern int _recvPacket();
 
 extern CDynamicStackArray<CServerRequest> ga_asrRequests;
-
-// --------------------------------------------------------------------------------------
-// Builds hearthbeat packet.
-// --------------------------------------------------------------------------------------
-void DarkPlaces_BuildHearthbeatPacket(CTString &strPacket)
-{
-  strPacket.PrintF("\xFF\xFF\xFF\xFFheartbeat DarkPlaces\x0A");
-}
 
 // --------------------------------------------------------------------------------------
 // Builds game status string.
@@ -155,6 +147,14 @@ static void DarkPlaces_ParseServerList(unsigned char *data, INDEX iLength, BOOL 
       break;
     }
   }
+}
+
+// --------------------------------------------------------------------------------------
+// Builds hearthbeat packet.
+// --------------------------------------------------------------------------------------
+void CDarkPlacesQueryProtocol::BuildHearthbeatPacket(CTString &strPacket)
+{
+  strPacket.PrintF("\xFF\xFF\xFF\xFFheartbeat DarkPlaces\x0A");
 }
 
 // --------------------------------------------------------------------------------------

@@ -27,6 +27,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class CGameAgentQueryProtocol : public IQueryProtocol
 {
   public:
+    void BuildHearthbeatPacket(CTString &strPacket, INDEX iChallenge);
+  
+  public:
     virtual void EnumTrigger(BOOL bInternet);
     virtual void EnumUpdate(void);
     virtual void ClientParsePacket(INDEX iLength);

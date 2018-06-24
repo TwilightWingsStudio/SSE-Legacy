@@ -71,7 +71,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Templates/Stock_CShader.h>
 #include <Engine/Templates/Stock_CSkeleton.h>
 
-#include <Engine/Query/MasterServerMgr.h>
+#include <Engine/Query/QueryProtocolMgr.h>
 
 #include <Engine/Integrations/Discord_Integration.h>
 
@@ -1766,7 +1766,7 @@ void CNetworkLibrary::EnumSessions(BOOL bInternet)
   //}
 
   // request enumeration
-  MS_EnumTrigger(bInternet);
+  CQueryProtocolMgr::EnumTrigger(bInternet);
 }
 
 /*
@@ -2507,7 +2507,7 @@ void CNetworkLibrary::MainLoop(void)
   if (_cmiComm.IsNetworkEnabled())
   {
     if (ser_bEnumeration) {
-      MS_OnServerUpdate();
+      CQueryProtocolMgr::OnServerUpdate();
     }
 
 //    _cmiComm.Broadcast_Update();
@@ -3067,7 +3067,7 @@ extern void NET_MakeDefaultState_t(
 // handle broadcast messages (server enumeration)
 void CNetworkLibrary::GameInactive(void)
 {
-  MS_EnumUpdate();
+  CQueryProtocolMgr::EnumUpdate();
   
   Discord_UpdateInfo(FALSE);
 

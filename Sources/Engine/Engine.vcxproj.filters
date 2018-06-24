@@ -778,9 +778,6 @@
     <ClCompile Include="Models\ModelDataIO.cpp">
       <Filter>Source Files\Models</Filter>
     </ClCompile>
-    <ClCompile Include="Query\MasterServerMgr.cpp">
-      <Filter>Source Files\Query</Filter>
-    </ClCompile>
     <ClCompile Include="Integrations\Discord_Integration.cpp">
       <Filter>Source Files\Integrations</Filter>
     </ClCompile>
@@ -806,6 +803,9 @@
       <Filter>Source Files\Query</Filter>
     </ClCompile>
     <ClCompile Include="Query\LegacyQueryProtocol.cpp">
+      <Filter>Source Files\Query</Filter>
+    </ClCompile>
+    <ClCompile Include="Query\QueryProtocolMgr.cpp">
       <Filter>Source Files\Query</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1425,9 +1425,6 @@
     <ClInclude Include="Query\MSLegacy.h">
       <Filter>Header Files\Query Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Query\MasterServerMgr.h">
-      <Filter>Header Files\Query Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Integrations\Discord_Functions.h">
       <Filter>Header Files\Integrations Headers</Filter>
     </ClInclude>
@@ -1444,6 +1441,9 @@
       <Filter>Header Files\Query Headers</Filter>
     </ClInclude>
     <ClInclude Include="Query\LegacyQueryProtocol.h">
+      <Filter>Header Files\Query Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Query\QueryProtocolMgr.h">
       <Filter>Header Files\Query Headers</Filter>
     </ClInclude>
   </ItemGroup>
