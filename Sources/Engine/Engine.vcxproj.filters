@@ -778,15 +778,6 @@
     <ClCompile Include="Models\ModelDataIO.cpp">
       <Filter>Source Files\Models</Filter>
     </ClCompile>
-    <ClCompile Include="Query\DarkPlacesMasterServer.cpp">
-      <Filter>Source Files\Query</Filter>
-    </ClCompile>
-    <ClCompile Include="Query\LegacyMasterServer.cpp">
-      <Filter>Source Files\Query</Filter>
-    </ClCompile>
-    <ClCompile Include="Query\GameAgentMasterServer.cpp">
-      <Filter>Source Files\Query</Filter>
-    </ClCompile>
     <ClCompile Include="Query\MasterServerMgr.cpp">
       <Filter>Source Files\Query</Filter>
     </ClCompile>
@@ -807,6 +798,15 @@
     </ClCompile>
     <ClCompile Include="Scripts\LuaLib_Base.cpp">
       <Filter>Source Files\Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="Query\DarkPlacesQueryProtocol.cpp">
+      <Filter>Source Files\Query</Filter>
+    </ClCompile>
+    <ClCompile Include="Query\GameAgentQueryProtocol.cpp">
+      <Filter>Source Files\Query</Filter>
+    </ClCompile>
+    <ClCompile Include="Query\LegacyQueryProtocol.cpp">
+      <Filter>Source Files\Query</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1436,6 +1436,15 @@
     </ClInclude>
     <ClInclude Include="Integrations\Discord_Types.h">
       <Filter>Header Files\Integrations Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Query\GameAgentQueryProtocol.h">
+      <Filter>Header Files\Query Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Query\DarkPlacesQueryProtocol.h">
+      <Filter>Header Files\Query Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Query\LegacyQueryProtocol.h">
+      <Filter>Header Files\Query Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

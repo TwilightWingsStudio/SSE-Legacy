@@ -26,6 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/SessionState.h>
 #include <Game/SessionProperties.h> // TODO: GET RID OF THIS!
 
+#include <Engine/Query/LegacyQueryProtocol.h>
 #include <Engine/Query/MasterServerMgr.h>
 #include <Engine/Query/MSLegacy.h>
 
@@ -220,7 +221,7 @@ static void _LocalSearch()
   _initializeWinsock();
 }
 
-void MSLegacy_EnumTrigger(BOOL bInternet)
+void CLegacyQueryProtocol::EnumTrigger(BOOL bInternet)
 {
   // Local Search with Legacy Protocol
   if (!bInternet) {
@@ -414,7 +415,7 @@ void MSLegacy_EnumTrigger(BOOL bInternet)
   }
 }
 
-void MSLegacy_EnumUpdate(void)
+void CLegacyQueryProtocol::EnumUpdate(void)
 {
   if (_bActivated)
   {
@@ -442,7 +443,7 @@ void MSLegacy_EnumUpdate(void)
   }	
 }
 
-extern void MSLegacy_ServerParsePacket(INDEX iLength)
+void CLegacyQueryProtocol::ServerParsePacket(INDEX iLength)
 {
   unsigned char *data = (unsigned char*)&_szBuffer[0];
 

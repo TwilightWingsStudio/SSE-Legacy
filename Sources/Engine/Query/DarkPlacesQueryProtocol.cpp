@@ -27,6 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/SessionState.h>
 #include <Game/SessionProperties.h> // TODO: GET RID OF THIS!
 
+#include <Engine/Query/DarkPlacesQueryProtocol.h>
 #include <Engine/Query/MasterServerMgr.h>
 
 #define DP_NET_PROTOCOL_VERSION 3
@@ -62,7 +63,7 @@ void DarkPlaces_BuildHearthbeatPacket(CTString &strPacket)
 // --------------------------------------------------------------------------------------
 // Builds game status string.
 // --------------------------------------------------------------------------------------
-void DarkPlaces_BuildQCStatus(CTString &strStatus)
+static void DarkPlaces_BuildQCStatus(CTString &strStatus)
 {
   INDEX ctFreeSlots = _pNetwork->ga_sesSessionState.ses_ctMaxPlayers - _pNetwork->ga_srvServer.GetClientsCount();
   
@@ -73,7 +74,7 @@ void DarkPlaces_BuildQCStatus(CTString &strStatus)
 // Builds status string.
 // Reply to getStatus or getInfo
 // --------------------------------------------------------------------------------------
-void DarkPlaces_BuildStatusResponse(const char* challenge, CTString &strPacket, BOOL bFullStatus)
+static void DarkPlaces_BuildStatusResponse(const char* challenge, CTString &strPacket, BOOL bFullStatus)
 {
   CTString strStatus;
   DarkPlaces_BuildQCStatus(strStatus);
@@ -97,9 +98,69 @@ void DarkPlaces_BuildStatusResponse(const char* challenge, CTString &strPacket, 
 }
 
 // --------------------------------------------------------------------------------------
+// Parse server-list received from the Master Server.
+// --------------------------------------------------------------------------------------
+static void DarkPlaces_ParseServerList(unsigned char *data, INDEX iLength, BOOL bExtended)
+{
+  if (ms_bDarkPlacesDebug) {
+    CPrintF("Data Length: %d\n", iLength);
+  }
+  
+  while (iLength >= 7)
+	{
+    // IPV4 Address.
+    if (data[0] == '\\') {
+      
+      unsigned short uPort = data[5] * 256 + data[6];
+      
+      if (uPort != 0 && (data[1] != 0xFF || data[2] != 0xFF || data[3] != 0xFF || data[4] != 0xFF))
+      {
+        CTString strIP;
+        strIP.PrintF("%u.%u.%u.%u", data[1], data[2], data[3], data[4]);
+    
+        if (ms_bDarkPlacesDebug) {
+          CPrintF("%s:%hu\n", strIP, uPort);
+        }
+        
+        sockaddr_in sinServer;
+        sinServer.sin_family = AF_INET;
+        sinServer.sin_addr.s_addr = inet_addr(strIP);
+        sinServer.sin_port = htons(uPort);
+  
+        // insert server status request into container
+        CServerRequest &sreq = ga_asrRequests.Push();
+        sreq.sr_ulAddress = sinServer.sin_addr.s_addr;
+        sreq.sr_iPort = sinServer.sin_port;
+        sreq.sr_tmRequestTime = _pTimer->GetHighPrecisionTimer().GetMilliseconds();
+  
+        // send packet to server
+        _sendPacketTo("\xFF\xFF\xFF\xFFgetstatus", &sinServer);
+      }
+      
+			data += 7;
+			iLength -= 7;
+
+    // IPV6 Address.
+    } else if (iLength >= 19 && data[0] == '/' && bExtended) {
+      
+      // Just skip it. Because our game don't have IPV6 support.
+			data += 19;
+			iLength -= 19;
+      
+    // Unknown Data.
+    } else {
+      if (ms_bDarkPlacesDebug) {
+        CPrintF("Error! Unknown data while parsing server list!\n");
+      }
+      break;
+    }
+  }
+}
+
+// --------------------------------------------------------------------------------------
 // Process packets while running server.
 // --------------------------------------------------------------------------------------
-void DarkPlaces_ServerParsePacket(INDEX iLength)
+void CDarkPlacesQueryProtocol::ServerParsePacket(INDEX iLength)
 {
   char *string = &_szBuffer[0];
   unsigned char *data = (unsigned char*)&_szBuffer[0];
@@ -179,69 +240,9 @@ void DarkPlaces_ServerParsePacket(INDEX iLength)
 }
 
 // --------------------------------------------------------------------------------------
-// Parse server-list received from the Master Server.
-// --------------------------------------------------------------------------------------
-void DarkPlaces_ParseServerList(unsigned char *data, INDEX iLength, BOOL bExtended)
-{
-  if (ms_bDarkPlacesDebug) {
-    CPrintF("Data Length: %d\n", iLength);
-  }
-  
-  while (iLength >= 7)
-	{
-    // IPV4 Address.
-    if (data[0] == '\\') {
-      
-      unsigned short uPort = data[5] * 256 + data[6];
-      
-      if (uPort != 0 && (data[1] != 0xFF || data[2] != 0xFF || data[3] != 0xFF || data[4] != 0xFF))
-      {
-        CTString strIP;
-        strIP.PrintF("%u.%u.%u.%u", data[1], data[2], data[3], data[4]);
-    
-        if (ms_bDarkPlacesDebug) {
-          CPrintF("%s:%hu\n", strIP, uPort);
-        }
-        
-        sockaddr_in sinServer;
-        sinServer.sin_family = AF_INET;
-        sinServer.sin_addr.s_addr = inet_addr(strIP);
-        sinServer.sin_port = htons(uPort);
-  
-        // insert server status request into container
-        CServerRequest &sreq = ga_asrRequests.Push();
-        sreq.sr_ulAddress = sinServer.sin_addr.s_addr;
-        sreq.sr_iPort = sinServer.sin_port;
-        sreq.sr_tmRequestTime = _pTimer->GetHighPrecisionTimer().GetMilliseconds();
-  
-        // send packet to server
-        _sendPacketTo("\xFF\xFF\xFF\xFFgetstatus", &sinServer);
-      }
-      
-			data += 7;
-			iLength -= 7;
-
-    // IPV6 Address.
-    } else if (iLength >= 19 && data[0] == '/' && bExtended) {
-      
-      // Just skip it. Because our game don't have IPV6 support.
-			data += 19;
-			iLength -= 19;
-      
-    // Unknown Data.
-    } else {
-      if (ms_bDarkPlacesDebug) {
-        CPrintF("Error! Unknown data while parsing server list!\n");
-      }
-      break;
-    }
-  }
-}
-
-// --------------------------------------------------------------------------------------
 // Process packets while running client.
 // --------------------------------------------------------------------------------------
-void DarkPlaces_ClientParsePacket(INDEX iLength)
+void CDarkPlacesQueryProtocol::ClientParsePacket(INDEX iLength)
 {
   char *string = &_szBuffer[0];
   unsigned char *data = (unsigned char*)&_szBuffer[0];
@@ -421,7 +422,7 @@ void DarkPlaces_ClientParsePacket(INDEX iLength)
   }
 }
 
-void DarkPlaces_EnumTrigger(BOOL bInternet)
+void CDarkPlacesQueryProtocol::EnumTrigger(BOOL bInternet)
 {
   // Make sure that there are no requests still stuck in buffer.
   ga_asrRequests.Clear();
@@ -438,7 +439,7 @@ void DarkPlaces_EnumTrigger(BOOL bInternet)
   _setStatus(".");
 }
 
-void DarkPlaces_EnumUpdate(void)
+void CDarkPlacesQueryProtocol::EnumUpdate(void)
 {
   int iLength = _recvPacket();
 
@@ -446,5 +447,5 @@ void DarkPlaces_EnumUpdate(void)
     return;
   }
   
-  DarkPlaces_ClientParsePacket(iLength);
+  ClientParsePacket(iLength);
 }

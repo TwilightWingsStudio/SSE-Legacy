@@ -26,6 +26,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/SessionState.h>
 #include <Game/SessionProperties.h> // TODO: GET RID OF THIS!
 
+#include <Engine/Query/DarkPlacesQueryProtocol.h>
+#include <Engine/Query/GameAgentQueryProtocol.h>
+#include <Engine/Query/LegacyQueryProtocol.h>
 #include <Engine/Query/MasterServerMgr.h>
 
 #pragma comment(lib, "wsock32.lib")
@@ -61,6 +64,10 @@ extern CTString ms_strGameName = "serioussamse";
 extern BOOL ms_bMSLegacy = TRUE;
 extern BOOL ms_bDarkPlacesMS = FALSE;
 extern BOOL ms_bDarkPlacesDebug = FALSE;
+
+extern CDarkPlacesQueryProtocol *_pDarkPlacesProtocol = new CDarkPlacesQueryProtocol();
+extern CGameAgentQueryProtocol *_pGameAgentProtocol = new CGameAgentQueryProtocol();
+extern CLegacyQueryProtocol *_pLegacyProtocol = new CLegacyQueryProtocol();
 
 void _uninitWinsock();
 
@@ -333,12 +340,12 @@ extern void MS_OnServerUpdate(void)
   {
     // [SSE]
     if (ms_bDarkPlacesMS) {
-      DarkPlaces_ServerParsePacket(iLength);
+      _pDarkPlacesProtocol->ServerParsePacket(iLength);
     } else if (!ms_bMSLegacy) {
-      GameAgent_ServerParsePacket(iLength);
+      _pGameAgentProtocol->ServerParsePacket(iLength);
     } else {
       _szBuffer[iLength] = 0;
-      MSLegacy_ServerParsePacket(iLength);
+      _pLegacyProtocol->ServerParsePacket(iLength);
     }
  }
 
@@ -378,16 +385,16 @@ extern void MS_EnumTrigger(BOOL bInternet)
   }
   
   if (ms_bDarkPlacesMS) {
-    DarkPlaces_EnumTrigger(bInternet);
+    _pDarkPlacesProtocol->EnumTrigger(bInternet);
     return; 
   }
   
   if (ms_bMSLegacy) {
-    MSLegacy_EnumTrigger(bInternet);
+    _pLegacyProtocol->EnumTrigger(bInternet);
     return;
   }
   
-  GameAgent_EnumTrigger(bInternet);
+  _pGameAgentProtocol->EnumTrigger(bInternet);
 }
 
 // --------------------------------------------------------------------------------------
@@ -401,15 +408,15 @@ extern void MS_EnumUpdate(void)
 
   // [SSE]
   if (ms_bDarkPlacesMS) {
-    DarkPlaces_EnumUpdate();
+    _pDarkPlacesProtocol->EnumUpdate();
   
   // GameAgent
   } else if (!ms_bMSLegacy) {
-    GameAgent_EnumUpdate();
+    _pGameAgentProtocol->EnumUpdate();
 
   // MSLegacy
   } else {
-    MSLegacy_EnumUpdate();
+    _pLegacyProtocol->EnumUpdate();
   }
 }
 

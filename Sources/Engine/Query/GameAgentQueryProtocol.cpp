@@ -26,6 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <Engine/Network/SessionState.h>
 #include <Game/SessionProperties.h> // TODO: GET RID OF THIS!
 
+#include <Engine/Query/GameAgentQueryProtocol.h>
 #include <Engine/Query/MasterServerMgr.h>
 
 extern const CSessionProperties* _getSP();
@@ -63,7 +64,7 @@ extern void GameAgent_BuildHearthbeatPacket(CTString &strPacket, INDEX iChalleng
       ms_strGameName);
 }
 
-extern void GameAgent_ServerParsePacket(INDEX iLength)
+void CGameAgentQueryProtocol::ServerParsePacket(INDEX iLength)
 {
   // check the received packet ID
   switch (_szBuffer[0])
@@ -131,7 +132,7 @@ extern void GameAgent_ServerParsePacket(INDEX iLength)
   }
 }
 
-extern void GameAgent_EnumTrigger(BOOL bInternet)
+void CGameAgentQueryProtocol::EnumTrigger(BOOL bInternet)
 {
   // Make sure that there are no requests still stuck in buffer.
   ga_asrRequests.Clear();
@@ -145,7 +146,7 @@ extern void GameAgent_EnumTrigger(BOOL bInternet)
   _setStatus(".");
 }
 
-void GameAgent_ClientParsePacket(INDEX iLength)
+void CGameAgentQueryProtocol::ClientParsePacket(INDEX iLength)
 {
   switch (_szBuffer[0])
   {
@@ -296,7 +297,7 @@ void GameAgent_ClientParsePacket(INDEX iLength)
   }
 }
 
-extern void GameAgent_EnumUpdate(void)
+void CGameAgentQueryProtocol::EnumUpdate(void)
 {
   int iLength = _recvPacket();
 
@@ -306,5 +307,5 @@ extern void GameAgent_EnumUpdate(void)
 
   _szBuffer[iLength] = 0; // Terminate the buffer with NULL.
 
-  GameAgent_ClientParsePacket(iLength);
+  ClientParsePacket(iLength);
 }

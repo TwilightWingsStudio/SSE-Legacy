@@ -42,21 +42,12 @@ extern void MS_EnumCancel(void);
 
 // GameAgent Master Server
 extern void GameAgent_BuildHearthbeatPacket(CTString &strPacket, INDEX iChallenge);
-extern void GameAgent_EnumTrigger(BOOL bInternet);
-extern void GameAgent_EnumUpdate(void);
-extern void GameAgent_ServerParsePacket(INDEX iLength);
 
 // Legacy Master Server
 extern void MSLegacy_BuildHearthbeatPacket(CTString &strPacket);
-extern void MSLegacy_EnumTrigger(BOOL bInternet);
-extern void MSLegacy_EnumUpdate(void);
-extern void MSLegacy_ServerParsePacket(INDEX iLength);
 
 // DarkPlaces Master Server
 extern void DarkPlaces_BuildHearthbeatPacket(CTString &strPacket);
-extern void DarkPlaces_EnumTrigger(BOOL bInternet);
-extern void DarkPlaces_EnumUpdate(void);
-extern void DarkPlaces_ServerParsePacket(INDEX iLength);
 
 DWORD WINAPI _MS_Thread(LPVOID lpParam);
 DWORD WINAPI _LocalNet_Thread(LPVOID lpParam);
