@@ -1137,6 +1137,8 @@ static void NET_MakePlayerSpectator(void *pArgs)
   CPrintF("  done! RPC sent!\n");
 }
 
+extern void DumpVFS();
+
 /*
  * Initialize game management.
  */
@@ -1144,6 +1146,8 @@ void CNetworkLibrary::Init(const CTString &strGameID)
 {
   // remember the game ID
   CMessageDispatcher::Init(strGameID);
+  
+  _pShell->DeclareSymbol("user void DumpVFS();", &DumpVFS);
   
   // [SSE] Netcode Update - Testing functions for player Attaching/Detaching/Swapping
   _pShell->DeclareSymbol("user void NET_ChangeServerForClient(INDEX, CTString);", &NET_ChangeServerForClient);
