@@ -381,7 +381,7 @@ void StartSelectLevelFromSplit(void)
 {
   CLevelsMenu &gmCurrent = _pGUIM->gmLevelsMenu;
 
-  FilterLevels(GetSpawnFlagsForGameType(_pGUIM->gmSplitStartMenu.gm_mgGameType.mg_iSelected));
+  FilterLevels(GetSpawnFlagsForGameType(_pGUIM->gmSplitStartMenu.gm_pGameType->mg_iSelected));
   void StartSplitStartMenu(void);
   _pAfterLevelChosen = StartSplitStartMenu;
   ChangeToMenu(&gmCurrent);

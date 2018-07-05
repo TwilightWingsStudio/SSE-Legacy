@@ -314,7 +314,7 @@ void InitializeMenus(void)
 
     _pGUIM->gmSinglePlayerNewMenu.Initialize_t();
     _pGUIM->gmSinglePlayerNewMenu.gm_strName = "SinglePlayerNew";
-    _pGUIM->gmSinglePlayerNewMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSinglePlayerNewMenu.gm_mgMedium;
+    _pGUIM->gmSinglePlayerNewMenu.gm_pmgSelectedByDefault = _pGUIM->gmSinglePlayerNewMenu.gm_pMedium;
     _pGUIM->gmSinglePlayerNewMenu.gm_pgmParentMenu = &_pGUIM->gmSinglePlayerMenu;
 
     _pGUIM->gmDisabledFunction.Initialize_t();
@@ -408,12 +408,12 @@ void InitializeMenus(void)
 
     _pGUIM->gmSplitScreenMenu.Initialize_t();
     _pGUIM->gmSplitScreenMenu.gm_strName = "SplitScreen";
-    _pGUIM->gmSplitScreenMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSplitScreenMenu.gm_mgStart;
+    _pGUIM->gmSplitScreenMenu.gm_pmgSelectedByDefault = _pGUIM->gmSplitScreenMenu.gm_pStartButton;
     _pGUIM->gmSplitScreenMenu.gm_pgmParentMenu = &_pGUIM->gmMainMenu;
 
     _pGUIM->gmSplitStartMenu.Initialize_t();
     _pGUIM->gmSplitStartMenu.gm_strName = "SplitStart";
-    _pGUIM->gmSplitStartMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSplitStartMenu.gm_mgStart;
+    _pGUIM->gmSplitStartMenu.gm_pmgSelectedByDefault = _pGUIM->gmSplitStartMenu.gm_pStart;
     _pGUIM->gmSplitStartMenu.gm_pgmParentMenu = &_pGUIM->gmSplitScreenMenu;
   } catch( char *strError) {
     FatalError( strError);

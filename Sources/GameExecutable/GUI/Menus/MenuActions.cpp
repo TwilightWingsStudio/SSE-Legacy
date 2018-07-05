@@ -330,9 +330,10 @@ static void FillResolutionsList(void)
     extern PIX _pixDesktopWidth;
     INDEX iRes = 0;
 
-    for (; iRes<_ctResolutions; iRes++) {
+    for (; iRes<_ctResolutions; iRes++)
+    {
       if (ppaWidths[iRes].Width > _pixDesktopWidth) break;
-        SetResolutionInList(iRes, ppaWidths[iRes].Width, ppaWidths[iRes].Height);
+      SetResolutionInList(iRes, ppaWidths[iRes].Width, ppaWidths[iRes].Height);
     }
 
     _ctResolutions = iRes;
@@ -348,7 +349,7 @@ static void FillResolutionsList(void)
     _admResolutionModes = new CDisplayMode[_ctResolutions];
 
     // For each resolution add it to list
-    for (INDEX iRes = 0; iRes<_ctResolutions; iRes++) {
+    for (INDEX iRes = 0; iRes < _ctResolutions; iRes++) {
       SetResolutionInList(iRes, pdm[iRes].dm_pixSizeI, pdm[iRes].dm_pixSizeJ);
     }
   }
@@ -448,11 +449,8 @@ extern void InitVideoOptionsButtons(void)
 {
   CVideoOptionsMenu &gmCurrent = _pGUIM->gmVideoOptionsMenu;
 
-  if (sam_bFullScreenActive) {
-    gmCurrent.gm_mgFullScreenCheckBox.mg_bValue = 1;
-  } else {
-    gmCurrent.gm_mgFullScreenCheckBox.mg_bValue = 0;
-  }
+  // Fullscreen.
+  gmCurrent.gm_mgFullScreenCheckBox.mg_bValue = sam_bFullScreenActive ? 1 : 0;
 
   gmCurrent.gm_mgDisplayAPITrigger.mg_iSelected = APIToSwitch((GfxAPIType)(INDEX)sam_iGfxAPI);
   gmCurrent.gm_mgDisplayAdaptersTrigger.mg_iSelected = sam_iDisplayAdapter;
@@ -706,6 +704,7 @@ extern void UpdateSplitLevel(INDEX iDummy)
   CSplitStartMenu &gmCurrent = _pGUIM->gmSplitStartMenu;
 
   ValidateLevelForFlags(_pGame->gam_strCustomLevel,
-    GetSpawnFlagsForGameType(gmCurrent.gm_mgGameType.mg_iSelected));
-  gmCurrent.gm_mgLevel.mg_strText = FindLevelByFileName(_pGame->gam_strCustomLevel).li_strName;
+    GetSpawnFlagsForGameType(gmCurrent.gm_pGameType->mg_iSelected));
+
+  gmCurrent.gm_pLevel->mg_strText = FindLevelByFileName(_pGame->gam_strCustomLevel).li_strName;
 }

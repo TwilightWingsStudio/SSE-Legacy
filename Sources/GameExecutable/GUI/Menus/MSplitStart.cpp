@@ -28,73 +28,86 @@ extern void UpdateSplitLevel(INDEX iDummy);
 // --------------------------------------------------------------------------------------
 void CSplitStartMenu::Initialize_t(void)
 {
-  // Initialize title label.
-  gm_mgTitle.mg_boxOnScreen = BoxTitle();
-  gm_mgTitle.mg_strText = TRANS("START SPLIT SCREEN");
-  AddChild(&gm_mgTitle);
+  // Initialize title label
+  gm_pTitle = new CMGTitle(TRANS("START SPLIT SCREEN"));
+  gm_pTitle->mg_boxOnScreen = BoxTitle();
 
   // Initialize "Game type" trigger.
-  TRIGGER_MG(gm_mgGameType, 0,
-    gm_mgStart, gm_mgDifficulty, TRANS("Game type:"), astrGameTypeRadioTexts);
-  gm_mgGameType.mg_ctTexts = ctGameTypeRadioTexts;
-  gm_mgGameType.mg_strTip = TRANS("choose type of multiplayer game");
+  gm_pGameType = new CMGTrigger(TRANS("Game type:"));
+  gm_pGameType->mg_strTip = TRANS("choose type of multiplayer game");
+  gm_pGameType->mg_boxOnScreen = BoxMediumRow(3);
+  gm_pGameType->mg_astrTexts = astrGameTypeRadioTexts;
+  gm_pGameType->mg_ctTexts = ctGameTypeRadioTexts;
+  gm_pGameType->mg_strValue = astrGameTypeRadioTexts[0];
 
   // Initialize "Difficulty" trigger.
-  TRIGGER_MG(gm_mgDifficulty, 1,
-    gm_mgGameType, gm_mgLevel, TRANS("Difficulty:"), astrDifficultyRadioTexts);
-  gm_mgDifficulty.mg_strTip = TRANS("choose difficulty level");
+  gm_pDifficulty = new CMGTrigger(TRANS("Difficulty:"));
+  gm_pDifficulty->mg_strTip = TRANS("choose difficulty level");
+  gm_pDifficulty->mg_boxOnScreen = BoxMediumRow(3);
+  gm_pDifficulty->mg_astrTexts = astrDifficultyRadioTexts;
+  gm_pDifficulty->mg_ctTexts = sizeof(astrDifficultyRadioTexts) / sizeof(astrDifficultyRadioTexts[0]);
+  gm_pDifficulty->mg_strValue = astrDifficultyRadioTexts[0];
 
   // Initialize level name
-  gm_mgLevel.mg_strText = "";
-  gm_mgLevel.mg_strLabel = TRANS("Level:");
-  gm_mgLevel.mg_boxOnScreen = BoxMediumRow(2);
-  gm_mgLevel.mg_bfsFontSize = BFS_MEDIUM;
-  gm_mgLevel.mg_iCenterI = -1;
-  gm_mgLevel.mg_pmgUp = &gm_mgDifficulty;
-  gm_mgLevel.mg_pmgDown = &gm_mgGameOptions;
-  gm_mgLevel.mg_strTip = TRANS("choose the level to start");
+  gm_pLevel->mg_strLabel = TRANS("Level:");
+  gm_pLevel->mg_strTip = TRANS("choose the level to start");
+  gm_pLevel->mg_strText = "";
+  gm_pLevel->mg_boxOnScreen = BoxMediumRow(2);
+  gm_pLevel->mg_bfsFontSize = BFS_MEDIUM;
+  gm_pLevel->mg_iCenterI = -1;
 
   // Initialize "Game Options" button
-  gm_mgGameOptions.mg_strText = TRANS("Game options");
-  gm_mgGameOptions.mg_boxOnScreen = BoxMediumRow(3);
-  gm_mgGameOptions.mg_bfsFontSize = BFS_MEDIUM;
-  gm_mgGameOptions.mg_iCenterI = 0;
-  gm_mgGameOptions.mg_pmgUp = &gm_mgLevel;
-  gm_mgGameOptions.mg_pmgDown = &gm_mgGameMutators;
-  gm_mgGameOptions.mg_strTip = TRANS("adjust game rules");
+  gm_pGameOptions = new CMGButton(TRANS("Game options"));
+  gm_pGameOptions->mg_boxOnScreen = BoxMediumRow(3);
+  gm_pGameOptions->mg_bfsFontSize = BFS_MEDIUM;
+  gm_pGameOptions->mg_iCenterI = 0;
+  gm_pGameOptions->mg_strTip = TRANS("adjust game rules");
   
   // Initialize "Game Mutators" button.
-  gm_mgGameMutators.mg_strText = TRANS("Game mutators");
-  gm_mgGameMutators.mg_boxOnScreen = BoxMediumRow(4);
-  gm_mgGameMutators.mg_bfsFontSize = BFS_MEDIUM;
-  gm_mgGameMutators.mg_iCenterI = 0;
-  gm_mgGameMutators.mg_pmgUp = &gm_mgGameOptions;
-  gm_mgGameMutators.mg_pmgDown = &gm_mgStart;
-  gm_mgGameMutators.mg_strTip = TRANS("adjust game rules");
+  gm_pGameMutators = new CMGButton(TRANS("Game mutators"));
+  gm_pGameMutators->mg_boxOnScreen = BoxMediumRow(4);
+  gm_pGameMutators->mg_bfsFontSize = BFS_MEDIUM;
+  gm_pGameMutators->mg_iCenterI = 0;
+  gm_pGameMutators->mg_strTip = TRANS("adjust game rules");
 
   // Initialize "Start" button
-  gm_mgStart.mg_bfsFontSize = BFS_LARGE;
-  gm_mgStart.mg_boxOnScreen = BoxBigRow(4.5);
-  gm_mgStart.mg_pmgUp = &gm_mgGameMutators;
-  gm_mgStart.mg_pmgDown = &gm_mgGameType;
-  gm_mgStart.mg_strText = TRANS("START");
+  gm_pStart = new CMGButton(TRANS("START"));
+  gm_pStart->mg_bfsFontSize = BFS_LARGE;
+  gm_pStart->mg_boxOnScreen = BoxBigRow(4.5);
+  
+  // Define neighbours.
+  gm_pGameType->mg_pmgUp = gm_pStart;
+  gm_pGameType->mg_pmgDown = gm_pDifficulty;
+  gm_pDifficulty->mg_pmgUp = gm_pGameType;
+  gm_pDifficulty->mg_pmgDown = gm_pLevel;
+  gm_pLevel->mg_pmgUp = gm_pDifficulty;
+  gm_pLevel->mg_pmgDown = gm_pGameOptions;
+  gm_pGameOptions->mg_pmgUp = gm_pLevel;
+  gm_pGameOptions->mg_pmgDown = gm_pGameMutators;
+  gm_pGameMutators->mg_pmgUp = gm_pGameOptions;
+  gm_pGameMutators->mg_pmgDown = gm_pStart;
+  gm_pStart->mg_pmgUp = gm_pGameMutators;
+  gm_pStart->mg_pmgDown = gm_pGameType;
   
   // Add components.
-  AddChild(&gm_mgLevel);
-  AddChild(&gm_mgGameOptions);
-  AddChild(&gm_mgGameMutators);
-  AddChild(&gm_mgStart);
+  AddChild(gm_pTitle);
+  AddChild(gm_pGameType);
+  AddChild(gm_pDifficulty);
+  AddChild(gm_pLevel);
+  AddChild(gm_pGameOptions);
+  AddChild(gm_pGameMutators);
+  AddChild(gm_pStart);
 }
 
 void CSplitStartMenu::StartMenu(void)
 {
   extern INDEX sam_bMentalActivated;
-  gm_mgDifficulty.mg_ctTexts = sam_bMentalActivated ? 7 : 5;
+  gm_pDifficulty->mg_ctTexts = sam_bMentalActivated ? 7 : 5;
 
-  gm_mgGameType.mg_iSelected = Clamp(_pShell->GetINDEX("gam_iStartMode"), 0L, ctGameTypeRadioTexts - 1L);
-  gm_mgGameType.ApplyCurrentSelection();
-  gm_mgDifficulty.mg_iSelected = _pShell->GetINDEX("gam_iStartDifficulty") + 1;
-  gm_mgDifficulty.ApplyCurrentSelection();
+  gm_pGameType->mg_iSelected = Clamp(_pShell->GetINDEX("gam_iStartMode"), 0L, ctGameTypeRadioTexts - 1L);
+  gm_pGameType->ApplyCurrentSelection();
+  gm_pDifficulty->mg_iSelected = _pShell->GetINDEX("gam_iStartDifficulty") + 1;
+  gm_pDifficulty->ApplyCurrentSelection();
 
   // clamp maximum number of players to at least 4
   _pShell->SetINDEX("gam_ctMaxPlayers", ClampDn(_pShell->GetINDEX("gam_ctMaxPlayers"), 4L));
@@ -105,8 +118,8 @@ void CSplitStartMenu::StartMenu(void)
 
 void CSplitStartMenu::EndMenu(void)
 {
-  _pShell->SetINDEX("gam_iStartDifficulty", gm_mgDifficulty.mg_iSelected - 1);
-  _pShell->SetINDEX("gam_iStartMode", gm_mgGameType.mg_iSelected);
+  _pShell->SetINDEX("gam_iStartDifficulty", gm_pDifficulty->mg_iSelected - 1);
+  _pShell->SetINDEX("gam_iStartMode", gm_pGameType->mg_iSelected);
 
   CGameMenu::EndMenu();
 }
@@ -120,26 +133,26 @@ BOOL CSplitStartMenu::OnEvent(const SEvent& event)
   if (event.EventType == EET_GUI_EVENT)
   {
     if (event.GuiEvent.EventType == EGET_TRIGGERED) {
-      if (event.GuiEvent.Caller == &gm_mgLevel) {
+      if (event.GuiEvent.Caller == gm_pLevel) {
         StartSelectLevelFromSplit();
         return TRUE;
 
-      } else if (event.GuiEvent.Caller == &gm_mgGameOptions) {
+      } else if (event.GuiEvent.Caller == gm_pGameOptions) {
         StartGameOptionsFromSplitScreen();
         return TRUE;
         
-      } else if (event.GuiEvent.Caller == &gm_mgGameMutators) {
+      } else if (event.GuiEvent.Caller == gm_pGameMutators) {
         StartVarGameMutators();
         return TRUE;
 
-      } else if (event.GuiEvent.Caller == &gm_mgStart) {
+      } else if (event.GuiEvent.Caller == gm_pStart) {
         StartSelectPlayersMenuFromSplit();
         return TRUE;
       }
 
     } else if (event.GuiEvent.EventType == EGET_CHANGED) {
 
-      if (event.GuiEvent.Caller == &gm_mgGameType) {
+      if (event.GuiEvent.Caller == gm_pGameType) {
         UpdateSplitLevel(-1);
         return TRUE; 
       }

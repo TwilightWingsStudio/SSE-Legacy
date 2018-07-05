@@ -27,10 +27,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class CSplitScreenMenu : public CGameMenu
 {
   public:
-    CMGTitle gm_mgTitle;
-    CMGButton gm_mgStart;
-    CMGButton gm_mgQuickLoad;
-    CMGButton gm_mgLoad;
+    CMGTitle *gm_pTitle;
+    CMGButton *gm_pStartButton;
+    CMGButton *gm_pQuickLoadButton;
+    CMGButton *gm_pLoadButton;
 
   public:
     void Initialize_t(void);

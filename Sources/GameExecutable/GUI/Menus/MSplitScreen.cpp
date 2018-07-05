@@ -25,38 +25,40 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 void CSplitScreenMenu::Initialize_t(void)
 {
   // Initialize title label.
-  gm_mgTitle.mg_boxOnScreen = BoxTitle();
-  gm_mgTitle.mg_strText = TRANS("SPLIT SCREEN");
+  gm_pTitle = new CMGTitle(TRANS("SPLIT SCREEN"));
+  gm_pTitle->mg_boxOnScreen = BoxTitle();
 
   // Initialize "New Game" button.
-  gm_mgStart.mg_bfsFontSize = BFS_LARGE;
-  gm_mgStart.mg_boxOnScreen = BoxBigRow(0);
-  gm_mgStart.mg_pmgUp = &gm_mgLoad;
-  gm_mgStart.mg_pmgDown = &gm_mgQuickLoad;
-  gm_mgStart.mg_strText = TRANS("NEW GAME");
-  gm_mgStart.mg_strTip = TRANS("start new split-screen game");
+  gm_pStartButton = new CMGButton(TRANS("NEW GAME"));
+  gm_pStartButton->mg_bfsFontSize = BFS_LARGE;
+  gm_pStartButton->mg_boxOnScreen = BoxBigRow(0);
+  gm_pStartButton->mg_strTip = TRANS("start new split-screen game");
 
   // Initialize "Quick Load" button.
-  gm_mgQuickLoad.mg_bfsFontSize = BFS_LARGE;
-  gm_mgQuickLoad.mg_boxOnScreen = BoxBigRow(1);
-  gm_mgQuickLoad.mg_pmgUp = &gm_mgStart;
-  gm_mgQuickLoad.mg_pmgDown = &gm_mgLoad;
-  gm_mgQuickLoad.mg_strText = TRANS("QUICK LOAD");
-  gm_mgQuickLoad.mg_strTip = TRANS("load a quick-saved game (F9)");
+  gm_pQuickLoadButton = new CMGButton(TRANS("QUICK LOAD"));
+  gm_pQuickLoadButton->mg_bfsFontSize = BFS_LARGE;
+  gm_pQuickLoadButton->mg_boxOnScreen = BoxBigRow(1);
+  gm_pQuickLoadButton->mg_strTip = TRANS("load a quick-saved game (F9)");
 
   // Initialize "Load" button.
-  gm_mgLoad.mg_bfsFontSize = BFS_LARGE;
-  gm_mgLoad.mg_boxOnScreen = BoxBigRow(2);
-  gm_mgLoad.mg_pmgUp = &gm_mgQuickLoad;
-  gm_mgLoad.mg_pmgDown = &gm_mgStart;
-  gm_mgLoad.mg_strText = TRANS("LOAD");
-  gm_mgLoad.mg_strTip = TRANS("load a saved split-screen game");
+  gm_pLoadButton = new CMGButton(TRANS("LOAD"));
+  gm_pLoadButton->mg_bfsFontSize = BFS_LARGE;
+  gm_pLoadButton->mg_boxOnScreen = BoxBigRow(2);
+  gm_pLoadButton->mg_strTip = TRANS("load a saved split-screen game");
+  
+  // Define neighbours.
+  gm_pStartButton->mg_pmgUp = gm_pLoadButton;
+  gm_pStartButton->mg_pmgDown = gm_pQuickLoadButton;
+  gm_pQuickLoadButton->mg_pmgUp = gm_pStartButton;
+  gm_pQuickLoadButton->mg_pmgDown = gm_pLoadButton;
+  gm_pLoadButton->mg_pmgUp = gm_pQuickLoadButton;
+  gm_pLoadButton->mg_pmgDown = gm_pStartButton;
 
   // Add components.
-  AddChild(&gm_mgTitle);
-  AddChild(&gm_mgStart);
-  AddChild(&gm_mgQuickLoad);
-  AddChild(&gm_mgLoad);
+  AddChild(gm_pTitle);
+  AddChild(gm_pStartButton);
+  AddChild(gm_pQuickLoadButton);
+  AddChild(gm_pLoadButton);
 }
 
 void CSplitScreenMenu::StartMenu(void)
@@ -72,15 +74,15 @@ BOOL CSplitScreenMenu::OnEvent(const SEvent& event)
 {
   if (event.EventType == EET_GUI_EVENT)
   {
-    if (event.GuiEvent.Caller == &gm_mgStart) {
+    if (event.GuiEvent.Caller == gm_pStartButton) {
       StartSplitStartMenu();
       return TRUE;
 
-    } else if (event.GuiEvent.Caller == &gm_mgQuickLoad) {
+    } else if (event.GuiEvent.Caller == gm_pQuickLoadButton) {
       StartSplitScreenQuickLoadMenu();
       return TRUE;
 
-    } else if (event.GuiEvent.Caller == &gm_mgLoad) {
+    } else if (event.GuiEvent.Caller == gm_pLoadButton) {
       StartSplitScreenLoadMenu();
       return TRUE;
     }

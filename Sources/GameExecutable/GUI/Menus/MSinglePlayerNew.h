@@ -27,14 +27,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class CSinglePlayerNewMenu : public CGameMenu
 {
   public:
-    CMGTitle gm_mgTitle;
-    CMGButton gm_mgTourist;
-    CMGButton gm_mgEasy;
-    CMGButton gm_mgMedium;
-    CMGButton gm_mgHard;
-    CMGButton gm_mgSerious;
-    CMGButton gm_mgMental;
-    CMGButton gm_mgSeriousMental; // [SSE]
+    CMGTitle *gm_pTitle;
+    CMGButton *gm_pTourist;
+    CMGButton *gm_pEasy;
+    CMGButton *gm_pMedium;
+    CMGButton *gm_pHard;
+    CMGButton *gm_pSerious;
+    CMGButton *gm_pMental;
+    CMGButton *gm_pSeriousMental; // [SSE]
 
   public:
     void Initialize_t(void);
