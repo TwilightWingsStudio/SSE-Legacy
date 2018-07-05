@@ -52,6 +52,16 @@ struct SEvent
     FLOAT Value;
   };
   
+  // Event for pressed/released key.
+  struct SKeyInputEvent
+  {
+    INDEX VKey;
+    bool PressedDown : 1;
+    bool Control : 1;
+    bool Shift : 1;
+    bool Alt : 1;
+  };
+  
   // Universal GUI event.
   struct SGuiEvent
   {
@@ -69,6 +79,7 @@ struct SEvent
   {
     struct SIntegerEvent IntegerEvent;
     struct SFloatEvent FloatEvent;
+    struct SKeyInputEvent KeyInputEvent;
     struct SGuiEvent GuiEvent;
   };
 };
