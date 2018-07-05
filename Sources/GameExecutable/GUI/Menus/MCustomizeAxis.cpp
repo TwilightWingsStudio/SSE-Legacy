@@ -56,18 +56,24 @@ void CCustomizeAxisMenu::Initialize_t(void)
   }
 
   // Initialize "Sensitivity" slider.
-  gm_mgSensitivity.mg_boxOnScreen = BoxMediumRow(3);
   gm_mgSensitivity.mg_strText = TRANS("SENSITIVITY");
-  gm_mgSensitivity.mg_pmgUp = &gm_mgMountedTrigger;
-  gm_mgSensitivity.mg_pmgDown = &gm_mgDeadzone;
   gm_mgSensitivity.mg_strTip = TRANS("set sensitivity for this axis");
+  gm_mgSensitivity.mg_boxOnScreen = BoxMediumRow(3);
+  gm_mgSensitivity.mg_iMinPos = 0;
+  gm_mgSensitivity.mg_iMaxPos = 50;
 
   // Initialize "Dead Zone" slider.
-  gm_mgDeadzone.mg_boxOnScreen = BoxMediumRow(4);
   gm_mgDeadzone.mg_strText = TRANS("DEAD ZONE");
+  gm_mgDeadzone.mg_strTip = TRANS("set dead zone for this axis");
+  gm_mgDeadzone.mg_boxOnScreen = BoxMediumRow(4);
+  gm_mgDeadzone.mg_iMinPos = 0;
+  gm_mgDeadzone.mg_iMaxPos = 50;
+  
+  // Define neighbours.
+  gm_mgSensitivity.mg_pmgUp = &gm_mgMountedTrigger;
+  gm_mgSensitivity.mg_pmgDown = &gm_mgDeadzone;
   gm_mgDeadzone.mg_pmgUp = &gm_mgSensitivity;
   gm_mgDeadzone.mg_pmgDown = &gm_mgInvertTrigger;
-  gm_mgDeadzone.mg_strTip = TRANS("set dead zone for this axis");
 
   // Add components.
   AddChild(&gm_mgSensitivity);
@@ -98,13 +104,9 @@ void CCustomizeAxisMenu::ObtainActionSettings(void)
 
   gm_mgMountedTrigger.mg_iSelected = iMountedAxis;
 
-  gm_mgSensitivity.mg_iMinPos = 0;
-  gm_mgSensitivity.mg_iMaxPos = 50;
   gm_mgSensitivity.mg_iCurPos = ctrls.ctrl_aaAxisActions[iSelectedAction].aa_fSensitivity / 2;
   gm_mgSensitivity.ApplyCurrentPosition();
 
-  gm_mgDeadzone.mg_iMinPos = 0;
-  gm_mgDeadzone.mg_iMaxPos = 50;
   gm_mgDeadzone.mg_iCurPos = ctrls.ctrl_aaAxisActions[iSelectedAction].aa_fDeadZone / 2;
   gm_mgDeadzone.ApplyCurrentPosition();
 
@@ -122,6 +124,7 @@ void CCustomizeAxisMenu::ObtainActionSettings(void)
 void CCustomizeAxisMenu::ApplyActionSettings(void)
 {
   CControls &ctrls = _pGame->gm_ctrlControlsExtra;
+
   INDEX iSelectedAction = gm_mgActionTrigger.mg_iSelected;
   INDEX iMountedAxis = gm_mgMountedTrigger.mg_iSelected;
   FLOAT fSensitivity =
@@ -160,6 +163,7 @@ void CCustomizeAxisMenu::StartMenu(void)
 void CCustomizeAxisMenu::EndMenu(void)
 {
   ApplyActionSettings();
+
   CGameMenu::EndMenu();
 }
 
@@ -172,10 +176,16 @@ BOOL CCustomizeAxisMenu::OnEvent(const SEvent& event)
   if (event.EventType == EET_GUI_EVENT)
   {
     if (event.GuiEvent.EventType == EGET_CHANGED) {
-      ObtainActionSettings();
+      if (event.GuiEvent.Caller == &gm_mgActionTrigger) {
+        ObtainActionSettings();
+      }
+
       return TRUE;
+
     } else if (event.GuiEvent.EventType == EGET_PRECHANGE) {
-      ApplyActionSettings();
+      if (event.GuiEvent.Caller == &gm_mgActionTrigger) {
+        ApplyActionSettings();
+      }
       return TRUE;
     }
   }

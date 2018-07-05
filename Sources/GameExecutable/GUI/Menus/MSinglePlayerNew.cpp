@@ -25,52 +25,51 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 void CSinglePlayerNewMenu::Initialize_t(void)
 {
   // Initialize title label.
-  gm_pTitle = new CMGTitle(TRANS("SPLIT SCREEN"));
-  gm_pTitle->mg_strText = TRANS("NEW GAME");
+  gm_pTitle = new CMGTitle(TRANS("NEW GAME"));
   gm_pTitle->mg_boxOnScreen = BoxTitle();
 
   // Initialize "Tourist" button.
   gm_pTourist = new CMGButton(TRANS("TOURIST"));
+  gm_pTourist->mg_strTip = TRANS("for non-FPS players");
   gm_pTourist->mg_bfsFontSize = BFS_LARGE;
   gm_pTourist->mg_boxOnScreen = BoxBigRow(0.0f);
-  gm_pTourist->mg_strTip = TRANS("for non-FPS players");
 
   // Initialize "Easy" button.
   gm_pEasy = new CMGButton(TRANS("EASY"));
+  gm_pEasy->mg_strTip = TRANS("for unexperienced FPS players");
   gm_pEasy->mg_bfsFontSize = BFS_LARGE;
   gm_pEasy->mg_boxOnScreen = BoxBigRow(1.0f);
-  gm_pEasy->mg_strTip = TRANS("for unexperienced FPS players");
 
   // Initialize "Medium" button.
   gm_pMedium = new CMGButton(TRANS("NORMAL"));
+  gm_pMedium->mg_strTip = TRANS("for experienced FPS players");
   gm_pMedium->mg_bfsFontSize = BFS_LARGE;
   gm_pMedium->mg_boxOnScreen = BoxBigRow(2.0f);
-  gm_pMedium->mg_strTip = TRANS("for experienced FPS players");
 
   // Initialize "Hard" button.
   gm_pHard = new CMGButton(TRANS("HARD"));
+  gm_pHard->mg_strTip = TRANS("for experienced Serious Sam players");
   gm_pHard->mg_bfsFontSize = BFS_LARGE;
   gm_pHard->mg_boxOnScreen = BoxBigRow(3.0f);
-  gm_pHard->mg_strTip = TRANS("for experienced Serious Sam players");
 
   // Initialize "Serious" button.
   gm_pSerious = new CMGButton(TRANS("SERIOUS"));
+  gm_pSerious->mg_strTip = TRANS("are you serious?");
   gm_pSerious->mg_bfsFontSize = BFS_LARGE;
   gm_pSerious->mg_boxOnScreen = BoxBigRow(4.0f);
-  gm_pSerious->mg_strTip = TRANS("are you serious?");
 
   // Initialize "Mental" button.
   gm_pMental = new CMGButton(TRANS("MENTAL"));
+  gm_pMental->mg_strTip = TRANS("you are not serious!");
   gm_pMental->mg_bfsFontSize = BFS_LARGE;
   gm_pMental->mg_boxOnScreen = BoxBigRow(5.0f);
-  gm_pMental->mg_strTip = TRANS("you are not serious!");
   gm_pMental->mg_bBlinking = FALSE;
   
   // Initialize "Serious Mental" button.
-  gm_pSeriousMental->mg_strText = TRANS("^cFF0000SERIOUS MENTAL");
+  gm_pSeriousMental = new CMGButton(TRANS("^cFF0000SERIOUS MENTAL"));
+  gm_pSeriousMental->mg_strTip = TRANS("you are too serious!");
   gm_pSeriousMental->mg_bfsFontSize = BFS_LARGE;
   gm_pSeriousMental->mg_boxOnScreen = BoxBigRow(6.0f);
-  gm_pSeriousMental->mg_strTip = TRANS("you are too serious!");
   gm_pSeriousMental->mg_bBlinking = TRUE;
 
   // Define neighbours.

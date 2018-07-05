@@ -328,7 +328,7 @@ void InitializeMenus(void)
 
     _pGUIM->gmControls.Initialize_t();
     _pGUIM->gmControls.gm_strName = "Controls";
-    _pGUIM->gmControls.gm_pmgSelectedByDefault = &_pGUIM->gmControls.gm_mgButtons;
+    _pGUIM->gmControls.gm_pmgSelectedByDefault = _pGUIM->gmControls.gm_pButtons;
 
       // warning! parent menu has to be set inside button activate function from where
       // Load/Save menu is called

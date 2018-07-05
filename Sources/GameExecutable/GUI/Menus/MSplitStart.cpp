@@ -49,6 +49,7 @@ void CSplitStartMenu::Initialize_t(void)
   gm_pDifficulty->mg_strValue = astrDifficultyRadioTexts[0];
 
   // Initialize level name
+  gm_pLevel = new CMGButton();
   gm_pLevel->mg_strLabel = TRANS("Level:");
   gm_pLevel->mg_strTip = TRANS("choose the level to start");
   gm_pLevel->mg_strText = "";
