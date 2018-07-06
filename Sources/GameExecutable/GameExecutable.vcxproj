@@ -63,6 +63,7 @@
     <LibraryPath>$(SolutionDir)..\Bin\Debug;$(SolutionDir)..\Tools.Win32\Libraries\DX8SDK\Lib;$(LibraryPath)</LibraryPath>
     <GenerateManifest>true</GenerateManifest>
     <EmbedManifest>true</EmbedManifest>
+    <TargetName>SeriousSam</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>Release\</OutDir>
@@ -72,6 +73,7 @@
     <LibraryPath>$(SolutionDir)..\Bin;$(SolutionDir)..\Tools.Win32\Libraries\DX8SDK\Lib;$(LibraryPath)</LibraryPath>
     <GenerateManifest>true</GenerateManifest>
     <EmbedManifest>true</EmbedManifest>
+    <TargetName>SeriousSam</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -112,15 +114,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>gamed.lib gamempd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <OutputFile>Debug\GameExecutable.exe</OutputFile>
+      <OutputFile>Debug\SeriousSam.exe</OutputFile>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
     <CustomBuildStep>
-      <Command>copy Debug\$(TargetName).exe $(SolutionDir)..\Bin\Debug\SeriousSam.exe &gt;nul 
-copy Debug\$(TargetName).map $(SolutionDir)..\Bin\Debug\SeriousSam.map &gt;nul </Command>
+      <Command>copy Debug\$(TargetName).exe $(SolutionDir)..\Bin\Debug\ &gt;nul
+copy Debug\$(TargetName).map $(SolutionDir)..\Bin\Debug\ &gt;nul</Command>
       <Message>Copying %(Filename) binaries to \Bin\Debug</Message>
-      <Outputs>$(SolutionDir)..\Bin\Debug\SeriousSam.exe;%(Outputs)</Outputs>
+      <Outputs>$(SolutionDir)..\Bin\Debug\$(InputName).exe;%(Outputs)</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -165,15 +167,15 @@ copy Debug\$(TargetName).map $(SolutionDir)..\Bin\Debug\SeriousSam.map &gt;nul <
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>game.lib gamemp.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <OutputFile>Release\GameExecutable.exe</OutputFile>
+      <OutputFile>Release\SeriousSam.exe</OutputFile>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
     <CustomBuildStep>
-      <Command>copy Release\$(TargetName).exe $(SolutionDir)..\Bin\SeriousSam.exe &gt;nul 
-copy Release\$(TargetName).map $(SolutionDir)..\Bin\SeriousSam.map &gt;nul </Command>
+      <Command>copy Release\$(TargetName).exe $(SolutionDir)..\Bin\ &gt;nul 
+copy Release\$(TargetName).map $(SolutionDir)..\Bin\ &gt;nul </Command>
       <Message>Copying %(Filename) binaries to \Bin</Message>
-      <Outputs>$(SolutionDir)..\Bin\SeriousSam.exe;%(Outputs)</Outputs>
+      <Outputs>$(SolutionDir)..\Bin\$(InputName).exe;%(Outputs)</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
