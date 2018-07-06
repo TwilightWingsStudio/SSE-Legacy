@@ -23,12 +23,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "MSelectPlayers.h"
 
 #define ADD_GADGET( gd, box, up, dn, lf, rt, txt) \
-  gd.mg_boxOnScreen = box; \
-  gd.mg_pmgUp = up; \
-  gd.mg_pmgDown = dn; \
-  gd.mg_pmgLeft = lf; \
-  gd.mg_pmgRight = rt; \
-  gd.mg_strText = txt; \
+  gd->mg_boxOnScreen = box; \
+  gd->mg_pmgUp = up; \
+  gd->mg_pmgDown = dn; \
+  gd->mg_pmgLeft = lf; \
+  gd->mg_pmgRight = rt; \
+  gd->mg_strText = txt; \
   AddChild(&gd);
 
 extern CTString astrNoYes[2];
@@ -42,52 +42,84 @@ extern void SelectPlayersApplyMenu(void);
 void CSelectPlayersMenu::Initialize_t(void)
 {
   // Initialize title label.
-  gm_mgTitle.mg_boxOnScreen = BoxTitle();
-  gm_mgTitle.mg_strText = TRANS("SELECT PLAYERS");
-  AddChild(&gm_mgTitle);
+  gm_pTitle = new CMGTitle(TRANS("SELECT PLAYERS"));
+  gm_pTitle->mg_boxOnScreen = BoxTitle();
 
   // Initialize "Dedicated" trigger.
-  TRIGGER_MG(gm_mgDedicated, 0, gm_mgStart, gm_mgObserver, TRANS("Dedicated:"), astrNoYes);
-  gm_mgDedicated.mg_strTip = TRANS("select to start dedicated server");
+  gm_pDedicated = new CMGTrigger(TRANS("Dedicated:"));
+  gm_pDedicated->mg_strTip = TRANS("select to start dedicated server");
+  gm_pDedicated->mg_boxOnScreen = BoxMediumRow(0);
+  gm_pDedicated->mg_astrTexts = astrNoYes;
+  gm_pDedicated->mg_ctTexts = 2;
 
   // Initialize "Observer" trigger.
-  TRIGGER_MG(gm_mgObserver, 1, gm_mgDedicated, gm_mgSplitScreenCfg, TRANS("Observer:"), astrNoYes);
-  gm_mgObserver.mg_strTip = TRANS("select to join in for observing, not for playing");
+  gm_pObserver = new CMGTrigger(TRANS("Observer:"));
+  gm_pObserver->mg_strTip = TRANS("select to join in for observing, not for playing");
+  gm_pObserver->mg_boxOnScreen = BoxMediumRow(1);
+  gm_pObserver->mg_astrTexts = astrNoYes;
+  gm_pObserver->mg_ctTexts = 2;
 
   // Initialize "Number of players" trigger.
-  TRIGGER_MG(gm_mgSplitScreenCfg, 2, gm_mgObserver, gm_mgPlayer0Change, TRANS("Number of players:"), astrSplitScreenRadioTexts);
-  gm_mgSplitScreenCfg.mg_strTip = TRANS("choose more than one player to play in split screen");
+  gm_pSplitScreenCfg = new CMGTrigger(TRANS("Number of players:"));
+  gm_pSplitScreenCfg->mg_strTip = TRANS("choose more than one player to play in split screen");
+  gm_pSplitScreenCfg->mg_boxOnScreen = BoxMediumRow(2);
+  gm_pSplitScreenCfg->mg_astrTexts = astrSplitScreenRadioTexts;
+  gm_pSplitScreenCfg->mg_ctTexts = sizeof(astrSplitScreenRadioTexts) / sizeof(astrSplitScreenRadioTexts[0]);
 
   // Initialize players selection buttons.
-  gm_mgPlayer0Change.mg_iCenterI = -1;
-  gm_mgPlayer1Change.mg_iCenterI = -1;
-  gm_mgPlayer2Change.mg_iCenterI = -1;
-  gm_mgPlayer3Change.mg_iCenterI = -1;
+  gm_pPlayer0Change = new CMGChangePlayer();
+  gm_pPlayer1Change = new CMGChangePlayer();
+  gm_pPlayer2Change = new CMGChangePlayer();
+  gm_pPlayer3Change = new CMGChangePlayer();
+  
+  gm_pPlayer0Change->mg_iCenterI = -1;
+  gm_pPlayer1Change->mg_iCenterI = -1;
+  gm_pPlayer2Change->mg_iCenterI = -1;
+  gm_pPlayer3Change->mg_iCenterI = -1;
 
-  gm_mgPlayer0Change.mg_boxOnScreen = BoxMediumMiddle(4);
-  gm_mgPlayer1Change.mg_boxOnScreen = BoxMediumMiddle(5);
-  gm_mgPlayer2Change.mg_boxOnScreen = BoxMediumMiddle(6);
-  gm_mgPlayer3Change.mg_boxOnScreen = BoxMediumMiddle(7);
+  gm_pPlayer0Change->mg_boxOnScreen = BoxMediumMiddle(4);
+  gm_pPlayer1Change->mg_boxOnScreen = BoxMediumMiddle(5);
+  gm_pPlayer2Change->mg_boxOnScreen = BoxMediumMiddle(6);
+  gm_pPlayer3Change->mg_boxOnScreen = BoxMediumMiddle(7);
 
-  gm_mgPlayer0Change.mg_strTip = gm_mgPlayer1Change.mg_strTip = gm_mgPlayer2Change.mg_strTip = gm_mgPlayer3Change.mg_strTip = TRANS("select profile for this player");
+  gm_pPlayer0Change->mg_strTip = gm_pPlayer1Change->mg_strTip = gm_pPlayer2Change->mg_strTip = gm_pPlayer3Change->mg_strTip = TRANS("select profile for this player");
 
-  gm_mgNotes.mg_boxOnScreen = BoxMediumRow(9.0);
-  gm_mgNotes.mg_bfsFontSize = BFS_MEDIUM;
-  gm_mgNotes.mg_iCenterI = -1;
-  gm_mgNotes.SetEnabled(FALSE);
-  gm_mgNotes.mg_bLabel = TRUE;
-  gm_mgNotes.mg_strText = "";
+  // Initialize notes label.
+  gm_pNotes = new CMGButton();
+  gm_pNotes->mg_boxOnScreen = BoxMediumRow(9.0);
+  gm_pNotes->mg_bfsFontSize = BFS_MEDIUM;
+  gm_pNotes->mg_iCenterI = -1;
+  gm_pNotes->SetEnabled(FALSE);
+  gm_pNotes->mg_bLabel = TRUE;
+  gm_pNotes->mg_strText = "";
+  
+  // Initialize "Start" button.
+  gm_pStart = new CMGButton(TRANS("START"));
+  gm_pStart->mg_boxOnScreen = BoxMediumRow(11);
+  gm_pStart->mg_bfsFontSize = BFS_LARGE;
+  gm_pStart->mg_iCenterI = 0;
+  
+  // Define neighbours.
+  gm_pDedicated->mg_pmgUp = gm_pStart;
+  gm_pDedicated->mg_pmgDown = gm_pObserver;
+  gm_pObserver->mg_pmgUp = gm_pDedicated;
+  gm_pObserver->mg_pmgDown = gm_pSplitScreenCfg;
+  gm_pSplitScreenCfg->mg_pmgUp = gm_pObserver;
+  gm_pSplitScreenCfg->mg_pmgDown = gm_pStart;
+  gm_pStart->mg_pmgUp = gm_pSplitScreenCfg;
+  gm_pStart->mg_pmgDown = gm_pDedicated;
 
   // Add components.
-  AddChild(&gm_mgPlayer0Change);
-  AddChild(&gm_mgPlayer1Change);
-  AddChild(&gm_mgPlayer2Change);
-  AddChild(&gm_mgPlayer3Change);
-  AddChild(&gm_mgNotes);
-
-  ADD_GADGET(gm_mgStart, BoxMediumRow(11), &gm_mgSplitScreenCfg, &gm_mgPlayer0Change, NULL, NULL, TRANS("START"));
-  gm_mgStart.mg_bfsFontSize = BFS_LARGE;
-  gm_mgStart.mg_iCenterI = 0;
+  AddChild(gm_pTitle);
+  AddChild(gm_pDedicated);
+  AddChild(gm_pObserver);
+  AddChild(gm_pSplitScreenCfg);
+  AddChild(gm_pPlayer0Change);
+  AddChild(gm_pPlayer1Change);
+  AddChild(gm_pPlayer2Change);
+  AddChild(gm_pPlayer3Change);
+  AddChild(gm_pNotes);
+  AddChild(gm_pStart);
 }
 
 extern void SelectPlayersFillMenu(void);
@@ -96,17 +128,17 @@ static void SelectPlayersApplyMenu(void)
 {
   CSelectPlayersMenu &gmCurrent = _pGUIM->gmSelectPlayersMenu;
 
-  if (gmCurrent.gm_bAllowDedicated && gmCurrent.gm_mgDedicated.mg_iSelected) {
+  if (gmCurrent.gm_bAllowDedicated && gmCurrent.gm_pDedicated->mg_iSelected) {
     _pGame->gm_MenuSplitScreenCfg = CGame::SSC_DEDICATED;
     return;
   }
 
-  if (gmCurrent.gm_bAllowObserving && gmCurrent.gm_mgObserver.mg_iSelected) {
+  if (gmCurrent.gm_bAllowObserving && gmCurrent.gm_pObserver->mg_iSelected) {
     _pGame->gm_MenuSplitScreenCfg = CGame::SSC_OBSERVER;
     return;
   }
 
-  _pGame->gm_MenuSplitScreenCfg = (enum CGame::SplitScreenCfg) gmCurrent.gm_mgSplitScreenCfg.mg_iSelected;
+  _pGame->gm_MenuSplitScreenCfg = (enum CGame::SplitScreenCfg) gmCurrent.gm_pSplitScreenCfg->mg_iSelected;
 }
 
 void CSelectPlayersMenu::StartMenu(void)
@@ -142,7 +174,7 @@ BOOL CSelectPlayersMenu::OnEvent(const SEvent& event)
   {
     if (event.GuiEvent.EventType == EGET_TRIGGERED)
     {
-      if (event.GuiEvent.Caller == &gm_mgStart)
+      if (event.GuiEvent.Caller == gm_pStart)
       {
         if (gm_pgmParentMenu == &_pGUIM->gmSplitStartMenu) {
           StartSplitScreenGame();
@@ -168,15 +200,15 @@ BOOL CSelectPlayersMenu::OnEvent(const SEvent& event)
 
       INDEX iNewValue = event.GuiEvent.IntValue;
       
-      if (event.GuiEvent.Caller == &gm_mgDedicated) {
+      if (event.GuiEvent.Caller == gm_pDedicated) {
         UpdateSelectPlayers(iNewValue);
         return TRUE;
 
-      } else if (event.GuiEvent.Caller == &gm_mgObserver) {
+      } else if (event.GuiEvent.Caller == gm_pObserver) {
         UpdateSelectPlayers(iNewValue);
         return TRUE;
 
-      } else if (event.GuiEvent.Caller == &gm_mgSplitScreenCfg) {
+      } else if (event.GuiEvent.Caller == gm_pSplitScreenCfg) {
         UpdateSelectPlayers(iNewValue);
         return TRUE;
       }

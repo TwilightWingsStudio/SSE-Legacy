@@ -290,8 +290,8 @@ static void FillResolutionsList(void)
 
   _ctResolutions = 0;
   
-  BOOL bFullScreen = gmCurrent.gm_mgFullScreenCheckBox.mg_bValue;
-  INDEX iAspectRatio = gmCurrent.gm_mgAspectRatioTrigger.mg_iSelected;
+  BOOL bFullScreen = gmCurrent.gm_pFullScreenCheckBox->mg_bValue;
+  INDEX iAspectRatio = gmCurrent.gm_pAspectRatioTrigger->mg_iSelected;
   SScreenResolution *ppaWidths = NULL;
 
   // If window
@@ -342,7 +342,7 @@ static void FillResolutionsList(void)
   } else {
     // get resolutions list from engine
     CDisplayMode *pdm = _pGfx->EnumDisplayModes(_ctResolutions,
-      SwitchToAPI(gmCurrent.gm_mgDisplayAPITrigger.mg_iSelected), gmCurrent.gm_mgDisplayAdaptersTrigger.mg_iSelected);
+      SwitchToAPI(gmCurrent.gm_pDisplayAPITrigger->mg_iSelected), gmCurrent.gm_pDisplayAdaptersTrigger->mg_iSelected);
 
     // allocate that much
     _astrResolutionTexts = new CTString[_ctResolutions];
@@ -354,8 +354,8 @@ static void FillResolutionsList(void)
     }
   }
 
-  gmCurrent.gm_mgResolutionsTrigger.mg_astrTexts = _astrResolutionTexts;
-  gmCurrent.gm_mgResolutionsTrigger.mg_ctTexts = _ctResolutions;
+  gmCurrent.gm_pResolutionsTrigger->mg_astrTexts = _astrResolutionTexts;
+  gmCurrent.gm_pResolutionsTrigger->mg_ctTexts = _ctResolutions;
 }
 
 static void FillAdaptersList(void)
@@ -368,15 +368,15 @@ static void FillAdaptersList(void)
 
   _ctAdapters = 0;
 
-  INDEX iApi = SwitchToAPI(gmCurrent.gm_mgDisplayAPITrigger.mg_iSelected);
+  INDEX iApi = SwitchToAPI(gmCurrent.gm_pDisplayAPITrigger->mg_iSelected);
   _ctAdapters = _pGfx->gl_gaAPI[iApi].ga_ctAdapters;
   _astrAdapterTexts = new CTString[_ctAdapters];
   for (INDEX iAdapter = 0; iAdapter<_ctAdapters; iAdapter++) {
     _astrAdapterTexts[iAdapter] = _pGfx->gl_gaAPI[iApi].ga_adaAdapter[iAdapter].da_strRenderer;
   }
 
-  gmCurrent.gm_mgDisplayAdaptersTrigger.mg_astrTexts = _astrAdapterTexts;
-  gmCurrent.gm_mgDisplayAdaptersTrigger.mg_ctTexts = _ctAdapters;
+  gmCurrent.gm_pDisplayAdaptersTrigger->mg_astrTexts = _astrAdapterTexts;
+  gmCurrent.gm_pDisplayAdaptersTrigger->mg_ctTexts = _ctAdapters;
 }
 
 extern void UpdateVideoOptionsButtons(INDEX iSelected)
@@ -393,56 +393,56 @@ extern void UpdateVideoOptionsButtons(INDEX iSelected)
   ASSERT(bOGLEnabled);
 #endif // SE1_D3D
 
-  CDisplayAdapter &da = _pGfx->gl_gaAPI[SwitchToAPI(gmCurrent.gm_mgDisplayAPITrigger.mg_iSelected)]
-    .ga_adaAdapter[gmCurrent.gm_mgDisplayAdaptersTrigger.mg_iSelected];
+  CDisplayAdapter &da = _pGfx->gl_gaAPI[SwitchToAPI(gmCurrent.gm_pDisplayAPITrigger->mg_iSelected)]
+    .ga_adaAdapter[gmCurrent.gm_pDisplayAdaptersTrigger->mg_iSelected];
 
   // number of available preferences is higher if video setup is custom
-  gmCurrent.gm_mgDisplayPrefsTrigger.mg_ctTexts = 3;
-  if (sam_iVideoSetup == 3) gmCurrent.gm_mgDisplayPrefsTrigger.mg_ctTexts++;
+  gmCurrent.gm_pDisplayPrefsTrigger->mg_ctTexts = 3;
+  if (sam_iVideoSetup == 3) gmCurrent.gm_pDisplayPrefsTrigger->mg_ctTexts++;
 
   // enumerate adapters
   FillAdaptersList();
 
   // show or hide buttons
-  gmCurrent.gm_mgDisplayAPITrigger.SetEnabled(bOGLEnabled
+  gmCurrent.gm_pDisplayAPITrigger->SetEnabled(bOGLEnabled
 #ifdef SE1_D3D
     && bD3DEnabled
 #endif // SE1_D3D
     );
-  gmCurrent.gm_mgDisplayAdaptersTrigger.SetEnabled(_ctAdapters > 1);
-  gmCurrent.gm_mgApply.SetEnabled(_bVideoOptionsChanged);
+  gmCurrent.gm_pDisplayAdaptersTrigger->SetEnabled(_ctAdapters > 1);
+  gmCurrent.gm_pApply->SetEnabled(_bVideoOptionsChanged);
   // determine which should be visible
 
-  gmCurrent.gm_mgFullScreenCheckBox.SetEnabled(TRUE);
+  gmCurrent.gm_pFullScreenCheckBox->SetEnabled(TRUE);
   if (da.da_ulFlags&DAF_FULLSCREENONLY) {
-    gmCurrent.gm_mgFullScreenCheckBox.SetEnabled(FALSE);
-    gmCurrent.gm_mgFullScreenCheckBox.mg_bValue = TRUE;
+    gmCurrent.gm_pFullScreenCheckBox->SetEnabled(FALSE);
+    gmCurrent.gm_pFullScreenCheckBox->mg_bValue = TRUE;
   }
 
-  gmCurrent.gm_mgBitsPerPixelTrigger.SetEnabled(TRUE);
+  gmCurrent.gm_pBitsPerPixelTrigger->SetEnabled(TRUE);
 
-  if (gmCurrent.gm_mgFullScreenCheckBox.mg_bValue == 0) {
-    gmCurrent.gm_mgBitsPerPixelTrigger.SetEnabled(FALSE);
-    gmCurrent.gm_mgBitsPerPixelTrigger.mg_iSelected = DepthToSwitch(DD_DEFAULT);
-    gmCurrent.gm_mgBitsPerPixelTrigger.ApplyCurrentSelection();
+  if (gmCurrent.gm_pFullScreenCheckBox->mg_bValue == 0) {
+    gmCurrent.gm_pBitsPerPixelTrigger->SetEnabled(FALSE);
+    gmCurrent.gm_pBitsPerPixelTrigger->mg_iSelected = DepthToSwitch(DD_DEFAULT);
+    gmCurrent.gm_pBitsPerPixelTrigger->ApplyCurrentSelection();
 
   } else if (da.da_ulFlags&DAF_16BITONLY) {
-    gmCurrent.gm_mgBitsPerPixelTrigger.SetEnabled(FALSE);
-    gmCurrent.gm_mgBitsPerPixelTrigger.mg_iSelected = DepthToSwitch(DD_16BIT);
-    gmCurrent.gm_mgBitsPerPixelTrigger.ApplyCurrentSelection();
+    gmCurrent.gm_pBitsPerPixelTrigger->SetEnabled(FALSE);
+    gmCurrent.gm_pBitsPerPixelTrigger->mg_iSelected = DepthToSwitch(DD_16BIT);
+    gmCurrent.gm_pBitsPerPixelTrigger->ApplyCurrentSelection();
   }
 
   // remember current selected resolution
   PIX pixSizeI, pixSizeJ;
-  ResolutionToSize(gmCurrent.gm_mgResolutionsTrigger.mg_iSelected, pixSizeI, pixSizeJ);
+  ResolutionToSize(gmCurrent.gm_pResolutionsTrigger->mg_iSelected, pixSizeI, pixSizeJ);
 
   // select same resolution again if possible
   FillResolutionsList();
-  SizeToResolution(pixSizeI, pixSizeJ, gmCurrent.gm_mgResolutionsTrigger.mg_iSelected);
+  SizeToResolution(pixSizeI, pixSizeJ, gmCurrent.gm_pResolutionsTrigger->mg_iSelected);
 
   // apply adapter and resolutions
-  gmCurrent.gm_mgDisplayAdaptersTrigger.ApplyCurrentSelection();
-  gmCurrent.gm_mgResolutionsTrigger.ApplyCurrentSelection();
+  gmCurrent.gm_pDisplayAdaptersTrigger->ApplyCurrentSelection();
+  gmCurrent.gm_pResolutionsTrigger->ApplyCurrentSelection();
 }
 
 extern void InitVideoOptionsButtons(void)
@@ -450,21 +450,22 @@ extern void InitVideoOptionsButtons(void)
   CVideoOptionsMenu &gmCurrent = _pGUIM->gmVideoOptionsMenu;
 
   // Fullscreen.
-  gmCurrent.gm_mgFullScreenCheckBox.mg_bValue = sam_bFullScreenActive ? 1 : 0;
+  gmCurrent.gm_pFullScreenCheckBox->mg_bValue = sam_bFullScreenActive ? 1 : 0;
 
-  gmCurrent.gm_mgDisplayAPITrigger.mg_iSelected = APIToSwitch((GfxAPIType)(INDEX)sam_iGfxAPI);
-  gmCurrent.gm_mgDisplayAdaptersTrigger.mg_iSelected = sam_iDisplayAdapter;
-  gmCurrent.gm_mgBitsPerPixelTrigger.mg_iSelected = DepthToSwitch((enum DisplayDepth)(INDEX)sam_iDisplayDepth);
+  gmCurrent.gm_pDisplayAPITrigger->mg_iSelected = APIToSwitch((GfxAPIType)(INDEX)sam_iGfxAPI);
+  gmCurrent.gm_pDisplayAdaptersTrigger->mg_iSelected = sam_iDisplayAdapter;
+  gmCurrent.gm_pBitsPerPixelTrigger->mg_iSelected = DepthToSwitch((enum DisplayDepth)(INDEX)sam_iDisplayDepth);
 
   FillResolutionsList();
-  SizeToResolution(sam_iScreenSizeI, sam_iScreenSizeJ, gmCurrent.gm_mgResolutionsTrigger.mg_iSelected);
-  gmCurrent.gm_mgDisplayPrefsTrigger.mg_iSelected = Clamp(int(sam_iVideoSetup), 0, 3);
+  SizeToResolution(sam_iScreenSizeI, sam_iScreenSizeJ, gmCurrent.gm_pResolutionsTrigger->mg_iSelected);
+  gmCurrent.gm_pDisplayPrefsTrigger->mg_iSelected = Clamp(int(sam_iVideoSetup), 0, 3);
 
-  gmCurrent.gm_mgDisplayPrefsTrigger.ApplyCurrentSelection();
-  gmCurrent.gm_mgDisplayAPITrigger.ApplyCurrentSelection();
-  gmCurrent.gm_mgDisplayAdaptersTrigger.ApplyCurrentSelection();
-  gmCurrent.gm_mgResolutionsTrigger.ApplyCurrentSelection();
-  gmCurrent.gm_mgBitsPerPixelTrigger.ApplyCurrentSelection();
+  // Apply triggers.
+  gmCurrent.gm_pDisplayPrefsTrigger->ApplyCurrentSelection();
+  gmCurrent.gm_pDisplayAPITrigger->ApplyCurrentSelection();
+  gmCurrent.gm_pDisplayAdaptersTrigger->ApplyCurrentSelection();
+  gmCurrent.gm_pResolutionsTrigger->ApplyCurrentSelection();
+  gmCurrent.gm_pBitsPerPixelTrigger->ApplyCurrentSelection();
 }
 
 extern void ApplyVideoOptions(void)
@@ -480,17 +481,17 @@ extern void ApplyVideoOptions(void)
   sam_old_iGfxAPI = sam_iGfxAPI;
   sam_old_iVideoSetup = sam_iVideoSetup;
 
-  BOOL bFullScreenMode = gmCurrent.gm_mgFullScreenCheckBox.mg_bValue == 1;
+  BOOL bFullScreenMode = gmCurrent.gm_pFullScreenCheckBox->mg_bValue == 1;
   PIX pixWindowSizeI, pixWindowSizeJ;
-  ResolutionToSize(gmCurrent.gm_mgResolutionsTrigger.mg_iSelected, pixWindowSizeI, pixWindowSizeJ);
-  enum GfxAPIType gat = SwitchToAPI(gmCurrent.gm_mgDisplayAPITrigger.mg_iSelected);
-  enum DisplayDepth dd = SwitchToDepth(gmCurrent.gm_mgBitsPerPixelTrigger.mg_iSelected);
-  const INDEX iAdapter = gmCurrent.gm_mgDisplayAdaptersTrigger.mg_iSelected;
+  ResolutionToSize(gmCurrent.gm_pResolutionsTrigger->mg_iSelected, pixWindowSizeI, pixWindowSizeJ);
+  enum GfxAPIType gat = SwitchToAPI(gmCurrent.gm_pDisplayAPITrigger->mg_iSelected);
+  enum DisplayDepth dd = SwitchToDepth(gmCurrent.gm_pBitsPerPixelTrigger->mg_iSelected);
+  const INDEX iAdapter = gmCurrent.gm_pDisplayAdaptersTrigger->mg_iSelected;
 
   // setup preferences
   extern INDEX _iLastPreferences;
   if (sam_iVideoSetup == 3) _iLastPreferences = 3;
-  sam_iVideoSetup = gmCurrent.gm_mgDisplayPrefsTrigger.mg_iSelected;
+  sam_iVideoSetup = gmCurrent.gm_pDisplayPrefsTrigger->mg_iSelected;
 
   // force fullscreen mode if needed
   CDisplayAdapter &da = _pGfx->gl_gaAPI[gat].ga_adaAdapter[iAdapter];
@@ -539,8 +540,8 @@ void RefreshServerListManually(void)
 extern void UpdateNetworkLevel(INDEX iDummy)
 {
   ValidateLevelForFlags(_pGame->gam_strCustomLevel,
-    GetSpawnFlagsForGameType(_pGUIM->gmNetworkStartMenu.gm_mgGameType.mg_iSelected));
-  _pGUIM->gmNetworkStartMenu.gm_mgLevel.mg_strText = FindLevelByFileName(_pGame->gam_strCustomLevel).li_strName;
+    GetSpawnFlagsForGameType(_pGUIM->gmNetworkStartMenu.gm_pGameType->mg_iSelected));
+  _pGUIM->gmNetworkStartMenu.gm_pLevel->mg_strText = FindLevelByFileName(_pGame->gam_strCustomLevel).li_strName;
 }
 
 // ------------------------ CSelectPlayersMenu implementation
@@ -570,42 +571,42 @@ extern void SelectPlayersFillMenu(void)
 
   INDEX *ai = _pGame->gm_aiMenuLocalPlayers;
 
-  gmCurrent.gm_mgPlayer0Change.mg_iLocalPlayer = 0;
-  gmCurrent.gm_mgPlayer1Change.mg_iLocalPlayer = 1;
-  gmCurrent.gm_mgPlayer2Change.mg_iLocalPlayer = 2;
-  gmCurrent.gm_mgPlayer3Change.mg_iLocalPlayer = 3;
+  gmCurrent.gm_pPlayer0Change->mg_iLocalPlayer = 0;
+  gmCurrent.gm_pPlayer1Change->mg_iLocalPlayer = 1;
+  gmCurrent.gm_pPlayer2Change->mg_iLocalPlayer = 2;
+  gmCurrent.gm_pPlayer3Change->mg_iLocalPlayer = 3;
 
   if (gmCurrent.gm_bAllowDedicated && _pGame->gm_MenuSplitScreenCfg == CGame::SSC_DEDICATED) {
-    gmCurrent.gm_mgDedicated.mg_iSelected = 1;
+    gmCurrent.gm_pDedicated->mg_iSelected = 1;
   } else {
-    gmCurrent.gm_mgDedicated.mg_iSelected = 0;
+    gmCurrent.gm_pDedicated->mg_iSelected = 0;
   }
 
-  gmCurrent.gm_mgDedicated.ApplyCurrentSelection();
+  gmCurrent.gm_pDedicated->ApplyCurrentSelection();
 
   if (gmCurrent.gm_bAllowObserving && _pGame->gm_MenuSplitScreenCfg == CGame::SSC_OBSERVER) {
-    gmCurrent.gm_mgObserver.mg_iSelected = 1;
+    gmCurrent.gm_pObserver->mg_iSelected = 1;
   } else {
-    gmCurrent.gm_mgObserver.mg_iSelected = 0;
+    gmCurrent.gm_pObserver->mg_iSelected = 0;
   }
 
-  gmCurrent.gm_mgObserver.ApplyCurrentSelection();
+  gmCurrent.gm_pObserver->ApplyCurrentSelection();
 
   if (_pGame->gm_MenuSplitScreenCfg >= CGame::SSC_PLAY1) {
-    gmCurrent.gm_mgSplitScreenCfg.mg_iSelected = _pGame->gm_MenuSplitScreenCfg;
-    gmCurrent.gm_mgSplitScreenCfg.ApplyCurrentSelection();
+    gmCurrent.gm_pSplitScreenCfg->mg_iSelected = _pGame->gm_MenuSplitScreenCfg;
+    gmCurrent.gm_pSplitScreenCfg->ApplyCurrentSelection();
   }
 
   BOOL bHasDedicated = gmCurrent.gm_bAllowDedicated;
   BOOL bHasObserver = gmCurrent.gm_bAllowObserving;
   BOOL bHasPlayers = TRUE;
 
-  if (bHasDedicated && gmCurrent.gm_mgDedicated.mg_iSelected) {
+  if (bHasDedicated && gmCurrent.gm_pDedicated->mg_iSelected) {
     bHasObserver = FALSE;
     bHasPlayers = FALSE;
   }
 
-  if (bHasObserver && gmCurrent.gm_mgObserver.mg_iSelected) {
+  if (bHasObserver && gmCurrent.gm_pObserver->mg_iSelected) {
     bHasPlayers = FALSE;
   }
 
@@ -614,17 +615,17 @@ extern void SelectPlayersFillMenu(void)
   INDEX i = 0;
 
   if (bHasDedicated) {
-    gmCurrent.gm_mgDedicated.Appear();
-    apmg[i++] = &gmCurrent.gm_mgDedicated;
+    gmCurrent.gm_pDedicated->Appear();
+    apmg[i++] = gmCurrent.gm_pDedicated;
   } else {
-    gmCurrent.gm_mgDedicated.Disappear();
+    gmCurrent.gm_pDedicated->Disappear();
   }
 
   if (bHasObserver) {
-    gmCurrent.gm_mgObserver.Appear();
-    apmg[i++] = &gmCurrent.gm_mgObserver;
+    gmCurrent.gm_pObserver->Appear();
+    apmg[i++] = gmCurrent.gm_pObserver;
   } else {
-    gmCurrent.gm_mgObserver.Disappear();
+    gmCurrent.gm_pObserver->Disappear();
   }
 
   for (INDEX iLocal = 0; iLocal<4; iLocal++) {
@@ -638,32 +639,40 @@ extern void SelectPlayersFillMenu(void)
     }
   }
 
-  gmCurrent.gm_mgPlayer0Change.Disappear();
-  gmCurrent.gm_mgPlayer1Change.Disappear();
-  gmCurrent.gm_mgPlayer2Change.Disappear();
-  gmCurrent.gm_mgPlayer3Change.Disappear();
+  gmCurrent.gm_pPlayer0Change->Disappear();
+  gmCurrent.gm_pPlayer1Change->Disappear();
+  gmCurrent.gm_pPlayer2Change->Disappear();
+  gmCurrent.gm_pPlayer3Change->Disappear();
 
   if (bHasPlayers) {
-    gmCurrent.gm_mgSplitScreenCfg.Appear();
-    apmg[i++] = &gmCurrent.gm_mgSplitScreenCfg;
-    gmCurrent.gm_mgPlayer0Change.Appear();
-    apmg[i++] = &gmCurrent.gm_mgPlayer0Change;
-    if (gmCurrent.gm_mgSplitScreenCfg.mg_iSelected >= 1) {
-      gmCurrent.gm_mgPlayer1Change.Appear();
-      apmg[i++] = &gmCurrent.gm_mgPlayer1Change;
+    gmCurrent.gm_pSplitScreenCfg->Appear();
+    apmg[i++] = gmCurrent.gm_pSplitScreenCfg;
+    
+    // We have atleast 1 player.
+    gmCurrent.gm_pPlayer0Change->Appear();
+    apmg[i++] = gmCurrent.gm_pPlayer0Change;
+    
+    // 1+
+    if (gmCurrent.gm_pSplitScreenCfg->mg_iSelected >= 1) {
+      gmCurrent.gm_pPlayer1Change->Appear();
+      apmg[i++] = gmCurrent.gm_pPlayer1Change;
     }
-    if (gmCurrent.gm_mgSplitScreenCfg.mg_iSelected >= 2) {
-      gmCurrent.gm_mgPlayer2Change.Appear();
-      apmg[i++] = &gmCurrent.gm_mgPlayer2Change;
+    
+    // 2+
+    if (gmCurrent.gm_pSplitScreenCfg->mg_iSelected >= 2) {
+      gmCurrent.gm_pPlayer2Change->Appear();
+      apmg[i++] = gmCurrent.gm_pPlayer2Change;
     }
-    if (gmCurrent.gm_mgSplitScreenCfg.mg_iSelected >= 3) {
-      gmCurrent.gm_mgPlayer3Change.Appear();
-      apmg[i++] = &gmCurrent.gm_mgPlayer3Change;
+    
+    // 3+
+    if (gmCurrent.gm_pSplitScreenCfg->mg_iSelected >= 3) {
+      gmCurrent.gm_pPlayer3Change->Appear();
+      apmg[i++] = gmCurrent.gm_pPlayer3Change;
     }
   } else {
-    gmCurrent.gm_mgSplitScreenCfg.Disappear();
+    gmCurrent.gm_pSplitScreenCfg->Disappear();
   }
-  apmg[i++] = &gmCurrent.gm_mgStart;
+  apmg[i++] = gmCurrent.gm_pStart;
 
   // relink
   for (INDEX img = 0; img<8; img++) {
@@ -686,15 +695,15 @@ extern void SelectPlayersFillMenu(void)
     apmg[img]->mg_pmgDown = apmg[imgSucc];
   }
 
-  gmCurrent.gm_mgPlayer0Change.SetPlayerText();
-  gmCurrent.gm_mgPlayer1Change.SetPlayerText();
-  gmCurrent.gm_mgPlayer2Change.SetPlayerText();
-  gmCurrent.gm_mgPlayer3Change.SetPlayerText();
+  gmCurrent.gm_pPlayer0Change->SetPlayerText();
+  gmCurrent.gm_pPlayer1Change->SetPlayerText();
+  gmCurrent.gm_pPlayer2Change->SetPlayerText();
+  gmCurrent.gm_pPlayer3Change->SetPlayerText();
 
-  if (bHasPlayers && gmCurrent.gm_mgSplitScreenCfg.mg_iSelected >= 1) {
-    gmCurrent.gm_mgNotes.mg_strText = TRANS("Make sure you set different controls for each player!");
+  if (bHasPlayers && gmCurrent.gm_pSplitScreenCfg->mg_iSelected >= 1) {
+    gmCurrent.gm_pNotes->mg_strText = TRANS("Make sure you set different controls for each player!");
   } else {
-    gmCurrent.gm_mgNotes.mg_strText = "";
+    gmCurrent.gm_pNotes->mg_strText = "";
   }
 }
 

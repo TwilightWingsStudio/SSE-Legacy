@@ -28,14 +28,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class CCustomizeAxisMenu : public CGameMenu
 {
   public:
-    CMGTitle gm_mgTitle;
-    CMGTrigger gm_mgActionTrigger;
-    CMGTrigger gm_mgMountedTrigger;
-    CMGSlider gm_mgSensitivity;
-    CMGSlider gm_mgDeadzone;
-    CMGTrigger gm_mgInvertTrigger;
-    CMGTrigger gm_mgRelativeTrigger;
-    CMGTrigger gm_mgSmoothTrigger;
+    CMGTitle *gm_pTitle;
+    CMGTrigger *gm_pActionTrigger;
+    CMGTrigger *gm_pMountedTrigger;
+    CMGSlider *gm_pSensitivity;
+    CMGSlider *gm_pDeadzone;
+    CMGTrigger *gm_pInvertTrigger;
+    CMGTrigger *gm_pRelativeTrigger;
+    CMGTrigger *gm_pSmoothTrigger;
 
   public:
     ~CCustomizeAxisMenu(void);

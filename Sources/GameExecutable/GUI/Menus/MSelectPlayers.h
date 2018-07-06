@@ -32,20 +32,20 @@ class CSelectPlayersMenu : public CGameMenu
     BOOL gm_bAllowDedicated;
     BOOL gm_bAllowObserving;
 
-    CMGTitle gm_mgTitle;
+    CMGTitle *gm_pTitle;
 
-    CMGTrigger gm_mgDedicated;
-    CMGTrigger gm_mgObserver;
-    CMGTrigger gm_mgSplitScreenCfg;
+    CMGTrigger *gm_pDedicated;
+    CMGTrigger *gm_pObserver;
+    CMGTrigger *gm_pSplitScreenCfg;
 
-    CMGChangePlayer gm_mgPlayer0Change;
-    CMGChangePlayer gm_mgPlayer1Change;
-    CMGChangePlayer gm_mgPlayer2Change;
-    CMGChangePlayer gm_mgPlayer3Change;
+    CMGChangePlayer *gm_pPlayer0Change;
+    CMGChangePlayer *gm_pPlayer1Change;
+    CMGChangePlayer *gm_pPlayer2Change;
+    CMGChangePlayer *gm_pPlayer3Change;
 
-    CMGButton gm_mgNotes;
+    CMGButton *gm_pNotes;
 
-    CMGButton gm_mgStart;
+    CMGButton *gm_pStart;
 
   public:
     void Initialize_t(void);

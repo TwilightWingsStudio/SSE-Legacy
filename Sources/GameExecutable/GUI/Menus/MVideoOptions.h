@@ -25,16 +25,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class CVideoOptionsMenu : public CGameMenu
 {
   public:
-    CMGTitle gm_mgTitle;
-    CMGTrigger gm_mgDisplayAPITrigger;
-    CMGTrigger gm_mgDisplayAdaptersTrigger;
-    CMGCheckBox gm_mgFullScreenCheckBox;
-    CMGTrigger gm_mgAspectRatioTrigger;
-    CMGTrigger gm_mgResolutionsTrigger;
-    CMGTrigger gm_mgDisplayPrefsTrigger;
-    CMGButton gm_mgVideoRendering;
-    CMGTrigger gm_mgBitsPerPixelTrigger;
-    CMGButton gm_mgApply;
+    CMGTitle *gm_pTitle;
+    CMGTrigger *gm_pDisplayAPITrigger;
+    CMGTrigger *gm_pDisplayAdaptersTrigger;
+    CMGCheckBox *gm_pFullScreenCheckBox;
+    CMGTrigger *gm_pAspectRatioTrigger;
+    CMGTrigger *gm_pResolutionsTrigger;
+    CMGTrigger *gm_pDisplayPrefsTrigger;
+    CMGButton *gm_pVideoRendering;
+    CMGTrigger *gm_pBitsPerPixelTrigger;
+    CMGButton *gm_pApply;
 
   public:
     void StartMenu(void);

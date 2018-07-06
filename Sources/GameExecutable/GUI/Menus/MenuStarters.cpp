@@ -392,7 +392,7 @@ void StartSelectLevelFromNetwork(void)
 {
   CLevelsMenu &gmCurrent = _pGUIM->gmLevelsMenu;
 
-  FilterLevels(GetSpawnFlagsForGameType(_pGUIM->gmNetworkStartMenu.gm_mgGameType.mg_iSelected));
+  FilterLevels(GetSpawnFlagsForGameType(_pGUIM->gmNetworkStartMenu.gm_pGameType->mg_iSelected));
   void StartNetworkStartMenu(void);
   _pAfterLevelChosen = StartNetworkStartMenu;
   ChangeToMenu(&gmCurrent);

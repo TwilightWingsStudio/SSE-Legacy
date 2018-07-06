@@ -35,7 +35,7 @@ void CSplitStartMenu::Initialize_t(void)
   // Initialize "Game type" trigger.
   gm_pGameType = new CMGTrigger(TRANS("Game type:"));
   gm_pGameType->mg_strTip = TRANS("choose type of multiplayer game");
-  gm_pGameType->mg_boxOnScreen = BoxMediumRow(3);
+  gm_pGameType->mg_boxOnScreen = BoxMediumRow(0);
   gm_pGameType->mg_astrTexts = astrGameTypeRadioTexts;
   gm_pGameType->mg_ctTexts = ctGameTypeRadioTexts;
   gm_pGameType->mg_strValue = astrGameTypeRadioTexts[0];
@@ -43,7 +43,7 @@ void CSplitStartMenu::Initialize_t(void)
   // Initialize "Difficulty" trigger.
   gm_pDifficulty = new CMGTrigger(TRANS("Difficulty:"));
   gm_pDifficulty->mg_strTip = TRANS("choose difficulty level");
-  gm_pDifficulty->mg_boxOnScreen = BoxMediumRow(3);
+  gm_pDifficulty->mg_boxOnScreen = BoxMediumRow(1);
   gm_pDifficulty->mg_astrTexts = astrDifficultyRadioTexts;
   gm_pDifficulty->mg_ctTexts = sizeof(astrDifficultyRadioTexts) / sizeof(astrDifficultyRadioTexts[0]);
   gm_pDifficulty->mg_strValue = astrDifficultyRadioTexts[0];

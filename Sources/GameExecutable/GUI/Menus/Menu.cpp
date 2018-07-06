@@ -347,7 +347,7 @@ void InitializeMenus(void)
 
     _pGUIM->gmCustomizeAxisMenu.Initialize_t();
     _pGUIM->gmCustomizeAxisMenu.gm_strName = "CustomizeAxis";
-    _pGUIM->gmCustomizeAxisMenu.gm_pmgSelectedByDefault = &_pGUIM->gmCustomizeAxisMenu.gm_mgActionTrigger;
+    _pGUIM->gmCustomizeAxisMenu.gm_pmgSelectedByDefault = _pGUIM->gmCustomizeAxisMenu.gm_pActionTrigger;
     _pGUIM->gmCustomizeAxisMenu.gm_pgmParentMenu = &_pGUIM->gmControls;
 
     _pGUIM->gmOptionsMenu.Initialize_t();
@@ -357,7 +357,7 @@ void InitializeMenus(void)
 
     _pGUIM->gmVideoOptionsMenu.Initialize_t();
     _pGUIM->gmVideoOptionsMenu.gm_strName = "VideoOptions";
-    _pGUIM->gmVideoOptionsMenu.gm_pmgSelectedByDefault = &_pGUIM->gmVideoOptionsMenu.gm_mgDisplayAPITrigger;
+    _pGUIM->gmVideoOptionsMenu.gm_pmgSelectedByDefault = _pGUIM->gmVideoOptionsMenu.gm_pDisplayAPITrigger;
     _pGUIM->gmVideoOptionsMenu.gm_pgmParentMenu = &_pGUIM->gmOptionsMenu;
 
     _pGUIM->gmAudioOptionsMenu.Initialize_t();
@@ -387,7 +387,7 @@ void InitializeMenus(void)
 
     _pGUIM->gmNetworkStartMenu.Initialize_t();
     _pGUIM->gmNetworkStartMenu.gm_strName = "NetworkStart";
-    _pGUIM->gmNetworkStartMenu.gm_pmgSelectedByDefault = &_pGUIM->gmNetworkStartMenu.gm_mgStart;
+    _pGUIM->gmNetworkStartMenu.gm_pmgSelectedByDefault = _pGUIM->gmNetworkStartMenu.gm_pStart;
     _pGUIM->gmNetworkStartMenu.gm_pgmParentMenu = &_pGUIM->gmNetworkMenu;
 
     _pGUIM->gmNetworkJoinMenu.Initialize_t();
@@ -399,7 +399,7 @@ void InitializeMenus(void)
     _pGUIM->gmSelectPlayersMenu.gm_bAllowObserving = FALSE;
     _pGUIM->gmSelectPlayersMenu.Initialize_t();
     _pGUIM->gmSelectPlayersMenu.gm_strName = "SelectPlayers";
-    _pGUIM->gmSelectPlayersMenu.gm_pmgSelectedByDefault = &_pGUIM->gmSelectPlayersMenu.gm_mgStart;
+    _pGUIM->gmSelectPlayersMenu.gm_pmgSelectedByDefault = _pGUIM->gmSelectPlayersMenu.gm_pStart;
 
     _pGUIM->gmNetworkOpenMenu.Initialize_t();
     _pGUIM->gmNetworkOpenMenu.gm_strName = "NetworkOpen";

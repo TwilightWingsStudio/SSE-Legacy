@@ -29,18 +29,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class CNetworkStartMenu : public CGameMenu
 {
   public:
-    CMGTitle gm_mgTitle;
-    CMGEdit gm_mgSessionName;
-    CMGTrigger gm_mgGameType;
-    CMGTrigger gm_mgDifficulty;
-    CMGButton gm_mgLevel;
-    CMGTrigger gm_mgMinPlayers;
-    CMGTrigger gm_mgMaxPlayers;
-    //CMGTrigger gm_mgWaitAllPlayers;
-    CMGTrigger gm_mgVisible;
-    CMGButton gm_mgGameOptions;
-    CMGButton gm_mgGameMutators;
-    CMGButton gm_mgStart;
+    CMGTitle *gm_pTitle;
+    CMGEdit *gm_pSessionName;
+    CMGTrigger *gm_pGameType;
+    CMGTrigger *gm_pDifficulty;
+    CMGButton *gm_pLevel;
+    CMGTrigger *gm_pMinPlayers;
+    CMGTrigger *gm_pMaxPlayers;
+    //CMGTrigger *gm_pWaitAllPlayers;
+    CMGTrigger *gm_pVisible;
+    CMGButton *gm_pGameOptions;
+    CMGButton *gm_pGameMutators;
+    CMGButton *gm_pStart;
 
   public:
     void Initialize_t(void);
