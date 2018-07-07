@@ -381,7 +381,7 @@ void CGame::SetMultiPlayerSession(CSessionProperties &sp)
     sp.sp_ulPickedKeys = 0;
     //
 
-    sp.sp_bSniperFullDamageInNoScope = FALSE; // [SSE] Gameplay - Sniper No Scope
+    sp.sp_bSniperFullDamageInNoScope = gam_bSniperFullDamageInNoScope; // [SSE] Gameplay - Sniper No Scope
     
     sp.sp_iScoreLimit = 0;
     sp.sp_iFragLimit  = 0;
