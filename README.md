@@ -28,6 +28,17 @@ This fork is created for extra features which are focused on improving gameplay 
 
 For some reasons these features are not added into Official repository. But I wish that in some day my project will become superior than Official.
 
+Overall changes
+---------------
+ - Code cleanup and refactor in many places.
+ - Engine's filesystem reworked to have more organized view.
+ - More than 30 new entities for building maps.
+ - Improved master-server support.
+   - Now engine supports DarkPlaces protocol. So `dpmaster` open-source master-server program can be used instead of any ugly-coded GameSpy protocol emulators.
+ - New gameplay options which you can setup during server startup. (TDM, mutators, etc.)
+ - Improved, but not ideal support for widescreen resolutions.
+ - Discord Rich Presence integration.
+ 
 ========================
 
 Here is Serious Engine v.1.10 source code, including the following projects:
