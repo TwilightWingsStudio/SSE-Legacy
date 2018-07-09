@@ -80,7 +80,7 @@ void CVideoOptionsMenu::Initialize_t(void)
   gm_pBitsPerPixelTrigger->mg_strTip = TRANS("select number of colors used for display");
   gm_pBitsPerPixelTrigger->mg_boxOnScreen = BoxMediumRow(6.0f);
   gm_pBitsPerPixelTrigger->mg_astrTexts = astrBitsPerPixelRadioTexts;
-  gm_pAspectRatioTrigger->mg_ctTexts = sizeof(astrBitsPerPixelRadioTexts) / sizeof(astrBitsPerPixelRadioTexts[0]);
+  gm_pBitsPerPixelTrigger->mg_ctTexts = sizeof(astrBitsPerPixelRadioTexts) / sizeof(astrBitsPerPixelRadioTexts[0]);
 
   // Initialize "Rendering Options" button.
   gm_pVideoRendering = new CMGButton(TRANS("RENDERING OPTIONS"));

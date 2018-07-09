@@ -46,32 +46,6 @@ extern CTString astrDisplayAspectRatioTexts[] = {
   //CTString("21:9"),  
 };
 
-extern PIX apixWidths[][2] = {
-  320, 240, // 4:3
-  400, 300, // 4:3
-  512, 384, // 4:3
-  640, 240, // 8:3
-  640, 480, // 4:3
-  720, 540, // 4:3
-  800, 300, // 8:3
-  800, 600, // 4:3
-  960, 720, // 4:3
-  1024, 384, // 8:3
-  1024, 768, // 4:3
-  1152, 864, // 4:3
-  1280, 480, // 8:3
-  1280, 720, // HD 16:9
-  1280, 960, // 4:3
-  1280, 1024, // 5:4
-  1600, 600,  // 8:3
-  1600, 1200, // 4:3
-  1920, 720,  // 8:3
-  1920, 1080, // FHD 16:9
-  1920, 1440, // 4:3
-  2048, 786,  // ?
-  2048, 1536, // 4:3
-};
-
 extern SScreenResolution asWidths4x3[] = {
   SScreenResolution(320, 240),
   SScreenResolution(400, 300),
@@ -89,6 +63,7 @@ extern SScreenResolution asWidths4x3[] = {
 };
 
 extern SScreenResolution asWidths5x4[] = {
+  SScreenResolution(720, 576),
   SScreenResolution(1280, 1024),
 };
 

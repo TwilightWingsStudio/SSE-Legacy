@@ -38,6 +38,19 @@ static CDisplayMode *_admResolutionModes = NULL;
 static CTString GetResolutionDescription(CDisplayMode &dm)
 {
   CTString str;
+  
+  // 4:3
+  if (dm.dm_pixSizeI * 3 == dm.dm_pixSizeJ * 4) {
+    str.PrintF("%dx%d (4:3)", dm.dm_pixSizeI, dm.dm_pixSizeJ);
+    return str;
+  }
+
+  // 16:9
+  if (dm.dm_pixSizeI * 9 == dm.dm_pixSizeJ * 16) {
+    str.PrintF("%dx%d (16:9)", dm.dm_pixSizeI, dm.dm_pixSizeJ);
+    return str;
+  }
+  
   // if dual head
   if (dm.IsDualHead()) {
     str.PrintF(TRANS("%dx%d double"), dm.dm_pixSizeI / 2, dm.dm_pixSizeJ);
@@ -48,6 +61,7 @@ static CTString GetResolutionDescription(CDisplayMode &dm)
   } else {
     str.PrintF("%dx%d", dm.dm_pixSizeI, dm.dm_pixSizeJ);
   }
+
   return str;
 }
 

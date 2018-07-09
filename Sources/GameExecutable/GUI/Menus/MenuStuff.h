@@ -63,10 +63,9 @@ struct SScreenResolution
 };
 
 extern CTString astrDisplayAspectRatioTexts[4];
-extern PIX apixWidths[23][2];
 
 extern SScreenResolution asWidths4x3[13];
-extern SScreenResolution asWidths5x4[1];
+extern SScreenResolution asWidths5x4[2];
 extern SScreenResolution asWidths16x9[9];
 extern SScreenResolution asWidths16x10[4];
 
