@@ -83,7 +83,7 @@ Do not use spaces, non-latin letters or special symbols such as ()+/[]' in the p
 
 To build Serious Engine 1, you'll need Visual Studio 2013 or 2015, Professional or Community edition ( https://www.visualstudio.com/post-download-vs?sku=community ).
 
-WARNING: If you will use Visual Studio higher or lower than 2013 then you can encounter bugs. Also game compiled with newer or older version of Visual Studio may be network incompatible with game compiled in VS 2013.
+WARNING: If you will use Visual Studio higher or lower than 2013 then you can encounter bugs (rotating camera, crashes etc.). Also game compiled with newer or older version of Visual Studio may be network incompatible with game compiled in VS 2013.
 
 **Building the Lua library.**
 
@@ -92,6 +92,12 @@ Once you've installed Visual Studio and (optionally) DirectX8 SDK.
  - Command prompt directory should be `/Sources/luajit/src`.
    - Use `cd /d <path>` command to navigate there.
  - Run msvcbuild.bat (located in `/Sources/luajit/src`) to build luajit library.
+ - Once it compiled go into `/Sources/luajit/src/`.
+ - Copy `lua51.lib` into `/Source/Engine/`.
+ - Copy `lua51.dll` into `/Bin/` and `/Bin/Debug/` directories.
+ 
+We don't include project files for LuaJit because you should compile it just ONCE.
+Also, making project files can make everything complicated if dependency should be updated.
 
 **Building the engine.**
 
@@ -115,7 +121,7 @@ DiscordRichPresence binaries are not included into repository. You can take comp
 Running
 -------
 
-This version of the engine comes with a set of resources (`/SE1_10.GRO`) that allow you to freely use the engine without any additional resources required. However if you want to open or modify levels from Serious Sam Classic: The First Encounter or The Second Encounter (including most user-made levels), you will have to copy the game's resources (.GRO files) into the engine folder. You can buy the original games on Steam, as a part of a bundle with Serious Sam Revolution ( http://store.steampowered.com/app/227780 )
+This version of the engine comes with a set of resources (`/SE1_10.GRO`) that allow you to freely use the engine without any additional resources required. However if you want to open or modify levels from Serious Sam Classic: The First Encounter or The Second Encounter (including most user-made levels), you will have to copy the game's resources (.GRO files) into the engine folder (`/Content/Base/`). You can buy the original games on Steam, as a part of a bundle with Serious Sam Revolution ( http://store.steampowered.com/app/227780 )
 
 WARNING: If you will try to run original The First Encounter levels or custom maps made for TFE then you need to resave them in the Serious Editor 1.07/1.10 or you will have not working scripts on levels.
 
