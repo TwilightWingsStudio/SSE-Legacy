@@ -21,6 +21,24 @@
 ##### Don't confuse with damned Revolution!
 ========================
 
+This project has been discontinued! You may ask - Why?  
+Following explanation may look stupid, but it is truth.  
+Were made critical flaws in the beginning and during the development. This problems can't be simply fixed in context of this project.
+
+Examples of flaws:
+ - Changes like files relocation should be done in beginning. Not later. Relocation causes losing of Git history for each relocated file.
+ - Entire codebase (I mean EACH file in the repository) should be pure clean, commented and documented before adding anything new.
+   - In this project some parts are cleaned up, some - partially, some - not. And we have unreadable mass because code have different purity.
+ - The Engine and Game should be split projects and be developed parallely.
+   - Here is they are not.
+ - Unstable code and really unfinished concepts should NOT be in repository before they are polished.
+   - Here we have a lot of features, but each has different progress of implementation.
+
+Hey! But even negative result is a result too! And it is not the end.
+So... It was simplier to start a new projects and work on them CORRECTLY from the beginning.
+
+---------------
+
 This is the unofficial fork of Serious Engine 1.
 This fork will be always synchronized with the official repository - https://github.com/Croteam-official/Serious-Engine.
 
